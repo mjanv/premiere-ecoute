@@ -50,8 +50,5 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
     create index(:listening_sessions, [:album_spotify_id])
     create index(:listening_sessions, [:current_track_spotify_id])
     create index(:listening_sessions, [:status])
-
-    # Add foreign key constraints
-           )
   end
 end
