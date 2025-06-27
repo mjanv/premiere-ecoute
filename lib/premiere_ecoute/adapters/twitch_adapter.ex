@@ -76,7 +76,7 @@ defmodule PremiereEcoute.Adapters.TwitchAdapter do
         poll_url = "#{@twitch_api_base}/polls"
 
         formatted_choices =
-          Enum.with_index(options, fn option, index ->
+          Enum.with_index(options, fn option, _index ->
             %{title: option}
           end)
 
