@@ -30,6 +30,38 @@ defmodule PremiereEcoute.MixProject do
 
   # Specifies your project dependencies.
   #
+  # Type `mix help deps` fordefmodule PremiereEcoute.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :premiere_ecoute,
+      version: "0.1.0",
+      elixir: "~> 1.15",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
+      deps: deps(),
+      listeners: [Phoenix.CodeReloader]
+    ]
+  end
+
+  # Configuration for the OTP application.
+  #
+  # Type `mix help compile.app` for more information.
+  def application do
+    [
+      mod: {PremiereEcoute.Application, []},
+      extra_applications: [:logger, :runtime_tools]
+    ]
+  end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  # Specifies your project dependencies.
+  #
   # Type `mix help deps` for examples and options.
   defp deps do
     [
@@ -61,7 +93,9 @@ defmodule PremiereEcoute.MixProject do
       {:bandit, "~> 1.5"},
       {:oauth2, "~> 2.0"},
       {:tesla, "~> 1.4"},
-      {:broadway, "~> 1.0"}
+      {:broadway, "~> 1.0"},
+      {:ueberauth, "~> 0.10"},
+      {:ueberauth_twitch, "~> 0.1"}
     ]
   end
 
