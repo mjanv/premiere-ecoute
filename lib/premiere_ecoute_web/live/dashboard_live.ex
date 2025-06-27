@@ -53,6 +53,8 @@ defmodule PremiereEcouteWeb.DashboardLive do
         {:noreply,
          socket
          |> assign(:selected_album, album)
+         |> assign(:search_results, [])
+         |> assign(:loading, false)
          |> put_flash(:info, "Album selected: #{album.name}")}
 
       {:error, reason} ->
