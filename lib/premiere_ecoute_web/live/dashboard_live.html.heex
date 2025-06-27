@@ -199,65 +199,69 @@
             </div>
           </div>
           
-<!-- Current Track Voting -->
+<!-- Current Track Voting from Twitch -->
           <%= if @current_track do %>
             <div class="bg-gray-800 rounded-lg p-6 mb-6">
-              <h3 class="text-xl font-semibold mb-4 text-purple-300">Current Track Rating</h3>
-              
-<!-- Streamer Vote -->
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Your Rating (Streamer)
-                </label>
-                <div class="flex space-x-2">
-                  <%= if Map.get(@track_votes, @current_track.spotify_id) do %>
-                    <button class="w-12 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold transition-colors">
-                      {Map.get(@track_votes, @current_track.spotify_id)}
-                    </button>
-                  <% end %>
-                  <div class="flex space-x-1">
-                    <%= for vote_value <- 1..10 do %>
-                      <button
-                        class={[
-                          "w-8 h-8 rounded text-sm transition-colors",
-                          (Map.get(@track_votes, @current_track.spotify_id) == vote_value &&
-                             "bg-purple-600 text-white") ||
-                            "bg-gray-700 hover:bg-gray-600 text-white"
-                        ]}
-                        phx-click="cast_vote"
-                        phx-value-value={vote_value}
-                      >
-                        {vote_value}
-                      </button>
-                    <% end %>
-                  </div>
-                </div>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-purple-300">Live Twitch Voting</h3>
+                <%= if @twitch_poll_id do %>
+                  <span class="text-sm text-green-400 bg-green-900/30 px-2 py-1 rounded">
+                    Poll Active: {@twitch_poll_id}
+                  </span>
+                <% else %>
+                  <span class="text-sm text-gray-400">No active poll</span>
+                <% end %>
               </div>
               
-<!-- Live Vote Visualization -->
+<!-- Twitch Poll Visualization -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-3">
-                  Live Viewer Votes
+                  Live Twitch Poll Results for "{@current_track.name}"
                 </label>
                 <div class="grid grid-cols-10 gap-2 mb-3">
                   <%= for vote_value <- 1..10 do %>
                     <div class="text-center">
                       <div class="h-16 bg-gray-700 rounded-lg flex items-end">
                         <div class={[
-                          "w-full rounded-b-lg",
-                          get_vote_height(vote_value),
+                          "w-full rounded-b-lg transition-all duration-500",
+                          get_vote_height(vote_value, @poll_results),
                           get_vote_color(vote_value)
                         ]}>
                         </div>
                       </div>
                       <span class="text-xs text-gray-400 mt-1">{vote_value}</span>
+                      <span class="text-xs text-purple-300 block">
+                        {get_vote_count(vote_value, @poll_results)}
+                      </span>
                     </div>
                   <% end %>
                 </div>
                 <div class="text-center">
-                  <span class="text-2xl font-bold text-purple-400">7.2</span>
-                  <span class="text-gray-400 ml-2">Average Score ({@active_voters} votes)</span>
+                  <span class="text-2xl font-bold text-purple-400">
+                    {calculate_average_score(@poll_results, @chat_votes)}
+                  </span>
+                  <span class="text-gray-400 ml-2">
+                    Average Score ({@active_voters} votes from poll + chat)
+                  </span>
                 </div>
+              </div>
+              
+<!-- Chat Vote Commands -->
+              <div class="mt-6 p-4 bg-gray-700/50 rounded-lg">
+                <h4 class="text-sm font-medium text-purple-300 mb-2">
+                  Chat Vote Commands ({map_size(@chat_votes)} chat votes)
+                </h4>
+                <p class="text-sm text-gray-400">
+                  Viewers can vote in chat with:
+                  <code class="bg-purple-900/30 px-1 rounded">!vote 8</code>
+                </p>
+                <%= if map_size(@chat_votes) > 0 do %>
+                  <div class="mt-2 text-xs text-gray-500">
+                    Recent chat votes: {Enum.take(@chat_votes, 5)
+                    |> Enum.map(fn {user, vote} -> "#{user}:#{vote}" end)
+                    |> Enum.join(", ")}
+                  </div>
+                <% end %>
               </div>
             </div>
           <% end %>
@@ -295,7 +299,15 @@
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
               <h3 class="text-xl font-medium mb-2">No Active Session</h3>
-              <p>Select an album and start a listening session to begin rating tracks</p>
+              <p>
+                Select an album and start a listening session to begin rating tracks via Twitch
+              </p>
+              <div class="mt-4 p-3 bg-purple-900/20 rounded-lg">
+                <p class="text-sm text-purple-300">
+                  💡 Voting happens via Twitch polls and chat commands like
+                  <code class="bg-purple-900/30 px-1 rounded">!vote 8</code>
+                </p>
+              </div>
             </div>
           </div>
         <% end %>
@@ -312,7 +324,11 @@
             <p class="text-sm text-gray-400">Active Voters</p>
           </div>
           <div class="bg-gray-700 rounded-lg p-4">
-            <div class="text-2xl font-bold text-purple-400">8.3</div>
+            <div class="text-2xl font-bold text-purple-400">
+              {if @current_session,
+                do: calculate_average_score(@poll_results, @chat_votes),
+                else: "0.0"}
+            </div>
             <p class="text-sm text-gray-400">Album Average</p>
           </div>
           <%= if @current_track && @selected_album do %>
@@ -326,6 +342,19 @@
               <p class="text-sm text-gray-400">Current Track</p>
             </div>
           <% end %>
+          
+<!-- Twitch Integration Status -->
+          <div class="bg-gray-700 rounded-lg p-4">
+            <div class="flex items-center space-x-2">
+              <%= if @twitch_poll_id do %>
+                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span class="text-sm text-green-400">Twitch Connected</span>
+              <% else %>
+                <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                <span class="text-sm text-gray-400">Twitch Offline</span>
+              <% end %>
+            </div>
+          </div>
         </div>
         
 <!-- Track Scores -->
@@ -341,7 +370,9 @@
                 ]}>
                   <span class="text-sm">Track {index + 1}</span>
                   <%= if @current_track && @current_track.spotify_id == track.spotify_id do %>
-                    <span class="text-sm font-bold text-purple-400">7.2</span>
+                    <span class="text-sm font-bold text-purple-400">
+                      {calculate_average_score(@poll_results, @chat_votes)}
+                    </span>
                   <% else %>
                     <span class="text-sm text-gray-400">-</span>
                   <% end %>
