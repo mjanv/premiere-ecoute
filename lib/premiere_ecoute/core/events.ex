@@ -10,6 +10,10 @@ defmodule PremiereEcoute.Core.Events do
   @type session_id :: String.t()
   @type track_id :: String.t()
   @type vote_value :: 1..10
+  @moduledoc """
+  Event structures for the event-driven architecture.
+  Events represent things that have happened in the system.
+  """
 
   defmodule AlbumSelected do
     @moduledoc "Event fired when an album is selected"
