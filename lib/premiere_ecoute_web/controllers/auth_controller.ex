@@ -8,7 +8,7 @@ defmodule PremiereEcouteWeb.AuthController do
   def request(conn, %{"provider" => "twitch"}) do
     # Redirect to Twitch OAuth
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
-    redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
+    redirect_uri = "http://localhost:4000/auth/twitch/callback"
 
     if client_id && redirect_uri do
       auth_url =
