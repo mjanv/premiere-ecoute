@@ -16,8 +16,8 @@ defmodule PremiereEcoute.Core.Commands do
     defstruct [:command_id, :streamer_id, :spotify_album_id, :timestamp]
 
     @type t :: %__MODULE__{
-            command_id: command_id,
-            streamer_id: streamer_id,
+            command_id: PremiereEcoute.Core.Commands.command_id(),
+            streamer_id: PremiereEcoute.Core.Commands.streamer_id(),
             spotify_album_id: String.t(),
             timestamp: DateTime.t()
           }
@@ -28,9 +28,9 @@ defmodule PremiereEcoute.Core.Commands do
     defstruct [:command_id, :streamer_id, :album_id, :timestamp]
 
     @type t :: %__MODULE__{
-            command_id: command_id,
-            streamer_id: streamer_id,
-            album_id: album_id,
+            command_id: PremiereEcoute.Core.Commands.command_id(),
+            streamer_id: PremiereEcoute.Core.Commands.streamer_id(),
+            album_id: PremiereEcoute.Core.Commands.album_id(),
             timestamp: DateTime.t()
           }
   end
@@ -40,9 +40,9 @@ defmodule PremiereEcoute.Core.Commands do
     defstruct [:command_id, :streamer_id, :session_id, :timestamp]
 
     @type t :: %__MODULE__{
-            command_id: command_id,
-            streamer_id: streamer_id,
-            session_id: session_id,
+            command_id: PremiereEcoute.Core.Commands.command_id(),
+            streamer_id: PremiereEcoute.Core.Commands.streamer_id(),
+            session_id: PremiereEcoute.Core.Commands.session_id(),
             timestamp: DateTime.t()
           }
   end
@@ -60,11 +60,11 @@ defmodule PremiereEcoute.Core.Commands do
     ]
 
     @type t :: %__MODULE__{
-            command_id: command_id,
-            session_id: session_id,
-            track_id: track_id,
+            command_id: PremiereEcoute.Core.Commands.command_id(),
+            session_id: PremiereEcoute.Core.Commands.session_id(),
+            track_id: PremiereEcoute.Core.Commands.track_id(),
             voter_id: String.t(),
-            vote_value: vote_value,
+            vote_value: PremiereEcoute.Core.Commands.vote_value(),
             voter_type: :streamer | :viewer,
             timestamp: DateTime.t()
           }
@@ -75,9 +75,9 @@ defmodule PremiereEcoute.Core.Commands do
     defstruct [:command_id, :streamer_id, :session_id, :timestamp]
 
     @type t :: %__MODULE__{
-            command_id: command_id,
-            streamer_id: streamer_id,
-            session_id: session_id,
+            command_id: PremiereEcoute.Core.Commands.command_id(),
+            streamer_id: PremiereEcoute.Core.Commands.streamer_id(),
+            session_id: PremiereEcoute.Core.Commands.session_id(),
             timestamp: DateTime.t()
           }
   end
