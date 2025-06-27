@@ -7,6 +7,19 @@
 # General application configuration
 import Config
 
+config :premiere_ecoute, :scopes,
+  user: [
+    default: true,
+    module: PremiereEcoute.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: PremiereEcoute.AccountsFixtures,
+    test_login_helper: :register_and_log_in_user
+  ]
+
 config :premiere_ecoute,
   ecto_repos: [PremiereEcoute.Repo],
   generators: [timestamp_type: :utc_datetime]
@@ -54,17 +67,25 @@ config :tailwind,
 
 # Configures Elixir's Logger
 config :logger, :default_formatter,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  format: "$time $metadata[$level] $message\n",request_id]
 
 # Use Jason for JSON parsing in Phoenix
+config :phoenix, :json_library, Jason
 
 # Spotify API Configuration
 config :premiere_ecoute,
   spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID"),
   spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
 
-config :phoenix, :json_library, Jason
+# Uberauth Configuration for Twitch OAuth
+config :ueberauth, Ueberauth,
+  providers: [
+    twitch: {Ueberauth.Strategy.Twitch, []}
+  ]
+
+config :ueberauth, Ueberauth.Strategy.Twitch.OAuth,
+  client_id: System.get_env("TWITCH_CLIENT_ID"),
+  client_secret: System.get_env("TWITCH_CLIENT_SECRET")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
