@@ -60,7 +60,10 @@ defmodule PremiereEcouteWeb.AuthController do
     Logger.error("Twitch OAuth error: #{error}")
 
     conn
-    |> put_flash(:error, "Authentication was cancelled or failed")
+    |> put_flash(
+      :info,
+      "Twitch authentication was cancelled. Click 'Connect Twitch' to try again."
+    )
     |> redirect(to: ~p"/")
   end
 
