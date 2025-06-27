@@ -7,37 +7,12 @@ defmodule PremiereEcoute.Core.Ports do
   alias PremiereEcoute.Core.Entities
 
   @doc """
-  Port for music metadata services (Spotify, Apple Music, etc.)
-  """
-  defmodule MusicMetadataPort do
-    @moduledoc """
-    Defines the interface for fetching music metadata from external services.
-    """
-
-    @type search_result :: %{
-            id: String.t(),
-            name: String.t(),
-            artist: String.t(),
-            release_date: Date.t() | nil,
-            cover_url: String.t() | nil,
-            total_tracks: integer()
-          }
-
-    @callback search_albums(query :: String.t()) ::
-                {:ok, [search_result()]} | {:error, term()}
-
-    @callback get_album_with_tracks(album_id :: String.t()) ::
-                {:ok, Entities.Album.t()} | {:error, term()}
-
-    @callback get_track_details(track_id :: String.t()) ::
-                {:ok, Entities.Track.t()} | {:error, term()}
-  end
-
-  @doc """
   Port for streaming platform integrations (Twitch, YouTube, etc.)
   """
   defmodule StreamingPlatformPort do
-    @moduledoc """
+    """
+    defmodule StreamingPlatformPort do
+    @moduledoc \"""
     Defines the interface for streaming platform integrations.
     """
 
