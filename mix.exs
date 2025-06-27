@@ -1,9 +1,3 @@
-==> ueberauth
-Compiling 9 files (.ex)
-Generated ueberauth app
-==> ueberauth_twitch
-Compiling 3 files (.ex)
-Generated ueberauth_twitch app
 defmodule PremiereEcoute.MixProject do
   use Mix.Project
 
