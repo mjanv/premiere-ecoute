@@ -17,7 +17,8 @@ defmodule PremiereEcouteWeb.AuthController do
             client_id: client_id,
             redirect_uri: redirect_uri,
             response_type: "code",
-            scope: "user-read-playback-state user-modify-playback-state user-read-currently-playing"
+            scope:
+              "user-read-playback-state user-modify-playback-state user-read-currently-playing"
           })
 
       redirect(conn, external: auth_url)
@@ -135,44 +136,45 @@ defmodule PremiereEcouteWeb.AuthController do
     end
   end
 
-  defp authenticate_spotify_user(code) do\
-    client_id = Application.get_env(:premiere_ecoute, :spotify_client_id)\
-    client_secret = Application.get_env(:premiere_ecoute, :spotify_client_secret)\
-    redirect_uri = "http://localhost:4000/auth/spotify/callback"\
-\
-    if client_id && client_secret do\
-      token_url = "https://accounts.spotify.com/api/token"\
-\
-      case Req.post(token_url,\
-             headers: [{"Content-Type", "application/x-www-form-urlencoded"}],\
-             body:\
-               URI.encode_query(%{\
-                 client_id: client_id,\
-                 client_secret: client_secret,\
-                 code: code,\
-                 grant_type: "authorization_code",\
-                 redirect_uri: redirect_uri\
-               })\
-           ) do\
-        {:ok, %{status: 200, body: %{"access_token" => token, "refresh_token" => refresh_token}}} ->\
-          {:ok,\
-           %{\
-             access_token: token,\
-             refresh_token: refresh_token\
-           }}\
-\
-        {:ok, %{status: status, body: body}} ->\
-          Logger.error("Spotify OAuth failed: #{status} - #{inspect(body)}")\
-          {:error, "Spotify authentication failed"}\
-\
-        {:error, reason} ->\
-          Logger.error("Spotify OAuth request failed: #{inspect(reason)}")\
-          {:error, "Network error during authentication"}\
-      end\
-    else\
-      {:error, "Spotify credentials not configured"}\
-    end\
+  defp authenticate_spotify_user(code) do
+    client_id = Application.get_env(:premiere_ecoute, :spotify_client_id)
+    client_secret = Application.get_env(:premiere_ecoute, :spotify_client_secret)
+    redirect_uri = "http://localhost:4000/auth/spotify/callback"
+
+    if client_id && client_secret do
+      token_url = "https://accounts.spotify.com/api/token"
+
+      case Req.post(token_url,
+             headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
+             body:
+               URI.encode_query(%{
+                 client_id: client_id,
+                 client_secret: client_secret,
+                 code: code,
+                 grant_type: "authorization_code",
+                 redirect_uri: redirect_uri
+               })
+           ) do
+        {:ok, %{status: 200, body: %{"access_token" => token, "refresh_token" => refresh_token}}} ->
+          {:ok,
+           %{
+             access_token: token,
+             refresh_token: refresh_token
+           }}
+
+        {:ok, %{status: status, body: body}} ->
+          Logger.error("Spotify OAuth failed: #{status} - #{inspect(body)}")
+          {:error, "Spotify authentication failed"}
+
+        {:error, reason} ->
+          Logger.error("Spotify OAuth request failed: #{inspect(reason)}")
+          {:error, "Network error during authentication"}
+      end
+    else
+      {:error, "Spotify credentials not configured"}
+    end
   end
+
   defp generate_random_password do
     :crypto.strong_rand_bytes(32) |> Base.encode64()
   end
