@@ -1,3 +1,9 @@
+==> gen_stage
+Compiling 10 files (.ex)
+Generated gen_stage app
+==> broadway
+Compiling 21 files (.ex)
+Generated broadway app
 defmodule PremiereEcoute.MixProject do
   use Mix.Project
 
