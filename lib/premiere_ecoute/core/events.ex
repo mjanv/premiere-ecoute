@@ -16,8 +16,8 @@ defmodule PremiereEcoute.Core.Events do
     defstruct [:event_id, :streamer_id, :album, :timestamp]
 
     @type t :: %__MODULE__{
-            event_id: event_id(),
-            streamer_id: streamer_id(),
+            event_id: event_id,
+            streamer_id: streamer_id,
             album: PremiereEcoute.Core.Entities.Album.t(),
             timestamp: DateTime.t()
           }
@@ -28,10 +28,10 @@ defmodule PremiereEcoute.Core.Events do
     defstruct [:event_id, :session_id, :streamer_id, :album_id, :timestamp]
 
     @type t :: %__MODULE__{
-            event_id: event_id(),
-            session_id: session_id(),
-            streamer_id: streamer_id(),
-            album_id: album_id(),
+            event_id: event_id,
+            session_id: session_id,
+            streamer_id: streamer_id,
+            album_id: album_id,
             timestamp: DateTime.t()
           }
   end
@@ -41,9 +41,9 @@ defmodule PremiereEcoute.Core.Events do
     defstruct [:event_id, :session_id, :streamer_id, :timestamp]
 
     @type t :: %__MODULE__{
-            event_id: event_id(),
-            session_id: session_id(),
-            streamer_id: streamer_id(),
+            event_id: event_id,
+            session_id: session_id,
+            streamer_id: streamer_id,
             timestamp: DateTime.t()
           }
   end
@@ -61,11 +61,11 @@ defmodule PremiereEcoute.Core.Events do
     ]
 
     @type t :: %__MODULE__{
-            event_id: event_id(),
-            session_id: session_id(),
-            track_id: track_id(),
+            event_id: event_id,
+            session_id: session_id,
+            track_id: track_id,
             voter_id: String.t(),
-            vote_value: vote_value(),
+            vote_value: vote_value,
             voter_type: :streamer | :viewer,
             timestamp: DateTime.t()
           }
@@ -76,10 +76,10 @@ defmodule PremiereEcoute.Core.Events do
     defstruct [:event_id, :session_id, :current_track_id, :next_track_id, :timestamp]
 
     @type t :: %__MODULE__{
-            event_id: event_id(),
-            session_id: session_id(),
-            current_track_id: track_id(),
-            next_track_id: track_id() | nil,
+            event_id: event_id,
+            session_id: session_id,
+            current_track_id: track_id,
+            next_track_id: track_id | nil,
             timestamp: DateTime.t()
           }
   end
