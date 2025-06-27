@@ -73,9 +73,6 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Spotify API Configuration
-config :premiere_ecoute,
-  spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID"),
   spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
 
 # Uberauth Configuration for Twitch OAuth
