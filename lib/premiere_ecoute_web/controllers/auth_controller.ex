@@ -44,7 +44,7 @@ defmodule PremiereEcouteWeb.AuthController do
 
             conn
             |> put_flash(:error, "Authentication failed")
-            |> redirect(to: ~p"/users/log-in")
+            |> redirect(to: ~p"/")
         end
 
       {:error, reason} ->
@@ -52,7 +52,7 @@ defmodule PremiereEcouteWeb.AuthController do
 
         conn
         |> put_flash(:error, "Twitch authentication failed")
-        |> redirect(to: ~p"/users/log-in")
+        |> redirect(to: ~p"/")
     end
   end
 
@@ -61,7 +61,7 @@ defmodule PremiereEcouteWeb.AuthController do
 
     conn
     |> put_flash(:error, "Authentication was cancelled or failed")
-    |> redirect(to: ~p"/users/log-in")
+    |> redirect(to: ~p"/")
   end
 
   defp find_or_create_user(auth_data) do
