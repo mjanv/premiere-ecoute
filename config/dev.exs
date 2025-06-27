@@ -2,10 +2,8 @@ import Config
 
 # Configure your database
 config :premiere_ecoute, PremiereEcoute.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "premiere_ecoute_dev",
+  adapter: Ecto.Adapters.SQLite3,
+  database: "priv/repo/premiere_ecoute_dev.db",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
