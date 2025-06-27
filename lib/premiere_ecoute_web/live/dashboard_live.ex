@@ -125,7 +125,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
   def handle_event("next_track", _params, socket) do
     case {socket.assigns.current_session, socket.assigns.selected_album} do
-      {%{id: session_id}, %{tracks: tracks}} ->
+      {%{id: _session_id}, %{tracks: tracks}} ->
         current_track = socket.assigns.current_track
         current_index = Enum.find_index(tracks, &(&1.spotify_id == current_track.spotify_id))
         next_track = Enum.at(tracks, current_index + 1)
@@ -166,7 +166,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
       nil ->
         {:noreply, put_flash(socket, :error, "No active session")}
 
-      session ->
+      _session ->
         {:noreply,
          socket
          |> assign(:current_session, nil)
@@ -203,7 +203,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
     {:noreply, assign(socket, :active_voters, socket.assigns.active_voters + 1)}
   end
 
-  def handle_info({:vote_cast, event}, socket) do
+  def handle_info({:vote_cast, _event}, socket) do
     # Update real-time vote display from Twitch
     {:noreply, assign(socket, :active_voters, socket.assigns.active_voters + 1)}
   end
@@ -262,7 +262,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
     case TwitchAdapter.listen_to_chat(streamer_id, chat_callback) do
       {:ok, _pid} -> :ok
-      {:error, reason} -> Logger.error("Failed to start chat listener: #{inspect(reason)}")
+      {:ok, _pid} -> :ok
     end
   end
 
