@@ -20,6 +20,18 @@ if System.get_env("PHX_SERVER") do
   config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: true
 end
 
+# Configure Spotify API credentials\
+config :premiere_ecoute,
+  spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID"),
+  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
+
+# Configure Twitch API credentials\
+config :premiere_ecoute,
+  twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
+  twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
+  twitch_redirect_uri:
+    System.get_env("TWITCH_REDIRECT_URI") || "http://localhost:4000/auth/twitch/callback"
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
