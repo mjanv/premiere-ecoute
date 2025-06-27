@@ -12,9 +12,9 @@
 ### Phase 1: Core Infrastructure
 - [x] Generate Phoenix project with SQLite
 - [x] Start development server
-- [ ] Create static design mockup for streaming dashboard
-- [ ] Set up event-driven architecture (Commands/Events)
-- [ ] Define core domain entities (Album, Track, ListeningSession, etc.)
+- [x] Create static design mockup for streaming dashboard
+- [x] Set up event-driven architecture (Commands/Events)
+- [x] Define core domain entities (Album, Track, ListeningSession, etc.)
 - [ ] Implement hexagonal architecture ports
 
 ### Phase 2: External Integrations  
