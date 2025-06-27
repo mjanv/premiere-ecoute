@@ -26,7 +26,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
      |> assign(:track_votes, %{})
      |> assign(:session_stats, %{})
      |> assign(:loading, false)
-     |> assign(:current_scope, socket.assigns[:current_scope])
+     |> assign(:current_scope, socket.assigns[:current_scope])}
   end
 
   @impl true
