@@ -211,6 +211,45 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
   # Private helper functions
 
+  # Template helper functions
+  defp format_duration(duration_ms) when is_integer(duration_ms) do
+    minutes = div(duration_ms, 60000)
+    seconds = div(rem(duration_ms, 60000), 1000)
+    "#{minutes}:#{String.pad_leading(to_string(seconds), 2, "0")}"
+  end
+
+  defp format_duration(_), do: "0:00"
+
+  defp get_vote_height(vote_value) do
+    case vote_value do
+      1 -> "h-2"
+      2 -> "h-4"
+      3 -> "h-8"
+      4 -> "h-12"
+      5 -> "h-10"
+      6 -> "h-14"
+      7 -> "h-16"
+      8 -> "h-12"
+      9 -> "h-8"
+      10 -> "h-6"
+    end
+  end
+
+  defp get_vote_color(vote_value) do
+    case vote_value do
+      1 -> "bg-red-500"
+      2 -> "bg-orange-500"
+      3 -> "bg-yellow-500"
+      4 -> "bg-lime-500"
+      5 -> "bg-green-500"
+      6 -> "bg-teal-500"
+      7 -> "bg-blue-500"
+      8 -> "bg-indigo-500"
+      9 -> "bg-purple-500"
+      10 -> "bg-pink-500"
+    end
+  end
+
   defp generate_id, do: Ecto.UUID.generate()
 
   defp get_streamer_id(socket) do
