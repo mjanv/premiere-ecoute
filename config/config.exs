@@ -79,6 +79,14 @@ config :premiere_ecoute,
   spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
 
 # Uberauth Configuration for Twitch OAuth
+
+# Twitch API Configuration
+config :premiere_ecoute,
+  twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
+  twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
+  twitch_redirect_uri:
+    System.get_env("TWITCH_REDIRECT_URI") || "http://localhost:4000/auth/twitch/callback"
+
 config :ueberauth, Ueberauth,
   providers: [
     twitch: {Ueberauth.Strategy.Twitch, []}
