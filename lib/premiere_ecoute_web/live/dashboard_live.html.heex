@@ -17,6 +17,24 @@
             <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
             <span class="text-sm text-green-400">Live</span>
           </div>
+          <!-- Spotify Status -->
+          <%= if @spotify_playback_state.device do %>
+            <div class="flex items-center space-x-2 px-3 py-1 bg-green-900/30 rounded-lg">
+              <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+              </svg>
+              <span class="text-sm text-green-400">
+                {if @spotify_playback_state.is_playing, do: "Playing", else: "Connected"}
+              </span>
+            </div>
+          <% else %>
+            <div class="flex items-center space-x-2 px-3 py-1 bg-gray-700 rounded-lg">
+              <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+              </svg>
+              <span class="text-sm text-gray-400">Spotify Offline</span>
+            </div>
+          <% end %>
           <a
             href="/auth/twitch"
             class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block"
@@ -201,6 +219,94 @@
               </div>
             </div>
           </div>
+          
+<!-- Spotify Playback Controls -->
+          <%= if @user_spotify_token do %>
+            <div class="bg-gray-800 rounded-lg p-4 mb-6">
+              <h3 class="text-lg font-semibold mb-3 text-green-400">Spotify Playback Control</h3>
+              <div class="flex items-center justify-center space-x-4">
+                <!-- Previous Track -->
+                <button
+                  class="bg-gray-700 hover:bg-gray-600 p-3 rounded-full transition-colors"
+                  phx-click="previous_track"
+                  title="Previous Track"
+                >
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+                  </svg>
+                </button>
+                
+<!-- Play/Pause -->
+                <%= if @spotify_playback_state.is_playing do %>
+                  <button
+                    class="bg-purple-600 hover:bg-purple-700 p-4 rounded-full transition-colors"
+                    phx-click="pause_playback"
+                    title="Pause"
+                  >
+                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M5.5 3.5A1.5 1.5 0 017 2h6a1.5 1.5 0 011.5 1.5v13A1.5 1.5 0 0113 18H7a1.5 1.5 0 01-1.5-1.5v-13z" />
+                    </svg>
+                  </button>
+                <% else %>
+                  <button
+                    class="bg-green-600 hover:bg-green-700 p-4 rounded-full transition-colors"
+                    phx-click="resume_playback"
+                    title="Play"
+                  >
+                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                    </svg>
+                  </button>
+                <% end %>
+                
+<!-- Next Track -->
+                <button
+                  class="bg-gray-700 hover:bg-gray-600 p-3 rounded-full transition-colors"
+                  phx-click="next_track"
+                  title="Next Track"
+                >
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
+                  </svg>
+                </button>
+              </div>
+              
+<!-- Playback Status -->
+              <%= if @spotify_playback_state.device do %>
+                <div class="mt-4 text-center">
+                  <p class="text-sm text-gray-400">
+                    Playing on:
+                    <span class="text-green-400">{@spotify_playback_state.device.name}</span>
+                    {if @spotify_playback_state.item,
+                      do: " • #{@spotify_playback_state.item.name}",
+                      else: ""}
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-600">
+              <div class="text-center text-gray-400">
+                <svg
+                  class="w-12 h-12 mx-auto mb-2 opacity-50"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                </svg>
+                <h3 class="text-lg font-medium mb-2">Connect Spotify for Playback Control</h3>
+                <p class="text-sm mb-4">
+                  Link your Spotify account to control music playback directly from the dashboard
+                </p>
+                <a
+                  href="/auth/spotify"
+                  class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block"
+                >
+                  Connect Spotify
+                </a>
+              </div>
+            </div>
+          <% end %>
           
 <!-- Current Track Voting from Twitch -->
           <%= if @current_track do %>
