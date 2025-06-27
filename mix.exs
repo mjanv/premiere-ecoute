@@ -1,3 +1,9 @@
+==> tesla
+Compiling 40 files (.ex)
+Generated tesla app
+==> oauth2
+Compiling 13 files (.ex)
+Generated oauth2 app
 defmodule PremiereEcoute.MixProject do
   use Mix.Project
 
