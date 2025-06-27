@@ -217,13 +217,13 @@
                 <div class="text-3xl font-bold text-white">{@active_voters}</div>
                 <p class="text-purple-100 text-sm">Active Voters</p>
               </div>
-              <div class="bg-gray-700 rounded-lg p-4">
-                <div class="text-2xl font-bold text-purple-400">
+              <div class="text-center px-4 py-3 bg-white/10 backdrop-blur-sm rounded-lg">
+                <div class="text-2xl font-bold text-white">
                   {if @current_session,
                     do: calculate_average_score(@poll_results, @chat_votes),
                     else: "0.0"}
                 </div>
-                <p class="text-sm text-gray-400">Album Average</p>
+                <p class="text-sm text-purple-100">Album Average</p>
               </div>
             </div>
           </div>
@@ -434,26 +434,27 @@
       <div class="w-1/4 bg-gray-800 border-l border-gray-700 p-6">
         <h3 class="text-lg font-semibold mb-4 text-purple-300">Track Scores</h3>
         <%= if @selected_album do %>
-          <div>
-            <h4 class="font-medium mb-3 text-purple-300">Track Scores</h4>
-            <div class="space-y-2 max-h-64 overflow-y-auto">
-              <%= for {track, index} <- Enum.with_index(@selected_album.tracks) do %>
-                <div class={[
-                  "flex justify-between items-center p-2 rounded",
-                  (@current_track && @current_track.spotify_id == track.spotify_id &&
-                     "bg-gray-700") || "bg-gray-600 opacity-50"
-                ]}>
-                  <span class="text-sm">Track {index + 1}</span>
-                  <%= if @current_track && @current_track.spotify_id == track.spotify_id do %>
-                    <span class="text-sm font-bold text-purple-400">
-                      {calculate_average_score(@poll_results, @chat_votes)}
-                    </span>
-                  <% else %>
-                    <span class="text-sm text-gray-400">-</span>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
+          <div class="space-y-2 max-h-96 overflow-y-auto">
+            <%= for {track, index} <- Enum.with_index(@selected_album.tracks) do %>
+              <div class={[
+                "flex justify-between items-center p-3 rounded",
+                (@current_track && @current_track.spotify_id == track.spotify_id &&
+                   "bg-gray-700") || "bg-gray-600 opacity-50"
+              ]}>
+                <span class="text-sm">Track {index + 1}</span>
+                <%= if @current_track && @current_track.spotify_id == track.spotify_id do %>
+                  <span class="text-sm font-bold text-purple-400">
+                    {calculate_average_score(@poll_results, @chat_votes)}
+                  </span>
+                <% else %>
+                  <span class="text-sm text-gray-400">-</span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center text-gray-400">
+            <p class="text-sm">Select an album to see track scores</p>
           </div>
         <% end %>
       </div>
