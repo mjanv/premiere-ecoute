@@ -52,8 +52,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
     create index(:listening_sessions, [:status])
 
     # Add foreign key constraints
-    create constraint(:listening_sessions, :valid_status,
-             check: "status IN ('preparing', 'active', 'stopped')"
            )
   end
 end
