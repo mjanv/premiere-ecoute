@@ -15,10 +15,10 @@
 - [x] Create static design mockup for streaming dashboard
 - [x] Set up event-driven architecture (Commands/Events)
 - [x] Define core domain entities (Album, Track, ListeningSession, etc.)
-- [ ] Implement hexagonal architecture ports
+- [x] Implement hexagonal architecture ports
 
 ### Phase 2: External Integrations  
-- [ ] Spotify adapter (album/track metadata)
+- [x] Spotify adapter (album/track metadata)
 - [ ] Twitch OAuth authentication 
 - [ ] Twitch API adapter (polls + chat integration)
 
