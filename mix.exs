@@ -61,7 +61,8 @@ defmodule PremiereEcoute.MixProject do
       {:bandit, "~> 1.5"},
       {:oauth2, "~> 2.0"},
       {:tesla, "~> 1.4"}
-    ]
+      {:broadway, "~> 1.0"},
+]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
