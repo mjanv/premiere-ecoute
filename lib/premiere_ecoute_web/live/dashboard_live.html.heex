@@ -217,6 +217,14 @@
                 <div class="text-3xl font-bold text-white">{@active_voters}</div>
                 <p class="text-purple-100 text-sm">Active Voters</p>
               </div>
+              <div class="bg-gray-700 rounded-lg p-4">
+                <div class="text-2xl font-bold text-purple-400">
+                  {if @current_session,
+                    do: calculate_average_score(@poll_results, @chat_votes),
+                    else: "0.0"}
+                </div>
+                <p class="text-sm text-gray-400">Album Average</p>
+              </div>
             </div>
           </div>
           
@@ -422,51 +430,11 @@
         <% end %>
       </div>
       
-<!-- Right Panel - Session Info -->
+      <!-- Right Panel - Track Scores -->
       <div class="w-1/4 bg-gray-800 border-l border-gray-700 p-6">
-        <h3 class="text-lg font-semibold mb-4 text-purple-300">Session Stats</h3>
+        <h3 class="text-lg font-semibold mb-4 text-purple-300">Track Scores</h3>
+      <div class="w-1/4 bg-gray-800 border-l border-gray-700 p-6">
         
-<!-- Stats Cards -->
-        <div class="space-y-4 mb-6">
-          <div class="bg-gray-700 rounded-lg p-4">
-            <div class="text-2xl font-bold text-green-400">{@active_voters}</div>
-            <p class="text-sm text-gray-400">Active Voters</p>
-          </div>
-          <div class="bg-gray-700 rounded-lg p-4">
-            <div class="text-2xl font-bold text-purple-400">
-              {if @current_session,
-                do: calculate_average_score(@poll_results, @chat_votes),
-                else: "0.0"}
-            </div>
-            <p class="text-sm text-gray-400">Album Average</p>
-          </div>
-          <%= if @current_track && @selected_album do %>
-            <div class="bg-gray-700 rounded-lg p-4">
-              <div class="text-2xl font-bold text-blue-400">
-                {Enum.find_index(
-                  @selected_album.tracks,
-                  &(&1.spotify_id == @current_track.spotify_id)
-                ) + 1}
-              </div>
-              <p class="text-sm text-gray-400">Current Track</p>
-            </div>
-          <% end %>
-          
-<!-- Twitch Integration Status -->
-          <div class="bg-gray-700 rounded-lg p-4">
-            <div class="flex items-center space-x-2">
-              <%= if @twitch_poll_id do %>
-                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span class="text-sm text-green-400">Twitch Connected</span>
-              <% else %>
-                <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                <span class="text-sm text-gray-400">Twitch Offline</span>
-              <% end %>
-            </div>
-          </div>
-        </div>
-        
-<!-- Track Scores -->
         <%= if @selected_album do %>
           <div>
             <h4 class="font-medium mb-3 text-purple-300">Track Scores</h4>
