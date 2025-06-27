@@ -58,6 +58,12 @@ config :logger, :default_formatter,
   metadata: [:request_id]
 
 # Use Jason for JSON parsing in Phoenix
+
+# Spotify API Configuration
+config :premiere_ecoute,
+  spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID"),
+  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
+
 config :phoenix, :json_library, Jason
 
 # Import environment specific config. This must remain at the bottom
