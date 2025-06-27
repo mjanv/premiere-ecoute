@@ -22,7 +22,12 @@ config :premiere_ecoute, :scopes,
 
 config :premiere_ecoute,
   ecto_repos: [PremiereEcoute.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET"),
+  twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
+  twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
+  twitch_redirect_uri:
+    System.get_env("TWITCH_REDIRECT_URI") || "http://localhost:4000/auth/twitch/callback"
 
 # Configures the endpoint
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
@@ -72,18 +77,6 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
-
-config :premiere_ecoute,
-  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
-
-# Uberauth Configuration for Twitch OAuth
-
-# Twitch API Configuration
-config :premiere_ecoute,
-  twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
-  twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
-  twitch_redirect_uri:
-    System.get_env("TWITCH_REDIRECT_URI") || "http://localhost:4000/auth/twitch/callback"
 
 config :ueberauth, Ueberauth,
   providers: [
