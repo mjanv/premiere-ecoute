@@ -67,6 +67,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/users/register", UserLive.Registration, :new
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
+      live "/", DashboardLive, :index
     end
 
     post "/users/log-in", UserSessionController, :create
