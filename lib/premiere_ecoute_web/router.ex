@@ -21,6 +21,10 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through :browser
 
     live "/", DashboardLive, :index
+
+    # OAuth routes
+    get "/auth/:provider", AuthController, :request
+    get "/auth/:provider/callback", AuthController, :callback
   end
 
   # Other scopes may use custom stacks.
@@ -68,6 +72,10 @@ defmodule PremiereEcouteWeb.Router do
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
       live "/", DashboardLive, :index
+
+      # OAuth routes
+      get "/auth/:provider", AuthController, :request
+      get "/auth/:provider/callback", AuthController, :callback
     end
 
     post "/users/log-in", UserSessionController, :create
