@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
 
   require Logger
 
+  @api ""
+
   @doc """
   Start playback of an album on the user's Spotify device
   """

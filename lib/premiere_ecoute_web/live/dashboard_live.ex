@@ -1,7 +1,8 @@
 defmodule PremiereEcouteWeb.DashboardLive do
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Adapters.{SpotifyAdapter, TwitchAdapter}
+  alias PremiereEcoute.Adapters.TwitchAdapter
+  alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Core.Commands
   alias PremiereEcoute.Core.Entities
   alias PremiereEcoute.Core.Events
@@ -64,7 +65,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
   end
 
   def handle_event("select_album", %{"album_id" => album_id}, socket) do
-    case SpotifyAdapter.get_album_with_tracks(album_id) do
+    case SpotifyApi.get_album(album_id) do
       {:ok, album} ->
         {:noreply,
          socket
@@ -110,7 +111,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
         # Start album playback on Spotify if token available
         playback_result =
           if user_token do
-            SpotifyAdapter.start_album_playback(user_token, album.spotify_id)
+            SpotifyApi.start_album_playback(user_token, album.spotify_id)
           else
             {:error, "No Spotify authentication"}
           end
@@ -170,7 +171,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
         {:noreply, put_flash(socket, :error, "Connect Spotify to control playback")}
 
       token ->
-        case SpotifyAdapter.pause_playback(token, socket.assigns.selected_device_id) do
+        case SpotifyApi.pause_playback(token, socket.assigns.selected_device_id) do
           {:ok, :paused} ->
             schedule_playback_sync()
             {:noreply, put_flash(socket, :info, "Playback paused")}
@@ -187,7 +188,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
         {:noreply, put_flash(socket, :error, "Connect Spotify to control playback")}
 
       token ->
-        case SpotifyAdapter.resume_playback(token, socket.assigns.selected_device_id) do
+        case SpotifyApi.resume_playback(token, socket.assigns.selected_device_id) do
           {:ok, :playing} ->
             schedule_playback_sync()
             {:noreply, put_flash(socket, :info, "Playback resumed")}
@@ -213,7 +214,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
                 {:ok, :skipped}
 
               token ->
-                SpotifyAdapter.skip_to_next(token, socket.assigns.selected_device_id)
+                SpotifyApi.skip_to_next(token, socket.assigns.selected_device_id)
             end
 
           # Create new Twitch poll for next track
@@ -270,7 +271,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
                 {:ok, :skipped}
 
               token ->
-                SpotifyAdapter.skip_to_previous(token, socket.assigns.selected_device_id)
+                SpotifyApi.skip_to_previous(token, socket.assigns.selected_device_id)
             end
 
           # Create new Twitch poll for previous track
@@ -322,7 +323,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
       _session ->
         # Pause Spotify playback when ending session
         if socket.assigns.user_spotify_token do
-          SpotifyAdapter.pause_playback(
+          SpotifyApi.pause_playback(
             socket.assigns.user_spotify_token,
             socket.assigns.selected_device_id
           )
@@ -341,35 +342,11 @@ defmodule PremiereEcouteWeb.DashboardLive do
     end
   end
 
-  def handle_event("select_device", %{"device_id" => device_id}, socket) do
-    {:noreply,
-     socket
-     |> assign(:selected_device_id, device_id)
-     |> put_flash(:info, "Spotify device selected")}
-  end
 
-  def handle_event("refresh_devices", _params, socket) do
-    case socket.assigns.user_spotify_token do
-      nil ->
-        {:noreply, put_flash(socket, :error, "Connect Spotify to see devices")}
-
-      token ->
-        case SpotifyAdapter.get_available_devices(token) do
-          {:ok, devices} ->
-            {:noreply,
-             socket
-             |> assign(:spotify_devices, devices)
-             |> put_flash(:info, "Devices refreshed")}
-
-          {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Failed to get devices: #{reason}")}
-        end
-    end
-  end
 
   @impl true
   def handle_info({:search_spotify, query}, socket) do
-    case SpotifyAdapter.search_albums(query) do
+    case SpotifyApi.search_albums(query) do
       {:ok, results} ->
         {:noreply,
          socket
@@ -393,7 +370,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
         {:noreply, socket}
 
       token ->
-        case SpotifyAdapter.get_playback_state(token) do
+        case SpotifyApi.get_playback_state(token) do
           {:ok, playback_state} ->
             {:noreply, assign(socket, :spotify_playback_state, playback_state)}
 

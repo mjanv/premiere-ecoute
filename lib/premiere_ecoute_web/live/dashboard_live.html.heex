@@ -44,13 +44,13 @@
         </div>
       </div>
     </header>
-    
+
 <!-- Main Content -->
     <div class="flex h-screen">
       <!-- Left Panel - Album Selection -->
       <div class="w-1/3 bg-gray-800 border-r border-gray-700 p-6">
         <h2 class="text-xl font-semibold mb-4 text-purple-300">Album Selection</h2>
-        
+
 <!-- Search -->
         <div class="mb-6">
           <.form
@@ -67,7 +67,7 @@
               error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
             />
           </.form>
-          
+
 <!-- Search Results -->
           <%= if @loading do %>
             <div class="mt-4 text-center text-gray-400">
@@ -83,7 +83,7 @@
                 <div
                   class="bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors"
                   phx-click="select_album"
-                  phx-value-album_id={album.id}
+                  phx-value-album_id={album.spotify_id}
                 >
                   <div class="flex items-center space-x-3">
                     <%= if album.cover_url do %>
@@ -110,7 +110,7 @@
             </div>
           <% end %>
         </div>
-        
+
 <!-- Selected Album -->
         <%= if @selected_album do %>
           <div class="bg-gray-700 rounded-lg p-4 mb-6">
@@ -154,7 +154,7 @@
               </button>
             <% end %>
           </div>
-          
+
 <!-- Track List -->
           <div>
             <h3 class="text-lg font-medium mb-3 text-purple-300">Track List</h3>
@@ -195,7 +195,7 @@
           </div>
         <% end %>
       </div>
-      
+
 <!-- Center Panel - Live Session -->
       <div class="flex-1 bg-gray-900 p-6">
         <%= if @current_session do %>
@@ -227,7 +227,7 @@
               </div>
             </div>
           </div>
-          
+
 <!-- Spotify Playback Controls -->
           <%= if @user_spotify_token do %>
             <div class="bg-gray-800 rounded-lg p-4 mb-6">
@@ -243,7 +243,7 @@
                     <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
                   </svg>
                 </button>
-                
+
 <!-- Play/Pause -->
                 <%= if @spotify_playback_state.is_playing do %>
                   <button
@@ -266,7 +266,7 @@
                     </svg>
                   </button>
                 <% end %>
-                
+
 <!-- Next Track -->
                 <button
                   class="bg-gray-700 hover:bg-gray-600 p-3 rounded-full transition-colors"
@@ -278,7 +278,7 @@
                   </svg>
                 </button>
               </div>
-              
+
 <!-- Playback Status -->
               <%= if @spotify_playback_state.device do %>
                 <div class="mt-4 text-center">
@@ -315,7 +315,7 @@
               </div>
             </div>
           <% end %>
-          
+
 <!-- Current Track Voting from Twitch -->
           <%= if @current_track do %>
             <div class="bg-gray-800 rounded-lg p-6 mb-6">
@@ -329,7 +329,7 @@
                   <span class="text-sm text-gray-400">No active poll</span>
                 <% end %>
               </div>
-              
+
 <!-- Twitch Poll Visualization -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-3">
@@ -362,7 +362,7 @@
                   </span>
                 </div>
               </div>
-              
+
 <!-- Chat Vote Commands -->
               <div class="mt-6 p-4 bg-gray-700/50 rounded-lg">
                 <h4 class="text-sm font-medium text-purple-300 mb-2">
@@ -382,7 +382,7 @@
               </div>
             </div>
           <% end %>
-          
+
 <!-- Session Controls -->
           <div class="flex space-x-4">
             <button
@@ -429,7 +429,7 @@
           </div>
         <% end %>
       </div>
-      
+
 <!-- Right Panel - Track Scores -->
       <div class="w-1/4 bg-gray-800 border-l border-gray-700 p-6">
         <h3 class="text-lg font-semibold mb-4 text-purple-300">Track Scores</h3>
@@ -444,7 +444,7 @@
                 <!-- Background color fill based on score -->
                 <div class="absolute inset-0 rounded-lg transition-all duration-500 bg-gray-700">
                 </div>
-                
+
 <!-- Content overlay -->
                 <div class="relative z-10">
                   <div class="flex justify-between items-center mb-1">

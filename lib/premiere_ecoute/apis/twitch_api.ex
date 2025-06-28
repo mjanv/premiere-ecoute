@@ -36,12 +36,10 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
   @behaviour __MODULE__.Behavior
 
-  alias PremiereEcoute.Core.Ports.StreamingPlatformPort
-
   @twitch_api_base "https://api.twitch.tv/helix"
   @twitch_oauth_base "https://id.twitch.tv/oauth2"
 
-  @impl StreamingPlatformPort
+  @impl true
   def authenticate_user(code) when is_binary(code) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     client_secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
@@ -90,7 +88,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     end
   end
 
-  @impl StreamingPlatformPort
+  @impl true
   def create_poll(channel_id, question, options)
       when is_binary(channel_id) and is_binary(question) and is_list(options) do
     case get_app_access_token() do
@@ -135,7 +133,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     end
   end
 
-  @impl StreamingPlatformPort
+  @impl true
   def get_poll_results(poll_id) when is_binary(poll_id) do
     case get_app_access_token() do
       {:ok, token} ->
@@ -175,7 +173,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     end
   end
 
-  @impl StreamingPlatformPort
+  @impl true
   def listen_to_chat(channel_id, callback)
       when is_binary(channel_id) and is_function(callback, 1) do
     # This would typically use WebSocket connection to Twitch IRC
