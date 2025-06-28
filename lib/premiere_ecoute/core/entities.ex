@@ -14,9 +14,7 @@ defmodule PremiereEcoute.Core.Entities do
       :release_date,
       :cover_url,
       :total_tracks,
-      :tracks,
-      :inserted_at,
-      :updated_at
+      :tracks
     ]
 
     @type t :: %__MODULE__{
@@ -27,9 +25,7 @@ defmodule PremiereEcoute.Core.Entities do
             release_date: Date.t() | nil,
             cover_url: String.t() | nil,
             total_tracks: integer(),
-            tracks: [Track.t()],
-            inserted_at: DateTime.t() | nil,
-            updated_at: DateTime.t() | nil
+            tracks: [Track.t()]
           }
   end
 
@@ -42,9 +38,7 @@ defmodule PremiereEcoute.Core.Entities do
       :name,
       :track_number,
       :duration_ms,
-      :preview_url,
-      :inserted_at,
-      :updated_at
+      :preview_url
     ]
 
     @type t :: %__MODULE__{
@@ -54,9 +48,7 @@ defmodule PremiereEcoute.Core.Entities do
             name: String.t(),
             track_number: integer(),
             duration_ms: integer(),
-            preview_url: String.t() | nil,
-            inserted_at: DateTime.t() | nil,
-            updated_at: DateTime.t() | nil
+            preview_url: String.t() | nil
           }
   end
 

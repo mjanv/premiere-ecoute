@@ -1,36 +1,22 @@
 import Config
 
-# config/runtime.exs is executed for all environments, including
-# during releases. It is executed after compilation and before the
-# system starts, so it is typically used to load production configuration
-# and secrets from environment variables or elsewhere. Do not define
-# any compile-time configuration in here, as it won't be applied.
-# The block below contains prod specific runtime configuration.
-
-# ## Using releases
-#
-# If you use `mix release`, you need to explicitly enable the server
-# by passing the PHX_SERVER=true when you start it:
-#
-#     PHX_SERVER=true bin/premiere_ecoute start
-#
-# Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
-# script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
   config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: true
 end
 
-# Configure Spotify API credentials\
 config :premiere_ecoute,
   spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID"),
-  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
+  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET"),
+  spotify_redirect_uri: System.get_env("SPOTIFY_REDIRECT_URI")
 
-# Configure Twitch API credentials\
 config :premiere_ecoute,
   twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
   twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
-  twitch_redirect_uri:
-    System.get_env("TWITCH_REDIRECT_URI") || "http://localhost:4000/auth/twitch/callback"
+  twitch_redirect_uri: System.get_env("TWITCH_REDIRECT_URI")
+
+config :ueberauth, Ueberauth.Strategy.Twitch.OAuth,
+  client_id: System.get_env("TWITCH_CLIENT_ID"),
+  client_secret: System.get_env("TWITCH_CLIENT_SECRET")
 
 if config_env() == :prod do
   database_url =
@@ -46,15 +32,9 @@ if config_env() == :prod do
     # ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-    # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,
     socket_options: maybe_ipv6
 
-  # The secret key base is used to sign/encrypt cookies and other secrets.
-  # A default value is used in config/dev.exs and config/test.exs but you
-  # want to use a different value for prod and you most likely don't want
-  # to check this value into version control, so we use an environment
-  # variable instead.
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
       raise """
@@ -110,22 +90,4 @@ if config_env() == :prod do
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
-
-  # ## Configuring the mailer
-  #
-  # In production you need to configure the mailer to use a different adapter.
-  # Also, you may need to configure the Swoosh API client of your choice if you
-  # are not using SMTP. Here is an example of the configuration:
-  #
-  #     config :premiere_ecoute, PremiereEcoute.Mailer,
-  #       adapter: Swoosh.Adapters.Mailgun,
-  #       api_key: System.get_env("MAILGUN_API_KEY"),
-  #       domain: System.get_env("MAILGUN_DOMAIN")
-  #
-  # For this example you need include a HTTP client required by Swoosh API client.
-  # Swoosh supports Hackney, Req and Finch out of the box:
-  #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
-  #
-  # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end

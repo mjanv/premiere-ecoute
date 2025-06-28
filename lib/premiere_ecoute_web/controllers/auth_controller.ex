@@ -1,9 +1,10 @@
 defmodule PremiereEcouteWeb.AuthController do
   use PremiereEcouteWeb, :controller
 
-  alias PremiereEcoute.Adapters.TwitchAdapter
-  alias PremiereEcoute.Accounts
   require Logger
+
+  alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Adapters.TwitchAdapter
 
   def request(conn, %{"provider" => "spotify"}) do
     # Redirect to Spotify OAuth for playback control

@@ -1,10 +1,3 @@
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Config module.
-#
-# This configuration file is loaded before any dependency and
-# is restricted to this project.
-
-# General application configuration
 import Config
 
 config :premiere_ecoute, :scopes,
@@ -35,13 +28,8 @@ config :premiere_ecoute, :scopes,
 
 config :premiere_ecoute,
   ecto_repos: [PremiereEcoute.Repo],
-  generators: [timestamp_type: :utc_datetime],
-  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET"),
-  twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
-  twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
-  twitch_redirect_uri: System.get_env("TWITCH_REDIRECT_URI")
+  generators: [timestamp_type: :utc_datetime]
 
-# Configures the endpoint
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -95,10 +83,4 @@ config :ueberauth, Ueberauth,
     twitch: {Ueberauth.Strategy.Twitch, []}
   ]
 
-config :ueberauth, Ueberauth.Strategy.Twitch.OAuth,
-  client_id: System.get_env("TWITCH_CLIENT_ID"),
-  client_secret: System.get_env("TWITCH_CLIENT_SECRET")
-
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

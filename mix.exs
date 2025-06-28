@@ -58,7 +58,7 @@ defmodule PremiereEcoute.MixProject do
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
       {:credo, "~> 1.7"},
-      {:dialyxir, "~> 1.4"}
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false}
     ]
   end
 
@@ -69,9 +69,9 @@ defmodule PremiereEcoute.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       # Quality
-      quality: ["format --check-formatted", "credo --strict", "di"],
+      quality: ["format --check-formatted", "credo --strict"],
       # Tests
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "dialyzer --short"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       # Deployment
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind premiere_ecoute", "esbuild premiere_ecoute"],
