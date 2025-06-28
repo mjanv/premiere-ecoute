@@ -22,7 +22,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
       add :name, :string, null: false, size: 500
       add :track_number, :integer, null: false
       add :duration_ms, :integer, default: 0
-      add :preview_url, :string, size: 1000
       add :album_id, references(:albums, on_delete: :delete_all), null: false
 
       timestamps(type: :utc_datetime)

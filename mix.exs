@@ -68,7 +68,7 @@ defmodule PremiereEcoute.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       # Quality
-      quality: ["format --check-formatted", "credo --strict"],
+      quality: ["format --check-formatted", "credo --strict", "dialyzer --format short"],
       # Tests
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       # Deployment

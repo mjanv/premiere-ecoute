@@ -1,56 +1,5 @@
 defmodule PremiereEcoute.Core.Entities do
-  @moduledoc """
-  Core domain entities for the Premiere Ecoute system.
-  All entities are pure Elixir structs without external dependencies.
-  """
-
-  defmodule Album do
-    @moduledoc "An album with metadata and tracks"
-    defstruct [
-      :id,
-      :spotify_id,
-      :name,
-      :artist,
-      :release_date,
-      :cover_url,
-      :total_tracks,
-      :tracks
-    ]
-
-    @type t :: %__MODULE__{
-            id: String.t() | nil,
-            spotify_id: String.t(),
-            name: String.t(),
-            artist: String.t(),
-            release_date: Date.t() | nil,
-            cover_url: String.t() | nil,
-            total_tracks: integer(),
-            tracks: [Track.t()]
-          }
-  end
-
-  defmodule Track do
-    @moduledoc "A track within an album"
-    defstruct [
-      :id,
-      :spotify_id,
-      :album_id,
-      :name,
-      :track_number,
-      :duration_ms,
-      :preview_url
-    ]
-
-    @type t :: %__MODULE__{
-            id: String.t() | nil,
-            spotify_id: String.t(),
-            album_id: String.t(),
-            name: String.t(),
-            track_number: integer(),
-            duration_ms: integer(),
-            preview_url: String.t() | nil
-          }
-  end
+  @moduledoc false
 
   defmodule ListeningSession do
     @moduledoc "A listening session where streamers and viewers rate an album"

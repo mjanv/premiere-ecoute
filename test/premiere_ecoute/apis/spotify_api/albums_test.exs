@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
-  alias PremiereEcoute.Core.Entities.Album
-  alias PremiereEcoute.Core.Entities.Track
+  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Sessions.Discography.Track
 
   describe "get_album/1" do
     test "list album and track details from an unique identifier" do
@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
 
       {:ok, album} = SpotifyApi.get_album(id)
 
-      assert album == %Album{
+      assert %Album{
                id: nil,
                spotify_id: "7aJuG4TFXa2hmE4z1yxc3n",
                name: "HIT ME HARD AND SOFT",
@@ -29,8 +29,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "SKINNY",
                    track_number: 1,
-                   duration_ms: 219_733,
-                   preview_url: nil
+                   duration_ms: 219_733
                  },
                  %Track{
                    id: nil,
@@ -38,8 +37,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "LUNCH",
                    track_number: 2,
-                   duration_ms: 179_586,
-                   preview_url: nil
+                   duration_ms: 179_586
                  },
                  %Track{
                    id: nil,
@@ -47,8 +45,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "CHIHIRO",
                    track_number: 3,
-                   duration_ms: 303_440,
-                   preview_url: nil
+                   duration_ms: 303_440
                  },
                  %Track{
                    id: nil,
@@ -56,8 +53,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "BIRDS OF A FEATHER",
                    track_number: 4,
-                   duration_ms: 210_373,
-                   preview_url: nil
+                   duration_ms: 210_373
                  },
                  %Track{
                    id: nil,
@@ -65,8 +61,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "WILDFLOWER",
                    track_number: 5,
-                   duration_ms: 261_466,
-                   preview_url: nil
+                   duration_ms: 261_466
                  },
                  %Track{
                    id: nil,
@@ -74,8 +69,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "THE GREATEST",
                    track_number: 6,
-                   duration_ms: 293_840,
-                   preview_url: nil
+                   duration_ms: 293_840
                  },
                  %Track{
                    id: nil,
@@ -83,8 +77,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "L’AMOUR DE MA VIE",
                    track_number: 7,
-                   duration_ms: 333_986,
-                   preview_url: nil
+                   duration_ms: 333_986
                  },
                  %Track{
                    id: nil,
@@ -92,8 +85,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "THE DINER",
                    track_number: 8,
-                   duration_ms: 186_346,
-                   preview_url: nil
+                   duration_ms: 186_346
                  },
                  %Track{
                    id: nil,
@@ -101,8 +93,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "BITTERSUITE",
                    track_number: 9,
-                   duration_ms: 298_440,
-                   preview_url: nil
+                   duration_ms: 298_440
                  },
                  %Track{
                    id: nil,
@@ -110,11 +101,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "BLUE",
                    track_number: 10,
-                   duration_ms: 343_120,
-                   preview_url: nil
+                   duration_ms: 343_120
                  }
                ]
-             }
+             } = album
     end
 
     test "returns an error from an unknown unique identifier" do

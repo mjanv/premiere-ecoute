@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
-  alias PremiereEcoute.Core.Entities.Album
+  alias PremiereEcoute.Sessions.Discography.Album
 
   describe "search_albums/1" do
     test "can list albums from a string query" do
@@ -13,15 +13,18 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
 
       for %Album{} = album <- albums do
         assert Enum.sort(Map.keys(album)) == [
+                 :__meta__,
                  :__struct__,
                  :artist,
                  :cover_url,
                  :id,
+                 :inserted_at,
                  :name,
                  :release_date,
                  :spotify_id,
                  :total_tracks,
-                 :tracks
+                 :tracks,
+                 :updated_at
                ]
       end
 

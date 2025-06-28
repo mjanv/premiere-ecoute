@@ -5,7 +5,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
 
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
-  alias PremiereEcoute.Core.Entities.{Album, Track}
+  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Sessions.Discography.Track
 
   @doc """
   Get an album
@@ -44,8 +45,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
             album_id: data["id"],
             name: track["name"],
             track_number: track["track_number"] || 0,
-            duration_ms: track["duration_ms"] || 0,
-            preview_url: track["preview_url"]
+            duration_ms: track["duration_ms"] || 0
           }
         end)
     }

@@ -17,6 +17,9 @@ defmodule PremiereEcouteWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
+  alias PremiereEcoute.Accounts
+  alias PremiereEcoute.AccountsFixtures
+
   using do
     quote do
       # The default endpoint for testing
@@ -45,8 +48,8 @@ defmodule PremiereEcouteWeb.ConnCase do
   test context.
   """
   def register_and_log_in_user(%{conn: conn} = context) do
-    user = PremiereEcoute.AccountsFixtures.user_fixture()
-    scope = PremiereEcoute.Accounts.Scope.for_user(user)
+    user = AccountsFixtures.user_fixture()
+    scope = Accounts.Scope.for_user(user)
 
     opts =
       context
