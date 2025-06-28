@@ -3,8 +3,8 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
   alias PremiereEcoute.Adapters.{SpotifyAdapter, TwitchAdapter}
   alias PremiereEcoute.Core.Commands
-  alias PremiereEcoute.Core.Events
   alias PremiereEcoute.Core.Entities
+  alias PremiereEcoute.Core.Events
 
   require Logger
 
@@ -465,8 +465,9 @@ defmodule PremiereEcouteWeb.DashboardLive do
     end
 
     case TwitchAdapter.listen_to_chat(streamer_id, chat_callback) do
-      {:ok, _pid} -> :ok
-      {:error, _reason} -> :ok
+      {:ok, _pid} ->
+        :ok
+        # {:error, _reason} -> :ok
     end
   end
 
@@ -514,8 +515,8 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
   # Template helper functions
   defp format_duration(duration_ms) when is_integer(duration_ms) do
-    minutes = div(duration_ms, 60000)
-    seconds = div(rem(duration_ms, 60000), 1000)
+    minutes = div(duration_ms, 60_000)
+    seconds = div(rem(duration_ms, 60_000), 1000)
     "#{minutes}:#{String.pad_leading(to_string(seconds), 2, "0")}"
   end
 

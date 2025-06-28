@@ -1,4 +1,6 @@
 defmodule PremiereEcoute.Music.Track do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
 

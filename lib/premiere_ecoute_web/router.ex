@@ -68,11 +68,16 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :current_user,
       on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
-      live "/", DashboardLive, :index
-
-      # OAuth routes
-      get "/auth/:provider", AuthController, :request
-      get "/auth/:provider/callback", AuthController, :callback
+      live "/users/register", UserLive.Registration, :new
+      live "/users/log-in", UserLive.Login, :new
+      live "/users/log-in/:token", UserLive.Confirmation, :new
     end
+
+    post "/users/log-in", UserSessionController, :create
+    delete "/users/log-out", UserSessionController, :delete
+
+    # OAuth routes
+    get "/auth/:provider", AuthController, :request
+    get "/auth/:provider/callback", AuthController, :callback
   end
 end

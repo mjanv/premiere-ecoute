@@ -442,16 +442,7 @@
                    "border-l-4 border-purple-500") || ""
               ]}>
                 <!-- Background color fill based on score -->
-                <div class={[
-                  "absolute inset-0 rounded-lg transition-all duration-500",
-                  if(@current_track && @current_track.spotify_id == track.spotify_id,
-                    do:
-                      get_track_score_background_class(
-                        calculate_average_score(@poll_results, @chat_votes)
-                      ),
-                    else: "bg-gray-700"
-                  )
-                ]}>
+                <div class="absolute inset-0 rounded-lg transition-all duration-500 bg-gray-700">
                 </div>
                 
 <!-- Content overlay -->

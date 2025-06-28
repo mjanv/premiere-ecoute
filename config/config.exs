@@ -8,6 +8,19 @@
 import Config
 
 config :premiere_ecoute, :scopes,
+  accounts_user: [
+    default: false,
+    module: PremiereEcoute.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: PremiereEcoute.AccountsFixtures,
+    test_login_helper: :register_and_log_in_user
+  ]
+
+config :premiere_ecoute, :scopes,
   user: [
     default: true,
     module: PremiereEcoute.Accounts.Scope,
@@ -26,8 +39,7 @@ config :premiere_ecoute,
   spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET"),
   twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
   twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
-  twitch_redirect_uri:
-    System.get_env("TWITCH_REDIRECT_URI") || "http://localhost:4000/auth/twitch/callback"
+  twitch_redirect_uri: System.get_env("TWITCH_REDIRECT_URI")
 
 # Configures the endpoint
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,

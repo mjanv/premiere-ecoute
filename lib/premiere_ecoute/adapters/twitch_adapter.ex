@@ -17,13 +17,7 @@ defmodule PremiereEcoute.Adapters.TwitchAdapter do
   def authenticate_user(code) when is_binary(code) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     client_secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
-
-    redirect_uri =
-      Application.get_env(
-        :premiere_ecoute,
-        :twitch_redirect_uri,
-        "http://localhost:4000/auth/twitch/callback"
-      )
+    redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
 
     if client_id && client_secret do
       token_url = "#{@twitch_oauth_base}/token"
