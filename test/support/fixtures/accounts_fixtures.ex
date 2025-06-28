@@ -58,8 +58,7 @@ defmodule PremiereEcoute.AccountsFixtures do
 
   def extract_user_token(fun) do
     {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
-    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
-    token
+    captured_email.text_body
   end
 
   def override_token_authenticated_at(token, authenticated_at) when is_binary(token) do

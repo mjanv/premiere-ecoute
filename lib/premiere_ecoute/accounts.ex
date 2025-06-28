@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Accounts do
   import Ecto.Query, warn: false
   alias PremiereEcoute.Repo
 
-  alias PremiereEcoute.Accounts.{User, UserNotifier, UserToken}
+  alias PremiereEcoute.Accounts.{User, UserToken}
 
   ## Database getters
 
@@ -268,7 +268,7 @@ defmodule PremiereEcoute.Accounts do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
 
     Repo.insert!(user_token)
-    UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
+    {:ok, %{to: "", body: "", text_body: encoded_token}}
   end
 
   @doc ~S"""
@@ -278,7 +278,7 @@ defmodule PremiereEcoute.Accounts do
       when is_function(magic_link_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "login")
     Repo.insert!(user_token)
-    UserNotifier.deliver_login_instructions(user, magic_link_url_fun.(encoded_token))
+    {:ok, %{to: "", body: "", text_body: encoded_token}}
   end
 
   @doc """

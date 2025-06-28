@@ -13,10 +13,6 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   secret_key_base: "QWnUlPd8dtgcO9GqNwZby5dC48OsqV2+qVZpCjhQOh9Hk+t+1pv3pmsgnZ6egjs5",
   server: false
 
-config :premiere_ecoute, PremiereEcoute.Mailer, adapter: Swoosh.Adapters.Test
-
-config :swoosh, :api_client, false
-
 config :logger, level: :warning
 
 config :phoenix, :plug_init_mode, :runtime
