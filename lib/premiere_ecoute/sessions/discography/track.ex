@@ -7,6 +7,18 @@ defmodule PremiereEcoute.Sessions.Discography.Track do
 
   alias PremiereEcoute.Sessions.Discography.Album
 
+  @type t :: %__MODULE__{
+          id: integer() | nil,
+          spotify_id: String.t() | nil,
+          name: String.t() | nil,
+          track_number: integer() | nil,
+          duration_ms: integer() | nil,
+          album_id: integer() | nil,
+          album: Album.t() | nil,
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
+        }
+
   schema "tracks" do
     field :spotify_id, :string
     field :name, :string

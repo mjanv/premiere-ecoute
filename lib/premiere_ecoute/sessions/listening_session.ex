@@ -6,8 +6,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   import Ecto.Changeset
 
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions.Discography.Album
 
   schema "listening_sessions" do
     field :streamer_id, :string

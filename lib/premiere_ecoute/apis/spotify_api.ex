@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   defmodule Behavior do
     @moduledoc "Defines the Spotify interface"
 
-    alias PremiereEcoute.Session.Discography.Album
+    alias PremiereEcoute.Sessions.Discography.Album
 
     @callback search_albums(query :: String.t()) :: {:ok, [Album.t()]} | {:error, term()}
     @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}

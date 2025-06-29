@@ -3,12 +3,14 @@ defmodule PremiereEcoute.Apis.TwitchClient do
 
   use WebSockex
 
+  require Logger
+
   def start_link(args) do
     WebSockex.start_link("wss://eventsub.wss.twitch.tv/ws", __MODULE__, args)
   end
 
   def handle_frame({:text, payload}, state) do
-    IO.inspect(JSON.decode!(payload))
+    Logger.info("#{inspect(JSON.decode!(payload))}")
     {:ok, state}
   end
 

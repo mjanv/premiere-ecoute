@@ -37,7 +37,6 @@ defmodule PremiereEcouteWeb.Router do
       pipe_through :browser
 
       live_dashboard "/dashboard", metrics: PremiereEcouteWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
 

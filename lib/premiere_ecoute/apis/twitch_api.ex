@@ -6,27 +6,11 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defmodule Behavior do
     @moduledoc false
 
-    @type poll_option :: %{text: String.t(), votes: integer()}
-    @type poll_result :: %{
-            id: String.t(),
-            question: String.t(),
-            options: [poll_option()],
-            status: :active | :ended,
-            total_votes: integer()
-          }
+    @callback create_poll(broadcaster_id :: String.t(), token :: String.t(), pool :: map()) ::
+                {:ok, map()} | {:error, term()}
 
-    @callback authenticate_user(code :: String.t()) ::
-                {:ok, %{user_id: String.t(), access_token: String.t()}} | {:error, term()}
-
-    @callback create_poll(
-                channel_id :: String.t(),
-                question :: String.t(),
-                options :: [String.t()]
-              ) ::
-                {:ok, String.t()} | {:error, term()}
-
-    @callback end_poll(poll_id :: String.t()) ::
-                {:ok, poll_result()} | {:error, term()}
+    @callback end_poll(broadcaster_id :: String.t(), token :: String.t(), poll_id :: String.t()) ::
+                {:ok, map()} | {:error, term()}
   end
 
   @behaviour __MODULE__.Behavior

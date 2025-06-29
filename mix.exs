@@ -10,6 +10,10 @@ defmodule PremiereEcoute.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
+      dialyzer: [
+        plt_add_apps: [:mix],
+        list_unused_filters: true
+      ],
       listeners: [Phoenix.CodeReloader]
     ]
   end
@@ -70,7 +74,12 @@ defmodule PremiereEcoute.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       # Quality
-      quality: ["format --check-formatted", "credo --strict", "dialyzer --format short"],
+      quality: [
+        "compile --warnings-as-errors",
+        "format --check-formatted",
+        "credo --strict",
+        "dialyzer --format short"
+      ],
       # Tests
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       # Deployment

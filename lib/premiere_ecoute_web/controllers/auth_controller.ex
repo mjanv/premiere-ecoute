@@ -60,7 +60,7 @@ defmodule PremiereEcouteWeb.AuthController do
   end
 
   def callback(conn, %{"provider" => "twitch", "code" => code}) do
-    case TwitchAdapter.authenticate_user(code) do
+    case TwitchApi.authorization_code(code) do
       {:ok, auth_data} ->
         case find_or_create_user(auth_data) do
           {:ok, user} ->

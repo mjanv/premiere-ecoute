@@ -2,7 +2,6 @@ defmodule PremiereEcouteWeb.DashboardLive do
   use PremiereEcouteWeb, :live_view
 
   alias Phoenix.LiveView.AsyncResult
-  alias PremiereEcoute.Adapters.TwitchAdapter
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
 
@@ -34,16 +33,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
      |> assign(:spotify_playback_state, %{is_playing: false, device: nil})
      |> assign(:spotify_devices, [])
      |> assign(:selected_device_id, nil)
-     |> assign(:user_spotify_token, user_spotify_token)
-     |> then(fn socket ->
-       # Initialize Spotify playback state if token is available
-       if user_spotify_token do
-         schedule_playback_sync()
-         socket
-       else
-         socket
-       end
-     end)}
+     |> assign(:user_spotify_token, user_spotify_token)}
   end
 
   @impl true
@@ -79,183 +69,6 @@ defmodule PremiereEcouteWeb.DashboardLive do
     PremiereEcouteWeb.PubSub.broadcast("command_bus", command)
 
     {:noreply, socket}
-  end
-
-  def handle_event("pause_playback", _params, socket) do
-    case socket.assigns.user_spotify_token do
-      nil ->
-        {:noreply, put_flash(socket, :error, "Connect Spotify to control playback")}
-
-      token ->
-        case SpotifyApi.pause_playback(token, socket.assigns.selected_device_id) do
-          {:ok, :paused} ->
-            schedule_playback_sync()
-            {:noreply, put_flash(socket, :info, "Playback paused")}
-
-          {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Failed to pause: #{reason}")}
-        end
-    end
-  end
-
-  def handle_event("resume_playback", _params, socket) do
-    case socket.assigns.user_spotify_token do
-      nil ->
-        {:noreply, put_flash(socket, :error, "Connect Spotify to control playback")}
-
-      token ->
-        case SpotifyApi.resume_playback(token, socket.assigns.selected_device_id) do
-          {:ok, :playing} ->
-            schedule_playback_sync()
-            {:noreply, put_flash(socket, :info, "Playback resumed")}
-
-          {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Failed to resume: #{reason}")}
-        end
-    end
-  end
-
-  def handle_event("next_track", _params, socket) do
-    case {socket.assigns.current_session, socket.assigns.selected_album} do
-      {%{id: _session_id}, %{tracks: tracks}} ->
-        current_track = socket.assigns.current_track
-        current_index = Enum.find_index(tracks, &(&1.spotify_id == current_track.spotify_id))
-        next_track = Enum.at(tracks, current_index + 1)
-
-        if next_track do
-          # Skip on Spotify if connected
-          spotify_result =
-            case socket.assigns.user_spotify_token do
-              nil ->
-                {:ok, :skipped}
-
-              token ->
-                SpotifyApi.skip_to_next(token, socket.assigns.selected_device_id)
-            end
-
-          # Create new Twitch poll for next track
-          streamer_id = get_streamer_id(socket)
-
-          case create_track_poll(next_track, streamer_id) do
-            {:ok, poll_id} ->
-              schedule_playback_sync()
-
-              flash_message =
-                case spotify_result do
-                  {:ok, :skipped} -> "Moved to track: #{next_track.name}. New poll created!"
-                  {:error, _} -> "Track changed (Spotify skip failed). New poll created!"
-                end
-
-              {:noreply,
-               socket
-               |> assign(:current_track, next_track)
-               |> assign(:twitch_poll_id, poll_id)
-               |> assign(:chat_votes, %{})
-               |> assign(:poll_results, %{})
-               |> put_flash(:info, flash_message)}
-
-            {:error, reason} ->
-              Logger.error("Failed to create poll for next track: #{inspect(reason)}")
-
-              {:noreply,
-               socket
-               |> assign(:current_track, next_track)
-               |> put_flash(:warning, "Moved to track: #{next_track.name}. Poll creation failed.")}
-          end
-        else
-          {:noreply, put_flash(socket, :info, "This is the last track")}
-        end
-
-      _ ->
-        {:noreply, put_flash(socket, :error, "No active session")}
-    end
-  end
-
-  def handle_event("previous_track", _params, socket) do
-    case {socket.assigns.current_session, socket.assigns.selected_album} do
-      {%{id: _session_id}, %{tracks: tracks}} ->
-        current_track = socket.assigns.current_track
-        current_index = Enum.find_index(tracks, &(&1.spotify_id == current_track.spotify_id))
-
-        if current_index > 0 do
-          previous_track = Enum.at(tracks, current_index - 1)
-
-          # Skip on Spotify if connected
-          spotify_result =
-            case socket.assigns.user_spotify_token do
-              nil ->
-                {:ok, :skipped}
-
-              token ->
-                SpotifyApi.skip_to_previous(token, socket.assigns.selected_device_id)
-            end
-
-          # Create new Twitch poll for previous track
-          streamer_id = get_streamer_id(socket)
-
-          case create_track_poll(previous_track, streamer_id) do
-            {:ok, poll_id} ->
-              schedule_playback_sync()
-
-              flash_message =
-                case spotify_result do
-                  {:ok, :skipped} -> "Moved to track: #{previous_track.name}. New poll created!"
-                  {:error, _} -> "Track changed (Spotify skip failed). New poll created!"
-                end
-
-              {:noreply,
-               socket
-               |> assign(:current_track, previous_track)
-               |> assign(:twitch_poll_id, poll_id)
-               |> assign(:chat_votes, %{})
-               |> assign(:poll_results, %{})
-               |> put_flash(:info, flash_message)}
-
-            {:error, reason} ->
-              Logger.error("Failed to create poll for previous track: #{inspect(reason)}")
-
-              {:noreply,
-               socket
-               |> assign(:current_track, previous_track)
-               |> put_flash(
-                 :warning,
-                 "Moved to track: #{previous_track.name}. Poll creation failed."
-               )}
-          end
-        else
-          {:noreply, put_flash(socket, :info, "This is the first track")}
-        end
-
-      _ ->
-        {:noreply, put_flash(socket, :error, "No active session")}
-    end
-  end
-
-  def handle_event("end_session", _params, socket) do
-    case socket.assigns.current_session do
-      nil ->
-        {:noreply, put_flash(socket, :error, "No active session")}
-
-      _session ->
-        # Pause Spotify playback when ending session
-        if socket.assigns.user_spotify_token do
-          SpotifyApi.pause_playback(
-            socket.assigns.user_spotify_token,
-            socket.assigns.selected_device_id
-          )
-        end
-
-        {:noreply,
-         socket
-         |> assign(:current_session, nil)
-         |> assign(:current_track, nil)
-         |> assign(:track_votes, %{})
-         |> assign(:twitch_poll_id, nil)
-         |> assign(:chat_votes, %{})
-         |> assign(:poll_results, %{})
-         |> assign(:spotify_playback_state, %{is_playing: false, device: nil})
-         |> put_flash(:info, "Session ended and Spotify playback stopped")}
-    end
   end
 
   @impl true
@@ -301,57 +114,14 @@ defmodule PremiereEcouteWeb.DashboardLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_info(%SessionStarted{session_id: id}, socket) do
+  @impl true
+  def handle_info(%SessionStarted{session_id: _id}, socket) do
     socket
     |> put_flash(:info, "Listening session started !")
-    |> push_patch(to: ~p"/session/#{id}")
+    # |> push_patch(to: ~p"/session/#{id}")
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # Private helper functions
-
-  defp create_track_poll(track, streamer_id) do
-    poll_question = "Rate \"#{track.name}\" (1-10)"
-    poll_options = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-
-    case TwitchAdapter.create_poll(streamer_id, poll_question, poll_options) do
-      {:ok, poll_id} ->
-        # Start monitoring poll results
-        spawn(fn -> monitor_poll_results(poll_id) end)
-        {:ok, poll_id}
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
-
-  defp monitor_poll_results(poll_id) do
-    # Poll for results every 5 seconds
-    :timer.sleep(5000)
-
-    case TwitchAdapter.get_poll_results(poll_id) do
-      {:ok, results} ->
-        Phoenix.PubSub.broadcast(
-          PremiereEcoute.PubSub,
-          "twitch_chat",
-          {:twitch_poll_update, results}
-        )
-
-        if results.status == :active do
-          monitor_poll_results(poll_id)
-        end
-
-      {:error, _reason} ->
-        :ok
-    end
-  end
-
-  defp schedule_playback_sync do
-    # Sync playback state in 2 seconds
-    Process.send_after(self(), :sync_playback_state, 2000)
-  end
-
-  # Template helper functions
   defp format_duration(duration_ms) when is_integer(duration_ms) do
     minutes = div(duration_ms, 60_000)
     seconds = div(rem(duration_ms, 60_000), 1000)
