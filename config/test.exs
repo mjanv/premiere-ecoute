@@ -1,7 +1,5 @@
 import Config
 
-config :bcrypt_elixir, :log_rounds, 1
-
 config :premiere_ecoute, PremiereEcoute.Repo,
   adapter: Ecto.Adapters.SQLite3,
   database: "priv/repo/premiere_ecoute_test#{System.get_env("MIX_TEST_PARTITION")}.db",
@@ -12,6 +10,11 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "QWnUlPd8dtgcO9GqNwZby5dC48OsqV2+qVZpCjhQOh9Hk+t+1pv3pmsgnZ6egjs5",
   server: false
+
+config :premiere_ecoute,
+  twitch_api: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
+
+config :bcrypt_elixir, :log_rounds, 1
 
 config :logger, level: :warning
 

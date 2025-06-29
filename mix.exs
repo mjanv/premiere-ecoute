@@ -57,7 +57,9 @@ defmodule PremiereEcoute.MixProject do
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
       {:credo, "~> 1.7"},
-      {:dialyxir, "~> 1.4", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:mox, "~> 1.2"},
+      {:websockex, "~> 0.4.3"}
     ]
   end
 

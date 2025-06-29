@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   import Ecto.Changeset
 
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Music.Album
+  alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Repo
 
   schema "listening_sessions" do

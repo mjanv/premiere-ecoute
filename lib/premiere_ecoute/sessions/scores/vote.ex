@@ -6,8 +6,8 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias PremiereEcoute.Discography.Track
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions.Discography.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
   schema "votes" do

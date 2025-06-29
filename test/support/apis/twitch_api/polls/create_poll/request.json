@@ -1,0 +1,9 @@
+{
+    "broadcaster_id": "141981764",
+    "title": "Heads or Tails?",
+    "choices": [
+        {"title": "Heads"},
+        {"title": "Tails"}
+    ],
+    "duration": 1800
+}

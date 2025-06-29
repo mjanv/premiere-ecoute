@@ -63,6 +63,28 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
     end
   end
 
+  defp get_user_info(access_token) do
+    "https://api.twitch.tv/helix/users"
+    |> Req.get(
+      headers: [
+        {"Authorization", "Bearer #{access_token}"},
+        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)}
+      ]
+    )
+    |> case do
+      {:ok, %{status: 200, body: %{"data" => [user | _]}}} ->
+        {:ok, user}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Twitch user info failed: #{status} - #{inspect(body)}")
+        {:error, "Failed to get user info"}
+
+      {:error, reason} ->
+        Logger.error("Twitch user info request failed: #{inspect(reason)}")
+        {:error, "Network error getting user info"}
+    end
+  end
+
   defp random(length) do
     :crypto.strong_rand_bytes(length)
     |> Base.url_encode64(padding: false)

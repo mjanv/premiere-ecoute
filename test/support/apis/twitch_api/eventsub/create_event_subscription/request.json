@@ -1,0 +1,11 @@
+{
+    "type": "user.update",
+    "version": "1",
+    "condition": {
+        "user_id": "1234"
+    },
+    "transport": {
+        "method": "websocket",
+        "session_id": "AQoQexAWVYKSTIu4ec_2VAxyuhAB"
+    }
+}

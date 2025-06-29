@@ -78,72 +78,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
     PremiereEcouteWeb.PubSub.broadcast("command_bus", command)
 
-    # Process command (would normally go through command handler)
-    session = create_listening_session(command, album)
-    first_track = List.first(album.tracks)
-
-    # Start chat listener for vote commands
-    streamer_id = get_streamer_id(socket)
-    # start_chat_listener(streamer_id)
-
-    # Get user's Spotify token for playback control
-    user_token = socket.assigns.user_spotify_token
-
-    # Start album playback on Spotify if token available
-    playback_result =
-      if user_token do
-        SpotifyApi.start_album_playback(user_token, album.spotify_id)
-      else
-        {:error, "No Spotify authentication"}
-      end
-
     {:noreply, socket}
-
-    # case create_track_poll(first_track, streamer_id) do
-    #   {:ok, poll_id} ->
-    #     # Broadcast session started event
-    #     event = %Events.SessionStarted{
-    #       event_id: generate_id(),
-    #       session_id: session.id,
-    #       streamer_id: command.streamer_id,
-    #       album_id: command.album_id,
-    #       timestamp: DateTime.utc_now()
-    #     }
-    #
-    #     Phoenix.PubSub.broadcast(
-    #       PremiereEcoute.PubSub,
-    #       "listening_sessions",
-    #       {:session_started, event}
-    #     )
-    #
-    #     # Update playback state
-    #     schedule_playback_sync()
-    #
-    #     flash_message =
-    #       case playback_result do
-    #         {:ok, :playing} ->
-    #           "Session started! Playing on Spotify and Twitch poll created."
-    #
-    #         {:error, _} ->
-    #           "Session started with Twitch poll. Connect Spotify for playback control."
-    #       end
-    #
-    #     {:noreply,
-    #       socket
-    #       |> assign(:current_session, session)
-    #       |> assign(:current_track, first_track)
-    #       |> assign(:twitch_poll_id, poll_id)
-    #       |> put_flash(:info, flash_message)}
-    #
-    #   {:error, reason} ->
-    #     Logger.error("Failed to create Twitch poll: #{inspect(reason)}")
-    #
-    #     {:noreply,
-    #       socket
-    #       |> assign(:current_session, session)
-    #       |> assign(:current_track, first_track)
-    #       |> put_flash(:warning, "Session started, but Twitch poll failed to create")}
-    # end
   end
 
   def handle_event("pause_playback", _params, socket) do
@@ -323,6 +258,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
     end
   end
 
+  @impl true
   def handle_async(:search, {:ok, result}, %{assigns: assigns} = socket) do
     case result do
       {:ok, albums} ->
@@ -386,45 +322,6 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
       {:error, reason} ->
         {:error, reason}
-    end
-  end
-
-  defp start_chat_listener(streamer_id) do
-    chat_callback = fn message ->
-      # Parse chat for vote commands like "!vote 8"
-      case parse_vote_command(message) do
-        {:ok, vote} ->
-          Phoenix.PubSub.broadcast(
-            PremiereEcoute.PubSub,
-            "twitch_chat",
-            {:twitch_chat_vote, %{user: message.user, vote: vote}}
-          )
-
-        :error ->
-          :ok
-      end
-    end
-
-    case TwitchAdapter.listen_to_chat(streamer_id, chat_callback) do
-      {:ok, _pid} ->
-        :ok
-        # {:error, _reason} -> :ok
-    end
-  end
-
-  defp parse_vote_command(%{message: message}) do
-    case Regex.run(~r/^!vote\s+(\d+)$/i, String.trim(message)) do
-      [_, vote_str] ->
-        case Integer.parse(vote_str) do
-          {vote, ""} when vote >= 1 and vote <= 10 ->
-            {:ok, vote}
-
-          _ ->
-            :error
-        end
-
-      _ ->
-        :error
     end
   end
 
@@ -550,25 +447,10 @@ defmodule PremiereEcouteWeb.DashboardLive do
     |> Enum.sum()
   end
 
-  defp generate_id, do: Ecto.UUID.generate()
-
   defp get_streamer_id(socket) do
     case socket.assigns.current_scope do
       %{user: %{id: user_id}} -> to_string(user_id)
       _ -> "anonymous_streamer"
     end
-  end
-
-  defp create_listening_session(command, album) do
-    %{
-      id: generate_id(),
-      streamer_id: command.streamer_id,
-      album_id: command.album_id,
-      current_track_id: List.first(album.tracks).spotify_id,
-      status: :active,
-      started_at: DateTime.utc_now(),
-      inserted_at: DateTime.utc_now(),
-      updated_at: DateTime.utc_now()
-    }
   end
 end

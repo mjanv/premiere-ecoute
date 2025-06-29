@@ -4,51 +4,31 @@ defmodule PremiereEcouteWeb.AuthController do
   require Logger
 
   alias PremiereEcoute.Accounts
-  alias PremiereEcoute.Adapters.TwitchAdapter
+  alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Apis.TwitchApi
 
   def request(conn, %{"provider" => "spotify"}) do
-    # Redirect to Spotify OAuth for playback control
     client_id = Application.get_env(:premiere_ecoute, :spotify_client_id)
-    redirect_uri = "http://localhost:4000/auth/spotify/callback"
+    redirect_uri = Application.get_env(:premiere_ecoute, :spotify_redirect_uri)
 
     if client_id && redirect_uri do
-      auth_url =
-        "https://accounts.spotify.com/authorize?" <>
-          URI.encode_query(%{
-            client_id: client_id,
-            redirect_uri: redirect_uri,
-            response_type: "code",
-            scope:
-              "user-read-playback-state user-modify-playback-state user-read-currently-playing"
-          })
-
-      redirect(conn, external: auth_url)
+      redirect(conn, external: SpotifyApi.authorization_url())
     else
       conn
-      |> put_flash(:error, "Spotify OAuth not configured")
+      |> put_flash(:error, "Spotify login not configured")
       |> redirect(to: ~p"/")
     end
   end
 
   def request(conn, %{"provider" => "twitch"}) do
-    # Redirect to Twitch OAuth
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
-    redirect_uri = "http://localhost:4000/auth/twitch/callback"
+    redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
 
     if client_id && redirect_uri do
-      auth_url =
-        "https://id.twitch.tv/oauth2/authorize?" <>
-          URI.encode_query(%{
-            client_id: client_id,
-            redirect_uri: redirect_uri,
-            response_type: "code",
-            scope: "channel:manage:polls chat:read user:read:email"
-          })
-
-      redirect(conn, external: auth_url)
+      redirect(conn, external: TwitchApi.authorization_url())
     else
       conn
-      |> put_flash(:error, "Twitch OAuth not configured")
+      |> put_flash(:error, "Twitch login not configured")
       |> redirect(to: ~p"/")
     end
   end
@@ -71,10 +51,17 @@ defmodule PremiereEcouteWeb.AuthController do
     end
   end
 
+  def callback(conn, %{"provider" => "spotify", "error" => error}) do
+    Logger.error("Spotify OAuth error: #{error}")
+
+    conn
+    |> put_flash(:info, "Spotify authentication failed")
+    |> redirect(to: ~p"/")
+  end
+
   def callback(conn, %{"provider" => "twitch", "code" => code}) do
     case TwitchAdapter.authenticate_user(code) do
       {:ok, auth_data} ->
-        # Find or create user based on Twitch data
         case find_or_create_user(auth_data) do
           {:ok, user} ->
             conn
@@ -99,25 +86,11 @@ defmodule PremiereEcouteWeb.AuthController do
     end
   end
 
-  def callback(conn, %{"provider" => "spotify", "error" => error}) do
-    Logger.error("Spotify OAuth error: #{error}")
-
-    conn
-    |> put_flash(
-      :info,
-      "Spotify authentication was cancelled. Click 'Connect Spotify' to try again."
-    )
-    |> redirect(to: ~p"/")
-  end
-
   def callback(conn, %{"provider" => "twitch", "error" => error}) do
     Logger.error("Twitch OAuth error: #{error}")
 
     conn
-    |> put_flash(
-      :info,
-      "Twitch authentication was cancelled. Click 'Connect Twitch' to try again."
-    )
+    |> put_flash(:info, "Twitch authentication failed")
     |> redirect(to: ~p"/")
   end
 
@@ -129,7 +102,7 @@ defmodule PremiereEcouteWeb.AuthController do
         # Create new user
         Accounts.register_user(%{
           email: email,
-          password: generate_random_password()
+          password: Base.encode64(:crypto.strong_rand_bytes(32))
         })
 
       user ->
@@ -174,9 +147,5 @@ defmodule PremiereEcouteWeb.AuthController do
     else
       {:error, "Spotify credentials not configured"}
     end
-  end
-
-  defp generate_random_password do
-    :crypto.strong_rand_bytes(32) |> Base.encode64()
   end
 end
