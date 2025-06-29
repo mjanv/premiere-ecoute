@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
 
   alias PremiereEcoute.Sessions.Discography.Album
 
+  @moduletag :spotify
+
   describe "search_albums/1" do
     test "can list albums from a string query" do
       query = "billie"

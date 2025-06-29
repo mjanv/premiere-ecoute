@@ -8,6 +8,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Track
 
+  @moduletag :spotify
+
   describe "get_album/1" do
     test "list album and track details from an unique identifier" do
       id = "7aJuG4TFXa2hmE4z1yxc3n"

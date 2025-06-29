@@ -6,8 +6,8 @@ defmodule PremiereEcoute.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      PremiereEcoute.Supervisor,
-      PremiereEcouteWeb.Supervisor
+      PremiereEcouteWeb.Supervisor,
+      PremiereEcoute.Supervisor
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: PremiereEcoute.Application)

@@ -18,13 +18,13 @@
             <span class="text-sm text-green-400">Live</span>
           </div>
           <!-- Spotify Status -->
-          <%= if @spotify_playback_state.device do %>
+          <%= if false do %>
             <div class="flex items-center space-x-2 px-3 py-1 bg-green-900/30 rounded-lg">
               <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
               </svg>
               <span class="text-sm text-green-400">
-                {if @spotify_playback_state.is_playing, do: "Playing", else: "Connected"}
+                {if false, do: "Playing", else: "Connected"}
               </span>
             </div>
           <% else %>
@@ -44,13 +44,13 @@
         </div>
       </div>
     </header>
-
+    
 <!-- Main Content -->
     <div class="flex h-screen">
       <!-- Left Panel - Album Selection -->
       <div class="w-1/3 bg-gray-800 border-r border-gray-700 p-6">
         <h2 class="text-xl font-semibold mb-4 text-purple-300">Album Selection</h2>
-
+        
 <!-- Search -->
         <div class="mb-6">
           <.form
@@ -67,9 +67,9 @@
               error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
             />
           </.form>
-
+          
 <!-- Search Results -->
-          <%= if @loading do %>
+          <%= if @search_albums.loading do %>
             <div class="mt-4 text-center text-gray-400">
               <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto">
               </div>
@@ -77,9 +77,9 @@
             </div>
           <% end %>
 
-          <%= if @search_results != [] do %>
+          <%= if @search_albums.ok? do %>
             <div class="mt-4 space-y-2 max-h-64 overflow-y-auto">
-              <%= for album <- @search_results do %>
+              <%= for album <- @search_albums.result do %>
                 <div
                   class="bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors"
                   phx-click="select_album"
@@ -110,15 +110,15 @@
             </div>
           <% end %>
         </div>
-
+        
 <!-- Selected Album -->
-        <%= if @selected_album do %>
+        <%= if @selected_album.ok? && @selected_album.result do %>
           <div class="bg-gray-700 rounded-lg p-4 mb-6">
             <div class="flex items-center space-x-4">
-              <%= if @selected_album.cover_url do %>
+              <%= if @selected_album.result.cover_url do %>
                 <img
-                  src={@selected_album.cover_url}
-                  alt={@selected_album.name}
+                  src={@selected_album.result.cover_url}
+                  alt={@selected_album.result.name}
                   class="w-16 h-16 rounded-lg object-cover"
                 />
               <% else %>
@@ -129,11 +129,11 @@
                 </div>
               <% end %>
               <div>
-                <h3 class="font-semibold text-purple-300">{@selected_album.name}</h3>
-                <p class="text-gray-400 text-sm">{@selected_album.artist}</p>
+                <h3 class="font-semibold text-purple-300">{@selected_album.result.name}</h3>
+                <p class="text-gray-400 text-sm">{@selected_album.result.artist}</p>
                 <p class="text-gray-500 text-xs">
-                  {@selected_album.total_tracks} tracks • {if @selected_album.release_date,
-                    do: @selected_album.release_date.year,
+                  {@selected_album.result.total_tracks} tracks • {if @selected_album.result.release_date,
+                    do: @selected_album.result.release_date.year,
                     else: "Unknown"}
                 </p>
               </div>
@@ -154,12 +154,12 @@
               </button>
             <% end %>
           </div>
-
+          
 <!-- Track List -->
           <div>
             <h3 class="text-lg font-medium mb-3 text-purple-300">Track List</h3>
             <div class="space-y-2 max-h-64 overflow-y-auto">
-              <%= for {track, index} <- Enum.with_index(@selected_album.tracks) do %>
+              <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
                 <div class={[
                   "bg-gray-700 rounded-lg p-3",
                   @current_track && @current_track.spotify_id == track.spotify_id &&
@@ -195,7 +195,7 @@
           </div>
         <% end %>
       </div>
-
+      
 <!-- Center Panel - Live Session -->
       <div class="flex-1 bg-gray-900 p-6">
         <%= if @current_session do %>
@@ -207,9 +207,9 @@
                 <%= if @current_track && @selected_album do %>
                   <p class="text-purple-100">
                     Track {Enum.find_index(
-                      @selected_album.tracks,
+                      @selected_album.result.tracks,
                       &(&1.spotify_id == @current_track.spotify_id)
-                    ) + 1} of {@selected_album.total_tracks} • {@current_track.name}
+                    ) + 1} of {@selected_album.result.total_tracks} • {@current_track.name}
                   </p>
                 <% end %>
               </div>
@@ -227,7 +227,7 @@
               </div>
             </div>
           </div>
-
+          
 <!-- Spotify Playback Controls -->
           <%= if @user_spotify_token do %>
             <div class="bg-gray-800 rounded-lg p-4 mb-6">
@@ -243,7 +243,7 @@
                     <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
                   </svg>
                 </button>
-
+                
 <!-- Play/Pause -->
                 <%= if @spotify_playback_state.is_playing do %>
                   <button
@@ -266,7 +266,7 @@
                     </svg>
                   </button>
                 <% end %>
-
+                
 <!-- Next Track -->
                 <button
                   class="bg-gray-700 hover:bg-gray-600 p-3 rounded-full transition-colors"
@@ -278,7 +278,7 @@
                   </svg>
                 </button>
               </div>
-
+              
 <!-- Playback Status -->
               <%= if @spotify_playback_state.device do %>
                 <div class="mt-4 text-center">
@@ -315,7 +315,7 @@
               </div>
             </div>
           <% end %>
-
+          
 <!-- Current Track Voting from Twitch -->
           <%= if @current_track do %>
             <div class="bg-gray-800 rounded-lg p-6 mb-6">
@@ -329,7 +329,7 @@
                   <span class="text-sm text-gray-400">No active poll</span>
                 <% end %>
               </div>
-
+              
 <!-- Twitch Poll Visualization -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-3">
@@ -362,7 +362,7 @@
                   </span>
                 </div>
               </div>
-
+              
 <!-- Chat Vote Commands -->
               <div class="mt-6 p-4 bg-gray-700/50 rounded-lg">
                 <h4 class="text-sm font-medium text-purple-300 mb-2">
@@ -382,7 +382,7 @@
               </div>
             </div>
           <% end %>
-
+          
 <!-- Session Controls -->
           <div class="flex space-x-4">
             <button
@@ -429,13 +429,13 @@
           </div>
         <% end %>
       </div>
-
+      
 <!-- Right Panel - Track Scores -->
       <div class="w-1/4 bg-gray-800 border-l border-gray-700 p-6">
         <h3 class="text-lg font-semibold mb-4 text-purple-300">Track Scores</h3>
-        <%= if @selected_album do %>
+        <%= if @selected_album.ok? && @selected_album.result do %>
           <div class="space-y-2">
-            <%= for {track, index} <- Enum.with_index(@selected_album.tracks) do %>
+            <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
               <div class={[
                 "relative rounded-lg p-3 overflow-hidden",
                 (@current_track && @current_track.spotify_id == track.spotify_id &&
@@ -444,7 +444,7 @@
                 <!-- Background color fill based on score -->
                 <div class="absolute inset-0 rounded-lg transition-all duration-500 bg-gray-700">
                 </div>
-
+                
 <!-- Content overlay -->
                 <div class="relative z-10">
                   <div class="flex justify-between items-center mb-1">
@@ -477,7 +477,6 @@
 </Layouts.app>
 
 <script>
-  // Helper functions for vote visualization
   window.formatDuration = function(durationMs) {
     const minutes = Math.floor(durationMs / 60000);
     const seconds = Math.floor((durationMs % 60000) / 1000);

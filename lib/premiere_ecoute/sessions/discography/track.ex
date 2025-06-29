@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Sessions.Discography.Track do
 
   import Ecto.Changeset
 
-  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Sessions.Discography.Album
 
   schema "tracks" do
     field :spotify_id, :string
@@ -21,11 +21,10 @@ defmodule PremiereEcoute.Sessions.Discography.Track do
   @doc false
   def changeset(track, attrs) do
     track
-    |> cast(attrs, [:spotify_id, :name, :track_number, :duration_ms, :album_id])
+    |> cast(attrs, [:spotify_id, :name, :track_number, :duration_ms])
     |> validate_required([:spotify_id, :name, :track_number])
     |> validate_number(:track_number, greater_than: 0)
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
-    |> foreign_key_constraint(:album_id)
-    |> unique_constraint([:spotify_id, :album_id])
+    |> unique_constraint([:spotify_id])
   end
 end

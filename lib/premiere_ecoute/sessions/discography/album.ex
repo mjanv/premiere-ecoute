@@ -38,6 +38,13 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
 
+  def get_or_create(%__MODULE__{spotify_id: spotify_id} = album) do
+    case read(spotify_id) do
+      %__MODULE__{} = album -> {:ok, album}
+      nil -> create(album)
+    end
+  end
+
   def read(spotify_id) do
     __MODULE__
     |> Repo.get_by(spotify_id: spotify_id)

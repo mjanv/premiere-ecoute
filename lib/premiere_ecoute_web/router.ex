@@ -20,25 +20,17 @@ defmodule PremiereEcouteWeb.Router do
   scope "/", PremiereEcouteWeb do
     pipe_through :browser
 
-    live "/", DashboardLive, :index
+    live_session :dashboard,
+      on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
+      live "/", DashboardLive, :index
+    end
 
     # OAuth routes
     get "/auth/:provider", AuthController, :request
     get "/auth/:provider/callback", AuthController, :callback
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", PremiereEcouteWeb do
-  #   pipe_through :api
-  # end
-
-  # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:premiere_ecoute, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
@@ -48,8 +40,6 @@ defmodule PremiereEcouteWeb.Router do
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
-
-  ## Authentication routes
 
   scope "/", PremiereEcouteWeb do
     pipe_through [:browser, :require_authenticated_user]
@@ -75,9 +65,5 @@ defmodule PremiereEcouteWeb.Router do
 
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
-
-    # OAuth routes
-    get "/auth/:provider", AuthController, :request
-    get "/auth/:provider/callback", AuthController, :callback
   end
 end

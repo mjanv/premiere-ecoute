@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   schema "listening_sessions" do
     field :streamer_id, :string
-    field :status, Ecto.Enum, values: [:preparing, :active, :stopped]
+    field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
     field :started_at, :utc_datetime
     field :ended_at, :utc_datetime
 
@@ -32,8 +32,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       :ended_at,
       :user_id
     ])
-    |> validate_required([:streamer_id, :album_id, :status])
-    |> validate_inclusion(:status, [:preparing, :active, :stopped])
+    |> validate_required([:streamer_id, :album_id])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:album_spotify_id)
   end

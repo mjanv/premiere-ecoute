@@ -1,20 +1,16 @@
 defmodule PremiereEcouteWeb.DashboardLive do
   use PremiereEcouteWeb, :live_view
 
+  alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Adapters.TwitchAdapter
-  alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Core.Commands
-  alias PremiereEcoute.Core.Entities
-  alias PremiereEcoute.Core.Events
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
 
   require Logger
 
   @impl true
   def mount(_params, session, socket) do
-    # Subscribe to session events for real-time updates
-    Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "listening_sessions")
-    Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "voting_updates")
-    Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "twitch_chat")
+    PremiereEcouteWeb.PubSub.subscribe("listening_sessions")
 
     # Get Spotify token from session
     user_spotify_token = Map.get(session, "spotify_token")
@@ -23,8 +19,8 @@ defmodule PremiereEcouteWeb.DashboardLive do
      socket
      |> assign(:page_title, "Streamer Dashboard")
      |> assign(:search_form, to_form(%{"query" => ""}))
-     |> assign(:search_results, [])
-     |> assign(:selected_album, nil)
+     |> assign(:search_albums, AsyncResult.ok([]))
+     |> assign(:selected_album, AsyncResult.ok(nil))
      |> assign(:current_session, nil)
      |> assign(:active_voters, 0)
      |> assign(:current_track, nil)
@@ -52,117 +48,102 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
   @impl true
   def handle_event("search_albums", %{"query" => query}, socket) when byte_size(query) > 2 do
-    send(self(), {:search_spotify, query})
-
-    {:noreply,
-     socket
-     |> assign(:loading, true)
-     |> assign(:search_results, [])}
+    socket
+    |> assign(:search_albums, AsyncResult.loading())
+    |> start_async(:search, fn -> PremiereEcoute.search_albums(query) end)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("search_albums", _params, socket) do
-    {:noreply, assign(socket, :search_results, [])}
-  end
+  def handle_event("search_albums", _params, socket), do: {:noreply, socket}
 
   def handle_event("select_album", %{"album_id" => album_id}, socket) do
-    case SpotifyApi.get_album(album_id) do
-      {:ok, album} ->
-        {:noreply,
-         socket
-         |> assign(:selected_album, album)
-         |> assign(:search_results, [])
-         |> assign(:loading, false)
-         |> put_flash(:info, "Album selected: #{album.name}")}
-
-      {:error, reason} ->
-        Logger.error("Failed to fetch album: #{inspect(reason)}")
-
-        {:noreply,
-         socket
-         |> put_flash(:error, "Failed to load album details")}
-    end
+    socket
+    |> assign(:search_albums, AsyncResult.ok([]))
+    |> assign(:selected_album, AsyncResult.loading())
+    |> start_async(:select, fn -> PremiereEcoute.get_album(album_id) end)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("start_session", _params, socket) do
-    case socket.assigns.selected_album do
-      nil ->
-        {:noreply, put_flash(socket, :error, "Please select an album first")}
+  def handle_event("start_session", _params, %{assigns: %{selected_album: nil}} = socket) do
+    {:noreply, put_flash(socket, :error, "Please select an album first")}
+  end
 
-      album ->
-        # Create start listening command
-        command = %Commands.StartListening{
-          command_id: generate_id(),
-          streamer_id: get_streamer_id(socket),
-          album_id: album.spotify_id,
-          timestamp: DateTime.utc_now()
-        }
+  def handle_event("start_session", _params, %{assigns: %{selected_album: album}} = socket) do
+    album = album.result
 
-        # Process command (would normally go through command handler)
-        session = create_listening_session(command, album)
-        first_track = List.first(album.tracks)
+    command = %StartListeningSession{
+      streamer_id: get_streamer_id(socket),
+      album_id: album.spotify_id
+    }
 
-        # Start chat listener for vote commands
-        streamer_id = get_streamer_id(socket)
-        start_chat_listener(streamer_id)
+    PremiereEcouteWeb.PubSub.broadcast("command_bus", command)
 
-        # Get user's Spotify token for playback control
-        user_token = socket.assigns.user_spotify_token
+    # Process command (would normally go through command handler)
+    session = create_listening_session(command, album)
+    first_track = List.first(album.tracks)
 
-        # Start album playback on Spotify if token available
-        playback_result =
-          if user_token do
-            SpotifyApi.start_album_playback(user_token, album.spotify_id)
-          else
-            {:error, "No Spotify authentication"}
-          end
+    # Start chat listener for vote commands
+    streamer_id = get_streamer_id(socket)
+    # start_chat_listener(streamer_id)
 
-        # Create Twitch poll for the first track
-        case create_track_poll(first_track, streamer_id) do
-          {:ok, poll_id} ->
-            # Broadcast session started event
-            event = %Events.SessionStarted{
-              event_id: generate_id(),
-              session_id: session.id,
-              streamer_id: command.streamer_id,
-              album_id: command.album_id,
-              timestamp: DateTime.utc_now()
-            }
+    # Get user's Spotify token for playback control
+    user_token = socket.assigns.user_spotify_token
 
-            Phoenix.PubSub.broadcast(
-              PremiereEcoute.PubSub,
-              "listening_sessions",
-              {:session_started, event}
-            )
+    # Start album playback on Spotify if token available
+    playback_result =
+      if user_token do
+        SpotifyApi.start_album_playback(user_token, album.spotify_id)
+      else
+        {:error, "No Spotify authentication"}
+      end
 
-            # Update playback state
-            schedule_playback_sync()
+    {:noreply, socket}
 
-            flash_message =
-              case playback_result do
-                {:ok, :playing} ->
-                  "Session started! Playing on Spotify and Twitch poll created."
-
-                {:error, _} ->
-                  "Session started with Twitch poll. Connect Spotify for playback control."
-              end
-
-            {:noreply,
-             socket
-             |> assign(:current_session, session)
-             |> assign(:current_track, first_track)
-             |> assign(:twitch_poll_id, poll_id)
-             |> put_flash(:info, flash_message)}
-
-          {:error, reason} ->
-            Logger.error("Failed to create Twitch poll: #{inspect(reason)}")
-
-            {:noreply,
-             socket
-             |> assign(:current_session, session)
-             |> assign(:current_track, first_track)
-             |> put_flash(:warning, "Session started, but Twitch poll failed to create")}
-        end
-    end
+    # case create_track_poll(first_track, streamer_id) do
+    #   {:ok, poll_id} ->
+    #     # Broadcast session started event
+    #     event = %Events.SessionStarted{
+    #       event_id: generate_id(),
+    #       session_id: session.id,
+    #       streamer_id: command.streamer_id,
+    #       album_id: command.album_id,
+    #       timestamp: DateTime.utc_now()
+    #     }
+    #
+    #     Phoenix.PubSub.broadcast(
+    #       PremiereEcoute.PubSub,
+    #       "listening_sessions",
+    #       {:session_started, event}
+    #     )
+    #
+    #     # Update playback state
+    #     schedule_playback_sync()
+    #
+    #     flash_message =
+    #       case playback_result do
+    #         {:ok, :playing} ->
+    #           "Session started! Playing on Spotify and Twitch poll created."
+    #
+    #         {:error, _} ->
+    #           "Session started with Twitch poll. Connect Spotify for playback control."
+    #       end
+    #
+    #     {:noreply,
+    #       socket
+    #       |> assign(:current_session, session)
+    #       |> assign(:current_track, first_track)
+    #       |> assign(:twitch_poll_id, poll_id)
+    #       |> put_flash(:info, flash_message)}
+    #
+    #   {:error, reason} ->
+    #     Logger.error("Failed to create Twitch poll: #{inspect(reason)}")
+    #
+    #     {:noreply,
+    #       socket
+    #       |> assign(:current_session, session)
+    #       |> assign(:current_track, first_track)
+    #       |> put_flash(:warning, "Session started, but Twitch poll failed to create")}
+    # end
   end
 
   def handle_event("pause_playback", _params, socket) do
@@ -342,70 +323,53 @@ defmodule PremiereEcouteWeb.DashboardLive do
     end
   end
 
-
-
-  @impl true
-  def handle_info({:search_spotify, query}, socket) do
-    case SpotifyApi.search_albums(query) do
-      {:ok, results} ->
-        {:noreply,
-         socket
-         |> assign(:search_results, results)
-         |> assign(:loading, false)}
+  def handle_async(:search, {:ok, result}, %{assigns: assigns} = socket) do
+    case result do
+      {:ok, albums} ->
+        socket
+        |> assign(:search_albums, AsyncResult.ok(albums))
 
       {:error, reason} ->
-        Logger.error("Spotify search failed: #{inspect(reason)}")
-
-        {:noreply,
-         socket
-         |> assign(:search_results, [])
-         |> assign(:loading, false)
-         |> put_flash(:error, "Search failed. Please try again.")}
+        socket
+        |> assign(:search_albums, AsyncResult.failed(assigns.search_albums, {:error, reason}))
+        |> put_flash(:error, "Search failed. Please try again.")
     end
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_info(:sync_playback_state, socket) do
-    case socket.assigns.user_spotify_token do
-      nil ->
-        {:noreply, socket}
+  def handle_async(:search, {:exit, reason}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:search_albums, AsyncResult.failed(assigns.search_albums, {:error, reason}))
+    |> put_flash(:error, "Search failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
 
-      token ->
-        case SpotifyApi.get_playback_state(token) do
-          {:ok, playback_state} ->
-            {:noreply, assign(socket, :spotify_playback_state, playback_state)}
+  def handle_async(:select, {:ok, result}, %{assigns: assigns} = socket) do
+    case result do
+      {:ok, album} ->
+        socket
+        |> assign(:selected_album, AsyncResult.ok(album))
 
-          {:error, _reason} ->
-            {:noreply, socket}
-        end
+      {:error, reason} ->
+        socket
+        |> assign(:selected_album, AsyncResult.failed(assigns.selected_album, {:error, reason}))
+        |> put_flash(:error, "Selection failed. Please try again.")
     end
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_info({:session_started, _event}, socket) do
-    {:noreply, assign(socket, :active_voters, socket.assigns.active_voters + 1)}
+  def handle_async(:select, {:exit, reason}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:selected_album, AsyncResult.failed(assigns.selected_album, {:error, reason}))
+    |> put_flash(:error, "Selection failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_info({:vote_cast, _event}, socket) do
-    # Update real-time vote display from Twitch
-    {:noreply, assign(socket, :active_voters, socket.assigns.active_voters + 1)}
-  end
-
-  def handle_info({:twitch_chat_vote, %{user: user, vote: vote}}, socket) do
-    # Handle chat vote commands like "!vote 8"
-    if socket.assigns.current_track do
-      chat_votes = Map.put(socket.assigns.chat_votes, user, vote)
-
-      {:noreply,
-       socket
-       |> assign(:chat_votes, chat_votes)
-       |> assign(:active_voters, map_size(chat_votes))}
-    else
-      {:noreply, socket}
-    end
-  end
-
-  def handle_info({:twitch_poll_update, poll_results}, socket) do
-    # Handle Twitch poll result updates
-    {:noreply, assign(socket, :poll_results, poll_results)}
+  def handle_info(%SessionStarted{session_id: id}, socket) do
+    socket
+    |> put_flash(:info, "Listening session started !")
+    |> push_patch(to: ~p"/session/#{id}")
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   # Private helper functions
@@ -596,7 +560,7 @@ defmodule PremiereEcouteWeb.DashboardLive do
   end
 
   defp create_listening_session(command, album) do
-    %Entities.ListeningSession{
+    %{
       id: generate_id(),
       streamer_id: command.streamer_id,
       album_id: command.album_id,

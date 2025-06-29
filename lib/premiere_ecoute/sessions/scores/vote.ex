@@ -7,8 +7,8 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   import Ecto.Query
 
   alias PremiereEcoute.Discography.Track
-  alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions.ListeningSession
 
   schema "votes" do
     field :viewer_id, :string

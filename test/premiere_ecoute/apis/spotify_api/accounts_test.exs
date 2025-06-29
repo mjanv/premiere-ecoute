@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AccountsTest do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
+  @moduletag :spotify
+
   describe "authorization_url/0" do
     test "can generate a valid authorization url for Spotify login" do
       url = SpotifyApi.Accounts.authorization_url()
