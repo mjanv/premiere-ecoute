@@ -43,7 +43,6 @@ defmodule PremiereEcoute.Core.CommandBus.Handler do
     end
   end
 
-
   @callback validate(struct()) :: {:ok, struct()} | {:error, any()}
   @callback handle(struct()) :: {:ok, [struct()]} | {:error, any()}
   @callback dispatch(struct()) :: :ok | {:error, any()}

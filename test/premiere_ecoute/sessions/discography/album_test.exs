@@ -197,7 +197,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
       :ok = Album.delete(spotify_id)
 
-      assert is_nil(Album.read(spotify_id))
+      assert is_nil(Album.get_by(spotify_id: spotify_id))
     end
 
     test "read an unexisting album" do
@@ -205,7 +205,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
       :ok = Album.delete(spotify_id)
 
-      assert is_nil(Album.read(spotify_id))
+      assert is_nil(Album.get_by(spotify_id: spotify_id))
     end
   end
 end

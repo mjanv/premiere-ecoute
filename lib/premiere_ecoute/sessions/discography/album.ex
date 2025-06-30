@@ -52,20 +52,28 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
   end
 
   def get_or_create(%__MODULE__{spotify_id: spotify_id} = album) do
-    case read(spotify_id) do
+    case get_by(spotify_id: spotify_id) do
       %__MODULE__{} = album -> {:ok, album}
       nil -> create(album)
     end
   end
 
-  def read(spotify_id) do
+  # AIDEV-NOTE: get/1 function for getting album by primary key id
+  def get(id) do
     __MODULE__
-    |> Repo.get_by(spotify_id: spotify_id)
+    |> Repo.get(id)
+    |> Repo.preload([:tracks])
+  end
+
+  # AIDEV-NOTE: get_by/1 function for getting album by arbitrary field criteria
+  def get_by(criteria) do
+    __MODULE__
+    |> Repo.get_by(criteria)
     |> Repo.preload([:tracks])
   end
 
   def delete(spotify_id) do
-    case read(spotify_id) do
+    case get_by(spotify_id: spotify_id) do
       nil ->
         :ok
 

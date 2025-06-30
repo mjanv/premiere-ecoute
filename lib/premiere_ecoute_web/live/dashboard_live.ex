@@ -129,7 +129,6 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
   defp format_duration(_), do: "0:00"
 
-
   defp get_streamer_id(socket) do
     case socket.assigns.current_scope do
       %{user: %{id: user_id}} -> to_string(user_id)
