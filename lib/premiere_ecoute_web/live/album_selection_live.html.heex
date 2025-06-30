@@ -1,7 +1,7 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
-  <div class="min-h-screen bg-gray-900 text-white">
+  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
     <!-- Header -->
-    <header class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+    <header class="border-b px-6 py-4" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
@@ -9,7 +9,7 @@
               <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
             </svg>
           </div>
-          <h1 class="text-2xl font-bold text-purple-400">Premiere Ecoute</h1>
+          <h1 class="text-2xl font-bold" style="color: var(--color-primary-400);">Premiere Ecoute</h1>
         </div>
         <div class="flex items-center space-x-4">
           <.link
@@ -57,8 +57,8 @@
 <!-- Main Content -->
     <div class="flex h-screen">
       <!-- Left Panel - Album Selection -->
-      <div class="w-1/2 bg-gray-800 border-r border-gray-700 p-6">
-        <h2 class="text-xl font-semibold mb-4 text-purple-300">Album Selection</h2>
+      <div class="w-1/2 border-r p-6" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
+        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">Album Selection</h2>
         
 <!-- Search -->
         <div class="mb-6">
@@ -72,7 +72,8 @@
               field={@search_form[:query]}
               type="text"
               placeholder="Search Spotify albums..."
-              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
               error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
             />
           </.form>
@@ -90,7 +91,8 @@
             <div class="mt-4 space-y-2 max-h-64 overflow-y-auto">
               <%= for album <- @search_albums.result do %>
                 <div
-                  class="bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors"
+                  class="rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors"
+                  style="background-color: var(--color-dark-800);"
                   phx-click="select_album"
                   phx-value-album_id={album.spotify_id}
                 >
@@ -109,7 +111,7 @@
                       </div>
                     <% end %>
                     <div class="flex-1 min-w-0">
-                      <h4 class="font-medium text-purple-300 truncate">{album.name}</h4>
+                      <h4 class="font-medium truncate" style="color: var(--color-primary-300);">{album.name}</h4>
                       <p class="text-gray-400 text-sm truncate">{album.artist}</p>
                       <p class="text-gray-500 text-xs">{album.total_tracks} tracks</p>
                     </div>
@@ -122,7 +124,7 @@
         
 <!-- Selected Album -->
         <%= if @selected_album.ok? && @selected_album.result do %>
-          <div class="bg-gray-700 rounded-lg p-6 mb-6">
+          <div class="rounded-lg p-6 mb-6" style="background-color: var(--color-dark-800);">
             <div class="text-center mb-6">
               <%= if @selected_album.result.cover_url do %>
                 <img
@@ -137,7 +139,7 @@
                   </svg>
                 </div>
               <% end %>
-              <h3 class="text-xl font-bold text-purple-300 mb-2">
+              <h3 class="text-xl font-bold mb-2" style="color: var(--color-primary-300);">
                 {@selected_album.result.name}
               </h3>
               <p class="text-gray-300 text-lg mb-2">{@selected_album.result.artist}</p>
@@ -165,7 +167,7 @@
             <% end %>
           </div>
         <% else %>
-          <div class="bg-gray-700 rounded-lg p-8 mb-6">
+          <div class="rounded-lg p-8 mb-6" style="background-color: var(--color-dark-800);">
             <div class="text-center text-gray-400">
               <svg
                 class="w-20 h-20 mx-auto mb-4 opacity-50"
@@ -182,12 +184,12 @@
       </div>
       
 <!-- Right Panel - Track List -->
-      <div class="w-1/2 bg-gray-800 p-6">
-        <h3 class="text-lg font-semibold mb-4 text-purple-300">Track List</h3>
+      <div class="w-1/2 p-6" style="background-color: var(--color-dark-900);">
+        <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">Track List</h3>
         <%= if @selected_album.ok? && @selected_album.result do %>
           <div class="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
             <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
-              <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors">
+              <div class="rounded-lg p-4 hover:bg-gray-600 transition-colors" style="background-color: var(--color-dark-800);">
                 <div class="flex justify-between items-center">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center space-x-3">
@@ -204,15 +206,15 @@
           </div>
           
 <!-- Album Summary -->
-          <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+          <div class="mt-6 p-4 rounded-lg" style="background-color: var(--color-dark-800);">
             <div class="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span class="text-gray-400">Total Tracks:</span>
-                <p class="font-medium text-purple-300">{length(@selected_album.result.tracks)}</p>
+                <p class="font-medium" style="color: var(--color-primary-300);">{length(@selected_album.result.tracks)}</p>
               </div>
               <div>
                 <span class="text-gray-400">Total Duration:</span>
-                <p class="font-medium text-purple-300">
+                <p class="font-medium" style="color: var(--color-primary-300);">
                   {total_ms =
                     @selected_album.result.tracks
                     |> Enum.map(&(&1.duration_ms || 0))

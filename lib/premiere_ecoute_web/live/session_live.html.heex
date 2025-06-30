@@ -1,0 +1,281 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
+  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
+    <!-- Header -->
+    <header class="border-b px-6 py-4" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: var(--color-primary-600);">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+            </svg>
+          </div>
+          <h1 class="text-2xl font-bold" style="color: var(--color-primary-400);">Premiere Ecoute</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <.link
+            navigate={~p"/sessions"}
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:text-purple-300 transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            All Sessions
+          </.link>
+          <.link
+            navigate={~p"/"}
+            class="inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium text-gray-300 transition-colors"
+            style="border-color: var(--color-dark-700); background-color: var(--color-dark-900);"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Homepage
+          </.link>
+        </div>
+      </div>
+    </header>
+    
+<!-- Main Content -->
+    <div class="flex h-screen">
+      <!-- Left Column - Session & Album Details (1/3) -->
+      <div class="w-1/3 border-r p-6 overflow-y-auto" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
+        <.async_result :let={session_data} assign={@session_data}>
+          <:loading>
+            <div class="animate-pulse">
+              <div class="h-4 rounded w-3/4 mb-4" style="background-color: var(--color-dark-800);"></div>
+              <div class="h-4 rounded w-1/2 mb-4" style="background-color: var(--color-dark-800);"></div>
+              <div class="h-4 rounded w-5/6" style="background-color: var(--color-dark-800);"></div>
+            </div>
+          </:loading>
+
+          <:failed :let={_failure}>
+            <div class="text-center">
+              <div class="text-red-500 text-xl mb-4">⚠️</div>
+              <h3 class="text-lg font-medium text-white mb-2">Unable to load session data</h3>
+              <p class="text-gray-400">Please try refreshing the page.</p>
+            </div>
+          </:failed>
+          
+<!-- Session Information -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 mb-6">
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-white">Session Information</h2>
+            </div>
+
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-blue-100">Status</span>
+                <span class={[
+                  "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
+                  session_status_class(@listening_session.status)
+                ]}>
+                  {String.capitalize(to_string(@listening_session.status))}
+                </span>
+              </div>
+
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-blue-100">Streamer:</span>
+                  <span class="text-white font-medium">{@listening_session.streamer_id}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-blue-100">Started:</span>
+                  <span class="text-white font-medium">
+                    {if @listening_session.started_at,
+                      do: Calendar.strftime(@listening_session.started_at, "%b %d, %Y"),
+                      else: "Not started"}
+                  </span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-blue-100">Total Votes:</span>
+                  <span class="text-white font-bold">{length(session_data.votes)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+<!-- Current Track (if session is active) -->
+          <%= if @listening_session.status == :active and assigns[:current_track] do %>
+            <div class="bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-6 mb-6">
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <div class="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                </div>
+                <h3 class="text-xl font-bold text-white">Now Playing</h3>
+              </div>
+              <p class="text-green-100 text-lg font-medium">{@current_track.name}</p>
+            </div>
+          <% end %>
+          
+<!-- Album Information -->
+          <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6">
+            <div class="flex items-center space-x-3 mb-6">
+              <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-white">Album Details</h3>
+            </div>
+
+            <div class="text-center mb-6">
+              <%= if session_data.album.cover_url do %>
+                <img
+                  src={session_data.album.cover_url}
+                  alt={"#{session_data.album.name} cover"}
+                  class="w-40 h-40 rounded-xl shadow-lg mx-auto mb-4"
+                />
+              <% else %>
+                <div class="w-40 h-40 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                </div>
+              <% end %>
+
+              <h2 class="text-xl font-bold text-white mb-2">{session_data.album.name}</h2>
+              <p class="text-lg text-purple-100 mb-4">{session_data.album.artist}</p>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span class="text-purple-100">Released:</span>
+                  <p class="font-medium text-white">
+                    {if session_data.album.release_date,
+                      do: Date.to_string(session_data.album.release_date),
+                      else: "Unknown"}
+                  </p>
+                </div>
+                <div>
+                  <span class="text-purple-100">Tracks:</span>
+                  <p class="font-medium text-white">
+                    {session_data.album.total_tracks || length(session_data.tracks)}
+                  </p>
+                </div>
+                <div>
+                  <span class="text-purple-100">Total Duration:</span>
+                  <p class="font-medium text-white">
+                    {total_ms = session_data.tracks |> Enum.map(&(&1.duration_ms || 0)) |> Enum.sum()
+                    total_minutes = div(total_ms, 60_000)
+                    "#{total_minutes} min"}
+                  </p>
+                </div>
+                <div>
+                  <span class="text-purple-100">Average Score:</span>
+                  <p class="font-bold text-white text-lg">
+                    <%= if length(session_data.scores) > 0 do %>
+                      {session_data.scores
+                      |> Enum.map(&(&1.average_score || 0))
+                      |> Enum.sum()
+                      |> Kernel./(length(session_data.scores))
+                      |> Float.round(1)}/10
+                    <% else %>
+                      Not rated
+                    <% end %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </.async_result>
+      </div>
+      
+<!-- Right Column - Track List (2/3) -->
+      <div class="w-2/3 p-6 overflow-y-auto" style="background-color: var(--color-dark-950);">
+        <.async_result :let={session_data} assign={@session_data}>
+          <:loading>
+            <div class="animate-pulse">
+              <div class="h-6 rounded w-1/4 mb-6" style="background-color: var(--color-dark-800);"></div>
+              <div class="space-y-4">
+                <%= for _ <- 1..10 do %>
+                  <div class="h-16 rounded-lg" style="background-color: var(--color-dark-900);"></div>
+                <% end %>
+              </div>
+            </div>
+          </:loading>
+
+          <:failed :let={_failure}>
+            <div class="text-center py-16">
+              <div class="text-red-500 text-xl mb-4">⚠️</div>
+              <h3 class="text-lg font-medium text-white mb-2">Unable to load tracks</h3>
+              <p class="text-gray-400">Please try refreshing the page.</p>
+            </div>
+          </:failed>
+
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--color-primary-300);">Track List</h2>
+
+            <%= if length(session_data.tracks) > 0 do %>
+              <div class="space-y-3">
+                <%= for {track, index} <- Enum.with_index(session_data.tracks, 1) do %>
+                  <div class="rounded-lg p-4 hover:bg-gray-700 transition-colors" style="background-color: var(--color-dark-900);">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-4 flex-1 min-w-0">
+                        <span class="text-lg text-gray-400 w-8 flex-shrink-0">{index}</span>
+                        <div class="flex-1 min-w-0">
+                          <h4 class="font-medium text-white text-lg truncate">{track.name}</h4>
+                          <%= if track.duration_ms do %>
+                            <p class="text-sm text-gray-400">
+                              {format_duration(track.duration_ms)}
+                            </p>
+                          <% end %>
+                        </div>
+                      </div>
+
+                      <div class="flex items-center space-x-8 text-sm flex-shrink-0">
+                        <div class="text-center">
+                          <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                            {track_votes_count(track.id, session_data.votes)}
+                          </p>
+                          <p class="text-gray-400">Votes</p>
+                        </div>
+                        <div class="text-center">
+                          <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                            <%= case track_score(track.id, session_data.scores) do %>
+                              <% 0 -> %>
+                                <span class="text-gray-500">--</span>
+                              <% score -> %>
+                                {Float.round(score, 1)}
+                            <% end %>
+                          </p>
+                          <p class="text-gray-400">Score</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-center py-16 text-gray-400">
+                <svg
+                  class="w-16 h-16 mx-auto mb-4 opacity-50"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                </svg>
+                <p>No tracks found for this album.</p>
+              </div>
+            <% end %>
+          </div>
+        </.async_result>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

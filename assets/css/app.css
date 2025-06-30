@@ -102,3 +102,114 @@
 }
 
 /* This file is for your main application CSS */
+
+/* Import Styrene BLC font - Using Poppins as fallback since Styrene BLC requires license */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* Custom CSS Variables for Design System */
+:root {
+  /* Purple-based color palette */
+  --color-primary-50: #faf7ff;
+  --color-primary-100: #f0ebff;
+  --color-primary-200: #e4dcff;
+  --color-primary-300: #d1c2ff;
+  --color-primary-400: #b89eff;
+  --color-primary-500: #9f75ff;
+  --color-primary-600: #8b4fff;
+  --color-primary-700: #7a3beb;
+  --color-primary-800: #6532c7;
+  --color-primary-900: #532ba3;
+  --color-primary-950: #36196e;
+
+  /* Dark backgrounds - more cohesive */
+  --color-dark-50: #f8fafc;
+  --color-dark-100: #f1f5f9;
+  --color-dark-200: #e2e8f0;
+  --color-dark-300: #cbd5e1;
+  --color-dark-400: #94a3b8;
+  --color-dark-500: #64748b;
+  --color-dark-600: #475569;
+  --color-dark-700: #334155;
+  --color-dark-800: #1e293b;
+  --color-dark-850: #172033;
+  --color-dark-900: #0f172a;
+  --color-dark-950: #020617;
+
+  /* Accent colors */
+  --color-accent-purple: #a855f7;
+  --color-accent-pink: #ec4899;
+  --color-accent-blue: #3b82f6;
+  --color-accent-green: #10b981;
+  --color-accent-yellow: #f59e0b;
+  --color-accent-red: #ef4444;
+}
+
+/* Apply font globally */
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Font weight utilities for better typography */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+/* Custom purple gradient backgrounds */
+.bg-gradient-purple {
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
+}
+
+.bg-gradient-purple-pink {
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-accent-pink) 100%);
+}
+
+.bg-gradient-purple-blue {
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-accent-blue) 100%);
+}
+
+/* Enhanced visual effects for better design cohesion */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 79, 255, 0.2);
+  background: rgba(139, 79, 255, 0.1);
+}
+
+.shadow-purple {
+  box-shadow: 0 4px 14px 0 rgba(139, 79, 255, 0.25);
+}
+
+.shadow-purple-lg {
+  box-shadow: 0 10px 40px 0 rgba(139, 79, 255, 0.35);
+}
+
+/* Button and interactive element enhancements */
+.btn-primary {
+  background: var(--color-primary-600);
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-700);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(139, 79, 255, 0.4);
+}
+
+.btn-secondary {
+  background: var(--color-dark-900);
+  color: var(--color-dark-300);
+  border: 1px solid var(--color-dark-700);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--color-dark-800);
+  color: white;
+  border-color: var(--color-dark-600);
+}

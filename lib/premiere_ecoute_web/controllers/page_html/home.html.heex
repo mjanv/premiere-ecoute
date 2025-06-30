@@ -1,17 +1,17 @@
-<div class="min-h-screen bg-gray-900 text-white">
+<div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
   <!-- Header -->
-  <header class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+  <header class="border-b px-6 py-4" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-4">
-        <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: var(--color-primary-600);">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
             <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
           </svg>
         </div>
-        <h1 class="text-2xl font-bold text-purple-400">Premiere Ecoute</h1>
+        <h1 class="text-2xl font-bold" style="color: var(--color-primary-400);">Premiere Ecoute</h1>
       </div>
       <div class="flex items-center space-x-4">
-        <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+        <button class="hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors" style="background-color: var(--color-primary-600);">
           Connect Twitch
         </button>
       </div>
@@ -21,20 +21,21 @@
 <!-- Main Content -->
   <div class="flex h-screen">
     <!-- Left Panel - Album Selection -->
-    <div class="w-1/3 bg-gray-800 border-r border-gray-700 p-6">
-      <h2 class="text-xl font-semibold mb-4 text-purple-300">Album Selection</h2>
+    <div class="w-1/3 border-r p-6" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
+      <h2 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">Album Selection</h2>
       
 <!-- Search -->
       <div class="mb-6">
         <input
           type="text"
           placeholder="Search Spotify albums..."
-          class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+          class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+          style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
         />
       </div>
       
 <!-- Selected Album -->
-      <div class="bg-gray-700 rounded-lg p-4 mb-6">
+      <div class="rounded-lg p-4 mb-6" style="background-color: var(--color-dark-800);">
         <div class="flex items-center space-x-4">
           <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
             <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -42,7 +43,7 @@
             </svg>
           </div>
           <div>
-            <h3 class="font-semibold text-purple-300">Selected Album</h3>
+            <h3 class="font-semibold" style="color: var(--color-primary-300);">Selected Album</h3>
             <p class="text-gray-400 text-sm">Artist Name</p>
             <p class="text-gray-500 text-xs">12 tracks • 2024</p>
           </div>
@@ -54,16 +55,16 @@
       
 <!-- Track List -->
       <div>
-        <h3 class="text-lg font-medium mb-3 text-purple-300">Track List</h3>
+        <h3 class="text-lg font-medium mb-3" style="color: var(--color-primary-300);">Track List</h3>
         <div class="space-y-2">
-          <div class="bg-gray-700 rounded-lg p-3 border-l-4 border-purple-500">
+          <div class="rounded-lg p-3 border-l-4 border-purple-500" style="background-color: var(--color-dark-800);">
             <div class="flex justify-between items-center">
               <span class="text-sm font-medium">1. Track Name</span>
               <span class="text-xs text-green-400">Currently Playing</span>
             </div>
             <p class="text-xs text-gray-400">3:42</p>
           </div>
-          <div class="bg-gray-700 rounded-lg p-3">
+          <div class="rounded-lg p-3" style="background-color: var(--color-dark-800);">
             <div class="flex justify-between items-center">
               <span class="text-sm">2. Another Track</span>
               <span class="text-xs text-gray-500">Next</span>
@@ -75,7 +76,7 @@
     </div>
     
 <!-- Center Panel - Live Session -->
-    <div class="flex-1 bg-gray-900 p-6">
+    <div class="flex-1 p-6" style="background-color: var(--color-dark-950);">
       <!-- Session Status -->
       <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 mb-6">
         <div class="flex items-center justify-between">
@@ -91,8 +92,8 @@
       </div>
       
 <!-- Current Track Voting -->
-      <div class="bg-gray-800 rounded-lg p-6 mb-6">
-        <h3 class="text-xl font-semibold mb-4 text-purple-300">Current Track Rating</h3>
+      <div class="rounded-lg p-6 mb-6" style="background-color: var(--color-dark-900);">
+        <h3 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">Current Track Rating</h3>
         
 <!-- Streamer Vote -->
         <div class="mb-6">
@@ -100,36 +101,36 @@
             Your Rating (Streamer)
           </label>
           <div class="flex space-x-2">
-            <button class="w-12 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold transition-colors">
+            <button class="w-12 h-12 hover:bg-purple-700 text-white rounded-lg font-bold transition-colors" style="background-color: var(--color-primary-600);">
               8
             </button>
             <div class="flex space-x-1">
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 1
               </button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 2
               </button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 3
               </button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 4
               </button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 5
               </button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 6
               </button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 7
               </button>
-              <button class="w-8 h-8 bg-purple-600 text-white rounded text-sm">8</button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 text-white rounded text-sm" style="background-color: var(--color-primary-600);">8</button>
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 9
               </button>
-              <button class="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition-colors">
+              <button class="w-8 h-8 hover:bg-gray-600 text-white rounded text-sm transition-colors" style="background-color: var(--color-dark-800);">
                 10
               </button>
             </div>
@@ -141,68 +142,68 @@
           <label class="block text-sm font-medium text-gray-300 mb-3">Live Viewer Votes</label>
           <div class="grid grid-cols-10 gap-2 mb-3">
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-2 bg-red-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">1</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-4 bg-orange-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">2</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-8 bg-yellow-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">3</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-12 bg-lime-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">4</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-10 bg-green-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">5</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-14 bg-teal-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">6</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-16 bg-blue-500 rounded-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">7</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-12 bg-indigo-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">8</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-8 bg-purple-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">9</span>
             </div>
             <div class="text-center">
-              <div class="h-16 bg-gray-700 rounded-lg flex items-end">
+              <div class="h-16 rounded-lg flex items-end" style="background-color: var(--color-dark-800);">
                 <div class="w-full h-6 bg-pink-500 rounded-b-lg"></div>
               </div>
               <span class="text-xs text-gray-400 mt-1">10</span>
             </div>
           </div>
           <div class="text-center">
-            <span class="text-2xl font-bold text-purple-400">7.2</span>
+            <span class="text-2xl font-bold" style="color: var(--color-primary-400);">7.2</span>
             <span class="text-gray-400 ml-2">Average Score (127 votes)</span>
           </div>
         </div>
@@ -223,20 +224,20 @@
     </div>
     
 <!-- Right Panel - Session Info -->
-    <div class="w-1/4 bg-gray-800 border-l border-gray-700 p-6">
-      <h3 class="text-lg font-semibold mb-4 text-purple-300">Session Stats</h3>
+    <div class="w-1/4 border-l p-6" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
+      <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">Session Stats</h3>
       
 <!-- Stats Cards -->
       <div class="space-y-4 mb-6">
-        <div class="bg-gray-700 rounded-lg p-4">
+        <div class="rounded-lg p-4" style="background-color: var(--color-dark-800);">
           <div class="text-2xl font-bold text-green-400">127</div>
           <p class="text-sm text-gray-400">Active Voters</p>
         </div>
-        <div class="bg-gray-700 rounded-lg p-4">
-          <div class="text-2xl font-bold text-purple-400">8.3</div>
+        <div class="rounded-lg p-4" style="background-color: var(--color-dark-800);">
+          <div class="text-2xl font-bold" style="color: var(--color-primary-400);">8.3</div>
           <p class="text-sm text-gray-400">Album Average</p>
         </div>
-        <div class="bg-gray-700 rounded-lg p-4">
+        <div class="rounded-lg p-4" style="background-color: var(--color-dark-800);">
           <div class="text-2xl font-bold text-blue-400">1</div>
           <p class="text-sm text-gray-400">Current Track</p>
         </div>
@@ -244,11 +245,11 @@
       
 <!-- Track Scores -->
       <div>
-        <h4 class="font-medium mb-3 text-purple-300">Track Scores</h4>
+        <h4 class="font-medium mb-3" style="color: var(--color-primary-300);">Track Scores</h4>
         <div class="space-y-2">
-          <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
+          <div class="flex justify-between items-center p-2 rounded" style="background-color: var(--color-dark-800);">
             <span class="text-sm">Track 1</span>
-            <span class="text-sm font-bold text-purple-400">7.2</span>
+            <span class="text-sm font-bold" style="color: var(--color-primary-400);">7.2</span>
           </div>
           <div class="flex justify-between items-center p-2 bg-gray-600 rounded opacity-50">
             <span class="text-sm">Track 2</span>

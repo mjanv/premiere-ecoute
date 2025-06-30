@@ -20,9 +20,10 @@ defmodule PremiereEcouteWeb.Router do
   scope "/", PremiereEcouteWeb do
     pipe_through :browser
 
-    live_session :dashboard,
+    live_session :main,
       on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
-      live "/", DashboardLive, :index
+      live "/", HomepageLive, :index
+      live "/album/select", AlbumSelectionLive, :index
       live "/sessions", SessionsLive, :index
       live "/session/:id", SessionLive, :show
     end
