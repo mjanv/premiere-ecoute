@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Core.CommandBus do
 
   def apply(command) do
     command
-    |> tap(fn command -> Logger.debug("command: #{command}") end)
+    |> tap(fn command -> Logger.debug("command: #{inspect(command)}") end)
     |> validate()
     |> handle()
     |> tap(fn
@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Core.CommandBus do
       {:error, events} when is_list(events) -> Enum.each(events, &dispatch/1)
       {:error, reason} -> {:error, reason}
     end)
-    |> tap(fn result -> Logger.debug("result: #{result}") end)
+    |> tap(fn result -> Logger.debug("result: #{inspect(result)}") end)
   end
 
   def validate(command) do

@@ -18,6 +18,10 @@ defmodule PremiereEcouteWeb.Endpoint do
     gzip: not code_reloading?,
     only: PremiereEcouteWeb.static_paths()
 
+  if Code.ensure_loaded?(Tidewave) do
+    plug Tidewave
+  end
+
   if code_reloading? do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader

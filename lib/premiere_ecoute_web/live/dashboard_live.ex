@@ -25,7 +25,6 @@ defmodule PremiereEcouteWeb.DashboardLive do
      |> assign(:current_track, nil)
      |> assign(:track_votes, %{})
      |> assign(:session_stats, %{})
-     |> assign(:loading, false)
      |> assign(:current_scope, socket.assigns[:current_scope] || %{})
      |> assign(:twitch_poll_id, nil)
      |> assign(:chat_votes, %{})

@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Supervisor do
+defmodule PremiereEcoute.Core.Supervisor do
   @moduledoc false
 
   use Supervisor
@@ -10,9 +10,7 @@ defmodule PremiereEcoute.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      PremiereEcoute.Repo,
-      PremiereEcoute.Core.Supervisor,
-      PremiereEcoute.Apis.Supervisor
+      PremiereEcoute.Core.Listener
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

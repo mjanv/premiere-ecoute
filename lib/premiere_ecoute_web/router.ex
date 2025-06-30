@@ -25,19 +25,8 @@ defmodule PremiereEcouteWeb.Router do
       live "/", DashboardLive, :index
     end
 
-    # OAuth routes
     get "/auth/:provider", AuthController, :request
     get "/auth/:provider/callback", AuthController, :callback
-  end
-
-  if Application.compile_env(:premiere_ecoute, :dev_routes) do
-    import Phoenix.LiveDashboard.Router
-
-    scope "/dev" do
-      pipe_through :browser
-
-      live_dashboard "/dashboard", metrics: PremiereEcouteWeb.Telemetry
-    end
   end
 
   scope "/", PremiereEcouteWeb do
@@ -64,5 +53,15 @@ defmodule PremiereEcouteWeb.Router do
 
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
+  end
+
+  if Application.compile_env(:premiere_ecoute, :dev_routes) do
+    import Phoenix.LiveDashboard.Router
+
+    scope "/dev" do
+      pipe_through :browser
+
+      live_dashboard "/dashboard", metrics: PremiereEcouteWeb.Telemetry
+    end
   end
 end

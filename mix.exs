@@ -21,7 +21,7 @@ defmodule PremiereEcoute.MixProject do
   def application do
     [
       mod: {PremiereEcoute.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
@@ -63,7 +63,8 @@ defmodule PremiereEcoute.MixProject do
       {:credo, "~> 1.7"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:mox, "~> 1.2"},
-      {:websockex, "~> 0.4.3"}
+      {:websockex, "~> 0.4.3"},
+      {:tidewave, "~> 0.1", only: :dev}
     ]
   end
 
