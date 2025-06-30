@@ -114,10 +114,10 @@ defmodule PremiereEcouteWeb.DashboardLive do
   end
 
   @impl true
-  def handle_info(%SessionStarted{session_id: _id}, socket) do
+  def handle_info(%SessionStarted{session_id: id}, socket) do
     socket
     |> put_flash(:info, "Listening session started !")
-    # |> push_patch(to: ~p"/session/#{id}")
+    |> push_navigate(to: ~p"/session/#{id}")
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -129,92 +129,6 @@ defmodule PremiereEcouteWeb.DashboardLive do
 
   defp format_duration(_), do: "0:00"
 
-  defp get_vote_height(vote_value, poll_results) do
-    # Calculate height based on actual poll/chat data
-    vote_count = get_vote_count(vote_value, poll_results)
-    max_votes = get_max_vote_count(poll_results)
-
-    if max_votes > 0 do
-      percentage = vote_count / max_votes
-      height_class = round(percentage * 16)
-      "h-#{min(height_class, 16)}"
-    else
-      "h-1"
-    end
-  end
-
-  defp get_vote_color(vote_value) do
-    case vote_value do
-      1 -> "bg-red-500"
-      2 -> "bg-orange-500"
-      3 -> "bg-yellow-500"
-      4 -> "bg-lime-500"
-      5 -> "bg-green-500"
-      6 -> "bg-teal-500"
-      7 -> "bg-blue-500"
-      8 -> "bg-indigo-500"
-      9 -> "bg-purple-500"
-      10 -> "bg-pink-500"
-    end
-  end
-
-  defp get_vote_count(vote_value, poll_results) do
-    # Get vote count from Twitch poll results
-    case poll_results do
-      %{options: options} ->
-        option = Enum.find(options, &(&1.text == to_string(vote_value)))
-        if option, do: option.votes, else: 0
-
-      _ ->
-        0
-    end
-  end
-
-  defp get_max_vote_count(poll_results) do
-    case poll_results do
-      %{options: options} ->
-        options
-        |> Enum.map(& &1.votes)
-        |> Enum.max(fn -> 0 end)
-
-      _ ->
-        0
-    end
-  end
-
-  defp calculate_average_score(poll_results, chat_votes) do
-    # Calculate average from both poll and chat votes
-    poll_total = calculate_poll_average(poll_results)
-    chat_total = calculate_chat_average(chat_votes)
-
-    total_votes = map_size(chat_votes) + (poll_results[:total_votes] || 0)
-
-    if total_votes > 0 do
-      Float.round((poll_total + chat_total) / total_votes, 1)
-    else
-      0.0
-    end
-  end
-
-  defp calculate_poll_average(poll_results) do
-    case poll_results do
-      %{options: options} ->
-        options
-        |> Enum.reduce(0, fn option, acc ->
-          vote_value = String.to_integer(option.text)
-          acc + vote_value * option.votes
-        end)
-
-      _ ->
-        0
-    end
-  end
-
-  defp calculate_chat_average(chat_votes) do
-    chat_votes
-    |> Map.values()
-    |> Enum.sum()
-  end
 
   defp get_streamer_id(socket) do
     case socket.assigns.current_scope do

@@ -23,6 +23,8 @@ defmodule PremiereEcouteWeb.Router do
     live_session :dashboard,
       on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
       live "/", DashboardLive, :index
+      live "/sessions", SessionsLive, :index
+      live "/session/:id", SessionLive, :show
     end
 
     get "/auth/:provider", AuthController, :request

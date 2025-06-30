@@ -12,16 +12,12 @@ defmodule PremiereEcoute.Core.CommandBus.Handler do
       |> Keyword.get(:events, [])
       |> Enum.map(fn {_, _, event} -> Module.concat(event) end)
 
-    quote do
+    quote location: :keep do
+      @commands unquote(commands)
+      @events unquote(events)
+
       @behaviour PremiereEcoute.Core.CommandBus.Handler
-
-      for command <- unquote(commands) do
-        PremiereEcoute.Core.CommandBus.Registry.register(command, __MODULE__)
-      end
-
-      for event <- unquote(events) do
-        PremiereEcoute.Core.CommandBus.Registry.register(event, __MODULE__)
-      end
+      @before_compile PremiereEcoute.Core.CommandBus.Handler
 
       def validate(command), do: {:ok, command}
       def handle(_command), do: {:ok, []}
@@ -30,6 +26,23 @@ defmodule PremiereEcoute.Core.CommandBus.Handler do
       defoverridable validate: 1, handle: 1, dispatch: 1
     end
   end
+
+  defmacro __before_compile__(env) do
+    commands = Module.get_attribute(env.module, :commands)
+    events = Module.get_attribute(env.module, :events)
+
+    for command <- commands do
+      PremiereEcoute.Core.CommandBus.Registry.register(command, env.module)
+    end
+
+    for event <- events do
+      PremiereEcoute.Core.CommandBus.Registry.register(event, env.module)
+    end
+
+    quote do
+    end
+  end
+
 
   @callback validate(struct()) :: {:ok, struct()} | {:error, any()}
   @callback handle(struct()) :: {:ok, [struct()]} | {:error, any()}

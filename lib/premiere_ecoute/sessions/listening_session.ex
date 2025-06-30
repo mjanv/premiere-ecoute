@@ -70,4 +70,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> changeset(attrs)
     |> Repo.insert()
   end
+
+  @doc """
+  Gets a listening session by id with preloaded associations.
+  """
+  def read(id) when is_integer(id) do
+    Repo.get(__MODULE__, id)
+    |> case do
+      nil -> nil
+      session -> Repo.preload(session, [:album, :user])
+    end
+  end
 end

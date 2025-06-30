@@ -121,11 +121,11 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
     end
   end
 
-  describe "read/1" do
-    test "read an existing album" do
-      {:ok, %Album{spotify_id: spotify_id}} = Album.create(@album)
+  describe "get/1" do
+    test "get an existing album" do
+      {:ok, %Album{id: id}} = Album.create(@album)
 
-      album = Album.read(spotify_id)
+      album = Album.get(id)
 
       assert %Album{
                spotify_id: "album123",
@@ -151,8 +151,43 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
              } = album
     end
 
-    test "read an unexisting album" do
-      assert is_nil(Album.read("unknown"))
+    test "get an unexisting album" do
+      assert is_nil(Album.get(-1))
+    end
+  end
+
+  describe "get_by/1" do
+    test "get an existing album" do
+      {:ok, %Album{spotify_id: spotify_id}} = Album.create(@album)
+
+      album = Album.get_by(spotify_id: spotify_id)
+
+      assert %Album{
+               spotify_id: "album123",
+               name: "Sample Album",
+               artist: "Sample Artist",
+               release_date: ~D[2023-01-01],
+               cover_url: "http://example.com/cover.jpg",
+               total_tracks: 2,
+               tracks: [
+                 %Track{
+                   spotify_id: "track001",
+                   name: "Track One",
+                   track_number: 1,
+                   duration_ms: 210_000
+                 },
+                 %Track{
+                   spotify_id: "track002",
+                   name: "Track Two",
+                   track_number: 2,
+                   duration_ms: 180_000
+                 }
+               ]
+             } = album
+    end
+
+    test "get an unexisting album" do
+      assert is_nil(Album.get_by(spotify_id: "unknown"))
     end
   end
 
