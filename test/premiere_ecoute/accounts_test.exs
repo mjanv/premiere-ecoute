@@ -1,9 +1,9 @@
 defmodule PremiereEcoute.AccountsTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Accounts
-
   import PremiereEcoute.AccountsFixtures
+
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.{User, UserToken}
 
   describe "get_user_by_email/1" do

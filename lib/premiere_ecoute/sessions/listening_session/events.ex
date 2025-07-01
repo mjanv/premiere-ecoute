@@ -4,11 +4,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   defmodule SessionStarted do
     @moduledoc false
 
-    defstruct [:session_id, :streamer_id, :album_id]
+    defstruct [:session_id, :user_id, :album_id]
 
     @type t :: %__MODULE__{
             session_id: String.t(),
-            streamer_id: String.t(),
+            user_id: integer(),
             album_id: String.t()
           }
   end
@@ -16,8 +16,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   defmodule SessionNotStarted do
     @moduledoc false
 
-    defstruct [:streamer_id]
+    defstruct [:user_id]
 
-    @type t :: %__MODULE__{streamer_id: String.t()}
+    @type t :: %__MODULE__{user_id: integer()}
   end
 end

@@ -61,7 +61,7 @@ defmodule PremiereEcouteWeb.AlbumSelectionLive do
     album = album.result
 
     command = %StartListeningSession{
-      streamer_id: get_streamer_id(socket),
+      user_id: get_user_id(socket),
       album_id: album.spotify_id
     }
 
@@ -129,10 +129,10 @@ defmodule PremiereEcouteWeb.AlbumSelectionLive do
 
   defp format_duration(_), do: "0:00"
 
-  defp get_streamer_id(socket) do
+  defp get_user_id(socket) do
     case socket.assigns.current_scope do
-      %{user: %{id: user_id}} -> to_string(user_id)
-      _ -> "anonymous_streamer"
+      %{user: %{id: user_id}} -> user_id
+      _ -> nil
     end
   end
 end

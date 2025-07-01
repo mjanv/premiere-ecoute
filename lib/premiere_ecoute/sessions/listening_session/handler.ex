@@ -13,21 +13,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
     commands: [PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession],
     events: [PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted]
 
-  def handle(%StartListeningSession{album_id: album_id, streamer_id: streamer_id}) do
+  def handle(%StartListeningSession{album_id: album_id, user_id: user_id}) do
     with {:ok, album} <- SpotifyApi.get_album(album_id),
          {:ok, album} <- Album.get_or_create(album),
          {:ok, session} <-
-           ListeningSession.create(%{streamer_id: streamer_id, album_id: album.id}) do
+           ListeningSession.create(%{user_id: user_id, album_id: album.id}) do
       {:ok,
        [
          %SessionStarted{
            session_id: session.id,
-           streamer_id: session.streamer_id,
+           user_id: session.user_id,
            album_id: session.album_id
          }
        ]}
     else
-      {:error, _} -> {:error, [%SessionNotStarted{streamer_id: streamer_id}]}
+      {:error, _} -> {:error, [%SessionNotStarted{user_id: user_id}]}
     end
   end
 

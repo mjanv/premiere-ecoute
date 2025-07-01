@@ -5,12 +5,13 @@ defmodule PremiereEcouteWeb.SessionLive do
 
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Sessions.ListeningSession
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
     listening_session =
       case Integer.parse(session_id) do
-        {int_id, ""} -> PremiereEcoute.Sessions.ListeningSession.read(int_id)
+        {int_id, ""} -> ListeningSession.get(int_id)
         _ -> nil
       end
 
@@ -59,6 +60,15 @@ defmodule PremiereEcouteWeb.SessionLive do
   @impl true
   def handle_info({:scores_updated, scores}, socket) do
     {:noreply, assign(socket, :scores, scores)}
+  end
+
+  @impl true
+  def handle_event("start_session", _params, %{assigns: %{listening_session: session}} = socket) do
+    {:noreply, assign(socket, :listening_session, ListeningSession.start(session))}
+  end
+
+  def handle_event("end_session", _params, %{assigns: %{listening_session: session}} = socket) do
+    {:noreply, assign(socket, :listening_session, ListeningSession.stop(session))}
   end
 
   @impl true

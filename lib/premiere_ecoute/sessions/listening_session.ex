@@ -10,7 +10,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Sessions.Discography.Album
 
   schema "listening_sessions" do
-    field :streamer_id, :string
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
     field :started_at, :utc_datetime
     field :ended_at, :utc_datetime
@@ -25,60 +24,70 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def changeset(listening_session, attrs) do
     listening_session
     |> cast(attrs, [
-      :streamer_id,
+      # :streamer_id,
       :album_id,
       :status,
       :started_at,
       :ended_at,
       :user_id
     ])
-    |> validate_required([:streamer_id, :album_id])
+    |> validate_required([:album_id])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:album_spotify_id)
   end
 
   def changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:streamer_id, :album_id, :user_id])
-    |> validate_required([:streamer_id, :album_id])
+    |> cast(attrs, [:album_id, :user_id])
+    |> validate_required([:album_id, :user_id])
     |> put_change(:status, :preparing)
-    |> put_change(:started_at, DateTime.utc_now())
-  end
-
-  @doc """
-  Start an active session
-  """
-  def start_changeset(listening_session) do
-    listening_session
-    |> change()
-    |> put_change(:status, :active)
-    |> put_change(:started_at, DateTime.utc_now())
-  end
-
-  @doc """
-  Stop a session
-  """
-  def stop_changeset(listening_session) do
-    listening_session
-    |> change()
-    |> put_change(:status, :stopped)
-    |> put_change(:ended_at, DateTime.utc_now())
   end
 
   def create(attrs) do
     %__MODULE__{}
     |> changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, session} -> {:ok, Repo.preload(session, [album: [:tracks], user: []])}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
-  @doc """
-  Gets a listening session by id with preloaded associations.
-  """
-  def read(id) when is_integer(id) do
-    Repo.get(__MODULE__, id)
+  def get(id) do
+    __MODULE__
+    |> Repo.get(id)
+    |> Repo.preload([album: [:tracks], user: []])
+  end
+
+  def start(%__MODULE__{} = session) do
+    session
+    |> change()
+    |> put_change(:status, :active)
+    |> put_change(:started_at, DateTime.utc_now(:second))
+    |> Repo.update()
+  end
+
+  def stop(%__MODULE__{status: :active} = session) do
+    session
+    |> change()
+    |> put_change(:status, :stopped)
+    |> put_change(:ended_at, DateTime.utc_now(:second))
+    |> Repo.update()
+  end
+
+  def stop(%__MODULE__{} = _session) do
+    {:error, :invalid_status}
+  end
+
+
+  def delete(id) do
+    __MODULE__
+    |> Repo.get(id)
     |> case do
-      nil -> nil
-      session -> Repo.preload(session, [:album, :user])
+      nil -> :error
+      session ->
+        Repo.delete(session)
+        :ok
     end
   end
 end

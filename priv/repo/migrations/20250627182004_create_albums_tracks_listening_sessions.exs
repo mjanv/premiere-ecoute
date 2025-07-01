@@ -30,9 +30,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
     create index(:tracks, [:album_id])
     create unique_index(:tracks, [:spotify_id, :album_id])
 
-    # Listening Sessions table
     create table(:listening_sessions) do
-      add :streamer_id, :string, null: false
       add :status, :string, null: false, default: "preparing"
       add :started_at, :utc_datetime
       add :ended_at, :utc_datetime

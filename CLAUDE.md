@@ -56,7 +56,7 @@ Embrace Elixir's pipeline operator (`|>`) for any sequence of three or more func
 
 ### Module Import Ordering
 
-Maintain consistent keyword ordering at the top of modules for enhanced readability and clear dependency hierarchies. Always arrange module keywords in this specific sequence: `use`, `require`, `import`, then `alias`. This ordering follows the logical flow of module compilation: macros are injected first, compile-time requirements are established, functions are imported, and finally convenient aliases are created.
+Maintain consistent keyword ordering at the top of modules for enhanced readability and clear dependency hierarchies. Always arrange module keywords in this specific sequence: `use`, `require`, `import`, then `alias`.
 
 ---
 
