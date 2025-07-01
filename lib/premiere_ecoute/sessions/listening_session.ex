@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Sessions.Discography.Track
 
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
@@ -16,6 +17,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     belongs_to :user, User, foreign_key: :user_id
     belongs_to :album, Album, foreign_key: :album_id
+    belongs_to :current_track, Track, foreign_key: :current_track_id
 
     timestamps(type: :utc_datetime)
   end
@@ -29,16 +31,18 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       :status,
       :started_at,
       :ended_at,
-      :user_id
+      :user_id,
+      :current_track_id
     ])
     |> validate_required([:album_id])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:album_spotify_id)
+    |> foreign_key_constraint(:current_track_id)
   end
 
   def changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:album_id, :user_id])
+    |> cast(attrs, [:album_id, :user_id, :current_track_id])
     |> validate_required([:album_id, :user_id])
     |> put_change(:status, :preparing)
   end
@@ -48,7 +52,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> changeset(attrs)
     |> Repo.insert()
     |> case do
-      {:ok, session} -> {:ok, Repo.preload(session, [album: [:tracks], user: []])}
+      {:ok, session} -> {:ok, Repo.preload(session, [album: [:tracks], user: [], current_track: []])}
       {:error, reason} -> {:error, reason}
     end
   end
@@ -79,6 +83,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     {:error, :invalid_status}
   end
 
+  def next_track(%__MODULE__{} = session) do
+    session
+    |> Repo.preload([album: [:tracks]])
+    |> change()
+    |> put_change(:current_track_id, hd(session.album.tracks).id)
+    |> Repo.update()
+    |> case do
+      {:ok, session} -> {:ok, Repo.preload(session, [album: [:tracks], user: [], current_track: []])}
+      {:error, reason} -> {:error, reason}
+    end
+  end
 
   def delete(id) do
     __MODULE__

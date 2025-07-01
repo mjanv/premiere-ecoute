@@ -36,11 +36,13 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
       add :ended_at, :utc_datetime
       add :user_id, references(:users, on_delete: :delete_all)
       add :album_id, references(:albums), null: false
+      add :current_track_id, references(:tracks, on_delete: :nilify_all)
 
       timestamps(type: :utc_datetime)
     end
 
     create index(:listening_sessions, [:user_id])
     create index(:listening_sessions, [:status])
+    create index(:listening_sessions, [:current_track_id])
   end
 end
