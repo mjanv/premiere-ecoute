@@ -31,6 +31,8 @@ defmodule PremiereEcouteWeb.SessionLive do
          socket
          |> assign(:listening_session, listening_session)
          |> assign(:session_id, session_id)
+         |> assign(:show_votes, true)
+         |> assign(:show_scores, true)
          |> assign_async(:session_data, fn ->
            {:ok, %{session_data: load_session_data(listening_session)}}
          end)}
@@ -69,6 +71,16 @@ defmodule PremiereEcouteWeb.SessionLive do
 
   def handle_event("end_session", _params, %{assigns: %{listening_session: session}} = socket) do
     {:noreply, assign(socket, :listening_session, ListeningSession.stop(session))}
+  end
+
+  @impl true
+  def handle_event("toggle_votes", _params, socket) do
+    {:noreply, assign(socket, :show_votes, !socket.assigns.show_votes)}
+  end
+
+  @impl true
+  def handle_event("toggle_scores", _params, socket) do
+    {:noreply, assign(socket, :show_scores, !socket.assigns.show_scores)}
   end
 
   @impl true

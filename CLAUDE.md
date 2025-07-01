@@ -22,7 +22,7 @@ AI may do:
 AI must NOT do:
 
 0. Write changes or use tools when you are not sure about something project specific, or if you don't have context for a particular feature/decision.
-1. Edit any unit tests located in `test/` folder (human own tests).
+1. Edit any unit tests (human own tests).
 2. Delete or mangle existing AIDEV- comments.
 3. Re-format code to any other style.
 4. Refactor large modules without human guidance.
