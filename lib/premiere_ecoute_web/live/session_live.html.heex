@@ -218,6 +218,77 @@
             </div>
           </:failed>
 
+          <!-- Session Controls -->
+          <div class="rounded-xl p-6 mb-6" style="background-color: var(--color-dark-800);">
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Track Controls -->
+              <div class="space-y-3">
+                <h4 class="text-sm font-medium text-gray-300 uppercase tracking-wide">Spotify</h4>
+                <div class="flex space-x-2">
+                  <button
+                    phx-click="previous_track"
+                    class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+                    </svg>
+                    <span>Previous</span>
+                  </button>
+                  <button
+                    phx-click="toggle_playback"
+                    class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+                  >
+                    <%= if assigns[:is_playing] do %>
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                      <span>Stop</span>
+                    <% else %>
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                      </svg>
+                      <span>Start</span>
+                    <% end %>
+                  </button>
+                  <button
+                    phx-click="next_track"
+                    class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+                  >
+                    <span>Next</span>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Poll Controls -->
+              <div class="space-y-3">
+                <h4 class="text-sm font-medium text-gray-300 uppercase tracking-wide">Twitch</h4>
+                <div class="flex space-x-2">
+                  <button
+                    phx-click="start_poll"
+                    class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Start Poll</span>
+                  </button>
+                  <button
+                    phx-click="stop_poll"
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 000 2h4a1 1 0 100-2H8z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Stop Poll</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="mb-6">
 
             <%= if length(session_data.tracks) > 0 do %>

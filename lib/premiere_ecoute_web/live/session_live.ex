@@ -61,6 +61,11 @@ defmodule PremiereEcouteWeb.SessionLive do
     {:noreply, assign(socket, :scores, scores)}
   end
 
+  @impl true
+  def handle_event(event, _params, socket) do
+    {:noreply, put_flash(socket, :info, "Received event: #{event}")}
+  end
+
   defp load_session_data(listening_session) do
     with %Album{} = album <- Album.get(listening_session.album_id),
          {:ok, votes} <- Sessions.get_session_votes(listening_session.id),
