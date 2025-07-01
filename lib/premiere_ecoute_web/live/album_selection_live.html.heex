@@ -1,7 +1,10 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
   <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
     <!-- Header -->
-    <header class="border-b px-6 py-4" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
+    <header
+      class="border-b px-6 py-4"
+      style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
+    >
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
@@ -9,7 +12,11 @@
               <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
             </svg>
           </div>
-          <.link navigate={~p"/"} class="text-2xl font-bold hover:opacity-80 transition-opacity" style="color: var(--color-primary-400);">
+          <.link
+            navigate={~p"/"}
+            class="text-2xl font-bold hover:opacity-80 transition-opacity"
+            style="color: var(--color-primary-400);"
+          >
             Premiere Ecoute
           </.link>
         </div>
@@ -59,8 +66,13 @@
 <!-- Main Content -->
     <div class="flex h-screen">
       <!-- Left Panel - Album Selection -->
-      <div class="w-1/2 border-r p-6" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
-        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">Album Selection</h2>
+      <div
+        class="w-1/2 border-r p-6"
+        style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
+      >
+        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">
+          Album Selection
+        </h2>
         
 <!-- Search -->
         <div class="mb-6">
@@ -113,7 +125,9 @@
                       </div>
                     <% end %>
                     <div class="flex-1 min-w-0">
-                      <h4 class="font-medium truncate" style="color: var(--color-primary-300);">{album.name}</h4>
+                      <h4 class="font-medium truncate" style="color: var(--color-primary-300);">
+                        {album.name}
+                      </h4>
                       <p class="text-gray-400 text-sm truncate">{album.artist}</p>
                       <p class="text-gray-500 text-xs">{album.total_tracks} tracks</p>
                     </div>
@@ -126,26 +140,35 @@
         
 <!-- Selected Album -->
         <%= if @selected_album.ok? && @selected_album.result do %>
-          <div class="rounded-xl mb-6 overflow-hidden relative min-h-[500px] shadow-lg"
-               style="background-color: var(--color-dark-900);">
+          <div
+            class="rounded-xl mb-6 overflow-hidden relative min-h-[500px] shadow-lg"
+            style="background-color: var(--color-dark-900);"
+          >
             
-            <!-- Blurred background layer -->
+<!-- Blurred background layer -->
             <%= if @selected_album.result.cover_url do %>
-              <div class="absolute inset-0"
-                   style={"background-image: url('#{@selected_album.result.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}>
+              <div
+                class="absolute inset-0"
+                style={"background-image: url('#{@selected_album.result.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
+              >
               </div>
             <% else %>
-              <div class="absolute inset-0" style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"></div>
+              <div
+                class="absolute inset-0"
+                style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"
+              >
+              </div>
             <% end %>
             
-            <!-- Overlay for text readability -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40"></div>
+<!-- Overlay for text readability -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40">
+            </div>
             
-            <!-- Content overlay with album cover and text -->
+<!-- Content overlay with album cover and text -->
             <div class="relative z-10 h-full flex items-center justify-center p-10">
               <div class="flex items-center space-x-12 max-w-6xl">
                 
-                <!-- Non-blurred album cover -->
+<!-- Non-blurred album cover -->
                 <div class="flex-shrink-0 relative">
                   <%= if @selected_album.result.cover_url do %>
                     <img
@@ -155,8 +178,10 @@
                       style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);"
                     />
                     <!-- Reflection effect -->
-                    <div class="absolute top-0 left-0 w-64 h-64 rounded-xl"
-                         style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;">
+                    <div
+                      class="absolute top-0 left-0 w-64 h-64 rounded-xl"
+                      style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;"
+                    >
                     </div>
                   <% else %>
                     <div class="w-64 h-64 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-2xl border-2 border-white/10 relative">
@@ -164,51 +189,76 @@
                         <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
                       </svg>
                       <!-- Reflection effect for fallback -->
-                      <div class="absolute top-0 left-0 w-64 h-64 rounded-xl"
-                           style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;">
+                      <div
+                        class="absolute top-0 left-0 w-64 h-64 rounded-xl"
+                        style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;"
+                      >
                       </div>
                     </div>
                   <% end %>
                 </div>
                 
-                <!-- Album info -->
+<!-- Album info -->
                 <div class="text-left space-y-6">
                   <h3 class="text-5xl font-bold text-white drop-shadow-2xl leading-tight">
-                    <%= @selected_album.result.name %>
+                    {@selected_album.result.name}
                   </h3>
-                  <p class="text-white text-3xl font-semibold drop-shadow-lg"><%= @selected_album.result.artist %></p>
+                  <p class="text-white text-3xl font-semibold drop-shadow-lg">
+                    {@selected_album.result.artist}
+                  </p>
                   
-                  <!-- Enhanced Album Stats -->
+<!-- Enhanced Album Stats -->
                   <div class="flex items-center space-x-8 text-white/90 text-xl font-semibold">
                     <div class="flex items-center space-x-3">
                       <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
                       </svg>
-                      <span><%= @selected_album.result.total_tracks %> tracks</span>
+                      <span>{@selected_album.result.total_tracks} tracks</span>
                     </div>
-                    
+
                     <div class="flex items-center space-x-3">
                       <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
-                      <span><%= 
-                        total_ms = @selected_album.result.tracks |> Enum.map(&(&1.duration_ms || 0)) |> Enum.sum()
+                      <span>
+                        {total_ms =
+                          @selected_album.result.tracks
+                          |> Enum.map(&(&1.duration_ms || 0))
+                          |> Enum.sum()
+
                         total_minutes = div(total_ms, 60_000)
-                        "#{total_minutes} min"
-                      %></span>
+                        "#{total_minutes} min"}
+                      </span>
                     </div>
-                    
+
                     <div class="flex items-center space-x-3">
                       <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
-                      <span><%= if @selected_album.result.release_date,
-                        do: @selected_album.result.release_date.year,
-                        else: "Unknown" %></span>
+                      <span>
+                        {if @selected_album.result.release_date,
+                          do: @selected_album.result.release_date.year,
+                          else: "Unknown"}
+                      </span>
                     </div>
                   </div>
                   
-                  <!-- Action Button moved here -->
+<!-- Action Button moved here -->
                   <div class="pt-4">
                     <%= if @current_session do %>
                       <button
@@ -249,11 +299,16 @@
       
 <!-- Right Panel - Track List -->
       <div class="w-1/2 p-6" style="background-color: var(--color-dark-900);">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">Track List</h3>
+        <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">
+          Track List
+        </h3>
         <%= if @selected_album.ok? && @selected_album.result do %>
           <div class="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
             <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
-              <div class="rounded-lg p-4 hover:bg-gray-600 transition-colors" style="background-color: var(--color-dark-800);">
+              <div
+                class="rounded-lg p-4 hover:bg-gray-600 transition-colors"
+                style="background-color: var(--color-dark-800);"
+              >
                 <div class="flex justify-between items-center">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center space-x-3">

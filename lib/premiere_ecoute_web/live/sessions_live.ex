@@ -89,7 +89,7 @@ defmodule PremiereEcouteWeb.SessionsLive do
     cond do
       diff < 60 -> "Just now"
       diff < 3600 -> "#{div(diff, 60)} min ago"
-      diff < 86400 -> "#{div(diff, 3600)} hours ago"
+      diff < 86_400 -> "#{div(diff, 3600)} hours ago"
       true -> "#{div(diff, 86400)} days ago"
     end
   end

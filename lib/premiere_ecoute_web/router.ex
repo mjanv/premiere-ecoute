@@ -26,6 +26,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/album/select", AlbumSelectionLive, :index
       live "/sessions", SessionsLive, :index
       live "/session/:id", SessionLive, :show
+      live "/account", AccountLive, :index
     end
 
     get "/auth/:provider", AuthController, :request
