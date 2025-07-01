@@ -124,47 +124,109 @@
         
 <!-- Selected Album -->
         <%= if @selected_album.ok? && @selected_album.result do %>
-          <div class="rounded-lg p-6 mb-6" style="background-color: var(--color-dark-800);">
-            <div class="text-center mb-6">
-              <%= if @selected_album.result.cover_url do %>
-                <img
-                  src={@selected_album.result.cover_url}
-                  alt={@selected_album.result.name}
-                  class="w-32 h-32 rounded-lg object-cover mx-auto mb-4 shadow-lg"
-                />
-              <% else %>
-                <div class="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                  </svg>
-                </div>
-              <% end %>
-              <h3 class="text-xl font-bold mb-2" style="color: var(--color-primary-300);">
-                {@selected_album.result.name}
-              </h3>
-              <p class="text-gray-300 text-lg mb-2">{@selected_album.result.artist}</p>
-              <p class="text-gray-400 text-sm">
-                {@selected_album.result.total_tracks} tracks • {if @selected_album.result.release_date,
-                  do: @selected_album.result.release_date.year,
-                  else: "Unknown"}
-              </p>
-            </div>
-
-            <%= if @current_session do %>
-              <button
-                class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg"
-                phx-click="end_session"
-              >
-                End Session
-              </button>
+          <div class="rounded-xl mb-6 overflow-hidden relative min-h-[500px] shadow-lg"
+               style="background-color: var(--color-dark-900);">
+            
+            <!-- Blurred background layer -->
+            <%= if @selected_album.result.cover_url do %>
+              <div class="absolute inset-0"
+                   style={"background-image: url('#{@selected_album.result.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}>
+              </div>
             <% else %>
-              <button
-                class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg"
-                phx-click="start_session"
-              >
-                🎵 Start Listening Session
-              </button>
+              <div class="absolute inset-0" style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"></div>
             <% end %>
+            
+            <!-- Overlay for text readability -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40"></div>
+            
+            <!-- Content overlay with album cover and text -->
+            <div class="relative z-10 h-full flex items-center justify-center p-10">
+              <div class="flex items-center space-x-12 max-w-6xl">
+                
+                <!-- Non-blurred album cover -->
+                <div class="flex-shrink-0 relative">
+                  <%= if @selected_album.result.cover_url do %>
+                    <img
+                      src={@selected_album.result.cover_url}
+                      alt={@selected_album.result.name}
+                      class="w-64 h-64 rounded-xl shadow-2xl border-2 border-white/10"
+                      style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);"
+                    />
+                    <!-- Reflection effect -->
+                    <div class="absolute top-0 left-0 w-64 h-64 rounded-xl"
+                         style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;">
+                    </div>
+                  <% else %>
+                    <div class="w-64 h-64 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-2xl border-2 border-white/10 relative">
+                      <svg class="w-32 h-32 text-white/60" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                      </svg>
+                      <!-- Reflection effect for fallback -->
+                      <div class="absolute top-0 left-0 w-64 h-64 rounded-xl"
+                           style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;">
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+                
+                <!-- Album info -->
+                <div class="text-left space-y-6">
+                  <h3 class="text-5xl font-bold text-white drop-shadow-2xl leading-tight">
+                    <%= @selected_album.result.name %>
+                  </h3>
+                  <p class="text-white text-3xl font-semibold drop-shadow-lg"><%= @selected_album.result.artist %></p>
+                  
+                  <!-- Enhanced Album Stats -->
+                  <div class="flex items-center space-x-8 text-white/90 text-xl font-semibold">
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                      </svg>
+                      <span><%= @selected_album.result.total_tracks %> tracks</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span><%= 
+                        total_ms = @selected_album.result.tracks |> Enum.map(&(&1.duration_ms || 0)) |> Enum.sum()
+                        total_minutes = div(total_ms, 60_000)
+                        "#{total_minutes} min"
+                      %></span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                      <span><%= if @selected_album.result.release_date,
+                        do: @selected_album.result.release_date.year,
+                        else: "Unknown" %></span>
+                    </div>
+                  </div>
+                  
+                  <!-- Action Button moved here -->
+                  <div class="pt-4">
+                    <%= if @current_session do %>
+                      <button
+                        class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg shadow-2xl"
+                        phx-click="end_session"
+                      >
+                        End Session
+                      </button>
+                    <% else %>
+                      <button
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg shadow-2xl"
+                        phx-click="start_session"
+                      >
+                        🎵 Start Listening Session
+                      </button>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         <% else %>
           <div class="rounded-lg p-8 mb-6" style="background-color: var(--color-dark-800);">
@@ -203,28 +265,6 @@
                 </div>
               </div>
             <% end %>
-          </div>
-          
-<!-- Album Summary -->
-          <div class="mt-6 p-4 rounded-lg" style="background-color: var(--color-dark-800);">
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span class="text-gray-400">Total Tracks:</span>
-                <p class="font-medium" style="color: var(--color-primary-300);">{length(@selected_album.result.tracks)}</p>
-              </div>
-              <div>
-                <span class="text-gray-400">Total Duration:</span>
-                <p class="font-medium" style="color: var(--color-primary-300);">
-                  {total_ms =
-                    @selected_album.result.tracks
-                    |> Enum.map(&(&1.duration_ms || 0))
-                    |> Enum.sum()
-
-                  total_minutes = div(total_ms, 60_000)
-                  "#{total_minutes} min"}
-                </p>
-              </div>
-            </div>
           </div>
         <% else %>
           <div class="text-center text-gray-400 h-full flex items-center justify-center">

@@ -54,20 +54,6 @@ mix phx.server # start Phoenix server (available at http://localhost:4000)
 
 Embrace Elixir's pipeline operator (`|>`) for any sequence of three or more function calls. Pipelines transform nested, inside-out code into clear, left-to-right data flow that mirrors natural thinking patterns.
 
-**Preferred:**
-```elixir
-"  Hello, World!  "
-|> String.trim()
-|> String.downcase()
-|> String.split()
-|> Enum.join("-")
-```
-
-**Avoid:**
-```elixir
-Enum.join(String.split(String.downcase(String.trim("  Hello, World!  "))), "-")
-```
-
 ### Module Import Ordering
 
 Maintain consistent keyword ordering at the top of modules for enhanced readability and clear dependency hierarchies. Always arrange module keywords in this specific sequence: `use`, `require`, `import`, then `alias`. This ordering follows the logical flow of module compilation: macros are injected first, compile-time requirements are established, functions are imported, and finally convenient aliases are created.
