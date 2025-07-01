@@ -5,32 +5,9 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Track
 
-  @album %Album{
-    spotify_id: "album123",
-    name: "Sample Album",
-    artist: "Sample Artist",
-    release_date: ~D[2023-01-01],
-    cover_url: "http://example.com/cover.jpg",
-    total_tracks: 2,
-    tracks: [
-      %Track{
-        spotify_id: "track001",
-        name: "Track One",
-        track_number: 1,
-        duration_ms: 210_000
-      },
-      %Track{
-        spotify_id: "track002",
-        name: "Track Two",
-        track_number: 2,
-        duration_ms: 180_000
-      }
-    ]
-  }
-
   describe "create/1" do
     test "creates an album with tracks" do
-      {:ok, album} = Album.create(@album)
+      {:ok, album} = Album.create(album_fixture())
 
       assert %Album{
                spotify_id: "album123",
@@ -57,8 +34,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
     end
 
     test "does not recreate an existing album" do
-      {:ok, _} = Album.create(@album)
-      {:error, changeset} = Album.create(@album)
+      {:ok, _} = Album.create(album_fixture())
+      {:error, changeset} = Album.create(album_fixture())
 
       assert Repo.traverse_errors(changeset) == %{spotify_id: ["has already been taken"]}
     end
@@ -66,7 +43,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
   describe "get_or_create/1" do
     test "create an unexisting album with tracks" do
-      {:ok, album} = Album.get_or_create(@album)
+      {:ok, album} = Album.get_or_create(album_fixture())
 
       assert %Album{
                spotify_id: "album123",
@@ -93,8 +70,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
     end
 
     test "does not recreate an existing album" do
-      {:ok, _} = Album.get_or_create(@album)
-      {:ok, album} = Album.get_or_create(@album)
+      {:ok, _} = Album.get_or_create(album_fixture())
+      {:ok, album} = Album.get_or_create(album_fixture())
 
       assert %Album{
                spotify_id: "album123",
@@ -123,7 +100,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
   describe "get/1" do
     test "get an existing album" do
-      {:ok, %Album{id: id}} = Album.create(@album)
+      {:ok, %Album{id: id}} = Album.create(album_fixture())
 
       album = Album.get(id)
 
@@ -158,7 +135,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
   describe "get_by/1" do
     test "get an existing album" do
-      {:ok, %Album{spotify_id: spotify_id}} = Album.create(@album)
+      {:ok, %Album{spotify_id: spotify_id}} = Album.create(album_fixture())
 
       album = Album.get_by(spotify_id: spotify_id)
 
@@ -193,7 +170,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
   describe "delete/1" do
     test "deletes an existing album" do
-      {:ok, %Album{spotify_id: spotify_id}} = Album.create(@album)
+      {:ok, %Album{spotify_id: spotify_id}} = Album.create(album_fixture())
 
       :ok = Album.delete(spotify_id)
 

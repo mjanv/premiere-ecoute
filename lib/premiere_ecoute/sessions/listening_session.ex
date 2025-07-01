@@ -26,7 +26,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def changeset(listening_session, attrs) do
     listening_session
     |> cast(attrs, [
-      # :streamer_id,
       :album_id,
       :status,
       :started_at,
@@ -52,15 +51,18 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> changeset(attrs)
     |> Repo.insert()
     |> case do
-      {:ok, session} -> {:ok, Repo.preload(session, [album: [:tracks], user: [], current_track: []])}
-      {:error, reason} -> {:error, reason}
+      {:ok, session} ->
+        {:ok, Repo.preload(session, album: [:tracks], user: [], current_track: [])}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
   def get(id) do
     __MODULE__
     |> Repo.get(id)
-    |> Repo.preload([album: [:tracks], user: []])
+    |> Repo.preload(album: [:tracks], user: [])
   end
 
   def start(%__MODULE__{} = session) do
@@ -85,13 +87,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   def next_track(%__MODULE__{} = session) do
     session
-    |> Repo.preload([album: [:tracks]])
+    |> Repo.preload(album: [:tracks])
     |> change()
     |> put_change(:current_track_id, hd(session.album.tracks).id)
     |> Repo.update()
     |> case do
-      {:ok, session} -> {:ok, Repo.preload(session, [album: [:tracks], user: [], current_track: []])}
-      {:error, reason} -> {:error, reason}
+      {:ok, session} ->
+        {:ok, Repo.preload(session, album: [:tracks], user: [], current_track: [])}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -99,7 +104,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     __MODULE__
     |> Repo.get(id)
     |> case do
-      nil -> :error
+      nil ->
+        :error
+
       session ->
         Repo.delete(session)
         :ok

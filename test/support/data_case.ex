@@ -20,12 +20,15 @@ defmodule PremiereEcoute.DataCase do
 
   using do
     quote do
-      alias PremiereEcoute.Repo
-
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+
       import PremiereEcoute.DataCase
+
+      import PremiereEcoute.Sessions.Discography.AlbumFixtures
+
+      alias PremiereEcoute.Repo
     end
   end
 
