@@ -9,7 +9,9 @@
               <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
             </svg>
           </div>
-          <h1 class="text-2xl font-bold" style="color: var(--color-primary-400);">Premiere Ecoute</h1>
+          <.link navigate={~p"/"} class="text-2xl font-bold hover:opacity-80 transition-opacity" style="color: var(--color-primary-400);">
+            Premiere Ecoute
+          </.link>
         </div>
         <div class="flex items-center space-x-4">
           <.link
@@ -223,7 +225,45 @@
             <div class="grid grid-cols-2 gap-4">
               <!-- Track Controls -->
               <div class="space-y-3">
-                <h4 class="text-sm font-medium text-gray-300 uppercase tracking-wide">Spotify</h4>
+                <div class="flex items-center justify-between">
+                  <h4 class="text-sm font-medium text-gray-300 uppercase tracking-wide">Spotify</h4>
+                  <div class="flex items-center space-x-2">
+                    <%= if assigns[:is_playing] do %>
+                      <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span class="text-xs text-green-400">Playing</span>
+                    <% else %>
+                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                      <span class="text-xs text-gray-500">Stopped</span>
+                    <% end %>
+                  </div>
+                </div>
+                
+                <!-- Playback Status -->
+                <%= if assigns[:current_track] do %>
+                  <div class="bg-white/5 rounded-lg p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-gray-400">Current Track:</span>
+                      <span class="text-xs text-gray-400">
+                        <%= if assigns[:time_remaining] do %>
+                          {format_duration(@time_remaining)} left
+                        <% else %>
+                          --:--
+                        <% end %>
+                      </span>
+                    </div>
+                    <p class="text-sm font-medium text-white truncate">{@current_track.name}</p>
+                    <%= if assigns[:track_progress] do %>
+                      <div class="w-full bg-gray-700 rounded-full h-1">
+                        <div class="bg-green-400 h-1 rounded-full transition-all duration-1000" style={"width: #{@track_progress}%"}></div>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="bg-white/5 rounded-lg p-3">
+                    <p class="text-xs text-gray-400 text-center">No track selected</p>
+                  </div>
+                <% end %>
+                
                 <div class="flex space-x-2">
                   <button
                     phx-click="previous_track"
@@ -264,7 +304,58 @@
 
               <!-- Poll Controls -->
               <div class="space-y-3">
-                <h4 class="text-sm font-medium text-gray-300 uppercase tracking-wide">Twitch</h4>
+                <div class="flex items-center justify-between">
+                  <h4 class="text-sm font-medium text-gray-300 uppercase tracking-wide">Twitch</h4>
+                  <div class="flex items-center space-x-2">
+                    <%= if assigns[:poll_active] do %>
+                      <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                      <span class="text-xs text-purple-400">Active Poll</span>
+                    <% else %>
+                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                      <span class="text-xs text-gray-500">No Poll</span>
+                    <% end %>
+                  </div>
+                </div>
+                
+                <!-- Poll Status -->
+                <div class="bg-white/5 rounded-lg p-3 space-y-2">
+                  <%= if assigns[:poll_active] do %>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-gray-400">Poll Status:</span>
+                      <span class="text-xs text-purple-400 font-medium">Running</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-gray-400">Total Votes:</span>
+                      <span class="text-xs text-white font-medium">
+                        {assigns[:poll_votes] || 0}
+                      </span>
+                    </div>
+                    <%= if assigns[:poll_time_remaining] do %>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Time Left:</span>
+                        <span class="text-xs text-purple-400 font-medium">
+                          {format_duration(@poll_time_remaining)}
+                        </span>
+                      </div>
+                    <% end %>
+                  <% else %>
+                    <%= if assigns[:poll_terminated] do %>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Last Poll:</span>
+                        <span class="text-xs text-gray-400 font-medium">Completed</span>
+                      </div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Final Votes:</span>
+                        <span class="text-xs text-white font-medium">
+                          {assigns[:last_poll_votes] || 0}
+                        </span>
+                      </div>
+                    <% else %>
+                      <p class="text-xs text-gray-400 text-center">No poll running</p>
+                    <% end %>
+                  <% end %>
+                </div>
+                
                 <div class="flex space-x-2">
                   <button
                     phx-click="start_poll"
