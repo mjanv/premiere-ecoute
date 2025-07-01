@@ -75,7 +75,7 @@
         </h2>
         
 <!-- Search -->
-        <div class="mb-6">
+        <div class="mb-6 relative">
           <.form
             for={@search_form}
             id="album-search-form"
@@ -92,9 +92,9 @@
             />
           </.form>
           
-<!-- Search Results -->
+<!-- Search Results Overlay -->
           <%= if @search_albums.loading do %>
-            <div class="mt-4 text-center text-gray-400">
+            <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4 text-center text-gray-400">
               <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto">
               </div>
               <p class="mt-2 text-sm">Searching albums...</p>
@@ -102,10 +102,10 @@
           <% end %>
 
           <%= if @search_albums.ok? do %>
-            <div class="mt-4 space-y-2 max-h-64 overflow-y-auto">
+            <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
               <%= for album <- @search_albums.result do %>
                 <div
-                  class="rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors"
+                  class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
                   style="background-color: var(--color-dark-800);"
                   phx-click="select_album"
                   phx-value-album_id={album.spotify_id}
@@ -141,7 +141,7 @@
 <!-- Selected Album -->
         <%= if @selected_album.ok? && @selected_album.result do %>
           <div
-            class="rounded-xl mb-6 overflow-hidden relative min-h-[500px] shadow-lg"
+            class="rounded-xl mb-6 overflow-hidden relative h-[calc(100vh-16rem)] shadow-lg"
             style="background-color: var(--color-dark-900);"
           >
             

@@ -33,6 +33,7 @@ defmodule PremiereEcouteWeb.SessionLive do
          |> assign(:session_id, session_id)
          |> assign(:show_votes, true)
          |> assign(:show_scores, true)
+         |> assign(:user_current_rating, nil)
          |> assign_async(:session_data, fn ->
            {:ok, %{session_data: load_session_data(listening_session)}}
          end)}
@@ -66,11 +67,28 @@ defmodule PremiereEcouteWeb.SessionLive do
 
   @impl true
   def handle_event("start_session", _params, %{assigns: %{listening_session: session}} = socket) do
-    {:noreply, assign(socket, :listening_session, ListeningSession.start(session))}
+    case ListeningSession.start(session) do
+      {:ok, started_session} -> 
+        # AIDEV-NOTE: Automatically select first track when starting session
+        case ListeningSession.next_track(started_session) do
+          {:ok, session_with_track} ->
+            Phoenix.PubSub.broadcast(PremiereEcoute.PubSub, "session:#{session.id}", {:track_changed, session_with_track.current_track})
+            socket = assign(socket, :listening_session, session_with_track)
+            socket = assign(socket, :user_current_rating, nil)
+            {:noreply, socket}
+          {:error, _} ->
+            # If no tracks available, just start without selecting a track
+            {:noreply, assign(socket, :listening_session, started_session)}
+        end
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
+    end
   end
 
   def handle_event("end_session", _params, %{assigns: %{listening_session: session}} = socket) do
-    {:noreply, assign(socket, :listening_session, ListeningSession.stop(session))}
+    case ListeningSession.stop(session) do
+      {:ok, session} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot stop session")}
+    end
   end
 
   @impl true
@@ -81,6 +99,61 @@ defmodule PremiereEcouteWeb.SessionLive do
   @impl true
   def handle_event("toggle_scores", _params, socket) do
     {:noreply, assign(socket, :show_scores, !socket.assigns.show_scores)}
+  end
+
+
+  @impl true
+  def handle_event("next_track", _params, %{assigns: %{listening_session: session}} = socket) do
+    case ListeningSession.next_track(session) do
+      {:ok, updated_session} -> 
+        # AIDEV-NOTE: Broadcast track change to update UI and notify other subscribers
+        Phoenix.PubSub.broadcast(PremiereEcoute.PubSub, "session:#{session.id}", {:track_changed, updated_session.current_track})
+        # Clear user rating when track changes
+        socket = assign(socket, :listening_session, updated_session)
+        socket = assign(socket, :user_current_rating, nil)
+        {:noreply, socket}
+      {:error, :no_tracks_left} -> 
+        {:noreply, put_flash(socket, :info, "Already at the last track")}
+      {:error, _reason} -> 
+        {:noreply, put_flash(socket, :error, "Failed to go to next track")}
+    end
+  end
+
+  @impl true
+  def handle_event("previous_track", _params, %{assigns: %{listening_session: session}} = socket) do
+    case ListeningSession.previous_track(session) do
+      {:ok, updated_session} -> 
+        # AIDEV-NOTE: Broadcast track change to update UI and notify other subscribers
+        Phoenix.PubSub.broadcast(PremiereEcoute.PubSub, "session:#{session.id}", {:track_changed, updated_session.current_track})
+        # Clear user rating when track changes
+        socket = assign(socket, :listening_session, updated_session)
+        socket = assign(socket, :user_current_rating, nil)
+        {:noreply, socket}
+      {:error, :no_tracks_left} -> 
+        {:noreply, put_flash(socket, :info, "Already at the first track")}
+      {:error, _reason} -> 
+        {:noreply, put_flash(socket, :error, "Failed to go to previous track")}
+    end
+  end
+
+  @impl true
+  def handle_event("vote_track", %{"track_id" => track_id, "rating" => rating}, socket) do
+    case Integer.parse(track_id) do
+      {_int_track_id, ""} ->
+        case Integer.parse(rating) do
+          {int_rating, ""} when int_rating >= 1 and int_rating <= 10 ->
+            # AIDEV-NOTE: Store user's rating for the track and update UI
+            socket = assign(socket, :user_current_rating, int_rating)
+            
+            # Here you would typically save the vote to the database
+            # For now, just update the UI and show confirmation
+            {:noreply, put_flash(socket, :info, "Rated track #{int_rating}/10")}
+          _ ->
+            {:noreply, put_flash(socket, :error, "Invalid rating")}
+        end
+      _ ->
+        {:noreply, put_flash(socket, :error, "Invalid track")}
+    end
   end
 
   @impl true

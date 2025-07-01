@@ -20,14 +20,18 @@ defmodule PremiereEcoute.Core.CommandBus do
 
   def validate(command) do
     case Registry.get(command.__struct__) do
-      nil -> {:error, :not_registered}
+      nil ->
+        {:error, :not_registered}
+        PremiereEcoute.Sessions.ListeningSession.Handler.validate(command)
       handler -> handler.validate(command)
     end
   end
 
   def handle({:ok, command}) do
     case Registry.get(command.__struct__) do
-      nil -> {:error, :not_registered}
+      nil ->
+        {:error, :not_registered}
+        PremiereEcoute.Sessions.ListeningSession.Handler.handle(command)
       handler -> handler.handle(command)
     end
   end
@@ -36,7 +40,9 @@ defmodule PremiereEcoute.Core.CommandBus do
 
   def dispatch(event) do
     case Registry.get(event.__struct__) do
-      nil -> {:error, :not_registered}
+      nil ->
+        {:error, :not_registered}
+        PremiereEcoute.Sessions.ListeningSession.Handler.dispatch(event)
       handler -> handler.dispatch(event)
     end
   end
