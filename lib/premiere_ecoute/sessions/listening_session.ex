@@ -46,23 +46,25 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> put_change(:status, :preparing)
   end
 
+  def preload(nil), do: nil
+  def preload(%__MODULE__{} = session) do
+    Repo.preload(session, [album: [:tracks], user: [], current_track: []], force: true)
+  end
+
   def create(attrs) do
     %__MODULE__{}
     |> changeset(attrs)
     |> Repo.insert()
     |> case do
-      {:ok, session} ->
-        {:ok, Repo.preload(session, album: [:tracks], user: [], current_track: [])}
-
-      {:error, reason} ->
-        {:error, reason}
+      {:ok, session} -> {:ok, preload(session)}
+      {:error, reason} ->  {:error, reason}
     end
   end
 
   def get(id) do
     __MODULE__
     |> Repo.get(id)
-    |> Repo.preload(album: [:tracks], user: [])
+    |> preload()
   end
 
   def start(%__MODULE__{} = session) do
@@ -86,17 +88,60 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   def next_track(%__MODULE__{} = session) do
+    session = Repo.preload(session, album: [:tracks], current_track: [])
+    tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
+
+    session.current_track
+    |> case do
+      nil ->
+        hd(tracks).id
+
+      current_track ->
+        current_index = Enum.find_index(tracks, &(&1.id == current_track.id))
+        if current_index == length(tracks) - 1 do
+          nil
+        else
+          Enum.at(tracks, current_index + 1).id
+        end
+    end
+    |> case do
+      nil -> {:error, :no_tracks_left}
+      track_id -> current_track(session, track_id)
+    end
+  end
+
+  def previous_track(%__MODULE__{} = session) do
+    session = Repo.preload(session, album: [:tracks], current_track: [])
+    tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
+
+    session.current_track
+    |> case do
+      nil ->
+        nil
+
+      current_track ->
+        current_index = Enum.find_index(tracks, &(&1.id == current_track.id))
+
+        if current_index == 0 do
+          nil
+        else
+          Enum.at(tracks, current_index - 1).id
+        end
+    end
+    |> case do
+      nil -> {:error, :no_tracks_left}
+      track_id -> current_track(session, track_id)
+    end
+  end
+
+  def current_track(%__MODULE__{} = session, track_id) do
     session
-    |> Repo.preload(album: [:tracks])
     |> change()
-    |> put_change(:current_track_id, hd(session.album.tracks).id)
+    |> put_change(:current_track_id, track_id)
     |> Repo.update()
     |> case do
-      {:ok, session} ->
-        {:ok, Repo.preload(session, album: [:tracks], user: [], current_track: [])}
-
-      {:error, reason} ->
-        {:error, reason}
+      {:ok, session} -> {:ok, preload(session)}
+      {:error, reason} -> {:error, reason}
     end
   end
 
