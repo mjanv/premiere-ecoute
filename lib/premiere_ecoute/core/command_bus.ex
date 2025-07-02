@@ -23,7 +23,9 @@ defmodule PremiereEcoute.Core.CommandBus do
       nil ->
         {:error, :not_registered}
         PremiereEcoute.Sessions.ListeningSession.Handler.validate(command)
-      handler -> handler.validate(command)
+
+      handler ->
+        handler.validate(command)
     end
   end
 
@@ -32,7 +34,9 @@ defmodule PremiereEcoute.Core.CommandBus do
       nil ->
         {:error, :not_registered}
         PremiereEcoute.Sessions.ListeningSession.Handler.handle(command)
-      handler -> handler.handle(command)
+
+      handler ->
+        handler.handle(command)
     end
   end
 
@@ -43,7 +47,9 @@ defmodule PremiereEcoute.Core.CommandBus do
       nil ->
         {:error, :not_registered}
         PremiereEcoute.Sessions.ListeningSession.Handler.dispatch(event)
-      handler -> handler.dispatch(event)
+
+      handler ->
+        handler.dispatch(event)
     end
   end
 end

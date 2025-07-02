@@ -46,8 +46,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> put_change(:status, :preparing)
   end
 
-  def preload(nil), do: nil
-  def preload(%__MODULE__{} = session) do
+  def preload(session) do
     Repo.preload(session, [album: [:tracks], user: [], current_track: []], force: true)
   end
 
@@ -57,13 +56,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.insert()
     |> case do
       {:ok, session} -> {:ok, preload(session)}
-      {:error, reason} ->  {:error, reason}
+      {:error, reason} -> {:error, reason}
     end
   end
 
   def get(id) do
     __MODULE__
     |> Repo.get(id)
+    |> preload()
+  end
+
+  def all do
+    __MODULE__
+    |> Repo.all()
     |> preload()
   end
 
@@ -98,6 +103,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
       current_track ->
         current_index = Enum.find_index(tracks, &(&1.id == current_track.id))
+
         if current_index == length(tracks) - 1 do
           nil
         else

@@ -175,7 +175,7 @@
               
 <!-- AIDEV-NOTE: Display toggles section with DaisyUI styling -->
               <div class="mt-4 pt-4 border-t border-white/20">
-                <div class="space-y-2">
+                <div class="flex space-x-6">
                   <div class="form-control">
                     <label class="label cursor-pointer justify-start">
                       <input
@@ -328,13 +328,17 @@
 <!-- Current Track Status -->
                 <%= if @listening_session.current_track do %>
                   <div class="bg-white/5 rounded-lg p-3 space-y-3">
-                    <p class="text-sm font-medium text-white truncate">{@listening_session.current_track.name}</p>
+                    <p class="text-sm font-medium text-white truncate">
+                      {@listening_session.current_track.name}
+                    </p>
                     <%= if @listening_session.current_track.duration_ms do %>
                       <div class="flex items-center justify-between text-xs text-gray-400">
                         <span>Progress:</span>
                         <span>
                           <%= if assigns[:track_elapsed_ms] do %>
-                            {format_duration(@track_elapsed_ms)} / {format_duration(@listening_session.current_track.duration_ms)}
+                            {format_duration(@track_elapsed_ms)} / {format_duration(
+                              @listening_session.current_track.duration_ms
+                            )}
                           <% else %>
                             0:00 / {format_duration(@listening_session.current_track.duration_ms)}
                           <% end %>
@@ -491,7 +495,9 @@
                   <button
                     phx-click="vote_track"
                     phx-value-track_id={
-                      if @listening_session.current_track, do: @listening_session.current_track.id, else: ""
+                      if @listening_session.current_track,
+                        do: @listening_session.current_track.id,
+                        else: ""
                     }
                     phx-value-rating={rating}
                     class={[
@@ -517,7 +523,6 @@
             </div>
           </div>
 
-
           <div class="mb-6">
             <%= if length(session_data.tracks) > 0 do %>
               <div class="space-y-3">
@@ -525,34 +530,46 @@
                   <div
                     class={[
                       "rounded-lg transition-colors overflow-hidden",
-                      if(@listening_session.current_track && @listening_session.current_track.id == track.id,
+                      if(
+                        @listening_session.current_track &&
+                          @listening_session.current_track.id == track.id,
                         do: "border-2 border-green-500/50",
                         else: "hover:bg-gray-700"
                       )
                     ]}
                     style={
-                      if(@listening_session.current_track && @listening_session.current_track.id == track.id,
+                      if(
+                        @listening_session.current_track &&
+                          @listening_session.current_track.id == track.id,
                         do: "",
                         else: "background-color: var(--color-dark-900);"
                       )
                     }
                   >
                     <!-- Track Row with Green Background -->
-                    <div 
-                      class={[
-                        "p-4 transition-colors",
-                        if(@listening_session.current_track && @listening_session.current_track.id == track.id,
-                          do: "bg-green-600/20 hover:bg-green-600/30",
-                          else: ""
-                        )
-                      ]}
-                    >
+                    <div class={[
+                      "p-4 transition-colors",
+                      if(
+                        @listening_session.current_track &&
+                          @listening_session.current_track.id == track.id,
+                        do: "bg-green-600/20 hover:bg-green-600/30",
+                        else: ""
+                      )
+                    ]}>
                       <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-4 flex-1 min-w-0">
                           <%= if @listening_session.current_track && @listening_session.current_track.id == track.id do %>
                             <div class="w-8 flex-shrink-0 flex items-center justify-center">
-                              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                              <svg
+                                class="w-5 h-5 text-green-400"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                  clip-rule="evenodd"
+                                />
                               </svg>
                             </div>
                           <% else %>
@@ -561,15 +578,21 @@
                           <div class="flex-1 min-w-0">
                             <h4 class={[
                               "font-medium text-lg truncate",
-                              if(@listening_session.current_track && @listening_session.current_track.id == track.id,
+                              if(
+                                @listening_session.current_track &&
+                                  @listening_session.current_track.id == track.id,
                                 do: "text-green-300",
                                 else: "text-white"
                               )
-                            ]}>{track.name}</h4>
+                            ]}>
+                              {track.name}
+                            </h4>
                             <%= if track.duration_ms do %>
                               <p class={[
                                 "text-sm",
-                                if(@listening_session.current_track && @listening_session.current_track.id == track.id,
+                                if(
+                                  @listening_session.current_track &&
+                                    @listening_session.current_track.id == track.id,
                                   do: "text-green-400",
                                   else: "text-gray-400"
                                 )
@@ -583,7 +606,10 @@
                         <div class="flex items-center space-x-8 text-sm flex-shrink-0">
                           <%= if @show_votes do %>
                             <div class="text-center">
-                              <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                              <p
+                                class="text-xl font-bold"
+                                style="color: var(--color-primary-300);"
+                              >
                                 {track_votes_count(track.id, session_data.votes)}
                               </p>
                               <p class="text-gray-400">Votes</p>
@@ -591,7 +617,10 @@
                           <% end %>
                           <%= if @show_scores do %>
                             <div class="text-center">
-                              <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                              <p
+                                class="text-xl font-bold"
+                                style="color: var(--color-primary-300);"
+                              >
                                 <%= case track_score(track.id, session_data.scores) do %>
                                   <% 0 -> %>
                                     <span class="text-gray-500">--</span>
@@ -606,7 +635,7 @@
                       </div>
                     </div>
                     
-                    <!-- AIDEV-NOTE: Histogram Section with Gray Background -->
+<!-- AIDEV-NOTE: Histogram Section with Gray Background -->
                     <%= if @listening_session.current_track && @listening_session.current_track.id == track.id do %>
                       <div class="px-4 pt-4 pb-2" style="background-color: var(--color-dark-800);">
                         <!-- Horizontal Histogram taking ~80% width -->
@@ -623,30 +652,32 @@
                                 </span>
                               <% end %>
                               
-                              <!-- Bar (the building) -->
+<!-- Bar (the building) -->
                               <div
-                                class={[
-                                  "w-full rounded-t transition-all duration-300 min-w-0",
-                                  case rating do
-                                    1 -> "bg-red-600"
-                                    2 -> "bg-red-500"
-                                    3 -> "bg-red-400"
-                                    4 -> "bg-orange-500"
-                                    5 -> "bg-yellow-500"
-                                    6 -> "bg-yellow-400"
-                                    7 -> "bg-green-400"
-                                    8 -> "bg-blue-400"
-                                    9 -> "bg-blue-500"
-                                    10 -> "bg-blue-600"
-                                  end,
-                                  # Highlight most voted (rating 7 with 15 votes)
-                                  if(votes == 15, do: "ring-2 ring-white/50", else: "")
-                                ]}
+                                class={
+                                  [
+                                    "w-full rounded-t transition-all duration-300 min-w-0",
+                                    case rating do
+                                      1 -> "bg-red-600"
+                                      2 -> "bg-red-500"
+                                      3 -> "bg-red-400"
+                                      4 -> "bg-orange-500"
+                                      5 -> "bg-yellow-500"
+                                      6 -> "bg-yellow-400"
+                                      7 -> "bg-green-400"
+                                      8 -> "bg-blue-400"
+                                      9 -> "bg-blue-500"
+                                      10 -> "bg-blue-600"
+                                    end,
+                                    # Highlight most voted (rating 7 with 15 votes)
+                                    if(votes == 15, do: "ring-2 ring-white/50", else: "")
+                                  ]
+                                }
                                 style={"height: #{max(votes * 4, 6)}px"}
                               >
                               </div>
                               
-                              <!-- Rating number -->
+<!-- Rating number -->
                               <span class="text-xs text-gray-400 font-medium mt-1">{rating}</span>
                             </div>
                           <% end %>

@@ -3,14 +3,10 @@ defmodule PremiereEcouteWeb.SessionsLive do
 
   require Logger
 
-  alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Sessions.ListeningSession
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "listening_sessions")
-    end
-
     {:ok,
      socket
      |> assign(:page_title, "All Sessions")
@@ -23,48 +19,31 @@ defmodule PremiereEcouteWeb.SessionsLive do
   end
 
   @impl true
-  def handle_info({:session_updated, _session}, socket) do
-    # Reload sessions when a session is updated
-    {:noreply,
-     assign_async(socket, :sessions_data, fn -> {:ok, %{sessions_data: load_sessions_data()}} end)}
-  end
-
-  @impl true
-  def handle_info({:session_started, _session}, socket) do
-    # Reload sessions when a new session is started
-    {:noreply,
-     assign_async(socket, :sessions_data, fn -> {:ok, %{sessions_data: load_sessions_data()}} end)}
-  end
-
-  @impl true
   def handle_event("navigate_to_session", %{"session_id" => session_id}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/session/#{session_id}")}
   end
 
   defp load_sessions_data do
-    try do
-      sessions = Sessions.list_listening_sessions()
-      # Group sessions by status for better organization
-      grouped_sessions = Enum.group_by(sessions, & &1.status)
+    sessions = ListeningSession.all()
+    grouped_sessions = Enum.group_by(sessions, & &1.status)
+
+    %{
+      sessions: sessions,
+      active_sessions: Map.get(grouped_sessions, :active, []),
+      preparing_sessions: Map.get(grouped_sessions, :preparing, []),
+      stopped_sessions: Map.get(grouped_sessions, :stopped, [])
+    }
+  rescue
+    error ->
+      Logger.error("Failed to load sessions: #{inspect(error)}")
 
       %{
-        sessions: sessions,
-        active_sessions: Map.get(grouped_sessions, :active, []),
-        preparing_sessions: Map.get(grouped_sessions, :preparing, []),
-        stopped_sessions: Map.get(grouped_sessions, :stopped, [])
+        sessions: [],
+        active_sessions: [],
+        preparing_sessions: [],
+        stopped_sessions: [],
+        error: "Failed to load sessions"
       }
-    rescue
-      error ->
-        Logger.error("Failed to load sessions: #{inspect(error)}")
-
-        %{
-          sessions: [],
-          active_sessions: [],
-          preparing_sessions: [],
-          stopped_sessions: [],
-          error: "Failed to load sessions"
-        }
-    end
   end
 
   def session_status_class(:preparing), do: "bg-yellow-900/30 text-yellow-400 border-yellow-700"

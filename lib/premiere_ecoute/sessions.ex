@@ -6,7 +6,6 @@ defmodule PremiereEcoute.Sessions do
   import Ecto.Query, warn: false
 
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
 
   @doc """
@@ -51,13 +50,5 @@ defmodule PremiereEcoute.Sessions do
   """
   def get_current_playing_track(_session_id) do
     {:ok, nil}
-  end
-
-  @doc """
-  Lists all listening sessions.
-  """
-  def list_listening_sessions do
-    Repo.all(ListeningSession)
-    |> Repo.preload([:album, :user])
   end
 end

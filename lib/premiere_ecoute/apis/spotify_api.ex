@@ -15,6 +15,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   @web "https://api.spotify.com/v1"
   @accounts "https://accounts.spotify.com/api"
 
+  def impl(), do: Application.get_env(@app, :spotify_api, __MODULE__)
+
   @spec api(:web | :accounts) :: Req.Request.t()
   def api(:web) do
     case client_credentials() do
