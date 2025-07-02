@@ -1,9 +1,6 @@
 defmodule PremiereEcouteWeb.UserLive.LoginTest do
   use PremiereEcouteWeb.ConnCase
 
-  import Phoenix.LiveViewTest
-  import PremiereEcoute.AccountsFixtures
-
   describe "login page" do
     test "renders login page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/log-in")

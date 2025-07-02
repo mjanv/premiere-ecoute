@@ -1,7 +1,6 @@
 defmodule PremiereEcouteWeb.UserSessionControllerTest do
   use PremiereEcouteWeb.ConnCase
 
-  import PremiereEcoute.AccountsFixtures
   alias PremiereEcoute.Accounts
 
   @moduletag :skip

@@ -1,9 +1,6 @@
 defmodule PremiereEcouteWeb.UserLive.RegistrationTest do
   use PremiereEcouteWeb.ConnCase
 
-  import Phoenix.LiveViewTest
-  import PremiereEcoute.AccountsFixtures
-
   describe "Registration page" do
     test "renders registration page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/register")

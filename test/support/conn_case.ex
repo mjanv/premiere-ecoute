@@ -22,15 +22,17 @@ defmodule PremiereEcouteWeb.ConnCase do
 
   using do
     quote do
-      # The default endpoint for testing
       @endpoint PremiereEcouteWeb.Endpoint
 
       use PremiereEcouteWeb, :verified_routes
 
-      # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
+      import Phoenix.LiveViewTest
       import PremiereEcouteWeb.ConnCase
+
+      import PremiereEcoute.AccountsFixtures
+      import PremiereEcoute.Sessions.Discography.AlbumFixtures
     end
   end
 

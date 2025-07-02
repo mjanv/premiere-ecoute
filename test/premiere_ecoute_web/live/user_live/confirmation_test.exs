@@ -1,9 +1,6 @@
 defmodule PremiereEcouteWeb.UserLive.ConfirmationTest do
   use PremiereEcouteWeb.ConnCase
 
-  import Phoenix.LiveViewTest
-  import PremiereEcoute.AccountsFixtures
-
   alias PremiereEcoute.Accounts
 
   setup do

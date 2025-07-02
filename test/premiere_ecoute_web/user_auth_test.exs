@@ -6,8 +6,6 @@ defmodule PremiereEcouteWeb.UserAuthTest do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcouteWeb.UserAuth
 
-  import PremiereEcoute.AccountsFixtures
-
   @remember_me_cookie "_premiere_ecoute_web_user_remember_me"
   @remember_me_cookie_max_age 60 * 60 * 24 * 14
 

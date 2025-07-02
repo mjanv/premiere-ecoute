@@ -26,9 +26,14 @@ defmodule PremiereEcoute.DataCase do
 
       import PremiereEcoute.DataCase
 
+      import PremiereEcoute.AccountsFixtures
       import PremiereEcoute.Sessions.Discography.AlbumFixtures
 
+      import Mox
+
       alias PremiereEcoute.Repo
+
+      setup :verify_on_exit!
     end
   end
 

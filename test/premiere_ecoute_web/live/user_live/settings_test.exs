@@ -2,8 +2,6 @@ defmodule PremiereEcouteWeb.UserLive.SettingsTest do
   use PremiereEcouteWeb.ConnCase
 
   alias PremiereEcoute.Accounts
-  import Phoenix.LiveViewTest
-  import PremiereEcoute.AccountsFixtures
 
   describe "Settings page" do
     test "renders settings page", %{conn: conn} do

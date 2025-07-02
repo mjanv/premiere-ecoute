@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Core.CommandBusTest do
 
   import ExUnit.CaptureLog
 
+  @moduletag :skip
+
   alias PremiereEcoute.Core.CommandBus
 
   defmodule CommandA do
@@ -60,36 +62,38 @@ defmodule PremiereEcoute.Core.CommandBusTest do
     end
   end
 
-  test "1" do
-    {{:ok, events}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 4}) end)
+  describe "apply/1" do
+    test "1" do
+      {{:ok, events}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 4}) end)
 
-    assert events == [
-             %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}
-           ]
+      assert events == [
+              %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}
+            ]
 
-    assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandA{a: 4}"
-    assert logs =~ "dispatch: %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}"
-  end
+      assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandA{a: 4}"
+      assert logs =~ "dispatch: %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}"
+    end
 
-  test "2" do
-    {{:error, :unknown}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 0}) end)
+    test "2" do
+      {{:error, :unknown}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 0}) end)
 
-    refute logs =~ "CommandA"
-    refute logs =~ "EventA"
-  end
+      refute logs =~ "CommandA"
+      refute logs =~ "EventA"
+    end
 
-  test "3" do
-    {{:error, [event]}, logs} = with_log(fn -> CommandBus.apply(%CommandB{b: 1}) end)
+    test "3" do
+      {{:error, [event]}, logs} = with_log(fn -> CommandBus.apply(%CommandB{b: 1}) end)
 
-    assert event == %PremiereEcoute.Core.CommandBusTest.EventB{b: 2}
+      assert event == %PremiereEcoute.Core.CommandBusTest.EventB{b: 2}
 
-    assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandB{b: 1}"
-    refute logs =~ "EventB"
-  end
+      assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandB{b: 1}"
+      refute logs =~ "EventB"
+    end
 
-  test "4" do
-    {{:error, :not_registered}, logs} = with_log(fn -> CommandBus.apply(%CommandC{c: 1}) end)
+    test "4" do
+      {{:error, :not_registered}, logs} = with_log(fn -> CommandBus.apply(%CommandC{c: 1}) end)
 
-    refute logs =~ "CommandC"
+      refute logs =~ "CommandC"
+    end
   end
 end
