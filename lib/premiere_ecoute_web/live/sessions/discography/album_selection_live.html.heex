@@ -1,0 +1,342 @@
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
+    <!-- Header -->
+    <header
+      class="border-b px-6 py-4"
+      style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+            </svg>
+          </div>
+          <.link
+            navigate={~p"/"}
+            class="text-2xl font-bold hover:opacity-80 transition-opacity"
+            style="color: var(--color-primary-400);"
+          >
+            Premiere Ecoute
+          </.link>
+        </div>
+        <div class="flex items-center space-x-4">
+          <.link
+            navigate={~p"/sessions"}
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:text-purple-300 transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            View All Sessions
+          </.link>
+          <!-- Spotify Status -->
+          <%= if false do %>
+            <div class="flex items-center space-x-2 px-3 py-1 bg-green-900/30 rounded-lg">
+              <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+              </svg>
+              <span class="text-sm text-green-400">
+                {if false, do: "Playing", else: "Connected"}
+              </span>
+            </div>
+          <% else %>
+            <div class="flex items-center space-x-2 px-3 py-1 bg-gray-700 rounded-lg">
+              <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+              </svg>
+              <span class="text-sm text-gray-400">Spotify Offline</span>
+            </div>
+          <% end %>
+          <a
+            href="/auth/twitch"
+            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-block"
+          >
+            Connect with Twitch
+          </a>
+        </div>
+      </div>
+    </header>
+
+<!-- Main Content -->
+    <div class="flex h-screen">
+      <!-- Left Panel - Album Selection -->
+      <div
+        class="w-1/2 border-r p-6"
+        style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
+      >
+        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">
+          Album Selection
+        </h2>
+
+<!-- Search -->
+        <div class="mb-6 relative">
+          <.form
+            for={@search_form}
+            id="album-search-form"
+            phx-change="search_albums"
+            phx-submit="search_albums"
+          >
+            <.input
+              field={@search_form[:query]}
+              type="text"
+              placeholder="Search Spotify albums..."
+              class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+              error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+            />
+          </.form>
+
+<!-- Search Results Overlay -->
+          <%= if @search_albums.loading do %>
+            <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4 text-center text-gray-400">
+              <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto">
+              </div>
+              <p class="mt-2 text-sm">Searching albums...</p>
+            </div>
+          <% end %>
+
+          <%= if @search_albums.ok? do %>
+            <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
+              <%= for album <- @search_albums.result do %>
+                <div
+                  class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                  style="background-color: var(--color-dark-800);"
+                  phx-click="select_album"
+                  phx-value-album_id={album.spotify_id}
+                >
+                  <div class="flex items-center space-x-3">
+                    <%= if album.cover_url do %>
+                      <img
+                        src={album.cover_url}
+                        alt={album.name}
+                        class="w-12 h-12 rounded object-cover"
+                      />
+                    <% else %>
+                      <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                        </svg>
+                      </div>
+                    <% end %>
+                    <div class="flex-1 min-w-0">
+                      <h4 class="font-medium truncate" style="color: var(--color-primary-300);">
+                        {album.name}
+                      </h4>
+                      <p class="text-gray-400 text-sm truncate">{album.artist}</p>
+                      <p class="text-gray-500 text-xs">{album.total_tracks} tracks</p>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+<!-- Selected Album -->
+        <%= if @selected_album.ok? && @selected_album.result do %>
+          <div
+            class="rounded-xl mb-6 overflow-hidden relative h-[calc(100vh-16rem)] shadow-lg"
+            style="background-color: var(--color-dark-900);"
+          >
+
+<!-- Blurred background layer -->
+            <%= if @selected_album.result.cover_url do %>
+              <div
+                class="absolute inset-0"
+                style={"background-image: url('#{@selected_album.result.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
+              >
+              </div>
+            <% else %>
+              <div
+                class="absolute inset-0"
+                style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"
+              >
+              </div>
+            <% end %>
+
+<!-- Overlay for text readability -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40">
+            </div>
+
+<!-- Content overlay with album cover and text -->
+            <div class="relative z-10 h-full flex items-center justify-center p-10">
+              <div class="flex items-center space-x-12 max-w-6xl">
+
+<!-- Non-blurred album cover -->
+                <div class="flex-shrink-0 relative">
+                  <%= if @selected_album.result.cover_url do %>
+                    <img
+                      src={@selected_album.result.cover_url}
+                      alt={@selected_album.result.name}
+                      class="w-64 h-64 rounded-xl shadow-2xl border-2 border-white/10"
+                      style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);"
+                    />
+                    <!-- Reflection effect -->
+                    <div
+                      class="absolute top-0 left-0 w-64 h-64 rounded-xl"
+                      style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;"
+                    >
+                    </div>
+                  <% else %>
+                    <div class="w-64 h-64 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-2xl border-2 border-white/10 relative">
+                      <svg class="w-32 h-32 text-white/60" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                      </svg>
+                      <!-- Reflection effect for fallback -->
+                      <div
+                        class="absolute top-0 left-0 w-64 h-64 rounded-xl"
+                        style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;"
+                      >
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+
+<!-- Album info -->
+                <div class="text-left space-y-6">
+                  <h3 class="text-5xl font-bold text-white drop-shadow-2xl leading-tight">
+                    {@selected_album.result.name}
+                  </h3>
+                  <p class="text-white text-3xl font-semibold drop-shadow-lg">
+                    {@selected_album.result.artist}
+                  </p>
+
+<!-- Enhanced Album Stats -->
+                  <div class="flex items-center space-x-8 text-white/90 text-xl font-semibold">
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                      <span>{@selected_album.result.total_tracks} tracks</span>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>
+                        {total_ms =
+                          @selected_album.result.tracks
+                          |> Enum.map(&(&1.duration_ms || 0))
+                          |> Enum.sum()
+
+                        total_minutes = div(total_ms, 60_000)
+                        "#{total_minutes} min"}
+                      </span>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <span>
+                        {if @selected_album.result.release_date,
+                          do: @selected_album.result.release_date.year,
+                          else: "Unknown"}
+                      </span>
+                    </div>
+                  </div>
+
+<!-- Action Button moved here -->
+                  <div class="pt-4">
+                    <button
+                      class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg shadow-2xl"
+                      phx-click="prepare_session"
+                    >
+                      🎵 Start Listening Session
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <div class="rounded-lg p-8 mb-6" style="background-color: var(--color-dark-800);">
+            <div class="text-center text-gray-400">
+              <svg
+                class="w-20 h-20 mx-auto mb-4 opacity-50"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+              </svg>
+              <h3 class="text-lg font-medium text-gray-300 mb-2">Ready to Start</h3>
+              <p class="text-sm">Search for an album above to begin your listening session</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+<!-- Right Panel - Track List -->
+      <div class="w-1/2 p-6" style="background-color: var(--color-dark-900);">
+        <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">
+          Track List
+        </h3>
+        <%= if @selected_album.ok? && @selected_album.result do %>
+          <div class="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
+            <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
+              <div
+                class="rounded-lg p-4 hover:bg-gray-600 transition-colors"
+                style="background-color: var(--color-dark-800);"
+              >
+                <div class="flex justify-between items-center">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-3">
+                      <span class="text-sm text-gray-400 w-6">{index + 1}</span>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="font-medium text-white truncate">{track.name}</h4>
+                        <p class="text-sm text-gray-400">{format_duration(track.duration_ms)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center text-gray-400 h-full flex items-center justify-center">
+            <div>
+              <svg
+                class="w-16 h-16 mx-auto mb-4 opacity-50"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+              </svg>
+              <p class="text-sm">Select an album to view tracks</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</Layouts.app>
+
+<script>
+  window.formatDuration = function(durationMs) {
+    const minutes = Math.floor(durationMs / 60000);
+    const seconds = Math.floor((durationMs % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+</script>
