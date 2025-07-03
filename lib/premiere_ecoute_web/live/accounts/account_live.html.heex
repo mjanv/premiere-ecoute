@@ -59,14 +59,16 @@
     
 <!-- Main Content -->
     <div class="max-w-4xl mx-auto px-6 py-8">
+      <!-- AIDEV-NOTE: Redesigned account page layout matching provided wireframe -->
+      <!-- Account Title -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-white mb-2">Account Settings</h1>
+        <h1 class="text-3xl font-bold text-white mb-2">Account</h1>
         <p class="text-gray-400">Manage your account, connections, and preferences</p>
       </div>
 
       <div class="space-y-8">
         
-<!-- Account Details Section -->
+<!-- Details Section -->
         <div class="rounded-xl p-6" style="background-color: var(--color-dark-900);">
           <div class="flex items-center space-x-3 mb-6">
             <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
@@ -78,51 +80,37 @@
                 />
               </svg>
             </div>
-            <h2 class="text-xl font-bold text-white">Account Details</h2>
+            <h2 class="text-xl font-bold text-white">Details</h2>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Twitch Account Details -->
+            <!-- Account Info -->
             <div class="space-y-4">
-              <h3 class="text-lg font-semibold text-white">Twitch Account</h3>
-              <%= if assigns[:twitch_user] do %>
-                <div class="bg-purple-600/20 rounded-lg p-4 border border-purple-600/30">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                      <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p class="font-medium text-white">{@twitch_user.display_name}</p>
-                      <p class="text-sm text-purple-300">@{@twitch_user.login}</p>
-                    </div>
+              <div class="bg-white/5 rounded-lg p-4">
+                <div class="flex items-center space-x-3 mb-3">
+                  <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
                   </div>
-                  <div class="mt-3 flex items-center space-x-2">
-                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span class="text-sm text-green-400">Connected</span>
-                  </div>
-                </div>
-              <% else %>
-                <div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-                  <div class="text-center">
-                    <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                      </svg>
-                    </div>
-                    <p class="text-gray-400 text-sm">Not connected</p>
-                    <button class="mt-2 text-purple-400 hover:text-purple-300 text-sm font-medium">
-                      Connect Twitch
-                    </button>
+                  <div>
+                    <p class="font-medium text-white">Account ID</p>
+                    <p class="text-sm text-gray-400">
+                      #{if assigns[:current_user],
+                        do: "##{assigns[:current_user].id}",
+                        else: "N/A"}
+                    </p>
                   </div>
                 </div>
-              <% end %>
+              </div>
             </div>
             
-<!-- Session Statistics -->
+<!-- Statistics -->
             <div class="space-y-4">
-              <h3 class="text-lg font-semibold text-white">Statistics</h3>
               <div class="bg-white/5 rounded-lg p-4">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-3">
@@ -131,7 +119,7 @@
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <span class="text-gray-300">Listening Sessions Created</span>
+                    <span class="text-gray-300">Sessions Created</span>
                   </div>
                   <span class="text-2xl font-bold text-white">
                     {assigns[:sessions_count] || 0}
@@ -140,6 +128,52 @@
               </div>
             </div>
           </div>
+        </div>
+        
+<!-- Twitch Section -->
+        <div class="rounded-xl p-6" style="background-color: var(--color-dark-900);">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-white">Twitch</h2>
+          </div>
+
+          <%= if assigns[:twitch_user] do %>
+            <div class="bg-purple-600/20 rounded-lg p-4 border border-purple-600/30">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-white">{@twitch_user.display_name}</p>
+                  <p class="text-sm text-purple-300">@{@twitch_user.login}</p>
+                </div>
+              </div>
+              <div class="mt-3 flex items-center space-x-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span class="text-sm text-green-400">Connected</span>
+              </div>
+            </div>
+          <% else %>
+            <div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+              <div class="text-center">
+                <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                  </svg>
+                </div>
+                <p class="text-gray-400 text-sm">Not connected</p>
+                <button class="mt-2 text-purple-400 hover:text-purple-300 text-sm font-medium">
+                  Connect Twitch
+                </button>
+              </div>
+            </div>
+          <% end %>
         </div>
         
 <!-- Spotify Section -->
