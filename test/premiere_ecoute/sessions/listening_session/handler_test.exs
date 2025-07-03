@@ -26,18 +26,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, [%SessionPrepared{} = event]} = Handler.handle(command)
-
-      session = ListeningSession.get(event.session_id)
-      album = Album.get(event.album_id)
+      {:ok, session, [%SessionPrepared{}]} = Handler.handle(command)
 
       assert session.user_id == user.id
-      assert session.album_id == album.id
       assert session.status == :preparing
 
-      assert album.spotify_id == "album123"
-      assert album.name == "Sample Album"
-      assert album.artist == "Sample Artist"
+      assert session.album.spotify_id == "album123"
+      assert session.album.name == "Sample Album"
+      assert session.album.artist == "Sample Artist"
     end
 
     test "returns SessionNotPrepared when SpotifyApi fails" do
@@ -97,8 +93,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, [event1]} = Handler.handle(command)
-      {:ok, [event2]} = Handler.handle(command)
+      {:ok, _, [event1]} = Handler.handle(command)
+      {:ok, _, [event2]} = Handler.handle(command)
 
       assert event1.session_id != event2.session_id
     end
@@ -117,11 +113,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, [%SessionPrepared{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionPrepared{} = event]} = Handler.handle(command)
 
       command = %StartListeningSession{session_id: event.session_id}
 
-      {:ok, [%SessionStarted{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionStarted{} = event]} = Handler.handle(command)
 
       session = ListeningSession.get(event.session_id)
 
@@ -143,17 +139,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, [%SessionPrepared{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionPrepared{} = event]} = Handler.handle(command)
 
       command = %StartListeningSession{session_id: event.session_id}
 
-      {:ok, [%SessionStarted{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionStarted{} = event]} = Handler.handle(command)
 
       command = %StopListeningSession{session_id: event.session_id}
 
-      {:ok, [%SessionStopped{} = event]} = Handler.handle(command)
+      {:ok, session, [%SessionStopped{}]} = Handler.handle(command)
 
-      session = ListeningSession.get(event.session_id)
       report = Report.get_by(session_id: session.id)
 
       assert session.status == :stopped

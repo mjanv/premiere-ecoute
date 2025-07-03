@@ -40,6 +40,12 @@ defmodule PremiereEcoute.Core.CommandBusTest do
     def validate(%CommandA{}), do: {:error, :unknown}
     def validate(command), do: {:ok, command}
 
+
+    def handle(%CommandA{a: 10} = command) do
+      Logger.error("handle: #{inspect(command)}")
+      {:ok, :state, [%EventA{a: 11}]}
+    end
+
     def handle(%CommandA{a: a} = command) do
       Logger.error("handle: #{inspect(command)}")
       {:ok, [%EventA{a: a + 1}]}
@@ -63,7 +69,7 @@ defmodule PremiereEcoute.Core.CommandBusTest do
   end
 
   describe "apply/1" do
-    test "1" do
+    test "1a" do
       {{:ok, events}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 4}) end)
 
       assert events == [
@@ -72,6 +78,18 @@ defmodule PremiereEcoute.Core.CommandBusTest do
 
       assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandA{a: 4}"
       assert logs =~ "dispatch: %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}"
+    end
+
+    test "1b" do
+      {{:ok, state, events}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 10}) end)
+
+      assert state == :state
+      assert events == [
+               %PremiereEcoute.Core.CommandBusTest.EventA{a: 11}
+             ]
+
+      assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandA{a: 10}"
+      assert logs =~ "dispatch: %PremiereEcoute.Core.CommandBusTest.EventA{a: 11}"
     end
 
     test "2" do

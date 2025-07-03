@@ -31,6 +31,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
          {:ok, album} <- Album.get_or_create(album),
          {:ok, session} <- ListeningSession.create(%{user_id: user_id, album_id: album.id}) do
       {:ok,
+       session,
        [
          %SessionPrepared{
            session_id: session.id,
@@ -47,7 +48,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, session} <- ListeningSession.start(session) do
-      {:ok, [%SessionStarted{session_id: session.id}]}
+      {:ok, session, [%SessionStarted{session_id: session.id}]}
     else
       _ -> {:error, []}
     end
@@ -57,7 +58,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
     with session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.stop(session) do
-      {:ok, [%SessionStopped{session_id: session.id}]}
+      {:ok, session, [%SessionStopped{session_id: session.id}]}
     else
       _ -> {:error, []}
     end

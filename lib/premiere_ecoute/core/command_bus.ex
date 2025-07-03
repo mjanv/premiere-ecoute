@@ -12,9 +12,20 @@ defmodule PremiereEcoute.Core.CommandBus do
     |> validate()
     |> handle()
     |> tap(fn
-      {:ok, events} when is_list(events) -> Enum.each(events, &dispatch/1)
-      {:error, events} when is_list(events) -> Enum.each(events, &dispatch/1)
-      {:error, reason} -> {:error, reason}
+      {:ok, entity, events} when is_list(events) ->
+        Enum.each(events, &dispatch/1)
+        {:ok, entity}
+
+      {:ok, events} when is_list(events) ->
+        Enum.each(events, &dispatch/1)
+        {:ok, events}
+
+      {:error, events} when is_list(events) ->
+        Enum.each(events, &dispatch/1)
+        {:error, events}
+
+      {:error, reason} ->
+        {:error, reason}
     end)
     |> tap(fn result -> Logger.debug("result: #{inspect(result)}") end)
   end
