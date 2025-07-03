@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Core.CommandBus do
     |> tap(fn
       {:ok, entity, events} when is_list(events) ->
         Enum.each(events, &dispatch/1)
-        {:ok, entity}
+        {:ok, entity, events}
 
       {:ok, events} when is_list(events) ->
         Enum.each(events, &dispatch/1)

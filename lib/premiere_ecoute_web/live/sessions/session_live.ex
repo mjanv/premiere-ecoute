@@ -48,7 +48,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("start_session", _params, %{assigns: %{listening_session: session}} = socket) do
-    PremiereEcoute.apply(%StartListeningSession{session_id: session.id})
+    %StartListeningSession{session_id: session.id}
+    PremiereEcoute.apply()
+    |> case do
+      {:ok, sess}
+    end
     {:noreply, socket}
   end
 
