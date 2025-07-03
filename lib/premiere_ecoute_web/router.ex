@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, html: {PremiereEcouteWeb.Layouts, :root}
     plug :protect_from_forgery
+    # %{"content-security-policy" => "default-src 'self'"}
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
   end
@@ -27,6 +28,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/sessions/discography/album/select", Sessions.Discography.AlbumSelectionLive, :index
       live "/sessions", Sessions.SessionsLive, :index
       live "/session/:id", Sessions.SessionLive, :show
+      live "/session/:id/overlay", Sessions.OverlayLive, :show
     end
   end
 
@@ -55,8 +57,8 @@ defmodule PremiereEcouteWeb.Router do
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
 
-    get "/auth/:provider", AuthController, :request
-    get "/auth/:provider/callback", AuthController, :callback
+    get "/auth/:provider", Accounts.AuthController, :request
+    get "/auth/:provider/callback", Accounts.AuthController, :callback
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do

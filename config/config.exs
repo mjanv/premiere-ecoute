@@ -42,6 +42,13 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
 
 config :premiere_ecoute, PremiereEcoute.Repo, adapter: Ecto.Adapters.Postgres
 
+config :premiere_ecoute, PremiereEcoute.PromEx,
+  disabled: false,
+  manual_metrics_start_delay: :no_delay,
+  drop_metrics_groups: [],
+  grafana: :disabled,
+  metrics_server: :disabled
+
 config :esbuild,
   version: "0.17.11",
   premiere_ecoute: [
@@ -69,7 +76,13 @@ config :phoenix, :json_library, Jason
 
 config :ueberauth, Ueberauth,
   providers: [
-    twitch: {Ueberauth.Strategy.Twitch, []}
+    twitch: {Ueberauth.Strategy.Twitch, []},
+    spotify:
+      {Ueberauth.Strategy.Spotify,
+       [
+         default_scope:
+           "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing"
+       ]}
   ]
 
 import_config "#{config_env()}.exs"

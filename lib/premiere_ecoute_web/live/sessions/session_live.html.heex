@@ -115,7 +115,7 @@
                       else: "Not started"}
                   </span>
                 </div>
-                <%= if @show_votes do %>
+                <%= if @show[:votes] do %>
                   <div class="flex justify-between">
                     <span class="text-purple-100">Total Votes:</span>
                     <span class="text-white font-bold">{length(session_data.votes)}</span>
@@ -180,8 +180,9 @@
                     <label class="label cursor-pointer justify-start">
                       <input
                         type="checkbox"
-                        phx-click="toggle_votes"
-                        checked={@show_votes}
+                        phx-click="toggle"
+                        phx-value-flag="votes"
+                        checked={@show[:votes]}
                         class="toggle toggle-primary mr-2"
                       />
                       <span class="text-white font-medium">Display votes</span>
@@ -191,8 +192,9 @@
                     <label class="label cursor-pointer justify-start">
                       <input
                         type="checkbox"
-                        phx-click="toggle_scores"
-                        checked={@show_scores}
+                        phx-click="toggle"
+                        phx-value-flag="scores"
+                        checked={@show[:scores]}
                         class="toggle toggle-primary mr-2"
                       />
                       <span class="text-white font-medium">Display scores</span>
@@ -259,7 +261,7 @@
                     "#{total_minutes} min"}
                   </p>
                 </div>
-                <%= if @show_scores do %>
+                <%= if @show[:scores] do %>
                   <div>
                     <span class="text-purple-100">Average Score:</span>
                     <p class="font-bold text-white text-lg">
@@ -604,7 +606,7 @@
                         </div>
 
                         <div class="flex items-center space-x-8 text-sm flex-shrink-0">
-                          <%= if @show_votes do %>
+                          <%= if @show[:votes] do %>
                             <div class="text-center">
                               <p
                                 class="text-xl font-bold"
@@ -615,7 +617,7 @@
                               <p class="text-gray-400">Votes</p>
                             </div>
                           <% end %>
-                          <%= if @show_scores do %>
+                          <%= if @show[:scores] do %>
                             <div class="text-center">
                               <p
                                 class="text-xl font-bold"

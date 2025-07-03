@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Supervisor do
   @impl true
   def init(_args) do
     children = [
+      PremiereEcoute.PromEx,
       PremiereEcoute.Repo,
       PremiereEcoute.Core.Supervisor,
       PremiereEcoute.Apis.Supervisor

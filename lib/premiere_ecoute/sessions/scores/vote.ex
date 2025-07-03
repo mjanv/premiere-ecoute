@@ -32,7 +32,6 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(vote, attrs) do
     vote
     |> cast(attrs, [:viewer_id, :session_id, :track_id, :is_streamer, :value])

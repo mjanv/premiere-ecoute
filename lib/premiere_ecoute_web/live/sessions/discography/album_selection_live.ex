@@ -42,7 +42,11 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     {:noreply, put_flash(socket, :error, "Please select an album first")}
   end
 
-  def handle_event("prepare_session", _params, %{assigns: %{selected_album: %{result: album}}} = socket) do
+  def handle_event(
+        "prepare_session",
+        _params,
+        %{assigns: %{selected_album: %{result: album}}} = socket
+      ) do
     %PrepareListeningSession{user_id: get_user_id(socket), album_id: album.spotify_id}
     |> PremiereEcoute.apply()
     |> case do
@@ -50,6 +54,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
         socket
         |> put_flash(:info, "Listening session started !")
         |> push_navigate(to: ~p"/session/#{id}")
+
       {:error, _} ->
         socket
         |> put_flash(:error, "Cannot create the listening session")

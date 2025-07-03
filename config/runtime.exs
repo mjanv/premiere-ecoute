@@ -24,6 +24,10 @@ config :ueberauth, Ueberauth.Strategy.Twitch.OAuth,
   client_id: System.get_env("TWITCH_CLIENT_ID"),
   client_secret: System.get_env("TWITCH_CLIENT_SECRET")
 
+config :ueberauth, Ueberauth.Strategy.Spotify.OAuth,
+  client_id: System.get_env("SPOTIFY_CLIENT_ID"),
+  client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
+
 if config_env() == :prod do
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||

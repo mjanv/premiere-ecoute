@@ -48,23 +48,28 @@ defmodule PremiereEcoute.MixProject do
        app: false,
        compile: false,
        depth: 1},
-      {:dns_cluster, "~> 0.1.1"},
+      {:dns_cluster, "~> 0.2"},
       # Backend
-      {:bcrypt_elixir, "~> 3.0"},
+      {:req, "~> 0.5"},
+      {:websockex, "~> 0.4.3"},
       {:jason, "~> 1.2"},
+      {:bcrypt_elixir, "~> 3.0"},
       {:postgrex, "~> 0.20.0"},
       {:ecto_sql, "~> 3.10"},
       {:ecto_sqlite3, "~> 0.12"},
-      {:req, "~> 0.5"},
-      {:websockex, "~> 0.4.3"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
+      {:ueberauth_spotify, "~> 0.2"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
+      {:prom_ex, "~> 1.11.0"},
       # Code quality
       {:credo, "~> 1.7"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      # Audit
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       # Tests
       {:mox, "~> 1.2"},
       # Development
@@ -84,6 +89,12 @@ defmodule PremiereEcoute.MixProject do
         "format --check-formatted",
         "credo --strict",
         "dialyzer --format short"
+      ],
+      # Audit
+      audit: [
+        "sobelow --compact",
+        "deps.audit",
+        "hex.outdated --within-requirements"
       ],
       # Tests
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],

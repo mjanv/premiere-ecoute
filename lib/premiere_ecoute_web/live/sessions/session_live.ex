@@ -8,7 +8,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
@@ -34,8 +33,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
          socket
          |> assign(:listening_session, listening_session)
          |> assign(:session_id, session_id)
-         |> assign(:show_votes, true)
-         |> assign(:show_scores, true)
+         |> assign(:show, %{votes: true, scores: true})
          |> assign(:user_current_rating, nil)
          |> assign_async(:session_data, fn ->
            {:ok, %{session_data: load_session_data(listening_session)}}
@@ -60,13 +58,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_event("toggle_votes", _params, socket) do
-    {:noreply, assign(socket, :show_votes, !socket.assigns.show_votes)}
-  end
-
-  @impl true
-  def handle_event("toggle_scores", _params, socket) do
-    {:noreply, assign(socket, :show_scores, !socket.assigns.show_scores)}
+  def handle_event("toggle", %{"flag" => flag}, %{assigns: assigns} = socket) do
+    {:noreply,
+     assign(socket, :show, Map.update!(assigns.show, String.to_atom(flag), fn v -> !v end))}
   end
 
   @impl true

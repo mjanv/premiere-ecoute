@@ -36,7 +36,6 @@ defmodule PremiereEcoute.Sessions.Scores.Pool do
     timestamps()
   end
 
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(pool, attrs) do
     pool
     |> cast(attrs, [:poll_id, :title, :total_votes, :votes, :ended_at, :session_id, :track_id])

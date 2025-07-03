@@ -57,7 +57,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     timestamps()
   end
 
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(report, attrs) do
     report
     |> cast(attrs, [
