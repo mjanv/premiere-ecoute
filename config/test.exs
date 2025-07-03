@@ -1,8 +1,7 @@
 import Config
 
 config :premiere_ecoute, PremiereEcoute.Repo,
-  adapter: Ecto.Adapters.SQLite3,
-  database: "priv/repo/premiere_ecoute_test#{System.get_env("MIX_TEST_PARTITION")}.db",
+  database: "premiere_ecoute_test",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 

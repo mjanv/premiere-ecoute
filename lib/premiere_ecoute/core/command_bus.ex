@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Core.CommandBus do
   require Logger
 
   alias PremiereEcoute.Core.CommandBus.Registry
+  alias PremiereEcoute.Sessions.ListeningSession.Handler
 
   def apply(command) do
     command
@@ -22,7 +23,7 @@ defmodule PremiereEcoute.Core.CommandBus do
     case Registry.get(command.__struct__) do
       nil ->
         {:error, :not_registered}
-        PremiereEcoute.Sessions.ListeningSession.Handler.validate(command)
+        Handler.validate(command)
 
       handler ->
         handler.validate(command)
@@ -33,7 +34,7 @@ defmodule PremiereEcoute.Core.CommandBus do
     case Registry.get(command.__struct__) do
       nil ->
         {:error, :not_registered}
-        PremiereEcoute.Sessions.ListeningSession.Handler.handle(command)
+        Handler.handle(command)
 
       handler ->
         handler.handle(command)
@@ -46,7 +47,7 @@ defmodule PremiereEcoute.Core.CommandBus do
     case Registry.get(event.__struct__) do
       nil ->
         {:error, :not_registered}
-        PremiereEcoute.Sessions.ListeningSession.Handler.dispatch(event)
+        Handler.dispatch(event)
 
       handler ->
         handler.dispatch(event)

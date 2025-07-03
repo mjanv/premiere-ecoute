@@ -40,6 +40,8 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   pubsub_server: PremiereEcoute.PubSub,
   live_view: [signing_salt: "6RkVNFmy"]
 
+config :premiere_ecoute, PremiereEcoute.Repo, adapter: Ecto.Adapters.Postgres
+
 config :esbuild,
   version: "0.17.11",
   premiere_ecoute: [

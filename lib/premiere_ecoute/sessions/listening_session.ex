@@ -9,6 +9,20 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.Scores.Report
+
+  @type t :: %__MODULE__{
+          id: integer(),
+          status: atom(),
+          started_at: DateTime.t(),
+          ended_at: DateTime.t(),
+          user: User.t(),
+          album: Album.t(),
+          current_track: Track.t(),
+          report: Report.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
 
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
@@ -18,6 +32,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     belongs_to :user, User, foreign_key: :user_id
     belongs_to :album, Album, foreign_key: :album_id
     belongs_to :current_track, Track, foreign_key: :current_track_id
+
+    has_one :report, Report, foreign_key: :session_id
 
     timestamps(type: :utc_datetime)
   end

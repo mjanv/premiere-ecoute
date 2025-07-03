@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Repo do
 
   use Ecto.Repo,
     otp_app: :premiere_ecoute,
-    adapter: Ecto.Adapters.SQLite3
+    adapter: Ecto.Adapters.Postgres
 
   def traverse_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->

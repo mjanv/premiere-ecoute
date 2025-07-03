@@ -30,16 +30,15 @@ defmodule PremiereEcoute.MixProject do
 
   defp deps do
     [
-      {:bcrypt_elixir, "~> 3.0"},
+      # Web
+      {:bandit, "~> 1.5"},
       {:phoenix, "~> 1.8.0-rc.3", override: true},
       {:phoenix_ecto, "~> 4.5"},
-      {:ecto_sql, "~> 3.10"},
-      {:ecto_sqlite3, "~> 0.12"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0.9"},
-      {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
+      {:floki, ">= 0.30.0", only: :test},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:heroicons,
@@ -49,21 +48,26 @@ defmodule PremiereEcoute.MixProject do
        app: false,
        compile: false,
        depth: 1},
-      {:req, "~> 0.5"},
-      {:telemetry_metrics, "~> 1.0"},
-      {:telemetry_poller, "~> 1.0"},
-      {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"},
-      {:oauth2, "~> 2.0"},
-      {:tesla, "~> 1.4"},
-      {:broadway, "~> 1.0"},
+      # Backend
+      {:bcrypt_elixir, "~> 3.0"},
+      {:jason, "~> 1.2"},
+      {:postgrex, "~> 0.20.0"},
+      {:ecto_sql, "~> 3.10"},
+      {:ecto_sqlite3, "~> 0.12"},
+      {:req, "~> 0.5"},
+      {:websockex, "~> 0.4.3"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
+      # Observability
+      {:telemetry_metrics, "~> 1.0"},
+      {:telemetry_poller, "~> 1.0"},
+      # Code quality
       {:credo, "~> 1.7"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      # Tests
       {:mox, "~> 1.2"},
-      {:websockex, "~> 0.4.3"},
+      # Development
       {:tidewave, "~> 0.1", only: :dev}
     ]
   end

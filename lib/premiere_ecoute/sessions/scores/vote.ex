@@ -10,10 +10,21 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   alias PremiereEcoute.Sessions.Discography.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
+  @type t :: %__MODULE__{
+          id: integer(),
+          viewer_id: String.t(),
+          value: integer(),
+          is_streamer: boolean(),
+          session: ListeningSession.t(),
+          track: Track.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
   schema "votes" do
     field :viewer_id, :string
     field :value, :integer, default: 1
-    field :streamer?, :boolean, default: false
+    field :is_streamer, :boolean, default: false
 
     belongs_to :session, ListeningSession
     belongs_to :track, Track
@@ -21,21 +32,42 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     timestamps(type: :utc_datetime)
   end
 
-  @doc false
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(vote, attrs) do
     vote
-    |> cast(attrs, [:viewer_id, :session_id, :track_id, :streamer?, :value])
-    |> validate_required([:viewer_id, :session_id, :track_id, :streamer?, :value])
+    |> cast(attrs, [:viewer_id, :session_id, :track_id, :is_streamer, :value])
+    |> validate_required([:viewer_id, :session_id, :track_id, :is_streamer, :value])
+    |> validate_number(:value, greater_than_or_equal_to: 0)
     |> unique_constraint([:viewer_id, :session_id, :track_id], name: :vote_index)
+    |> foreign_key_constraint(:session_id)
+    |> foreign_key_constraint(:track_id)
   end
 
-  def add(%__MODULE__{} = vote) do
+  @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def create(%__MODULE__{} = vote) do
     %__MODULE__{}
     |> changeset(Map.from_struct(vote))
     |> Repo.insert()
   end
 
-  def listening_session_votes(session_id) do
-    Repo.all(from(ls in __MODULE__, where: ls.session_id == ^session_id))
+  @spec update(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def update(%__MODULE__{} = vote, attrs) do
+    vote
+    |> changeset(attrs)
+    |> Repo.update()
+  end
+
+  @spec get_by(Keyword.t()) :: [t()]
+  def get_by(opts) do
+    Repo.one(from(v in __MODULE__, where: ^opts))
+  end
+
+  @spec all(Keyword.t()) :: [t()]
+  def all(opts) do
+    from(v in __MODULE__,
+      where: ^opts,
+      order_by: [asc: v.inserted_at]
+    )
+    |> Repo.all()
   end
 end

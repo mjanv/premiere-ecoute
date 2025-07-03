@@ -2,8 +2,8 @@ defmodule PremiereEcouteWeb.AlbumSelectionLive do
   use PremiereEcouteWeb, :live_view
 
   alias Phoenix.LiveView.AsyncResult
-  alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
 
   require Logger
 
@@ -53,19 +53,15 @@ defmodule PremiereEcouteWeb.AlbumSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("start_session", _params, %{assigns: %{selected_album: nil}} = socket) do
+  def handle_event("prepare_session", _params, %{assigns: %{selected_album: nil}} = socket) do
     {:noreply, put_flash(socket, :error, "Please select an album first")}
   end
 
-  def handle_event("start_session", _params, %{assigns: %{selected_album: album}} = socket) do
+  def handle_event("prepare_session", _params, %{assigns: %{selected_album: album}} = socket) do
     album = album.result
 
-    command = %StartListeningSession{
-      user_id: get_user_id(socket),
-      album_id: album.spotify_id
-    }
-
-    PremiereEcouteWeb.PubSub.broadcast("command_bus", command)
+    %PrepareListeningSession{user_id: get_user_id(socket), album_id: album.spotify_id}
+    |> PremiereEcoute.apply()
 
     {:noreply, socket}
   end
@@ -114,7 +110,7 @@ defmodule PremiereEcouteWeb.AlbumSelectionLive do
   end
 
   @impl true
-  def handle_info(%SessionStarted{session_id: id}, socket) do
+  def handle_info(%SessionPrepared{session_id: id}, socket) do
     socket
     |> put_flash(:info, "Listening session started !")
     |> push_navigate(to: ~p"/session/#{id}")

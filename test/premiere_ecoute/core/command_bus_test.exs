@@ -67,8 +67,8 @@ defmodule PremiereEcoute.Core.CommandBusTest do
       {{:ok, events}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 4}) end)
 
       assert events == [
-              %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}
-            ]
+               %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}
+             ]
 
       assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandA{a: 4}"
       assert logs =~ "dispatch: %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}"

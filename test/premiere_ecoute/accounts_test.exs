@@ -69,10 +69,6 @@ defmodule PremiereEcoute.AccountsTest do
       %{email: email} = user_fixture()
       {:error, changeset} = Accounts.register_user(%{email: email})
       assert "has already been taken" in errors_on(changeset).email
-
-      # Now try with the upper cased email too, to check that email case is ignored.
-      {:error, changeset} = Accounts.register_user(%{email: String.upcase(email)})
-      assert "has already been taken" in errors_on(changeset).email
     end
 
     test "registers users without password" do

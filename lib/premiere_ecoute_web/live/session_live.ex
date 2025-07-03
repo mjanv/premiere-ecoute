@@ -6,6 +6,9 @@ defmodule PremiereEcouteWeb.SessionLive do
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
@@ -46,57 +49,14 @@ defmodule PremiereEcouteWeb.SessionLive do
   end
 
   @impl true
-  def handle_info({:session_updated, session}, socket) do
-    {:noreply, assign(socket, :listening_session, session)}
-  end
-
-  @impl true
-  def handle_info({:track_changed, track_info}, socket) do
-    {:noreply, assign(socket, :current_track, track_info)}
-  end
-
-  @impl true
-  def handle_info({:votes_updated, votes}, socket) do
-    {:noreply, assign(socket, :votes, votes)}
-  end
-
-  @impl true
-  def handle_info({:scores_updated, scores}, socket) do
-    {:noreply, assign(socket, :scores, scores)}
-  end
-
-  @impl true
   def handle_event("start_session", _params, %{assigns: %{listening_session: session}} = socket) do
-    case ListeningSession.start(session) do
-      {:ok, started_session} ->
-        # AIDEV-NOTE: Automatically select first track when starting session
-        case ListeningSession.next_track(started_session) do
-          {:ok, session_with_track} ->
-            Phoenix.PubSub.broadcast(
-              PremiereEcoute.PubSub,
-              "session:#{session.id}",
-              {:track_changed, session_with_track.current_track}
-            )
-
-            socket = assign(socket, :listening_session, session_with_track)
-            socket = assign(socket, :user_current_rating, nil)
-            {:noreply, socket}
-
-          {:error, _} ->
-            # If no tracks available, just start without selecting a track
-            {:noreply, assign(socket, :listening_session, started_session)}
-        end
-
-      {:error, _} ->
-        {:noreply, put_flash(socket, :error, "Cannot start session")}
-    end
+    PremiereEcoute.apply(%StartListeningSession{session_id: session.id})
+    {:noreply, socket}
   end
 
-  def handle_event("end_session", _params, %{assigns: %{listening_session: session}} = socket) do
-    case ListeningSession.stop(session) do
-      {:ok, session} -> {:noreply, assign(socket, :listening_session, session)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot stop session")}
-    end
+  def handle_event("stop_session", _params, %{assigns: %{listening_session: session}} = socket) do
+    PremiereEcoute.apply(%StopListeningSession{session_id: session.id})
+    {:noreply, socket}
   end
 
   @impl true
@@ -182,6 +142,16 @@ defmodule PremiereEcouteWeb.SessionLive do
   @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, "Received event: #{event}")}
+  end
+
+  @impl true
+  def handle_info({:track_changed, track}, socket) do
+    {:noreply, assign(socket, :current_track, track)}
+  end
+
+  @impl true
+  def handle_info(%SessionStarted{}, socket) do
+    {:noreply, assign(socket, :current_track, nil)}
   end
 
   defp load_session_data(listening_session) do

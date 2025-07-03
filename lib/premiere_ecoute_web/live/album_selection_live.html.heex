@@ -263,14 +263,14 @@
                     <%= if @current_session do %>
                       <button
                         class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg shadow-2xl"
-                        phx-click="end_session"
+                        phx-click="stop_session"
                       >
                         End Session
                       </button>
                     <% else %>
                       <button
                         class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg shadow-2xl"
-                        phx-click="start_session"
+                        phx-click="prepare_session"
                       >
                         🎵 Start Listening Session
                       </button>
