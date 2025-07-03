@@ -49,16 +49,20 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_event("start_session", _params, %{assigns: %{listening_session: session}} = socket) do
     %StartListeningSession{session_id: session.id}
-    PremiereEcoute.apply()
+    |> PremiereEcoute.apply()
     |> case do
-      {:ok, sess}
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
     end
-    {:noreply, socket}
   end
 
   def handle_event("stop_session", _params, %{assigns: %{listening_session: session}} = socket) do
-    PremiereEcoute.apply(%StopListeningSession{session_id: session.id})
-    {:noreply, socket}
+    %StopListeningSession{session_id: session.id}
+    |> PremiereEcoute.apply()
+    |> case do
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot stop session")}
+    end
   end
 
   @impl true
@@ -70,16 +74,16 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_event("next_track", _params, %{assigns: %{listening_session: session}} = socket) do
     case ListeningSession.next_track(session) do
-      {:ok, updated_session} ->
+      {:ok, session} ->
         # AIDEV-NOTE: Broadcast track change to update UI and notify other subscribers
         Phoenix.PubSub.broadcast(
           PremiereEcoute.PubSub,
           "session:#{session.id}",
-          {:track_changed, updated_session.current_track}
+          {:track_changed, session.current_track}
         )
 
         # Clear user rating when track changes
-        socket = assign(socket, :listening_session, updated_session)
+        socket = assign(socket, :listening_session, session)
         socket = assign(socket, :user_current_rating, nil)
         {:noreply, socket}
 
@@ -121,11 +125,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       {_int_track_id, ""} ->
         case Integer.parse(rating) do
           {int_rating, ""} when int_rating >= 1 and int_rating <= 10 ->
-            # AIDEV-NOTE: Store user's rating for the track and update UI
             socket = assign(socket, :user_current_rating, int_rating)
-
-            # Here you would typically save the vote to the database
-            # For now, just update the UI and show confirmation
             {:noreply, put_flash(socket, :info, "Rated track #{int_rating}/10")}
 
           _ ->

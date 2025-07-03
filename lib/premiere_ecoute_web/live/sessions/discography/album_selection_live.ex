@@ -3,7 +3,6 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
 
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
 
   require Logger
 
@@ -50,14 +49,8 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     %PrepareListeningSession{user_id: get_user_id(socket), album_id: album.spotify_id}
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, [%SessionPrepared{session_id: id}]} ->
-        socket
-        |> put_flash(:info, "Listening session started !")
-        |> push_navigate(to: ~p"/session/#{id}")
-
-      {:error, _} ->
-        socket
-        |> put_flash(:error, "Cannot create the listening session")
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/session/#{session}")
+      {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
     end
     |> then(fn socket -> {:noreply, socket} end)
   end

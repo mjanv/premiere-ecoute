@@ -12,7 +12,6 @@ defmodule PremiereEcoute.Supervisor do
     children = [
       PremiereEcoute.PromEx,
       PremiereEcoute.Repo,
-      PremiereEcoute.Core.Supervisor,
       PremiereEcoute.Apis.Supervisor
     ]
 

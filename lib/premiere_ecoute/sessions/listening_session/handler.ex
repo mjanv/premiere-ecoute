@@ -30,8 +30,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
     with {:ok, album} <- SpotifyApi.impl().get_album(album_id),
          {:ok, album} <- Album.get_or_create(album),
          {:ok, session} <- ListeningSession.create(%{user_id: user_id, album_id: album.id}) do
-      {:ok,
-       session,
+      {:ok, session,
        [
          %SessionPrepared{
            session_id: session.id,

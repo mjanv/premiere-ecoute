@@ -10,12 +10,14 @@ defmodule PremiereEcoute.Apis.TwitchClient do
   end
 
   def handle_frame({:text, payload}, state) do
-    Logger.info("#{inspect(JSON.decode!(payload))}")
-    {:ok, state}
+    Logger.info("#{inspect(state)} - #{inspect(JSON.decode!(payload))}")
+    handle(state, payload)
   end
 
   def terminate(reason, state) do
     IO.puts("\nSocket Terminating:\n#{inspect(reason)}\n\n#{inspect(state)}\n")
     exit(:normal)
   end
+
+  def handle(state, _), do: {:ok, state}
 end
