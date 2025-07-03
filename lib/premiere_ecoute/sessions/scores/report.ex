@@ -30,8 +30,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   @type t :: %__MODULE__{
           id: integer(),
           generated_at: NaiveDateTime.t(),
-          individual_votes: integer(),
-          pool_votes: integer(),
+          unique_votes: integer(),
           unique_voters: integer(),
           session_summary: session_summary(),
           track_summaries: [track_summary()],
@@ -45,8 +44,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   schema "reports" do
     field :generated_at, :naive_datetime
-    field :individual_votes, :integer
-    field :pool_votes, :integer
+    field :unique_votes, :integer
     field :unique_voters, :integer
     field :session_summary, :map
     field :track_summaries, {:array, :map}
@@ -64,16 +62,14 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     report
     |> cast(attrs, [
       :generated_at,
-      :individual_votes,
-      :pool_votes,
+      :unique_votes,
       :unique_voters,
       :session_summary,
       :track_summaries,
       :session_id
     ])
     |> validate_required([:generated_at, :session_id])
-    |> validate_number(:individual_votes, greater_than_or_equal_to: 0)
-    |> validate_number(:pool_votes, greater_than_or_equal_to: 0)
+    |> validate_number(:unique_votes, greater_than_or_equal_to: 0)
     |> validate_number(:unique_voters, greater_than_or_equal_to: 0)
     |> foreign_key_constraint(:session_id)
   end
@@ -104,8 +100,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     attrs = %{
       session_id: session_id,
       generated_at: NaiveDateTime.utc_now(),
-      individual_votes: session_stats.individual_votes,
-      pool_votes: session_stats.pool_votes,
+      unique_votes: session_stats.unique_votes,
       unique_voters: session_stats.unique_voters,
       session_summary: session_summary,
       track_summaries: track_summaries
@@ -163,12 +158,10 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     """
 
     result = SQL.query!(Repo, query, [session_id])
-    [row] = result.rows
-    [individual_votes, pool_votes, unique_voters] = row
+    [[individual_votes, pool_votes, unique_voters]] = result.rows
 
     %{
-      individual_votes: individual_votes,
-      pool_votes: pool_votes,
+      unique_votes: individual_votes + pool_votes,
       unique_voters: unique_voters
     }
   end

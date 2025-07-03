@@ -2,8 +2,9 @@ defmodule PremiereEcoute do
   @moduledoc false
 
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Core
 
-  def apply(command), do: PremiereEcouteWeb.PubSub.broadcast("command_bus", command)
+  defdelegate apply(command), to: Core
 
   defdelegate search_albums(query), to: SpotifyApi
   defdelegate get_album(album_id), to: SpotifyApi

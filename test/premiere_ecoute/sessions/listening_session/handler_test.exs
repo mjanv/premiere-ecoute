@@ -159,14 +159,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
       assert session.status == :stopped
 
       assert %PremiereEcoute.Sessions.Scores.Report{
-               individual_votes: 0,
-               pool_votes: 0,
+               unique_votes: 0,
                pools: [],
                session_id: session_id,
                session_summary: %{
-                 "streamer_score" => 0.0,
+                 "streamer_score" => +0.0,
                  "tracks_rated" => 0,
-                 "viewer_score" => 0.0
+                 "viewer_score" => +0.0
                },
                track_summaries: [],
                unique_voters: 0,

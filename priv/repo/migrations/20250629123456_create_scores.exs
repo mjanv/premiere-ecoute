@@ -22,8 +22,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
 
     create table(:reports) do
       add :generated_at, :naive_datetime, null: false
-      add :individual_votes, :integer, null: false, default: 0
-      add :pool_votes, :integer, null: false, default: 0
+      add :unique_votes, :integer, null: false, default: 0
       add :unique_voters, :integer, null: false, default: 0
       add :session_summary, :map, null: false, default: %{}
       add :track_summaries, {:array, :map}, null: false, default: []

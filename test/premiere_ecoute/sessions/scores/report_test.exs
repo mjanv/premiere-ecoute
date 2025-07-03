@@ -105,8 +105,7 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
       {:ok, report} = Report.generate(session)
 
       assert report.session_id == session.id
-      assert report.individual_votes == 8
-      assert report.pool_votes == 11
+      assert report.unique_votes == 19
       assert report.unique_voters == 14
 
       session_summary = report.session_summary

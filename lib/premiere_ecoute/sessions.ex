@@ -42,13 +42,4 @@ defmodule PremiereEcoute.Sessions do
 
     {:ok, scores}
   end
-
-  @doc """
-  Gets the currently playing track for a session.
-  This is a placeholder - in a real implementation this would
-  track the current playback state.
-  """
-  def get_current_playing_track(_session_id) do
-    {:ok, nil}
-  end
 end

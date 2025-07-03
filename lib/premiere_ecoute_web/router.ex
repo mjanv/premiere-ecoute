@@ -23,14 +23,11 @@ defmodule PremiereEcouteWeb.Router do
     live_session :main,
       on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
       live "/", HomepageLive, :index
-      live "/album/select", AlbumSelectionLive, :index
-      live "/sessions", SessionsLive, :index
-      live "/session/:id", SessionLive, :show
-      live "/account", AccountLive, :index
+      live "/account", Accounts.AccountLive, :index
+      live "/sessions/discography/album/select", Sessions.Discography.AlbumSelectionLive, :index
+      live "/sessions", Sessions.SessionsLive, :index
+      live "/session/:id", Sessions.SessionLive, :show
     end
-
-    get "/auth/:provider", AuthController, :request
-    get "/auth/:provider/callback", AuthController, :callback
   end
 
   scope "/", PremiereEcouteWeb do
@@ -57,6 +54,9 @@ defmodule PremiereEcouteWeb.Router do
 
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
+
+    get "/auth/:provider", AuthController, :request
+    get "/auth/:provider/callback", AuthController, :callback
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do
