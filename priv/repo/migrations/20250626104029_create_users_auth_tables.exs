@@ -7,6 +7,11 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersAuthTables do
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime
 
+      # AIDEV-NOTE: Spotify integration fields
+      add :spotify_access_token, :string
+      add :spotify_refresh_token, :string
+      add :spotify_expires_at, :utc_datetime
+
       timestamps(type: :utc_datetime)
     end
 

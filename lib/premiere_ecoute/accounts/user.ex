@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Accounts.User do
 
   import Ecto.Changeset
 
+  alias PremiereEcoute.Repo
+
   @type t :: %__MODULE__{
           id: integer() | nil,
           email: String.t() | nil,
@@ -12,6 +14,9 @@ defmodule PremiereEcoute.Accounts.User do
           hashed_password: String.t() | nil,
           confirmed_at: DateTime.t() | nil,
           authenticated_at: DateTime.t() | nil,
+          spotify_access_token: String.t() | nil,
+          spotify_refresh_token: String.t() | nil,
+          spotify_expires_at: DateTime.t() | nil,
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }
@@ -22,6 +27,10 @@ defmodule PremiereEcoute.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+
+    field :spotify_access_token, :string, redact: true
+    field :spotify_refresh_token, :string, redact: true
+    field :spotify_expires_at, :utc_datetime
 
     timestamps(type: :utc_datetime)
   end
@@ -129,6 +138,30 @@ defmodule PremiereEcoute.Accounts.User do
   end
 
   @doc """
+  A user changeset for updating Spotify tokens.
+  """
+  def spotify_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
+    |> validate_spotify_tokens()
+  end
+
+  @doc """
+  A user changeset for disconnecting Spotify (allows nil values).
+  """
+  def spotify_disconnect_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
+  end
+
+  defp validate_spotify_tokens(changeset) do
+    case get_change(changeset, :spotify_access_token) do
+      nil -> changeset
+      _ -> validate_required(changeset, [:spotify_access_token])
+    end
+  end
+
+  @doc """
   Verifies the password.
 
   If there is no user or the user doesn't have a password, we call
@@ -142,5 +175,34 @@ defmodule PremiereEcoute.Accounts.User do
   def valid_password?(_, _) do
     Bcrypt.no_user_verify()
     false
+  end
+
+  def update(changeset) do
+    changeset
+    |> Repo.update()
+  end
+
+  def update_spotify_tokens(user, %{
+        access_token: access_token,
+        refresh_token: refresh_token,
+        expires_in: expires_in
+      }) do
+    user
+    |> spotify_changeset(%{
+      spotify_access_token: access_token,
+      spotify_refresh_token: refresh_token,
+      spotify_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)
+    })
+    |> Repo.update()
+  end
+
+  def disconnect_spotify(user) do
+    user
+    |> spotify_disconnect_changeset(%{
+      spotify_access_token: nil,
+      spotify_refresh_token: nil,
+      spotify_expires_at: nil
+    })
+    |> Repo.update()
   end
 end

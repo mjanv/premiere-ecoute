@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   require Logger
 
+  alias PremiereEcoute.Apis.SpotifyApi.Player
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
@@ -29,10 +30,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
           Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{session_id}")
         end
 
+        # AIDEV-NOTE: Get current user for Spotify integration
+        current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
+
         {:ok,
          socket
          |> assign(:listening_session, listening_session)
          |> assign(:session_id, session_id)
+         |> assign(:current_user, current_user)
          |> assign(:show, %{votes: true, scores: true})
          |> assign(:user_current_rating, nil)
          |> assign_async(:session_data, fn ->
@@ -47,12 +52,31 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_event("start_session", _params, %{assigns: %{listening_session: session}} = socket) do
+  def handle_event(
+        "start_session",
+        _params,
+        %{assigns: %{listening_session: session, current_user: user}} = socket
+      ) do
     %StartListeningSession{session_id: session.id}
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
+      {:ok, updated_session, _} ->
+        # AIDEV-NOTE: Start Spotify playback when session starts
+        spotify_result = start_spotify_playback(user, updated_session)
+
+        socket =
+          case spotify_result do
+            {:ok, _} ->
+              socket |> put_flash(:info, "Session started and Spotify playback began!")
+
+            {:error, reason} ->
+              socket |> put_flash(:warning, "Session started but Spotify failed: #{reason}")
+          end
+
+        {:noreply, assign(socket, :listening_session, updated_session)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Cannot start session")}
     end
   end
 
@@ -116,6 +140,50 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Failed to go to previous track")}
+    end
+  end
+
+  @impl true
+  def handle_event("toggle_playback", _params, %{assigns: %{current_user: user}} = socket) do
+    case user do
+      %{spotify_access_token: access_token} when not is_nil(access_token) ->
+        # AIDEV-NOTE: Get current playback state to determine if playing or paused
+        case Player.get_playback_state(access_token) do
+          {:ok, %{"is_playing" => true}} ->
+            # Currently playing, so pause
+            case Player.pause_playback(access_token) do
+              {:ok, _} ->
+                {:noreply, put_flash(socket, :info, "Spotify playback paused")}
+
+              {:error, reason} ->
+                {:noreply, put_flash(socket, :error, "Failed to pause: #{reason}")}
+            end
+
+          {:ok, %{"is_playing" => false}} ->
+            # Currently paused, so play
+            case Player.start_playback(access_token) do
+              {:ok, _} ->
+                {:noreply, put_flash(socket, :info, "Spotify playback resumed")}
+
+              {:error, reason} ->
+                {:noreply, put_flash(socket, :error, "Failed to play: #{reason}")}
+            end
+
+          {:ok, %{}} ->
+            # No active device or no playback state
+            {:noreply,
+             put_flash(
+               socket,
+               :error,
+               "No active Spotify device. Start playing music on Spotify first, then try again."
+             )}
+
+          {:error, reason} ->
+            {:noreply, put_flash(socket, :error, "Failed to get playback state: #{reason}")}
+        end
+
+      _ ->
+        {:noreply, put_flash(socket, :error, "Connect Spotify in your account settings first")}
     end
   end
 
@@ -194,5 +262,39 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     votes
     |> Enum.filter(&(&1.track_id == track_id))
     |> length()
+  end
+
+  defp start_spotify_playback(user, session) do
+    case user do
+      %{spotify_access_token: access_token} when not is_nil(access_token) ->
+        # AIDEV-NOTE: Get the current track from the session
+        case get_current_track_uri(session) do
+          {:ok, track_uri} ->
+            Logger.info("Starting Spotify playback for track: #{track_uri}")
+            Player.start_playback(access_token, uris: [track_uri])
+
+          {:error, reason} ->
+            Logger.warning("Could not get track URI: #{reason}")
+            # Try to start playback without specific track
+            Player.start_playback(access_token)
+        end
+
+      _ ->
+        {:error, "No Spotify connection. Connect Spotify in your account settings."}
+    end
+  end
+
+  defp get_current_track_uri(session) do
+    # AIDEV-NOTE: Get the current track from the session and build Spotify URI
+    case session.current_track do
+      nil ->
+        {:error, "No current track"}
+
+      track when is_map(track) and not is_nil(track.spotify_id) ->
+        {:ok, "spotify:track:#{track.spotify_id}"}
+
+      _ ->
+        {:error, "Track has no Spotify ID"}
+    end
   end
 end

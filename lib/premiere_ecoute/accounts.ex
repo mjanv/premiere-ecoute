@@ -4,9 +4,9 @@ defmodule PremiereEcoute.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias PremiereEcoute.Repo
 
   alias PremiereEcoute.Accounts.{User, UserToken}
+  alias PremiereEcoute.Repo
 
   ## Database getters
 

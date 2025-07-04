@@ -12,10 +12,7 @@ defmodule PremiereEcouteWeb.Router do
     # %{"content-security-policy" => "default-src 'self'"}
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
-  end
-
-  pipeline :api do
-    plug :accepts, ["json"]
+    plug PremiereEcouteWeb.Plugs.RenewTokens
   end
 
   scope "/", PremiereEcouteWeb do
@@ -24,10 +21,6 @@ defmodule PremiereEcouteWeb.Router do
     live_session :main,
       on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
       live "/", HomepageLive, :index
-      live "/account", Accounts.AccountLive, :index
-      live "/sessions/discography/album/select", Sessions.Discography.AlbumSelectionLive, :index
-      live "/sessions", Sessions.SessionsLive, :index
-      live "/session/:id", Sessions.SessionLive, :show
       live "/session/:id/overlay", Sessions.OverlayLive, :show
     end
   end
@@ -39,6 +32,10 @@ defmodule PremiereEcouteWeb.Router do
       on_mount: [{PremiereEcouteWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/account", Accounts.AccountLive, :index
+      live "/sessions/discography/album/select", Sessions.Discography.AlbumSelectionLive, :index
+      live "/sessions", Sessions.SessionsLive, :index
+      live "/session/:id", Sessions.SessionLive, :show
     end
 
     post "/users/update-password", UserSessionController, :update_password

@@ -1,63 +1,6 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
   <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
-    <!-- Header -->
-    <header
-      class="border-b px-6 py-4"
-      style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
-    >
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div
-            class="w-10 h-10 rounded-lg flex items-center justify-center"
-            style="background-color: var(--color-primary-600);"
-          >
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-            </svg>
-          </div>
-          <.link
-            navigate={~p"/"}
-            class="text-2xl font-bold hover:opacity-80 transition-opacity"
-            style="color: var(--color-primary-400);"
-          >
-            Premiere Ecoute
-          </.link>
-        </div>
-        <div class="flex items-center space-x-4">
-          <.link
-            navigate={~p"/sessions"}
-            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:text-purple-300 transition-colors"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            All Sessions
-          </.link>
-          <.link
-            navigate={~p"/"}
-            class="inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium text-gray-300 transition-colors"
-            style="border-color: var(--color-dark-700); background-color: var(--color-dark-900);"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Homepage
-          </.link>
-        </div>
-      </div>
-    </header>
-    
-<!-- Main Content -->
+    <!-- Main Content -->
     <div class="max-w-4xl mx-auto px-6 py-8">
       <!-- AIDEV-NOTE: Redesigned account page layout matching provided wireframe -->
       <!-- Account Title -->
@@ -100,9 +43,11 @@
                   <div>
                     <p class="font-medium text-white">Account ID</p>
                     <p class="text-sm text-gray-400">
-                      #{if assigns[:current_user],
-                        do: "##{assigns[:current_user].id}",
-                        else: "N/A"}
+                      <%= if @current_user do %>
+                        #{@current_user.id}
+                      <% else %>
+                        N/A
+                      <% end %>
                     </p>
                   </div>
                 </div>
@@ -141,7 +86,7 @@
             <h2 class="text-xl font-bold text-white">Twitch</h2>
           </div>
 
-          <%= if assigns[:twitch_user] do %>
+          <%= if @twitch_user do %>
             <div class="bg-purple-600/20 rounded-lg p-4 border border-purple-600/30">
               <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
@@ -150,8 +95,12 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="font-medium text-white">{@twitch_user.display_name}</p>
-                  <p class="text-sm text-purple-300">@{@twitch_user.login}</p>
+                  <p class="font-medium text-white">
+                    {String.replace(@twitch_user.email, "@twitch.tv", "")}
+                  </p>
+                  <p class="text-sm text-purple-300">
+                    @{String.replace(@twitch_user.email, "@twitch.tv", "")}
+                  </p>
                 </div>
               </div>
               <div class="mt-3 flex items-center space-x-2">
@@ -168,7 +117,10 @@
                   </svg>
                 </div>
                 <p class="text-gray-400 text-sm">Not connected</p>
-                <button class="mt-2 text-purple-400 hover:text-purple-300 text-sm font-medium">
+                <button
+                  phx-click="connect_twitch"
+                  class="mt-2 text-purple-400 hover:text-purple-300 text-sm font-medium"
+                >
                   Connect Twitch
                 </button>
               </div>
@@ -187,27 +139,65 @@
             <h2 class="text-xl font-bold text-white">Spotify</h2>
           </div>
 
-          <div class="min-h-[200px] flex items-center justify-center">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-                </svg>
+          <%= if @current_user && @current_user.spotify_access_token do %>
+            <!-- AIDEV-NOTE: Spotify connected state -->
+            <div class="bg-green-600/20 rounded-lg p-4 border border-green-600/30">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-white">Spotify Connected</p>
+                  <p class="text-sm text-green-300">Ready for music playback control</p>
+                </div>
               </div>
-              <button
-                phx-click="connect_spotify"
-                class="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg font-medium transition-colors text-lg inline-flex items-center space-x-2"
-              >
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-                </svg>
-                <span>Connect with Spotify</span>
-              </button>
-              <p class="text-gray-400 text-sm mt-2">
-                Connect your Spotify account to search and play music
-              </p>
+              <div class="mt-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span class="text-sm text-green-400">Connected</span>
+                  <%= if @current_user.spotify_expires_at do %>
+                    <span class="text-xs text-green-300">
+                      • Expires: {Calendar.strftime(
+                        @current_user.spotify_expires_at,
+                        "%m/%d %H:%M"
+                      )}
+                    </span>
+                  <% end %>
+                </div>
+                <button
+                  phx-click="disconnect_spotify"
+                  class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
+                >
+                  Disconnect
+                </button>
+              </div>
             </div>
-          </div>
+          <% else %>
+            <!-- AIDEV-NOTE: Spotify not connected state -->
+            <div class="min-h-[200px] flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
+                </div>
+                <button
+                  phx-click="connect_spotify"
+                  class="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg font-medium transition-colors text-lg inline-flex items-center space-x-2"
+                >
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
+                  <span>Connect with Spotify</span>
+                </button>
+                <p class="text-gray-400 text-sm mt-2">
+                  Connect your Spotify account to search and play music
+                </p>
+              </div>
+            </div>
+          <% end %>
         </div>
         
 <!-- Actions Section -->

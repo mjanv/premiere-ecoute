@@ -9,6 +9,8 @@ defmodule PremiereEcouteWeb.Layouts do
   """
   use PremiereEcouteWeb, :html
 
+  import PremiereEcouteWeb.Components.Header
+
   embed_templates "layouts/*"
 
   @doc """
@@ -31,9 +33,12 @@ defmodule PremiereEcouteWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <main class="min-h-screen bg-gray-900">
-      {render_slot(@inner_block)}
-    </main>
+    <div class="min-h-screen bg-gray-900">
+      <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} />
+      <main>
+        {render_slot(@inner_block)}
+      </main>
+    </div>
 
     <.flash_group flash={@flash} />
     """

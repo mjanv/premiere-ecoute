@@ -3,6 +3,9 @@ defmodule PremiereEcouteWeb.HomepageLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    # AIDEV-NOTE: Get current user from authentication scope for conditional UI
+    current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
+    socket = assign(socket, :current_user, current_user)
     {:ok, socket}
   end
 

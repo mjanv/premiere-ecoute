@@ -34,6 +34,18 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
       })
   end
 
+  def authorization_url_with_state(user_id) do
+    "https://accounts.spotify.com/authorize?" <>
+      URI.encode_query(%{
+        response_type: "code",
+        client_id: Application.get_env(:premiere_ecoute, :spotify_client_id),
+        scope:
+          "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing",
+        redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri),
+        state: user_id
+      })
+  end
+
   def authorization_code(code, _state) do
     SpotifyApi.api(:accounts)
     |> Req.post(
@@ -41,7 +53,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
       form: [
         grant_type: "authorization_code",
         code: code,
-        redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri)
+        redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri),
+        client_id: Application.get_env(:premiere_ecoute, :spotify_client_id)
       ]
     )
     |> case do
@@ -55,11 +68,40 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
 
       {:ok, %{status: status, body: body}} ->
         Logger.error("Spotify auth failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify authentication failed"}
+        {:error, "Spotify authentication failed: #{status} - #{inspect(body)}"}
 
       {:error, reason} ->
         Logger.error("Spotify auth request failed: #{inspect(reason)}")
         {:error, "Network error during authentication"}
+    end
+  end
+
+  def renew_token(refresh_token) do
+    SpotifyApi.api(:accounts)
+    |> Req.post(
+      url: "/token",
+      form: [
+        grant_type: "refresh_token",
+        refresh_token: refresh_token,
+        client_id: Application.get_env(:premiere_ecoute, :spotify_client_id)
+      ]
+    )
+    |> case do
+      {:ok, %{status: 200, body: %{"access_token" => access_token} = body}} ->
+        {:ok,
+         %{
+           access_token: access_token,
+           refresh_token: body["refresh_token"] || refresh_token,
+           expires_in: body["expires_in"]
+         }}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify token refresh failed: #{status} - #{inspect(body)}")
+        {:error, "Spotify token refresh failed: #{status} - #{inspect(body)}"}
+
+      {:error, reason} ->
+        Logger.error("Spotify token refresh request failed: #{inspect(reason)}")
+        {:error, "Network error during token refresh"}
     end
   end
 
