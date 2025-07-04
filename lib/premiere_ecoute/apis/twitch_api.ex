@@ -8,16 +8,18 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
     @callback subscribe(Scope.t(), type :: String.t()) :: {:ok, map()} | {:error, term()}
 
-    @callback create_poll(Scope.t(), pool :: map()) :: {:ok, map()} | {:error, term()}
+    @callback create_poll(Scope.t(), poll :: map()) :: {:ok, map()} | {:error, term()}
     @callback end_poll(Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback get_poll(Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
   @behaviour __MODULE__.Behavior
 
-  # @app :premiere_ecoute
+  @app :premiere_ecoute
   # @web "https://api.twitch.tv/helix"
   # @accounts "https://id.twitch.tv/oauth2"
+
+  def impl, do: Application.get_env(@app, :twitch_api, __MODULE__)
 
   def api(:helix, token \\ "") do
     Req.new(

@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Scores.Pool do
+defmodule PremiereEcoute.Sessions.Scores.Poll do
   @moduledoc false
 
   use Ecto.Schema
@@ -23,7 +23,7 @@ defmodule PremiereEcoute.Sessions.Scores.Pool do
           updated_at: NaiveDateTime.t()
         }
 
-  schema "pools" do
+  schema "polls" do
     field :poll_id, :string
     field :title, :string
     field :total_votes, :integer
@@ -36,14 +36,14 @@ defmodule PremiereEcoute.Sessions.Scores.Pool do
     timestamps()
   end
 
-  def changeset(pool, attrs) do
-    pool
+  def changeset(poll, attrs) do
+    poll
     |> cast(attrs, [:poll_id, :title, :total_votes, :votes, :ended_at, :session_id, :track_id])
     |> validate_required([:poll_id, :total_votes, :votes, :session_id, :track_id])
     |> validate_number(:total_votes, greater_than_or_equal_to: 0)
     |> validate_votes_map()
     |> unique_constraint([:poll_id])
-    |> unique_constraint([:session_id, :track_id], name: :pools_session_track_index)
+    |> unique_constraint([:session_id, :track_id], name: :polls_session_track_index)
     |> foreign_key_constraint(:session_id)
     |> foreign_key_constraint(:track_id)
   end
@@ -66,9 +66,9 @@ defmodule PremiereEcoute.Sessions.Scores.Pool do
   end
 
   @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def create(%__MODULE__{} = pool) do
+  def create(%__MODULE__{} = poll) do
     %__MODULE__{}
-    |> changeset(Map.from_struct(pool))
+    |> changeset(Map.from_struct(poll))
     |> Repo.insert()
   end
 

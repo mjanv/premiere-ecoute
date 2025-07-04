@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
 
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.{Pool, Report, Vote}
+  alias PremiereEcoute.Sessions.Scores.{Poll, Report, Vote}
 
   describe "generate/1" do
     test "generates comprehensive report with all vote sources" do
@@ -79,8 +79,8 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
         {:ok, _} = Vote.create(vote)
       end
 
-      pools = [
-        %Pool{
+      polls = [
+        %Poll{
           poll_id: "twitch_poll_track1",
           title: "Rate Track 1",
           session_id: session.id,
@@ -88,7 +88,7 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
           votes: %{"5" => 2, "8" => 3, "10" => 1},
           total_votes: 6
         },
-        %Pool{
+        %Poll{
           poll_id: "twitch_poll_track2",
           title: "Rate Track 2",
           session_id: session.id,
@@ -98,8 +98,8 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
         }
       ]
 
-      for pool <- pools do
-        {:ok, _} = Pool.create(pool)
+      for poll <- polls do
+        {:ok, _} = Poll.create(poll)
       end
 
       {:ok, report} = Report.generate(session)
@@ -120,13 +120,13 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
       track2_summary = Enum.find(track_summaries, &(&1.track_id == track2.id))
 
       assert track1_summary.individual_count == 4
-      assert track1_summary.pool_count == 6
+      assert track1_summary.poll_count == 6
       assert track1_summary.unique_voters == 9
       assert_in_delta track1_summary.viewer_score, 7.165, 0.1
       assert track1_summary.streamer_score == 9.0
 
       assert track2_summary.individual_count == 4
-      assert track2_summary.pool_count == 5
+      assert track2_summary.poll_count == 5
       assert track2_summary.unique_voters == 8
       assert_in_delta track2_summary.viewer_score, 8.065, 0.1
       assert track2_summary.streamer_score == 7.0

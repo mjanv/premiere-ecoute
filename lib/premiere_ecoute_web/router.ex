@@ -15,6 +15,11 @@ defmodule PremiereEcouteWeb.Router do
     plug PremiereEcouteWeb.Plugs.RenewTokens
   end
 
+  pipeline :webhook do
+    plug :accepts, ["json"]
+    plug :fetch_session
+  end
+
   scope "/", PremiereEcouteWeb do
     pipe_through :browser
 
@@ -56,6 +61,12 @@ defmodule PremiereEcouteWeb.Router do
 
     get "/auth/:provider", Accounts.AuthController, :request
     get "/auth/:provider/callback", Accounts.AuthController, :callback
+  end
+
+  scope "/webhooks", PremiereEcouteWeb.Webhooks do
+    pipe_through :webhook
+
+    post "/twitch", TwitchController, :handle_event
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do

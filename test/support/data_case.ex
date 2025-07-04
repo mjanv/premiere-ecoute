@@ -33,6 +33,7 @@ defmodule PremiereEcoute.DataCase do
 
       alias PremiereEcoute.Repo
 
+      setup :set_mox_from_context
       setup :verify_on_exit!
     end
   end

@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.{Pool, Vote}
+  alias PremiereEcoute.Sessions.Scores.{Poll, Vote}
 
   @type session_summary :: %{
           viewer_score: float(),
@@ -23,7 +23,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           viewer_score: float(),
           streamer_score: float(),
           individual_count: integer(),
-          pool_count: integer(),
+          poll_count: integer(),
           unique_voters: integer()
         }
 
@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           session_id: integer(),
           session: ListeningSession.t(),
           votes: [Vote.t()],
-          pools: [Pool.t()],
+          polls: [Poll.t()],
           inserted_at: NaiveDateTime.t(),
           updated_at: NaiveDateTime.t()
         }
@@ -52,7 +52,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     belongs_to :session, ListeningSession
 
     has_many :votes, Vote, foreign_key: :session_id, references: :session_id
-    has_many :pools, Pool, foreign_key: :session_id, references: :session_id
+    has_many :polls, Poll, foreign_key: :session_id, references: :session_id
 
     timestamps()
   end
@@ -74,7 +74,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   end
 
   def preload(%__MODULE__{} = report) do
-    Repo.preload(report, [:votes, :pools])
+    Repo.preload(report, [:votes, :polls])
   end
 
   @doc """
@@ -82,7 +82,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   This is the main business logic function that combines all vote sources:
   1. Individual votes (viewers + streamer)
-  2. Twitch pools
+  2. Twitch polls
   3. Calculates unique voter counts and aggregated scores
 
   ## Examples
@@ -137,18 +137,18 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     query = """
     SELECT
       COALESCE(individual_votes, 0) as individual_votes,
-      COALESCE(pool_votes, 0) as pool_votes,
-      COALESCE(unique_individual_voters, 0) + COALESCE(pool_votes, 0) as unique_voters
+      COALESCE(poll_votes, 0) as poll_votes,
+      COALESCE(unique_individual_voters, 0) + COALESCE(poll_votes, 0) as unique_voters
     FROM (
       SELECT COUNT(*) as individual_votes
       FROM votes
       WHERE session_id = $1
     ) votes_count
     CROSS JOIN (
-      SELECT COALESCE(SUM(total_votes), 0) as pool_votes
-      FROM pools
+      SELECT COALESCE(SUM(total_votes), 0) as poll_votes
+      FROM polls
       WHERE session_id = $1
-    ) pools_count
+    ) polls_count
     CROSS JOIN (
       SELECT COUNT(DISTINCT viewer_id) as unique_individual_voters
       FROM votes
@@ -157,10 +157,10 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     """
 
     result = SQL.query!(Repo, query, [session_id])
-    [[individual_votes, pool_votes, unique_voters]] = result.rows
+    [[individual_votes, poll_votes, unique_voters]] = result.rows
 
     %{
-      unique_votes: individual_votes + pool_votes,
+      unique_votes: individual_votes + poll_votes,
       unique_voters: unique_voters
     }
   end
@@ -183,7 +183,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       FROM votes
       WHERE session_id = $1 AND is_streamer = true
     ),
-    pool_avg AS (
+    poll_avg AS (
       SELECT
         track_id,
         (
@@ -198,7 +198,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           COALESCE((votes->>'9')::INTEGER, 0) * 9 +
           COALESCE((votes->>'10')::INTEGER, 0) * 10
         )::FLOAT / total_votes::FLOAT as avg_score
-      FROM pools
+      FROM polls
       WHERE session_id = $1
     ),
     combined_viewer_avg AS (
@@ -216,17 +216,17 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       FROM (
         SELECT DISTINCT track_id FROM votes WHERE session_id = $1
         UNION
-        SELECT DISTINCT track_id FROM pools WHERE session_id = $1
+        SELECT DISTINCT track_id FROM polls WHERE session_id = $1
       ) all_tracks
       LEFT JOIN viewer_individual_avg vi USING (track_id)
-      LEFT JOIN pool_avg pa USING (track_id)
+      LEFT JOIN poll_avg pa USING (track_id)
     ),
     track_count AS (
       SELECT COUNT(DISTINCT track_id) as tracks_rated
       FROM (
         SELECT track_id FROM votes WHERE session_id = $1
         UNION
-        SELECT track_id FROM pools WHERE session_id = $1
+        SELECT track_id FROM polls WHERE session_id = $1
       ) all_tracks
     )
     SELECT
@@ -253,7 +253,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     WITH all_tracks AS (
       SELECT DISTINCT track_id FROM votes WHERE session_id = $1
       UNION
-      SELECT DISTINCT track_id FROM pools WHERE session_id = $1
+      SELECT DISTINCT track_id FROM polls WHERE session_id = $1
     ),
     vote_stats AS (
       SELECT
@@ -266,10 +266,10 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       WHERE session_id = $1
       GROUP BY track_id
     ),
-    pool_stats AS (
+    poll_stats AS (
       SELECT
         track_id,
-        total_votes as pool_count,
+        total_votes as poll_count,
         (
           COALESCE((votes->>'1')::INTEGER, 0) * 1 +
           COALESCE((votes->>'2')::INTEGER, 0) * 2 +
@@ -281,28 +281,28 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           COALESCE((votes->>'8')::INTEGER, 0) * 8 +
           COALESCE((votes->>'9')::INTEGER, 0) * 9 +
           COALESCE((votes->>'10')::INTEGER, 0) * 10
-        )::FLOAT / total_votes::FLOAT as pool_avg
-      FROM pools
+        )::FLOAT / total_votes::FLOAT as poll_avg
+      FROM polls
       WHERE session_id = $1
     )
     SELECT
       t.track_id,
       CASE
-        WHEN v.viewer_individual_avg IS NOT NULL AND p.pool_avg IS NOT NULL
-        THEN (v.viewer_individual_avg + p.pool_avg) / 2.0
+        WHEN v.viewer_individual_avg IS NOT NULL AND p.poll_avg IS NOT NULL
+        THEN (v.viewer_individual_avg + p.poll_avg) / 2.0
         WHEN v.viewer_individual_avg IS NOT NULL
         THEN v.viewer_individual_avg
-        WHEN p.pool_avg IS NOT NULL
-        THEN p.pool_avg
+        WHEN p.poll_avg IS NOT NULL
+        THEN p.poll_avg
         ELSE 0.0
       END as viewer_score,
       COALESCE(v.streamer_avg, 0.0) as streamer_score,
       COALESCE(v.individual_count, 0) as individual_count,
-      COALESCE(p.pool_count, 0) as pool_count,
-      COALESCE(v.unique_individual_voters, 0) + COALESCE(p.pool_count, 0) as unique_voters
+      COALESCE(p.poll_count, 0) as poll_count,
+      COALESCE(v.unique_individual_voters, 0) + COALESCE(p.poll_count, 0) as unique_voters
     FROM all_tracks t
     LEFT JOIN vote_stats v USING (track_id)
-    LEFT JOIN pool_stats p USING (track_id)
+    LEFT JOIN poll_stats p USING (track_id)
     ORDER BY t.track_id
     """
 
@@ -313,7 +313,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
                                viewer_score,
                                streamer_score,
                                individual_count,
-                               pool_count,
+                               poll_count,
                                unique_voters
                              ] ->
       %{
@@ -321,7 +321,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
         viewer_score: viewer_score || 0.0,
         streamer_score: streamer_score || 0.0,
         individual_count: individual_count || 0,
-        pool_count: pool_count || 0,
+        poll_count: poll_count || 0,
         unique_voters: unique_voters || 0
       }
     end)

@@ -1,6 +1,7 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
   use PremiereEcoute.DataCase, async: true
 
+  alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
@@ -103,10 +104,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
   describe "handle/1 - StartListeningSession" do
     test "successfully start a prepare session and returns SessionStarted event" do
       user = user_fixture()
+      scope = user_scope_fixture(user)
       album = album_fixture()
 
       PremiereEcoute.Apis.SpotifyApiMock
       |> expect(:get_album, fn _ -> {:ok, album} end)
+
+      PremiereEcoute.Apis.TwitchApiMock
+      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
+        {:ok, %{}}
+      end)
+
+      PremiereEcoute.Apis.TwitchApiMock
+      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
+        {:ok, %{}}
+      end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
@@ -115,7 +127,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
 
       {:ok, _, [%SessionPrepared{} = event]} = Handler.handle(command)
 
-      command = %StartListeningSession{session_id: event.session_id}
+      command = %StartListeningSession{session_id: event.session_id, scope: scope}
 
       {:ok, _, [%SessionStarted{} = event]} = Handler.handle(command)
 
@@ -129,10 +141,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
   describe "handle/1 - StopListeningSession" do
     test "successfully creates session and generate a report" do
       user = user_fixture()
+      scope = user_scope_fixture(user)
       album = album_fixture()
 
       PremiereEcoute.Apis.SpotifyApiMock
       |> expect(:get_album, fn _ -> {:ok, album} end)
+
+      PremiereEcoute.Apis.TwitchApiMock
+      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
+        {:ok, %{}}
+      end)
+
+      PremiereEcoute.Apis.TwitchApiMock
+      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
+        {:ok, %{}}
+      end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
@@ -141,7 +164,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
 
       {:ok, _, [%SessionPrepared{} = event]} = Handler.handle(command)
 
-      command = %StartListeningSession{session_id: event.session_id}
+      command = %StartListeningSession{session_id: event.session_id, scope: scope}
 
       {:ok, _, [%SessionStarted{} = event]} = Handler.handle(command)
 
@@ -155,7 +178,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
 
       assert %PremiereEcoute.Sessions.Scores.Report{
                unique_votes: 0,
-               pools: [],
+               polls: [],
                session_id: session_id,
                session_summary: %{
                  "streamer_score" => +0.0,

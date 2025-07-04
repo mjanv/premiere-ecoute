@@ -2,6 +2,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
   @moduledoc false
 
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Apis.TwitchApi
 
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
@@ -43,9 +44,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
     end
   end
 
-  def handle(%StartListeningSession{session_id: session_id}) do
+  def handle(%StartListeningSession{session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
+         {:ok, _} <- TwitchApi.impl().subscribe(scope, "channel.chat.message"),
+         {:ok, _} <- TwitchApi.impl().subscribe(scope, "channel.poll.progress"),
          {:ok, session} <- ListeningSession.start(session) do
       {:ok, session, [%SessionStarted{session_id: session.id}]}
     else

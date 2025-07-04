@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
   use Ecto.Migration
 
   def change do
-    create table(:pools) do
+    create table(:polls) do
       add :poll_id, :string, null: false
       add :title, :string
       add :total_votes, :integer, null: false, default: 0
@@ -15,10 +15,10 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
       timestamps()
     end
 
-    create unique_index(:pools, [:poll_id])
-    create unique_index(:pools, [:session_id, :track_id], name: :pools_session_track_index)
-    create index(:pools, [:session_id])
-    create index(:pools, [:track_id])
+    create unique_index(:polls, [:poll_id])
+    create unique_index(:polls, [:session_id, :track_id], name: :polls_session_track_index)
+    create index(:polls, [:session_id])
+    create index(:polls, [:track_id])
 
     create table(:reports) do
       add :generated_at, :naive_datetime, null: false
