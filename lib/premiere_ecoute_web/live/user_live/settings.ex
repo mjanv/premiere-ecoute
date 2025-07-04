@@ -78,17 +78,19 @@ defmodule PremiereEcouteWeb.UserLive.Settings do
 
   def mount(_params, _session, socket) do
     user = socket.assigns.current_scope.user
-    email_changeset = Accounts.change_user_email(user, %{}, validate_email: false)
-    password_changeset = Accounts.change_user_password(user, %{}, hash_password: false)
 
-    socket =
-      socket
-      |> assign(:current_email, user.email)
-      |> assign(:email_form, to_form(email_changeset))
-      |> assign(:password_form, to_form(password_changeset))
-      |> assign(:trigger_submit, false)
-
-    {:ok, socket}
+    socket
+    |> assign(:current_email, user.email)
+    |> assign(
+      :email_form,
+      to_form(Accounts.User.email_changeset(user, %{}, validate_email: false))
+    )
+    |> assign(
+      :password_form,
+      to_form(Accounts.User.password_changeset(user, %{}, hash_password: false))
+    )
+    |> assign(:trigger_submit, false)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   def handle_event("validate_email", params, socket) do
@@ -96,7 +98,7 @@ defmodule PremiereEcouteWeb.UserLive.Settings do
 
     email_form =
       socket.assigns.current_scope.user
-      |> Accounts.change_user_email(user_params, validate_email: false)
+      |> Accounts.User.email_changeset(user_params, validate_email: false)
       |> Map.put(:action, :validate)
       |> to_form()
 
@@ -108,7 +110,7 @@ defmodule PremiereEcouteWeb.UserLive.Settings do
     user = socket.assigns.current_scope.user
     true = Accounts.sudo_mode?(user)
 
-    case Accounts.change_user_email(user, user_params) do
+    case Accounts.User.email_changeset(user, user_params) do
       %{valid?: true} = changeset ->
         Accounts.deliver_user_update_email_instructions(
           Ecto.Changeset.apply_action!(changeset, :insert),

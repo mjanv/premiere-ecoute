@@ -46,18 +46,20 @@ defmodule PremiereEcoute.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  @doc """
-  A user changeset for registering or changing the email.
+  def changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [
+      :email,
+      :twitch_user_id,
+      :twitch_access_token,
+      :twitch_refresh_token,
+      :twitch_expires_at,
+      :twitch_username
+    ])
+    |> validate_email(opts)
+  end
 
-  It requires the email to change otherwise an error is added.
-
-  ## Options
-
-    * `:validate_email` - Set to false if you don't want to validate the
-      uniqueness of the email, useful when displaying live validations.
-      Defaults to `true`.
-  """
-  def email_changeset(user, attrs, opts \\ []) do
+  def email_changeset(user, attrs \\ %{}, opts \\ []) do
     user
     |> cast(attrs, [:email])
     |> validate_email(opts)
@@ -105,7 +107,7 @@ defmodule PremiereEcoute.Accounts.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
-  def password_changeset(user, attrs, opts \\ []) do
+  def password_changeset(user, attrs \\ %{}, opts \\ []) do
     user
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
@@ -144,8 +146,7 @@ defmodule PremiereEcoute.Accounts.User do
   Confirms the account by setting `confirmed_at`.
   """
   def confirm_changeset(user) do
-    now = DateTime.utc_now(:second)
-    change(user, confirmed_at: now)
+    change(user, confirmed_at: DateTime.utc_now(:second))
   end
 
   @doc """
@@ -186,6 +187,12 @@ defmodule PremiereEcoute.Accounts.User do
   def valid_password?(_, _) do
     Bcrypt.no_user_verify()
     false
+  end
+
+  def register_user(attrs) do
+    %__MODULE__{}
+    |> changeset(attrs)
+    |> Repo.insert()
   end
 
   def update(changeset) do

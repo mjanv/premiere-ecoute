@@ -11,7 +11,7 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   server: false
 
 config :premiere_ecoute,
-  twitch_api: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
+  twitch_req_options: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
 
 config :bcrypt_elixir, :log_rounds, 1
 

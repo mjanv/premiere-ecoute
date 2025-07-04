@@ -29,14 +29,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     json_body = Jason.encode!(body)
     content_length = byte_size(json_body)
 
-    headers = [
-      {"Authorization", "Bearer #{access_token}"},
-      {"Content-Type", "application/json"},
-      {"Content-Length", to_string(content_length)}
-    ]
-
     SpotifyApi.api(:web)
-    |> Req.merge(headers: headers)
+    |> Req.merge(
+      headers: [
+        {"Authorization", "Bearer #{access_token}"},
+        {"Content-Type", "application/json"},
+        {"Content-Length", to_string(content_length)}
+      ]
+    )
     |> Req.put(url: "/me/player/play", body: json_body)
     |> handle_playback_response()
   end
@@ -61,14 +61,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   Skip to next track in the user's queue.
   """
   def next_track(access_token) do
-    headers = [
-      {"Authorization", "Bearer #{access_token}"},
-      {"Content-Length", "0"},
-      {"Content-Type", "application/json"}
-    ]
-
     SpotifyApi.api(:web)
-    |> Req.merge(headers: headers)
+    |> Req.merge(
+      headers: [
+        {"Authorization", "Bearer #{access_token}"},
+        {"Content-Length", "0"},
+        {"Content-Type", "application/json"}
+      ]
+    )
     |> Req.post(url: "/me/player/next", body: "")
     |> handle_playback_response()
   end
@@ -77,14 +77,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   Skip to previous track in the user's queue.
   """
   def previous_track(access_token) do
-    headers = [
-      {"Authorization", "Bearer #{access_token}"},
-      {"Content-Length", "0"},
-      {"Content-Type", "application/json"}
-    ]
-
     SpotifyApi.api(:web)
-    |> Req.merge(headers: headers)
+    |> Req.merge(
+      headers: [
+        {"Authorization", "Bearer #{access_token}"},
+        {"Content-Length", "0"},
+        {"Content-Type", "application/json"}
+      ]
+    )
     |> Req.post(url: "/me/player/previous", body: "")
     |> handle_playback_response()
   end
@@ -93,17 +93,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   Get information about the user's current playback state.
   """
   def get_playback_state(access_token) do
-    headers = [{"Authorization", "Bearer #{access_token}"}]
-
     SpotifyApi.api(:web)
-    |> Req.merge(headers: headers)
+    |> Req.merge(headers: [{"Authorization", "Bearer #{access_token}"}])
     |> Req.get(url: "/me/player")
     |> case do
       {:ok, %{status: 200, body: body}} ->
         {:ok, body}
 
       {:ok, %{status: 204}} ->
-        # No active device
         {:ok, %{}}
 
       {:ok, %{status: status, body: body}} ->

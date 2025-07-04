@@ -3,7 +3,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
 
   require Logger
 
-  def subscribe(broadcaster_id, token, session_id, type) do
+  alias PremiereEcoute.Accounts.Scope
+
+  def subscribe(%Scope{user: %{twitch_user_id: user_id, twitch_access_token: token}}, type) do
     "https://api.twitch.tv/helix/eventsub/subscriptions"
     |> Req.post(
       plug: {Req.Test, PremiereEcoute.Apis.TwitchApi},
@@ -14,11 +16,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
       ],
       json: %{
         type: type,
-        version: "1",
-        condition: %{user_id: broadcaster_id},
+        version: "2",
+        condition: %{broadcaster_user_id: user_id, moderator_user_id: user_id},
         transport: %{
-          method: "websocket",
-          session_id: session_id
+          method: "webhook",
+          callback: Application.get_env(:premiere_ecoute, :twitch_webhook_callback_url),
+          secret: Application.get_env(:premiere_ecoute, :twitch_eventsub_secret)
         }
       }
     )

@@ -44,7 +44,7 @@ defmodule PremiereEcouteWeb.UserLive.Registration do
   end
 
   def mount(_params, _session, socket) do
-    changeset = Accounts.change_user_email(%User{})
+    changeset = Accounts.User.email_changeset(%User{})
 
     {:ok, assign_form(socket, changeset), temporary_assigns: [form: nil]}
   end
@@ -72,12 +72,11 @@ defmodule PremiereEcouteWeb.UserLive.Registration do
   end
 
   def handle_event("validate", %{"user" => user_params}, socket) do
-    changeset = Accounts.change_user_email(%User{}, user_params)
+    changeset = Accounts.User.email_changeset(%User{}, user_params)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
-    form = to_form(changeset, as: "user")
-    assign(socket, form: form)
+    assign(socket, form: to_form(changeset, as: "user"))
   end
 end

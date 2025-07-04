@@ -1,11 +1,13 @@
 {
-    "type": "user.update",
-    "version": "1",
-    "condition": {
-        "user_id": "1234"
+    "type":"channel.follow",
+    "version":"2",
+    "condition":{
+       "broadcaster_user_id":"1234",
+       "moderator_user_id":"1234"
     },
-    "transport": {
-        "method": "websocket",
-        "session_id": "AQoQexAWVYKSTIu4ec_2VAxyuhAB"
+    "transport":{
+       "method":"webhook",
+       "callback":"https://example.com/callback",
+       "secret":"s3cre77890ab"
     }
 }

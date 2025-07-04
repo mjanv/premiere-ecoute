@@ -61,11 +61,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> PremiereEcoute.apply()
     |> case do
       {:ok, updated_session, _} ->
-        # AIDEV-NOTE: Start Spotify playback when session starts
-        spotify_result = start_spotify_playback(user, updated_session)
-
         socket =
-          case spotify_result do
+          case start_spotify_playback(user, updated_session) do
             {:ok, _} ->
               socket |> put_flash(:info, "Session started and Spotify playback began!")
 
@@ -99,13 +96,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_event("next_track", _params, %{assigns: %{listening_session: session}} = socket) do
     case ListeningSession.next_track(session) do
       {:ok, session} ->
-        # AIDEV-NOTE: Broadcast track change to update UI and notify other subscribers
-        Phoenix.PubSub.broadcast(
-          PremiereEcoute.PubSub,
-          "session:#{session.id}",
-          {:track_changed, session.current_track}
-        )
-
         # Clear user rating when track changes
         socket = assign(socket, :listening_session, session)
         socket = assign(socket, :user_current_rating, nil)
@@ -123,14 +113,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_event("previous_track", _params, %{assigns: %{listening_session: session}} = socket) do
     case ListeningSession.previous_track(session) do
       {:ok, updated_session} ->
-        # AIDEV-NOTE: Broadcast track change to update UI and notify other subscribers
-        Phoenix.PubSub.broadcast(
-          PremiereEcoute.PubSub,
-          "session:#{session.id}",
-          {:track_changed, updated_session.current_track}
-        )
-
-        # Clear user rating when track changes
         socket = assign(socket, :listening_session, updated_session)
         socket = assign(socket, :user_current_rating, nil)
         {:noreply, socket}
@@ -208,11 +190,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, "Received event: #{event}")}
-  end
-
-  @impl true
-  def handle_info({:track_changed, track}, socket) do
-    {:noreply, assign(socket, :current_track, track)}
   end
 
   @impl true

@@ -72,4 +72,7 @@ config :ueberauth, Ueberauth,
        ]}
   ]
 
+config :premiere_ecoute,
+  twitch_req_options: []
+
 import_config "#{config_env()}.exs"

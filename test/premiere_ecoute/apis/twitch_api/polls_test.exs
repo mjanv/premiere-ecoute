@@ -4,8 +4,20 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
 
+  setup do
+    scope =
+      user_scope_fixture(
+        user_fixture(%{
+          twitch_user_id: "141981764",
+          twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+        })
+      )
+
+    {:ok, %{scope: scope}}
+  end
+
   describe "create_poll/2" do
-    test "can create a new poll" do
+    test "can create a new poll", %{scope: scope} do
       ApiMock.stub(
         TwitchApi,
         path: {:post, "/helix/polls"},
@@ -14,9 +26,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
         status: 200
       )
 
-      poll = %{title: "Heads or Tails?", choices: ["Heads", "Tails"]}
+      poll = %{title: "Heads or Tails?", choices: ["Heads", "Tails"], duration: 1800}
 
-      {:ok, poll} = TwitchApi.create_poll("141981764", "", poll)
+      {:ok, poll} = TwitchApi.create_poll(scope, poll)
 
       assert poll == %{
                "bits_per_vote" => 0,
@@ -51,7 +63,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
   end
 
   describe "end_poll/2" do
-    test "can end a poll" do
+    test "can end a poll", %{scope: scope} do
       ApiMock.stub(
         TwitchApi,
         path: {:patch, "/helix/polls"},
@@ -60,7 +72,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
         status: 200
       )
 
-      {:ok, poll} = TwitchApi.end_poll("141981764", "", "ed961efd-8a3f-4cf5-a9d0-e616c590cd2a")
+      {:ok, poll} = TwitchApi.end_poll(scope, "ed961efd-8a3f-4cf5-a9d0-e616c590cd2a")
 
       assert poll == %{
                "bits_per_vote" => 0,
@@ -96,7 +108,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
   end
 
   describe "get_poll/2" do
-    test "can read a poll status" do
+    test "can read a poll status", %{scope: scope} do
       ApiMock.stub(
         TwitchApi,
         path: {:get, "/helix/polls"},
@@ -105,7 +117,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
         status: 200
       )
 
-      {:ok, poll} = TwitchApi.get_poll("141981764", "", "ed961efd-8a3f-4cf5-a9d0-e616c590cd2a")
+      {:ok, poll} = TwitchApi.get_poll(scope, "ed961efd-8a3f-4cf5-a9d0-e616c590cd2a")
 
       assert poll == %{
                "bits_per_vote" => 0,

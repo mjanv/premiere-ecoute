@@ -40,14 +40,8 @@ defmodule PremiereEcoute.AccountsFixtures do
     user
   end
 
-  def user_scope_fixture do
-    user = user_fixture()
-    user_scope_fixture(user)
-  end
-
-  def user_scope_fixture(user) do
-    Scope.for_user(user)
-  end
+  def user_scope_fixture, do: user_scope_fixture(user_fixture())
+  def user_scope_fixture(user), do: Scope.for_user(user)
 
   def set_password(user) do
     {:ok, user, _expired_tokens} =

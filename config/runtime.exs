@@ -12,7 +12,9 @@ config :premiere_ecoute,
 config :premiere_ecoute,
   twitch_client_id: System.get_env("TWITCH_CLIENT_ID"),
   twitch_client_secret: System.get_env("TWITCH_CLIENT_SECRET"),
-  twitch_redirect_uri: System.get_env("TWITCH_REDIRECT_URI")
+  twitch_redirect_uri: System.get_env("TWITCH_REDIRECT_URI"),
+  twitch_webhook_callback_url: "https://example.com/callback",
+  twitch_eventsub_secret: "s3cre77890ab"
 
 config :premiere_ecoute, PremiereEcoute.Repo,
   username: System.get_env("POSTGRES_USERNAME"),

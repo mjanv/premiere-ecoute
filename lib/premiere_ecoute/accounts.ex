@@ -74,11 +74,7 @@ defmodule PremiereEcoute.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def register_user(attrs) do
-    %User{}
-    |> User.email_changeset(attrs)
-    |> Repo.insert()
-  end
+  defdelegate register_user(attrs), to: User
 
   ## Settings
 
@@ -95,21 +91,6 @@ defmodule PremiereEcoute.Accounts do
   end
 
   def sudo_mode?(_user, _minutes), do: false
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for changing the user email.
-
-  See `PremiereEcoute.Accounts.User.email_changeset/3` for a list of supported options.
-
-  ## Examples
-
-      iex> change_user_email(user)
-      %Ecto.Changeset{data: %User{}}
-
-  """
-  def change_user_email(user, attrs \\ %{}, opts \\ []) do
-    User.email_changeset(user, attrs, opts)
-  end
 
   @doc """
   Updates the user email using the given token.

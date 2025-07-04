@@ -6,6 +6,14 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
   describe "subscribe/2" do
     test "can subscribe to a Twitch event" do
+      scope =
+        user_scope_fixture(
+          user_fixture(%{
+            twitch_user_id: "1234",
+            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+          })
+        )
+
       ApiMock.stub(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
@@ -14,8 +22,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
         status: 202
       )
 
-      {:ok, subscription} =
-        TwitchApi.subscribe("1234", "", "AQoQexAWVYKSTIu4ec_2VAxyuhAB", "user.update")
+      {:ok, subscription} = TwitchApi.subscribe(scope, "channel.follow")
 
       assert subscription == %{
                "condition" => %{"user_id" => "1234"},

@@ -3,21 +3,22 @@ defmodule PremiereEcoute.Apis.TwitchApi.Polls do
 
   require Logger
 
-  # @impl true
-  def create_poll(broadcaster_id, token, %{title: title, choices: choices}) do
-    "https://api.twitch.tv/helix/polls"
+  alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Apis.TwitchApi
+
+  def create_poll(%Scope{user: %{twitch_user_id: broadcaster_id, twitch_access_token: token}}, %{
+        title: title,
+        choices: choices,
+        duration: duration
+      }) do
+    TwitchApi.api(:helix, token)
     |> Req.post(
-      plug: {Req.Test, PremiereEcoute.Apis.TwitchApi},
-      headers: [
-        {"Authorization", "Bearer #{token}"},
-        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
-        {"Content-Type", "application/json"}
-      ],
+      url: "/polls",
       json: %{
         broadcaster_id: broadcaster_id,
         title: title,
         choices: Enum.map(choices, fn choice -> %{title: choice} end),
-        duration: 1800
+        duration: duration
       }
     )
     |> case do
@@ -34,16 +35,13 @@ defmodule PremiereEcoute.Apis.TwitchApi.Polls do
     end
   end
 
-  # @impl true
-  def end_poll(broadcaster_id, token, poll_id) do
-    "https://api.twitch.tv/helix/polls"
+  def end_poll(
+        %Scope{user: %{twitch_user_id: broadcaster_id, twitch_access_token: token}},
+        poll_id
+      ) do
+    TwitchApi.api(:helix, token)
     |> Req.patch(
-      plug: {Req.Test, PremiereEcoute.Apis.TwitchApi},
-      headers: [
-        {"Authorization", "Bearer #{token}"},
-        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
-        {"Content-Type", "application/json"}
-      ],
+      url: "/polls",
       json: %{
         broadcaster_id: broadcaster_id,
         id: poll_id,
@@ -64,15 +62,13 @@ defmodule PremiereEcoute.Apis.TwitchApi.Polls do
     end
   end
 
-  def get_poll(broadcaster_id, token, poll_id) do
-    "https://api.twitch.tv/helix/polls"
+  def get_poll(
+        %Scope{user: %{twitch_user_id: broadcaster_id, twitch_access_token: token}},
+        poll_id
+      ) do
+    TwitchApi.api(:helix, token)
     |> Req.get(
-      plug: {Req.Test, PremiereEcoute.Apis.TwitchApi},
-      headers: [
-        {"Authorization", "Bearer #{token}"},
-        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
-        {"Content-Type", "application/json"}
-      ],
+      url: "/polls",
       params: %{
         broadcaster_id: broadcaster_id,
         id: poll_id

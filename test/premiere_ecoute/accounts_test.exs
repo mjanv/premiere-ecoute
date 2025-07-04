@@ -100,13 +100,6 @@ defmodule PremiereEcoute.AccountsTest do
     end
   end
 
-  describe "change_user_email/3" do
-    test "returns a user changeset" do
-      assert %Ecto.Changeset{} = changeset = Accounts.change_user_email(%User{})
-      assert changeset.required == [:email]
-    end
-  end
-
   describe "deliver_user_update_email_instructions/3" do
     setup do
       %{user: user_fixture()}

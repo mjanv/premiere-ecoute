@@ -18,6 +18,8 @@ defmodule PremiereEcoute.Accounts.Scope do
 
   alias PremiereEcoute.Accounts.User
 
+  @type t() :: %__MODULE__{user: User.t()}
+
   defstruct user: nil
 
   @doc """
