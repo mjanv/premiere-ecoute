@@ -86,7 +86,8 @@
             <h2 class="text-xl font-bold text-white">Twitch</h2>
           </div>
 
-          <%= if @twitch_user do %>
+          <%= if @current_user && @current_user.twitch_access_token do %>
+            <!-- AIDEV-NOTE: Twitch connected state -->
             <div class="bg-purple-600/20 rounded-lg p-4 border border-purple-600/30">
               <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
@@ -96,16 +97,40 @@
                 </div>
                 <div>
                   <p class="font-medium text-white">
-                    {String.replace(@twitch_user.email, "@twitch.tv", "")}
+                    <%= if @current_user.twitch_username do %>
+                      {@current_user.twitch_username}
+                    <% else %>
+                      {String.replace(@current_user.email, "@twitch.tv", "")}
+                    <% end %>
                   </p>
                   <p class="text-sm text-purple-300">
-                    @{String.replace(@twitch_user.email, "@twitch.tv", "")}
+                    @<%= if @current_user.twitch_username do %>
+                      {@current_user.twitch_username}
+                    <% else %>
+                      {String.replace(@current_user.email, "@twitch.tv", "")}
+                    <% end %>
                   </p>
                 </div>
               </div>
-              <div class="mt-3 flex items-center space-x-2">
-                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span class="text-sm text-green-400">Connected</span>
+              <div class="mt-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span class="text-sm text-green-400">Connected</span>
+                  <%= if @current_user.twitch_expires_at do %>
+                    <span class="text-xs text-purple-300">
+                      • Expires: {Calendar.strftime(
+                        @current_user.twitch_expires_at,
+                        "%m/%d %H:%M"
+                      )}
+                    </span>
+                  <% end %>
+                </div>
+                <button
+                  phx-click="disconnect_twitch"
+                  class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
+                >
+                  Disconnect
+                </button>
               </div>
             </div>
           <% else %>

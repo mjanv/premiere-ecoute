@@ -55,6 +55,29 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
   end
 
   @impl true
+  def handle_event("disconnect_twitch", _params, socket) do
+    # AIDEV-NOTE: Disconnect Twitch by clearing tokens (but keep user logged in)
+    case socket.assigns.current_user do
+      nil ->
+        socket
+        |> put_flash(:error, "User not found")
+
+      user ->
+        case Accounts.User.disconnect_twitch(user) do
+          {:ok, user} ->
+            socket
+            |> assign(:current_user, user)
+            |> put_flash(:info, "Twitch tokens revoked successfully")
+
+          {:error, _changeset} ->
+            socket
+            |> put_flash(:error, "Failed to disconnect Twitch")
+        end
+    end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
   def handle_event("delete_account", _params, socket) do
     # AIDEV-NOTE: Empty handler as requested - no backend action
     {:noreply, socket}

@@ -12,6 +12,13 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersAuthTables do
       add :spotify_refresh_token, :string
       add :spotify_expires_at, :utc_datetime
 
+      # AIDEV-NOTE: Twitch integration fields
+      add :twitch_user_id, :string
+      add :twitch_access_token, :string
+      add :twitch_refresh_token, :string
+      add :twitch_expires_at, :utc_datetime
+      add :twitch_username, :string
+
       timestamps(type: :utc_datetime)
     end
 

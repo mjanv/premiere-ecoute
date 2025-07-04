@@ -65,7 +65,15 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
           })
       )
       |> case do
-        {:ok, %{status: 200, body: %{"access_token" => token, "refresh_token" => refresh_token}}} ->
+        {:ok,
+         %{
+           status: 200,
+           body: %{
+             "access_token" => token,
+             "refresh_token" => refresh_token,
+             "expires_in" => expires_in
+           }
+         }} ->
           case get_user_info(token) do
             {:ok, user_info} ->
               {:ok,
@@ -73,6 +81,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
                  user_id: user_info["id"],
                  access_token: token,
                  refresh_token: refresh_token,
+                 expires_in: expires_in,
                  username: user_info["login"],
                  display_name: user_info["display_name"]
                }}
@@ -113,6 +122,52 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
       {:error, reason} ->
         Logger.error("Twitch user info request failed: #{inspect(reason)}")
         {:error, "Network error getting user info"}
+    end
+  end
+
+  def renew_token(refresh_token) do
+    client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
+    client_secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
+
+    if client_id && client_secret && refresh_token do
+      "https://id.twitch.tv/oauth2/token"
+      |> Req.post(
+        headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
+        body:
+          URI.encode_query(%{
+            client_id: client_id,
+            client_secret: client_secret,
+            grant_type: "refresh_token",
+            refresh_token: refresh_token
+          })
+      )
+      |> case do
+        {:ok,
+         %{
+           status: 200,
+           body:
+             %{
+               "access_token" => access_token,
+               "refresh_token" => new_refresh_token
+             } = body
+         }} ->
+          {:ok,
+           %{
+             access_token: access_token,
+             refresh_token: new_refresh_token,
+             expires_in: body["expires_in"]
+           }}
+
+        {:ok, %{status: status, body: body}} ->
+          Logger.error("Twitch token refresh failed: #{status} - #{inspect(body)}")
+          {:error, "Twitch token refresh failed: #{status} - #{inspect(body)}"}
+
+        {:error, reason} ->
+          Logger.error("Twitch token refresh request failed: #{inspect(reason)}")
+          {:error, "Network error during token refresh"}
+      end
+    else
+      {:error, "Missing Twitch credentials or refresh token"}
     end
   end
 

@@ -17,6 +17,11 @@ defmodule PremiereEcoute.Accounts.User do
           spotify_access_token: String.t() | nil,
           spotify_refresh_token: String.t() | nil,
           spotify_expires_at: DateTime.t() | nil,
+          twitch_user_id: String.t() | nil,
+          twitch_access_token: String.t() | nil,
+          twitch_refresh_token: String.t() | nil,
+          twitch_expires_at: DateTime.t() | nil,
+          twitch_username: String.t() | nil,
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }
@@ -31,6 +36,12 @@ defmodule PremiereEcoute.Accounts.User do
     field :spotify_access_token, :string, redact: true
     field :spotify_refresh_token, :string, redact: true
     field :spotify_expires_at, :utc_datetime
+
+    field :twitch_user_id, :string
+    field :twitch_access_token, :string, redact: true
+    field :twitch_refresh_token, :string, redact: true
+    field :twitch_expires_at, :utc_datetime
+    field :twitch_username, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -203,6 +214,116 @@ defmodule PremiereEcoute.Accounts.User do
       spotify_refresh_token: nil,
       spotify_expires_at: nil
     })
+    |> Repo.update()
+  end
+
+  @doc """
+  A user changeset for updating Twitch tokens and user data.
+  """
+  def twitch_changeset(user, attrs) do
+    user
+    |> cast(attrs, [
+      :twitch_user_id,
+      :twitch_access_token,
+      :twitch_refresh_token,
+      :twitch_expires_at,
+      :twitch_username
+    ])
+    |> validate_twitch_tokens()
+  end
+
+  @doc """
+  A user changeset for updating only Twitch tokens (during refresh).
+  """
+  def twitch_token_refresh_changeset(user, attrs) do
+    user
+    |> cast(attrs, [
+      :twitch_access_token,
+      :twitch_refresh_token,
+      :twitch_expires_at
+    ])
+    |> validate_required([:twitch_access_token])
+  end
+
+  defp validate_twitch_tokens(changeset) do
+    case get_change(changeset, :twitch_access_token) do
+      nil -> changeset
+      _ -> validate_required(changeset, [:twitch_user_id, :twitch_access_token, :twitch_username])
+    end
+  end
+
+  @doc """
+  Updates user with Twitch auth data from login (includes user_id and username).
+  """
+  def update_twitch_auth(user, %{
+        user_id: user_id,
+        access_token: access_token,
+        refresh_token: refresh_token,
+        expires_in: expires_in,
+        username: username
+      }) do
+    user
+    |> twitch_changeset(%{
+      twitch_user_id: user_id,
+      twitch_access_token: access_token,
+      twitch_refresh_token: refresh_token,
+      twitch_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second),
+      twitch_username: username
+    })
+    |> Repo.update()
+  end
+
+  @doc """
+  Updates user with refreshed Twitch tokens (no user_id/username).
+  """
+  def update_twitch_tokens(user, %{
+        access_token: access_token,
+        refresh_token: refresh_token,
+        expires_in: expires_in
+      }) do
+    user
+    |> twitch_token_refresh_changeset(%{
+      twitch_access_token: access_token,
+      twitch_refresh_token: refresh_token,
+      twitch_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)
+    })
+    |> Repo.update()
+  end
+
+  # Handle case where expires_in is not provided
+  def update_twitch_tokens(user, %{
+        access_token: access_token,
+        refresh_token: refresh_token
+      }) do
+    user
+    |> twitch_token_refresh_changeset(%{
+      twitch_access_token: access_token,
+      twitch_refresh_token: refresh_token
+    })
+    |> Repo.update()
+  end
+
+  @doc """
+  Disconnects Twitch by clearing all Twitch tokens and data.
+  """
+  def disconnect_twitch(user) do
+    user
+    |> cast(
+      %{
+        twitch_user_id: nil,
+        twitch_access_token: nil,
+        twitch_refresh_token: nil,
+        twitch_expires_at: nil,
+        twitch_username: nil
+      },
+      [
+        :twitch_user_id,
+        :twitch_access_token,
+        :twitch_refresh_token,
+        :twitch_expires_at,
+        :twitch_username
+      ]
+    )
     |> Repo.update()
   end
 end

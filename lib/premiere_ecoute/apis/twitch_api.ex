@@ -20,6 +20,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
   defdelegate authorization_url, to: __MODULE__.Accounts
   defdelegate authorization_code(code), to: __MODULE__.Accounts
+  defdelegate renew_token(refresh_token), to: __MODULE__.Accounts
 
   defdelegate subscribe(broadcaster_id, token, type, session_id), to: __MODULE__.EventSub
 

@@ -110,13 +110,6 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
         conn
         |> put_flash(:error, "Spotify authentication failed: #{reason}")
         |> redirect(to: ~p"/")
-
-      error ->
-        Logger.error("Spotify OAuth unexpected result: #{inspect(error)}")
-
-        conn
-        |> put_flash(:error, "Spotify authentication failed")
-        |> redirect(to: ~p"/")
     end
   end
 
@@ -131,7 +124,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   def callback(conn, %{"provider" => "twitch", "code" => code}) do
     case TwitchApi.authorization_code(code) do
       {:ok, auth_data} ->
-        case find_or_create_user(IO.inspect(auth_data, label: "auth_data")) do
+        case find_or_create_user(auth_data) do
           {:ok, user} ->
             conn
             |> put_session(:user_return_to, ~p"/")
@@ -168,14 +161,22 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
     case Accounts.get_user_by_email(email) do
       nil ->
-        # Create new user
-        Accounts.register_user(%{
-          email: email,
-          password: Base.encode64(:crypto.strong_rand_bytes(32))
-        })
+        # Create new user with Twitch auth data
+        case Accounts.register_user(%{
+               email: email,
+               password: Base.encode64(:crypto.strong_rand_bytes(32))
+             }) do
+          {:ok, user} ->
+            # Store Twitch auth data for new user
+            Accounts.User.update_twitch_auth(user, auth_data)
+
+          error ->
+            error
+        end
 
       user ->
-        {:ok, user}
+        # Update existing user with latest Twitch auth data
+        Accounts.User.update_twitch_auth(user, auth_data)
     end
   end
 end

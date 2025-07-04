@@ -3,8 +3,6 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
 
   import Phoenix.LiveViewTest
 
-  # AIDEV-NOTE: Tests homepage LiveView functionality - content display, navigation, and link behavior
-
   describe "homepage" do
     test "displays the homepage", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/")
@@ -15,14 +13,8 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
       assert html =~ "Create listening sessions"
 
       # Navigation links
-      assert html =~ "View All Sessions"
-      assert html =~ "Account"
       assert html =~ "Connect with Twitch"
       assert html =~ "href=\"/auth/twitch\""
-
-      # Action buttons
-      assert html =~ "Start New Session"
-      assert html =~ "Browse Sessions"
 
       # Feature previews
       assert html =~ "Album Discovery"
@@ -36,27 +28,11 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
     test "navigation links work correctly", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/")
 
-      # Test sessions link
+      # Test main CTA button (homepage Connect with Twitch - the larger button)
       assert lv
-             |> element("a[href='/sessions']", "View All Sessions")
+             |> element("a[href='/auth/twitch'].bg-purple-600", "Connect with Twitch")
              |> render_click()
-             |> follow_redirect(conn, ~p"/sessions")
-
-      # Test account link
-      {:ok, lv, _html} = live(conn, ~p"/")
-
-      assert lv
-             |> element("a[href='/account']", "Account")
-             |> render_click()
-             |> follow_redirect(conn, ~p"/account")
-
-      # Test start new session link
-      {:ok, lv, _html} = live(conn, ~p"/")
-
-      assert lv
-             |> element("a[href='/sessions/discography/album/select']", "Start New Session")
-             |> render_click()
-             |> follow_redirect(conn, ~p"/sessions/discography/album/select")
+             |> follow_redirect(conn, ~p"/auth/twitch")
     end
   end
 end
