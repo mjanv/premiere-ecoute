@@ -24,7 +24,7 @@ defmodule PremiereEcoute.ApiMock do
     end)
   end
 
-  def payload(path) do
-    JSON.decode!(File.read!(Path.join("test/support/apis", path)))
-  end
+  def payload(nil), do: ""
+  def payload(map) when is_map(map), do: map
+  def payload(path), do: JSON.decode!(File.read!(Path.join("test/support/apis", path)))
 end

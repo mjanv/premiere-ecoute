@@ -2,10 +2,10 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   use PremiereEcouteWeb.ConnCase
 
   alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Apis.Events.MessageSent
-  alias PremiereEcoute.Apis.Events.PollEnded
-  alias PremiereEcoute.Apis.Events.PollStarted
-  alias PremiereEcoute.Apis.Events.PollUpdated
+  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
+  alias PremiereEcoute.Sessions.Scores.Events.PollEnded
+  alias PremiereEcoute.Sessions.Scores.Events.PollStarted
+  alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
   alias PremiereEcouteWeb.Webhooks.TwitchController
 
   describe "POST /webhooks/twitch" do
@@ -89,7 +89,11 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       event = TwitchController.handle(payload)
 
-      assert event == %MessageSent{user_id: "4145994", message: "Hi chat"}
+      assert event == %MessageSent{
+               broadcaster_id: "1971641",
+               user_id: "4145994",
+               message: "Hi chat"
+             }
     end
 
     test "channel.poll.begin" do
@@ -97,7 +101,11 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       event = TwitchController.handle(payload)
 
-      assert event == %PollStarted{id: "1243456"}
+      assert event == %PollStarted{
+               id: "1243456",
+               title: "Aren’t shoes just really hard socks?",
+               votes: %{"Yeah!" => 0, "No!" => 0, "Maybe!" => 0}
+             }
     end
 
     test "channel.poll.progress" do
@@ -105,7 +113,10 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       event = TwitchController.handle(payload)
 
-      assert event == %PollUpdated{id: "1243456"}
+      assert event == %PollUpdated{
+               id: "1243456",
+               votes: %{"Yeah!" => 12, "No!" => 14, "Maybe!" => 7}
+             }
     end
 
     test "channel.poll.end" do
@@ -113,7 +124,10 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       event = TwitchController.handle(payload)
 
-      assert event == %PollEnded{id: "1243456"}
+      assert event == %PollEnded{
+               id: "1243456",
+               votes: %{"Blue" => 120, "Yellow" => 140, "Green" => 80}
+             }
     end
   end
 end

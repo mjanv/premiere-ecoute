@@ -4,16 +4,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   require Logger
 
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Apis.TwitchApi
 
-  def subscribe(%Scope{user: %{twitch_user_id: user_id, twitch_access_token: token}}, type) do
-    "https://api.twitch.tv/helix/eventsub/subscriptions"
+  def subscribe(%Scope{user: %{twitch_user_id: user_id}}, type) do
+    TwitchApi.api(:helix)
     |> Req.post(
-      plug: {Req.Test, PremiereEcoute.Apis.TwitchApi},
-      headers: [
-        {"Authorization", "Bearer #{token}"},
-        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
-        {"Content-Type", "application/json"}
-      ],
+      url: "/eventsub/subscriptions",
       json: %{
         type: type,
         version: "2",
@@ -26,7 +22,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
       }
     )
     |> case do
-      {:ok, %{status: 202, body: %{"data" => [poll | _]}}} ->
+      {:ok, %{status: 202, body: %{"data" => [%{"id" => id} = poll | _]}}} ->
+        Cachex.put(:polls, {user_id, type}, id)
         {:ok, poll}
 
       {:ok, %{status: status, body: body}} ->
@@ -36,6 +33,32 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
       {:error, reason} ->
         Logger.error("Twitch poll request failed: #{inspect(reason)}")
         {:error, "Network error creating poll"}
+    end
+  end
+
+  def unsubscribe(%Scope{user: %{twitch_user_id: user_id}}, type) do
+    case Cachex.get(:polls, {user_id, type}) do
+      {:ok, id} when is_binary(id) ->
+        TwitchApi.api(:helix)
+        |> Req.delete(
+          url: "/eventsub/subscriptions",
+          params: %{"id" => id}
+        )
+        |> case do
+          {:ok, %{status: 204}} ->
+            {:ok, id}
+
+          {:ok, %{status: status}} ->
+            Logger.error("Twitch poll creation failed: #{status}")
+            {:error, "Failed to delete poll"}
+
+          {:error, reason} ->
+            Logger.error("Twitch poll request failed: #{inspect(reason)}")
+            {:error, "Network error deleting poll"}
+        end
+
+      _ ->
+        {:error, "Unknown subscription"}
     end
   end
 end

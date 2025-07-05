@@ -41,20 +41,19 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
     |> cast(attrs, [:poll_id, :title, :total_votes, :votes, :ended_at, :session_id, :track_id])
     |> validate_required([:poll_id, :total_votes, :votes, :session_id, :track_id])
     |> validate_number(:total_votes, greater_than_or_equal_to: 0)
-    |> validate_votes_map()
+    |> validate_votes()
     |> unique_constraint([:poll_id])
     |> unique_constraint([:session_id, :track_id], name: :polls_session_track_index)
     |> foreign_key_constraint(:session_id)
     |> foreign_key_constraint(:track_id)
   end
 
-  defp validate_votes_map(changeset) do
+  defp validate_votes(changeset) do
     case get_field(changeset, :votes) do
       votes when is_map(votes) ->
         calculated_total = votes |> Map.values() |> Enum.sum()
-        expected_total = get_field(changeset, :total_votes)
 
-        if calculated_total == expected_total do
+        if calculated_total == get_field(changeset, :total_votes) do
           changeset
         else
           add_error(changeset, :votes, "vote counts must sum to total_votes")
@@ -70,6 +69,19 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
     %__MODULE__{}
     |> changeset(Map.from_struct(poll))
     |> Repo.insert()
+  end
+
+  @spec upsert(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def upsert(%__MODULE__{poll_id: poll_id} = poll) when not is_nil(poll_id) do
+    case Repo.get_by(__MODULE__, poll_id: poll_id) do
+      nil ->
+        create(poll)
+
+      p ->
+        p
+        |> changeset(%{total_votes: poll.total_votes, votes: poll.votes})
+        |> Repo.update()
+    end
   end
 
   @spec get_by(Keyword.t()) :: [t()]

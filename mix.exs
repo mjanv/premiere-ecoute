@@ -53,6 +53,7 @@ defmodule PremiereEcoute.MixProject do
       {:req, "~> 0.5"},
       {:websockex, "~> 0.4.3"},
       {:jason, "~> 1.2"},
+      {:cachex, "~> 3.3"},
       {:bcrypt_elixir, "~> 3.0"},
       {:postgrex, "~> 0.20.0"},
       {:ecto_sql, "~> 3.10"},

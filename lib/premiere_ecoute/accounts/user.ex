@@ -189,6 +189,8 @@ defmodule PremiereEcoute.Accounts.User do
     false
   end
 
+  def get_by(opts), do: Repo.get_by(__MODULE__, opts)
+
   def register_user(attrs) do
     %__MODULE__{}
     |> changeset(attrs)

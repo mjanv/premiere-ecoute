@@ -16,22 +16,23 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   @behaviour __MODULE__.Behavior
 
   @app :premiere_ecoute
-  # @web "https://api.twitch.tv/helix"
   # @accounts "https://id.twitch.tv/oauth2"
 
   def impl, do: Application.get_env(@app, :twitch_api, __MODULE__)
 
-  def api(:helix, token \\ "") do
+  def api(:helix, token \\ nil) do
+    token = token || Application.get_env(@app, :twitch_client_id)
+
     Req.new(
       [
         base_url: "https://api.twitch.tv/helix",
         headers: [
           {"Authorization", "Bearer #{token}"},
-          {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
+          {"Client-Id", Application.get_env(@app, :twitch_client_id)},
           {"Content-Type", "application/json"}
         ]
       ]
-      |> Keyword.merge(Application.get_env(:premiere_ecoute, :twitch_req_options, []))
+      |> Keyword.merge(Application.get_env(@app, :twitch_req_options, []))
     )
   end
 
@@ -40,6 +41,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defdelegate renew_token(refresh_token), to: __MODULE__.Accounts
 
   defdelegate subscribe(scope, type), to: __MODULE__.EventSub
+  defdelegate unsubscribe(scope, type), to: __MODULE__.EventSub
 
   defdelegate create_poll(scope, poll), to: __MODULE__.Polls
   defdelegate end_poll(scope, poll_id), to: __MODULE__.Polls

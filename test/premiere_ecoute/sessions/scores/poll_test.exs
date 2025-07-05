@@ -54,6 +54,66 @@ defmodule PremiereEcoute.Sessions.Scores.PollTest do
     end
   end
 
+  describe "upsert/1" do
+    test "upsert a poll", %{album: album, session: session} do
+      attrs = %Poll{
+        poll_id: "poll_id",
+        title: "Poll question ?",
+        total_votes: 8,
+        votes: %{"1" => 3, "2" => 5},
+        session_id: session.id,
+        track_id: hd(album.tracks).id
+      }
+
+      {:ok, %Poll{} = poll} = Poll.create(attrs)
+
+      attrs = %Poll{
+        poll_id: "poll_id",
+        total_votes: 9,
+        votes: %{"1" => 3, "2" => 6}
+      }
+
+      {:ok, %Poll{} = new_poll} = Poll.upsert(attrs)
+
+      assert %Poll{
+               poll_id: "poll_id",
+               session_id: session_id,
+               title: "Poll question ?",
+               votes: %{"1" => 3, "2" => 6},
+               track_id: track_id
+             } = new_poll
+
+      assert session_id == session.id
+      assert track_id == poll.track_id
+    end
+
+    test "does not upsert a poll with wrong votes", %{album: album, session: session} do
+      attrs = %Poll{
+        poll_id: "poll_id",
+        title: "Poll question ?",
+        total_votes: 8,
+        votes: %{"1" => 3, "2" => 5},
+        session_id: session.id,
+        track_id: hd(album.tracks).id
+      }
+
+      {:ok, %Poll{}} = Poll.create(attrs)
+
+      attrs = %Poll{
+        poll_id: "poll_id",
+        title: "Poll question ?",
+        total_votes: 0,
+        votes: %{"1" => 3, "2" => 6},
+        session_id: session.id,
+        track_id: hd(album.tracks).id
+      }
+
+      {:error, changeset} = Poll.upsert(attrs)
+
+      assert Repo.traverse_errors(changeset) == %{votes: ["vote counts must sum to total_votes"]}
+    end
+  end
+
   describe "get_by/1" do
     test "get a poll by session_id", %{album: album, session: session} do
       attrs = %Poll{

@@ -3,8 +3,6 @@ defmodule PremiereEcoute.Core.CommandBusTest do
 
   import ExUnit.CaptureLog
 
-  @moduletag :skip
-
   alias PremiereEcoute.Core.CommandBus
 
   defmodule CommandA do
@@ -57,7 +55,7 @@ defmodule PremiereEcoute.Core.CommandBusTest do
   end
 
   defmodule EventDispatcher do
-    use PremiereEcoute.Core.CommandBus.Handler,
+    use PremiereEcoute.Core.EventBus.Handler,
       events: [PremiereEcoute.Core.CommandBusTest.EventA]
 
     require Logger
@@ -105,13 +103,14 @@ defmodule PremiereEcoute.Core.CommandBusTest do
       assert event == %PremiereEcoute.Core.CommandBusTest.EventB{b: 2}
 
       assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandB{b: 1}"
-      refute logs =~ "EventB"
+      assert logs =~ "[error] No registered handler for PremiereEcoute.Core.CommandBusTest.EventB"
     end
 
     test "4" do
       {{:error, :not_registered}, logs} = with_log(fn -> CommandBus.apply(%CommandC{c: 1}) end)
 
-      refute logs =~ "CommandC"
+      assert logs =~
+               "[error] No registered handler for PremiereEcoute.Core.CommandBusTest.CommandC"
     end
   end
 end

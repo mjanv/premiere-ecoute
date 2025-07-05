@@ -39,4 +39,51 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
              }
     end
   end
+
+  describe "unsubscribe/2" do
+    test "can unsubscribe from a Twitch event" do
+      scope =
+        user_scope_fixture(
+          user_fixture(%{
+            twitch_user_id: "1234",
+            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+          })
+        )
+
+      ApiMock.stub(
+        TwitchApi,
+        path: {:post, "/helix/eventsub/subscriptions"},
+        request: "twitch_api/eventsub/create_event_subscription/request.json",
+        response: "twitch_api/eventsub/create_event_subscription/response.json",
+        status: 202
+      )
+
+      {:ok, _} = TwitchApi.subscribe(scope, "channel.follow")
+
+      ApiMock.stub(
+        TwitchApi,
+        path: {:delete, "/helix/eventsub/subscriptions"},
+        params: %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a"},
+        status: 204
+      )
+
+      {:ok, id} = TwitchApi.unsubscribe(scope, "channel.follow")
+
+      assert id == "26b1c993-bfcf-44d9-b876-379dacafe75a"
+    end
+
+    test "cannot unsubscribe from an unknown Twitch event" do
+      scope =
+        user_scope_fixture(
+          user_fixture(%{
+            twitch_user_id: "5678",
+            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+          })
+        )
+
+      {:error, reason} = TwitchApi.unsubscribe(scope, "channel.follow")
+
+      assert reason == "Unknown subscription"
+    end
+  end
 end

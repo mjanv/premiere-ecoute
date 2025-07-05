@@ -12,7 +12,9 @@ defmodule PremiereEcoute.Supervisor do
     children = [
       PremiereEcoute.PromEx,
       PremiereEcoute.Repo,
-      PremiereEcoute.Apis.Supervisor
+      PremiereEcoute.Apis.Supervisor,
+      Supervisor.child_spec({Cachex, name: :cache}, id: :cache1),
+      Supervisor.child_spec({Cachex, name: :polls}, id: :cache2)
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

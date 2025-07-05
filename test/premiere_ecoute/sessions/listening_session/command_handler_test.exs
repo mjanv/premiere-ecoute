@@ -1,9 +1,10 @@
-defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
+defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.CommandHandler
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
@@ -11,7 +12,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
-  alias PremiereEcoute.Sessions.ListeningSession.Handler
   alias PremiereEcoute.Sessions.Scores.Report
 
   describe "handle/1 - PrepareListeningSession" do
@@ -27,7 +27,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, session, [%SessionPrepared{}]} = Handler.handle(command)
+      {:ok, session, [%SessionPrepared{}]} = CommandHandler.handle(command)
 
       assert session.user_id == user.id
       assert session.status == :preparing
@@ -49,7 +49,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album_id
       }
 
-      {:error, [%SessionNotPrepared{} = event]} = Handler.handle(command)
+      {:error, [%SessionNotPrepared{} = event]} = CommandHandler.handle(command)
 
       assert event.user_id == user_id
     end
@@ -77,7 +77,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album_id
       }
 
-      {:error, [%SessionNotPrepared{} = event]} = Handler.handle(command)
+      {:error, [%SessionNotPrepared{} = event]} = CommandHandler.handle(command)
 
       assert event.user_id == user_id
     end
@@ -94,8 +94,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, _, [event1]} = Handler.handle(command)
-      {:ok, _, [event2]} = Handler.handle(command)
+      {:ok, _, [event1]} = CommandHandler.handle(command)
+      {:ok, _, [event2]} = CommandHandler.handle(command)
 
       assert event1.session_id != event2.session_id
     end
@@ -125,11 +125,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, _, [%SessionPrepared{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionPrepared{} = event]} = CommandHandler.handle(command)
 
       command = %StartListeningSession{session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionStarted{} = event]} = CommandHandler.handle(command)
 
       session = ListeningSession.get(event.session_id)
 
@@ -162,15 +162,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.HandlerTest do
         album_id: album.id
       }
 
-      {:ok, _, [%SessionPrepared{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionPrepared{} = event]} = CommandHandler.handle(command)
 
       command = %StartListeningSession{session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = Handler.handle(command)
+      {:ok, _, [%SessionStarted{} = event]} = CommandHandler.handle(command)
 
       command = %StopListeningSession{session_id: event.session_id}
 
-      {:ok, session, [%SessionStopped{}]} = Handler.handle(command)
+      {:ok, session, [%SessionStopped{}]} = CommandHandler.handle(command)
 
       report = Report.get_by(session_id: session.id)
 

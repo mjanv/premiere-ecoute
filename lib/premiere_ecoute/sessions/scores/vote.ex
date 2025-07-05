@@ -69,4 +69,11 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     )
     |> Repo.all()
   end
+
+  def from_message(message) do
+    case Integer.parse(message) do
+      {integer, _} when integer >= 0 and integer <= 10 -> {:ok, integer}
+      _ -> {:error, message}
+    end
+  end
 end

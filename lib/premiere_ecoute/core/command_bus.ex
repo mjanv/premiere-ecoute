@@ -3,8 +3,8 @@ defmodule PremiereEcoute.Core.CommandBus do
 
   require Logger
 
-  alias PremiereEcoute.Core.CommandBus.Registry
-  alias PremiereEcoute.Sessions.ListeningSession.Handler
+  alias PremiereEcoute.Core.EventBus
+  alias PremiereEcoute.Core.Registry
 
   def apply(command) do
     command
@@ -13,15 +13,15 @@ defmodule PremiereEcoute.Core.CommandBus do
     |> handle()
     |> tap(fn
       {:ok, entity, events} when is_list(events) ->
-        Enum.each(events, &dispatch/1)
+        EventBus.dispatch(events)
         {:ok, entity, events}
 
       {:ok, events} when is_list(events) ->
-        Enum.each(events, &dispatch/1)
+        EventBus.dispatch(events)
         {:ok, events}
 
       {:error, events} when is_list(events) ->
-        Enum.each(events, &dispatch/1)
+        EventBus.dispatch(events)
         {:error, events}
 
       {:error, reason} ->
@@ -33,8 +33,8 @@ defmodule PremiereEcoute.Core.CommandBus do
   def validate(command) do
     case Registry.get(command.__struct__) do
       nil ->
+        Logger.error("No registered handler for #{inspect(command.__struct__)}")
         {:error, :not_registered}
-        Handler.validate(command)
 
       handler ->
         handler.validate(command)
@@ -44,8 +44,8 @@ defmodule PremiereEcoute.Core.CommandBus do
   def handle({:ok, command}) do
     case Registry.get(command.__struct__) do
       nil ->
+        Logger.error("No registered handler for #{inspect(command.__struct__)}")
         {:error, :not_registered}
-        Handler.handle(command)
 
       handler ->
         handler.handle(command)
@@ -53,15 +53,4 @@ defmodule PremiereEcoute.Core.CommandBus do
   end
 
   def handle({:error, reason}), do: {:error, reason}
-
-  def dispatch(event) do
-    case Registry.get(event.__struct__) do
-      nil ->
-        {:error, :not_registered}
-        Handler.dispatch(event)
-
-      handler ->
-        handler.dispatch(event)
-    end
-  end
 end

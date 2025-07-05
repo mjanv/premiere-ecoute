@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
+defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   @moduledoc false
 
   alias PremiereEcoute.Apis.SpotifyApi
@@ -20,11 +20,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
       PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession,
       PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession,
       PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
-    ],
-    events: [
-      PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared,
-      PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted,
-      PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
     ]
 
   def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id}) do
@@ -65,10 +60,4 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Handler do
       _ -> {:error, []}
     end
   end
-
-  def dispatch(%{session_id: session_id} = event) do
-    PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", event)
-  end
-
-  def dispatch(_), do: :ok
 end
