@@ -4,17 +4,21 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
 
-  describe "get_event_subscriptions/2" do
-    test "read the list of existing subscriptions" do
-      scope =
-        user_scope_fixture(
-          user_fixture(%{
-            twitch_user_id: "1234",
-            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
-          })
-        )
+  setup do
+    scope =
+      user_scope_fixture(
+        user_fixture(%{
+          twitch_user_id: "1234",
+          twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+        })
+      )
 
-      ApiMock.stub(
+    {:ok, %{scope: scope}}
+  end
+
+  describe "get_event_subscriptions/2" do
+    test "read the list of existing subscriptions", %{scope: scope} do
+      ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/eventsub/subscriptions"},
         response: "twitch_api/eventsub/get_event_subscriptions/response.json",
@@ -32,16 +36,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
   end
 
   describe "subscribe/2" do
-    test "can subscribe to a Twitch event" do
-      scope =
-        user_scope_fixture(
-          user_fixture(%{
-            twitch_user_id: "1234",
-            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
-          })
-        )
-
-      ApiMock.stub(
+    test "can subscribe to a Twitch event", %{scope: scope} do
+      ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
         request: "twitch_api/eventsub/create_event_subscription/request.json",
@@ -75,7 +71,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
           })
         )
 
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
         request: "twitch_api/eventsub/create_event_subscription/request.json",
@@ -85,7 +81,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
       {:ok, _} = TwitchApi.subscribe(scope, "channel.follow")
 
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
         request: "twitch_api/eventsub/create_event_subscription/request.json",
@@ -104,16 +100,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
   end
 
   describe "unsubscribe/2" do
-    test "can unsubscribe from a Twitch event" do
-      scope =
-        user_scope_fixture(
-          user_fixture(%{
-            twitch_user_id: "1234",
-            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
-          })
-        )
-
-      ApiMock.stub(
+    test "can unsubscribe from a Twitch event", %{scope: scope} do
+      ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
         request: "twitch_api/eventsub/create_event_subscription/request.json",
@@ -123,7 +111,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
       {:ok, _} = TwitchApi.subscribe(scope, "channel.follow")
 
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:delete, "/helix/eventsub/subscriptions"},
         params: %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a"},
@@ -151,18 +139,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
   end
 
   describe "cancel_all_subscriptions/1" do
-    test "unsubscribe from all known subscriptions" do
-      scope =
-        user_scope_fixture(
-          user_fixture(%{
-            twitch_user_id: "1234",
-            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
-          })
-        )
-
+    test "unsubscribe from all known subscriptions", %{scope: scope} do
       ApiMock.expect(
         TwitchApi,
-        1,
         path: {:get, "/helix/eventsub/subscriptions"},
         response: "twitch_api/eventsub/get_event_subscriptions/response.json",
         params: %{"user_id" => "1234"},
@@ -171,7 +150,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
       ApiMock.expect(
         TwitchApi,
-        1,
         path: {:delete, "/helix/eventsub/subscriptions"},
         params: %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a"},
         status: 204
@@ -179,7 +157,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
       ApiMock.expect(
         TwitchApi,
-        1,
         path: {:delete, "/helix/eventsub/subscriptions"},
         params: %{"id" => "35016908-41ff-33ce-7879-61b8dfc2ee16"},
         status: 204
@@ -193,18 +170,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
              ]
     end
 
-    test "cannot unsubscribe from all known subscriptions in case API error" do
-      scope =
-        user_scope_fixture(
-          user_fixture(%{
-            twitch_user_id: "1234",
-            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
-          })
-        )
-
+    test "cannot unsubscribe from all known subscriptions in case API error", %{scope: scope} do
       ApiMock.expect(
         TwitchApi,
-        1,
         path: {:get, "/helix/eventsub/subscriptions"},
         response: "twitch_api/eventsub/get_event_subscriptions/response.json",
         params: %{"user_id" => "1234"},
@@ -213,7 +181,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
       ApiMock.expect(
         TwitchApi,
-        1,
         path: {:delete, "/helix/eventsub/subscriptions"},
         params: %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a"},
         status: 204
@@ -221,7 +188,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
       ApiMock.expect(
         TwitchApi,
-        1,
         path: {:delete, "/helix/eventsub/subscriptions"},
         params: %{"id" => "35016908-41ff-33ce-7879-61b8dfc2ee16"},
         response: %{"error" => "The subscription was not found."},

@@ -18,7 +18,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
   describe "send_chat_message/2" do
     test "can send a message to a chat", %{scope: scope} do
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/messages"},
         request: "twitch_api/chat/send_chat_message/request.json",
@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
   describe "send_announcement/3" do
     test "can send an annoucement to a chat", %{scope: scope} do
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/announcements"},
         request: "twitch_api/chat/send_chat_announcement/request.json",

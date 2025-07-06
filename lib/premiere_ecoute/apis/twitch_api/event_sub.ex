@@ -95,10 +95,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
           subscriptions
           |> Enum.map(fn s -> unsubscribe(scope, s["type"]) end)
 
-      case Enum.all?(results, fn {status, _} -> status == :ok end) do
-        true -> {:ok, Enum.map(results, fn {_, id} -> id end)}
-        false -> {:error, "Cannot cancel all subscriptions"}
-      end
+        case Enum.all?(results, fn {status, _} -> status == :ok end) do
+          true -> {:ok, Enum.map(results, fn {_, id} -> id end)}
+          false -> {:error, "Cannot cancel all subscriptions"}
+        end
 
       {:error, reason} ->
         {:error, reason}

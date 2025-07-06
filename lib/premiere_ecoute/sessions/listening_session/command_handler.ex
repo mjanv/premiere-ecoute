@@ -62,6 +62,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- TwitchApi.impl().cancel_all_subscriptions(scope),
+         {:ok, _} <- TwitchApi.impl().send_chat_announcement(scope, "Good bye !", "purple"),
          {:ok, session} <- ListeningSession.stop(session) do
       {:ok, session, [%SessionStopped{session_id: session.id}]}
     else

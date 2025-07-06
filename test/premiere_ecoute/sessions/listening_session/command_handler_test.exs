@@ -176,6 +176,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       PremiereEcoute.Apis.TwitchApi.Mock
       |> expect(:cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
 
+      PremiereEcoute.Apis.TwitchApi.Mock
+      |> expect(:send_chat_announcement, fn %Scope{user: ^user}, _message, _color ->
+        {:ok, %{}}
+      end)
+
       command = %PrepareListeningSession{
         user_id: user.id,
         album_id: album.id

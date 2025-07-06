@@ -28,6 +28,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   defmodule StopListeningSession do
     @moduledoc false
 
+    alias PremiereEcoute.Accounts.Scope
+
     defstruct [:session_id, :scope]
 
     @type t :: %__MODULE__{

@@ -18,7 +18,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
 
   describe "create_poll/2" do
     test "can create a new poll", %{scope: scope} do
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/polls"},
         request: "twitch_api/polls/create_poll/request.json",
@@ -64,7 +64,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
 
   describe "end_poll/2" do
     test "can end a poll", %{scope: scope} do
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:patch, "/helix/polls"},
         request: "twitch_api/polls/end_poll/request.json",
@@ -109,7 +109,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
 
   describe "get_poll/2" do
     test "can read a poll status", %{scope: scope} do
-      ApiMock.stub(
+      ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/polls"},
         params: "twitch_api/polls/get_polls/params.json",
