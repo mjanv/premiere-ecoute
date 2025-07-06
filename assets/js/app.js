@@ -24,10 +24,34 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+// AIDEV-NOTE: LiveView hooks for overlay functionality
+const Hooks = {
+  CopyToClipboard: {
+    mounted() {
+      this.handleEvent("copy_to_clipboard", ({text}) => {
+        navigator.clipboard.writeText(text).then(() => {
+          console.log("Text copied to clipboard:", text)
+        }).catch(err => {
+          console.error("Failed to copy text: ", err)
+        })
+      })
+    }
+  },
+  
+  OpenUrl: {
+    mounted() {
+      this.handleEvent("open_url", ({url}) => {
+        window.open(url, '_blank')
+      })
+    }
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken}
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits

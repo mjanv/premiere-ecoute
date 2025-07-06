@@ -42,16 +42,20 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
                unique_votes: 2,
                polls: [],
                session_id: _,
-               session_summary: %{"streamer_score" => +0.0, "tracks_rated" => 1, "viewer_score" => 2.5},
+               session_summary: %{
+                 "streamer_score" => +0.0,
+                 "tracks_rated" => 1,
+                 "viewer_score" => 2.5
+               },
                track_summaries: [
-                %{
-                  "unique_votes" => 2,
-                  "poll_count" => 0,
-                  "streamer_score" => +0.0,
-                  "unique_voters" => 2,
-                  "viewer_score" => 2.5
-                }
-              ],
+                 %{
+                   "unique_votes" => 2,
+                   "poll_count" => 0,
+                   "streamer_score" => +0.0,
+                   "unique_voters" => 2,
+                   "viewer_score" => 2.5
+                 }
+               ],
                unique_voters: 2,
                votes: _
              } = report

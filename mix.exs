@@ -115,7 +115,7 @@ defmodule PremiereEcoute.MixProject do
       # Tests
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       # Deployment
-      deploy: ["format", "compile --warnings-as-errors", "cmd fly deploy"]
+      deploy: ["format", "compile --warnings-as-errors", "test", "cmd fly deploy"]
     ]
   end
 end

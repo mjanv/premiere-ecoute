@@ -21,7 +21,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
     create index(:polls, [:track_id])
 
     create table(:reports) do
-      add :generated_at, :naive_datetime, null: false
       add :unique_votes, :integer, null: false, default: 0
       add :unique_voters, :integer, null: false, default: 0
       add :session_summary, :map, null: false, default: %{}
@@ -32,7 +31,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
       timestamps()
     end
 
-    create index(:reports, [:session_id])
-    create index(:reports, [:generated_at])
+    create unique_index(:reports, [:session_id], name: :reports_session_id_unique_index)
   end
 end

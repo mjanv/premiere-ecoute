@@ -4,11 +4,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   require Logger
 
   alias PremiereEcoute.Apis.SpotifyApi.Player
-  alias PremiereEcoute.Sessions
-  alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
+  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
@@ -41,8 +41,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
          |> assign(:current_user, current_user)
          |> assign(:show, %{votes: true, scores: true})
          |> assign(:user_current_rating, nil)
-         |> assign_async(:session_data, fn ->
-           {:ok, %{session_data: load_session_data(listening_session)}}
+         |> assign(:report, nil)
+         |> assign_async(:report, fn ->
+           {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
          end)}
     end
   end
@@ -101,16 +102,40 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
      assign(socket, :show, Map.update!(assigns.show, String.to_atom(flag), fn v -> !v end))}
   end
 
+  @impl true
+  def handle_event("open_overlay", _params, socket) do
+    overlay_url = "#{socket.host_uri}/session/#{socket.assigns.listening_session.id}/overlay"
+    {:noreply, push_event(socket, "open_url", %{url: overlay_url})}
+  end
+
+  @impl true
+  def handle_event("copy_overlay_url", _params, socket) do
+    overlay_url = "#{socket.host_uri}/session/#{socket.assigns.listening_session.id}/overlay"
+
+    {:noreply,
+     socket
+     |> push_event("copy_to_clipboard", %{text: overlay_url})
+     |> put_flash(:info, "Overlay URL copied to clipboard!")}
+  end
+
   # AIDEV-NOTE: Spotify player events are now handled by the LiveComponent
 
   @impl true
   def handle_event("vote_track", %{"track_id" => track_id, "rating" => rating}, socket) do
     case Integer.parse(track_id) do
-      {_int_track_id, ""} ->
+      {int_track_id, ""} ->
         case Integer.parse(rating) do
           {int_rating, ""} when int_rating >= 1 and int_rating <= 10 ->
-            socket = assign(socket, :user_current_rating, int_rating)
-            {:noreply, put_flash(socket, :info, "Rated track #{int_rating}/10")}
+            # AIDEV-NOTE: Create streamer vote and save to database
+            case create_streamer_vote(socket, int_track_id, int_rating) do
+              {:ok, _vote} ->
+                socket = assign(socket, :user_current_rating, int_rating)
+                {:noreply, put_flash(socket, :info, "Rated track #{int_rating}/10")}
+
+              {:error, reason} ->
+                Logger.error("Failed to create streamer vote: #{inspect(reason)}")
+                {:noreply, put_flash(socket, :error, "Failed to save rating")}
+            end
 
           _ ->
             {:noreply, put_flash(socket, :error, "Invalid rating")}
@@ -142,26 +167,30 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_info(%Vote{} = _vote, socket) do
+    session_id = socket.assigns.session_id
+
+    {:noreply,
+     socket
+     |> assign_async(:report, fn ->
+       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
+     end)}
+  end
+
+  @impl true
   def handle_info(event, socket) do
     {:noreply, put_flash(socket, :info, "Received #{inspect(event)}")}
   end
 
-  defp load_session_data(listening_session) do
-    with %Album{} = album <- Album.get(listening_session.album_id),
-         {:ok, votes} <- Sessions.get_session_votes(listening_session.id),
-         {:ok, scores} <- Sessions.get_session_scores(listening_session.id) do
-      %{
-        album: album,
-        tracks: album.tracks || [],
-        votes: votes,
-        scores: scores,
-        current_track: nil
-      }
-    else
-      error ->
-        Logger.error("Failed to load session data: #{inspect(error)}")
-        %{error: "Failed to load session data"}
-    end
+  @impl true
+  def handle_async(:report, {:ok, %{report: report}}, socket) do
+    {:noreply, assign(socket, :report, report)}
+  end
+
+  @impl true
+  def handle_async(:report, {:exit, reason}, socket) do
+    Logger.error("Failed to load session report: #{inspect(reason)}")
+    {:noreply, socket}
   end
 
   def format_duration(nil), do: "--:--"
@@ -173,21 +202,154 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     "#{minutes}:#{String.pad_leading(Integer.to_string(seconds), 2, "0")}"
   end
 
-  def session_status_class(:preparing), do: "bg-yellow-900/30 text-yellow-400"
-  def session_status_class(:active), do: "bg-green-900/30 text-green-400"
-  def session_status_class(:stopped), do: "bg-gray-700 text-gray-300"
+  def session_status_class(:preparing),
+    do: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
 
-  def track_score(track_id, scores) do
-    case Enum.find(scores, &(&1.track_id == track_id)) do
-      nil -> 0
-      score -> score.average_score || 0
+  def session_status_class(:active),
+    do: "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md"
+
+  def session_status_class(:stopped),
+    do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"
+
+  # AIDEV-NOTE: Helper functions to extract data from Report struct for template use
+  def track_score(_track_id, nil), do: 0.0
+
+  def track_score(track_id, report) do
+    case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
+      nil -> 0.0
+      track_summary -> Float.round(track_summary["viewer_score"] || 0.0, 1)
     end
   end
 
-  def track_votes_count(track_id, votes) do
-    votes
-    |> Enum.filter(&(&1.track_id == track_id))
-    |> length()
+  def track_votes_count(_track_id, nil), do: 0
+
+  def track_votes_count(track_id, report) do
+    case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
+      nil -> 0
+      track_summary -> track_summary["unique_votes"] || 0
+    end
+  end
+
+  def session_average_score(nil), do: 0.0
+
+  def session_average_score(report) do
+    case report.session_summary do
+      %{"viewer_score" => score} when is_number(score) -> Float.round(score, 1)
+      _ -> 0.0
+    end
+  end
+
+  def session_total_votes(nil), do: 0
+  def session_total_votes(report), do: report.unique_votes || 0
+
+  def session_unique_voters(nil), do: 0
+  def session_unique_voters(report), do: report.unique_voters || 0
+
+  def session_tracks_rated(nil), do: 0
+
+  def session_tracks_rated(report) do
+    case report.session_summary do
+      %{"tracks_rated" => count} when is_integer(count) -> count
+      _ -> 0
+    end
+  end
+
+  def session_streamer_score(nil), do: 0.0
+
+  def session_streamer_score(report) do
+    case report.session_summary do
+      %{"streamer_score" => score} when is_number(score) -> Float.round(score, 1)
+      _ -> 0.0
+    end
+  end
+
+  def track_streamer_score(_track_id, nil), do: 0.0
+
+  def track_streamer_score(track_id, report) do
+    case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
+      nil -> 0.0
+      track_summary -> Float.round(track_summary["streamer_score"] || 0.0, 1)
+    end
+  end
+
+  # AIDEV-NOTE: Get vote distribution histogram data for a specific track from raw votes and polls
+  def track_vote_distribution(_track_id, nil), do: for(rating <- 1..10, do: {rating, 0})
+
+  def track_vote_distribution(track_id, report) do
+    # Calculate distribution from individual votes
+    individual_distribution =
+      report.votes
+      |> Enum.filter(&(&1.track_id == track_id))
+      |> Enum.group_by(& &1.value)
+      |> Map.new(fn {value, votes} -> {value, length(votes)} end)
+
+    # Calculate distribution from poll votes
+    poll_distribution =
+      report.polls
+      |> Enum.filter(&(&1.track_id == track_id))
+      |> Enum.reduce(%{}, fn poll, acc ->
+        poll.votes
+        |> Enum.reduce(acc, fn {rating_str, count}, inner_acc ->
+          rating = String.to_integer(rating_str)
+          Map.update(inner_acc, rating, count, &(&1 + count))
+        end)
+      end)
+
+    # Combine both distributions and ensure all ratings 1-10 are present
+    for rating <- 1..10 do
+      individual_count = Map.get(individual_distribution, rating, 0)
+      poll_count = Map.get(poll_distribution, rating, 0)
+      total_count = individual_count + poll_count
+      {rating, total_count}
+    end
+  end
+
+  # AIDEV-NOTE: Get the maximum vote count for highlighting in histogram
+  def track_max_votes(_track_id, nil), do: 0
+
+  def track_max_votes(track_id, report) do
+    track_vote_distribution(track_id, report)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.max(fn -> 0 end)
+  end
+
+  # AIDEV-NOTE: Create and save streamer vote, then broadcast for UI updates
+  defp create_streamer_vote(socket, track_id, rating) do
+    session_id = String.to_integer(socket.assigns.session_id)
+    current_scope = socket.assigns.current_scope
+
+    case current_scope do
+      %{user: %{id: user_id}} when not is_nil(user_id) ->
+        vote_attrs = %Vote{
+          viewer_id: to_string(user_id),
+          session_id: session_id,
+          track_id: track_id,
+          value: rating,
+          is_streamer: true
+        }
+
+        case Vote.create(vote_attrs) do
+          {:ok, vote} ->
+            # Broadcast vote_cast event for real-time updates
+            Phoenix.PubSub.broadcast(
+              PremiereEcoute.PubSub,
+              "session:#{session_id}",
+              {:vote_cast, vote}
+            )
+
+            # Regenerate report with new vote data
+            listening_session = ListeningSession.get(session_id)
+            Report.generate(listening_session)
+
+            {:ok, vote}
+
+          error ->
+            error
+        end
+
+      _ ->
+        {:error, "User not authenticated"}
+    end
   end
 
   defp start_spotify_playback(user, session) do

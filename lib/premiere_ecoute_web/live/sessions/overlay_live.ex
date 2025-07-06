@@ -3,10 +3,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   require Logger
 
-  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
-
-  # AIDEV-NOTE: OBS overlay LiveView for displaying real-time session statistics during livestreams
+  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -23,9 +22,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
          |> put_flash(:error, "Session not found")
          |> assign(:session_id, id)
          |> assign(:listening_session, nil)
-         |> assign(:current_average_score, 0.0)
-         |> assign(:total_votes, 0)
-         |> assign(:tracks_rated, 0)}
+         |> assign(:report, nil)}
 
       listening_session ->
         if connected?(socket) do
@@ -36,11 +33,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
          socket
          |> assign(:session_id, id)
          |> assign(:listening_session, listening_session)
-         |> assign(:current_average_score, 0.0)
-         |> assign(:total_votes, 0)
-         |> assign(:tracks_rated, 0)
-         |> assign_async(:stats, fn ->
-           {:ok, %{stats: load_session_stats(id)}}
+         |> assign(:report, nil)
+         |> assign_async(:report, fn ->
+           {:ok, %{report: Report.get_by(session_id: String.to_integer(id))}}
          end)}
     end
   end
@@ -57,20 +52,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
     {:noreply,
      socket
-     |> assign_async(:stats, fn ->
-       {:ok, %{stats: load_session_stats(session_id)}}
-     end)}
-  end
-
-  @impl true
-  def handle_info({:vote_cast, _vote_data}, socket) do
-    # Reload stats when new vote is cast
-    session_id = socket.assigns.session_id
-
-    {:noreply,
-     socket
-     |> assign_async(:stats, fn ->
-       {:ok, %{stats: load_session_stats(session_id)}}
+     |> assign_async(:report, fn ->
+       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
      end)}
   end
 
@@ -81,8 +64,20 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
     {:noreply,
      socket
-     |> assign_async(:stats, fn ->
-       {:ok, %{stats: load_session_stats(session_id)}}
+     |> assign_async(:report, fn ->
+       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
+     end)}
+  end
+
+  @impl true
+  def handle_info(%Vote{} = _vote, socket) do
+    # AIDEV-NOTE: Handle vote PubSub message - reload stats from updated report
+    session_id = socket.assigns.session_id
+
+    {:noreply,
+     socket
+     |> assign_async(:report, fn ->
+       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
      end)}
   end
 
@@ -93,65 +88,35 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_async(:stats, {:ok, %{stats: stats}}, socket) do
-    {:noreply,
-     socket
-     |> assign(:current_average_score, stats.average_score)
-     |> assign(:total_votes, stats.total_votes)
-     |> assign(:tracks_rated, stats.tracks_rated)}
+  def handle_async(:report, {:ok, %{report: report}}, socket) do
+    {:noreply, assign(socket, :report, report)}
   end
 
   @impl true
-  def handle_async(:stats, {:exit, reason}, socket) do
-    Logger.error("Failed to load session stats: #{inspect(reason)}")
+  def handle_async(:report, {:exit, reason}, socket) do
+    Logger.error("Failed to load session report: #{inspect(reason)}")
     {:noreply, socket}
   end
 
-  defp load_session_stats(session_id) do
-    session_id_int =
-      case Integer.parse(session_id) do
-        {int_id, ""} -> int_id
-        _ -> nil
-      end
+  # AIDEV-NOTE: Helper functions to extract data from Report struct for template use
+  def current_average_score(nil), do: 0.0
 
-    case session_id_int do
-      nil ->
-        %{average_score: 0.0, total_votes: 0, tracks_rated: 0}
-
-      int_id ->
-        case Sessions.get_session_scores(int_id) do
-          {:ok, scores} ->
-            calculate_session_stats(scores)
-        end
+  def current_average_score(report) do
+    case report.session_summary do
+      %{"viewer_score" => score} when is_number(score) -> Float.round(score, 2)
+      _ -> 0.0
     end
   end
 
-  defp calculate_session_stats(scores) do
-    if Enum.empty?(scores) do
-      %{average_score: 0.0, total_votes: 0, tracks_rated: 0}
-    else
-      total_votes = Enum.sum(Enum.map(scores, & &1.vote_count))
+  def total_votes(nil), do: 0
+  def total_votes(report), do: report.unique_votes || 0
 
-      # Calculate weighted average across all tracks
-      weighted_sum =
-        scores
-        |> Enum.map(fn score ->
-          Decimal.to_float(score.average_score) * score.vote_count
-        end)
-        |> Enum.sum()
+  def tracks_rated(nil), do: 0
 
-      average_score =
-        if total_votes > 0 do
-          weighted_sum / total_votes
-        else
-          0.0
-        end
-
-      %{
-        average_score: Float.round(average_score, 2),
-        total_votes: total_votes,
-        tracks_rated: length(scores)
-      }
+  def tracks_rated(report) do
+    case report.session_summary do
+      %{"tracks_rated" => count} when is_integer(count) -> count
+      _ -> 0
     end
   end
 end

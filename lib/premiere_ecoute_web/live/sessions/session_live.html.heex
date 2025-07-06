@@ -8,25 +8,7 @@
         class="w-1/3 border-r p-6 overflow-y-auto"
         style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
       >
-        <.async_result :let={session_data} assign={@session_data}>
-          <:loading>
-            <div class="animate-pulse">
-              <div class="h-4 rounded w-3/4 mb-4" style="background-color: var(--color-dark-800);">
-              </div>
-              <div class="h-4 rounded w-1/2 mb-4" style="background-color: var(--color-dark-800);">
-              </div>
-              <div class="h-4 rounded w-5/6" style="background-color: var(--color-dark-800);">
-              </div>
-            </div>
-          </:loading>
-
-          <:failed :let={_failure}>
-            <div class="text-center">
-              <div class="text-red-500 text-xl mb-4">⚠️</div>
-              <h3 class="text-lg font-medium text-white mb-2">Unable to load session data</h3>
-              <p class="text-gray-400">Please try refreshing the page.</p>
-            </div>
-          </:failed>
+        <%= if @listening_session.album do %>
           
 <!-- Session Information -->
           <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 mb-6">
@@ -36,12 +18,9 @@
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h2 class="text-xl font-bold text-white">Session Information</h2>
-            </div>
-
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-purple-100">Status</span>
+              <div class="flex items-center w-full">
+                <h2 class="text-xl font-bold text-white">Listening Session</h2>
+                <div class="flex-1"></div>
                 <span class={[
                   "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
                   session_status_class(@listening_session.status)
@@ -49,23 +28,70 @@
                   {String.capitalize(to_string(@listening_session.status))}
                 </span>
               </div>
+            </div>
 
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-purple-100">Started:</span>
-                  <span class="text-white font-medium">
-                    {if @listening_session.started_at,
-                      do: Calendar.strftime(@listening_session.started_at, "%b %d, %Y"),
-                      else: "Not started"}
-                  </span>
-                </div>
-                <%= if @show[:votes] do %>
-                  <div class="flex justify-between">
-                    <span class="text-purple-100">Total Votes:</span>
-                    <span class="text-white font-bold">{length(session_data.votes)}</span>
+            <div class="space-y-3">
+              <%= if @show[:scores] do %>
+                <!-- Main Score Stats -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                  <div class="text-center bg-white/10 rounded-lg p-3">
+                    <div class="text-2xl font-bold text-white">
+                      <.async_result :let={report} assign={@report}>
+                        <:loading>--</:loading>
+                        <:failed>--</:failed>
+                        <%= if session_average_score(report) > 0 do %>
+                          {session_average_score(report)}<span class="text-lg text-purple-200">/10</span>
+                        <% else %>
+                          --<span class="text-lg text-purple-200">/10</span>
+                        <% end %>
+                      </.async_result>
+                    </div>
+                    <div class="text-xs text-purple-200 font-medium">Viewers</div>
                   </div>
-                <% end %>
-              </div>
+
+                  <div class="text-center bg-white/10 rounded-lg p-3">
+                    <div class="text-2xl font-bold text-white">
+                      <.async_result :let={report} assign={@report}>
+                        <:loading>--</:loading>
+                        <:failed>--</:failed>
+                        <%= if session_streamer_score(report) > 0 do %>
+                          {session_streamer_score(report)}<span class="text-lg text-purple-200">/10</span>
+                        <% else %>
+                          --<span class="text-lg text-purple-200">/10</span>
+                        <% end %>
+                      </.async_result>
+                    </div>
+                    <div class="text-xs text-purple-200 font-medium">Streamer</div>
+                  </div>
+                </div>
+              <% end %>
+
+              <%= if @show[:votes] do %>
+                <!-- Vote Stats -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                  <div class="text-center bg-white/10 rounded-lg p-3">
+                    <div class="text-xl font-bold text-white">
+                      <.async_result :let={report} assign={@report}>
+                        <:loading>--</:loading>
+                        <:failed>--</:failed>
+                        {session_total_votes(report)}
+                      </.async_result>
+                    </div>
+                    <div class="text-xs text-purple-200 font-medium">Total Votes</div>
+                  </div>
+
+                  <div class="text-center bg-white/10 rounded-lg p-3">
+                    <div class="text-xl font-bold text-white">
+                      <.async_result :let={report} assign={@report}>
+                        <:loading>--</:loading>
+                        <:failed>--</:failed>
+                        {session_unique_voters(report)}
+                      </.async_result>
+                    </div>
+                    <div class="text-xs text-purple-200 font-medium">Unique Voters</div>
+                  </div>
+                </div>
+              <% end %>
               
 <!-- AIDEV-NOTE: Session control buttons for start/end listening session -->
               <div class="mt-4 pt-4 border-t border-white/20">
@@ -73,7 +99,7 @@
                   <%= if @listening_session.status == :preparing do %>
                     <button
                       phx-click="start_session"
-                      class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+                      class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-2 px-4 rounded-lg font-medium transition-all duration-200 text-sm flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
                     >
                       <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path
@@ -117,31 +143,104 @@
                 </div>
               </div>
               
-<!-- AIDEV-NOTE: Display toggles section with DaisyUI styling -->
+<!-- AIDEV-NOTE: Overlay link section -->
+              <div
+                class="mt-4 pt-4 border-t border-white/20"
+                id="overlay-hooks"
+                phx-hook="CopyToClipboard"
+              >
+                <div class="relative">
+                  <div class="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 z-10">
+                    <span class="text-xs text-purple-200 font-medium">Overlay</span>
+                    <div class="w-px h-4 bg-white/20"></div>
+                  </div>
+                  <input
+                    type="text"
+                    readonly
+                    value={"#{@socket.host_uri}/session/#{@listening_session.id}/overlay"}
+                    class="w-full bg-white/10 border border-white/20 rounded-lg pl-20 pr-20 py-2 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    id="overlay-url-input"
+                  />
+                  <div class="absolute right-1 top-1 bottom-1 flex space-x-1">
+                    <div id="open-url-hook" phx-hook="OpenUrl">
+                      <button
+                        phx-click="open_overlay"
+                        class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors flex items-center justify-center h-full"
+                        title="Open overlay in new tab"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <button
+                      phx-click="copy_overlay_url"
+                      class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded transition-colors flex items-center justify-center h-full"
+                      title="Copy overlay URL"
+                    >
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+<!-- AIDEV-NOTE: Display toggles section - Blended styling -->
               <div class="mt-4 pt-4 border-t border-white/20">
-                <div class="flex space-x-6">
-                  <div class="form-control">
-                    <label class="label cursor-pointer justify-start">
+                <div class="flex justify-center space-x-6">
+                  <div class="flex items-center">
+                    <label class="flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         phx-click="toggle"
                         phx-value-flag="votes"
                         checked={@show[:votes]}
-                        class="toggle toggle-primary mr-2"
+                        class="sr-only"
                       />
-                      <span class="text-white font-medium">Display votes</span>
+                      <div class={[
+                        "relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ease-in-out mr-3",
+                        if(@show[:votes], do: "bg-purple-500", else: "bg-white/20")
+                      ]}>
+                        <span class={[
+                          "inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out translate-y-0.5",
+                          if(@show[:votes], do: "translate-x-4", else: "translate-x-0.5")
+                        ]}>
+                        </span>
+                      </div>
+                      <span class="text-purple-200 text-sm font-medium">Display votes</span>
                     </label>
                   </div>
-                  <div class="form-control">
-                    <label class="label cursor-pointer justify-start">
+                  <div class="flex items-center">
+                    <label class="flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         phx-click="toggle"
                         phx-value-flag="scores"
                         checked={@show[:scores]}
-                        class="toggle toggle-primary mr-2"
+                        class="sr-only"
                       />
-                      <span class="text-white font-medium">Display scores</span>
+                      <div class={[
+                        "relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ease-in-out mr-3",
+                        if(@show[:scores], do: "bg-purple-500", else: "bg-white/20")
+                      ]}>
+                        <span class={[
+                          "inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out translate-y-0.5",
+                          if(@show[:scores], do: "translate-x-4", else: "translate-x-0.5")
+                        ]}>
+                        </span>
+                      </div>
+                      <span class="text-purple-200 text-sm font-medium">Display scores</span>
                     </label>
                   </div>
                 </div>
@@ -149,109 +248,82 @@
             </div>
           </div>
           
-<!-- Album Information -->
-          <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6">
-            <div class="flex items-center space-x-3 mb-6">
-              <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-white">Album Details</h3>
-            </div>
-
-            <div class="text-center mb-6">
-              <%= if session_data.album.cover_url do %>
-                <img
-                  src={session_data.album.cover_url}
-                  alt={"#{session_data.album.name} cover"}
-                  class="w-40 h-40 rounded-xl shadow-lg mx-auto mb-4"
-                />
-              <% else %>
-                <div class="w-40 h-40 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                  </svg>
-                </div>
-              <% end %>
-
-              <h2 class="text-xl font-bold text-white mb-2">{session_data.album.name}</h2>
-              <p class="text-lg text-purple-100 mb-4">{session_data.album.artist}</p>
-            </div>
-
-            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span class="text-purple-100">Released:</span>
-                  <p class="font-medium text-white">
-                    {if session_data.album.release_date,
-                      do: Date.to_string(session_data.album.release_date),
-                      else: "Unknown"}
-                  </p>
-                </div>
-                <div>
-                  <span class="text-purple-100">Tracks:</span>
-                  <p class="font-medium text-white">
-                    {session_data.album.total_tracks || length(session_data.tracks)}
-                  </p>
-                </div>
-                <div>
-                  <span class="text-purple-100">Total Duration:</span>
-                  <p class="font-medium text-white">
-                    {total_ms =
-                      session_data.tracks |> Enum.map(&(&1.duration_ms || 0)) |> Enum.sum()
-
-                    total_minutes = div(total_ms, 60_000)
-                    "#{total_minutes} min"}
-                  </p>
-                </div>
-                <%= if @show[:scores] do %>
-                  <div>
-                    <span class="text-purple-100">Average Score:</span>
-                    <p class="font-bold text-white text-lg">
-                      <%= if length(session_data.scores) > 0 do %>
-                        {session_data.scores
-                        |> Enum.map(&(&1.average_score || 0))
-                        |> Enum.sum()
-                        |> Kernel./(length(session_data.scores))
-                        |> Float.round(1)}/10
-                      <% else %>
-                        Not rated
-                      <% end %>
-                    </p>
+<!-- Album Information - Compact Design -->
+          <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-4">
+            <div class="flex items-start space-x-4">
+              <!-- Album Cover -->
+              <div class="flex-shrink-0">
+                <%= if @listening_session.album.cover_url do %>
+                  <img
+                    src={@listening_session.album.cover_url}
+                    alt={"#{@listening_session.album.name} cover"}
+                    class="w-36 h-36 rounded-lg shadow-lg"
+                  />
+                <% else %>
+                  <div class="w-36 h-36 bg-white/20 rounded-lg flex items-center justify-center">
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                    </svg>
                   </div>
                 <% end %>
               </div>
+              
+<!-- Album Info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center space-x-2 mb-3">
+                  <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-bold text-white">Album Details</h3>
+                </div>
+
+                <h2 class="text-lg font-bold text-white mb-1 truncate">
+                  {@listening_session.album.name}
+                </h2>
+                <p class="text-purple-100 mb-3 truncate">{@listening_session.album.artist}</p>
+
+                <div class="grid grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <span class="text-purple-200 block">Released</span>
+                    <span class="font-medium text-white">
+                      {if @listening_session.album.release_date,
+                        do: Calendar.strftime(@listening_session.album.release_date, "%-d %B %Y"),
+                        else: "Unknown"}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-purple-200 block">Tracks</span>
+                    <span class="font-medium text-white">
+                      {@listening_session.album.total_tracks ||
+                        length(@listening_session.album.tracks || [])}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-purple-200 block">Duration</span>
+                    <span class="font-medium text-white">
+                      {total_ms =
+                        (@listening_session.album.tracks || [])
+                        |> Enum.map(&(&1.duration_ms || 0))
+                        |> Enum.sum()
+
+                      total_minutes = div(total_ms, 60_000)
+                      "#{total_minutes}min"}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </.async_result>
+        <% end %>
       </div>
       
 <!-- Right Column - Track List (2/3) -->
       <div class="w-2/3 p-6 overflow-y-auto" style="background-color: var(--color-dark-950);">
-        <.async_result :let={session_data} assign={@session_data}>
-          <:loading>
-            <div class="animate-pulse">
-              <div class="h-6 rounded w-1/4 mb-6" style="background-color: var(--color-dark-800);">
-              </div>
-              <div class="space-y-4">
-                <%= for _ <- 1..10 do %>
-                  <div class="h-16 rounded-lg" style="background-color: var(--color-dark-900);">
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          </:loading>
-
-          <:failed :let={_failure}>
-            <div class="text-center py-16">
-              <div class="text-red-500 text-xl mb-4">⚠️</div>
-              <h3 class="text-lg font-medium text-white mb-2">Unable to load tracks</h3>
-              <p class="text-gray-400">Please try refreshing the page.</p>
-            </div>
-          </:failed>
-          
-<!-- Session Controls -->
+        
+<!-- Session Controls - Only show when session is active -->
+        <%= if @listening_session.status == :active do %>
           <div class="rounded-xl p-6 mb-6" style="background-color: var(--color-dark-800);">
             <div class="grid grid-cols-2 gap-4">
               <!-- AIDEV-NOTE: Spotify Player LiveComponent -->
@@ -353,8 +425,10 @@
               </div>
             </div>
           </div>
-          
-<!-- AIDEV-NOTE: Compact Streamer Voting Section -->
+        <% end %>
+        
+<!-- AIDEV-NOTE: Compact Streamer Voting Section - Only show when session is active -->
+        <%= if @listening_session.status == :active do %>
           <div class="rounded-xl p-3 mb-6" style="background-color: var(--color-dark-800);">
             <div class="flex items-center justify-center space-x-3">
               <span class="text-xs text-gray-400 whitespace-nowrap">Your rating</span>
@@ -390,128 +464,169 @@
               </div>
             </div>
           </div>
+        <% end %>
 
-          <div class="mb-6">
-            <%= if length(session_data.tracks) > 0 do %>
-              <div class="space-y-3">
-                <%= for {track, index} <- Enum.with_index(session_data.tracks, 1) do %>
-                  <div
-                    class={[
-                      "rounded-lg transition-colors overflow-hidden",
-                      if(
-                        @listening_session.current_track &&
-                          @listening_session.current_track.id == track.id,
-                        do: "border-2 border-green-500/50",
-                        else: "hover:bg-gray-700"
-                      )
-                    ]}
-                    style={
-                      if(
-                        @listening_session.current_track &&
-                          @listening_session.current_track.id == track.id,
-                        do: "",
-                        else: "background-color: var(--color-dark-900);"
-                      )
-                    }
-                  >
-                    <!-- Track Row with Green Background -->
-                    <div class={[
-                      "p-4 transition-colors",
-                      if(
-                        @listening_session.current_track &&
-                          @listening_session.current_track.id == track.id,
-                        do: "bg-green-600/20 hover:bg-green-600/30",
-                        else: ""
-                      )
-                    ]}>
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4 flex-1 min-w-0">
-                          <%= if @listening_session.current_track && @listening_session.current_track.id == track.id do %>
-                            <div class="w-8 flex-shrink-0 flex items-center justify-center">
-                              <svg
-                                class="w-5 h-5 text-green-400"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                  clip-rule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                          <% else %>
-                            <span class="text-lg text-gray-400 w-8 flex-shrink-0">{index}</span>
-                          <% end %>
-                          <div class="flex-1 min-w-0">
-                            <h4 class={[
-                              "font-medium text-lg truncate",
+        <div class="mb-6">
+          <%= if @listening_session.album && length(@listening_session.album.tracks || []) > 0 do %>
+            <div class="space-y-3">
+              <%= for {track, index} <- Enum.with_index(@listening_session.album.tracks, 1) do %>
+                <div
+                  class={[
+                    "rounded-lg transition-colors overflow-hidden",
+                    if(
+                      @listening_session.current_track &&
+                        @listening_session.current_track.id == track.id,
+                      do: "border-2 border-green-500/50",
+                      else: "hover:bg-gray-700"
+                    )
+                  ]}
+                  style={
+                    if(
+                      @listening_session.current_track &&
+                        @listening_session.current_track.id == track.id,
+                      do: "",
+                      else: "background-color: var(--color-dark-900);"
+                    )
+                  }
+                >
+                  <!-- Track Row with Green Background -->
+                  <div class={[
+                    "p-4 transition-colors",
+                    if(
+                      @listening_session.current_track &&
+                        @listening_session.current_track.id == track.id,
+                      do: "bg-green-600/20 hover:bg-green-600/30",
+                      else: ""
+                    )
+                  ]}>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-4 flex-1 min-w-0">
+                        <%= if @listening_session.current_track && @listening_session.current_track.id == track.id do %>
+                          <div class="w-8 flex-shrink-0 flex items-center justify-center">
+                            <svg
+                              class="w-5 h-5 text-green-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                        <% else %>
+                          <span class="text-lg text-gray-400 w-8 flex-shrink-0">{index}</span>
+                        <% end %>
+                        <div class="flex-1 min-w-0">
+                          <h4 class={[
+                            "font-medium text-lg truncate",
+                            if(
+                              @listening_session.current_track &&
+                                @listening_session.current_track.id == track.id,
+                              do: "text-green-300",
+                              else: "text-white"
+                            )
+                          ]}>
+                            {track.name}
+                          </h4>
+                          <%= if track.duration_ms do %>
+                            <p class={[
+                              "text-sm",
                               if(
                                 @listening_session.current_track &&
                                   @listening_session.current_track.id == track.id,
-                                do: "text-green-300",
-                                else: "text-white"
+                                do: "text-green-400",
+                                else: "text-gray-400"
                               )
                             ]}>
-                              {track.name}
-                            </h4>
-                            <%= if track.duration_ms do %>
-                              <p class={[
-                                "text-sm",
-                                if(
-                                  @listening_session.current_track &&
-                                    @listening_session.current_track.id == track.id,
-                                  do: "text-green-400",
-                                  else: "text-gray-400"
-                                )
-                              ]}>
-                                {format_duration(track.duration_ms)}
-                              </p>
-                            <% end %>
-                          </div>
-                        </div>
-
-                        <div class="flex items-center space-x-8 text-sm flex-shrink-0">
-                          <%= if @show[:votes] do %>
-                            <div class="text-center">
-                              <p
-                                class="text-xl font-bold"
-                                style="color: var(--color-primary-300);"
-                              >
-                                {track_votes_count(track.id, session_data.votes)}
-                              </p>
-                              <p class="text-gray-400">Votes</p>
-                            </div>
-                          <% end %>
-                          <%= if @show[:scores] do %>
-                            <div class="text-center">
-                              <p
-                                class="text-xl font-bold"
-                                style="color: var(--color-primary-300);"
-                              >
-                                <%= case track_score(track.id, session_data.scores) do %>
-                                  <% 0 -> %>
-                                    <span class="text-gray-500">--</span>
-                                  <% score -> %>
-                                    {Float.round(score, 1)}
-                                <% end %>
-                              </p>
-                              <p class="text-gray-400">Score</p>
-                            </div>
+                              {format_duration(track.duration_ms)}
+                            </p>
                           <% end %>
                         </div>
                       </div>
+
+                      <div class="flex items-center space-x-8 text-sm flex-shrink-0">
+                        <%= if @show[:votes] do %>
+                          <div class="text-center">
+                            <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                              <.async_result :let={report} assign={@report}>
+                                <:loading>--</:loading>
+                                <:failed>--</:failed>
+                                {track_votes_count(track.id, report)}
+                              </.async_result>
+                            </p>
+                            <p class="text-gray-400">Votes</p>
+                          </div>
+                        <% end %>
+                        <%= if @show[:scores] do %>
+                          <div class="text-center">
+                            <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                              <.async_result :let={report} assign={@report}>
+                                <:loading>--</:loading>
+                                <:failed>--</:failed>
+                                <%= case track_score(track.id, report) do %>
+                                  <% +0.0 -> %>
+                                    <span class="text-gray-500">--</span>
+                                  <% score -> %>
+                                    {score}
+                                <% end %>
+                              </.async_result>
+                            </p>
+                            <p class="text-gray-400">Score</p>
+                          </div>
+                          <div class="text-center">
+                            <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                              <.async_result :let={report} assign={@report}>
+                                <:loading>--</:loading>
+                                <:failed>--</:failed>
+                                <%= case track_streamer_score(track.id, report) do %>
+                                  <% +0.0 -> %>
+                                    <span class="text-gray-500">--</span>
+                                  <% score -> %>
+                                    {score}
+                                <% end %>
+                              </.async_result>
+                            </p>
+                            <p class="text-gray-400">My Score</p>
+                          </div>
+                        <% end %>
+                      </div>
                     </div>
-                    
-<!-- AIDEV-NOTE: Histogram Section with Gray Background -->
-                    <%= if @listening_session.current_track && @listening_session.current_track.id == track.id do %>
-                      <div class="px-4 pt-4 pb-2" style="background-color: var(--color-dark-800);">
-                        <!-- Horizontal Histogram taking ~80% width -->
-                        <div class="flex items-end justify-center h-20 mx-auto w-4/5">
-                          <%= for {rating, votes} <- [
-                            {1, 2}, {2, 1}, {3, 4}, {4, 3}, {5, 8},
-                            {6, 12}, {7, 15}, {8, 9}, {9, 6}, {10, 3}
-                          ] do %>
+                  </div>
+                  
+<!-- AIDEV-NOTE: Histogram Section - show for current track when active, or all tracks when session ended -->
+                  <%= if (@listening_session.current_track && @listening_session.current_track.id == track.id) || @listening_session.status == :stopped do %>
+                    <div class="px-4 pt-4 pb-2" style="background-color: var(--color-dark-800);">
+                      <!-- Horizontal Histogram taking ~80% width -->
+                      <div class="flex items-end justify-center h-20 mx-auto w-4/5">
+                        <.async_result :let={report} assign={@report}>
+                          <:loading>
+                            <%= for rating <- 1..10 do %>
+                              <div class="flex-1 flex flex-col items-center px-1">
+                                <div
+                                  class="w-full bg-gray-600 rounded-t animate-pulse"
+                                  style="height: 8px"
+                                >
+                                </div>
+                                <span class="text-xs text-gray-400 font-medium mt-1">
+                                  {rating}
+                                </span>
+                              </div>
+                            <% end %>
+                          </:loading>
+                          <:failed>
+                            <%= for rating <- 1..10 do %>
+                              <div class="flex-1 flex flex-col items-center px-1">
+                                <div class="w-full bg-red-600 rounded-t" style="height: 6px">
+                                </div>
+                                <span class="text-xs text-gray-400 font-medium mt-1">
+                                  {rating}
+                                </span>
+                              </div>
+                            <% end %>
+                          </:failed>
+                          <%= for {rating, votes} <- track_vote_distribution(track.id, report) do %>
                             <div class="flex-1 flex flex-col items-center px-1">
                               <!-- Vote count above bar (on the roof) -->
                               <%= if votes > 0 do %>
@@ -537,8 +652,11 @@
                                       9 -> "bg-blue-500"
                                       10 -> "bg-blue-600"
                                     end,
-                                    # Highlight most voted (rating 7 with 15 votes)
-                                    if(votes == 15, do: "ring-2 ring-white/50", else: "")
+                                    # Highlight most voted rating dynamically
+                                    if(votes > 0 && votes == track_max_votes(track.id, report),
+                                      do: "ring-2 ring-white/50",
+                                      else: ""
+                                    )
                                   ]
                                 }
                                 style={"height: #{max(votes * 4, 6)}px"}
@@ -546,29 +664,31 @@
                               </div>
                               
 <!-- Rating number -->
-                              <span class="text-xs text-gray-400 font-medium mt-1">{rating}</span>
+                              <span class="text-xs text-gray-400 font-medium mt-1">
+                                {rating}
+                              </span>
                             </div>
                           <% end %>
-                        </div>
+                        </.async_result>
                       </div>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            <% else %>
-              <div class="text-center py-16 text-gray-400">
-                <svg
-                  class="w-16 h-16 mx-auto mb-4 opacity-50"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                </svg>
-                <p>No tracks found for this album.</p>
-              </div>
-            <% end %>
-          </div>
-        </.async_result>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-16 text-gray-400">
+              <svg
+                class="w-16 h-16 mx-auto mb-4 opacity-50"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+              </svg>
+              <p>No tracks found for this album.</p>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>

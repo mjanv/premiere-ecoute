@@ -31,7 +31,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   @type t :: %__MODULE__{
           id: integer(),
-          generated_at: NaiveDateTime.t(),
           unique_votes: integer(),
           unique_voters: integer(),
           session_summary: session_summary(),
@@ -45,7 +44,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
         }
 
   schema "reports" do
-    field :generated_at, :naive_datetime
     field :unique_votes, :integer
     field :unique_voters, :integer
     field :session_summary, :map
@@ -62,14 +60,13 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   def changeset(report, attrs) do
     report
     |> cast(attrs, [
-      :generated_at,
       :unique_votes,
       :unique_voters,
       :session_summary,
       :track_summaries,
       :session_id
     ])
-    |> validate_required([:generated_at, :session_id])
+    |> validate_required([:session_id])
     |> validate_number(:unique_votes, greater_than_or_equal_to: 0)
     |> validate_number(:unique_voters, greater_than_or_equal_to: 0)
     |> foreign_key_constraint(:session_id)
@@ -101,7 +98,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
     attrs = %{
       session_id: session_id,
-      generated_at: NaiveDateTime.utc_now(),
       unique_votes: session_stats.unique_votes,
       unique_voters: session_stats.unique_voters,
       session_summary: calculate_session_summary(session_id),
@@ -141,14 +137,11 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   def all(opts) do
     from(r in __MODULE__,
       where: ^opts,
-      order_by: [desc: r.generated_at]
+      order_by: [desc: r.inserted_at]
     )
     |> Repo.all()
   end
 
-  # PostgreSQL-based calculation functions using raw SQL for maximum efficiency
-
-  # Calculates session-level statistics using PostgreSQL aggregation
   defp calculate_session_stats(session_id) do
     query = """
     SELECT
@@ -181,9 +174,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     }
   end
 
-  # Calculates session summary scores using PostgreSQL aggregation
   defp calculate_session_summary(session_id) do
-    # PostgreSQL-compatible query with JSON handling
     query = """
     WITH viewer_individual_avg AS (
       SELECT
@@ -263,7 +254,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     }
   end
 
-  # Calculates track summaries using PostgreSQL aggregation
   defp calculate_track_summaries(session_id) do
     query = """
     WITH all_tracks AS (
