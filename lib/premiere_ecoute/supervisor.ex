@@ -13,8 +13,9 @@ defmodule PremiereEcoute.Supervisor do
       PremiereEcoute.PromEx,
       PremiereEcoute.Repo,
       PremiereEcoute.Apis.Supervisor,
-      Supervisor.child_spec({Cachex, name: :cache}, id: :cache1),
-      Supervisor.child_spec({Cachex, name: :polls}, id: :cache2)
+      Supervisor.child_spec({Cachex, name: :sessions}, id: :cache1),
+      Supervisor.child_spec({Cachex, name: :polls}, id: :cache2),
+      Supervisor.child_spec({Cachex, name: :tokens}, id: :cache3)
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

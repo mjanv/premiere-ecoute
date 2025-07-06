@@ -49,6 +49,7 @@ defmodule PremiereEcouteWeb do
   def live_view do
     quote do
       use Phoenix.LiveView
+      use Gettext, backend: PremiereEcouteWeb.Gettext
 
       unquote(html_helpers())
     end

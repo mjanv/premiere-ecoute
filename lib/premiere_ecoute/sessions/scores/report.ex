@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   use Ecto.Schema
 
+  require Logger
+
   import Ecto.Changeset
   import Ecto.Query
 
@@ -109,8 +111,12 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     |> changeset(attrs)
     |> Repo.insert()
     |> case do
-      {:ok, report} -> {:ok, preload(report)}
-      {:error, reason} -> {:error, reason}
+      {:ok, report} ->
+        {:ok, preload(report)}
+
+      {:error, reason} ->
+        Logger.error("Cannot generate report due to: #{inspect(reason)}")
+        {:error, reason}
     end
   end
 

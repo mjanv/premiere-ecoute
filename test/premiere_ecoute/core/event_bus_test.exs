@@ -18,11 +18,10 @@ defmodule PremiereEcoute.Core.EventBusTest do
   end
 
   defmodule Handler do
-    use PremiereEcoute.Core.EventBus.Handler,
-      events: [
-        PremiereEcoute.Core.EventBusTest.EventA,
-        PremiereEcoute.Core.EventBusTest.EventB
-      ]
+    use PremiereEcoute.Core.EventBus.Handler
+
+    event(PremiereEcoute.Core.EventBusTest.EventA)
+    event(PremiereEcoute.Core.EventBusTest.EventB)
 
     require Logger
 

@@ -19,7 +19,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
           })
       )
       |> case do
-        {:ok, %{status: 200, body: %{"access_token" => token}}} ->
+        {:ok, %{status: 200, body: %{"access_token" => token, "expires_in" => expires_in}}} ->
+          Cachex.put(:tokens, :app_access_token, token, expire: expires_in * 1_000)
           {:ok, token}
 
         {:ok, %{status: status, body: body}} ->
@@ -40,7 +41,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
       URI.encode_query(%{
         response_type: "code",
         client_id: Application.get_env(:premiere_ecoute, :twitch_client_id),
-        scope: "channel:manage:polls channel:read:polls",
+        scope:
+          "channel:manage:polls channel:read:polls channel:bot user:read:chat user:write:chat user:bot moderator:manage:announcements",
         redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri),
         state: random(16)
       })

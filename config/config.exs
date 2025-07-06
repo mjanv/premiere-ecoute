@@ -1,5 +1,13 @@
 import Config
 
+config :premiere_ecoute,
+  handlers: [
+    PremiereEcoute.Sessions.ListeningSession.CommandHandler,
+    PremiereEcoute.Sessions.ListeningSession.EventHandler,
+    PremiereEcoute.Sessions.Scores.EventHandler
+  ],
+  twitch_req_options: []
+
 config :premiere_ecoute, :scopes,
   user: [
     default: true,
@@ -61,6 +69,10 @@ config :logger, :default_formatter,
 
 config :phoenix, :json_library, Jason
 
+config :premiere_ecoute, PremiereEcouteWeb.Gettext,
+  locales: ~w(en fr),
+  default_locale: "fr"
+
 config :ueberauth, Ueberauth,
   providers: [
     twitch: {Ueberauth.Strategy.Twitch, []},
@@ -71,8 +83,5 @@ config :ueberauth, Ueberauth,
            "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing"
        ]}
   ]
-
-config :premiere_ecoute,
-  twitch_req_options: []
 
 import_config "#{config_env()}.exs"

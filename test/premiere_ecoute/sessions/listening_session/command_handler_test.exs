@@ -1,10 +1,10 @@
-defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
+defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Core.CommandBus
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.CommandHandler
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
       user = user_fixture()
       album = album_fixture()
 
-      PremiereEcoute.Apis.SpotifyApiMock
+      PremiereEcoute.Apis.SpotifyApi.Mock
       |> expect(:get_album, fn _ -> {:ok, album} end)
 
       command = %PrepareListeningSession{
@@ -27,7 +27,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
         album_id: album.id
       }
 
-      {:ok, session, [%SessionPrepared{}]} = CommandHandler.handle(command)
+      {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
 
       assert session.user_id == user.id
       assert session.status == :preparing
@@ -41,7 +41,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
       user_id = 1
       album_id = "spotify:album:invalid"
 
-      PremiereEcoute.Apis.SpotifyApiMock
+      PremiereEcoute.Apis.SpotifyApi.Mock
       |> expect(:get_album, fn ^album_id -> {:error, :not_found} end)
 
       command = %PrepareListeningSession{
@@ -49,7 +49,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
         album_id: album_id
       }
 
-      {:error, [%SessionNotPrepared{} = event]} = CommandHandler.handle(command)
+      {:error, [%SessionNotPrepared{} = event]} = CommandBus.apply(command)
 
       assert event.user_id == user_id
     end
@@ -69,7 +69,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
         tracks: []
       }
 
-      PremiereEcoute.Apis.SpotifyApiMock
+      PremiereEcoute.Apis.SpotifyApi.Mock
       |> expect(:get_album, fn ^album_id -> {:ok, album} end)
 
       command = %PrepareListeningSession{
@@ -77,7 +77,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
         album_id: album_id
       }
 
-      {:error, [%SessionNotPrepared{} = event]} = CommandHandler.handle(command)
+      {:error, [%SessionNotPrepared{} = event]} = CommandBus.apply(command)
 
       assert event.user_id == user_id
     end
@@ -86,7 +86,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
       user = user_fixture()
       album = album_fixture()
 
-      PremiereEcoute.Apis.SpotifyApiMock
+      PremiereEcoute.Apis.SpotifyApi.Mock
       |> expect(:get_album, 2, fn _ -> {:ok, album} end)
 
       command = %PrepareListeningSession{
@@ -94,8 +94,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
         album_id: album.id
       }
 
-      {:ok, _, [event1]} = CommandHandler.handle(command)
-      {:ok, _, [event2]} = CommandHandler.handle(command)
+      {:ok, _, [event1]} = CommandBus.apply(command)
+      {:ok, _, [event2]} = CommandBus.apply(command)
 
       assert event1.session_id != event2.session_id
     end
@@ -107,16 +107,24 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      PremiereEcoute.Apis.SpotifyApiMock
+      PremiereEcoute.Apis.SpotifyApi.Mock
       |> expect(:get_album, fn _ -> {:ok, album} end)
 
-      PremiereEcoute.Apis.TwitchApiMock
+      PremiereEcoute.Apis.TwitchApi.Mock
+      |> expect(:cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+
+      PremiereEcoute.Apis.TwitchApi.Mock
       |> expect(:subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
         {:ok, %{}}
       end)
 
-      PremiereEcoute.Apis.TwitchApiMock
+      PremiereEcoute.Apis.TwitchApi.Mock
       |> expect(:subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
+        {:ok, %{}}
+      end)
+
+      PremiereEcoute.Apis.TwitchApi.Mock
+      |> expect(:send_chat_announcement, fn %Scope{user: ^user}, _message, _color ->
         {:ok, %{}}
       end)
 
@@ -125,11 +133,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
         album_id: album.id
       }
 
-      {:ok, _, [%SessionPrepared{} = event]} = CommandHandler.handle(command)
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
 
       command = %StartListeningSession{session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = CommandHandler.handle(command)
+      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
       session = ListeningSession.get(event.session_id)
 
@@ -144,33 +152,44 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandCommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      PremiereEcoute.Apis.SpotifyApiMock
+      PremiereEcoute.Apis.SpotifyApi.Mock
       |> expect(:get_album, fn _ -> {:ok, album} end)
 
-      PremiereEcoute.Apis.TwitchApiMock
+      PremiereEcoute.Apis.TwitchApi.Mock
+      |> expect(:cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+
+      PremiereEcoute.Apis.TwitchApi.Mock
       |> expect(:subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
         {:ok, %{}}
       end)
 
-      PremiereEcoute.Apis.TwitchApiMock
+      PremiereEcoute.Apis.TwitchApi.Mock
       |> expect(:subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
         {:ok, %{}}
       end)
+
+      PremiereEcoute.Apis.TwitchApi.Mock
+      |> expect(:send_chat_announcement, fn %Scope{user: ^user}, _message, _color ->
+        {:ok, %{}}
+      end)
+
+      PremiereEcoute.Apis.TwitchApi.Mock
+      |> expect(:cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
         album_id: album.id
       }
 
-      {:ok, _, [%SessionPrepared{} = event]} = CommandHandler.handle(command)
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
 
       command = %StartListeningSession{session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = CommandHandler.handle(command)
+      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
-      command = %StopListeningSession{session_id: event.session_id}
+      command = %StopListeningSession{session_id: event.session_id, scope: scope}
 
-      {:ok, session, [%SessionStopped{}]} = CommandHandler.handle(command)
+      {:ok, session, [%SessionStopped{}]} = CommandBus.apply(command)
 
       report = Report.get_by(session_id: session.id)
 

@@ -25,6 +25,13 @@ defmodule PremiereEcoute.MixProject do
     ]
   end
 
+  def cli do
+    [
+      default_task: "phx.server",
+      preferred_envs: [docs: :docs]
+    ]
+  end
+
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -48,6 +55,7 @@ defmodule PremiereEcoute.MixProject do
        app: false,
        compile: false,
        depth: 1},
+      {:gettext, "~> 0.26"},
       {:dns_cluster, "~> 0.2"},
       # Backend
       {:req, "~> 0.5"},
@@ -84,6 +92,13 @@ defmodule PremiereEcoute.MixProject do
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.build": ["tailwind premiere_ecoute", "esbuild premiere_ecoute"],
+      "assets.deploy": [
+        "tailwind premiere_ecoute --minify",
+        "esbuild premiere_ecoute --minify",
+        "phx.digest"
+      ],
       # Quality
       quality: [
         "compile --warnings-as-errors",
@@ -100,13 +115,7 @@ defmodule PremiereEcoute.MixProject do
       # Tests
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       # Deployment
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind premiere_ecoute", "esbuild premiere_ecoute"],
-      "assets.deploy": [
-        "tailwind premiere_ecoute --minify",
-        "esbuild premiere_ecoute --minify",
-        "phx.digest"
-      ]
+      deploy: ["format", "compile --warnings-as-errors", "cmd fly deploy"]
     ]
   end
 end

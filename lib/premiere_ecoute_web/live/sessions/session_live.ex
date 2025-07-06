@@ -78,12 +78,19 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  def handle_event("stop_session", _params, %{assigns: %{listening_session: session}} = socket) do
-    %StopListeningSession{session_id: session.id}
+  def handle_event(
+        "stop_session",
+        _params,
+        %{assigns: %{listening_session: session, current_scope: scope}} = socket
+      ) do
+    %StopListeningSession{session_id: session.id, scope: scope}
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot stop session")}
+      {:ok, session, _} ->
+        {:noreply, assign(socket, :listening_session, session)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Cannot stop session")}
     end
   end
 

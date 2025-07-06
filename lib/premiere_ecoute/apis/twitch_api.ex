@@ -1,12 +1,23 @@
 defmodule PremiereEcoute.Apis.TwitchApi do
   @moduledoc "Twitch API"
 
+  require Logger
+
   defmodule Behavior do
     @moduledoc false
 
     alias PremiereEcoute.Accounts.Scope
 
+    @callback send_chat_message(Scope.t(), message :: String.t()) ::
+                {:ok, map()} | {:error, term()}
+
+    @callback send_chat_announcement(Scope.t(), message :: String.t(), color :: String.t()) ::
+                {:ok, String.t()} | {:error, term()}
+
+    @callback get_event_subscriptions(Scope.t()) :: {:ok, [map()]} | {:error, term()}
     @callback subscribe(Scope.t(), type :: String.t()) :: {:ok, map()} | {:error, term()}
+    @callback unsubscribe(Scope.t(), type :: String.t()) :: {:ok, String.t()} | {:error, term()}
+    @callback cancel_all_subscriptions(Scope.t()) :: {:ok, [String.t()]} | {:error, term()}
 
     @callback create_poll(Scope.t(), poll :: map()) :: {:ok, map()} | {:error, term()}
     @callback end_poll(Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
@@ -21,7 +32,19 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   def impl, do: Application.get_env(@app, :twitch_api, __MODULE__)
 
   def api(:helix, token \\ nil) do
-    token = token || Application.get_env(@app, :twitch_client_id)
+    token =
+      with {:ok, nil} <- {:ok, token},
+           {:ok, nil} <- Cachex.get(:tokens, :app_access_token),
+           {:ok, token} <- PremiereEcoute.Apis.TwitchApi.Accounts.access_token() do
+        token
+      else
+        {:ok, token} ->
+          token
+
+        {:error, reason} ->
+          Logger.error("Cannot retrieve Twitch app access token due to #{inspect(reason)}")
+          ""
+      end
 
     Req.new(
       [
@@ -40,8 +63,13 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defdelegate authorization_code(code), to: __MODULE__.Accounts
   defdelegate renew_token(refresh_token), to: __MODULE__.Accounts
 
+  defdelegate send_chat_message(scope, type), to: __MODULE__.Chat
+  defdelegate send_chat_announcement(scope, type, color), to: __MODULE__.Chat
+
+  defdelegate get_event_subscriptions(scope), to: __MODULE__.EventSub
   defdelegate subscribe(scope, type), to: __MODULE__.EventSub
   defdelegate unsubscribe(scope, type), to: __MODULE__.EventSub
+  defdelegate cancel_all_subscriptions(scope), to: __MODULE__.EventSub
 
   defdelegate create_poll(scope, poll), to: __MODULE__.Polls
   defdelegate end_poll(scope, poll_id), to: __MODULE__.Polls

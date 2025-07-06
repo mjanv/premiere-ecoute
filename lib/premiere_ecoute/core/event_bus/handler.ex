@@ -1,22 +1,29 @@
 defmodule PremiereEcoute.Core.EventBus.Handler do
   @moduledoc false
 
-  defmacro __using__(opts) do
-    events =
-      opts
-      |> Keyword.get(:events, [])
-      |> Enum.map(fn {_, _, event} -> Module.concat(event) end)
+  defmacro __using__(_opts) do
+    quote do
+      import unquote(__MODULE__)
+      @before_compile unquote(__MODULE__)
+      @behaviour unquote(__MODULE__)
 
-    quote location: :keep do
-      @behaviour PremiereEcoute.Core.EventBus.Handler
-
-      for event <- unquote(events) do
-        PremiereEcoute.Core.Registry.register(event, __MODULE__)
-      end
+      Module.register_attribute(__MODULE__, :events, accumulate: true)
 
       def dispatch(_event), do: :ok
 
       defoverridable dispatch: 1
+    end
+  end
+
+  defmacro __before_compile__(_env) do
+    quote do
+      def commands_or_events, do: @events
+    end
+  end
+
+  defmacro event(event) do
+    quote do
+      @events unquote(event)
     end
   end
 

@@ -149,10 +149,10 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   end
 
   def callback(conn, %{"provider" => "twitch", "error" => error}) do
-    Logger.error("Twitch OAuth error: #{error}")
+    Logger.error("Twitch OAuth error: #{inspect(error)}")
 
     conn
-    |> put_flash(:info, "Twitch authentication failed")
+    |> put_flash(:error, "Twitch authentication failed")
     |> redirect(to: ~p"/")
   end
 

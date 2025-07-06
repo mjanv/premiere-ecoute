@@ -26,11 +26,10 @@ defmodule PremiereEcoute.Core.CommandBusTest do
   end
 
   defmodule Handler do
-    use PremiereEcoute.Core.CommandBus.Handler,
-      commands: [
-        PremiereEcoute.Core.CommandBusTest.CommandA,
-        PremiereEcoute.Core.CommandBusTest.CommandB
-      ]
+    use PremiereEcoute.Core.CommandBus.Handler
+
+    command(PremiereEcoute.Core.CommandBusTest.CommandA)
+    command(PremiereEcoute.Core.CommandBusTest.CommandB)
 
     require Logger
 
@@ -55,8 +54,9 @@ defmodule PremiereEcoute.Core.CommandBusTest do
   end
 
   defmodule EventDispatcher do
-    use PremiereEcoute.Core.EventBus.Handler,
-      events: [PremiereEcoute.Core.CommandBusTest.EventA]
+    use PremiereEcoute.Core.EventBus.Handler
+
+    event(PremiereEcoute.Core.CommandBusTest.EventA)
 
     require Logger
 

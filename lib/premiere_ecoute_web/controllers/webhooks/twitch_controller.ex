@@ -28,6 +28,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         |> send_resp(204, "")
 
       "notification" ->
+        Logger.error("Notification: #{inspect(handle(conn.body_params))}")
         Core.dispatch(handle(conn.body_params))
 
         conn

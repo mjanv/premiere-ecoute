@@ -1,8 +1,12 @@
-Mox.defmock(PremiereEcoute.Apis.TwitchApiMock, for: PremiereEcoute.Apis.TwitchApi.Behavior)
-Application.put_env(:premiere_ecoute, :twitch_api, PremiereEcoute.Apis.TwitchApiMock)
+mocks = [
+  twitch_api: PremiereEcoute.Apis.TwitchApi,
+  spotify_api: PremiereEcoute.Apis.SpotifyApi
+]
 
-Mox.defmock(PremiereEcoute.Apis.SpotifyApiMock, for: PremiereEcoute.Apis.SpotifyApi.Behavior)
-Application.put_env(:premiere_ecoute, :spotify_api, PremiereEcoute.Apis.SpotifyApiMock)
+for {key, module} <- mocks do
+  Mox.defmock(Module.concat([module, Mock]), for: Module.concat([module, Behavior]))
+  Application.put_env(:premiere_ecoute, key, Module.concat([module, Mock]))
+end
 
-ExUnit.start(capture_log: true, exclude: [:spotify])
+ExUnit.start(capture_log: true, exclude: [:spotify, :twitch])
 Ecto.Adapters.SQL.Sandbox.mode(PremiereEcoute.Repo, :manual)

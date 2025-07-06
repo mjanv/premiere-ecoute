@@ -3,12 +3,9 @@ defmodule PremiereEcoute.Core.Registry do
 
   require Logger
 
-  @table __MODULE__
+  @handlers Application.compile_env(:premiere_ecoute, :handlers, [])
 
-  def register(command_or_event, handler) do
-    Logger.debug("Register #{inspect(command_or_event)} to #{inspect(handler)}")
-    :persistent_term.put({@table, command_or_event}, handler)
+  def get(command_or_event) do
+    Enum.find(@handlers, fn h -> command_or_event in h.commands_or_events() end)
   end
-
-  def get(command_or_event), do: :persistent_term.get({@table, command_or_event}, nil)
 end

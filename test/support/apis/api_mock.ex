@@ -3,25 +3,31 @@ defmodule PremiereEcoute.ApiMock do
 
   import ExUnit.Assertions
 
+  def expect(module, n \\ 1, opts \\ []) do
+    Req.Test.expect(module, n, fn conn -> fun(conn, opts) end)
+  end
+
   def stub(module, opts \\ []) do
-    Req.Test.stub(module, fn conn ->
-      {method, path} = opts[:path]
+    Req.Test.stub(module, fn conn -> fun(conn, opts) end)
+  end
 
-      assert String.to_atom(String.downcase(conn.method)) == method
-      assert conn.request_path == path
+  def fun(conn, opts) do
+    {method, path} = opts[:path]
 
-      if opts[:params] do
-        assert conn.query_params == payload(opts[:params])
-      end
+    assert String.to_atom(String.downcase(conn.method)) == method
+    assert conn.request_path == path
 
-      if opts[:request] do
-        assert conn.body_params == payload(opts[:request])
-      end
+    if opts[:params] do
+      assert conn.query_params == payload(opts[:params])
+    end
 
-      conn
-      |> Plug.Conn.put_status(Keyword.get(opts, :status, 200))
-      |> Req.Test.json(payload(opts[:response]))
-    end)
+    if opts[:request] do
+      assert conn.body_params == payload(opts[:request])
+    end
+
+    conn
+    |> Plug.Conn.put_status(Keyword.get(opts, :status, 200))
+    |> Req.Test.json(payload(opts[:response]))
   end
 
   def payload(nil), do: ""

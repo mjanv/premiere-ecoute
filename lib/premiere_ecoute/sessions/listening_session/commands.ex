@@ -28,10 +28,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   defmodule StopListeningSession do
     @moduledoc false
 
-    defstruct [:session_id]
+    defstruct [:session_id, :scope]
 
     @type t :: %__MODULE__{
-            session_id: String.t()
+            session_id: String.t(),
+            scope: Scope.t()
           }
   end
 end

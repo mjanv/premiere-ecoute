@@ -6,15 +6,14 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandler do
   alias PremiereEcoute.Sessions.Scores.Poll
   alias PremiereEcoute.Sessions.Scores.Vote
 
-  use PremiereEcoute.Core.EventBus.Handler,
-    events: [
-      PremiereEcoute.Sessions.Scores.Events.MessageSent,
-      PremiereEcoute.Sessions.Scores.Events.PollUpdated
-    ]
+  use PremiereEcoute.Core.EventBus.Handler
+
+  event(PremiereEcoute.Sessions.Scores.Events.MessageSent)
+  event(PremiereEcoute.Sessions.Scores.Events.PollUpdated)
 
   def dispatch(%MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: message}) do
     with {:ok, value} <- Vote.from_message(message),
-         {:ok, {session_id, track_id}} <- Cachex.get(:cache, broadcaster_id),
+         {:ok, {session_id, track_id}} <- Cachex.get(:sessions, broadcaster_id),
          vote <- %Vote{
            viewer_id: user_id,
            session_id: session_id,

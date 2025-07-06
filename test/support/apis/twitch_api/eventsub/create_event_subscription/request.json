@@ -7,7 +7,7 @@
     },
     "transport":{
        "method":"webhook",
-       "callback":"https://example.com/callback",
+       "callback":"http://localhost:4000/webhooks/twitch",
        "secret":"s3cre77890ab"
     }
 }
