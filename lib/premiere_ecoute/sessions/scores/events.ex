@@ -4,9 +4,14 @@ defmodule PremiereEcoute.Sessions.Scores.Events do
   defmodule MessageSent do
     @moduledoc false
 
-    @type t :: %__MODULE__{broadcaster_id: String.t(), user_id: String.t(), message: String.t()}
+    @type t :: %__MODULE__{
+            broadcaster_id: String.t(),
+            user_id: String.t(),
+            message: String.t(),
+            is_streamer: boolean()
+          }
 
-    defstruct [:broadcaster_id, :user_id, :message]
+    defstruct [:broadcaster_id, :user_id, :message, :is_streamer]
   end
 
   defmodule PollEnded do

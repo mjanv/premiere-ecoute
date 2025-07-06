@@ -92,7 +92,8 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
       assert event == %MessageSent{
                broadcaster_id: "1971641",
                user_id: "4145994",
-               message: "Hi chat"
+               message: "Hi chat",
+               is_streamer: false
              }
     end
 

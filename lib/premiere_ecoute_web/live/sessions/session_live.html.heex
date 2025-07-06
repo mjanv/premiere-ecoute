@@ -324,7 +324,7 @@
         
 <!-- Session Controls - Only show when session is active -->
         <%= if @listening_session.status == :active do %>
-          <div class="rounded-xl p-6 mb-6" style="background-color: var(--color-dark-800);">
+          <div class="rounded-xl p-6 mb-6 bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/20">
             <div class="grid grid-cols-2 gap-4">
               <!-- AIDEV-NOTE: Spotify Player LiveComponent -->
               <div>
@@ -341,7 +341,7 @@
 <!-- Poll Controls -->
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <h4 class="text-sm font-medium text-gray-300 uppercase tracking-wide">
+                  <h4 class="text-sm font-medium text-purple-300 uppercase tracking-wide">
                     Twitch
                   </h4>
                   <div class="flex items-center space-x-2">
@@ -429,18 +429,13 @@
         
 <!-- AIDEV-NOTE: Compact Streamer Voting Section - Only show when session is active -->
         <%= if @listening_session.status == :active do %>
-          <div class="rounded-xl p-3 mb-6" style="background-color: var(--color-dark-800);">
+          <div class="rounded-xl p-3 mb-6 bg-gradient-to-r from-emerald-900/20 to-teal-900/20 border border-emerald-500/20">
             <div class="flex items-center justify-center space-x-3">
-              <span class="text-xs text-gray-400 whitespace-nowrap">Your rating</span>
+              <span class="text-xs text-emerald-300 whitespace-nowrap">Your rating</span>
               <div class="flex space-x-1">
                 <%= for rating <- 1..10 do %>
                   <button
                     phx-click="vote_track"
-                    phx-value-track_id={
-                      if @listening_session.current_track,
-                        do: @listening_session.current_track.id,
-                        else: ""
-                    }
                     phx-value-rating={rating}
                     class={[
                       "px-2 py-1 text-sm rounded border transition-colors min-w-[32px]",
@@ -549,19 +544,19 @@
                       <div class="flex items-center space-x-8 text-sm flex-shrink-0">
                         <%= if @show[:votes] do %>
                           <div class="text-center">
-                            <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                            <p class="text-xl font-bold text-purple-300">
                               <.async_result :let={report} assign={@report}>
                                 <:loading>--</:loading>
                                 <:failed>--</:failed>
                                 {track_votes_count(track.id, report)}
                               </.async_result>
                             </p>
-                            <p class="text-gray-400">Votes</p>
+                            <p class="text-purple-400/70">Votes</p>
                           </div>
                         <% end %>
                         <%= if @show[:scores] do %>
                           <div class="text-center">
-                            <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                            <p class="text-xl font-bold text-pink-300">
                               <.async_result :let={report} assign={@report}>
                                 <:loading>--</:loading>
                                 <:failed>--</:failed>
@@ -573,10 +568,10 @@
                                 <% end %>
                               </.async_result>
                             </p>
-                            <p class="text-gray-400">Score</p>
+                            <p class="text-pink-400/70">Score</p>
                           </div>
                           <div class="text-center">
-                            <p class="text-xl font-bold" style="color: var(--color-primary-300);">
+                            <p class="text-xl font-bold text-emerald-300">
                               <.async_result :let={report} assign={@report}>
                                 <:loading>--</:loading>
                                 <:failed>--</:failed>
@@ -588,7 +583,7 @@
                                 <% end %>
                               </.async_result>
                             </p>
-                            <p class="text-gray-400">My Score</p>
+                            <p class="text-emerald-400/70">My Score</p>
                           </div>
                         <% end %>
                       </div>
@@ -597,7 +592,7 @@
                   
 <!-- AIDEV-NOTE: Histogram Section - show for current track when active, or all tracks when session ended -->
                   <%= if (@listening_session.current_track && @listening_session.current_track.id == track.id) || @listening_session.status == :stopped do %>
-                    <div class="px-4 pt-4 pb-2" style="background-color: var(--color-dark-800);">
+                    <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
                       <!-- Horizontal Histogram taking ~80% width -->
                       <div class="flex items-end justify-center h-20 mx-auto w-4/5">
                         <.async_result :let={report} assign={@report}>

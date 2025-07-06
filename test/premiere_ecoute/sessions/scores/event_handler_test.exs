@@ -25,8 +25,20 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
   describe "dispatch/1 - MessageSent" do
     test "cast a new vote", %{session: session} do
       track_id = session.current_track.id
-      EventBus.dispatch(%MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "5"})
-      EventBus.dispatch(%MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "0"})
+
+      EventBus.dispatch(%MessageSent{
+        broadcaster_id: "1234",
+        user_id: "viewer1",
+        message: "5",
+        is_streamer: false
+      })
+
+      EventBus.dispatch(%MessageSent{
+        broadcaster_id: "1234",
+        user_id: "viewer2",
+        message: "0",
+        is_streamer: false
+      })
 
       [%Vote{} = vote1, %Vote{} = vote2] = Vote.all(session_id: session.id)
 
@@ -65,17 +77,30 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
       EventBus.dispatch(%MessageSent{
         broadcaster_id: "1234",
         user_id: "viewer1",
-        message: "Hello"
+        message: "Hello",
+        is_streamer: false
       })
 
       EventBus.dispatch(%MessageSent{
         broadcaster_id: "1234",
         user_id: "viewer1",
-        message: "@user ok"
+        message: "@user ok",
+        is_streamer: false
       })
 
-      EventBus.dispatch(%MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "11"})
-      EventBus.dispatch(%MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "-1"})
+      EventBus.dispatch(%MessageSent{
+        broadcaster_id: "1234",
+        user_id: "viewer2",
+        message: "11",
+        is_streamer: false
+      })
+
+      EventBus.dispatch(%MessageSent{
+        broadcaster_id: "1234",
+        user_id: "viewer2",
+        message: "-1",
+        is_streamer: false
+      })
 
       assert Enum.empty?(Vote.all(session_id: session.id))
       assert is_nil(Report.get_by(session_id: session.id))

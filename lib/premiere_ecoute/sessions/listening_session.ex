@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   use Ecto.Schema
 
   import Ecto.Changeset
+  import Ecto.Query
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Repo
@@ -97,8 +98,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> preload()
   end
 
-  def all do
-    __MODULE__
+  @spec all(Keyword.t()) :: [t()]
+  def all(opts) do
+    from(s in __MODULE__,
+      where: ^opts,
+      order_by: [asc: s.inserted_at]
+    )
     |> Repo.all()
     |> preload()
   end

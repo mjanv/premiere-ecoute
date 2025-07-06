@@ -45,7 +45,12 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
           "message" => %{"text" => text}
         }
       }) do
-    %MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: text}
+    %MessageSent{
+      broadcaster_id: broadcaster_id,
+      user_id: user_id,
+      message: text,
+      is_streamer: false
+    }
   end
 
   def handle(%{

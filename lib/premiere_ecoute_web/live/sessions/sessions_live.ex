@@ -7,10 +7,16 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    scope = socket.assigns.current_scope
+
     {:ok,
      socket
      |> assign(:page_title, "All Sessions")
-     |> assign_async(:sessions_data, fn -> {:ok, %{sessions_data: load_sessions_data()}} end)}
+     |> assign(:show_delete_modal, false)
+     |> assign(:session_to_delete, nil)
+     |> assign_async(:sessions_data, fn ->
+       {:ok, %{sessions_data: load_sessions_data(scope)}}
+     end)}
   end
 
   @impl true
@@ -20,11 +26,73 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   @impl true
   def handle_event("navigate_to_session", %{"session_id" => session_id}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/session/#{session_id}")}
+    # Only navigate if we're not in the middle of a delete operation
+    case socket.assigns[:show_delete_modal] do
+      # Don't navigate if modal is open
+      true -> {:noreply, socket}
+      _ -> {:noreply, push_navigate(socket, to: ~p"/session/#{session_id}")}
+    end
   end
 
-  defp load_sessions_data do
-    sessions = ListeningSession.all()
+  @impl true
+  def handle_event("delete_session", %{"session_id" => session_id}, socket) do
+    {:noreply,
+     socket
+     |> assign(:show_delete_modal, true)
+     |> assign(:session_to_delete, session_id)}
+  end
+
+  @impl true
+  def handle_event("cancel_delete", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:show_delete_modal, false)
+     |> assign(:session_to_delete, nil)}
+  end
+
+  @impl true
+  def handle_event("confirm_delete", _params, socket) do
+    case socket.assigns[:session_to_delete] do
+      nil ->
+        {:noreply, put_flash(socket, :error, "No session selected for deletion")}
+
+      session_id ->
+        case Integer.parse(session_id) do
+          {int_id, ""} ->
+            case ListeningSession.delete(int_id) do
+              :ok ->
+                # Reload sessions data
+                scope = socket.assigns.current_scope
+
+                {:noreply,
+                 socket
+                 |> assign(:show_delete_modal, false)
+                 |> assign(:session_to_delete, nil)
+                 |> put_flash(:info, "Session deleted successfully")
+                 |> assign_async(:sessions_data, fn ->
+                   {:ok, %{sessions_data: load_sessions_data(scope)}}
+                 end)}
+
+              :error ->
+                {:noreply,
+                 socket
+                 |> assign(:show_delete_modal, false)
+                 |> assign(:session_to_delete, nil)
+                 |> put_flash(:error, "Failed to delete session")}
+            end
+
+          _ ->
+            {:noreply,
+             socket
+             |> assign(:show_delete_modal, false)
+             |> assign(:session_to_delete, nil)
+             |> put_flash(:error, "Invalid session ID")}
+        end
+    end
+  end
+
+  defp load_sessions_data(scope) do
+    sessions = ListeningSession.all(user_id: scope.user.id)
     grouped_sessions = Enum.group_by(sessions, & &1.status)
 
     %{

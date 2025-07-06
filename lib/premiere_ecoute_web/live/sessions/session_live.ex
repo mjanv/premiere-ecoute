@@ -3,15 +3,21 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   require Logger
 
-  alias PremiereEcoute.Apis.SpotifyApi.Player
+  alias PremiereEcoute.Core
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
+  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Report
   alias PremiereEcoute.Sessions.Scores.Vote
+  alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
+    if connected?(socket) do
+      Process.send_after(self(), :refresh, 0)
+    end
+
     listening_session =
       case Integer.parse(session_id) do
         {int_id, ""} -> ListeningSession.get(int_id)
@@ -57,26 +63,13 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_event(
         "start_session",
         _params,
-        %{assigns: %{listening_session: session, current_user: user, current_scope: scope}} =
-          socket
+        %{assigns: %{listening_session: session, current_scope: scope}} = socket
       ) do
     %StartListeningSession{session_id: session.id, scope: scope}
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, updated_session, _} ->
-        socket =
-          case start_spotify_playback(user, updated_session) do
-            {:ok, _} ->
-              socket |> put_flash(:info, "Session started and Spotify playback began!")
-
-            {:error, reason} ->
-              socket |> put_flash(:warning, "Session started but Spotify failed: #{reason}")
-          end
-
-        {:noreply, assign(socket, :listening_session, updated_session)}
-
-      {:error, _} ->
-        {:noreply, put_flash(socket, :error, "Cannot start session")}
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
     end
   end
 
@@ -88,11 +81,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     %StopListeningSession{session_id: session.id, scope: scope}
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} ->
-        {:noreply, assign(socket, :listening_session, session)}
-
-      {:error, _} ->
-        {:noreply, put_flash(socket, :error, "Cannot stop session")}
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot stop session")}
     end
   end
 
@@ -118,32 +108,18 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
      |> put_flash(:info, "Overlay URL copied to clipboard!")}
   end
 
-  # AIDEV-NOTE: Spotify player events are now handled by the LiveComponent
-
   @impl true
-  def handle_event("vote_track", %{"track_id" => track_id, "rating" => rating}, socket) do
-    case Integer.parse(track_id) do
-      {int_track_id, ""} ->
-        case Integer.parse(rating) do
-          {int_rating, ""} when int_rating >= 1 and int_rating <= 10 ->
-            # AIDEV-NOTE: Create streamer vote and save to database
-            case create_streamer_vote(socket, int_track_id, int_rating) do
-              {:ok, _vote} ->
-                socket = assign(socket, :user_current_rating, int_rating)
-                {:noreply, put_flash(socket, :info, "Rated track #{int_rating}/10")}
+  def handle_event("vote_track", %{"rating" => rating}, socket) do
+    user_id = socket.assigns.current_scope.user.twitch_user_id
 
-              {:error, reason} ->
-                Logger.error("Failed to create streamer vote: #{inspect(reason)}")
-                {:noreply, put_flash(socket, :error, "Failed to save rating")}
-            end
+    Core.dispatch(%MessageSent{
+      broadcaster_id: user_id,
+      user_id: user_id,
+      message: rating,
+      is_streamer: true
+    })
 
-          _ ->
-            {:noreply, put_flash(socket, :error, "Invalid rating")}
-        end
-
-      _ ->
-        {:noreply, put_flash(socket, :error, "Invalid track")}
-    end
+    {:noreply, assign(socket, :user_current_rating, String.to_integer(rating))}
   end
 
   @impl true
@@ -153,17 +129,15 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_info({:session_updated, session}, socket) do
-    # AIDEV-NOTE: Handle session updates from Spotify player component
     socket = assign(socket, :listening_session, session)
     socket = assign(socket, :user_current_rating, nil)
     {:noreply, socket}
   end
 
   @impl true
-  def handle_info(:refreshh, socket) do
-    socket = PremiereEcouteWeb.Sessions.Components.SpotifyPlayer.refresh_state(socket)
-
-    {:noreply, socket}
+  def handle_info(:refresh, socket) do
+    Process.send_after(self(), :refresh, 2_500)
+    {:noreply, SpotifyPlayer.refresh_state(socket)}
   end
 
   @impl true
@@ -311,78 +285,5 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     track_vote_distribution(track_id, report)
     |> Enum.map(&elem(&1, 1))
     |> Enum.max(fn -> 0 end)
-  end
-
-  # AIDEV-NOTE: Create and save streamer vote, then broadcast for UI updates
-  defp create_streamer_vote(socket, track_id, rating) do
-    session_id = String.to_integer(socket.assigns.session_id)
-    current_scope = socket.assigns.current_scope
-
-    case current_scope do
-      %{user: %{id: user_id}} when not is_nil(user_id) ->
-        vote_attrs = %Vote{
-          viewer_id: to_string(user_id),
-          session_id: session_id,
-          track_id: track_id,
-          value: rating,
-          is_streamer: true
-        }
-
-        case Vote.create(vote_attrs) do
-          {:ok, vote} ->
-            # Broadcast vote_cast event for real-time updates
-            Phoenix.PubSub.broadcast(
-              PremiereEcoute.PubSub,
-              "session:#{session_id}",
-              {:vote_cast, vote}
-            )
-
-            # Regenerate report with new vote data
-            listening_session = ListeningSession.get(session_id)
-            Report.generate(listening_session)
-
-            {:ok, vote}
-
-          error ->
-            error
-        end
-
-      _ ->
-        {:error, "User not authenticated"}
-    end
-  end
-
-  defp start_spotify_playback(user, session) do
-    case user do
-      %{spotify_access_token: access_token} when not is_nil(access_token) ->
-        # AIDEV-NOTE: Get the current track from the session
-        case get_current_track_uri(session) do
-          {:ok, track_uri} ->
-            Logger.info("Starting Spotify playback for track: #{track_uri}")
-            Player.start_playback(access_token, uris: [track_uri])
-
-          {:error, reason} ->
-            Logger.warning("Could not get track URI: #{reason}")
-            # Try to start playback without specific track
-            Player.start_playback(access_token)
-        end
-
-      _ ->
-        {:error, "No Spotify connection. Connect Spotify in your account settings."}
-    end
-  end
-
-  defp get_current_track_uri(session) do
-    # AIDEV-NOTE: Get the current track from the session and build Spotify URI
-    case session.current_track do
-      nil ->
-        {:error, "No current track"}
-
-      track when is_map(track) and not is_nil(track.spotify_id) ->
-        {:ok, "spotify:track:#{track.spotify_id}"}
-
-      _ ->
-        {:error, "Track has no Spotify ID"}
-    end
   end
 end
