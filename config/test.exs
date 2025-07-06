@@ -9,6 +9,7 @@ config :premiere_ecoute,
     PremiereEcoute.Core.CommandBusTest.EventDispatcher,
     PremiereEcoute.Core.EventBusTest.Handler
   ],
+  spotify_req_options: [plug: {Req.Test, PremiereEcoute.Apis.SpotifyApi}],
   twitch_req_options: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

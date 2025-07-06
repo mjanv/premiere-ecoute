@@ -14,8 +14,8 @@ defmodule PremiereEcoute.ApiMock do
   def fun(conn, opts) do
     {method, path} = opts[:path]
 
-    assert String.to_atom(String.downcase(conn.method)) == method
     assert conn.request_path == path
+    assert String.to_atom(String.downcase(conn.method)) == method
 
     if opts[:params] do
       assert conn.query_params == payload(opts[:params])

@@ -24,7 +24,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           track_id: integer(),
           viewer_score: float(),
           streamer_score: float(),
-          individual_count: integer(),
+          unique_votes: integer(),
           poll_count: integer(),
           unique_voters: integer()
         }
@@ -82,6 +82,9 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   @doc """
   Generates a comprehensive report for a listening session.
 
+  If a report already exists for the session, it will be updated with fresh data.
+  If no report exists, a new one will be created.
+
   This is the main business logic function that combines all vote sources:
   1. Individual votes (viewers + streamer)
   2. Twitch polls
@@ -89,27 +92,33 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   ## Examples
 
-      iex> generate(123)
+      iex> generate(%ListeningSession{id: 123})
       {:ok, %Report{}}
   """
   @spec generate(ListeningSession.t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def generate(%ListeningSession{id: session_id}) do
-    session_stats = calculate_session_stats_sql(session_id)
-    track_summaries = calculate_track_summaries_sql(session_id)
-    session_summary = calculate_session_summary_sql(session_id)
+    session_stats = calculate_session_stats(session_id)
 
     attrs = %{
       session_id: session_id,
       generated_at: NaiveDateTime.utc_now(),
       unique_votes: session_stats.unique_votes,
       unique_voters: session_stats.unique_voters,
-      session_summary: session_summary,
-      track_summaries: track_summaries
+      session_summary: calculate_session_summary(session_id),
+      track_summaries: calculate_track_summaries(session_id)
     }
 
-    %__MODULE__{}
-    |> changeset(attrs)
-    |> Repo.insert()
+    case get_by(session_id: session_id) do
+      nil ->
+        %__MODULE__{}
+        |> changeset(attrs)
+        |> Repo.insert()
+
+      report ->
+        report
+        |> changeset(attrs)
+        |> Repo.update()
+    end
     |> case do
       {:ok, report} ->
         {:ok, preload(report)}
@@ -122,9 +131,10 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   @spec get_by(Keyword.t()) :: t() | nil
   def get_by(opts) do
-    from(r in __MODULE__, where: ^opts)
-    |> Repo.one()
-    |> preload()
+    case Repo.one(from(r in __MODULE__, where: ^opts)) do
+      nil -> nil
+      report -> preload(report)
+    end
   end
 
   @spec all(Keyword.t()) :: [t()]
@@ -139,7 +149,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   # PostgreSQL-based calculation functions using raw SQL for maximum efficiency
 
   # Calculates session-level statistics using PostgreSQL aggregation
-  defp calculate_session_stats_sql(session_id) do
+  defp calculate_session_stats(session_id) do
     query = """
     SELECT
       COALESCE(individual_votes, 0) as individual_votes,
@@ -172,7 +182,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   end
 
   # Calculates session summary scores using PostgreSQL aggregation
-  defp calculate_session_summary_sql(session_id) do
+  defp calculate_session_summary(session_id) do
     # PostgreSQL-compatible query with JSON handling
     query = """
     WITH viewer_individual_avg AS (
@@ -254,7 +264,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   end
 
   # Calculates track summaries using PostgreSQL aggregation
-  defp calculate_track_summaries_sql(session_id) do
+  defp calculate_track_summaries(session_id) do
     query = """
     WITH all_tracks AS (
       SELECT DISTINCT track_id FROM votes WHERE session_id = $1
@@ -264,7 +274,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     vote_stats AS (
       SELECT
         track_id,
-        COUNT(*) as individual_count,
+        COUNT(*) as unique_votes,
         AVG(CASE WHEN is_streamer = false THEN value::FLOAT END) as viewer_individual_avg,
         AVG(CASE WHEN is_streamer = true THEN value::FLOAT END) as streamer_avg,
         COUNT(DISTINCT CASE WHEN is_streamer = false THEN viewer_id END) as unique_individual_voters
@@ -303,7 +313,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
         ELSE 0.0
       END as viewer_score,
       COALESCE(v.streamer_avg, 0.0) as streamer_score,
-      COALESCE(v.individual_count, 0) as individual_count,
+      COALESCE(v.unique_votes, 0) as unique_votes,
       COALESCE(p.poll_count, 0) as poll_count,
       COALESCE(v.unique_individual_voters, 0) + COALESCE(p.poll_count, 0) as unique_voters
     FROM all_tracks t
@@ -318,7 +328,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
                                track_id,
                                viewer_score,
                                streamer_score,
-                               individual_count,
+                               unique_votes,
                                poll_count,
                                unique_voters
                              ] ->
@@ -326,7 +336,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
         track_id: track_id,
         viewer_score: viewer_score || 0.0,
         streamer_score: streamer_score || 0.0,
-        individual_count: individual_count || 0,
+        unique_votes: unique_votes || 0,
         poll_count: poll_count || 0,
         unique_voters: unique_voters || 0
       }

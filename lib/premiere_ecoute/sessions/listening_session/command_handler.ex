@@ -43,11 +43,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StartListeningSession{session_id: session_id, scope: scope}) do
-    with session <- ListeningSession.get(session_id),
-         {:ok, session} <- ListeningSession.next_track(session),
-         {:ok, _} <- TwitchApi.impl().cancel_all_subscriptions(scope),
+    with {:ok, _} <- TwitchApi.impl().cancel_all_subscriptions(scope),
          {:ok, _} <- TwitchApi.impl().subscribe(scope, "channel.chat.message"),
          {:ok, _} <- TwitchApi.impl().subscribe(scope, "channel.poll.progress"),
+         session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         {:ok, session} <- ListeningSession.next_track(session),
+         {:ok, _} <- SpotifyApi.impl().start_resume_playback(scope, session.current_track),
          {:ok, _} <- TwitchApi.impl().send_chat_announcement(scope, "Bienvenue !", "purple"),
          {:ok, session} <- ListeningSession.start(session) do
       {:ok, session, [%SessionStarted{session_id: session.id}]}

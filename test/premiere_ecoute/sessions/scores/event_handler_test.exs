@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
   alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
   alias PremiereEcoute.Sessions.Scores.Poll
+  alias PremiereEcoute.Sessions.Scores.Report
   alias PremiereEcoute.Sessions.Scores.Vote
 
   setup do
@@ -34,6 +35,26 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
 
       assert %Vote{viewer_id: "viewer2", value: 0, track_id: ^track_id, is_streamer: false} =
                vote2
+
+      report = Report.get_by(session_id: session.id)
+
+      assert %PremiereEcoute.Sessions.Scores.Report{
+               unique_votes: 2,
+               polls: [],
+               session_id: _,
+               session_summary: %{"streamer_score" => +0.0, "tracks_rated" => 1, "viewer_score" => 2.5},
+               track_summaries: [
+                %{
+                  "unique_votes" => 2,
+                  "poll_count" => 0,
+                  "streamer_score" => +0.0,
+                  "unique_voters" => 2,
+                  "viewer_score" => 2.5
+                }
+              ],
+               unique_voters: 2,
+               votes: _
+             } = report
     end
 
     test "does not cast vote from invalid messages", %{session: session} do
@@ -53,6 +74,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
       EventBus.dispatch(%MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "-1"})
 
       assert Enum.empty?(Vote.all(session_id: session.id))
+      assert is_nil(Report.get_by(session_id: session.id))
     end
   end
 

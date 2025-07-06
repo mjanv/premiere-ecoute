@@ -6,7 +6,8 @@ config :premiere_ecoute,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
     PremiereEcoute.Sessions.Scores.EventHandler
   ],
-  twitch_req_options: []
+  twitch_req_options: [],
+  spotify_req_options: []
 
 config :premiere_ecoute, :scopes,
   user: [

@@ -5,7 +5,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
 
   require Logger
 
+  alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Sessions.Discography.Track
 
   @doc """
   Start/resume playback on the user's active device.
@@ -97,11 +100,29 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     |> Req.merge(headers: [{"Authorization", "Bearer #{access_token}"}])
     |> Req.get(url: "/me/player")
     |> case do
-      {:ok, %{status: 200, body: body}} ->
-        {:ok, body}
+      {:ok,
+       %{
+         status: 200,
+         body: %{
+           "device" => device,
+           "is_playing" => is_playing,
+           "item" => item,
+           "progress_ms" => progress_ms
+         }
+       }} ->
+        state = %{
+          "is_playing" => is_playing,
+          "item" =>
+            item
+            |> Map.take(["id", "name", "track_number", "duration_ms"])
+            |> Map.merge(%{"progress_ms" => progress_ms}),
+          "device" => Map.take(device, ["id", "name", "is_active"])
+        }
+
+        {:ok, state}
 
       {:ok, %{status: 204}} ->
-        {:ok, %{}}
+        {:ok, default()}
 
       {:ok, %{status: status, body: body}} ->
         Logger.error("Spotify get playback state failed: #{status} - #{inspect(body)}")
@@ -110,6 +131,92 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
       {:error, reason} ->
         Logger.error("Spotify get playback state request failed: #{inspect(reason)}")
         {:error, "Network error during playback state"}
+    end
+  end
+
+  def default, do: %{"is_playing" => false, "item" => nil, "device" => nil}
+
+  def start_resume_playback(%Scope{user: %{spotify_access_token: access_token}}, %Album{
+        spotify_id: spotify_id
+      }) do
+    SpotifyApi.api(:web)
+    |> Req.merge(headers: [{"Authorization", "Bearer #{access_token}"}])
+    |> Req.put(
+      url: "/me/player/play",
+      json: %{context_uri: "spotify:album:#{spotify_id}", offset: %{position: 0}, position_ms: 0}
+    )
+    |> case do
+      {:ok, %{status: 204}} ->
+        {:ok, "spotify:album:#{spotify_id}"}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify start resume playback failed: #{status} - #{inspect(body)}")
+        {:error, "Spotify start resume playback failed"}
+
+      {:error, reason} ->
+        Logger.error("Spotify start resume playback request failed: #{inspect(reason)}")
+        {:error, "Network error during start resume playback"}
+    end
+  end
+
+  def start_resume_playback(%Scope{user: %{spotify_access_token: access_token}}, %Track{
+        spotify_id: spotify_id
+      }) do
+    SpotifyApi.api(:web)
+    |> Req.merge(headers: [{"Authorization", "Bearer #{access_token}"}])
+    |> Req.put(
+      url: "/me/player/play",
+      json: %{uris: ["spotify:track:#{spotify_id}"], position_ms: 0}
+    )
+    |> case do
+      {:ok, %{status: 204}} ->
+        {:ok, "spotify:track:#{spotify_id}"}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify start resume playback failed: #{status} - #{inspect(body)}")
+        {:error, "Spotify start resume playback failed"}
+
+      {:error, reason} ->
+        Logger.error("Spotify start resume playback request failed: #{inspect(reason)}")
+        {:error, "Network error during start resume playback"}
+    end
+  end
+
+  def add_item_to_playback_queue(%Scope{user: %{spotify_access_token: access_token}}, %Track{
+        spotify_id: spotify_id
+      }) do
+    SpotifyApi.api(:web)
+    |> Req.merge(
+      headers: [
+        {"Authorization", "Bearer #{access_token}"},
+        {"Content-Type", "application/json"},
+        {"Content-Length", "0"}
+      ]
+    )
+    |> Req.post(
+      url: "/me/player/queue",
+      params: %{uri: "spotify:track:#{spotify_id}"}
+    )
+    |> case do
+      {:ok, %{status: 204}} ->
+        {:ok, "spotify:track:#{spotify_id}"}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify add item to playback queue failed: #{status} - #{inspect(body)}")
+        {:error, "Spotify add item to playback queue failed"}
+
+      {:error, reason} ->
+        Logger.error("Spotify add item to playback queue request failed: #{inspect(reason)}")
+        {:error, "Network error during add item to playback queue"}
+    end
+  end
+
+  def add_item_to_playback_queue(%Scope{} = scope, %Album{tracks: tracks}) do
+    results = Enum.map(tracks, fn t -> add_item_to_playback_queue(scope, t) end)
+
+    case Enum.all?(results, fn {status, _} -> status == :ok end) do
+      true -> {:ok, Enum.map(results, fn {_, context_uri} -> context_uri end)}
+      false -> {:error, "Cannot queue all album tracks"}
     end
   end
 

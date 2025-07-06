@@ -1,10 +1,12 @@
 defmodule PremiereEcoute.Sessions.Scores.EventHandler do
   @moduledoc false
 
+  alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
   alias PremiereEcoute.Sessions.Scores.Poll
   alias PremiereEcoute.Sessions.Scores.Vote
+  alias PremiereEcoute.Sessions.Scores.Report
 
   use PremiereEcoute.Core.EventBus.Handler
 
@@ -21,7 +23,9 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandler do
            value: value,
            is_streamer: false
          },
-         {:ok, _} <- Vote.create(vote) do
+         {:ok, vote} <- Vote.create(vote),
+         {:ok, _} <- Report.generate(%ListeningSession{id: session_id}),
+         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", vote) do
       :ok
     else
       _ -> :ok

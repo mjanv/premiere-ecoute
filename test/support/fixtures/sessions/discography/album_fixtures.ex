@@ -4,8 +4,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumFixtures do
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Track
 
-  def album_fixture do
-    %Album{
+  def album_fixture(attrs \\ %{}) do
+    %{
       spotify_id: "album123",
       name: "Sample Album",
       artist: "Sample Artist",
@@ -27,5 +27,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumFixtures do
         }
       ]
     }
+    |> Map.merge(attrs)
+    |> then(fn attrs -> struct(Album, attrs) end)
   end
 end

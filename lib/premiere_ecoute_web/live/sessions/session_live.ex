@@ -36,6 +36,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         {:ok,
          socket
          |> assign(:listening_session, listening_session)
+         |> assign(:player_state, nil)
          |> assign(:session_id, session_id)
          |> assign(:current_user, current_user)
          |> assign(:show, %{votes: true, scores: true})
@@ -100,82 +101,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
      assign(socket, :show, Map.update!(assigns.show, String.to_atom(flag), fn v -> !v end))}
   end
 
-  @impl true
-  def handle_event("next_track", _params, %{assigns: %{listening_session: session}} = socket) do
-    case ListeningSession.next_track(session) do
-      {:ok, session} ->
-        # Clear user rating when track changes
-        socket = assign(socket, :listening_session, session)
-        socket = assign(socket, :user_current_rating, nil)
-        {:noreply, socket}
-
-      {:error, :no_tracks_left} ->
-        {:noreply, put_flash(socket, :info, "Already at the last track")}
-
-      {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to go to next track")}
-    end
-  end
-
-  @impl true
-  def handle_event("previous_track", _params, %{assigns: %{listening_session: session}} = socket) do
-    case ListeningSession.previous_track(session) do
-      {:ok, updated_session} ->
-        socket = assign(socket, :listening_session, updated_session)
-        socket = assign(socket, :user_current_rating, nil)
-        {:noreply, socket}
-
-      {:error, :no_tracks_left} ->
-        {:noreply, put_flash(socket, :info, "Already at the first track")}
-
-      {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to go to previous track")}
-    end
-  end
-
-  @impl true
-  def handle_event("toggle_playback", _params, %{assigns: %{current_user: user}} = socket) do
-    case user do
-      %{spotify_access_token: access_token} when not is_nil(access_token) ->
-        # AIDEV-NOTE: Get current playback state to determine if playing or paused
-        case Player.get_playback_state(access_token) do
-          {:ok, %{"is_playing" => true}} ->
-            # Currently playing, so pause
-            case Player.pause_playback(access_token) do
-              {:ok, _} ->
-                {:noreply, put_flash(socket, :info, "Spotify playback paused")}
-
-              {:error, reason} ->
-                {:noreply, put_flash(socket, :error, "Failed to pause: #{reason}")}
-            end
-
-          {:ok, %{"is_playing" => false}} ->
-            # Currently paused, so play
-            case Player.start_playback(access_token) do
-              {:ok, _} ->
-                {:noreply, put_flash(socket, :info, "Spotify playback resumed")}
-
-              {:error, reason} ->
-                {:noreply, put_flash(socket, :error, "Failed to play: #{reason}")}
-            end
-
-          {:ok, %{}} ->
-            # No active device or no playback state
-            {:noreply,
-             put_flash(
-               socket,
-               :error,
-               "No active Spotify device. Start playing music on Spotify first, then try again."
-             )}
-
-          {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Failed to get playback state: #{reason}")}
-        end
-
-      _ ->
-        {:noreply, put_flash(socket, :error, "Connect Spotify in your account settings first")}
-    end
-  end
+  # AIDEV-NOTE: Spotify player events are now handled by the LiveComponent
 
   @impl true
   def handle_event("vote_track", %{"track_id" => track_id, "rating" => rating}, socket) do
@@ -198,6 +124,21 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, "Received event: #{event}")}
+  end
+
+  @impl true
+  def handle_info({:session_updated, session}, socket) do
+    # AIDEV-NOTE: Handle session updates from Spotify player component
+    socket = assign(socket, :listening_session, session)
+    socket = assign(socket, :user_current_rating, nil)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(:refreshh, socket) do
+    socket = PremiereEcouteWeb.Sessions.Components.SpotifyPlayer.refresh_state(socket)
+
+    {:noreply, socket}
   end
 
   @impl true
