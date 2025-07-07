@@ -103,8 +103,7 @@
 
 /* This file is for your main application CSS */
 
-/* Import Styrene BLC font - Using Poppins as fallback since Styrene BLC requires license */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+/* AIDEV-NOTE: Bricolage Grotesque font integration - loaded via root layout */
 
 /* Custom CSS Variables for Design System */
 :root {
@@ -146,7 +145,7 @@
 
 /* Apply font globally */
 body {
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 400;
   line-height: 1.6;
 }

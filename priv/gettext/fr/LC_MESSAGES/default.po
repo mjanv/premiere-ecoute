@@ -24,7 +24,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer cette session d'écoute ? Cette act
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:58
 #, elixir-autogen, elixir-format
 msgid "Browse Sessions"
-msgstr "Parcourir les Sessions"
+msgstr "Mes sessions"
 
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:34
 #, elixir-autogen, elixir-format
@@ -80,7 +80,7 @@ msgstr "Partagez vos goûts musicaux avec le monde. Créez des sessions d'écout
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:40
 #, elixir-autogen, elixir-format
 msgid "Start New Session"
-msgstr "Démarrer une Nouvelle Session"
+msgstr "Nouvelle session"
 
 #: lib/premiere_ecoute_web/components/header.ex:130
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:8
@@ -142,7 +142,7 @@ msgstr "Spectateurs"
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:178
 #, elixir-autogen, elixir-format
 msgid "Active Sessions"
-msgstr "Sessions Actives"
+msgstr "Actives"
 
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:194
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:290
