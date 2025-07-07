@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
       {:error, _} ->
         socket
-        |> put_flash(:error, "Cannot read playback state")
+        |> put_flash(:error, gettext("Cannot read playback state"))
         |> assign(:player_state, SpotifyApi.Player.default())
     end
   end
@@ -42,20 +42,22 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         case SpotifyApi.pause_playback(socket.assigns.current_scope) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => false})
-            {:noreply, put_flash(socket, :info, "Spotify playback paused")}
+            {:noreply, put_flash(socket, :info, gettext("Spotify playback paused"))}
 
           {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Failed to pause: #{reason}")}
+            {:noreply,
+             put_flash(socket, :error, gettext("Failed to pause: %{reason}", reason: reason))}
         end
 
       %{"is_playing" => false} = state ->
         case SpotifyApi.start_playback(socket.assigns.current_scope) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => true})
-            {:noreply, put_flash(socket, :info, "Spotify playback resumed")}
+            {:noreply, put_flash(socket, :info, gettext("Spotify playback resumed"))}
 
           {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Failed to play: #{reason}")}
+            {:noreply,
+             put_flash(socket, :error, gettext("Failed to play: %{reason}", reason: reason))}
         end
     end
   end
@@ -68,13 +70,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
       {:ok, session} ->
         SpotifyApi.start_resume_playback(socket.assigns.current_scope, session.current_track)
         send(self(), {:session_updated, session})
-        {:noreply, put_flash(socket, :info, "Next track")}
+        {:noreply, put_flash(socket, :info, gettext("Next track"))}
 
       {:error, :no_tracks_left} ->
-        {:noreply, put_flash(socket, :info, "Already at the last track")}
+        {:noreply, put_flash(socket, :info, gettext("Already at the last track"))}
 
       {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to go to next track")}
+        {:noreply, put_flash(socket, :error, gettext("Failed to go to next track"))}
     end
   end
 
@@ -86,13 +88,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
       {:ok, session} ->
         SpotifyApi.start_resume_playback(socket.assigns.current_scope, session.current_track)
         send(self(), {:session_updated, session})
-        {:noreply, put_flash(socket, :info, "Previous track")}
+        {:noreply, put_flash(socket, :info, gettext("Previous track"))}
 
       {:error, :no_tracks_left} ->
-        {:noreply, put_flash(socket, :info, "Already at the first track")}
+        {:noreply, put_flash(socket, :info, gettext("Already at the first track"))}
 
       {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to go to previous track")}
+        {:noreply, put_flash(socket, :error, gettext("Failed to go to previous track"))}
     end
   end
 
@@ -110,7 +112,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
             <span class="text-xs text-green-400">{@player_state["device"]["name"]}</span>
           <% else %>
             <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span class="text-xs text-red-500">Not playing</span>
+            <span class="text-xs text-red-500">{gettext("Not playing")}</span>
           <% end %>
         </div>
       </div>
@@ -122,7 +124,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
             {@player_state["item"]["name"]}
           </p>
           <div class="flex items-center justify-between text-xs text-gray-400">
-            <span>Progress:</span>
+            <span>{gettext("Progress:")}</span>
             <span>
               {format_duration(@player_state["item"]["progress_ms"])} / {format_duration(
                 @player_state["item"]["duration_ms"]
@@ -132,7 +134,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         </div>
       <% else %>
         <div class="bg-white/5 rounded-lg p-3">
-          <p class="text-xs text-gray-400 text-center">No track selected</p>
+          <p class="text-xs text-gray-400 text-center">{gettext("No track selected")}</p>
         </div>
       <% end %>
 
@@ -145,7 +147,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
           </svg>
-          <span>Previous</span>
+          <span>{gettext("Previous")}</span>
         </button>
         <button
           phx-click="toggle_playback"
@@ -160,7 +162,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
                 clip-rule="evenodd"
               />
             </svg>
-            <span>Pause</span>
+            <span>{gettext("Pause")}</span>
           <% else %>
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -169,7 +171,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
                 clip-rule="evenodd"
               />
             </svg>
-            <span>Play</span>
+            <span>{gettext("Play")}</span>
           <% end %>
         </button>
         <button
@@ -177,7 +179,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           phx-target={@myself}
           class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
         >
-          <span>Next</span>
+          <span>{gettext("Next")}</span>
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
           </svg>

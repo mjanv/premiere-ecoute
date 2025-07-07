@@ -91,7 +91,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                         d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                       />
                     </svg>
-                    My Sessions
+                    {gettext("My Sessions")}
                   </.link>
                   
     <!-- Create Session (second item) -->
@@ -107,7 +107,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                       />
                     </svg>
-                    Create Session
+                    {gettext("Create Session")}
                   </.link>
                   
     <!-- Divider -->
@@ -126,7 +126,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
                     </svg>
-                    Account
+                    {gettext("Account")}
                   </.link>
                   
     <!-- Log Out -->
@@ -143,7 +143,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                       />
                     </svg>
-                    Log Out
+                    {gettext("Log Out")}
                   </.link>
                 </div>
               </div>
@@ -158,7 +158,7 @@ defmodule PremiereEcouteWeb.Components.Header do
               <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
               </svg>
-              Connect with Twitch
+              {gettext("Connect with Twitch")}
             </.link>
           <% end %>
         </div>

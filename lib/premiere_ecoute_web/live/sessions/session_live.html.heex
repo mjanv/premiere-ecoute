@@ -19,7 +19,7 @@
                 </svg>
               </div>
               <div class="flex items-center w-full">
-                <h2 class="text-xl font-bold text-white">Listening Session</h2>
+                <h2 class="text-xl font-bold text-white">{gettext("Listening Session")}</h2>
                 <div class="flex-1"></div>
                 <span class={[
                   "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
@@ -46,7 +46,7 @@
                         <% end %>
                       </.async_result>
                     </div>
-                    <div class="text-xs text-purple-200 font-medium">Viewers</div>
+                    <div class="text-xs text-purple-200 font-medium">{gettext("Viewers")}</div>
                   </div>
 
                   <div class="text-center bg-white/10 rounded-lg p-3">
@@ -61,7 +61,7 @@
                         <% end %>
                       </.async_result>
                     </div>
-                    <div class="text-xs text-purple-200 font-medium">Streamer</div>
+                    <div class="text-xs text-purple-200 font-medium">{gettext("Streamer")}</div>
                   </div>
                 </div>
               <% end %>
@@ -77,7 +77,9 @@
                         {session_total_votes(report)}
                       </.async_result>
                     </div>
-                    <div class="text-xs text-purple-200 font-medium">Total Votes</div>
+                    <div class="text-xs text-purple-200 font-medium">
+                      {gettext("Total Votes")}
+                    </div>
                   </div>
 
                   <div class="text-center bg-white/10 rounded-lg p-3">
@@ -88,7 +90,9 @@
                         {session_unique_voters(report)}
                       </.async_result>
                     </div>
-                    <div class="text-xs text-purple-200 font-medium">Unique Voters</div>
+                    <div class="text-xs text-purple-200 font-medium">
+                      {gettext("Unique Voters")}
+                    </div>
                   </div>
                 </div>
               <% end %>
@@ -108,7 +112,7 @@
                           clip-rule="evenodd"
                         />
                       </svg>
-                      <span>Start Session</span>
+                      <span>{gettext("Start Session")}</span>
                     </button>
                   <% end %>
 
@@ -124,7 +128,7 @@
                           clip-rule="evenodd"
                         />
                       </svg>
-                      <span>End Session</span>
+                      <span>{gettext("End Session")}</span>
                     </button>
                   <% end %>
 
@@ -137,7 +141,7 @@
                           clip-rule="evenodd"
                         />
                       </svg>
-                      <span>Session Ended</span>
+                      <span>{gettext("Session Ended")}</span>
                     </div>
                   <% end %>
                 </div>
@@ -151,7 +155,7 @@
               >
                 <div class="relative">
                   <div class="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 z-10">
-                    <span class="text-xs text-purple-200 font-medium">Overlay</span>
+                    <span class="text-xs text-purple-200 font-medium">{gettext("Overlay")}</span>
                     <div class="w-px h-4 bg-white/20"></div>
                   </div>
                   <input
@@ -166,7 +170,7 @@
                       <button
                         phx-click="open_overlay"
                         class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors flex items-center justify-center h-full"
-                        title="Open overlay in new tab"
+                        title={gettext("Open overlay in new tab")}
                       >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
@@ -181,7 +185,7 @@
                     <button
                       phx-click="copy_overlay_url"
                       class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded transition-colors flex items-center justify-center h-full"
-                      title="Copy overlay URL"
+                      title={gettext("Copy overlay URL")}
                     >
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -218,7 +222,9 @@
                         ]}>
                         </span>
                       </div>
-                      <span class="text-purple-200 text-sm font-medium">Display votes</span>
+                      <span class="text-purple-200 text-sm font-medium">
+                        {gettext("Display votes")}
+                      </span>
                     </label>
                   </div>
                   <div class="flex items-center">
@@ -240,7 +246,9 @@
                         ]}>
                         </span>
                       </div>
-                      <span class="text-purple-200 text-sm font-medium">Display scores</span>
+                      <span class="text-purple-200 text-sm font-medium">
+                        {gettext("Display scores")}
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -276,7 +284,7 @@
                       <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
                     </svg>
                   </div>
-                  <h3 class="text-lg font-bold text-white">Album Details</h3>
+                  <h3 class="text-lg font-bold text-white">{gettext("Album Details")}</h3>
                 </div>
 
                 <h2 class="text-lg font-bold text-white mb-1 truncate">
@@ -286,7 +294,7 @@
 
                 <div class="grid grid-cols-3 gap-3 text-xs">
                   <div>
-                    <span class="text-purple-200 block">Released</span>
+                    <span class="text-purple-200 block">{gettext("Released")}</span>
                     <span class="font-medium text-white">
                       {if @listening_session.album.release_date,
                         do: Calendar.strftime(@listening_session.album.release_date, "%-d %B %Y"),
@@ -294,14 +302,14 @@
                     </span>
                   </div>
                   <div>
-                    <span class="text-purple-200 block">Tracks</span>
+                    <span class="text-purple-200 block">{gettext("Tracks")}</span>
                     <span class="font-medium text-white">
                       {@listening_session.album.total_tracks ||
                         length(@listening_session.album.tracks || [])}
                     </span>
                   </div>
                   <div>
-                    <span class="text-purple-200 block">Duration</span>
+                    <span class="text-purple-200 block">{gettext("Duration")}</span>
                     <span class="font-medium text-white">
                       {total_ms =
                         (@listening_session.album.tracks || [])
@@ -347,10 +355,10 @@
                   <div class="flex items-center space-x-2">
                     <%= if assigns[:poll_active] do %>
                       <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                      <span class="text-xs text-purple-400">Active Poll</span>
+                      <span class="text-xs text-purple-400">{gettext("Active Poll")}</span>
                     <% else %>
                       <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                      <span class="text-xs text-gray-500">No Poll</span>
+                      <span class="text-xs text-gray-500">{gettext("No Poll")}</span>
                     <% end %>
                   </div>
                 </div>
@@ -359,18 +367,20 @@
                 <div class="bg-white/5 rounded-lg p-3 space-y-2">
                   <%= if assigns[:poll_active] do %>
                     <div class="flex items-center justify-between">
-                      <span class="text-xs text-gray-400">Poll Status:</span>
-                      <span class="text-xs text-purple-400 font-medium">Running</span>
+                      <span class="text-xs text-gray-400">{gettext("Poll Status:")}</span>
+                      <span class="text-xs text-purple-400 font-medium">
+                        {gettext("Running")}
+                      </span>
                     </div>
                     <div class="flex items-center justify-between">
-                      <span class="text-xs text-gray-400">Total Votes:</span>
+                      <span class="text-xs text-gray-400">{gettext("Total Votes:")}</span>
                       <span class="text-xs text-white font-medium">
                         {assigns[:poll_votes] || 0}
                       </span>
                     </div>
                     <%= if assigns[:poll_time_remaining] do %>
                       <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Time Left:</span>
+                        <span class="text-xs text-gray-400">{gettext("Time Left:")}</span>
                         <span class="text-xs text-purple-400 font-medium">
                           {format_duration(@poll_time_remaining)}
                         </span>
@@ -379,17 +389,21 @@
                   <% else %>
                     <%= if assigns[:poll_terminated] do %>
                       <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Last Poll:</span>
-                        <span class="text-xs text-gray-400 font-medium">Completed</span>
+                        <span class="text-xs text-gray-400">{gettext("Last Poll:")}</span>
+                        <span class="text-xs text-gray-400 font-medium">
+                          {gettext("Completed")}
+                        </span>
                       </div>
                       <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Final Votes:</span>
+                        <span class="text-xs text-gray-400">{gettext("Final Votes:")}</span>
                         <span class="text-xs text-white font-medium">
                           {assigns[:last_poll_votes] || 0}
                         </span>
                       </div>
                     <% else %>
-                      <p class="text-xs text-gray-400 text-center">No poll running</p>
+                      <p class="text-xs text-gray-400 text-center">
+                        {gettext("No poll running")}
+                      </p>
                     <% end %>
                   <% end %>
                 </div>
@@ -406,7 +420,7 @@
                         clip-rule="evenodd"
                       />
                     </svg>
-                    <span>Start Poll</span>
+                    <span>{gettext("Start Poll")}</span>
                   </button>
                   <button
                     phx-click="stop_poll"
@@ -419,7 +433,7 @@
                         clip-rule="evenodd"
                       />
                     </svg>
-                    <span>Stop Poll</span>
+                    <span>{gettext("Stop Poll")}</span>
                   </button>
                 </div>
               </div>
@@ -431,7 +445,9 @@
         <%= if @listening_session.status == :active do %>
           <div class="rounded-xl p-3 mb-6 bg-gradient-to-r from-emerald-900/20 to-teal-900/20 border border-emerald-500/20">
             <div class="flex items-center justify-center space-x-3">
-              <span class="text-xs text-emerald-300 whitespace-nowrap">Your rating</span>
+              <span class="text-xs text-emerald-300 whitespace-nowrap">
+                {gettext("Your rating")}
+              </span>
               <div class="flex space-x-1">
                 <%= for rating <- 1..10 do %>
                   <button
@@ -551,7 +567,7 @@
                                 {track_votes_count(track.id, report)}
                               </.async_result>
                             </p>
-                            <p class="text-purple-400/70">Votes</p>
+                            <p class="text-purple-400/70">{gettext("Votes")}</p>
                           </div>
                         <% end %>
                         <%= if @show[:scores] do %>
@@ -568,7 +584,7 @@
                                 <% end %>
                               </.async_result>
                             </p>
-                            <p class="text-pink-400/70">Score</p>
+                            <p class="text-pink-400/70">{gettext("Score")}</p>
                           </div>
                           <div class="text-center">
                             <p class="text-xl font-bold text-emerald-300">
@@ -583,7 +599,7 @@
                                 <% end %>
                               </.async_result>
                             </p>
-                            <p class="text-emerald-400/70">My Score</p>
+                            <p class="text-emerald-400/70">{gettext("My Score")}</p>
                           </div>
                         <% end %>
                       </div>
@@ -680,7 +696,7 @@
               >
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
-              <p>No tracks found for this album.</p>
+              <p>{gettext("No tracks found for this album.")}</p>
             </div>
           <% end %>
         </div>

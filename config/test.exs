@@ -21,6 +21,8 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   secret_key_base: "QWnUlPd8dtgcO9GqNwZby5dC48OsqV2+qVZpCjhQOh9Hk+t+1pv3pmsgnZ6egjs5",
   server: false
 
+config :premiere_ecoute, PremiereEcouteWeb.Gettext, default_locale: "en"
+
 config :bcrypt_elixir, :log_rounds, 1
 
 config :logger, level: :warning
