@@ -26,7 +26,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
   end
 
   describe "get_playback_state/1" do
-    test "return a playing playback state" do
+    test "return a playing playback state", %{scope: scope} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/me/player"},
@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 200
       )
 
-      {:ok, state} = Player.get_playback_state("")
+      {:ok, state} = Player.get_playback_state(scope)
 
       assert state == %{
                "is_playing" => true,
@@ -53,7 +53,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
              }
     end
 
-    test "return a non-playing playback state" do
+    test "return a non-playing playback state", %{scope: scope} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/me/player"},
@@ -61,13 +61,65 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, state} = Player.get_playback_state("")
+      {:ok, state} = Player.get_playback_state(scope)
 
       assert state == %{
                "is_playing" => false,
                "device" => nil,
                "item" => nil
              }
+    end
+  end
+
+  describe "start_playback/1" do
+    test "start the current player", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/play"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = Player.start_playback(scope)
+    end
+  end
+
+  describe "pause_playback/1" do
+    test "pause the current player", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/pause"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = Player.pause_playback(scope)
+    end
+  end
+
+  describe "next_track/1" do
+    test "skips to the next track", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:post, "/v1/me/player/next"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = Player.next_track(scope)
+    end
+  end
+
+  describe "previous_track/1" do
+    test "skips to the previous track", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:post, "/v1/me/player/previous"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = Player.previous_track(scope)
     end
   end
 

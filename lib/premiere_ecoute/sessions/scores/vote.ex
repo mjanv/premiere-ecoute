@@ -11,14 +11,14 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   alias PremiereEcoute.Sessions.ListeningSession
 
   @type t :: %__MODULE__{
-          id: integer(),
-          viewer_id: String.t(),
-          value: integer(),
+          id: integer() | nil,
+          viewer_id: String.t() | nil,
+          value: integer() | nil,
           is_streamer: boolean(),
-          session: ListeningSession.t(),
-          track: Track.t(),
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t()
+          session: ListeningSession.t() | nil | Ecto.Association.NotLoaded.t(),
+          track: Track.t() | nil | Ecto.Association.NotLoaded.t(),
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
         }
 
   schema "votes" do

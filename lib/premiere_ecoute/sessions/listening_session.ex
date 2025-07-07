@@ -13,16 +13,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Sessions.Scores.Report
 
   @type t :: %__MODULE__{
-          id: integer(),
+          id: integer() | nil,
           status: atom(),
-          started_at: DateTime.t(),
-          ended_at: DateTime.t(),
-          user: User.t(),
-          album: Album.t(),
-          current_track: Track.t(),
-          report: Report.t(),
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t()
+          started_at: DateTime.t() | nil,
+          ended_at: DateTime.t() | nil,
+          user: User.t() | nil | Ecto.Association.NotLoaded.t(),
+          album: Album.t() | nil | Ecto.Association.NotLoaded.t(),
+          current_track: Track.t() | nil | Ecto.Association.NotLoaded.t(),
+          report: Report.t() | nil | Ecto.Association.NotLoaded.t(),
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
         }
 
   schema "listening_sessions" do

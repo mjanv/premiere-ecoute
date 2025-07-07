@@ -5,12 +5,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
   require Logger
 
-  alias PremiereEcoute.Apis.SpotifyApi.Player
+  alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Sessions.ListeningSession
 
   @impl true
   def mount(socket) do
-    {:ok, assign(socket, :player_state, Player.default())}
+    {:ok, assign(socket, :player_state, SpotifyApi.Player.default())}
   end
 
   @impl true
@@ -24,14 +24,14 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   end
 
   def refresh_state(socket) do
-    case Player.get_playback_state(socket.assigns.current_user.spotify_access_token) do
+    case SpotifyApi.get_playback_state(socket.assigns.current_scope) do
       {:ok, state} ->
         assign(socket, :player_state, state)
 
       {:error, _} ->
         socket
         |> put_flash(:error, "Cannot read playback state")
-        |> assign(:player_state, Player.default())
+        |> assign(:player_state, SpotifyApi.Player.default())
     end
   end
 
@@ -39,7 +39,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   def handle_event("toggle_playback", _params, socket) do
     case socket.assigns.player_state do
       %{"is_playing" => true} = state ->
-        case Player.pause_playback(socket.assigns.current_user.spotify_access_token) do
+        case SpotifyApi.pause_playback(socket.assigns.current_scope) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => false})
             {:noreply, put_flash(socket, :info, "Spotify playback paused")}
@@ -49,7 +49,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         end
 
       %{"is_playing" => false} = state ->
-        case Player.start_playback(socket.assigns.current_user.spotify_access_token) do
+        case SpotifyApi.start_playback(socket.assigns.current_scope) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => true})
             {:noreply, put_flash(socket, :info, "Spotify playback resumed")}
@@ -66,7 +66,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
     case ListeningSession.next_track(session) do
       {:ok, session} ->
-        Player.start_resume_playback(socket.assigns.current_scope, session.current_track)
+        SpotifyApi.start_resume_playback(socket.assigns.current_scope, session.current_track)
         send(self(), {:session_updated, session})
         {:noreply, put_flash(socket, :info, "Next track")}
 
@@ -84,7 +84,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
     case ListeningSession.previous_track(session) do
       {:ok, session} ->
-        Player.start_resume_playback(socket.assigns.current_scope, session.current_track)
+        SpotifyApi.start_resume_playback(socket.assigns.current_scope, session.current_track)
         send(self(), {:session_updated, session})
         {:noreply, put_flash(socket, :info, "Previous track")}
 
@@ -121,16 +121,14 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           <p class="text-sm font-medium text-white truncate">
             {@player_state["item"]["name"]}
           </p>
-          <%= if true do %>
-            <div class="flex items-center justify-between text-xs text-gray-400">
-              <span>Progress:</span>
-              <span>
-                {format_duration(@player_state["item"]["progress_ms"])} / {format_duration(
-                  @player_state["item"]["duration_ms"]
-                )}
-              </span>
-            </div>
-          <% end %>
+          <div class="flex items-center justify-between text-xs text-gray-400">
+            <span>Progress:</span>
+            <span>
+              {format_duration(@player_state["item"]["progress_ms"])} / {format_duration(
+                @player_state["item"]["duration_ms"]
+              )}
+            </span>
+          </div>
         </div>
       <% else %>
         <div class="bg-white/5 rounded-lg p-3">

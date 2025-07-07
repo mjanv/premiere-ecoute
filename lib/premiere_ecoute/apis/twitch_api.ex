@@ -8,17 +8,20 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
     alias PremiereEcoute.Accounts.Scope
 
+    # Chat
     @callback send_chat_message(Scope.t(), message :: String.t()) ::
                 {:ok, map()} | {:error, term()}
 
     @callback send_chat_announcement(Scope.t(), message :: String.t(), color :: String.t()) ::
                 {:ok, String.t()} | {:error, term()}
 
+    # EventSub
     @callback get_event_subscriptions(Scope.t()) :: {:ok, [map()]} | {:error, term()}
     @callback subscribe(Scope.t(), type :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback unsubscribe(Scope.t(), type :: String.t()) :: {:ok, String.t()} | {:error, term()}
     @callback cancel_all_subscriptions(Scope.t()) :: {:ok, [String.t()]} | {:error, term()}
 
+    # Polls
     @callback create_poll(Scope.t(), poll :: map()) :: {:ok, map()} | {:error, term()}
     @callback end_poll(Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback get_poll(Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}

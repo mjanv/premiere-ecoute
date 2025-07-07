@@ -14,30 +14,16 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   Start/resume playback on the user's active device.
   Can optionally specify track URIs to play.
   """
-  def start_playback(access_token, opts \\ []) do
-    body =
-      case opts[:uris] do
-        nil -> %{}
-        uris when is_list(uris) -> %{uris: uris}
-        uri when is_binary(uri) -> %{uris: [uri]}
-      end
-
-    # Add position if specified
-    body =
-      case opts[:position_ms] do
-        nil -> body
-        pos when is_integer(pos) -> Map.put(body, :position_ms, pos)
-      end
-
+  def start_playback(%Scope{user: %{spotify_access_token: access_token}}) do
+    body = %{}
     json_body = Jason.encode!(body)
-    content_length = byte_size(json_body)
 
     SpotifyApi.api(:web)
     |> Req.merge(
       headers: [
         {"Authorization", "Bearer #{access_token}"},
         {"Content-Type", "application/json"},
-        {"Content-Length", to_string(content_length)}
+        {"Content-Length", to_string(byte_size(json_body))}
       ]
     )
     |> Req.put(url: "/me/player/play", body: json_body)
@@ -47,7 +33,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Pause playback on the user's active device.
   """
-  def pause_playback(access_token) do
+  def pause_playback(%Scope{user: %{spotify_access_token: access_token}}) do
     headers = [
       {"Authorization", "Bearer #{access_token}"},
       {"Content-Length", "0"},
@@ -63,7 +49,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Skip to next track in the user's queue.
   """
-  def next_track(access_token) do
+  def next_track(%Scope{user: %{spotify_access_token: access_token}}) do
     SpotifyApi.api(:web)
     |> Req.merge(
       headers: [
@@ -79,7 +65,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Skip to previous track in the user's queue.
   """
-  def previous_track(access_token) do
+  def previous_track(%Scope{user: %{spotify_access_token: access_token}}) do
     SpotifyApi.api(:web)
     |> Req.merge(
       headers: [
@@ -95,7 +81,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Get information about the user's current playback state.
   """
-  def get_playback_state(access_token) do
+  def get_playback_state(%Scope{user: %{spotify_access_token: access_token}}) do
     SpotifyApi.api(:web)
     |> Req.merge(headers: [{"Authorization", "Bearer #{access_token}"}])
     |> Req.get(url: "/me/player")

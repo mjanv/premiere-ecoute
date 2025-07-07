@@ -87,20 +87,20 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
           user ->
             case Accounts.User.update_spotify_tokens(user, spotify_data) do
-              {:ok, user} ->
+              {:ok, _} ->
                 conn
                 |> put_flash(
                   :info,
                   "Spotify connected! You can now control playback from the dashboard."
                 )
-                |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
+                |> redirect(to: ~p"/account")
 
               {:error, _changeset} ->
                 Logger.error("Failed to store Spotify tokens for user #{user.id}")
 
                 conn
                 |> put_flash(:error, "Failed to connect Spotify account")
-                |> redirect(to: ~p"/")
+                |> redirect(to: ~p"/account")
             end
         end
 

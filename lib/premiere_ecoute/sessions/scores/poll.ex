@@ -11,16 +11,16 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
   alias PremiereEcoute.Sessions.ListeningSession
 
   @type t :: %__MODULE__{
-          id: integer(),
-          poll_id: String.t(),
-          title: String.t(),
-          total_votes: integer(),
-          votes: map(),
-          ended_at: NaiveDateTime.t(),
-          session: ListeningSession.t(),
-          track: Track.t(),
-          inserted_at: NaiveDateTime.t(),
-          updated_at: NaiveDateTime.t()
+          id: integer() | nil,
+          poll_id: String.t() | nil,
+          title: String.t() | nil,
+          total_votes: integer() | nil,
+          votes: map() | nil,
+          ended_at: NaiveDateTime.t() | nil,
+          session: ListeningSession.t() | nil | Ecto.Association.NotLoaded.t(),
+          track: Track.t() | nil | Ecto.Association.NotLoaded.t(),
+          inserted_at: NaiveDateTime.t() | nil,
+          updated_at: NaiveDateTime.t() | nil
         }
 
   schema "polls" do

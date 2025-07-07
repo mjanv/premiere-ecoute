@@ -14,13 +14,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
   alias PremiereEcoute.Sessions.Scores.Report
 
+  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+
   describe "handle/1 - PrepareListeningSession" do
     test "successfully creates session and returns SessionPrepared event" do
       user = user_fixture()
       album = album_fixture()
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:get_album, fn _ -> {:ok, album} end)
+      expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
@@ -41,8 +43,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       user_id = 1
       album_id = "spotify:album:invalid"
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:get_album, fn ^album_id -> {:error, :not_found} end)
+      expect(SpotifyApi, :get_album, fn ^album_id -> {:error, :not_found} end)
 
       command = %PrepareListeningSession{
         user_id: user_id,
@@ -69,8 +70,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         tracks: []
       }
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:get_album, fn ^album_id -> {:ok, album} end)
+      expect(SpotifyApi, :get_album, fn ^album_id -> {:ok, album} end)
 
       command = %PrepareListeningSession{
         user_id: user_id,
@@ -86,8 +86,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       user = user_fixture()
       album = album_fixture()
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:get_album, 2, fn _ -> {:ok, album} end)
+      expect(SpotifyApi, :get_album, 2, fn _ -> {:ok, album} end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
@@ -107,31 +106,23 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
+      expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
         {:ok, %{}}
       end)
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
+      expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
         {:ok, %{}}
       end)
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:get_album, fn _ -> {:ok, album} end)
+      expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:start_resume_playback, fn %Scope{user: ^user}, _track ->
+      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
         {:ok, "spotify:track:track001"}
       end)
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:send_chat_announcement, fn %Scope{user: ^user}, _message, _color ->
-        {:ok, %{}}
-      end)
+      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, %{}} end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
@@ -175,39 +166,25 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
+      expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" ->
         {:ok, %{}}
       end)
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
+      expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.poll.progress" ->
         {:ok, %{}}
       end)
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:get_album, fn _ -> {:ok, album} end)
+      expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
 
-      PremiereEcoute.Apis.SpotifyApi.Mock
-      |> expect(:start_resume_playback, fn %Scope{user: ^user}, _track ->
+      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
         {:ok, "spotify:track:track001"}
       end)
 
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:send_chat_announcement, fn %Scope{user: ^user}, _message, _color ->
-        {:ok, %{}}
-      end)
-
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
-
-      PremiereEcoute.Apis.TwitchApi.Mock
-      |> expect(:send_chat_announcement, fn %Scope{user: ^user}, _message, _color ->
-        {:ok, %{}}
-      end)
+      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, %{}} end)
+      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, %{}} end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
