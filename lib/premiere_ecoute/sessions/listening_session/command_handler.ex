@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   @moduledoc false
 
+  use PremiereEcoute.Core.CommandBus.Handler
+
   require Logger
 
   alias PremiereEcoute.Apis.SpotifyApi
@@ -16,8 +18,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
   alias PremiereEcoute.Sessions.Scores.Report
-
-  use PremiereEcoute.Core.CommandBus.Handler
 
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession)
@@ -45,7 +45,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%StartListeningSession{session_id: session_id, scope: scope}) do
     with {:ok, _} <- TwitchApi.impl().cancel_all_subscriptions(scope),
          {:ok, _} <- TwitchApi.impl().subscribe(scope, "channel.chat.message"),
-         {:ok, _} <- TwitchApi.impl().subscribe(scope, "channel.poll.progress"),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.next_track(session),

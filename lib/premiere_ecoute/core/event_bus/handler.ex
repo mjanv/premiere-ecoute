@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Core.EventBus.Handler do
 
   defmacro __using__(_opts) do
     quote do
+      use Gettext, backend: PremiereEcouteWeb.Gettext
+
       import unquote(__MODULE__)
       @before_compile unquote(__MODULE__)
       @behaviour unquote(__MODULE__)

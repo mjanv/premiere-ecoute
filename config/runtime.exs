@@ -31,6 +31,8 @@ config :ueberauth, Ueberauth.Strategy.Spotify.OAuth,
   client_id: System.get_env("SPOTIFY_CLIENT_ID"),
   client_secret: System.get_env("SPOTIFY_CLIENT_SECRET")
 
+config :sentry, dsn: System.get_env("SENTRY_DSN")
+
 if config_env() == :prod do
   secret_key_base = System.get_env("SECRET_KEY_BASE") || raise "SECRET_KEY_BASE is missing."
   host = System.get_env("PHX_HOST") || "example.com"

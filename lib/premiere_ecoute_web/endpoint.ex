@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb.Endpoint do
     cookie_key: "request_logger"
 
   plug Plug.RequestId
-  plug PromEx.Plug, prom_ex_module: PremiereEcoute.PromEx
+  plug PromEx.Plug, prom_ex_module: PremiereEcoute.Telemetry.PromEx
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,

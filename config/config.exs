@@ -38,7 +38,7 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
 
 config :premiere_ecoute, PremiereEcoute.Repo, adapter: Ecto.Adapters.Postgres
 
-config :premiere_ecoute, PremiereEcoute.PromEx,
+config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   disabled: false,
   manual_metrics_start_delay: :no_delay,
   drop_metrics_groups: [],
@@ -63,6 +63,11 @@ config :tailwind,
     ),
     cd: Path.expand("..", __DIR__)
   ]
+
+config :sentry,
+  environment_name: Mix.env(),
+  enable_source_code_context: true,
+  root_source_code_paths: [File.cwd!()]
 
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",

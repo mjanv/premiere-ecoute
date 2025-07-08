@@ -59,6 +59,7 @@ defmodule PremiereEcoute.MixProject do
       {:dns_cluster, "~> 0.2"},
       # Backend
       {:req, "~> 0.5"},
+      {:hackney, "~> 1.20"},
       {:websockex, "~> 0.4.3"},
       {:jason, "~> 1.2"},
       {:cachex, "~> 3.3"},
@@ -73,6 +74,7 @@ defmodule PremiereEcoute.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:prom_ex, "~> 1.11.0"},
+      {:sentry, "~> 11.0.1"},
       # Code quality
       {:credo, "~> 1.7"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
@@ -99,6 +101,7 @@ defmodule PremiereEcoute.MixProject do
         "esbuild premiere_ecoute --minify",
         "phx.digest"
       ],
+      gettext: ["gettext.extract", "gettext.merge priv/gettext"],
       # Quality
       quality: [
         "compile --warnings-as-errors",

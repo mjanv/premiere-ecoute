@@ -1,0 +1,40 @@
+/* AIDEV-NOTE: Bricolage Grotesque font faces - served from static directory */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./BricolageGrotesque-Light-c9d407d4d8fad25ac125968c9ab7ef0c.woff2?vsn=d') format('woff2');
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./BricolageGrotesque-2511719a29a3617d61962ccec4144bd5.woff2?vsn=d') format('woff2');
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./BricolageGrotesque-Medium-ae098b5bcc78ce1248b7c5e09aa3479e.woff2?vsn=d') format('woff2');
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./BricolageGrotesque-SemiBold-7d94eab57d834ec076433bfbdd8ddd22.woff2?vsn=d') format('woff2');
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./BricolageGrotesque-Bold-2acf97884999f8dc6b9d9d514c2ae614.woff2?vsn=d') format('woff2');
+}

@@ -49,6 +49,7 @@ defmodule PremiereEcouteWeb do
     quote do
       use Phoenix.LiveView
 
+      on_mount PremiereEcouteWeb.Hooks.RestoreLocale
       unquote(html_helpers())
     end
   end

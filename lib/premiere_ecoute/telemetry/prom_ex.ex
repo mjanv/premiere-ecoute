@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.PromEx do
+defmodule PremiereEcoute.Telemetry.PromEx do
   @moduledoc false
 
   use PromEx, otp_app: :premiere_ecoute
@@ -12,8 +12,8 @@ defmodule PremiereEcoute.PromEx do
       Plugins.Beam,
       {Plugins.Phoenix, router: PremiereEcouteWeb.Router, endpoint: PremiereEcouteWeb.Endpoint},
       Plugins.Ecto,
-      # Plugins.Oban,
-      Plugins.PhoenixLiveView
+      Plugins.PhoenixLiveView,
+      PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
     ]
   end
 
@@ -32,7 +32,6 @@ defmodule PremiereEcoute.PromEx do
       {:prom_ex, "beam.json"},
       {:prom_ex, "phoenix.json"},
       {:prom_ex, "ecto.json"},
-      # {:prom_ex, "oban.json"},
       {:prom_ex, "phoenix_live_view.json"}
       # Add your dashboard definitions here with the format: {:otp_app, "path_in_priv"}
       # {:premiere_ecoute, "/grafana_dashboards/user_metrics.json"}

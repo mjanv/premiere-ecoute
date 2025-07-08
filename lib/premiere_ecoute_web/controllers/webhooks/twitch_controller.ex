@@ -9,31 +9,29 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   alias PremiereEcoute.Sessions.Scores.Events.PollStarted
   alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
 
+  alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
+
   def handle_event(conn, _params) do
-    headers = Enum.into(conn.req_headers, %{})
+    conn
+    |> put_resp_content_type("text/plain")
+    |> then(fn conn ->
+      headers = Enum.into(conn.req_headers, %{})
+      type = headers["twitch-eventsub-message-type"]
+      TwitchApiMetrics.webhook_received(type)
+      {type, conn}
+    end)
+    |> case do
+      {"webhook_callback_verification", conn} ->
+        response = conn.body_params["challenge"]
+        send_resp(conn, 200, response)
 
-    case headers["twitch-eventsub-message-type"] do
-      "webhook_callback_verification" ->
-        Logger.info("Webhook callback verification: #{inspect(conn.body_params)}")
+      {"revocation", conn} ->
+        Logger.error("revocation: #{inspect(conn.body_params)}")
+        send_resp(conn, 204, "")
 
-        conn
-        |> put_resp_content_type("text/plain")
-        |> send_resp(200, conn.body_params["challenge"])
-
-      "revocation" ->
-        Logger.error("Revocation: #{inspect(conn.body_params)}")
-
-        conn
-        |> put_resp_content_type("text/plain")
-        |> send_resp(204, "")
-
-      "notification" ->
-        Logger.error("Notification: #{inspect(handle(conn.body_params))}")
+      {"notification", conn} ->
         Core.dispatch(handle(conn.body_params))
-
-        conn
-        |> put_resp_content_type("text/plain")
-        |> send_resp(202, "")
+        send_resp(conn, 202, "")
     end
   end
 

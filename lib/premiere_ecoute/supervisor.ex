@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      PremiereEcoute.PromEx,
+      PremiereEcoute.Telemetry.PromEx,
       PremiereEcoute.Repo,
       PremiereEcoute.Apis.Supervisor,
       Supervisor.child_spec({Cachex, name: :sessions}, id: :cache1),
