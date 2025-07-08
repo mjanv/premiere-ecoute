@@ -1,6 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi do
   @moduledoc "Spotify API"
 
+  alias PremiereEcoute.Telemetry
+  alias PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics
+
   defmodule Behavior do
     @moduledoc "Defines the Spotify interface"
 
@@ -48,6 +51,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
       {:error, _} ->
         Req.new(base_url: @web)
     end
+    |> Telemetry.ReqPipeline.attach(&SpotifyApiMetrics.api_called/1)
   end
 
   def api(:accounts) do

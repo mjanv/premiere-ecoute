@@ -3,6 +3,9 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
   require Logger
 
+  alias PremiereEcoute.Telemetry
+  alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
+
   defmodule Behavior do
     @moduledoc false
 
@@ -60,6 +63,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
       ]
       |> Keyword.merge(Application.get_env(@app, :twitch_req_options, []))
     )
+    |> Telemetry.ReqPipeline.attach(&TwitchApiMetrics.api_called/1)
   end
 
   defdelegate authorization_url, to: __MODULE__.Accounts

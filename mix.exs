@@ -60,9 +60,8 @@ defmodule PremiereEcoute.MixProject do
       # Backend
       {:req, "~> 0.5"},
       {:hackney, "~> 1.20"},
-      {:websockex, "~> 0.4.3"},
       {:jason, "~> 1.2"},
-      {:cachex, "~> 3.3"},
+      {:cachex, "~> 4.1"},
       {:bcrypt_elixir, "~> 3.0"},
       {:postgrex, "~> 0.20.0"},
       {:ecto_sql, "~> 3.10"},
@@ -78,6 +77,7 @@ defmodule PremiereEcoute.MixProject do
       # Code quality
       {:credo, "~> 1.7"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:dotenvy, "~> 1.0"},
       # Audit
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},

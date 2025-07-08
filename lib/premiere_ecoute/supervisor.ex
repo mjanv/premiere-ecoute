@@ -12,7 +12,6 @@ defmodule PremiereEcoute.Supervisor do
     children = [
       PremiereEcoute.Telemetry.PromEx,
       PremiereEcoute.Repo,
-      PremiereEcoute.Apis.Supervisor,
       Supervisor.child_spec({Cachex, name: :sessions}, id: :cache1),
       Supervisor.child_spec({Cachex, name: :polls}, id: :cache2),
       Supervisor.child_spec({Cachex, name: :tokens}, id: :cache3)

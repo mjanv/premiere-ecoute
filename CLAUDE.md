@@ -117,7 +117,6 @@ def render_feed(...) do
    - `PremiereEcoute.Application` - Main application supervisor
    - `PremiereEcoute.Supervisor` - Core business logic supervision
    - `PremiereEcoute.Core.Supervisor` - Command bus and event handling
-   - `PremiereEcoute.Apis.Supervisor` - External API client supervision
 
 ---
 

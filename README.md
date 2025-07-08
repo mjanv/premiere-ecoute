@@ -1,18 +1,14 @@
-# PremiereEcoute
+# Premiere Ecoute
 
-To start your Phoenix server:
+> Select, listen and note album releases with your Twitch community
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+Premiere Ecoute turns album listening into an interactive experience where streamers and their Twitch audiences can discover and note music together. Built with Phoenix LiveView, it combines Spotify playback, Twitch chat voting through messages and pools and OBS overlays to give you the most awesome SaaS.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+[![Watch the video](https://img.youtube.com/vi/RecB_ZMGjFE/hqdefault.jpg)](https://youtu.be/nTQUwghvy5Q)
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
-## Learn more
+## 🔗 Links
 
-* Official website: https://www.phoenixframework.org/
-* Guides: https://hexdocs.pm/phoenix/overview.html
-* Docs: https://hexdocs.pm/phoenix
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+- [**🚀 Live Application**](https://premiere-ecoute.fly.dev)
+- [**📈 Grafana Dashboards**](https://fly-metrics.net/d/fly-app/fly-app?orgId=140881)
+- [**🐛 Sentry Error Tracking**](https://maxime-janvier.sentry.io/insights/projects/premiere-ecoute/?project=4509617392975872)
