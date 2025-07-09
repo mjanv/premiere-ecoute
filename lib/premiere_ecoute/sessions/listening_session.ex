@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
   use PremiereEcoute.Core.Schema,
-    preload: [album: [:tracks], user: [], current_track: []]
+    root: [album: [:tracks], user: [], current_track: []]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Repo
@@ -67,7 +67,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.insert()
     |> case do
       {:ok, session} ->
-        session = Repo.preload(session, album: [:tracks], user: [], current_track: [])
+        session = preload(session)
 
         if session.user && session.user.twitch_user_id do
           Cachex.put(:sessions, session.user.twitch_user_id, {session.id, nil})
@@ -175,19 +175,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
       {:error, reason} ->
         {:error, reason}
-    end
-  end
-
-  def delete(id) do
-    __MODULE__
-    |> Repo.get(id)
-    |> case do
-      nil ->
-        :error
-
-      session ->
-        Repo.delete(session)
-        :ok
     end
   end
 end

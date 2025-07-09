@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   @moduledoc false
 
   use PremiereEcoute.Core.Schema,
-    preload: [:votes, :polls]
+    root: [:votes, :polls]
 
   require Logger
 

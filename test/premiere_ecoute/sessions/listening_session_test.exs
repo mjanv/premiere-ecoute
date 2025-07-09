@@ -270,7 +270,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     test "can delete an existing listening session", %{user: user, album: album} do
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
-      ListeningSession.delete(session.id)
+      ListeningSession.delete(session)
 
       assert is_nil(ListeningSession.get(session.id))
     end

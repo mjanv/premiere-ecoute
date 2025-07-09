@@ -2,7 +2,8 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
   @moduledoc false
 
   use PremiereEcoute.Core.Schema,
-    preload: [:tracks]
+    root: [:tracks],
+    identity: [:spotify_id]
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Track
@@ -50,30 +51,10 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
 
-  def get_or_create(%__MODULE__{spotify_id: spotify_id} = album) do
-    case get_by(spotify_id: spotify_id) do
-      %__MODULE__{} = album -> {:ok, album}
-      nil -> create(album)
-    end
-  end
-
-  def delete(spotify_id) do
-    case get_by(spotify_id: spotify_id) do
-      nil ->
-        :ok
-
-      album ->
-        # AIDEV-NOTE: add foreign key constraint to handle listening sessions reference
-        changeset =
-          album
-          |> Ecto.Changeset.change()
-
-        # |> Ecto.Changeset.foreign_key_constraint(:album_id, name: "listening_sessions_album_id_fkey")
-
-        case Repo.delete(changeset) do
-          {:ok, _} -> :ok
-          {:error, _} -> :error
-        end
-    end
+  def delete(album) do
+    album
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.foreign_key_constraint(:album_id, name: "listening_sessions_album_id_fkey")
+    |> Repo.delete(allow_stale: true)
   end
 end

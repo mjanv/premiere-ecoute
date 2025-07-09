@@ -633,9 +633,9 @@ msgstr "Sondages"
 #: lib/premiere_ecoute_web/live/admin/admin_live.ex:94
 #, elixir-autogen, elixir-format
 msgid "Sentry Dashboard"
-msgstr "Tableau de Bord Sentry"
+msgstr "Sentry"
 
 #: lib/premiere_ecoute_web/live/admin/admin_live.ex:108
 #, elixir-autogen, elixir-format
 msgid "Grafana Dashboard"
-msgstr "Tableau de Bord Grafana"
+msgstr "Grafana"

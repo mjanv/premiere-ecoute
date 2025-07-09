@@ -2,7 +2,8 @@ defmodule PremiereEcoute.Core.Schema do
   @moduledoc false
 
   defmacro __using__(opts) do
-    preload = Keyword.get(opts, :preload, [])
+    root = Keyword.get(opts, :root, [])
+    identity = Keyword.get(opts, :identity, [])
 
     quote do
       use Ecto.Schema
@@ -12,59 +13,41 @@ defmodule PremiereEcoute.Core.Schema do
 
       alias PremiereEcoute.Repo
 
-      # Pipeline
-      def preload(structs_or_struct_or_nil) do
-        Repo.preload(structs_or_struct_or_nil, unquote(preload), force: true)
-      end
+      # Preload
+      def preload({:ok, entity}), do: {:ok, preload(entity)}
+      def preload({:error, reason}), do: {:error, reason}
+      def preload(entity), do: Repo.preload(entity, unquote(root), force: true)
 
       # Create operations
-      def create(entity) do
-        __MODULE__
-        |> struct()
-        |> changeset(Map.from_struct(entity))
-        |> Repo.insert()
+      def create(entity) when is_struct(entity), do: create(Map.from_struct(entity))
+      def create(attrs), do: preload(Repo.insert(changeset(struct(__MODULE__), attrs)))
+      def create_if_not_exists(entity) do
+        case get_by(Map.take(entity, unquote(identity))) do
+          nil -> create(entity)
+          entity -> {:ok, entity}
+        end
       end
 
       # Read operations
       def get(id), do: preload(Repo.get(__MODULE__, id))
-      def get_by(clauses), do: preload(Repo.get_by(__MODULE__, clauses))
+      def get_by(query \\ __MODULE__, clauses), do: preload(Repo.get_by(query, clauses))
       def all, do: preload(Repo.all(__MODULE__))
-      def all_by(clauses), do: preload(Repo.all_by(__MODULE__, clauses))
+      def all_by(query \\ __MODULE__, clauses), do: preload(Repo.all_by(query, clauses))
 
       # Update operations
-      @spec update(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-      def update(entity, attrs) do
-        entity
-        |> changeset(attrs)
-        |> Repo.update()
-      end
+      def update(entity, attrs), do: preload(Repo.update(changeset(entity, attrs)))
+      def upsert(entity, attrs), do: preload(Repo.insert_or_update(changeset(entity, attrs)))
 
       # Delete operations
-      def delete(id) do
-        case Repo.get(__MODULE__, id) do
-          nil ->
-            :error
-
-          entity ->
-            Repo.delete(entity)
-            :ok
-        end
-      end
-
-      def delete_all, do: Repo.delete_all(__MODULE__)
+      def delete(entity), do: Repo.delete(entity, allow_stale: true)
+      def delete_all(query \\ __MODULE__), do: Repo.delete_all(query)
 
       # Statistics
-      def average(field), do: Repo.aggregate(__MODULE__, :avg, field)
-      def average(query, field), do: Repo.aggregate(query, :avg, field)
-      def count(field), do: Repo.aggregate(__MODULE__, :count, field)
-      def count(query, field), do: Repo.aggregate(query, :count, field)
-      def max(field), do: Repo.aggregate(__MODULE__, :max, field)
-      def max(query, field), do: Repo.aggregate(query, :max, field)
-      def min(field), do: Repo.aggregate(__MODULE__, :min, field)
-      def sum(field), do: Repo.aggregate(__MODULE__, :sum, field)
-
-      def min(query, field), do: Repo.aggregate(query, :min, field)
-      def sum(query, field), do: Repo.aggregate(query, :sum, field)
+      def average(query \\ __MODULE__, field), do: Repo.aggregate(query, :avg, field)
+      def count(query \\ __MODULE__, field), do: Repo.aggregate(query, :count, field)
+      def max(query \\ __MODULE__, field), do: Repo.aggregate(query, :max, field)
+      def min(query \\ __MODULE__, field), do: Repo.aggregate(query, :min, field)
+      def sum(query \\ __MODULE__, field), do: Repo.aggregate(query, :sum, field)
 
       defoverridable preload: 1, create: 1, update: 2, delete: 1
     end

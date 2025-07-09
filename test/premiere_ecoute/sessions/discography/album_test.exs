@@ -42,9 +42,9 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
     end
   end
 
-  describe "get_or_create/1" do
+  describe "create_if_not_exists/1" do
     test "create an unexisting album with tracks" do
-      {:ok, album} = Album.get_or_create(album_fixture())
+      {:ok, album} = Album.create_if_not_exists(album_fixture())
 
       assert %Album{
                spotify_id: "album123",
@@ -71,8 +71,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
     end
 
     test "does not recreate an existing album" do
-      {:ok, _} = Album.get_or_create(album_fixture())
-      {:ok, album} = Album.get_or_create(album_fixture())
+      {:ok, _} = Album.create_if_not_exists(album_fixture())
+      {:ok, album} = Album.create_if_not_exists(album_fixture())
 
       assert %Album{
                spotify_id: "album123",
@@ -172,18 +172,19 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
   end
 
   describe "delete/1" do
-    test "deletes an existing album" do
-      {:ok, %Album{spotify_id: spotify_id}} = Album.create(album_fixture())
+    test "delete an existing album" do
+      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
 
-      :ok = Album.delete(spotify_id)
+      {:ok, _} = Album.delete(album)
 
       assert is_nil(Album.get_by(spotify_id: spotify_id))
     end
 
-    test "read an unexisting album" do
-      spotify_id = "unknown"
+    test "can delete stale album" do
+      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
 
-      :ok = Album.delete(spotify_id)
+      {:ok, _} = Album.delete(album)
+      {:ok, _} = Album.delete(album)
 
       assert is_nil(Album.get_by(spotify_id: spotify_id))
     end
@@ -194,7 +195,9 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
       {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
-      :error = Album.delete(spotify_id)
+      {:error, _} = Album.delete(album)
+
+      assert not(assert is_nil(Album.get_by(spotify_id: spotify_id)))
     end
   end
 end

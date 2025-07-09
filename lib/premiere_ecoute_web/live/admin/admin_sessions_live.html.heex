@@ -1,0 +1,298 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} />
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white">{gettext("Sessions Management")}</h1>
+          <p class="mt-2 text-gray-400">{gettext("View and manage listening sessions")}</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+          <.link
+            navigate="/admin"
+            class="inline-flex items-center px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {gettext("Back to Dashboard")}
+          </.link>
+        </div>
+      </div>
+    </div>
+    
+<!-- Sessions Table -->
+    <div class="bg-gray-800 rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-700">
+        <h2 class="text-xl font-semibold text-white">{gettext("Listening Sessions")} ({length(@sessions)})</h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Status")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("User")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Album")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Created")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Actions")}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <%= for session <- @sessions do %>
+              <tr
+                class="hover:bg-gray-700 cursor-pointer"
+                phx-click="show_session_modal"
+                phx-value-session_id={session.id}
+              >
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{status_class(session.status)}"}>
+                    {status_text(session.status)}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <%= if session.user && session.user.twitch_username do %>
+                    @{session.user.twitch_username}
+                  <% else %>
+                    <span class="text-gray-500">Unknown User</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-8 w-8">
+                      <%= if session.album && session.album.cover_url do %>
+                        <img
+                          class="h-8 w-8 rounded object-cover"
+                          src={session.album.cover_url}
+                          alt={session.album.name}
+                        />
+                      <% else %>
+                        <div class="h-8 w-8 rounded bg-gray-600 flex items-center justify-center">
+                          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                            />
+                          </svg>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-white">
+                        <%= if session.album do %>
+                          {session.album.name}
+                        <% else %>
+                          <span class="text-gray-500">No Album</span>
+                        <% end %>
+                      </div>
+                      <%= if session.album do %>
+                        <div class="text-sm text-gray-400">
+                          {session.album.artist}
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {format_datetime(session.inserted_at)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button
+                    phx-click="delete_session"
+                    phx-value-session_id={session.id}
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors"
+                    title={gettext("Delete session")}
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            <% end %>
+
+            <%= if @sessions == [] do %>
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-gray-400">
+                  <div class="flex flex-col items-center">
+                    <svg class="w-12 h-12 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <p class="text-lg font-medium">{gettext("No sessions found")}</p>
+                    <p class="text-sm">
+                      {gettext("Listening sessions will appear here when users start listening to albums.")}
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Session Modal -->
+<%= if @show_modal and @selected_session do %>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="close_modal">
+    <div class="bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[80vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-700">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 mr-4">
+            <span class={"inline-flex items-center px-3 py-1 rounded-full text-sm font-medium #{status_class(@selected_session.status)}"}>
+              {status_text(@selected_session.status)}
+            </span>
+          </div>
+          <div>
+            <h2 class="text-xl font-semibold text-white">{gettext("Session Details")}</h2>
+            <p class="text-gray-400">
+              {gettext("Created")}: {format_datetime(@selected_session.inserted_at)}
+            </p>
+          </div>
+        </div>
+        <button phx-click="close_modal" class="text-gray-400 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+<!-- Modal Content -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Session Info -->
+          <div class="bg-gray-700 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-white mb-4">{gettext("Session Information")}</h3>
+            <div class="space-y-3">
+              <div>
+                <span class="text-sm text-gray-400">{gettext("Started")}:</span>
+                <div class="text-white">{format_datetime(@selected_session.started_at)}</div>
+              </div>
+              <div>
+                <span class="text-sm text-gray-400">{gettext("Ended")}:</span>
+                <div class="text-white">{format_datetime(@selected_session.ended_at)}</div>
+              </div>
+              <div>
+                <span class="text-sm text-gray-400">{gettext("Duration")}:</span>
+                <div class="text-white">
+                  {format_duration(@selected_session.started_at, @selected_session.ended_at)}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+<!-- User Info -->
+          <div class="bg-gray-700 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-white mb-4">{gettext("User Information")}</h3>
+            <%= if @selected_session.user do %>
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-12 w-12">
+                  <div class="h-12 w-12 rounded-full bg-gray-600 flex items-center justify-center">
+                    <%= if @selected_session.user.email do %>
+                      <span class="text-sm font-medium text-white">
+                        {String.first(@selected_session.user.email) |> String.upcase()}
+                      </span>
+                    <% else %>
+                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fill-rule="evenodd"
+                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-white">{@selected_session.user.email}</div>
+                  <%= if @selected_session.user.twitch_username do %>
+                    <div class="text-sm text-gray-400">@{@selected_session.user.twitch_username}</div>
+                  <% end %>
+                </div>
+              </div>
+            <% else %>
+              <div class="text-gray-400">{gettext("No user associated with this session")}</div>
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Album Info -->
+        <%= if @selected_session.album do %>
+          <div class="mt-6 bg-gray-700 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-white mb-4">{gettext("Album Information")}</h3>
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-16 w-16">
+                <%= if @selected_session.album.cover_url do %>
+                  <img
+                    class="h-16 w-16 rounded-lg object-cover"
+                    src={@selected_session.album.cover_url}
+                    alt={@selected_session.album.name}
+                  />
+                <% else %>
+                  <div class="h-16 w-16 rounded-lg bg-gray-600 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                      />
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+              <div class="ml-4">
+                <div class="text-lg font-medium text-white">{@selected_session.album.name}</div>
+                <div class="text-gray-400">{@selected_session.album.artist}</div>
+                <%= if @selected_session.album.release_date do %>
+                  <div class="text-sm text-gray-500">
+                    {Calendar.strftime(@selected_session.album.release_date, "%B %d, %Y")}
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+<!-- Current Track Info -->
+        <%= if @selected_session.current_track do %>
+          <div class="mt-6 bg-gray-700 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-white mb-4">{gettext("Current Track")}</h3>
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center mr-3">
+                <span class="text-xs font-medium text-white">{@selected_session.current_track.track_number}</span>
+              </div>
+              <div>
+                <div class="text-white font-medium">{@selected_session.current_track.name}</div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

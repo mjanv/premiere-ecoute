@@ -3,25 +3,20 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
 
   def mount(_params, _session, socket) do
-    albums = list_albums()
-
     socket
     |> assign(:page_title, "Admin Albums")
-    |> assign(:albums, albums)
+    |> assign(:albums, Album.all())
     |> assign(:selected_album, nil)
     |> assign(:show_modal, false)
     |> then(fn socket -> {:ok, socket} end)
   end
 
   def handle_event("show_album_modal", %{"album_id" => album_id}, socket) do
-    album = Album.get(String.to_integer(album_id))
-
     socket
-    |> assign(:selected_album, album)
+    |> assign(:selected_album, Album.get(album_id))
     |> assign(:show_modal, true)
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -35,31 +30,18 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
 
   def handle_event("delete_album", %{"album_id" => album_id}, socket) do
     album_id
-    |> String.to_integer()
     |> Album.get()
-    |> Repo.delete()
+    |> Album.delete()
     |> case do
       {:ok, _} ->
         socket
-        |> assign(:albums, list_albums())
+        |> assign(:albums, Album.all())
         |> put_flash(:info, "Album deleted successfully")
-        |> then(fn socket -> {:noreply, socket} end)
-
       {:error, _} ->
         socket
-        |> put_flash(
-          :error,
-          "Cannot delete album - it may be referenced by listening sessions or other records"
-        )
-        |> then(fn socket -> {:noreply, socket} end)
+        |> put_flash(:error, "Cannot delete album")
     end
-  end
-
-  defp list_albums do
-    Album
-    |> Repo.all()
-    |> Repo.preload(:tracks)
-    |> Enum.sort_by(& &1.name)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   defp format_duration(duration_ms) when is_integer(duration_ms) do
