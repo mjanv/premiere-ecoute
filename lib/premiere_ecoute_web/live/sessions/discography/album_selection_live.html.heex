@@ -13,12 +13,7 @@
         
 <!-- Search -->
         <div class="mb-6 relative">
-          <.form
-            for={@search_form}
-            id="album-search-form"
-            phx-change="search_albums"
-            phx-submit="search_albums"
-          >
+          <.form for={@search_form} id="album-search-form" phx-change="search_albums" phx-submit="search_albums">
             <.input
               field={@search_form[:query]}
               type="text"
@@ -49,11 +44,7 @@
                 >
                   <div class="flex items-center space-x-3">
                     <%= if album.cover_url do %>
-                      <img
-                        src={album.cover_url}
-                        alt={album.name}
-                        class="w-12 h-12 rounded object-cover"
-                      />
+                      <img src={album.cover_url} alt={album.name} class="w-12 h-12 rounded object-cover" />
                     <% else %>
                       <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center">
                         <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -98,8 +89,7 @@
             <% end %>
             
 <!-- Overlay for text readability -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40">
-            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40"></div>
             
 <!-- Content overlay with album cover and text -->
             <div class="relative z-10 h-full flex items-center justify-center p-10">
@@ -211,11 +201,7 @@
         <% else %>
           <div class="rounded-lg p-8 mb-6" style="background-color: var(--color-dark-800);">
             <div class="text-center text-gray-400">
-              <svg
-                class="w-20 h-20 mx-auto mb-4 opacity-50"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg class="w-20 h-20 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
               <h3 class="text-lg font-medium text-gray-300 mb-2">Ready to Start</h3>
@@ -254,11 +240,7 @@
         <% else %>
           <div class="text-center text-gray-400 h-full flex items-center justify-center">
             <div>
-              <svg
-                class="w-16 h-16 mx-auto mb-4 opacity-50"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
               <p class="text-sm">Select an album to view tracks</p>

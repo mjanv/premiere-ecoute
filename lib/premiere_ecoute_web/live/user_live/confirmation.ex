@@ -18,12 +18,7 @@ defmodule PremiereEcouteWeb.UserLive.Confirmation do
           phx-trigger-action={@trigger_submit}
         >
           <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
-          <.input
-            :if={!@current_scope}
-            field={@form[:remember_me]}
-            type="checkbox"
-            label="Keep me logged in"
-          />
+          <.input :if={!@current_scope} field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
           <.button variant="primary" phx-disable-with="Confirming..." class="w-full">
             Confirm my account
           </.button>
@@ -38,12 +33,7 @@ defmodule PremiereEcouteWeb.UserLive.Confirmation do
           phx-trigger-action={@trigger_submit}
         >
           <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
-          <.input
-            :if={!@current_scope}
-            field={@form[:remember_me]}
-            type="checkbox"
-            label="Keep me logged in"
-          />
+          <.input :if={!@current_scope} field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
           <.button variant="primary" phx-disable-with="Logging in..." class="w-full">Log in</.button>
         </.form>
 
@@ -59,8 +49,7 @@ defmodule PremiereEcouteWeb.UserLive.Confirmation do
     if user = Accounts.get_user_by_magic_link_token(token) do
       form = to_form(%{"token" => token}, as: "user")
 
-      {:ok, assign(socket, user: user, form: form, trigger_submit: false),
-       temporary_assigns: [form: nil]}
+      {:ok, assign(socket, user: user, form: form, trigger_submit: false), temporary_assigns: [form: nil]}
     else
       {:ok,
        socket

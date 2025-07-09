@@ -1,9 +1,8 @@
 defmodule PremiereEcoute.Sessions.Discography.Album do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
+  use PremiereEcoute.Core.Schema,
+    preload: [:tracks]
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Track
@@ -58,27 +57,20 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     end
   end
 
-  # AIDEV-NOTE: get/1 function for getting album by primary key id
-  def get(id) do
-    __MODULE__
-    |> Repo.get(id)
-    |> Repo.preload([:tracks])
-  end
-
-  # AIDEV-NOTE: get_by/1 function for getting album by arbitrary field criteria
-  def get_by(criteria) do
-    __MODULE__
-    |> Repo.get_by(criteria)
-    |> Repo.preload([:tracks])
-  end
-
   def delete(spotify_id) do
     case get_by(spotify_id: spotify_id) do
       nil ->
         :ok
 
       album ->
-        case Repo.delete(album) do
+        # AIDEV-NOTE: add foreign key constraint to handle listening sessions reference
+        changeset =
+          album
+          |> Ecto.Changeset.change()
+
+        # |> Ecto.Changeset.foreign_key_constraint(:album_id, name: "listening_sessions_album_id_fkey")
+
+        case Repo.delete(changeset) do
           {:ok, _} -> :ok
           {:error, _} -> :error
         end

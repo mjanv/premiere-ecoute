@@ -1,12 +1,10 @@
 defmodule PremiereEcoute.Sessions.Scores.Report do
   @moduledoc false
 
-  use Ecto.Schema
+  use PremiereEcoute.Core.Schema,
+    preload: [:votes, :polls]
 
   require Logger
-
-  import Ecto.Changeset
-  import Ecto.Query
 
   alias Ecto.Adapters.SQL
 
@@ -72,10 +70,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     |> foreign_key_constraint(:session_id)
   end
 
-  def preload(%__MODULE__{} = report) do
-    Repo.preload(report, [:votes, :polls])
-  end
-
   @doc """
   Generates a comprehensive report for a listening session.
 
@@ -122,14 +116,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       {:error, reason} ->
         Logger.error("Cannot generate report due to: #{inspect(reason)}")
         {:error, reason}
-    end
-  end
-
-  @spec get_by(Keyword.t()) :: t() | nil
-  def get_by(opts) do
-    case Repo.one(from(r in __MODULE__, where: ^opts)) do
-      nil -> nil
-      report -> preload(report)
     end
   end
 

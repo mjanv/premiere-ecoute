@@ -48,9 +48,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   end
 
   def callback(conn, %{"provider" => "spotify", "code" => code, "state" => state}) do
-    Logger.info(
-      "Spotify callback started with code: #{String.slice(code, 0, 20)}... and state: #{state}"
-    )
+    Logger.info("Spotify callback started with code: #{String.slice(code, 0, 20)}... and state: #{state}")
 
     result =
       try do

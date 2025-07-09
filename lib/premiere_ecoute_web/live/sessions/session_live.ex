@@ -88,8 +88,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("toggle", %{"flag" => flag}, %{assigns: assigns} = socket) do
-    {:noreply,
-     assign(socket, :show, Map.update!(assigns.show, String.to_atom(flag), fn v -> !v end))}
+    {:noreply, assign(socket, :show, Map.update!(assigns.show, String.to_atom(flag), fn v -> !v end))}
   end
 
   @impl true

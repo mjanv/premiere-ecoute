@@ -1,9 +1,7 @@
 defmodule PremiereEcoute.Sessions.Discography.Track do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
+  use PremiereEcoute.Core.Schema
 
   alias PremiereEcoute.Sessions.Discography.Album
 

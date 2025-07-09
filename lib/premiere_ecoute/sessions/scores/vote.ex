@@ -1,10 +1,7 @@
 defmodule PremiereEcoute.Sessions.Scores.Vote do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
-  import Ecto.Query
+  use PremiereEcoute.Core.Schema
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Track
@@ -40,25 +37,6 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     |> unique_constraint([:viewer_id, :session_id, :track_id], name: :vote_index)
     |> foreign_key_constraint(:session_id)
     |> foreign_key_constraint(:track_id)
-  end
-
-  @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def create(%__MODULE__{} = vote) do
-    %__MODULE__{}
-    |> changeset(Map.from_struct(vote))
-    |> Repo.insert()
-  end
-
-  @spec update(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def update(%__MODULE__{} = vote, attrs) do
-    vote
-    |> changeset(attrs)
-    |> Repo.update()
-  end
-
-  @spec get_by(Keyword.t()) :: [t()]
-  def get_by(opts) do
-    Repo.one(from(v in __MODULE__, where: ^opts))
   end
 
   @spec all(Keyword.t()) :: [t()]

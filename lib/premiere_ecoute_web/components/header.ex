@@ -12,10 +12,7 @@ defmodule PremiereEcouteWeb.Components.Header do
 
   def app_header(assigns) do
     ~H"""
-    <header
-      class="border-b px-6 py-4"
-      style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
-    >
+    <header class="border-b px-6 py-4" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div
@@ -55,12 +52,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                 </svg>
                 {@current_user.twitch_username || ""}
                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               
@@ -100,12 +92,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     class="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-gray-200 transition-colors"
                   >
                     <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     {gettext("Create Session")}
                   </.link>

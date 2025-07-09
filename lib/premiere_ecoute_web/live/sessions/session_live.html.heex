@@ -148,11 +148,7 @@
               </div>
               
 <!-- AIDEV-NOTE: Overlay link section -->
-              <div
-                class="mt-4 pt-4 border-t border-white/20"
-                id="overlay-hooks"
-                phx-hook="CopyToClipboard"
-              >
+              <div class="mt-4 pt-4 border-t border-white/20" id="overlay-hooks" phx-hook="CopyToClipboard">
                 <div class="relative">
                   <div class="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 z-10">
                     <span class="text-xs text-purple-200 font-medium">{gettext("Overlay")}</span>
@@ -463,8 +459,7 @@
                             else: ""
                           )
                         ],
-                        else:
-                          "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50"
+                        else: "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50"
                       )
                     ]}
                     disabled={!@listening_session.current_track}
@@ -514,11 +509,7 @@
                       <div class="flex items-center space-x-4 flex-1 min-w-0">
                         <%= if @listening_session.current_track && @listening_session.current_track.id == track.id do %>
                           <div class="w-8 flex-shrink-0 flex items-center justify-center">
-                            <svg
-                              class="w-5 h-5 text-green-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
+                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                               <path
                                 fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
@@ -615,11 +606,7 @@
                           <:loading>
                             <%= for rating <- 1..10 do %>
                               <div class="flex-1 flex flex-col items-center px-1">
-                                <div
-                                  class="w-full bg-gray-600 rounded-t animate-pulse"
-                                  style="height: 8px"
-                                >
-                                </div>
+                                <div class="w-full bg-gray-600 rounded-t animate-pulse" style="height: 8px"></div>
                                 <span class="text-xs text-gray-400 font-medium mt-1">
                                   {rating}
                                 </span>
@@ -629,8 +616,7 @@
                           <:failed>
                             <%= for rating <- 1..10 do %>
                               <div class="flex-1 flex flex-col items-center px-1">
-                                <div class="w-full bg-red-600 rounded-t" style="height: 6px">
-                                </div>
+                                <div class="w-full bg-red-600 rounded-t" style="height: 6px"></div>
                                 <span class="text-xs text-gray-400 font-medium mt-1">
                                   {rating}
                                 </span>
@@ -689,11 +675,7 @@
             </div>
           <% else %>
             <div class="text-center py-16 text-gray-400">
-              <svg
-                class="w-16 h-16 mx-auto mb-4 opacity-50"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
               <p>{gettext("No tracks found for this album.")}</p>

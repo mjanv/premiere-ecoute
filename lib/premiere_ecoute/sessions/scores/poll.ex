@@ -1,10 +1,7 @@
 defmodule PremiereEcoute.Sessions.Scores.Poll do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
-  import Ecto.Query
+  use PremiereEcoute.Core.Schema
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Track
@@ -64,13 +61,6 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
     end
   end
 
-  @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def create(%__MODULE__{} = poll) do
-    %__MODULE__{}
-    |> changeset(Map.from_struct(poll))
-    |> Repo.insert()
-  end
-
   @spec upsert(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def upsert(%__MODULE__{poll_id: poll_id} = poll) when not is_nil(poll_id) do
     case Repo.get_by(__MODULE__, poll_id: poll_id) do
@@ -82,11 +72,6 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
         |> changeset(%{total_votes: poll.total_votes, votes: poll.votes})
         |> Repo.update()
     end
-  end
-
-  @spec get_by(Keyword.t()) :: [t()]
-  def get_by(opts) do
-    Repo.one(from(p in __MODULE__, where: ^opts))
   end
 
   @spec all(Keyword.t()) :: [t()]

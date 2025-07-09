@@ -45,8 +45,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
             {:noreply, put_flash(socket, :info, gettext("Spotify playback paused"))}
 
           {:error, reason} ->
-            {:noreply,
-             put_flash(socket, :error, gettext("Failed to pause: %{reason}", reason: reason))}
+            {:noreply, put_flash(socket, :error, gettext("Failed to pause: %{reason}", reason: reason))}
         end
 
       %{"is_playing" => false} = state ->
@@ -56,8 +55,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
             {:noreply, put_flash(socket, :info, gettext("Spotify playback resumed"))}
 
           {:error, reason} ->
-            {:noreply,
-             put_flash(socket, :error, gettext("Failed to play: %{reason}", reason: reason))}
+            {:noreply, put_flash(socket, :error, gettext("Failed to play: %{reason}", reason: reason))}
         end
     end
   end

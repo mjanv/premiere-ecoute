@@ -1,10 +1,8 @@
 defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
-  import Ecto.Query
+  use PremiereEcoute.Core.Schema,
+    preload: [album: [:tracks], user: [], current_track: []]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Repo
@@ -63,17 +61,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> put_change(:status, :preparing)
   end
 
-  def preload(session) do
-    Repo.preload(session, [album: [:tracks], user: [], current_track: []], force: true)
-  end
-
   def create(attrs) do
     %__MODULE__{}
     |> changeset(attrs)
     |> Repo.insert()
     |> case do
       {:ok, session} ->
-        session = preload(session)
+        session = Repo.preload(session, album: [:tracks], user: [], current_track: [])
 
         if session.user && session.user.twitch_user_id do
           Cachex.put(:sessions, session.user.twitch_user_id, {session.id, nil})
@@ -84,18 +78,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       {:error, reason} ->
         {:error, reason}
     end
-  end
-
-  def get(id) do
-    __MODULE__
-    |> Repo.get(id)
-    |> preload()
-  end
-
-  def get_by(opts) do
-    __MODULE__
-    |> Repo.get_by(opts)
-    |> preload()
   end
 
   @spec all(Keyword.t()) :: [t()]
@@ -189,7 +171,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
           Cachex.put(:sessions, session.user.twitch_user_id, {session.id, track_id})
         end
 
-        {:ok, preload(session)}
+        {:ok, session}
 
       {:error, reason} ->
         {:error, reason}
