@@ -41,7 +41,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   end
 
   @impl true
-  def handle_event("confirm_delete", _params, %{assigns: %{session_to_delete: session_id, current_scope: scope}} = socket) do
+  def handle_event(
+        "confirm_delete",
+        _params,
+        %{assigns: %{session_to_delete: session_id, current_scope: scope}} = socket
+      ) do
     session_id
     |> ListeningSession.delete()
     |> case do

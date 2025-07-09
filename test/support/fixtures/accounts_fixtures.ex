@@ -13,9 +13,7 @@ defmodule PremiereEcoute.AccountsFixtures do
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
-    Enum.into(attrs, %{
-      email: unique_user_email()
-    })
+    Enum.into(attrs, %{email: unique_user_email()})
   end
 
   def unconfirmed_user_fixture(attrs \\ %{}) do

@@ -197,7 +197,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
       {:error, _} = Album.delete(album)
 
-      assert not(assert is_nil(Album.get_by(spotify_id: spotify_id)))
+      assert not assert(is_nil(Album.get_by(spotify_id: spotify_id)))
     end
   end
 end

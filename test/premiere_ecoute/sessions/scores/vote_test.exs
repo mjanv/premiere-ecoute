@@ -112,48 +112,48 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
   end
 
   describe "all/1" do
-    test "read all votes from a listening sessions", %{album: album, session: session} do
-      %ListeningSession{id: s_id} = session
+    test "read all votes from a listening session", %{album: album, session: session} do
+      %ListeningSession{id: id} = session
       %Album{tracks: [%Track{id: t1_id}, %Track{id: t2_id}]} = album
 
       votes = [
-        %Vote{viewer_id: "1", session_id: s_id, track_id: t1_id, is_streamer: true, value: 1},
-        %Vote{viewer_id: "1", session_id: s_id, track_id: t2_id, is_streamer: true, value: 2},
-        %Vote{viewer_id: "2", session_id: s_id, track_id: t1_id, is_streamer: false, value: 0},
-        %Vote{viewer_id: "2", session_id: s_id, track_id: t2_id, is_streamer: false, value: 1}
+        %Vote{viewer_id: "1", session_id: id, track_id: t1_id, is_streamer: true, value: 1},
+        %Vote{viewer_id: "1", session_id: id, track_id: t2_id, is_streamer: true, value: 2},
+        %Vote{viewer_id: "2", session_id: id, track_id: t1_id, is_streamer: false, value: 0},
+        %Vote{viewer_id: "2", session_id: id, track_id: t2_id, is_streamer: false, value: 1}
       ]
 
       for vote <- votes do
         {:ok, _} = Vote.create(vote)
       end
 
-      registered_votes = Vote.all(where: [session_id: s_id])
+      registered_votes = Vote.all(where: [session_id: id])
 
       assert [
                %Vote{
                  viewer_id: "1",
-                 session_id: ^s_id,
+                 session_id: ^id,
                  track_id: ^t1_id,
                  is_streamer: true,
                  value: 1
                },
                %Vote{
                  viewer_id: "1",
-                 session_id: ^s_id,
+                 session_id: ^id,
                  track_id: ^t2_id,
                  is_streamer: true,
                  value: 2
                },
                %Vote{
                  viewer_id: "2",
-                 session_id: ^s_id,
+                 session_id: ^id,
                  track_id: ^t1_id,
                  is_streamer: false,
                  value: 0
                },
                %Vote{
                  viewer_id: "2",
-                 session_id: ^s_id,
+                 session_id: ^id,
                  track_id: ^t2_id,
                  is_streamer: false,
                  value: 1

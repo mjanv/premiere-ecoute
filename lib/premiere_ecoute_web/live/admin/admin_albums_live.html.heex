@@ -20,7 +20,7 @@
         </div>
       </div>
     </div>
-
+    
 <!-- Albums Table -->
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700">
@@ -133,6 +133,29 @@
         </table>
       </div>
     </div>
+    
+<!-- Pagination -->
+    <%!-- AIDEV-NOTE: Lean pagination bar with ellipsis and purple styling --%>
+    <div class="mt-6 flex items-center justify-center space-x-1">
+      <%= for page_item <- pagination_range(@page.page_number, @page.total_pages) do %>
+        <%= if page_item == :ellipsis do %>
+          <span class="px-2 py-1 text-sm text-gray-500">...</span>
+        <% else %>
+          <%= if page_item == @page.page_number do %>
+            <span class="px-3 py-1 text-sm font-medium text-white bg-purple-500 rounded border border-purple-500">
+              {page_item}
+            </span>
+          <% else %>
+            <.link
+              patch={~p"/admin/albums?page=#{page_item}&per_page=#{@page.page_size}"}
+              class="px-3 py-1 text-sm text-gray-400 hover:text-purple-400 hover:bg-gray-800 rounded transition-colors"
+            >
+              {page_item}
+            </.link>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 </div>
 
@@ -177,7 +200,7 @@
           </svg>
         </button>
       </div>
-
+      
 <!-- Modal Content -->
       <div class="flex-1 overflow-y-auto p-6">
         <h3 class="text-lg font-medium text-white mb-4">

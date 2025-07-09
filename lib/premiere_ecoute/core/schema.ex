@@ -21,6 +21,7 @@ defmodule PremiereEcoute.Core.Schema do
       # Create operations
       def create(entity) when is_struct(entity), do: create(Map.from_struct(entity))
       def create(attrs), do: preload(Repo.insert(changeset(struct(__MODULE__), attrs)))
+
       def create_if_not_exists(entity) do
         case get_by(Map.take(entity, unquote(identity))) do
           nil -> create(entity)
@@ -33,15 +34,14 @@ defmodule PremiereEcoute.Core.Schema do
       def get_by(query \\ __MODULE__, clauses), do: preload(Repo.get_by(query, clauses))
       def all(clauses \\ []), do: Repo.all(all_query(clauses))
       def all_by(query \\ __MODULE__, clauses), do: preload(Repo.all_by(query, clauses))
-      def page(clauses \\ [], page, page_size \\ 1), do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
+
+      def page(clauses \\ [], page, page_size \\ 1),
+        do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
 
       defp all_query(clauses \\ []) do
-        where = Keyword.get(clauses, :where, true)
-        order_by = Keyword.get(clauses, :order_by, [asc: :updated_at])
-
         __MODULE__
-        |> where(^where)
-        |> order_by(^order_by)
+        |> where(^Keyword.get(clauses, :where, true))
+        |> order_by(^Keyword.get(clauses, :order_by, asc: :updated_at))
         |> preload(unquote(root))
       end
 
@@ -60,7 +60,7 @@ defmodule PremiereEcoute.Core.Schema do
       def min(query \\ __MODULE__, field), do: Repo.aggregate(query, :min, field)
       def sum(query \\ __MODULE__, field), do: Repo.aggregate(query, :sum, field)
 
-      defoverridable preload: 1, create: 1, update: 2, delete: 1
+      defoverridable create: 1, update: 2, upsert: 2, delete: 1
     end
   end
 end
