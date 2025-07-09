@@ -55,7 +55,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   end
 
   defp load(scope) do
-    sessions = ListeningSession.all(user_id: scope.user.id)
+    sessions = ListeningSession.all(where: [user_id: scope.user.id])
     grouped_sessions = Enum.group_by(sessions, & &1.status)
 
     %{

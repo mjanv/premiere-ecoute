@@ -80,16 +80,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     end
   end
 
-  @spec all(Keyword.t()) :: [t()]
-  def all(opts) do
-    from(s in __MODULE__,
-      where: ^opts,
-      order_by: [asc: s.inserted_at]
-    )
-    |> Repo.all()
-    |> preload()
-  end
-
   def start(%__MODULE__{} = session) do
     session
     |> change()

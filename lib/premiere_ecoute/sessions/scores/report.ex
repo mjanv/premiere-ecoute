@@ -119,15 +119,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     end
   end
 
-  @spec all(Keyword.t()) :: [t()]
-  def all(opts) do
-    from(r in __MODULE__,
-      where: ^opts,
-      order_by: [desc: r.inserted_at]
-    )
-    |> Repo.all()
-  end
-
   defp calculate_session_stats(session_id) do
     query = """
     SELECT

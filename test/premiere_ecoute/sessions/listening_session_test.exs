@@ -95,7 +95,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
-      sessions = ListeningSession.all(user_id: user.id)
+      sessions = ListeningSession.all(where: [user_id: user.id])
 
       for session <- sessions do
         assert %PremiereEcoute.Sessions.ListeningSession{

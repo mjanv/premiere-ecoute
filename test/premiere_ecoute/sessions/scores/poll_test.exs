@@ -169,7 +169,7 @@ defmodule PremiereEcoute.Sessions.Scores.PollTest do
         {:ok, _} = Poll.create(poll)
       end
 
-      found_polls = Poll.all(session_id: session.id)
+      found_polls = Poll.all(where: [session_id: session.id])
 
       assert length(found_polls) == 2
       assert Enum.all?(found_polls, &(&1.session_id == session.id))
@@ -177,7 +177,7 @@ defmodule PremiereEcoute.Sessions.Scores.PollTest do
     end
 
     test "returns empty list when no polls exist for session" do
-      polls = Poll.all(session_id: 999)
+      polls = Poll.all(where: [session_id: 999])
 
       assert polls == []
     end

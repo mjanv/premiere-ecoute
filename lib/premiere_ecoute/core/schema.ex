@@ -31,8 +31,19 @@ defmodule PremiereEcoute.Core.Schema do
       # Read operations
       def get(id), do: preload(Repo.get(__MODULE__, id))
       def get_by(query \\ __MODULE__, clauses), do: preload(Repo.get_by(query, clauses))
-      def all, do: preload(Repo.all(__MODULE__))
+      def all(clauses \\ []), do: Repo.all(all_query(clauses))
       def all_by(query \\ __MODULE__, clauses), do: preload(Repo.all_by(query, clauses))
+      def page(clauses \\ [], page, page_size \\ 1), do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
+
+      defp all_query(clauses \\ []) do
+        where = Keyword.get(clauses, :where, true)
+        order_by = Keyword.get(clauses, :order_by, [asc: :updated_at])
+
+        __MODULE__
+        |> where(^where)
+        |> order_by(^order_by)
+        |> preload(unquote(root))
+      end
 
       # Update operations
       def update(entity, attrs), do: preload(Repo.update(changeset(entity, attrs)))

@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
         is_streamer: false
       })
 
-      [%Vote{} = vote1, %Vote{} = vote2] = Vote.all(session_id: session.id)
+      [%Vote{} = vote1, %Vote{} = vote2] = Vote.all(where: [session_id: session.id])
 
       assert %Vote{viewer_id: "viewer1", value: 5, track_id: ^track_id, is_streamer: false} =
                vote1
@@ -102,7 +102,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
         is_streamer: false
       })
 
-      assert Enum.empty?(Vote.all(session_id: session.id))
+      assert Enum.empty?(Vote.all(where: [session_id: session.id]))
       assert is_nil(Report.get_by(session_id: session.id))
     end
   end
@@ -121,7 +121,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
 
       EventBus.dispatch(%PollUpdated{id: "poll1", votes: %{"A" => 5, "B" => 7}})
 
-      [%Poll{} = poll] = Poll.all(session_id: session.id)
+      [%Poll{} = poll] = Poll.all(where: [session_id: session.id])
 
       assert %Poll{
                poll_id: "poll1",
@@ -134,7 +134,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
     test "does not update an unknown poll", %{session: session} do
       EventBus.dispatch(%PollUpdated{id: "poll2", votes: %{"A" => 5, "B" => 7}})
 
-      assert Enum.empty?(Poll.all(session_id: session.id))
+      assert Enum.empty?(Poll.all(where: [session_id: session.id]))
     end
   end
 end

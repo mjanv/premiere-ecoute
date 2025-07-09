@@ -39,15 +39,6 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     |> foreign_key_constraint(:track_id)
   end
 
-  @spec all(Keyword.t()) :: [t()]
-  def all(opts) do
-    from(v in __MODULE__,
-      where: ^opts,
-      order_by: [asc: v.inserted_at]
-    )
-    |> Repo.all()
-  end
-
   def from_message(message) do
     case Integer.parse(message) do
       {integer, _} when integer >= 0 and integer <= 10 -> {:ok, integer}

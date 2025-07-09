@@ -127,7 +127,7 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
         {:ok, _} = Vote.create(vote)
       end
 
-      registered_votes = Vote.all(session_id: s_id)
+      registered_votes = Vote.all(where: [session_id: s_id])
 
       assert [
                %Vote{

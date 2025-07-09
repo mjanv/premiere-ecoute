@@ -73,13 +73,4 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
         |> Repo.update()
     end
   end
-
-  @spec all(Keyword.t()) :: [t()]
-  def all(opts) do
-    from(p in __MODULE__,
-      where: ^opts,
-      order_by: [asc: p.inserted_at]
-    )
-    |> Repo.all()
-  end
 end

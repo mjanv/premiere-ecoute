@@ -232,7 +232,7 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
 
       {:ok, report} = Report.generate(session)
 
-      assert length(Report.all(session_id: session.id)) == 1
+      assert length(Report.all(where: [session_id: session.id])) == 1
 
       assert report.session_id == session.id
       assert report.unique_votes == 19

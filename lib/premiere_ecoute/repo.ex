@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Repo do
     otp_app: :premiere_ecoute,
     adapter: Ecto.Adapters.Postgres
 
+  use Scrivener, page_size: 1
+
   def traverse_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
       Regex.replace(~r"%{(\w+)}", msg, fn _, key ->

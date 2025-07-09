@@ -60,7 +60,7 @@ defmodule PremiereEcoute.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:postgrex, "~> 0.20.0"},
       {:ecto_sql, "~> 3.10"},
-      {:ecto_sqlite3, "~> 0.12"},
+      {:scrivener_ecto, "~> 3.0"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
       {:ueberauth_spotify, "~> 0.2"},

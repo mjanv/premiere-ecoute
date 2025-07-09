@@ -8,7 +8,7 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
   def mount(_params, _session, socket) do
     socket
     |> assign(:page_title, "Admin Albums")
-    |> assign(:albums, Album.all())
+    |> assign(:page, Album.page(1))
     |> assign(:selected_album, nil)
     |> assign(:show_modal, false)
     |> then(fn socket -> {:ok, socket} end)
@@ -35,7 +35,7 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
     |> case do
       {:ok, _} ->
         socket
-        |> assign(:albums, Album.all())
+        |> assign(:page, Album.page(1))
         |> put_flash(:info, "Album deleted successfully")
       {:error, _} ->
         socket
