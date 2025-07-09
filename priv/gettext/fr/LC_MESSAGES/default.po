@@ -220,6 +220,7 @@ msgid "Unable to load sessions"
 msgstr "Impossible de charger les sessions"
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:249
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:73
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr "Actions"
@@ -428,6 +429,7 @@ msgid "Unique Voters"
 msgstr "Votants Uniques"
 
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:570
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:126
 #, elixir-autogen, elixir-format
 msgid "Votes"
 msgstr "Votes"
@@ -562,3 +564,78 @@ msgstr "Nous ne trouvons pas Internet"
 #, elixir-autogen, elixir-format
 msgid "Hello !"
 msgstr "Bienvenue !"
+
+#: lib/premiere_ecoute_web/components/header.ex:127
+#, elixir-autogen, elixir-format
+msgid "Admin"
+msgstr "Administration"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:47
+#, elixir-autogen, elixir-format
+msgid "Admin Dashboard"
+msgstr "Tableau de Bord Admin"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:48
+#, elixir-autogen, elixir-format
+msgid "Manage your PremiereEcoute application"
+msgstr "Gérez votre application PremiereEcoute"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:52
+#, elixir-autogen, elixir-format
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:53
+#, elixir-autogen, elixir-format
+msgid "Manage user accounts and roles"
+msgstr "Gérez les comptes utilisateurs et les rôles"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:61
+#, elixir-autogen, elixir-format
+msgid "User"
+msgstr "Utilisateur"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:64
+#, elixir-autogen, elixir-format
+msgid "Role"
+msgstr "Rôle"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:67
+#, elixir-autogen, elixir-format
+msgid "Connections"
+msgstr "Connexions"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:70
+#, elixir-autogen, elixir-format
+msgid "Joined"
+msgstr "Inscription"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:144
+#, elixir-autogen, elixir-format
+msgid "Remove Admin"
+msgstr "Retirer Admin"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:144
+#, elixir-autogen, elixir-format
+msgid "Make Admin"
+msgstr "Promouvoir Admin"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:109
+#, elixir-autogen, elixir-format
+msgid "Sessions"
+msgstr "Sessions"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:143
+#, elixir-autogen, elixir-format
+msgid "Polls"
+msgstr "Sondages"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:94
+#, elixir-autogen, elixir-format
+msgid "Sentry Dashboard"
+msgstr "Tableau de Bord Sentry"
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.ex:108
+#, elixir-autogen, elixir-format
+msgid "Grafana Dashboard"
+msgstr "Tableau de Bord Grafana"

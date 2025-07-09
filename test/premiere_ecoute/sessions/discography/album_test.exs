@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.ListeningSession
 
   describe "create/1" do
     test "creates an album with tracks" do
@@ -135,7 +136,9 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
   describe "get_by/1" do
     test "get an existing album" do
-      {:ok, %Album{spotify_id: spotify_id}} = Album.create(album_fixture())
+      user = user_fixture()
+      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
+      {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
       album = Album.get_by(spotify_id: spotify_id)
 
@@ -183,6 +186,14 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       :ok = Album.delete(spotify_id)
 
       assert is_nil(Album.get_by(spotify_id: spotify_id))
+    end
+
+    test "cannot delete an album associated to at least one listening session" do
+      user = user_fixture()
+      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
+      {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      :error = Album.delete(spotify_id)
     end
   end
 end

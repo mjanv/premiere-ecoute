@@ -195,6 +195,11 @@ defmodule PremiereEcouteWeb.UserAuth do
       on user_token.
       Redirects to login page if there's no logged user.
 
+    * `:require_admin` - Authenticates the user from the session,
+      and assigns the current_scope to socket assigns based
+      on user_token. Requires user to have admin role.
+      Redirects to home page if there's no logged user or user is not admin.
+
   ## Examples
 
   Use the `on_mount` lifecycle macro in LiveViews to mount or authenticate
@@ -211,6 +216,10 @@ defmodule PremiereEcouteWeb.UserAuth do
 
       live_session :authenticated, on_mount: [{PremiereEcouteWeb.UserAuth, :require_authenticated}] do
         live "/profile", ProfileLive, :index
+      end
+
+      live_session :admin, on_mount: [{PremiereEcouteWeb.UserAuth, :require_admin}] do
+        live "/admin", AdminLive, :index
       end
   """
   def on_mount(:mount_current_scope, _params, session, socket) do
@@ -247,6 +256,23 @@ defmodule PremiereEcouteWeb.UserAuth do
     end
   end
 
+  def on_mount(:require_admin, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope &&
+         socket.assigns.current_scope.user &&
+         socket.assigns.current_scope.user.role == :admin do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You must be an admin to access this page.")
+        |> Phoenix.LiveView.redirect(to: ~p"/")
+
+      {:halt, socket}
+    end
+  end
+
   defp mount_current_scope(socket, session) do
     Phoenix.Component.assign_new(socket, :current_scope, fn ->
       {user, _} =
@@ -275,6 +301,23 @@ defmodule PremiereEcouteWeb.UserAuth do
     else
       conn
       |> put_flash(:error, "You must log in to access this page.")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/")
+      |> halt()
+    end
+  end
+
+  @doc """
+  Plug for routes that require the user to be authenticated and have admin role.
+  """
+  def require_admin_user(conn, _opts) do
+    if conn.assigns.current_scope &&
+         conn.assigns.current_scope.user &&
+         conn.assigns.current_scope.user.role == :admin do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must be an admin to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/")
       |> halt()

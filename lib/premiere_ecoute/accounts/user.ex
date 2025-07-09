@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Accounts.User do
           hashed_password: String.t() | nil,
           confirmed_at: DateTime.t() | nil,
           authenticated_at: DateTime.t() | nil,
+          role: :streamer | :admin,
           spotify_access_token: String.t() | nil,
           spotify_refresh_token: String.t() | nil,
           spotify_expires_at: DateTime.t() | nil,
@@ -32,6 +33,7 @@ defmodule PremiereEcoute.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+    field :role, Ecto.Enum, values: [:streamer, :admin], default: :streamer
 
     field :spotify_access_token, :string, redact: true
     field :spotify_refresh_token, :string, redact: true
@@ -50,6 +52,7 @@ defmodule PremiereEcoute.Accounts.User do
     user
     |> cast(attrs, [
       :email,
+      :role,
       :twitch_user_id,
       :twitch_access_token,
       :twitch_refresh_token,
@@ -57,6 +60,7 @@ defmodule PremiereEcoute.Accounts.User do
       :twitch_username
     ])
     |> validate_email(opts)
+    |> validate_inclusion(:role, [:streamer, :admin])
   end
 
   def email_changeset(user, attrs \\ %{}, opts \\ []) do
@@ -188,6 +192,8 @@ defmodule PremiereEcoute.Accounts.User do
     Bcrypt.no_user_verify()
     false
   end
+
+  def get!(id), do: Repo.get!(__MODULE__, id)
 
   def get_by(opts), do: Repo.get_by(__MODULE__, opts)
 
@@ -335,4 +341,6 @@ defmodule PremiereEcoute.Accounts.User do
     )
     |> Repo.update()
   end
+
+  def all, do: Repo.all(__MODULE__)
 end

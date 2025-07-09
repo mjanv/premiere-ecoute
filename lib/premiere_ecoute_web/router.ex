@@ -63,6 +63,16 @@ defmodule PremiereEcouteWeb.Router do
     get "/auth/:provider/callback", Accounts.AuthController, :callback
   end
 
+  scope "/admin", PremiereEcouteWeb.Admin do
+    pipe_through [:browser, :require_authenticated_user, :require_admin_user]
+
+    live_session :admin,
+      on_mount: [{PremiereEcouteWeb.UserAuth, :require_admin}] do
+      live "/", AdminLive, :index
+      live "/albums", AdminAlbumsLive, :index
+    end
+  end
+
   scope "/webhooks", PremiereEcouteWeb.Webhooks do
     pipe_through :webhook
 

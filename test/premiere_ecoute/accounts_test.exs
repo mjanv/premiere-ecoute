@@ -68,16 +68,27 @@ defmodule PremiereEcoute.AccountsTest do
     test "validates email uniqueness" do
       %{email: email} = user_fixture()
       {:error, changeset} = Accounts.register_user(%{email: email})
+
       assert "has already been taken" in errors_on(changeset).email
     end
 
     test "registers users without password" do
       email = unique_user_email()
+
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+
       assert user.email == email
       assert is_nil(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
+    end
+
+    test "registers users with a default role" do
+      email = unique_user_email()
+
+      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+
+      assert user.role == :streamer
     end
   end
 
