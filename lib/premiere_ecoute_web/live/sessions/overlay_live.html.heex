@@ -15,7 +15,7 @@
   <%= if @listening_session do %>
     <div style="line-height: 1;">
       <%= if @report.loading do %>
-        <div style="font-size: 20px; color: rgba(255, 255, 255, 0.8);">Loading...</div>
+        <div style="font-size: 20px; color: rgba(255, 255, 255, 0.8);">{gettext("Loading...")}</div>
       <% else %>
         <span style="font-size: 40px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
           {current_average_score(@report.result)}
@@ -27,7 +27,7 @@
     </div>
   <% else %>
     <div style="color: #EF4444; font-size: 18px; font-weight: 500;">
-      Session Not Found
+{gettext("Session Not Found")}
     </div>
   <% end %>
 </div>

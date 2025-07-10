@@ -67,7 +67,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
 
       {:error, _} ->
         socket
-        |> put_flash(:error, "Failed to update user role")
+        |> put_flash(:error, gettext("Failed to update user role"))
         |> then(fn socket -> {:noreply, socket} end)
     end
   end

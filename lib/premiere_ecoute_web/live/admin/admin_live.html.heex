@@ -332,27 +332,27 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- User Information -->
           <div>
-            <h3 class="text-lg font-medium text-white mb-4">User Information</h3>
+            <h3 class="text-lg font-medium text-white mb-4">{gettext("User Information")}</h3>
             <div class="space-y-3">
               <div>
-                <label class="block text-sm font-medium text-gray-300">Email</label>
+                <label class="block text-sm font-medium text-gray-300">{gettext("Email")}</label>
                 <p class="mt-1 text-sm text-gray-400">{@selected_user.email}</p>
               </div>
 
               <%= if @selected_user.twitch_username do %>
                 <div>
-                  <label class="block text-sm font-medium text-gray-300">Twitch Username</label>
+                  <label class="block text-sm font-medium text-gray-300">{gettext("Twitch Username")}</label>
                   <p class="mt-1 text-sm text-gray-400">@{@selected_user.twitch_username}</p>
                 </div>
               <% end %>
 
               <div>
-                <label class="block text-sm font-medium text-gray-300">Role</label>
+                <label class="block text-sm font-medium text-gray-300">{gettext("Role")}</label>
                 <p class="mt-1 text-sm text-gray-400">{String.capitalize(to_string(@selected_user.role))}</p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-300">Member Since</label>
+                <label class="block text-sm font-medium text-gray-300">{gettext("Member Since")}</label>
                 <p class="mt-1 text-sm text-gray-400">{Calendar.strftime(@selected_user.inserted_at, "%B %d, %Y")}</p>
               </div>
             </div>
@@ -360,7 +360,7 @@
           
 <!-- Connected Services -->
           <div>
-            <h3 class="text-lg font-medium text-white mb-4">Connected Services</h3>
+            <h3 class="text-lg font-medium text-white mb-4">{gettext("Connected Services")}</h3>
             <div class="space-y-3">
               <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
                 <div class="flex items-center">
@@ -376,7 +376,7 @@
                     else: "bg-red-900 text-red-200"
                   )
                 ]}>
-                  {if @selected_user.spotify_access_token, do: "Connected", else: "Disconnected"}
+                  {if @selected_user.spotify_access_token, do: gettext("Connected"), else: gettext("Disconnected")}
                 </span>
               </div>
 
@@ -394,7 +394,7 @@
                     else: "bg-red-900 text-red-200"
                   )
                 ]}>
-                  {if @selected_user.twitch_access_token, do: "Connected", else: "Disconnected"}
+                  {if @selected_user.twitch_access_token, do: gettext("Connected"), else: gettext("Disconnected")}
                 </span>
               </div>
             </div>
@@ -403,7 +403,7 @@
         
 <!-- Actions -->
         <div class="mt-6 pt-6 border-t border-gray-700">
-          <h3 class="text-lg font-medium text-white mb-4">Actions</h3>
+          <h3 class="text-lg font-medium text-white mb-4">{gettext("Actions")}</h3>
           <div class="flex space-x-3">
             <button
               phx-click="toggle_role"

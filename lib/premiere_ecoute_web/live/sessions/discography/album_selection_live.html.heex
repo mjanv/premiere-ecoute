@@ -57,7 +57,7 @@
                         {album.name}
                       </h4>
                       <p class="text-gray-400 text-sm truncate">{album.artist}</p>
-                      <p class="text-gray-500 text-xs">{album.total_tracks} tracks</p>
+                      <p class="text-gray-500 text-xs">{album.total_tracks} {gettext("tracks")}</p>
                     </div>
                   </div>
                 </div>
@@ -145,7 +145,7 @@
                           d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
                         />
                       </svg>
-                      <span>{@selected_album.result.total_tracks} tracks</span>
+                      <span>{@selected_album.result.total_tracks} {gettext("tracks")}</span>
                     </div>
 
                     <div class="flex items-center space-x-3">
@@ -164,7 +164,7 @@
                           |> Enum.sum()
 
                         total_minutes = div(total_ms, 60_000)
-                        "#{total_minutes} min"}
+                        "#{total_minutes} #{gettext("min")}"}
                       </span>
                     </div>
 
@@ -180,7 +180,7 @@
                       <span>
                         {if @selected_album.result.release_date,
                           do: @selected_album.result.release_date.year,
-                          else: "Unknown"}
+                          else: gettext("Unknown")}
                       </span>
                     </div>
                   </div>
@@ -191,7 +191,7 @@
                       class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg shadow-2xl"
                       phx-click="prepare_session"
                     >
-                      🎵 Start Listening Session
+                      🎵 {gettext("Start Listening Session")}
                     </button>
                   </div>
                 </div>
@@ -204,8 +204,8 @@
               <svg class="w-20 h-20 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
-              <h3 class="text-lg font-medium text-gray-300 mb-2">Ready to Start</h3>
-              <p class="text-sm">Search for an album above to begin your listening session</p>
+              <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("Ready to Start")}</h3>
+              <p class="text-sm">{gettext("Search for an album above to begin your listening session")}</p>
             </div>
           </div>
         <% end %>
@@ -214,7 +214,7 @@
 <!-- Right Panel - Track List -->
       <div class="w-1/2 p-6" style="background-color: var(--color-dark-900);">
         <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">
-          Track List
+          {gettext("Track List")}
         </h3>
         <%= if @selected_album.ok? && @selected_album.result do %>
           <div class="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
@@ -243,7 +243,7 @@
               <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
-              <p class="text-sm">Select an album to view tracks</p>
+              <p class="text-sm">{gettext("Select an album to view tracks")}</p>
             </div>
           </div>
         <% end %>

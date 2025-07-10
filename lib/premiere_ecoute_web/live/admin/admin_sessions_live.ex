@@ -8,10 +8,20 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   def mount(_params, _session, socket) do
     socket
     |> assign(:page_title, "Admin Sessions")
-    |> assign(:sessions, ListeningSession.all())
+    |> assign(:page, ListeningSession.page([], 1, 2))
     |> assign(:selected_session, nil)
     |> assign(:show_modal, false)
     |> then(fn socket -> {:ok, socket} end)
+  end
+
+  def handle_params(params, _url, socket) do
+    # AIDEV-NOTE: Handle pagination parameters from URL
+    page_number = String.to_integer(params["page"] || "1")
+    page_size = String.to_integer(params["per_page"] || "2")
+
+    socket
+    |> assign(:page, ListeningSession.page([], page_number, page_size))
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   def handle_event("show_session_modal", %{"session_id" => session_id}, socket) do
@@ -29,18 +39,20 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   end
 
   def handle_event("delete_session", %{"session_id" => session_id}, socket) do
+    current_page = socket.assigns.page
+
     session_id
     |> ListeningSession.get()
     |> ListeningSession.delete()
     |> case do
       :ok ->
         socket
-        |> assign(:sessions, ListeningSession.all())
-        |> put_flash(:info, "Session deleted successfully")
+        |> assign(:page, ListeningSession.page([], current_page.page_number, current_page.page_size))
+        |> put_flash(:info, gettext("Session deleted successfully"))
 
       :error ->
         socket
-        |> put_flash(:error, "Failed to delete session")
+        |> put_flash(:error, gettext("Failed to delete session"))
     end
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -69,4 +81,21 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   defp status_text(:active), do: "Active"
   defp status_text(:stopped), do: "Stopped"
   defp status_text(_), do: "Unknown"
+
+  # AIDEV-NOTE: Generate pagination range with ellipsis for lean display
+  defp pagination_range(current_page, total_pages) do
+    cond do
+      total_pages <= 7 ->
+        1..total_pages |> Enum.to_list()
+
+      current_page <= 4 ->
+        [1, 2, 3, 4, 5, :ellipsis, total_pages]
+
+      current_page >= total_pages - 3 ->
+        [1, :ellipsis, total_pages - 4, total_pages - 3, total_pages - 2, total_pages - 1, total_pages]
+
+      true ->
+        [1, :ellipsis, current_page - 1, current_page, current_page + 1, :ellipsis, total_pages]
+    end
+  end
 end

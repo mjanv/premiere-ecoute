@@ -45,11 +45,11 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
       {:ok, _} ->
         socket
         |> assign(:page, Album.page([], page.page_number, page.page_size))
-        |> put_flash(:info, "Album deleted successfully")
+        |> put_flash(:info, gettext("Album deleted successfully"))
 
       {:error, _} ->
         socket
-        |> put_flash(:error, "Cannot delete album")
+        |> put_flash(:error, gettext("Cannot delete album"))
     end
     |> then(fn socket -> {:noreply, socket} end)
   end
