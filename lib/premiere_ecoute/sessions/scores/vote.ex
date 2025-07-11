@@ -38,10 +38,17 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     |> foreign_key_constraint(:track_id)
   end
 
-  def from_message(message) do
-    case Integer.parse(message) do
-      {integer, _} when integer >= 0 and integer <= 10 -> {:ok, message}
-      _ -> {:error, message}
+  def from_message(message, vote_options) do
+    # AIDEV-NOTE: Validate vote against session's vote_options (integer or string based)
+    if message in vote_options do
+      {:ok, message}
+    else
+      {:error, message}
     end
+  end
+  
+  # AIDEV-NOTE: Legacy function for backward compatibility
+  def from_message(message) do
+    from_message(message, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
   end
 end
