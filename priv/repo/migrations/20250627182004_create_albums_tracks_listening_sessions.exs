@@ -32,8 +32,10 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
 
     create table(:listening_sessions) do
       add :status, :string, null: false, default: "preparing"
+      add :vote_options, {:array, :string}, default: [], null: false
       add :started_at, :utc_datetime
       add :ended_at, :utc_datetime
+
       add :user_id, references(:users, on_delete: :delete_all)
       add :album_id, references(:albums), null: false
       add :current_track_id, references(:tracks, on_delete: :nilify_all)

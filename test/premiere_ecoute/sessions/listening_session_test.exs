@@ -21,10 +21,11 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
 
       assert %PremiereEcoute.Sessions.ListeningSession{
                status: :preparing,
-               current_track: nil,
+               vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
                started_at: nil,
-               album: album,
-               ended_at: nil
+               ended_at: nil,
+               current_track: nil,
+               album: album
              } = session
 
       assert %Album{
@@ -49,6 +50,22 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
                  }
                ]
              } = album
+    end
+
+    test "can create a new listening session with different voting options", %{
+      user: user,
+      album: album
+    } do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, vote_options: ["smash", "pass"]})
+
+      assert %PremiereEcoute.Sessions.ListeningSession{
+               status: :preparing,
+               vote_options: ["smash", "pass"],
+               started_at: nil,
+               ended_at: nil,
+               current_track: nil,
+               album: _
+             } = session
     end
   end
 

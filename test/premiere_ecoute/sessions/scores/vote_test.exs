@@ -19,14 +19,14 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
         viewer_id: "twitch_user_42",
         session_id: session.id,
         track_id: hd(album.tracks).id,
-        value: 2,
+        value: "smash",
         is_streamer: false
       }
 
       {:ok, %Vote{} = vote} = Vote.create(attrs)
 
       assert %Vote{
-               value: 2,
+               value: "smash",
                is_streamer: false,
                session_id: session_id,
                viewer_id: "twitch_user_42",
@@ -42,14 +42,14 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
         viewer_id: "twitch_streamer_42",
         session_id: session.id,
         track_id: hd(album.tracks).id,
-        value: 3,
+        value: "3",
         is_streamer: true
       }
 
       {:ok, %Vote{} = vote} = Vote.create(attrs)
 
       assert %Vote{
-               value: 3,
+               value: "3",
                is_streamer: true,
                session_id: session_id,
                viewer_id: "twitch_streamer_42",
@@ -67,14 +67,14 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
         viewer_id: "twitch_user_42",
         session_id: session.id,
         track_id: hd(album.tracks).id,
-        value: 2,
+        value: "2",
         is_streamer: false
       }
 
       {:ok, %Vote{} = vote} = Vote.create(attrs)
-      {:ok, %Vote{} = new_vote} = Vote.update(vote, %{value: 3})
+      {:ok, %Vote{} = new_vote} = Vote.update(vote, %{value: "3"})
 
-      assert {vote.value, new_vote.value} == {2, 3}
+      assert {vote.value, new_vote.value} == {"2", "3"}
     end
   end
 
@@ -84,7 +84,7 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
         viewer_id: "twitch_user_42",
         session_id: session.id,
         track_id: hd(album.tracks).id,
-        value: 2,
+        value: "2",
         is_streamer: false
       }
 
@@ -98,7 +98,7 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
         )
 
       assert %Vote{
-               value: 2,
+               value: "2",
                is_streamer: false,
                viewer_id: "twitch_user_42"
              } = vote
@@ -117,10 +117,10 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
       %Album{tracks: [%Track{id: t1_id}, %Track{id: t2_id}]} = album
 
       votes = [
-        %Vote{viewer_id: "1", session_id: id, track_id: t1_id, is_streamer: true, value: 1},
-        %Vote{viewer_id: "1", session_id: id, track_id: t2_id, is_streamer: true, value: 2},
-        %Vote{viewer_id: "2", session_id: id, track_id: t1_id, is_streamer: false, value: 0},
-        %Vote{viewer_id: "2", session_id: id, track_id: t2_id, is_streamer: false, value: 1}
+        %Vote{viewer_id: "1", session_id: id, track_id: t1_id, is_streamer: true, value: "1"},
+        %Vote{viewer_id: "1", session_id: id, track_id: t2_id, is_streamer: true, value: "2"},
+        %Vote{viewer_id: "2", session_id: id, track_id: t1_id, is_streamer: false, value: "0"},
+        %Vote{viewer_id: "2", session_id: id, track_id: t2_id, is_streamer: false, value: "1"}
       ]
 
       for vote <- votes do
@@ -135,28 +135,28 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
                  session_id: ^id,
                  track_id: ^t1_id,
                  is_streamer: true,
-                 value: 1
+                 value: "1"
                },
                %Vote{
                  viewer_id: "1",
                  session_id: ^id,
                  track_id: ^t2_id,
                  is_streamer: true,
-                 value: 2
+                 value: "2"
                },
                %Vote{
                  viewer_id: "2",
                  session_id: ^id,
                  track_id: ^t1_id,
                  is_streamer: false,
-                 value: 0
+                 value: "0"
                },
                %Vote{
                  viewer_id: "2",
                  session_id: ^id,
                  track_id: ^t2_id,
                  is_streamer: false,
-                 value: 1
+                 value: "1"
                }
              ] = registered_votes
     end

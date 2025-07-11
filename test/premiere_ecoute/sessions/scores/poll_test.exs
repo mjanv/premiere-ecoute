@@ -153,14 +153,14 @@ defmodule PremiereEcoute.Sessions.Scores.PollTest do
           poll_id: "poll_1",
           session_id: session.id,
           track_id: Enum.at(track_ids, 0),
-          votes: %{1 => 3, 5 => 2},
+          votes: %{"1" => 3, "5" => 2},
           total_votes: 5
         },
         %Poll{
           poll_id: "poll_2",
           session_id: session.id,
           track_id: Enum.at(track_ids, 1),
-          votes: %{8 => 1, 10 => 4},
+          votes: %{"8" => 1, "10" => 4},
           total_votes: 5
         }
       ]

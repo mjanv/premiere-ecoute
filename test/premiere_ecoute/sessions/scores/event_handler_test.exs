@@ -42,10 +42,10 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
 
       [%Vote{} = vote1, %Vote{} = vote2] = Vote.all(where: [session_id: session.id])
 
-      assert %Vote{viewer_id: "viewer1", value: 5, track_id: ^track_id, is_streamer: false} =
+      assert %Vote{viewer_id: "viewer1", value: "5", track_id: ^track_id, is_streamer: false} =
                vote1
 
-      assert %Vote{viewer_id: "viewer2", value: 0, track_id: ^track_id, is_streamer: false} =
+      assert %Vote{viewer_id: "viewer2", value: "0", track_id: ^track_id, is_streamer: false} =
                vote2
 
       report = Report.get_by(session_id: session.id)

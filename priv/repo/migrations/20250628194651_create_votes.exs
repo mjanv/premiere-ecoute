@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateVotes do
   def change do
     create table(:votes) do
       add :viewer_id, :string, null: false
-      add :value, :integer, default: 1, null: false
+      add :value, :string, null: false
       add :is_streamer, :boolean, default: false, null: false
 
       add :session_id, references(:listening_sessions, on_delete: :delete_all), null: false

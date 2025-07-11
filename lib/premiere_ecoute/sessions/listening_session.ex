@@ -25,6 +25,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
+    field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     field :started_at, :utc_datetime
     field :ended_at, :utc_datetime
 
@@ -43,6 +44,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> cast(attrs, [
       :album_id,
       :status,
+      :vote_options,
       :started_at,
       :ended_at,
       :user_id,

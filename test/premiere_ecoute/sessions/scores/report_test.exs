@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
   alias PremiereEcoute.Sessions.Scores.{Poll, Report, Vote}
 
   describe "generate/1" do
-    test "generates comprehensive report with all vote sources" do
+    test "generates comprehensive report with all vote sources for 1-10 vote options" do
       user = user_fixture()
       {:ok, album} = Album.create(album_fixture())
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
@@ -18,42 +18,42 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
           viewer_id: "viewer1",
           session_id: session.id,
           track_id: track1.id,
-          value: 8,
+          value: "8",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer2",
           session_id: session.id,
           track_id: track1.id,
-          value: 6,
+          value: "6",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer3",
           session_id: session.id,
           track_id: track1.id,
-          value: 7,
+          value: "7",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer1",
           session_id: session.id,
           track_id: track2.id,
-          value: 9,
+          value: "9",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer2",
           session_id: session.id,
           track_id: track2.id,
-          value: 5,
+          value: "5",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer3",
           session_id: session.id,
           track_id: track2.id,
-          value: 8,
+          value: "8",
           is_streamer: false
         }
       ]
@@ -63,14 +63,14 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
           viewer_id: "streamer",
           session_id: session.id,
           track_id: track1.id,
-          value: 9,
+          value: "9",
           is_streamer: true
         },
         %Vote{
           viewer_id: "streamer",
           session_id: session.id,
           track_id: track2.id,
-          value: 7,
+          value: "7",
           is_streamer: true
         }
       ]
@@ -132,6 +132,131 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
       assert track2_summary.streamer_score == 7.0
     end
 
+    test "generates comprehensive report with all vote sources for smash/pass vote options" do
+      user = user_fixture()
+      {:ok, album} = Album.create(album_fixture())
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, vote_options: ["smash", "pass"]})
+
+      [track1, track2] = album.tracks
+
+      viewer_votes = [
+        %Vote{
+          viewer_id: "viewer1",
+          session_id: session.id,
+          track_id: track1.id,
+          value: "smash",
+          is_streamer: false
+        },
+        %Vote{
+          viewer_id: "viewer2",
+          session_id: session.id,
+          track_id: track1.id,
+          value: "pass",
+          is_streamer: false
+        },
+        %Vote{
+          viewer_id: "viewer3",
+          session_id: session.id,
+          track_id: track1.id,
+          value: "smash",
+          is_streamer: false
+        },
+        %Vote{
+          viewer_id: "viewer1",
+          session_id: session.id,
+          track_id: track2.id,
+          value: "smash",
+          is_streamer: false
+        },
+        %Vote{
+          viewer_id: "viewer2",
+          session_id: session.id,
+          track_id: track2.id,
+          value: "pass",
+          is_streamer: false
+        },
+        %Vote{
+          viewer_id: "viewer3",
+          session_id: session.id,
+          track_id: track2.id,
+          value: "smash",
+          is_streamer: false
+        }
+      ]
+
+      streamer_votes = [
+        %Vote{
+          viewer_id: "streamer",
+          session_id: session.id,
+          track_id: track1.id,
+          value: "pass",
+          is_streamer: true
+        },
+        %Vote{
+          viewer_id: "streamer",
+          session_id: session.id,
+          track_id: track2.id,
+          value: "smash",
+          is_streamer: true
+        }
+      ]
+
+      for vote <- viewer_votes ++ streamer_votes do
+        {:ok, _} = Vote.create(vote)
+      end
+
+      polls = [
+        %Poll{
+          poll_id: "twitch_poll_track1",
+          title: "Rate Track 1",
+          session_id: session.id,
+          track_id: track1.id,
+          votes: %{"smash" => 2, "pass" => 4},
+          total_votes: 6
+        },
+        %Poll{
+          poll_id: "twitch_poll_track2",
+          title: "Rate Track 2",
+          session_id: session.id,
+          track_id: track2.id,
+          votes: %{"smash" => 3, "pass" => 2},
+          total_votes: 5
+        }
+      ]
+
+      for poll <- polls do
+        {:ok, _} = Poll.create(poll)
+      end
+
+      {:ok, report} = Report.generate(session)
+
+      assert report.session_id == session.id
+      assert report.unique_votes == 19
+      assert report.unique_voters == 14
+
+      assert report.session_summary.tracks_rated == 2
+      assert report.session_summary.viewer_score == "smash"
+      assert report.session_summary.streamer_score == "even"
+
+      track_summaries = report.track_summaries
+      assert length(track_summaries) == 2
+
+      track1_summary = Enum.find(track_summaries, &(&1.track_id == track1.id))
+      track2_summary = Enum.find(track_summaries, &(&1.track_id == track2.id))
+
+      assert track1_summary.unique_votes == 4
+      assert track1_summary.poll_count == 6
+      assert track1_summary.unique_voters == 9
+      assert track1_summary.viewer_score == "smash"
+      assert track1_summary.streamer_score == "pass"
+
+      assert track2_summary.unique_votes == 4
+      assert track2_summary.poll_count == 5
+      assert track2_summary.unique_voters == 8
+      assert track2_summary.viewer_score == "smash"
+      assert track2_summary.streamer_score == "smash"
+    end
+
     test "generates comprehensive report with all vote sources with partial report regenerations" do
       user = user_fixture()
       {:ok, album} = Album.create(album_fixture())
@@ -144,42 +269,42 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
           viewer_id: "viewer1",
           session_id: session.id,
           track_id: track1.id,
-          value: 8,
+          value: "8",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer2",
           session_id: session.id,
           track_id: track1.id,
-          value: 6,
+          value: "6",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer3",
           session_id: session.id,
           track_id: track1.id,
-          value: 7,
+          value: "7",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer1",
           session_id: session.id,
           track_id: track2.id,
-          value: 9,
+          value: "9",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer2",
           session_id: session.id,
           track_id: track2.id,
-          value: 5,
+          value: "5",
           is_streamer: false
         },
         %Vote{
           viewer_id: "viewer3",
           session_id: session.id,
           track_id: track2.id,
-          value: 8,
+          value: "8",
           is_streamer: false
         }
       ]
@@ -189,14 +314,14 @@ defmodule PremiereEcoute.Sessions.Scores.ReportTest do
           viewer_id: "streamer",
           session_id: session.id,
           track_id: track1.id,
-          value: 9,
+          value: "9",
           is_streamer: true
         },
         %Vote{
           viewer_id: "streamer",
           session_id: session.id,
           track_id: track2.id,
-          value: 7,
+          value: "7",
           is_streamer: true
         }
       ]

@@ -1,5 +1,8 @@
 import Config
 
+config :premiere_ecoute,
+  twitch_api: PremiereEcoute.Support.Apis.TwitchApiStub
+
 config :premiere_ecoute, PremiereEcoute.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,

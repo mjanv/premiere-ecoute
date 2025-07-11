@@ -13,15 +13,15 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   alias PremiereEcoute.Sessions.Scores.{Poll, Vote}
 
   @type session_summary :: %{
-          viewer_score: float(),
-          streamer_score: float(),
+          viewer_score: float() | String.t(),
+          streamer_score: float() | String.t(),
           tracks_rated: integer()
         }
 
   @type track_summary :: %{
           track_id: integer(),
-          viewer_score: float(),
-          streamer_score: float(),
+          viewer_score: float() | String.t(),
+          streamer_score: float() | String.t(),
           unique_votes: integer(),
           poll_count: integer(),
           unique_voters: integer()

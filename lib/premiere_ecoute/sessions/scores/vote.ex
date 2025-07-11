@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
 
   schema "votes" do
     field :viewer_id, :string
-    field :value, :integer, default: 1
+    field :value, :string
     field :is_streamer, :boolean, default: false
 
     belongs_to :session, ListeningSession
@@ -33,7 +33,6 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     vote
     |> cast(attrs, [:viewer_id, :session_id, :track_id, :is_streamer, :value])
     |> validate_required([:viewer_id, :session_id, :track_id, :is_streamer, :value])
-    |> validate_number(:value, greater_than_or_equal_to: 0)
     |> unique_constraint([:viewer_id, :session_id, :track_id], name: :vote_index)
     |> foreign_key_constraint(:session_id)
     |> foreign_key_constraint(:track_id)
@@ -41,7 +40,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
 
   def from_message(message) do
     case Integer.parse(message) do
-      {integer, _} when integer >= 0 and integer <= 10 -> {:ok, integer}
+      {integer, _} when integer >= 0 and integer <= 10 -> {:ok, message}
       _ -> {:error, message}
     end
   end

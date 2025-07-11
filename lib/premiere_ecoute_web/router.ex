@@ -69,6 +69,7 @@ defmodule PremiereEcouteWeb.Router do
     live_session :admin,
       on_mount: [{PremiereEcouteWeb.UserAuth, :require_admin}] do
       live "/", AdminLive, :index
+      live "/users", AdminUsersLive, :index
       live "/albums", AdminAlbumsLive, :index
       live "/sessions", AdminSessionsLive, :index
     end
