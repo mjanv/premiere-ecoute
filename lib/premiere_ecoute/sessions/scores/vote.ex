@@ -46,7 +46,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
       {:error, message}
     end
   end
-  
+
   # AIDEV-NOTE: Legacy function for backward compatibility
   def from_message(message) do
     from_message(message, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])

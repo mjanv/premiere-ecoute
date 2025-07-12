@@ -49,7 +49,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
          |> assign(:user_current_rating, nil)
          |> assign(:report, nil)
          |> assign_async(:report, fn ->
-           {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
+           {:ok, %{report: Report.get_by(session_id: session_id)}}
          end)}
     end
   end
@@ -118,7 +118,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       is_streamer: true
     })
 
-    {:noreply, assign(socket, :user_current_rating, String.to_integer(rating))}
+    {:noreply, assign(socket, :user_current_rating, rating)}
   end
 
   @impl true
@@ -146,7 +146,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     {:noreply,
      socket
      |> assign_async(:report, fn ->
-       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
+       {:ok, %{report: Report.get_by(session_id: session_id)}}
      end)}
   end
 
@@ -185,12 +185,19 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"
 
   # AIDEV-NOTE: Helper functions to extract data from Report struct for template use
-  def track_score(_track_id, nil), do: 0.0
+  def track_score(_track_id, nil), do: "N/A"
 
   def track_score(track_id, report) do
     case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
-      nil -> 0.0
-      track_summary -> Float.round(track_summary["viewer_score"] || 0.0, 1)
+      nil ->
+        "N/A"
+
+      track_summary ->
+        case track_summary["viewer_score"] do
+          score when is_number(score) -> Float.round(score, 1)
+          score when is_binary(score) -> score
+          _ -> "N/A"
+        end
     end
   end
 
@@ -203,12 +210,13 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  def session_average_score(nil), do: 0.0
+  def session_average_score(nil), do: "N/A"
 
   def session_average_score(report) do
     case report.session_summary do
       %{"viewer_score" => score} when is_number(score) -> Float.round(score, 1)
-      _ -> 0.0
+      %{"viewer_score" => score} when is_binary(score) -> score
+      _ -> "N/A"
     end
   end
 
@@ -227,28 +235,63 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  def session_streamer_score(nil), do: 0.0
+  def vote_type_display(nil), do: "0-10"
+
+  def vote_type_display(%{vote_options: vote_options}) when is_list(vote_options) do
+    cond do
+      vote_options == ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] -> "0-10"
+      vote_options == ["1", "2", "3", "4", "5"] -> "1-5"
+      vote_options == ["smash", "pass"] -> "Smash or Pass"
+      true -> "Custom (#{length(vote_options)} options)"
+    end
+  end
+
+  def vote_type_display(_), do: "0-10"
+
+  def session_vote_options(nil), do: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+
+  def session_vote_options(%{vote_options: vote_options}) when is_list(vote_options) do
+    # For the voting interface, we need to filter out "0" if it exists since it's typically not used for voting
+    case vote_options do
+      # Remove "0" for voting interface
+      ["0" | rest] -> rest
+      options -> options
+    end
+  end
+
+  def session_vote_options(_), do: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+
+  def session_streamer_score(nil), do: "N/A"
 
   def session_streamer_score(report) do
     case report.session_summary do
       %{"streamer_score" => score} when is_number(score) -> Float.round(score, 1)
-      _ -> 0.0
+      %{"streamer_score" => score} when is_binary(score) -> score
+      _ -> "N/A"
     end
   end
 
-  def track_streamer_score(_track_id, nil), do: 0.0
+  def track_streamer_score(_track_id, nil), do: "N/A"
 
   def track_streamer_score(track_id, report) do
     case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
-      nil -> 0.0
-      track_summary -> Float.round(track_summary["streamer_score"] || 0.0, 1)
+      nil ->
+        "N/A"
+
+      track_summary ->
+        case track_summary["streamer_score"] do
+          score when is_number(score) -> Float.round(score, 1)
+          score when is_binary(score) -> score
+          _ -> "N/A"
+        end
     end
   end
 
   # AIDEV-NOTE: Get vote distribution histogram data for a specific track from raw votes and polls
-  def track_vote_distribution(_track_id, nil), do: for(rating <- 1..10, do: {rating, 0})
+  def track_vote_distribution(_track_id, nil, session),
+    do: for(rating <- session_vote_options(session), do: {rating, 0})
 
-  def track_vote_distribution(track_id, report) do
+  def track_vote_distribution(track_id, report, session) do
     # Calculate distribution from individual votes
     individual_distribution =
       report.votes
@@ -263,13 +306,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> Enum.reduce(%{}, fn poll, acc ->
         poll.votes
         |> Enum.reduce(acc, fn {rating_str, count}, inner_acc ->
-          rating = String.to_integer(rating_str)
+          # Handle both numeric and string ratings
+          rating = if String.match?(rating_str, ~r/^\d+$/), do: String.to_integer(rating_str), else: rating_str
           Map.update(inner_acc, rating, count, &(&1 + count))
         end)
       end)
 
-    # Combine both distributions and ensure all ratings 1-10 are present
-    for rating <- 1..10 do
+    # Combine both distributions and ensure all session vote options are present
+    for rating <- session_vote_options(session) do
       individual_count = Map.get(individual_distribution, rating, 0)
       poll_count = Map.get(poll_distribution, rating, 0)
       total_count = individual_count + poll_count
@@ -278,11 +322,87 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   # AIDEV-NOTE: Get the maximum vote count for highlighting in histogram
-  def track_max_votes(_track_id, nil), do: 0
+  def track_max_votes(_track_id, nil, _session), do: 0
 
-  def track_max_votes(track_id, report) do
-    track_vote_distribution(track_id, report)
+  def track_max_votes(track_id, report, session) do
+    track_vote_distribution(track_id, report, session)
     |> Enum.map(&elem(&1, 1))
     |> Enum.max(fn -> 0 end)
+  end
+
+  # AIDEV-NOTE: Get dynamic color for vote option based on its position and type
+  def vote_option_color(vote_option, session) do
+    vote_options = session_vote_options(session)
+    total_options = length(vote_options)
+
+    # Find the index of this vote option
+    index = Enum.find_index(vote_options, &(&1 == vote_option)) || 0
+
+    cond do
+      # Special handling for smash/pass
+      vote_option == "smash" ->
+        "bg-green-500"
+
+      vote_option == "pass" ->
+        "bg-red-500"
+
+      # For numeric options, use gradient based on position
+      total_options <= 5 ->
+        # For 1-5 scale, use yellow to green gradient
+        case index do
+          # 1st option
+          0 -> "bg-red-500"
+          # 2nd option
+          1 -> "bg-orange-500"
+          # 3rd option
+          2 -> "bg-yellow-500"
+          # 4th option
+          3 -> "bg-green-400"
+          # 5th option
+          4 -> "bg-green-500"
+          _ -> "bg-blue-400"
+        end
+
+      total_options <= 10 ->
+        # For larger scales like 0-10, use full gradient
+        case index do
+          # 1st option
+          0 -> "bg-red-600"
+          # 2nd option
+          1 -> "bg-red-500"
+          # 3rd option
+          2 -> "bg-red-400"
+          # 4th option
+          3 -> "bg-orange-500"
+          # 5th option
+          4 -> "bg-yellow-500"
+          # 6th option
+          5 -> "bg-yellow-400"
+          # 7th option
+          6 -> "bg-green-400"
+          # 8th option
+          7 -> "bg-blue-400"
+          # 9th option
+          8 -> "bg-blue-500"
+          # 10th option
+          9 -> "bg-blue-600"
+          _ -> "bg-purple-400"
+        end
+
+      true ->
+        # For custom options with many choices, cycle through colors
+        colors = [
+          "bg-red-500",
+          "bg-orange-500",
+          "bg-yellow-500",
+          "bg-green-500",
+          "bg-blue-500",
+          "bg-purple-500",
+          "bg-pink-500",
+          "bg-indigo-500"
+        ]
+
+        Enum.at(colors, rem(index, length(colors)), "bg-gray-500")
+    end
   end
 end

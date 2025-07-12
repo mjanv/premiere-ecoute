@@ -16,6 +16,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:selected_album, AsyncResult.ok(nil))
     |> assign(:current_scope, socket.assigns[:current_scope] || %{})
+    |> assign(:vote_options_preset, "0-10")
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -41,12 +42,24 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     {:noreply, put_flash(socket, :error, "Please select an album first")}
   end
 
+  def handle_event("vote_options_preset_change", %{"preset" => preset}, socket) do
+    socket
+    |> assign(:vote_options_preset, preset)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event(
         "prepare_session",
         _params,
         %{assigns: %{selected_album: %{result: album}}} = socket
       ) do
-    %PrepareListeningSession{user_id: get_user_id(socket), album_id: album.spotify_id}
+    vote_options = get_vote_options(socket.assigns)
+
+    %PrepareListeningSession{
+      user_id: get_user_id(socket),
+      album_id: album.spotify_id,
+      vote_options: vote_options
+    }
     |> PremiereEcoute.apply()
     |> case do
       {:ok, session, _} -> push_navigate(socket, to: ~p"/session/#{session}")
@@ -104,6 +117,13 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
   end
 
   defp format_duration(_), do: "0:00"
+
+  def get_vote_options(%{vote_options_preset: "0-10"}), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+  def get_vote_options(%{vote_options_preset: "1-5"}), do: ["1", "2", "3", "4", "5"]
+  def get_vote_options(%{vote_options_preset: "smash-pass"}), do: ["smash", "pass"]
+
+  # default fallback
+  def get_vote_options(_), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 
   defp get_user_id(socket) do
     case socket.assigns.current_scope do

@@ -34,9 +34,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
          |> assign(:session_id, id)
          |> assign(:listening_session, listening_session)
          |> assign(:report, nil)
-         |> assign_async(:report, fn ->
-           {:ok, %{report: Report.get_by(session_id: String.to_integer(id))}}
-         end)}
+         |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)}
     end
   end
 
@@ -53,7 +51,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     {:noreply,
      socket
      |> assign_async(:report, fn ->
-       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
+       {:ok, %{report: Report.get_by(session_id: session_id)}}
      end)}
   end
 
@@ -64,9 +62,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
     {:noreply,
      socket
-     |> assign_async(:report, fn ->
-       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
-     end)}
+     |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)}
   end
 
   @impl true
@@ -76,9 +72,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
     {:noreply,
      socket
-     |> assign_async(:report, fn ->
-       {:ok, %{report: Report.get_by(session_id: String.to_integer(session_id))}}
-     end)}
+     |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)}
   end
 
   @impl true
@@ -99,12 +93,13 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   # AIDEV-NOTE: Helper functions to extract data from Report struct for template use
-  def current_average_score(nil), do: 0.0
+  def current_average_score(nil), do: "N/A"
 
   def current_average_score(report) do
     case report.session_summary do
       %{"viewer_score" => score} when is_number(score) -> Float.round(score, 2)
-      _ -> 0.0
+      %{"viewer_score" => score} when is_binary(score) -> score
+      _ -> "N/A"
     end
   end
 

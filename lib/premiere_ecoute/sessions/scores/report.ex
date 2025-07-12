@@ -80,7 +80,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   1. Individual votes (viewers + streamer)
   2. Twitch polls
   3. Calculates unique voter counts and aggregated scores
-  
+
   The scoring logic adapts based on the session's vote_options:
   - Integer values: scores computed as averages
   - String values: scores computed as most frequent ("even" if tied)
@@ -95,7 +95,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     # AIDEV-NOTE: Load votes and polls for this session
     votes = Vote.all() |> Enum.filter(&(&1.session_id == session_id))
     polls = Poll.all() |> Enum.filter(&(&1.session_id == session_id))
-    
+
     session_stats = calculate_session_stats(session_id)
 
     attrs = %{
@@ -128,7 +128,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
   end
 
   # AIDEV-NOTE: Helper functions for vote type detection and scoring logic
-  
+
   @doc false
   defp vote_options_are_integers?(vote_options) do
     Enum.all?(vote_options, fn option ->
@@ -138,7 +138,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       end
     end)
   end
-  
+
   @doc false
   defp calculate_average_score(votes) when is_list(votes) do
     if Enum.empty?(votes) do
@@ -152,11 +152,11 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
             _ -> 0
           end
         end)
-      
+
       Enum.sum(numeric_votes) / length(numeric_votes)
     end
   end
-  
+
   @doc false
   defp calculate_most_frequent(votes) when is_list(votes) do
     if Enum.empty?(votes) do
@@ -167,14 +167,15 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       |> case do
         frequencies when map_size(frequencies) == 0 ->
           "even"
-        
+
         frequencies ->
           max_count = frequencies |> Map.values() |> Enum.max()
-          most_frequent = 
+
+          most_frequent =
             frequencies
             |> Enum.filter(fn {_value, count} -> count == max_count end)
             |> Enum.map(fn {value, _count} -> value end)
-          
+
           case length(most_frequent) do
             1 -> hd(most_frequent)
             _ -> "even"
@@ -217,24 +218,24 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   defp calculate_session_summary(%ListeningSession{vote_options: vote_options}, votes, polls) do
     # AIDEV-NOTE: Session summary calculation adapted for integer vs string voting
-    
+
     # Get all track IDs that have votes or polls
     track_ids_with_votes = votes |> Enum.map(& &1.track_id) |> Enum.uniq()
     track_ids_with_polls = polls |> Enum.map(& &1.track_id) |> Enum.uniq()
     all_track_ids = (track_ids_with_votes ++ track_ids_with_polls) |> Enum.uniq()
-    
+
     tracks_rated = length(all_track_ids)
-    
-    {viewer_score, streamer_score} = 
+
+    {viewer_score, streamer_score} =
       if vote_options_are_integers?(vote_options) do
         # For integer options: calculate track averages, then session average
-        viewer_scores_per_track = 
+        viewer_scores_per_track =
           all_track_ids
           |> Enum.map(fn track_id ->
             calculate_track_viewer_score(track_id, vote_options, votes, polls)
           end)
           |> Enum.reject(&is_nil/1)
-        
+
         streamer_scores_per_track =
           all_track_ids
           |> Enum.map(fn track_id ->
@@ -242,47 +243,47 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           end)
           |> Enum.reject(&is_nil/1)
 
-        viewer_score = 
+        viewer_score =
           if Enum.empty?(viewer_scores_per_track) do
             0.0
           else
             Enum.sum(viewer_scores_per_track) / length(viewer_scores_per_track)
           end
-        
-        streamer_score = 
+
+        streamer_score =
           if Enum.empty?(streamer_scores_per_track) do
             0.0
           else
             Enum.sum(streamer_scores_per_track) / length(streamer_scores_per_track)
           end
-        
+
         {viewer_score, streamer_score}
       else
         # For string options: get all individual votes across all tracks, then find most frequent
-        all_viewer_votes = 
+        all_viewer_votes =
           votes
           |> Enum.filter(fn vote -> vote.track_id in all_track_ids and not vote.is_streamer end)
           |> Enum.map(& &1.value)
-        
-        all_streamer_votes = 
+
+        all_streamer_votes =
           votes
           |> Enum.filter(fn vote -> vote.track_id in all_track_ids and vote.is_streamer end)
           |> Enum.map(& &1.value)
-        
+
         # Add poll votes for all tracks
-        all_poll_votes = 
+        all_poll_votes =
           polls
           |> Enum.filter(fn poll -> poll.track_id in all_track_ids end)
-          |> Enum.flat_map(fn poll -> 
+          |> Enum.flat_map(fn poll ->
             case extract_poll_score(poll, vote_options) do
               nil -> []
               score -> [score]
             end
           end)
-        
+
         viewer_score = calculate_most_frequent(all_viewer_votes ++ all_poll_votes)
         streamer_score = calculate_most_frequent(all_streamer_votes)
-        
+
         {viewer_score, streamer_score}
       end
 
@@ -292,38 +293,38 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       tracks_rated: tracks_rated
     }
   end
-  
+
   # AIDEV-NOTE: Helper functions for track-level score calculations
-  
+
   @doc false
   defp calculate_track_viewer_score(track_id, vote_options, votes, polls) do
     # Get individual viewer votes for this track
-    individual_votes = 
+    individual_votes =
       votes
       |> Enum.filter(fn vote -> vote.track_id == track_id and not vote.is_streamer end)
       |> Enum.map(& &1.value)
-    
+
     # Get poll votes for this track (extract from polls)
-    poll_scores = 
+    poll_scores =
       polls
       |> Enum.filter(fn poll -> poll.track_id == track_id end)
       |> Enum.map(fn poll -> extract_poll_score(poll, vote_options) end)
       |> Enum.reject(&is_nil/1)
-    
+
     if vote_options_are_integers?(vote_options) do
       # For integers: average the individual average with poll averages
-      individual_avg = 
+      individual_avg =
         if Enum.empty?(individual_votes) do
           nil
         else
           calculate_average_score(individual_votes)
         end
-      
+
       # Combine individual average with poll averages
-      all_averages = 
+      all_averages =
         ([individual_avg] ++ poll_scores)
         |> Enum.reject(&is_nil/1)
-      
+
       if Enum.empty?(all_averages) do
         nil
       else
@@ -331,24 +332,24 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       end
     else
       # For strings: compute most frequent for individual votes and polls separately, then decide
-      individual_result = 
+      individual_result =
         if Enum.empty?(individual_votes) do
           nil
         else
           calculate_most_frequent(individual_votes)
         end
-      
-      poll_results = 
+
+      poll_results =
         polls
         |> Enum.filter(fn poll -> poll.track_id == track_id end)
         |> Enum.map(fn poll -> extract_poll_score(poll, vote_options) end)
         |> Enum.reject(&is_nil/1)
-      
+
       # Combine individual result with poll results, with individual votes taking priority in ties
-      all_results = 
+      all_results =
         ([individual_result] ++ poll_results)
         |> Enum.reject(&is_nil/1)
-      
+
       if Enum.empty?(all_results) do
         nil
       else
@@ -362,14 +363,14 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       end
     end
   end
-  
+
   @doc false
   defp calculate_track_streamer_score(track_id, vote_options, votes) do
-    streamer_votes = 
+    streamer_votes =
       votes
       |> Enum.filter(fn vote -> vote.track_id == track_id and vote.is_streamer end)
       |> Enum.map(& &1.value)
-    
+
     if Enum.empty?(streamer_votes) do
       nil
     else
@@ -380,27 +381,30 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
       end
     end
   end
-  
+
   @doc false
   defp extract_poll_score(poll, vote_options) do
     # AIDEV-NOTE: Extract average/most frequent score from poll data
     if vote_options_are_integers?(vote_options) do
       # For integer options, calculate weighted average
       total_votes = poll.total_votes || 0
+
       if total_votes == 0 do
         nil
       else
-        weighted_sum = 
+        weighted_sum =
           vote_options
           |> Enum.reduce(0, fn option, acc ->
             case Integer.parse(option) do
               {value, ""} ->
                 vote_count = Map.get(poll.votes || %{}, option, 0)
-                acc + (value * vote_count)
-              _ -> acc
+                acc + value * vote_count
+
+              _ ->
+                acc
             end
           end)
-        
+
         weighted_sum / total_votes
       end
     else
@@ -414,16 +418,19 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           {option, count} ->
             # Check if there's a tie
             max_count = count
-            tied_options = 
+
+            tied_options =
               poll.votes
               |> Enum.filter(fn {_option, count} -> count == max_count end)
               |> Enum.map(fn {option, _count} -> option end)
-            
+
             case length(tied_options) do
               1 -> option
               _ -> "even"
             end
-          _ -> nil
+
+          _ ->
+            nil
         end
       end
     end
@@ -431,38 +438,38 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   defp calculate_track_summaries(%ListeningSession{vote_options: vote_options}, votes, polls) do
     # AIDEV-NOTE: Track summaries calculation adapted for integer vs string voting
-    
+
     # Get all track IDs that have votes or polls
     track_ids_with_votes = votes |> Enum.map(& &1.track_id) |> Enum.uniq()
     track_ids_with_polls = polls |> Enum.map(& &1.track_id) |> Enum.uniq()
     all_track_ids = (track_ids_with_votes ++ track_ids_with_polls) |> Enum.uniq()
-    
+
     all_track_ids
     |> Enum.map(fn track_id ->
       # Calculate scores for this track
       viewer_score = calculate_track_viewer_score(track_id, vote_options, votes, polls)
       streamer_score = calculate_track_streamer_score(track_id, vote_options, votes)
-      
+
       # Count stats for this track
       track_votes = Enum.filter(votes, fn vote -> vote.track_id == track_id end)
       track_polls = Enum.filter(polls, fn poll -> poll.track_id == track_id end)
-      
+
       unique_votes = length(track_votes)
-      poll_count = track_polls |> Enum.map(& &1.total_votes || 0) |> Enum.sum()
-      
-      unique_individual_voters = 
+      poll_count = track_polls |> Enum.map(&(&1.total_votes || 0)) |> Enum.sum()
+
+      unique_individual_voters =
         track_votes
         |> Enum.filter(fn vote -> not vote.is_streamer end)
         |> Enum.map(& &1.viewer_id)
         |> Enum.uniq()
         |> length()
-      
+
       unique_voters = unique_individual_voters + poll_count
-      
+
       %{
         track_id: track_id,
-        viewer_score: viewer_score || (if vote_options_are_integers?(vote_options), do: 0.0, else: "even"),
-        streamer_score: streamer_score || (if vote_options_are_integers?(vote_options), do: 0.0, else: "even"),
+        viewer_score: viewer_score || if(vote_options_are_integers?(vote_options), do: 0.0, else: "even"),
+        streamer_score: streamer_score || if(vote_options_are_integers?(vote_options), do: 0.0, else: "even"),
         unique_votes: unique_votes,
         poll_count: poll_count,
         unique_voters: unique_voters

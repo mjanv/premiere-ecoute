@@ -19,8 +19,9 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandler do
         message: message,
         is_streamer: is_streamer
       }) do
-    with {:ok, value} <- Vote.from_message(message),
-         {:ok, {session_id, track_id}} <- Cachex.get(:sessions, broadcaster_id),
+    with {:ok, {session_id, track_id}} <- Cachex.get(:sessions, broadcaster_id),
+         session <- ListeningSession.get(session_id),
+         {:ok, value} <- Vote.from_message(message, session.vote_options),
          vote <- %Vote{
            viewer_id: user_id,
            session_id: session_id,
@@ -29,7 +30,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandler do
            is_streamer: is_streamer
          },
          {:ok, vote} <- Vote.create(vote),
-         {:ok, _} <- Report.generate(%ListeningSession{id: session_id}),
+         {:ok, _} <- Report.generate(session),
          :ok <-
            PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", vote) do
       :ok

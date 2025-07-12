@@ -177,6 +177,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, %{}} end)
+
+      expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
       expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
       expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, %{}} end)
 

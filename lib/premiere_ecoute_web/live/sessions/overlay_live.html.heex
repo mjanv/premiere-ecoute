@@ -17,12 +17,23 @@
       <%= if @report.loading do %>
         <div style="font-size: 20px; color: rgba(255, 255, 255, 0.8);">{gettext("Loading...")}</div>
       <% else %>
-        <span style="font-size: 40px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-          {current_average_score(@report.result)}
-        </span>
-        <span style="font-size: 20px; color: rgba(255, 255, 255, 0.7); font-weight: 500;">
-          /10
-        </span>
+        <%= case current_average_score(@report.result) do %>
+          <% score when is_number(score) -> %>
+            <span style="font-size: 40px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+              {score}
+            </span>
+            <span style="font-size: 20px; color: rgba(255, 255, 255, 0.7); font-weight: 500;">
+              /10
+            </span>
+          <% score when is_binary(score) and score != "N/A" -> %>
+            <span style="font-size: 40px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+              {score}
+            </span>
+          <% _ -> %>
+            <span style="font-size: 40px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+              --
+            </span>
+        <% end %>
       <% end %>
     </div>
   <% else %>

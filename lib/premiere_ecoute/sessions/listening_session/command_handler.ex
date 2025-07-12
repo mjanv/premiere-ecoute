@@ -23,10 +23,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession)
 
-  def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id}) do
+  def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id, vote_options: vote_options}) do
     with {:ok, album} <- SpotifyApi.impl().get_album(album_id),
          {:ok, album} <- Album.create_if_not_exists(album),
-         {:ok, session} <- ListeningSession.create(%{user_id: user_id, album_id: album.id}) do
+         {:ok, session} <-
+           ListeningSession.create(%{
+             user_id: user_id,
+             album_id: album.id,
+             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+           }) do
       {:ok, session,
        [
          %SessionPrepared{
@@ -62,6 +67,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%StopListeningSession{session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
+         {:ok, _} <- SpotifyApi.impl().pause_playback(scope),
          {:ok, _} <- TwitchApi.impl().cancel_all_subscriptions(scope),
          {:ok, _} <- TwitchApi.impl().send_chat_announcement(scope, "Good bye !", "purple"),
          {:ok, session} <- ListeningSession.stop(session) do

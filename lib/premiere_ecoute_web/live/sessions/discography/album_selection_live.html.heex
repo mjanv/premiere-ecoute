@@ -211,8 +211,43 @@
         <% end %>
       </div>
       
-<!-- Right Panel - Track List -->
+<!-- Right Panel - Configuration & Track List -->
       <div class="w-1/2 p-6" style="background-color: var(--color-dark-900);">
+        <!-- Vote Options Configuration -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">
+            {gettext("Vote Options")}
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Preset Selection -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">
+                {gettext("Choose vote format")}
+              </label>
+              <form phx-change="vote_options_preset_change">
+                <select
+                  name="preset"
+                  value={@vote_options_preset}
+                  class="w-full rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                  style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                >
+                  <option value="0-10">
+                    {gettext("0-10 Rating")}
+                  </option>
+                  <option value="1-5">
+                    {gettext("1-5 Rating")}
+                  </option>
+                  <option value="smash-pass">
+                    {gettext("Smash or Pass")}
+                  </option>
+                </select>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+<!-- Track List -->
         <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">
           {gettext("Track List")}
         </h3>
