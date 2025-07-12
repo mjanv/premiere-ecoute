@@ -29,7 +29,7 @@ defmodule PremiereEcoute.DataCase do
       import PremiereEcoute.AccountsFixtures
       import PremiereEcoute.Sessions.Discography.AlbumFixtures
 
-      import Mox
+      import Hammox
 
       alias PremiereEcoute.Repo
 

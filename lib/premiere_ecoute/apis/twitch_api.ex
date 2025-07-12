@@ -36,6 +36,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   # @accounts "https://id.twitch.tv/oauth2"
 
   def impl, do: Application.get_env(@app, :twitch_api, __MODULE__)
+  def base_url, do: Application.get_env(@app, :twitch_api_base_url, "https://api.twitch.tv/helix")
 
   def api(:helix, token \\ nil) do
     token =
@@ -54,7 +55,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
     Req.new(
       [
-        base_url: "https://api.twitch.tv/helix",
+        base_url: base_url(),
         headers: [
           {"Authorization", "Bearer #{token}"},
           {"Client-Id", Application.get_env(@app, :twitch_client_id)},

@@ -5,12 +5,18 @@ defmodule PremiereEcoute.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
+    mandatory = [
       PremiereEcouteWeb.Supervisor,
       PremiereEcoute.Supervisor
     ]
 
-    Supervisor.start_link(children, strategy: :one_for_one, name: PremiereEcoute.Application)
+    optionals =
+      case Application.get_env(:premiere_ecoute, :environment) do
+        :dev -> [PremiereEcouteMock.Supervisor]
+        _ -> []
+      end
+
+    Supervisor.start_link(mandatory ++ optionals, strategy: :one_for_one, name: PremiereEcoute.Application)
   end
 
   @impl true

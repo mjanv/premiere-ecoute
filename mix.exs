@@ -53,6 +53,8 @@ defmodule PremiereEcoute.MixProject do
       {:gettext, "~> 0.26"},
       {:dns_cluster, "~> 0.2"},
       # Backend
+      {:dotenvy, "~> 1.0"},
+      {:uuid, "~> 1.1"},
       {:req, "~> 0.5"},
       {:hackney, "~> 1.20"},
       {:jason, "~> 1.2"},
@@ -70,14 +72,13 @@ defmodule PremiereEcoute.MixProject do
       {:prom_ex, "~> 1.11.0"},
       {:sentry, "~> 11.0.1"},
       # Code quality
-      {:credo, "~> 1.7"},
+      {:credo, "~> 1.7", only: [:dev]},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
-      {:dotenvy, "~> 1.0"},
       # Audit
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       # Tests
-      {:mox, "~> 1.2"},
+      {:hammox, "~> 0.7", only: :test},
       # Development
       {:tidewave, "~> 0.1", only: :dev}
     ]

@@ -26,7 +26,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.id
+        album_id: album.spotify_id
       }
 
       {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
@@ -90,7 +90,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.id
+        album_id: album.spotify_id
       }
 
       {:ok, _, [event1]} = CommandBus.apply(command)
@@ -119,12 +119,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, "Bienvenue !", _ ->
-        {:ok, %{}}
+        {:ok, ""}
       end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.id
+        album_id: album.spotify_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -176,15 +176,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         {:ok, "spotify:track:track001"}
       end)
 
-      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, %{}} end)
+      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, ""} end)
 
       expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
       expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
-      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, %{}} end)
+      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, ""} end)
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.id
+        album_id: album.spotify_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)

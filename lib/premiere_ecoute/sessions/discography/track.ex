@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Sessions.Discography.Track do
           track_number: integer() | nil,
           duration_ms: integer() | nil,
           album_id: integer() | nil,
-          album: Album.t() | nil,
+          album: Album.t() | Ecto.Association.NotLoaded.t() | nil,
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }

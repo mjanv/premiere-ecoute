@@ -1,6 +1,7 @@
 import Config
 
 config :premiere_ecoute,
+  environment: config_env(),
   handlers: [
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,

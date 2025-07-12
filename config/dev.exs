@@ -1,7 +1,8 @@
 import Config
 
 config :premiere_ecoute,
-  twitch_api: PremiereEcoute.Support.Apis.TwitchApiStub
+  # twitch_api: PremiereEcouteMock.TwitchApi.Mock,
+  twitch_api_base_url: "http://localhost:4001"
 
 config :premiere_ecoute, PremiereEcoute.Repo,
   stacktrace: true,
