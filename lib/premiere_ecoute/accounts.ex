@@ -156,6 +156,13 @@ defmodule PremiereEcoute.Accounts do
     end
   end
 
+  def update_user_role(user, role) do
+    user
+    |> Ecto.Changeset.cast(%{role: role}, [:role])
+    |> Ecto.Changeset.validate_inclusion(:role, [:viewer, :streamer, :admin])
+    |> Repo.update()
+  end
+
   ## Session
 
   @doc """

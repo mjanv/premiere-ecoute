@@ -75,12 +75,13 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class={[
                     "inline-flex px-2 py-1 text-xs font-semibold rounded-full",
-                    if(user.role == :admin,
-                      do: "bg-purple-100 text-purple-800",
-                      else: "bg-green-100 text-green-800"
-                    )
+                    case user.role do
+                      :admin -> "bg-purple-100 text-purple-800"
+                      :streamer -> "bg-blue-100 text-blue-800"
+                      :viewer -> "bg-gray-100 text-gray-800"
+                    end
                   ]}>
-                    {user.role}
+                    {String.capitalize(to_string(user.role))}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -108,20 +109,12 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
-                    phx-click="toggle_role"
+                    phx-click="show_user_modal"
                     phx-value-user_id={user.id}
                     onclick="event.stopPropagation()"
-                    class={[
-                      "inline-flex items-center px-3 py-1 rounded-md text-sm font-medium",
-                      if(user.role == :admin,
-                        do: "bg-red-600 hover:bg-red-700 text-white",
-                        else: "bg-purple-600 hover:bg-purple-700 text-white"
-                      )
-                    ]}
+                    class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-600 hover:bg-gray-700 text-white"
                   >
-                    {if user.role == :admin,
-                      do: gettext("Remove Admin"),
-                      else: gettext("Make Admin")}
+                    {gettext("Manage")}
                   </button>
                 </td>
               </tr>
@@ -155,10 +148,11 @@
             <% end %>
             <span class={[
               "inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-2",
-              if(@selected_user.role == :admin,
-                do: "bg-purple-100 text-purple-800",
-                else: "bg-green-100 text-green-800"
-              )
+              case @selected_user.role do
+                :admin -> "bg-purple-100 text-purple-800"
+                :streamer -> "bg-blue-100 text-blue-800"
+                :viewer -> "bg-gray-100 text-gray-800"
+              end
             ]}>
               {String.capitalize(to_string(@selected_user.role))}
             </span>
@@ -248,23 +242,28 @@
 <!-- Actions -->
         <div class="mt-6 pt-6 border-t border-gray-700">
           <h3 class="text-lg font-medium text-white mb-4">{gettext("Actions")}</h3>
-          <div class="flex space-x-3">
-            <button
-              phx-click="toggle_role"
-              phx-value-user_id={@selected_user.id}
-              class={[
-                "inline-flex items-center px-4 py-2 rounded-md text-sm font-medium",
-                if(@selected_user.role == :admin,
-                  do: "bg-red-600 hover:bg-red-700 text-white",
-                  else: "bg-purple-600 hover:bg-purple-700 text-white"
-                )
-              ]}
-            >
-              {if @selected_user.role == :admin,
-                do: gettext("Remove Admin Role"),
-                else: gettext("Grant Admin Role")}
-            </button>
-          </div>
+          <form phx-submit="change_role">
+            <input type="hidden" name="user_id" value={@selected_user.id} />
+            <div class="flex items-end space-x-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Change Role")}</label>
+                <select
+                  name="role"
+                  class="bg-gray-700 border border-gray-600 text-white text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                >
+                  <option value="viewer" selected={@selected_user.role == :viewer}>{gettext("Viewer")}</option>
+                  <option value="streamer" selected={@selected_user.role == :streamer}>{gettext("Streamer")}</option>
+                  <option value="admin" selected={@selected_user.role == :admin}>{gettext("Admin")}</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                {gettext("Update Role")}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

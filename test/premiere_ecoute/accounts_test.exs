@@ -88,7 +88,7 @@ defmodule PremiereEcoute.AccountsTest do
 
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
 
-      assert user.role == :streamer
+      assert user.role == :viewer
     end
   end
 
@@ -240,6 +240,27 @@ defmodule PremiereEcoute.AccountsTest do
         })
 
       refute Repo.get_by(UserToken, user_id: user.id)
+    end
+  end
+
+  describe "update_user_role/1" do
+    setup do
+      %{user: user_fixture()}
+    end
+
+    test "update a user role", %{user: user} do
+      assert user.role == :viewer
+
+      {:ok, user} = Accounts.update_user_role(user, :streamer)
+
+      assert user.role == :streamer
+    end
+
+    test "does not update an unknown user role", %{user: user} do
+      {:error, changeset} = Accounts.update_user_role(user, :god)
+
+      refute changeset.valid?
+      assert %{role: ["is invalid"]} = errors_on(changeset)
     end
   end
 

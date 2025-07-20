@@ -4,15 +4,14 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersAuthTables do
   def change do
     create table(:users) do
       add :email, :string, null: false, collate: :nocase
+      add :role, :string, default: "viewer", null: false
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime
 
-      # AIDEV-NOTE: Spotify integration fields
       add :spotify_access_token, :string
       add :spotify_refresh_token, :string
       add :spotify_expires_at, :utc_datetime
 
-      # AIDEV-NOTE: Twitch integration fields
       add :twitch_user_id, :string
       add :twitch_access_token, :string
       add :twitch_refresh_token, :string
@@ -21,6 +20,10 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersAuthTables do
 
       timestamps(type: :utc_datetime)
     end
+
+    create constraint(:users, :role_must_be_valid,
+             check: "role IN ('viewer', 'streamer', 'admin', 'bot')"
+           )
 
     create unique_index(:users, [:email])
 

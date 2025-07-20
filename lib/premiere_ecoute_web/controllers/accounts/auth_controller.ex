@@ -91,14 +91,14 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
                   :info,
                   "Spotify connected! You can now control playback from the dashboard."
                 )
-                |> redirect(to: ~p"/account")
+                |> redirect(to: ~p"/users/account")
 
               {:error, _changeset} ->
                 Logger.error("Failed to store Spotify tokens for user #{user.id}")
 
                 conn
                 |> put_flash(:error, "Failed to connect Spotify account")
-                |> redirect(to: ~p"/account")
+                |> redirect(to: ~p"/users/account")
             end
         end
 

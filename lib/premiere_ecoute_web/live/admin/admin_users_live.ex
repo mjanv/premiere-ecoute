@@ -3,20 +3,19 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Repo
+  alias PremiereEcoute.Accounts
 
   def mount(_params, _session, socket) do
     socket
     |> assign(:page_title, "Admin Users")
-    |> assign(:users, User.all())
+    |> assign(:users, Accounts.User.all())
     |> assign(:selected_user, nil)
     |> assign(:show_user_modal, false)
     |> then(fn socket -> {:ok, socket} end)
   end
 
   def handle_event("show_user_modal", %{"user_id" => user_id}, socket) do
-    user = User.get!(user_id)
+    user = Accounts.User.get!(user_id)
 
     socket
     |> assign(:selected_user, user)
@@ -36,19 +35,15 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
     {:noreply, socket}
   end
 
-  def handle_event("toggle_role", %{"user_id" => user_id}, socket) do
-    user = User.get!(user_id)
-    new_role = if user.role == :admin, do: :streamer, else: :admin
-
-    user
-    |> Ecto.Changeset.cast(%{role: new_role}, [:role])
-    |> Ecto.Changeset.validate_inclusion(:role, [:streamer, :admin])
-    |> Repo.update()
+  def handle_event("change_role", %{"user_id" => user_id, "role" => role}, socket) do
+    user_id
+    |> Accounts.User.get!()
+    |> Accounts.update_user_role(String.to_atom(role))
     |> case do
-      {:ok, updated_user} ->
+      {:ok, user} ->
         socket
-        |> assign(:users, User.all())
-        |> assign(:selected_user, updated_user)
+        |> assign(:users, Accounts.User.all())
+        |> assign(:selected_user, user)
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, _} ->

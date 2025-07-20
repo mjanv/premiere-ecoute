@@ -62,7 +62,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     }
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} -> push_navigate(socket, to: ~p"/session/#{session}")
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
       {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
     end
     |> then(fn socket -> {:noreply, socket} end)

@@ -23,56 +23,67 @@ defmodule PremiereEcouteWeb.Router do
   scope "/", PremiereEcouteWeb do
     pipe_through :browser
 
-    live_session :main,
-      on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
+    live_session :main, on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
       live "/", HomepageLive, :index
-      live "/session/:id/overlay", Sessions.OverlayLive, :show
     end
   end
 
-  scope "/", PremiereEcouteWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live_session :require_authenticated_user,
-      on_mount: [{PremiereEcouteWeb.UserAuth, :require_authenticated}] do
-      live "/users/settings", UserLive.Settings, :edit
-      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
-      live "/account", Accounts.AccountLive, :index
-      live "/sessions/discography/album/select", Sessions.Discography.AlbumSelectionLive, :index
-      live "/sessions", Sessions.SessionsLive, :index
-      live "/session/:id", Sessions.SessionLive, :show
-    end
-
-    post "/users/update-password", UserSessionController, :update_password
-  end
-
-  scope "/", PremiereEcouteWeb do
+  scope "/users", PremiereEcouteWeb do
     pipe_through [:browser]
 
     live_session :current_user,
       on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
-      live "/users/register", UserLive.Registration, :new
-      live "/users/log-in", UserLive.Login, :new
-      live "/users/log-in/:token", UserLive.Confirmation, :new
+      live "/register", UserLive.Registration, :new
+      live "/log-in", UserLive.Login, :new
+      live "/log-in/:token", UserLive.Confirmation, :new
     end
 
-    post "/users/log-in", UserSessionController, :create
-    delete "/users/log-out", UserSessionController, :delete
+    post "/log-in", UserSessionController, :create
+    delete "/log-out", UserSessionController, :delete
+  end
 
-    get "/auth/:provider", Accounts.AuthController, :request
-    get "/auth/:provider/callback", Accounts.AuthController, :callback
+  scope "/users", PremiereEcouteWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :users, on_mount: [{PremiereEcouteWeb.UserAuth, :require_authenticated}] do
+      live "/settings", UserLive.Settings, :edit
+      live "/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/account", Accounts.AccountLive, :index
+    end
+
+    post "/update-password", UserSessionController, :update_password
+  end
+
+  scope "/sessions", PremiereEcouteWeb do
+    pipe_through [:browser]
+
+    live_session :sessions, on_mount: [{PremiereEcouteWeb.UserAuth, :require_streamer}] do
+      live "/", Sessions.SessionsLive, :index
+      live "/:id", Sessions.SessionLive, :show
+      live "/discography/album/select", Sessions.Discography.AlbumSelectionLive, :index
+    end
+
+    live_session :public_sessions do
+      live "/:id/overlay", Sessions.OverlayLive, :show
+    end
   end
 
   scope "/admin", PremiereEcouteWeb.Admin do
-    pipe_through [:browser, :require_authenticated_user, :require_admin_user]
+    pipe_through [:browser]
 
-    live_session :admin,
-      on_mount: [{PremiereEcouteWeb.UserAuth, :require_admin}] do
+    live_session :admin, on_mount: [{PremiereEcouteWeb.UserAuth, :require_admin}] do
       live "/", AdminLive, :index
       live "/users", AdminUsersLive, :index
       live "/albums", AdminAlbumsLive, :index
       live "/sessions", AdminSessionsLive, :index
     end
+  end
+
+  scope "/auth", PremiereEcouteWeb do
+    pipe_through [:browser]
+
+    get "/:provider", Accounts.AuthController, :request
+    get "/:provider/callback", Accounts.AuthController, :callback
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do

@@ -50,6 +50,39 @@
                   </div>
                 </div>
               </div>
+
+              <div class="bg-white/5 rounded-lg p-4">
+                <div class="flex items-center space-x-3 mb-3">
+                  <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fill-rule="evenodd"
+                        d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium text-white">{gettext("Role")}</p>
+                    <div class="mt-1">
+                      <%= if @current_user do %>
+                        <span class={[
+                          "inline-flex px-2 py-1 text-xs font-semibold rounded-full",
+                          case @current_user.role do
+                            :admin -> "bg-purple-100 text-purple-800"
+                            :streamer -> "bg-blue-100 text-blue-800"
+                            :viewer -> "bg-gray-100 text-gray-800"
+                          end
+                        ]}>
+                          {String.capitalize(to_string(@current_user.role))}
+                        </span>
+                      <% else %>
+                        <p class="text-sm text-gray-400">N/A</p>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
 <!-- Statistics -->

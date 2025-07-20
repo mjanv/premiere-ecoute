@@ -24,8 +24,8 @@
         
 <!-- Action Buttons -->
         <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
-          <%= if @current_user do %>
-            <!-- AIDEV-NOTE: Authenticated user - show session buttons -->
+          <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:streamer, :admin] do %>
+            <!-- AIDEV-NOTE: Streamer/Admin user - show session buttons -->
             <.link
               navigate={~p"/sessions/discography/album/select"}
               class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-white font-semibold rounded-lg transition-all text-lg hover:scale-105 bg-gradient-purple hover:shadow-lg"
@@ -54,6 +54,17 @@
               </svg>
               {gettext("Browse Sessions")}
             </.link>
+          <% end %>
+          <%= if @current_scope && @current_scope.user do %>
+            <!-- AIDEV-NOTE: Viewer user - show welcome message -->
+            <div class="text-center">
+              <p class="text-lg text-gray-300 mb-4">
+                {gettext("Welcome back, %{username}!", username: @current_scope.user.twitch_username || "User")}
+              </p>
+              <p class="text-gray-400">
+                {gettext("Explore listening sessions and join the community discussions.")}
+              </p>
+            </div>
           <% else %>
             <!-- AIDEV-NOTE: Anonymous user - show big Connect with Twitch button -->
             <.link

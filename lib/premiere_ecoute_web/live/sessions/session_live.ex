@@ -93,13 +93,13 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("open_overlay", _params, socket) do
-    overlay_url = "#{socket.host_uri}/session/#{socket.assigns.listening_session.id}/overlay"
+    overlay_url = "#{socket.host_uri}/sessions/#{socket.assigns.listening_session.id}/overlay"
     {:noreply, push_event(socket, "open_url", %{url: overlay_url})}
   end
 
   @impl true
   def handle_event("copy_overlay_url", _params, socket) do
-    overlay_url = "#{socket.host_uri}/session/#{socket.assigns.listening_session.id}/overlay"
+    overlay_url = "#{socket.host_uri}/sessions/#{socket.assigns.listening_session.id}/overlay"
 
     {:noreply,
      socket

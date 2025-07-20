@@ -70,32 +70,40 @@ defmodule PremiereEcouteWeb.Components.Header do
                 style="display: none;"
               >
                 <div class="py-1">
-                  <!-- My Sessions (first item) -->
-                  <.link
-                    navigate={~p"/sessions"}
-                    class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                  >
-                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                      />
-                    </svg>
-                    {gettext("My Sessions")}
-                  </.link>
-                  
+                  <!-- Session management (only for streamers and admins) -->
+                  <%= if @current_user.role in [:streamer, :admin] do %>
+                    <!-- My Sessions (first item) -->
+                    <.link
+                      navigate={~p"/sessions"}
+                      class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                    >
+                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                        />
+                      </svg>
+                      {gettext("My Sessions")}
+                    </.link>
+                    
     <!-- Create Session (second item) -->
-                  <.link
-                    navigate={~p"/sessions/discography/album/select"}
-                    class="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-gray-200 transition-colors"
-                  >
-                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    {gettext("Create Session")}
-                  </.link>
+                    <.link
+                      navigate={~p"/sessions/discography/album/select"}
+                      class="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-gray-200 transition-colors"
+                    >
+                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 6v6m0 0v6m-6 0h6m-6 0H6"
+                        />
+                      </svg>
+                      {gettext("Create Session")}
+                    </.link>
+                  <% end %>
                   
     <!-- Admin (if admin user) -->
                   <%= if @current_user.role == :admin do %>
@@ -138,7 +146,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                   
     <!-- Account -->
                   <.link
-                    navigate={~p"/account"}
+                    navigate={~p"/users/account"}
                     class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                   >
                     <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

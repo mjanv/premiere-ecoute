@@ -256,6 +256,23 @@ defmodule PremiereEcouteWeb.UserAuth do
     end
   end
 
+  def on_mount(:require_streamer, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope &&
+         socket.assigns.current_scope.user &&
+         socket.assigns.current_scope.user.role in [:streamer, :admin] do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You must be a streamer or an admin to access this page.")
+        |> Phoenix.LiveView.redirect(to: ~p"/")
+
+      {:halt, socket}
+    end
+  end
+
   def on_mount(:require_admin, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
@@ -301,6 +318,23 @@ defmodule PremiereEcouteWeb.UserAuth do
     else
       conn
       |> put_flash(:error, "You must log in to access this page.")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/")
+      |> halt()
+    end
+  end
+
+  @doc """
+  Plug for routes that require the user to be authenticated and have streamer role.
+  """
+  def require_streamer_user(conn, _opts) do
+    if conn.assigns.current_scope &&
+         conn.assigns.current_scope.user &&
+         conn.assigns.current_scope.user.role in [:streamer, :admin] do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must be a streamer or an admin to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/")
       |> halt()
