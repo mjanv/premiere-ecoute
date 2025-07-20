@@ -2,6 +2,9 @@ import Config
 
 config :premiere_ecoute,
   environment: config_env(),
+  ecto_repos: [PremiereEcoute.Repo],
+  event_stores: [PremiereEcoute.EventStore],
+  generators: [timestamp_type: :utc_datetime],
   handlers: [
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
@@ -21,10 +24,6 @@ config :premiere_ecoute, :scopes,
     test_login_helper: :register_and_log_in_user
   ]
 
-config :premiere_ecoute,
-  ecto_repos: [PremiereEcoute.Repo],
-  generators: [timestamp_type: :utc_datetime]
-
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -36,6 +35,11 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   live_view: [signing_salt: "6RkVNFmy"]
 
 config :premiere_ecoute, PremiereEcoute.Repo, adapter: Ecto.Adapters.Postgres
+
+config :premiere_ecoute, PremiereEcoute.EventStore,
+  column_data_type: "jsonb",
+  serializer: EventStore.JsonbSerializer,
+  types: EventStore.PostgresTypes
 
 config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   disabled: false,

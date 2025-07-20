@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Repo do
-  @moduledoc false
+  @moduledoc """
+  Primary database repository for the Premiere Ecoute application.
+
+  Provides database access through Ecto with PostgreSQL adapter and includes pagination support via Scrivener. Contains utility functions for error handling and changeset processing.
+  """
 
   use Ecto.Repo,
     otp_app: :premiere_ecoute,
@@ -7,6 +11,20 @@ defmodule PremiereEcoute.Repo do
 
   use Scrivener, page_size: 10
 
+  @doc """
+  Transforms changeset errors into human-readable messages.
+
+  Traverses all errors in a changeset and interpolates placeholder values
+  in error messages. Replaces patterns like `%{field}` with actual values
+  from the error options.
+
+  ## Examples
+
+      iex> changeset = %Ecto.Changeset{errors: [{:email, {"must be %{count} characters", [count: 5]}}]}
+      iex> traverse_errors(changeset)
+      %{email: ["must be 5 characters"]}
+
+  """
   def traverse_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
       Regex.replace(~r"%{(\w+)}", msg, fn _, key ->

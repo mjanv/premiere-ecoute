@@ -30,6 +30,14 @@ config :premiere_ecoute, PremiereEcoute.Repo,
   hostname: env!("POSTGRES_HOSTNAME"),
   socket_options: if(env!("ECTO_IPV6", :string, nil) in ~w(true 1), do: [:inet6], else: [])
 
+config :premiere_ecoute, PremiereEcoute.EventStore,
+  schema: "event_store",
+  database: env!("POSTGRES_DATABASE", :string, "premiere_ecoute_#{config_env()}"),
+  username: env!("POSTGRES_USERNAME"),
+  password: env!("POSTGRES_PASSWORD"),
+  hostname: env!("POSTGRES_HOSTNAME"),
+  socket_options: if(env!("ECTO_IPV6", :string, nil) in ~w(true 1), do: [:inet6], else: [])
+
 config :ueberauth, Ueberauth.Strategy.Twitch.OAuth,
   client_id: env!("TWITCH_CLIENT_ID"),
   client_secret: env!("TWITCH_CLIENT_SECRET")

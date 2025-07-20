@@ -4,17 +4,25 @@ defmodule PremiereEcoute.MixProject do
   def project do
     [
       app: :premiere_ecoute,
+      name: "Premiere Ecoute",
       version: "0.1.0",
       elixir: "~> 1.18",
+      source_url: "https://github.com/mjanv/premiere_ecoute",
+      homepage_url: "https://premiere-ecoute.fly.dev/",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
+      test_coverage: [tool: ExCoveralls],
       dialyzer: [
         plt_add_apps: [:mix],
         list_unused_filters: true
       ],
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -28,7 +36,7 @@ defmodule PremiereEcoute.MixProject do
   def cli do
     [
       default_task: "phx.server",
-      preferred_envs: [docs: :docs]
+      preferred_envs: [test: :test, "test.cover": :test]
     ]
   end
 
@@ -39,7 +47,7 @@ defmodule PremiereEcoute.MixProject do
     [
       # Web
       {:bandit, "~> 1.5"},
-      {:phoenix, "~> 1.8.0-rc.3", override: true},
+      {:phoenix, "~> 1.8.0-rc.4", override: true},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -62,6 +70,7 @@ defmodule PremiereEcoute.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:postgrex, "~> 0.20.0"},
       {:ecto_sql, "~> 3.10"},
+      {:eventstore, "~> 1.4"},
       {:scrivener_ecto, "~> 3.0"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
@@ -79,7 +88,10 @@ defmodule PremiereEcoute.MixProject do
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       # Tests
       {:hammox, "~> 0.7", only: :test},
+      {:excoveralls, "~> 0.18", only: :test},
       # Development
+      {:doctor, "~> 0.22.0", only: :dev},
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:tidewave, "~> 0.1", only: :dev}
     ]
   end
@@ -88,8 +100,8 @@ defmodule PremiereEcoute.MixProject do
     [
       # Setup
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "ecto.setup": ["event_store.create", "ecto.create", "event_store.init", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["event_store.drop", "ecto.drop", "ecto.setup"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind premiere_ecoute", "esbuild premiere_ecoute"],
       "assets.deploy": [
@@ -112,9 +124,25 @@ defmodule PremiereEcoute.MixProject do
         "hex.outdated --within-requirements"
       ],
       # Tests
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: [
+        "event_store.drop --quiet",
+        "event_store.create --quiet",
+        "ecto.create --quiet",
+        "event_store.init --quiet",
+        "ecto.migrate --quiet",
+        "test"
+      ],
+      "test.cover": [
+        "event_store.drop --quiet",
+        "ecto.create --quiet",
+        "ecto.migrate --quiet",
+        "coveralls.html",
+        "cmd firefox cover/excoveralls.html"
+      ],
       # Deployment
-      deploy: ["format", "compile --warnings-as-errors", "test", "cmd fly deploy"]
+      docs: ["doctor", "docs"],
+      ready: ["format", "quality", "cmd mix test --color"],
+      deploy: ["cmd fly deploy"]
     ]
   end
 end

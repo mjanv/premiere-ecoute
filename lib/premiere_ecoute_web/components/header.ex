@@ -117,6 +117,22 @@ defmodule PremiereEcouteWeb.Components.Header do
                     </.link>
                   <% end %>
                   
+    <!-- AIDEV-NOTE: Dev mode fake Twitch link for testing -->
+                  <%= if Application.get_env(:premiere_ecoute, :environment) == :dev and @current_user.twitch_user_id do %>
+                    <!-- Divider -->
+                    <div class="border-t border-gray-600 my-1"></div>
+                    <a
+                      href={"http://localhost:4001/#{@current_user.twitch_user_id}/chat"}
+                      target="_blank"
+                      class="flex items-center px-4 py-2 text-sm text-purple-300 hover:bg-gray-700 hover:text-purple-200 transition-colors"
+                    >
+                      <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                      </svg>
+                      Fake Twitch Chat
+                    </a>
+                  <% end %>
+                  
     <!-- Divider -->
                   <div class="border-t border-gray-600 my-1"></div>
                   

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Stream Mock</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #0e0e10;
+            color: #efeff1;
+            font-size: 13px;
+            overflow: hidden;
+        }
+        
+        /* Main Layout */
+        .twitch-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        /* Left Sidebar */
+        .left-sidebar {
+            width: 240px;
+            background-color: #1f1f23;
+            border-right: 1px solid #2f2f35;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #2f2f35;
+        }
+        
+        .logo {
+            color: #9147ff;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        
+        .nav-section {
+            padding: 20px 15px;
+        }
+        
+        .nav-title {
+            color: #adadb8;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #efeff1;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        
+        .nav-item.active {
+            background-color: #9147ff;
+            padding-left: 8px;
+            padding-right: 8px;
+            font-weight: 600;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        /* Video Area */
+        .video-container {
+            background-color: #000000;
+            aspect-ratio: 16/9;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #2f2f35;
+        }
+        
+        .video-placeholder {
+            color: #adadb8;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .video-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 4px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .play-button {
+            background: none;
+            border: none;
+            color: #efeff1;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        /* Stream Info */
+        .stream-info {
+            padding: 20px;
+            border-bottom: 1px solid #2f2f35;
+        }
+        
+        .stream-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #efeff1;
+        }
+        
+        .stream-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .channel-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .channel-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9147ff, #772ce8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .channel-name {
+            color: #efeff1;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .channel-name:hover {
+            color: #9147ff;
+        }
+        
+        .stream-category {
+            background-color: #2f2f35;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #adadb8;
+        }
+        
+        .viewer-count {
+            color: #eb0400;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .follow-button {
+            background-color: #9147ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s;
+        }
+        
+        .follow-button:hover {
+            background-color: #772ce8;
+        }
+        
+        /* Right Chat Sidebar */
+        .chat-sidebar {
+            width: 340px;
+            background-color: #18181b;
+            border-left: 1px solid #2f2f35;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        /* Chat Styles */
+        .chat-header {
+            background-color: #18181b;
+            padding: 8px 12px;
+            border-bottom: 1px solid #2f2f35;
+            font-weight: 600;
+            font-size: 12px;
+            color: #adadb8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 120px);
+        }
+        .message {
+            display: flex;
+            align-items: baseline;
+            line-height: 1.4;
+            font-size: 13px;
+            padding: 1px 12px;
+            min-height: 20px;
+            word-wrap: break-word;
+        }
+        .message:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        .message.announcement {
+            background-color: #1f1f23;
+            border-left: 3px solid #9147ff;
+            padding: 6px 12px;
+            margin: 2px 0;
+            border-radius: 0;
+        }
+        .username {
+            font-weight: 700;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+        .timestamp {
+            color: #adadb8;
+            font-size: 11px;
+            margin-right: 6px;
+            display: none;
+        }
+        .message:hover .timestamp {
+            display: inline;
+        }
+        .message-content {
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .announcement-badge {
+            background-color: #9147ff;
+            color: #ffffff;
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: 4px;
+            text-transform: uppercase;
+        }
+        .status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+        }
+        .status.connected {
+            background-color: #00f5ff;
+            color: #0e0e10;
+        }
+        .status.disconnected {
+            background-color: #f13c20;
+            color: #efeff1;
+        }
+        .chat-input-container {
+            background-color: #18181b;
+            border-top: 1px solid #2f2f35;
+            padding: 10px 12px;
+            flex-shrink: 0;
+        }
+        .message-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        #messageInput {
+            flex: 1;
+            background-color: #2f2f35;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            padding: 6px 10px;
+            color: #efeff1;
+            font-size: 13px;
+            font-family: inherit;
+            resize: none;
+            transition: border-color 0.15s ease;
+        }
+        #messageInput:focus {
+            outline: none;
+            border-color: #9147ff;
+            background-color: #3a3a3d;
+        }
+        #messageInput::placeholder {
+            color: #adadb8;
+        }
+        #sendButton {
+            background-color: #9147ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #sendButton:hover:not(:disabled) {
+            background-color: #772ce8;
+        }
+        #sendButton:disabled {
+            background-color: #464649;
+            color: #adadb8;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .left-sidebar {
+                width: 50px;
+            }
+            .chat-sidebar {
+                width: 300px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .left-sidebar {
+                display: none;
+            }
+            .chat-sidebar {
+                width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status disconnected" id="status">Disconnected</div>
+    
+    <div class="twitch-layout">
+        <!-- Left Sidebar -->
+        <div class="left-sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">Twitch</a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">For You</div>
+                <a href="#" class="nav-item">
+                    🎯 Following
+                </a>
+                <a href="#" class="nav-item active">
+                    📺 Browse
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Category</div>
+                <a href="#" class="nav-item">
+                    🎵 Music & Performing Arts
+                </a>
+                <a href="#" class="nav-item">
+                    🎮 Just Chatting
+                </a>
+                <a href="#" class="nav-item">
+                    📻 Talk Shows & Podcasts
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Video Container -->
+            <div class="video-container">
+                <div class="video-placeholder">
+                    🎵 Music Stream Placeholder<br>
+                    <small style="color: #adadb8;">Live audio streaming would appear here</small>
+                </div>
+                <div class="video-controls">
+                    <button class="play-button">▶️</button>
+                    <span style="font-size: 12px;">Live Stream</span>
+                    <div style="flex: 1;"></div>
+                    <span style="font-size: 12px;">🔊 Volume</span>
+                </div>
+            </div>
+            
+            <!-- Stream Info -->
+            <div class="stream-info">
+                <div class="stream-title">Discovering New Albums - Première Écoute Stream</div>
+                
+                <div class="stream-meta">
+                    <div class="channel-info">
+                        <div class="channel-avatar">PE</div>
+                        <a href="#" class="channel-name">PremiereEcoute</a>
+                    </div>
+                    
+                    <div class="stream-category">Music & Performing Arts</div>
+                    <div class="viewer-count">● 1,234 viewers</div>
+                    
+                    <button class="follow-button">Follow</button>
+                </div>
+                
+                <div style="color: #adadb8; font-size: 13px; line-height: 1.4;">
+                    Join us as we explore new albums together! Real-time listening sessions with chat voting and discussion. 
+                    Currently featuring: Album discovery and community reactions.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Chat Sidebar -->
+        <div class="chat-sidebar">
+            <div class="chat-header">
+                Stream Chat
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                <div class="message">
+                    <span class="timestamp">00:00:00</span>
+                    <span class="username" style="color: #9147ff;">System</span>
+                    <span class="message-content">Welcome to the stream! Connecting...</span>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <form id="messageForm" class="message-form">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Type a message..." 
+                        maxlength="500"
+                        autocomplete="off"
+                    />
+                    <button type="submit" id="sendButton">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const statusElement = document.getElementById('status');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        // AIDEV-NOTE: Generate random user ID and username for chat messages
+        function generateRandomUserId() {
+            return Math.floor(Math.random() * 1000000);
+        }
+        
+        function generateRandomUsername() {
+            const adjectives = ['Cool', 'Epic', 'Awesome', 'Super', 'Mega', 'Ultra', 'Pro', 'Elite'];
+            const nouns = ['Gamer', 'Viewer', 'Fan', 'Listener', 'User', 'Watcher', 'Player', 'Chat'];
+            const randomNum = Math.floor(Math.random() * 9999);
+            
+            return `${adjectives[Math.floor(Math.random() * adjectives.length)]}${nouns[Math.floor(Math.random() * nouns.length)]}${randomNum}`;
+        }
+        
+        // Twitch-like username colors
+        const usernameColors = [
+            '#ff0000', '#0000ff', '#008000', '#b22222', '#ff7f50', '#9acd32', 
+            '#ff4500', '#2e8b57', '#daa520', '#d2691e', '#5f9ea0', '#1e90ff',
+            '#ff69b4', '#8a2be2', '#00ff7f'
+        ];
+        
+        function getUsernameColor(username) {
+            let hash = 0;
+            for (let i = 0; i < username.length; i++) {
+                hash = username.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return usernameColors[Math.abs(hash) % usernameColors.length];
+        }
+        
+        // Generate user identity once per session
+        const userId = generateRandomUserId();
+        const username = generateRandomUsername();
+        const userColor = getUsernameColor(username);
+        
+        // WebSocket connection
+        const ws = new WebSocket('ws://localhost:4001/chat/ws');
+        
+        ws.onopen = function() {
+            statusElement.textContent = 'Connected';
+            statusElement.className = 'status connected';
+            addMessage('System', `Connected as ${username}!`, false);
+        };
+        
+        ws.onclose = function() {
+            statusElement.textContent = 'Disconnected';
+            statusElement.className = 'status disconnected';
+            addMessage('System', 'Disconnected from chat stream', false);
+        };
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            addMessage(data.username || 'User', data.message, data.type === 'announcement', data.color);
+        };
+        
+        // AIDEV-NOTE: Handle form submission to send messages via webhook
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Disable form while sending
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
+            
+            // Send message via webhook
+            // Extract broadcaster_id from current URL path
+            const pathParts = window.location.pathname.split('/');
+            const broadcasterId = pathParts[1]; // assumes /:broadcaster_id/chat format
+            
+            fetch(`/${broadcasterId}/chat/webhook`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    broadcaster_user_id: userId.toString(),
+                    broadcaster_user_name: username,
+                    message: message
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to send message');
+                }
+                messageInput.value = '';
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                addMessage('System', 'Failed to send message. Please try again.', false);
+            })
+            .finally(() => {
+                // Re-enable form
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send';
+                messageInput.focus();
+            });
+        });
+        
+        // Handle Enter key press
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                messageForm.dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        function addMessage(username, message, isAnnouncement = false, color = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isAnnouncement ? 'message announcement' : 'message';
+            
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const usernameColor = color || getUsernameColor(username);
+            
+            messageDiv.innerHTML = `
+                ${isAnnouncement ? '<span class="announcement-badge">ANNOUNCEMENT</span>' : ''}
+                <span class="timestamp">${timestamp}</span>
+                <span class="username" style="color: ${usernameColor}">${username}:</span>
+                <span class="message-content">${message}</span>
+            `;
+            
+            if (color && isAnnouncement) {
+                messageDiv.style.borderLeftColor = color;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Keep only last 100 messages
+            while (chatContainer.children.length > 100) {
+                chatContainer.removeChild(chatContainer.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>

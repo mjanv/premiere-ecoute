@@ -1,0 +1,6 @@
+{
+    "print_summary": false,
+    "skip_files": [
+      "lib/premiere_ecoute_mock"
+    ]
+}
