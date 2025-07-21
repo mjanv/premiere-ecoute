@@ -1,0 +1,9 @@
+<h1>Changelog</h1>
+
+<%= for entry <- @changelog do %>
+  <div>
+    <h2>[{entry.id}] {entry.title}</h2>
+
+    {raw(entry.body)}
+  </div>
+<% end %>

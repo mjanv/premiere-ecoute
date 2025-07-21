@@ -255,22 +255,25 @@ defmodule PremiereEcouteWeb.UserAuth do
   def on_mount(role, _params, session, socket) when role in [:viewer, :streamer, :bot, :admin] do
     socket = mount_current_scope(socket, session)
 
-    accepted_roles = case role do
-      :viewer -> [:viewer, :streamer, :admin]
-      :streamer -> [:streamer, :admin]
-      :bot -> [:bot, :admin]
-      :admin -> [:admin]
-    end
+    accepted_roles =
+      case role do
+        :viewer -> [:viewer, :streamer, :admin]
+        :streamer -> [:streamer, :admin]
+        :bot -> [:bot, :admin]
+        :admin -> [:admin]
+      end
 
-    if socket.assigns.current_scope && socket.assigns.current_scope.user && socket.assigns.current_scope.user.role in accepted_roles do
+    if socket.assigns.current_scope && socket.assigns.current_scope.user &&
+         socket.assigns.current_scope.user.role in accepted_roles do
       {:cont, socket}
     else
-      error = case role do
-        :viewer -> "a viewer, a streamer or an admin"
-        :streamer -> "a streamer or an admin"
-        :bot -> "a bot or an admin"
-        :admin -> "an admin"
-      end
+      error =
+        case role do
+          :viewer -> "a viewer, a streamer or an admin"
+          :streamer -> "a streamer or an admin"
+          :bot -> "a bot or an admin"
+          :admin -> "an admin"
+        end
 
       socket
       |> Phoenix.LiveView.put_flash(:error, "You must be #{error} to access this page.")

@@ -75,6 +75,9 @@ defmodule PremiereEcoute.MixProject do
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
       {:ueberauth_spotify, "~> 0.2"},
+      {:nimble_publisher, "~> 1.1"},
+      {:makeup_elixir, ">= 0.0.0"},
+      {:makeup_erlang, ">= 0.0.0"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},

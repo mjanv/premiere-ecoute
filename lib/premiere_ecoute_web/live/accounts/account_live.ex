@@ -79,7 +79,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
   @impl true
   def handle_event("delete_account", _params, socket) do
-    # AIDEV-NOTE: Empty handler as requested - no backend action
     {:noreply, socket}
   end
 end

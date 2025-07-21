@@ -23,7 +23,7 @@ defmodule PremiereEcouteWeb.Router do
   end
 
   scope "/", PremiereEcouteWeb do
-    pipe_through :browser
+    pipe_through [:browser]
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
@@ -88,16 +88,23 @@ defmodule PremiereEcouteWeb.Router do
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do
-    pipe_through :webhook
+    pipe_through [:webhook]
 
     post "/twitch", TwitchController, :handle
+  end
+
+  scope "/changelog", PremiereEcouteWeb.Static do
+    pipe_through :browser
+
+    get "/", ChangelogController, :index
+    get "/:id", ChangelogController, :show
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through [:browser]
 
       live_dashboard "/dashboard", metrics: PremiereEcouteWeb.Telemetry
     end
