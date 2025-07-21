@@ -10,13 +10,13 @@ defmodule Mix.Tasks.Gettext.Check do
 
   @impl true
   def run(_args) do
-    Mix.shell().info("📤 Extracting translatable strings...")
     Mix.Task.run("gettext.extract")
 
     for locale <- @locales do
-      Mix.shell().info("🔄 Merging translations for '#{locale}' locale...")
       Mix.Task.run("gettext.merge", ["priv/gettext", "--locale", locale])
+    end
 
+    for locale <- ["fr", "it"] do
       file = "priv/gettext/#{locale}/LC_MESSAGES/default.po"
       Mix.shell().info("🔍 Checking for missing #{locale} translations in #{file}...")
 
@@ -27,7 +27,6 @@ defmodule Mix.Tasks.Gettext.Check do
       |> case do
         [] ->
           Mix.shell().info("✅ No missing translations found.")
-          exit({:shutdown, 0})
 
         translations ->
           Mix.shell().error("🔥 Missing translations found:\n" <> Enum.join(translations, "--"))

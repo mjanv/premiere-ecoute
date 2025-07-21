@@ -36,7 +36,7 @@ msgstr "Annuler"
 msgid "Community Rating"
 msgstr "Évaluation Communautaire"
 
-#: lib/premiere_ecoute_web/components/header.ex:192
+#: lib/premiere_ecoute_web/components/header.ex:249
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:79
 #, elixir-autogen, elixir-format
 msgid "Connect with Twitch"
@@ -83,7 +83,7 @@ msgstr "Partagez vos goûts musicaux avec le monde. Créez des sessions d'écout
 msgid "Start New Session"
 msgstr "Nouvelle session"
 
-#: lib/premiere_ecoute_web/components/header.ex:160
+#: lib/premiere_ecoute_web/components/header.ex:217
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Account"
@@ -546,17 +546,17 @@ msgstr "Lecture Spotify reprise"
 msgid "Attempting to reconnect"
 msgstr "Tentative de reconnexion"
 
-#: lib/premiere_ecoute_web/components/header.ex:104
+#: lib/premiere_ecoute_web/components/header.ex:161
 #, elixir-autogen, elixir-format
 msgid "Create Session"
 msgstr "Créer une Session"
 
-#: lib/premiere_ecoute_web/components/header.ex:177
+#: lib/premiere_ecoute_web/components/header.ex:234
 #, elixir-autogen, elixir-format
 msgid "Log Out"
 msgstr "Se Déconnecter"
 
-#: lib/premiere_ecoute_web/components/header.ex:88
+#: lib/premiere_ecoute_web/components/header.ex:145
 #, elixir-autogen, elixir-format
 msgid "My Sessions"
 msgstr "Mes Sessions"
@@ -571,7 +571,7 @@ msgstr "Quelque chose s'est mal passé !"
 msgid "We can't find the internet"
 msgstr "Nous ne trouvons pas Internet"
 
-#: lib/premiere_ecoute_web/components/header.ex:124
+#: lib/premiere_ecoute_web/components/header.ex:181
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:258
 #, elixir-autogen, elixir-format
 msgid "Admin"
@@ -963,3 +963,28 @@ msgstr "Bienvenue !"
 #, elixir-autogen, elixir-format
 msgid "Bot"
 msgstr "Bot"
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:179
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Changelog"
+msgstr "Changer le Rôle"
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:211
+#, elixir-autogen, elixir-format
+msgid "Contact"
+msgstr "Contact"
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:195
+#, elixir-autogen, elixir-format
+msgid "Cookies"
+msgstr "Cookies"
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:187
+#, elixir-autogen, elixir-format
+msgid "Privacy"
+msgstr "Vie privée"
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:203
+#, elixir-autogen, elixir-format
+msgid "Terms"
+msgstr "Conditions générales"

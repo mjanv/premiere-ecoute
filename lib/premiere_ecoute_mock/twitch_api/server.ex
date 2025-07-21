@@ -67,7 +67,7 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
       for {pid, _} <- entries, do: send(pid, {:chat_message, message_data})
     end)
 
-    no_content(conn)
+    json(conn, 200, data(%{"message_id" => UUID.uuid4(), "is_sent" => true, "drop_reason" => nil}, %{}))
   end
 
   post "/chat/announcements" do
