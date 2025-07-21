@@ -22,7 +22,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
     end
   end
 
-  def authorization_url do
+  def authorization_url(state \\ nil) do
     "https://accounts.spotify.com/authorize?" <>
       URI.encode_query(%{
         response_type: "code",
@@ -30,19 +30,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
         scope:
           "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing",
         redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri),
-        state: random(16)
-      })
-  end
-
-  def authorization_url_with_state(user_id) do
-    "https://accounts.spotify.com/authorize?" <>
-      URI.encode_query(%{
-        response_type: "code",
-        client_id: Application.get_env(:premiere_ecoute, :spotify_client_id),
-        scope:
-          "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing",
-        redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri),
-        state: user_id
+        state: state || random(16)
       })
   end
 

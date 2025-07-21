@@ -17,7 +17,7 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   def handle_params(params, _url, socket) do
     # AIDEV-NOTE: Handle pagination parameters from URL
     page_number = String.to_integer(params["page"] || "1")
-    page_size = String.to_integer(params["per_page"] || "2")
+    page_size = String.to_integer(params["per_page"] || "10")
 
     socket
     |> assign(:page, ListeningSession.page([], page_number, page_size))

@@ -118,8 +118,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         {:ok, "spotify:track:track001"}
       end)
 
-      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, "Bienvenue !", _ ->
-        {:ok, ""}
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome !" ->
+        {:ok, %{}}
       end)
 
       command = %PrepareListeningSession{
@@ -176,11 +176,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         {:ok, "spotify:track:track001"}
       end)
 
-      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, ""} end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, _ -> {:ok, %{}} end)
 
       expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
       expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
-      expect(TwitchApi, :send_chat_announcement, fn %Scope{user: ^user}, _, _ -> {:ok, ""} end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, _ -> {:ok, %{}} end)
 
       command = %PrepareListeningSession{
         user_id: user.id,

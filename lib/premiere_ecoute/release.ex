@@ -8,6 +8,10 @@ defmodule PremiereEcoute.Release do
   def migrate do
     load_app()
 
+    # config = PremiereEcoute.EventStore.config()
+    # :ok = EventStore.Tasks.Create.exec(config, [])
+    # :ok = EventStore.Tasks.Init.exec(config, [])
+
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
     end
@@ -24,6 +28,7 @@ defmodule PremiereEcoute.Release do
   end
 
   defp load_app do
+    # Application.ensure_all_started(:postgrex)
     Application.ensure_all_started(:ssl)
     Application.ensure_loaded(@app)
   end

@@ -7,12 +7,24 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi
 
+  def request(conn, %{"provider" => "twitch"}) do
+    client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
+    redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
+
+    if client_id && redirect_uri do
+      redirect(conn, external: TwitchApi.authorization_url())
+    else
+      conn
+      |> put_flash(:error, "Twitch login not configured")
+      |> redirect(to: ~p"/")
+    end
+  end
+
   def request(conn, %{"provider" => "spotify"}) do
     client_id = Application.get_env(:premiere_ecoute, :spotify_client_id)
     redirect_uri = Application.get_env(:premiere_ecoute, :spotify_redirect_uri)
 
     if client_id && redirect_uri do
-      # AIDEV-NOTE: Get current user ID and include in OAuth state
       user_id =
         case conn.assigns[:current_scope] do
           %{user: %{id: id}} -> to_string(id)
@@ -20,8 +32,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
         end
 
       if user_id do
-        authorization_url = SpotifyApi.authorization_url_with_state(user_id)
-        redirect(conn, external: authorization_url)
+        redirect(conn, external: SpotifyApi.authorization_url(user_id))
       else
         conn
         |> put_flash(:error, "You must be logged in to connect Spotify")
@@ -34,17 +45,39 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     end
   end
 
-  def request(conn, %{"provider" => "twitch"}) do
-    client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
-    redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
+  def callback(conn, %{"provider" => "twitch", "code" => code}) do
+    case TwitchApi.authorization_code(code) do
+      {:ok, auth_data} ->
+        case find_or_create_user(auth_data) do
+          {:ok, user} ->
+            conn
+            |> put_session(:user_return_to, ~p"/")
+            |> put_flash(:info, "Successfully authenticated with Twitch!")
+            |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
 
-    if client_id && redirect_uri do
-      redirect(conn, external: TwitchApi.authorization_url())
-    else
-      conn
-      |> put_flash(:error, "Twitch login not configured")
-      |> redirect(to: ~p"/")
+          {:error, reason} ->
+            Logger.error("Failed to create user from Twitch auth: #{inspect(reason)}")
+
+            conn
+            |> put_flash(:error, "Authentication failed")
+            |> redirect(to: ~p"/")
+        end
+
+      {:error, reason} ->
+        Logger.error("Twitch OAuth failed: #{inspect(reason)}")
+
+        conn
+        |> put_flash(:error, "Twitch authentication failed")
+        |> redirect(to: ~p"/")
     end
+  end
+
+  def callback(conn, %{"provider" => "twitch", "error" => error}) do
+    Logger.error("Twitch OAuth error: #{inspect(error)}")
+
+    conn
+    |> put_flash(:error, "Twitch authentication failed")
+    |> redirect(to: ~p"/")
   end
 
   def callback(conn, %{"provider" => "spotify", "code" => code, "state" => state}) do
@@ -116,41 +149,6 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
     conn
     |> put_flash(:info, "Spotify authentication failed")
-    |> redirect(to: ~p"/")
-  end
-
-  def callback(conn, %{"provider" => "twitch", "code" => code}) do
-    case TwitchApi.authorization_code(code) do
-      {:ok, auth_data} ->
-        case find_or_create_user(auth_data) do
-          {:ok, user} ->
-            conn
-            |> put_session(:user_return_to, ~p"/")
-            |> put_flash(:info, "Successfully authenticated with Twitch!")
-            |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
-
-          {:error, reason} ->
-            Logger.error("Failed to create user from Twitch auth: #{inspect(reason)}")
-
-            conn
-            |> put_flash(:error, "Authentication failed")
-            |> redirect(to: ~p"/")
-        end
-
-      {:error, reason} ->
-        Logger.error("Twitch OAuth failed: #{inspect(reason)}")
-
-        conn
-        |> put_flash(:error, "Twitch authentication failed")
-        |> redirect(to: ~p"/")
-    end
-  end
-
-  def callback(conn, %{"provider" => "twitch", "error" => error}) do
-    Logger.error("Twitch OAuth error: #{inspect(error)}")
-
-    conn
-    |> put_flash(:error, "Twitch authentication failed")
     |> redirect(to: ~p"/")
   end
 

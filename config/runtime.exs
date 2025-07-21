@@ -7,9 +7,7 @@ source!([
   System.get_env()
 ])
 
-if env!("PHX_SERVER") do
-  config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: true
-end
+config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: env!("PHX_SERVER", :boolean, false)
 
 config :premiere_ecoute,
   spotify_client_id: env!("SPOTIFY_CLIENT_ID"),
@@ -54,8 +52,8 @@ if config_env() == :prod do
   config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
     url: [host: env!("PHX_HOST"), port: 443, scheme: "https"],
     http: [
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: String.to_integer(env!("PORT") || "4000")
+      ip: {0, 0, 0, 0},
+      port: env!("PORT", :string, 4000)
     ],
     secret_key_base: env!("SECRET_KEY_BASE")
 

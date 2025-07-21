@@ -142,7 +142,8 @@ defmodule PremiereEcoute.MixProject do
       # Deployment
       docs: ["doctor", "docs"],
       ready: ["format", "quality", "cmd mix test --color"],
-      deploy: ["cmd fly deploy"]
+      deploy: ["cmd fly deploy"],
+      db: ["cmd fly postgres connect -a premiere-ecoute-db"]
     ]
   end
 end

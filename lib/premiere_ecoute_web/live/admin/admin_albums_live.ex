@@ -16,7 +16,7 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
 
   def handle_params(params, _url, socket) do
     page_number = String.to_integer(params["page"] || "1")
-    page_size = String.to_integer(params["per_page"] || "1")
+    page_size = String.to_integer(params["per_page"] || "10")
 
     socket
     |> assign(:page, Album.page([], page_number, page_size))

@@ -55,7 +55,7 @@
               {gettext("Browse Sessions")}
             </.link>
           <% end %>
-          <%= if @current_scope && @current_scope.user do %>
+          <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:viewer] do %>
             <!-- AIDEV-NOTE: Viewer user - show welcome message -->
             <div class="text-center">
               <p class="text-lg text-gray-300 mb-4">
@@ -65,7 +65,8 @@
                 {gettext("Explore listening sessions and join the community discussions.")}
               </p>
             </div>
-          <% else %>
+          <% end %>
+          <%= if is_nil(@current_scope) do %>
             <!-- AIDEV-NOTE: Anonymous user - show big Connect with Twitch button -->
             <.link
               href={~p"/auth/twitch"}

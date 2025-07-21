@@ -75,7 +75,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   # Accounts
   defdelegate client_credentials, to: __MODULE__.Accounts
   defdelegate authorization_url, to: __MODULE__.Accounts
-  defdelegate authorization_url_with_state(user_id), to: __MODULE__.Accounts
+  defdelegate authorization_url(state), to: __MODULE__.Accounts
   defdelegate authorization_code(code, state), to: __MODULE__.Accounts
   defdelegate renew_token(refresh_token), to: __MODULE__.Accounts
 

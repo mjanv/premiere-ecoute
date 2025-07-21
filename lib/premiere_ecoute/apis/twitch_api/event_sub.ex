@@ -110,8 +110,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   defp version("channel.poll.progress"), do: "1"
   defp version(_), do: "0"
 
-  defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.chat.message"),
-    do: %{broadcaster_user_id: user_id, user_id: user_id}
+  defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.chat.message") do
+    %{broadcaster_user_id: user_id, user_id: user_id}
+  end
 
   defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.follow"),
     do: %{broadcaster_user_id: user_id, moderator_user_id: user_id}

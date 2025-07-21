@@ -3,18 +3,20 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
 
   require Logger
 
+  alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
 
   def send_chat_message(%Scope{user: %{twitch_user_id: user_id}}, message) do
-    TwitchApi.api(:helix)
+    bot = Bot.get()
+
+    TwitchApi.api(:helix, bot.twitch_access_token)
     |> Req.post(
       url: "/chat/messages",
       json: %{
         broadcaster_id: user_id,
-        sender_id: user_id,
-        message: message,
-        for_source_only: true
+        sender_id: bot.twitch_user_id,
+        message: message
       }
     )
     |> case do
@@ -36,12 +38,14 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
         message,
         color \\ "purple"
       ) do
+    bot = Bot.get()
+
     TwitchApi.api(:helix, token)
     |> Req.post(
       url: "/chat/announcements",
       params: %{
         broadcaster_id: user_id,
-        moderator_id: user_id
+        moderator_id: bot.twitch_user_id
       },
       json: %{
         message: message,

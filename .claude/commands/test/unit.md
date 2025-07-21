@@ -1,0 +1,1 @@
+Generate an unique test based on the following business rule: $ARGUMENTS

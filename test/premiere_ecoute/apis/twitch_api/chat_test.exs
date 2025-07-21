@@ -13,6 +13,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
         })
       )
 
+    %{id: _} = user_fixture(%{email: "premiereecoutebot@twitch.tv", twitch_user_id: "467189141"})
+
     {:ok, %{scope: scope}}
   end
 
@@ -43,7 +45,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
         TwitchApi,
         path: {:post, "/helix/chat/announcements"},
         request: "twitch_api/chat/send_chat_announcement/request.json",
-        params: %{"broadcaster_id" => "141981764", "moderator_id" => "141981764"},
+        params: %{"broadcaster_id" => "141981764", "moderator_id" => "467189141"},
         status: 204
       )
 

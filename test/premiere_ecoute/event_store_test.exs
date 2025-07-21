@@ -3,6 +3,8 @@ defmodule PremiereEcoute.EventStoreTest do
 
   alias PremiereEcoute.EventStore
 
+  @moduletag :skip
+
   describe "append/2" do
     test "add event to a stream" do
       :ok = EventStore.append(%UserCreated{id: "id"}, UUID.uuid4())

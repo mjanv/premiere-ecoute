@@ -2,6 +2,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   @moduledoc false
 
   use PremiereEcoute.Core.CommandBus.Handler
+  use Gettext, backend: PremiereEcouteWeb.Gettext
 
   require Logger
 
@@ -18,6 +19,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
   alias PremiereEcoute.Sessions.Scores.Report
+
+  alias PremiereEcouteWeb.Gettext
 
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession)
@@ -52,9 +55,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- TwitchApi.impl().subscribe(scope, "channel.chat.message"),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
+         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, Gettext.gettext(gettext_noop("Welcome !"))),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- SpotifyApi.impl().start_resume_playback(scope, session.current_track),
-         {:ok, _} <- TwitchApi.impl().send_chat_announcement(scope, "Bienvenue !", "purple"),
          {:ok, session} <- ListeningSession.start(session) do
       {:ok, session, [%SessionStarted{session_id: session.id}]}
     else
@@ -69,7 +72,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- SpotifyApi.impl().pause_playback(scope),
          {:ok, _} <- TwitchApi.impl().cancel_all_subscriptions(scope),
-         {:ok, _} <- TwitchApi.impl().send_chat_announcement(scope, "Good bye !", "purple"),
+         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Good bye !"),
          {:ok, session} <- ListeningSession.stop(session) do
       {:ok, session, [%SessionStopped{session_id: session.id}]}
     else

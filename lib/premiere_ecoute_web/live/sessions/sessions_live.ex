@@ -47,6 +47,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
         %{assigns: %{session_to_delete: session_id, current_scope: scope}} = socket
       ) do
     session_id
+    |> ListeningSession.get()
     |> ListeningSession.delete()
     |> case do
       {:ok, _} -> put_flash(socket, :info, "Session deleted successfully")
