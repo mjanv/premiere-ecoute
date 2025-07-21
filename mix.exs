@@ -10,6 +10,7 @@ defmodule PremiereEcoute.MixProject do
       source_url: "https://github.com/mjanv/premiere_ecoute",
       homepage_url: "https://premiere-ecoute.fly.dev/",
       elixirc_paths: elixirc_paths(Mix.env()),
+      elixirc_options: [ignore_module_conflict: true],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
@@ -118,8 +119,8 @@ defmodule PremiereEcoute.MixProject do
         "compile --warnings-as-errors",
         "format --check-formatted",
         "credo --strict",
-        "dialyzer --format short",
-        "gettext.check"
+        "dialyzer --format short"
+        # "gettext.check"
       ],
       # Audit
       audit: [

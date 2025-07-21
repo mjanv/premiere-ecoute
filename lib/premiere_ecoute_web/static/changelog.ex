@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Static.Changelog.Entry do
+  @moduledoc false
+
   @enforce_keys [:id, :title, :date, :body]
   defstruct [:id, :title, :date, :body]
 

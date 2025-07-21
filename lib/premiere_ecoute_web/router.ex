@@ -3,8 +3,8 @@ defmodule PremiereEcouteWeb.Router do
 
   import PremiereEcouteWeb.UserAuth
 
-  alias PremiereEcouteWeb.UserAuth
   alias PremiereEcouteWeb.Plugs
+  alias PremiereEcouteWeb.UserAuth
 
   pipeline :browser do
     plug :accepts, ["html"]

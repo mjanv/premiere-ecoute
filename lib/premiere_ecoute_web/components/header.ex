@@ -33,6 +33,63 @@ defmodule PremiereEcouteWeb.Components.Header do
         </div>
 
         <div class="flex items-center space-x-4">
+          <!-- Locale Switcher -->
+          <div class="relative" x-data="{ open: false }">
+            <button
+              @click="open = !open"
+              class="inline-flex items-center px-3 py-2 border rounded-lg text-sm font-medium text-gray-300 hover:text-white transition-colors"
+              style="border-color: var(--color-dark-700); background-color: var(--color-dark-900);"
+            >
+              <%= if Gettext.get_locale(PremiereEcouteWeb.Gettext) == "fr" do %>
+                <img src="/images/flags/fr.svg" alt="French" class="w-4 h-4 mr-2" />
+              <% end %>
+              <%= if Gettext.get_locale(PremiereEcouteWeb.Gettext) == "it" do %>
+                <img src="/images/flags/it.svg" alt="Italiano" class="w-4 h-4 mr-2" />
+              <% end %>
+              <%= if Gettext.get_locale(PremiereEcouteWeb.Gettext) == "en" do %>
+                <img src="/images/flags/en.svg" alt="English" class="w-4 h-4 mr-2" />
+              <% end %>
+              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+    <!-- Dropdown Menu -->
+            <div
+              x-show="open"
+              @click.away="open = false"
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="transform opacity-0 scale-95"
+              x-transition:enter-end="transform opacity-100 scale-100"
+              x-transition:leave="transition ease-in duration-75"
+              x-transition:leave-start="transform opacity-100 scale-100"
+              x-transition:leave-end="transform opacity-0 scale-95"
+              class="absolute right-0 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-50"
+              style="display: none;"
+            >
+              <div class="py-1">
+                <a
+                  href="?locale=fr"
+                  class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                >
+                  <img src="/images/flags/fr.svg" alt="French" class="w-4 h-4 mr-3" /> Français
+                </a>
+                <a
+                  href="?locale=it"
+                  class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                >
+                  <img src="/images/flags/it.svg" alt="French" class="w-4 h-4 mr-3" /> Italiano
+                </a>
+                <a
+                  href="?locale=en"
+                  class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                >
+                  <img src="/images/flags/en.svg" alt="English" class="w-4 h-4 mr-3" /> English
+                </a>
+              </div>
+            </div>
+          </div>
+
           <%= if @current_user do %>
             <!-- AIDEV-NOTE: Authenticated user navigation -->
             <!-- User Menu Dropdown -->

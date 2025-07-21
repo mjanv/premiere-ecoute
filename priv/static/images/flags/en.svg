@@ -1,0 +1,19 @@
+<svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="16" rx="2" fill="#F3F4F6"/>
+  <mask id="path-2-inside-1_1_1" fill="white">
+    <rect width="24" height="16" rx="2"/>
+  </mask>
+  <rect width="24" height="16" rx="2" fill="#012169" stroke="#E5E7EB" stroke-width="2" mask="url(#path-2-inside-1_1_1)"/>
+  <!-- White cross (St. George) -->
+  <rect x="9.6" y="0" width="4.8" height="16" fill="white"/>
+  <rect x="0" y="6.4" width="24" height="3.2" fill="white"/>
+  <!-- Red cross (St. George) -->
+  <rect x="10.4" y="0" width="3.2" height="16" fill="#C8102E"/>
+  <rect x="0" y="7.2" width="24" height="1.6" fill="#C8102E"/>
+  <!-- White diagonal cross (St. Andrew) -->
+  <polygon points="0,0 4.8,0 24,14.4 24,16 19.2,16 0,1.6" fill="white"/>
+  <polygon points="24,0 24,1.6 4.8,16 0,16 0,14.4 19.2,0" fill="white"/>
+  <!-- Red diagonal cross (St. Patrick) -->
+  <polygon points="0,0 2.4,0 24,13.6 24,16 21.6,16 0,2.4" fill="#C8102E"/>
+  <polygon points="24,0 24,2.4 2.4,16 0,16 0,13.6 21.6,0" fill="#C8102E"/>
+</svg>

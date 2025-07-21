@@ -6,4 +6,6 @@ defmodule PremiereEcouteWeb.Gettext do
   def gettext(msgid) do
     Gettext.gettext(__MODULE__, msgid)
   end
+
+  def locale, do: Gettext.get_locale(__MODULE__)
 end

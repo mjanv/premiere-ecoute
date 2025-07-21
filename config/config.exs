@@ -79,8 +79,8 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 
 config :premiere_ecoute, PremiereEcouteWeb.Gettext,
-  locales: ~w(en fr),
-  default_locale: "fr"
+  locales: ~w(en fr it),
+  default_locale: "en"
 
 config :ueberauth, Ueberauth,
   providers: [

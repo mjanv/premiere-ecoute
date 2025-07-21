@@ -20,6 +20,13 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
   end
 
   @impl true
+  def handle_params(_params, url, socket) do
+    # AIDEV-NOTE: Extract current path for locale switcher
+    current_path = URI.parse(url).path || "/"
+    {:noreply, assign(socket, :current_path, current_path)}
+  end
+
+  @impl true
   def handle_event("connect_spotify", _params, socket) do
     # AIDEV-NOTE: Redirect to Spotify OAuth flow
     {:noreply, redirect(socket, to: ~p"/auth/spotify")}

@@ -1,15 +1,15 @@
-## This file is a PO Template file.
-##
-## "msgid"s here are often extracted from source code.
-## Add new messages manually only if they're dynamic
-## messages that can't be statically extracted.
-##
-## Run "mix gettext.extract" to bring this file up to
-## date. Leave "msgstr"s empty as changing them here has no
-## effect: edit them in PO (.po) files instead.
-#
+## "msgid"s in this file come from POT (.pot) files.
+###
+### Do not add, change, or remove "msgid"s manually here as
+### they're tied to the ones in the corresponding POT file
+### (with the same domain).
+###
+### Use "mix gettext.extract --merge" or "mix gettext.merge"
+### to merge POT files into PO files.
 msgid ""
 msgstr ""
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:106
 #, elixir-autogen, elixir-format
@@ -36,7 +36,7 @@ msgstr ""
 msgid "Community Rating"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/header.ex:249
+#: lib/premiere_ecoute_web/components/header.ex:243
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:79
 #, elixir-autogen, elixir-format
 msgid "Connect with Twitch"
@@ -83,7 +83,7 @@ msgstr ""
 msgid "Start New Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/header.ex:217
+#: lib/premiere_ecoute_web/components/header.ex:211
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Account"
@@ -546,17 +546,17 @@ msgstr ""
 msgid "Attempting to reconnect"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/header.ex:161
+#: lib/premiere_ecoute_web/components/header.ex:155
 #, elixir-autogen, elixir-format
 msgid "Create Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/header.ex:234
+#: lib/premiere_ecoute_web/components/header.ex:228
 #, elixir-autogen, elixir-format
 msgid "Log Out"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/header.ex:145
+#: lib/premiere_ecoute_web/components/header.ex:139
 #, elixir-autogen, elixir-format
 msgid "My Sessions"
 msgstr ""
@@ -571,7 +571,7 @@ msgstr ""
 msgid "We can't find the internet"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/header.ex:181
+#: lib/premiere_ecoute_web/components/header.ex:175
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:258
 #, elixir-autogen, elixir-format
 msgid "Admin"

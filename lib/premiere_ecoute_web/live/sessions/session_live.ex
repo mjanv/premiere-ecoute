@@ -55,8 +55,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(_params, url, socket) do
+    # AIDEV-NOTE: Extract current path for locale switcher
+    current_path = URI.parse(url).path || "/"
+    {:noreply, assign(socket, :current_path, current_path)}
   end
 
   @impl true

@@ -6,7 +6,7 @@ defmodule Mix.Tasks.Gettext.Check do
   Runs gettext.extract, gettext.merge, and greps for missing translations.
   """
 
-  @locales ["fr"]
+  @locales Application.compile_env(:premiere_ecoute, [PremiereEcouteWeb.Gettext, :locales])
 
   @impl true
   def run(_args) do

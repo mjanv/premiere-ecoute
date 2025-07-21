@@ -1,0 +1,382 @@
+<style>
+  html, body {
+    background-color: white !important;
+    color: #24292f !important;
+    font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    color: #24292f;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    color: #24292f;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #d1d9e0;
+  }
+
+  h3 {
+    color: #24292f;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  p, li {
+    margin-bottom: 1rem;
+    color: #656d76;
+  }
+
+  ul {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  strong {
+    color: #24292f;
+    font-weight: 600;
+  }
+
+  a {
+    color: #0969da;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .back-to-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem 1rem;
+    background-color: #f6f8fa;
+    border: 1px solid #d1d9e0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #656d76;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+  }
+
+  .back-to-home:hover {
+    background-color: #eaeef2;
+    border-color: #bdc1c6;
+    color: #24292f;
+  }
+
+  .highlight {
+    background-color: #fff8c4;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #f59e0b;
+    margin: 1.5rem 0;
+  }
+
+  .cookie-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+
+  .cookie-table th,
+  .cookie-table td {
+    border: 1px solid #d1d9e0;
+    padding: 0.75rem;
+    text-align: left;
+  }
+
+  .cookie-table th {
+    background-color: #f6f8fa;
+    font-weight: 600;
+    color: #24292f;
+  }
+
+  .cookie-table td {
+    color: #656d76;
+  }
+
+  .cookie-essential {
+    background-color: #dcfce7;
+    border-left: 4px solid #16a34a;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+
+  .cookie-functional {
+    background-color: #f3e8ff;
+    border-left: 4px solid #9333ea;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+</style>
+
+<div class="container">
+  <a href="/" class="back-to-home">&larr; Accueil</a>
+
+  <h1>Politique de Cookies</h1>
+
+  <div class="highlight">
+    <p><strong>Derniere mise a jour :</strong> {Date.utc_today() |> Date.to_string()}</p>
+  </div>
+
+  <p>
+    Cette politique explique comment <strong>Premiere Ecoute</strong>
+    utilise les cookies et technologies similaires sur notre plateforme, conformement au Reglement General sur la Protection des Donnees (RGPD) et a la directive ePrivacy europeenne.
+  </p>
+
+  <h2>1. Qu'est-ce qu'un cookie ?</h2>
+  <p>
+    Un cookie est un petit fichier texte stocke sur votre appareil lorsque vous visitez un site web. Les cookies permettent au site de memoriser vos actions et preferences pendant une periode donnee.
+  </p>
+
+  <h2>2. Comment nous utilisons les cookies</h2>
+  <p>Nous utilisons les cookies uniquement pour :</p>
+  <ul>
+    <li>Maintenir votre session de connexion</li>
+    <li>Assurer la securite de votre navigation</li>
+    <li>Permettre le fonctionnement des sessions collaboratives en temps reel</li>
+    <li>Memoriser votre choix de rester connecte ("Se souvenir de moi")</li>
+  </ul>
+
+  <h2>3. Cookies utilises par notre plateforme</h2>
+
+  <h3>3.1 Cookies strictement necessaires</h3>
+  <div class="cookie-essential">
+    <p>
+      <strong>
+        Ces cookies sont essentiels au fonctionnement de notre plateforme et ne peuvent pas etre desactives.
+      </strong>
+    </p>
+  </div>
+
+  <table class="cookie-table">
+    <thead>
+      <tr>
+        <th>Nom du cookie</th>
+        <th>Finalite</th>
+        <th>Duree</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>_premiere_ecoute_key</td>
+        <td>Session utilisateur - Maintient votre etat de connexion</td>
+        <td>Session navigateur</td>
+        <td>Session</td>
+      </tr>
+      <tr>
+        <td>user_token</td>
+        <td>Token d'authentification securise pour identifier l'utilisateur</td>
+        <td>Session navigateur</td>
+        <td>Session</td>
+      </tr>
+      <tr>
+        <td>live_socket_id</td>
+        <td>Communication temps reel pour les sessions collaboratives (Phoenix LiveView)</td>
+        <td>Session navigateur</td>
+        <td>Session</td>
+      </tr>
+      <tr>
+        <td>user_return_to</td>
+        <td>Redirection apres connexion vers la page demandee initialement</td>
+        <td>Session navigateur</td>
+        <td>Session</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 Cookie "Se souvenir de moi"</h3>
+  <div class="cookie-functional">
+    <p>
+      <strong>Ce cookie est place uniquement si vous cochez la case "Se souvenir de moi" lors de la connexion.</strong>
+    </p>
+  </div>
+
+  <table class="cookie-table">
+    <thead>
+      <tr>
+        <th>Nom du cookie</th>
+        <th>Finalite</th>
+        <th>Duree</th>
+        <th>Options de securite</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>_premiere_ecoute_web_user_remember_me</td>
+        <td>Maintient votre connexion automatique entre les sessions</td>
+        <td>14 jours maximum</td>
+        <td>Signe numeriquement, SameSite=Lax</td>
+      </tr>
+      <tr>
+        <td>user_remember_me</td>
+        <td>Indicateur que l'option "Se souvenir de moi" est activee</td>
+        <td>Session navigateur</td>
+        <td>Session interne</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Cookies des services tiers integres</h2>
+
+  <h3>4.1 Twitch</h3>
+  <p>Lors de l'authentification via Twitch, des cookies peuvent etre places par Twitch pour :</p>
+  <ul>
+    <li>Gerer votre authentification OAuth2</li>
+    <li>Maintenir votre session Twitch</li>
+    <li>Assurer la securite de l'authentification</li>
+  </ul>
+  <p>
+    Ces cookies sont regis par la <a href="https://www.twitch.tv/p/fr-fr/legal/privacy-notice/">politique de confidentialite de Twitch</a>.
+  </p>
+
+  <h3>4.2 Spotify (optionnel)</h3>
+  <p>Si vous connectez votre compte Spotify, des cookies peuvent etre places par Spotify pour :</p>
+  <ul>
+    <li>Gerer votre authentification OAuth2 Spotify</li>
+    <li>Acceder a vos donnees musicales</li>
+    <li>Controler la lecture musicale</li>
+  </ul>
+  <p>
+    Ces cookies sont regis par la <a href="https://www.spotify.com/fr/privacy/">politique de confidentialite de Spotify</a>.
+  </p>
+
+  <h2>5. Gestion automatique des cookies</h2>
+
+  <h3>5.1 Renouvellement automatique</h3>
+  <p>Pour votre securite, notre systeme :</p>
+  <ul>
+    <li><strong>Renouvelle automatiquement</strong> les tokens de session tous les 7 jours</li>
+    <li><strong>Supprime les cookies</strong> lors de la deconnexion</li>
+    <li><strong>Expire automatiquement</strong> les cookies "Se souvenir de moi" apres 14 jours</li>
+    <li><strong>Regenere les sessions</strong> pour prevenir les attaques de fixation</li>
+  </ul>
+
+  <h3>5.2 Nettoyage automatique</h3>
+  <p>Lors de la deconnexion, tous les cookies sont automatiquement supprimes :</p>
+  <ul>
+    <li>Session utilisateur effacee</li>
+    <li>Cookie "Se souvenir de moi" supprime</li>
+    <li>Connexions temps reel fermees</li>
+    <li>Tokens d'authentification invalides</li>
+  </ul>
+
+  <h2>6. Controle des cookies par l'utilisateur</h2>
+
+  <h3>6.1 Desactiver le cookie "Se souvenir de moi"</h3>
+  <p>Vous pouvez controler ce cookie :</p>
+  <ul>
+    <li><strong>Lors de la connexion</strong> : Ne pas cocher la case "Se souvenir de moi"</li>
+    <li><strong>Apres connexion</strong> : Se deconnecter supprime automatiquement ce cookie</li>
+  </ul>
+
+  <h3>6.2 Parametres du navigateur</h3>
+  <div class="highlight">
+    <p>
+      <strong>Attention :</strong>
+      Bloquer les cookies essentiels empechera le fonctionnement de la plateforme. Vous ne pourrez pas vous connecter ni utiliser les fonctionnalites collaboratives.
+    </p>
+  </div>
+
+  <p>Vous pouvez configurer votre navigateur pour :</p>
+  <ul>
+    <li><strong>Chrome</strong> : Parametres > Confidentialite et securite > Cookies</li>
+    <li><strong>Firefox</strong> : Options > Vie privee et securite > Cookies</li>
+    <li><strong>Safari</strong> : Preferences > Confidentialite > Cookies</li>
+    <li><strong>Edge</strong> : Parametres > Cookies et autorisations</li>
+  </ul>
+
+  <h2>7. Securite des cookies</h2>
+  <p>Toutes les mesures de securite sont implementees :</p>
+  <ul>
+    <li><strong>Signature cryptographique</strong> : Cookies signes pour prevenir la falsification</li>
+    <li><strong>SameSite=Lax</strong> : Protection contre les attaques CSRF</li>
+    <li><strong>Expiration controlee</strong> : Durees de vie limitees</li>
+    <li><strong>Renouvellement automatique</strong> : Tokens regles regulierement</li>
+    <li><strong>Nettoyage a la deconnexion</strong> : Suppression complete des donnees</li>
+  </ul>
+
+  <h2>8. Durees de conservation</h2>
+  <table class="cookie-table">
+    <thead>
+      <tr>
+        <th>Type de cookie</th>
+        <th>Duree maximum</th>
+        <th>Suppression</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Cookies de session</td>
+        <td>Fermeture du navigateur</td>
+        <td>Automatique</td>
+      </tr>
+      <tr>
+        <td>Cookie "Se souvenir de moi"</td>
+        <td>14 jours</td>
+        <td>Automatique ou a la deconnexion</td>
+      </tr>
+      <tr>
+        <td>Tokens de session</td>
+        <td>7 jours (renouvellement auto)</td>
+        <td>Automatique</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>9. Base juridique</h2>
+  <p>L'utilisation des cookies est basee sur :</p>
+  <ul>
+    <li><strong>Execution du contrat</strong> : Pour les cookies essentiels au fonctionnement du service</li>
+    <li><strong>Consentement explicite</strong> : Pour le cookie "Se souvenir de moi" (case a cocher)</li>
+    <li><strong>Interet legitime</strong> : Pour la securite et la prevention des fraudes</li>
+  </ul>
+
+  <h2>10. Vos droits</h2>
+  <p>Concernant les cookies contenant des donnees personnelles :</p>
+  <ul>
+    <li><strong>Droit d'acces</strong> : Connaitre les cookies utilises</li>
+    <li><strong>Droit d'opposition</strong> : Vous opposer au cookie "Se souvenir de moi"</li>
+    <li><strong>Droit d'effacement</strong> : Supprimer les cookies (via deconnexion)</li>
+    <li><strong>Droit de retrait</strong> : Retirer le consentement au cookie optionnel</li>
+  </ul>
+
+  <h2>11. Contact</h2>
+  <p>Pour toute question sur notre utilisation des cookies :</p>
+  <ul>
+    <li><strong>Email</strong> : privacy@premiere-ecoute.fr</li>
+    <li><strong>Reclamations CNIL</strong> : <a href="https://www.cnil.fr">www.cnil.fr</a></li>
+  </ul>
+
+  <p>
+    Pour plus d'informations sur la protection de vos donnees, consultez notre <a href="/legal/privacy">Politique de Confidentialite</a>.
+  </p>
+</div>
