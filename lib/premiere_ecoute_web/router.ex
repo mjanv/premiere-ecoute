@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Router do
   import PremiereEcouteWeb.UserAuth
 
   alias PremiereEcouteWeb.UserAuth
+  alias PremiereEcouteWeb.Plugs
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -14,7 +15,8 @@ defmodule PremiereEcouteWeb.Router do
     # %{"content-security-policy" => "default-src 'self'"}
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
-    plug PremiereEcouteWeb.Plugs.RenewTokens
+    plug Plugs.RenewTokens
+    plug Plugs.SetLocale
   end
 
   pipeline :webhook do
