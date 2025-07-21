@@ -93,11 +93,20 @@ defmodule PremiereEcouteWeb.Router do
     post "/twitch", TwitchController, :handle
   end
 
-  scope "/changelog", PremiereEcouteWeb.Static do
+  scope "/changelog", PremiereEcouteWeb.Static.Changelog do
     pipe_through :browser
 
     get "/", ChangelogController, :index
     get "/:id", ChangelogController, :show
+  end
+
+  scope "/legal", PremiereEcouteWeb.Static.Legal do
+    pipe_through :browser
+
+    get "/privacy", LegalController, :privacy
+    get "/cookies", LegalController, :cookies
+    get "/terms", LegalController, :terms
+    get "/contact", LegalController, :contact
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do

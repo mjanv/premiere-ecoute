@@ -1,6 +1,6 @@
 defmodule PremiereEcouteWeb.Static.Changelog.Entry do
-  @enforce_keys [:id, :title, :body, :description]
-  defstruct [:id, :title, :body, :description]
+  @enforce_keys [:id, :title, :date, :body]
+  defstruct [:id, :title, :date, :body]
 
   def build(filename, attrs, body) do
     [id] = filename |> Path.rootname() |> Path.split() |> Enum.take(-1)

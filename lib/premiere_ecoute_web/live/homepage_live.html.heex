@@ -1,7 +1,7 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
-  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
+  <div class="text-white flex flex-col" style="background-color: var(--color-dark-950); min-height: calc(100vh - 5rem);">
     <!-- Main Content -->
-    <div class="flex items-center justify-center min-h-[calc(100vh-5rem)]">
+    <div class="flex-1 flex items-center justify-center py-8">
       <div class="text-center max-w-5xl px-6">
         <!-- Hero Section -->
         <div class="mb-12">
@@ -163,5 +163,55 @@
         </div>
       </div>
     </div>
+    
+<!-- Footer -->
+    <footer
+      class="py-4 px-6"
+      style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);"
+    >
+      <div class="max-w-5xl mx-auto text-center">
+        <div class="flex justify-center items-center space-x-3">
+          <.link
+            navigate={~p"/changelog"}
+            class="text-sm font-medium transition-colors hover:text-white"
+            style="color: var(--color-dark-300);"
+          >
+            {gettext("Changelog")}
+          </.link>
+          <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+          <.link
+            navigate={~p"/legal/privacy"}
+            class="text-sm font-medium transition-colors hover:text-white"
+            style="color: var(--color-dark-300);"
+          >
+            {gettext("Privacy")}
+          </.link>
+          <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+          <.link
+            navigate={~p"/legal/cookies"}
+            class="text-sm font-medium transition-colors hover:text-white"
+            style="color: var(--color-dark-300);"
+          >
+            {gettext("Cookies")}
+          </.link>
+          <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+          <.link
+            navigate={~p"/legal/terms"}
+            class="text-sm font-medium transition-colors hover:text-white"
+            style="color: var(--color-dark-300);"
+          >
+            {gettext("Terms")}
+          </.link>
+          <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+          <.link
+            navigate={~p"/legal/contact"}
+            class="text-sm font-medium transition-colors hover:text-white"
+            style="color: var(--color-dark-300);"
+          >
+            {gettext("Contact")}
+          </.link>
+        </div>
+      </div>
+    </footer>
   </div>
 </Layouts.app>

@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Static.ChangelogController do
+defmodule PremiereEcouteWeb.Static.Changelog.ChangelogController do
   use PremiereEcouteWeb, :controller
 
   alias PremiereEcouteWeb.Static.Changelog
