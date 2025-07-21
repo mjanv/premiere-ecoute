@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.UserLive.RegistrationTest do
+defmodule PremiereEcouteWeb.Accounts.UserRegistrationLiveTest do
   use PremiereEcouteWeb.ConnCase
 
   describe "Registration page" do

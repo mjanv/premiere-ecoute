@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Accounts.User do
           hashed_password: String.t() | nil,
           confirmed_at: DateTime.t() | nil,
           authenticated_at: DateTime.t() | nil,
-          role: :viewer | :streamer | :admin,
+          role: :viewer | :streamer | :admin | :bot,
           spotify_access_token: String.t() | nil,
           spotify_refresh_token: String.t() | nil,
           spotify_expires_at: DateTime.t() | nil,
@@ -33,7 +33,7 @@ defmodule PremiereEcoute.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
-    field :role, Ecto.Enum, values: [:viewer, :streamer, :admin], default: :viewer
+    field :role, Ecto.Enum, values: [:viewer, :streamer, :admin, :bot], default: :viewer
 
     field :spotify_access_token, :string, redact: true
     field :spotify_refresh_token, :string, redact: true

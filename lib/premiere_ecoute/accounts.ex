@@ -156,10 +156,24 @@ defmodule PremiereEcoute.Accounts do
     end
   end
 
+  @doc """
+  Updates the user role.
+
+  Returns the updated user.
+
+  ## Examples
+
+      iex> update_user_role(user, :streamer)
+      {:ok, %User{}}
+
+      iex> update_user_role(user, %{role: "is invalid"})
+      {:error, %Ecto.Changeset{}}
+
+  """
   def update_user_role(user, role) do
     user
     |> Ecto.Changeset.cast(%{role: role}, [:role])
-    |> Ecto.Changeset.validate_inclusion(:role, [:viewer, :streamer, :admin])
+    |> Ecto.Changeset.validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
     |> Repo.update()
   end
 

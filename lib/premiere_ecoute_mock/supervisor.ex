@@ -12,7 +12,6 @@ defmodule PremiereEcouteMock.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      # AIDEV-NOTE: Registry for WebSocket chat message broadcasting
       {Registry, keys: :duplicate, name: PremiereEcouteMock.ChatRegistry},
       {Bandit, plug: TwitchApi.Server, scheme: :http, port: 4001},
       TwitchApi.Backend

@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.UserSessionController do
+defmodule PremiereEcouteWeb.Accounts.UserSessionController do
   use PremiereEcouteWeb, :controller
 
   alias PremiereEcoute.Accounts

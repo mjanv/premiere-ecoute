@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
 
   alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
 
-  def handle_event(conn, _params) do
+  def handle(conn, _params) do
     conn
     |> put_resp_content_type("text/plain")
     |> then(fn conn ->

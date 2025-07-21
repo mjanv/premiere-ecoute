@@ -251,9 +251,10 @@ defmodule PremiereEcoute.AccountsTest do
     test "update a user role", %{user: user} do
       assert user.role == :viewer
 
-      {:ok, user} = Accounts.update_user_role(user, :streamer)
-
-      assert user.role == :streamer
+      for role <- [:viewer, :streamer, :admin, :bot] do
+        {:ok, user} = Accounts.update_user_role(user, role)
+        assert user.role == role
+      end
     end
 
     test "does not update an unknown user role", %{user: user} do

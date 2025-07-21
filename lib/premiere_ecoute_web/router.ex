@@ -3,6 +3,8 @@ defmodule PremiereEcouteWeb.Router do
 
   import PremiereEcouteWeb.UserAuth
 
+  alias PremiereEcouteWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -23,55 +25,54 @@ defmodule PremiereEcouteWeb.Router do
   scope "/", PremiereEcouteWeb do
     pipe_through :browser
 
-    live_session :main, on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
+    live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
     end
   end
 
-  scope "/users", PremiereEcouteWeb do
+  scope "/users", PremiereEcouteWeb.Accounts do
     pipe_through [:browser]
 
-    live_session :current_user,
-      on_mount: [{PremiereEcouteWeb.UserAuth, :mount_current_scope}] do
-      live "/register", UserLive.Registration, :new
-      live "/log-in", UserLive.Login, :new
-      live "/log-in/:token", UserLive.Confirmation, :new
+    live_session :current_user, on_mount: [{UserAuth, :current_scope}] do
+      live "/register", UserRegistrationLive, :new
+      live "/log-in", UserLoginLive, :new
+      live "/log-in/:token", UserConfirmationLive, :new
     end
 
     post "/log-in", UserSessionController, :create
     delete "/log-out", UserSessionController, :delete
   end
 
-  scope "/users", PremiereEcouteWeb do
+  scope "/users", PremiereEcouteWeb.Accounts do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :users, on_mount: [{PremiereEcouteWeb.UserAuth, :require_authenticated}] do
-      live "/settings", UserLive.Settings, :edit
-      live "/settings/confirm-email/:token", UserLive.Settings, :confirm_email
-      live "/account", Accounts.AccountLive, :index
+    live_session :users do
+      live "/settings", UserSettingsLive, :edit
+      live "/settings/confirm-email/:token", UserSettingsLive, :confirm_email
+      live "/account", AccountLive, :index
     end
 
     post "/update-password", UserSessionController, :update_password
   end
 
-  scope "/sessions", PremiereEcouteWeb do
+  scope "/sessions", PremiereEcouteWeb.Sessions do
     pipe_through [:browser]
 
-    live_session :sessions, on_mount: [{PremiereEcouteWeb.UserAuth, :require_streamer}] do
-      live "/", Sessions.SessionsLive, :index
-      live "/:id", Sessions.SessionLive, :show
-      live "/discography/album/select", Sessions.Discography.AlbumSelectionLive, :index
+    live_session :sessions, on_mount: [{UserAuth, :streamer}] do
+      live "/", SessionsLive, :index
+      live "/:id", SessionLive, :show
+      live "/discography/album/select", Discography.AlbumSelectionLive, :index
     end
 
     live_session :public_sessions do
-      live "/:id/overlay", Sessions.OverlayLive, :show
+      live "/:id/overlay", OverlayLive, :show
     end
   end
 
   scope "/admin", PremiereEcouteWeb.Admin do
     pipe_through [:browser]
 
-    live_session :admin, on_mount: [{PremiereEcouteWeb.UserAuth, :require_admin}] do
+    live_session :admin, on_mount: [{UserAuth, :admin}] do
       live "/", AdminLive, :index
       live "/users", AdminUsersLive, :index
       live "/albums", AdminAlbumsLive, :index
@@ -79,17 +80,17 @@ defmodule PremiereEcouteWeb.Router do
     end
   end
 
-  scope "/auth", PremiereEcouteWeb do
+  scope "/auth", PremiereEcouteWeb.Accounts do
     pipe_through [:browser]
 
-    get "/:provider", Accounts.AuthController, :request
-    get "/:provider/callback", Accounts.AuthController, :callback
+    get "/:provider", AuthController, :request
+    get "/:provider/callback", AuthController, :callback
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do
     pipe_through :webhook
 
-    post "/twitch", TwitchController, :handle_event
+    post "/twitch", TwitchController, :handle
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do

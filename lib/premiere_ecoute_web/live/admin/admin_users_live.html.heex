@@ -79,6 +79,7 @@
                       :admin -> "bg-purple-100 text-purple-800"
                       :streamer -> "bg-blue-100 text-blue-800"
                       :viewer -> "bg-gray-100 text-gray-800"
+                      :bot -> "bg-red-100 text-red-800"
                     end
                   ]}>
                     {String.capitalize(to_string(user.role))}
@@ -152,6 +153,7 @@
                 :admin -> "bg-purple-100 text-purple-800"
                 :streamer -> "bg-blue-100 text-blue-800"
                 :viewer -> "bg-gray-100 text-gray-800"
+                :bot -> "bg-red-100 text-red-800"
               end
             ]}>
               {String.capitalize(to_string(@selected_user.role))}
@@ -254,6 +256,7 @@
                   <option value="viewer" selected={@selected_user.role == :viewer}>{gettext("Viewer")}</option>
                   <option value="streamer" selected={@selected_user.role == :streamer}>{gettext("Streamer")}</option>
                   <option value="admin" selected={@selected_user.role == :admin}>{gettext("Admin")}</option>
+                  <option value="bot" selected={@selected_user.role == :bot}>{gettext("Bot")}</option>
                 </select>
               </div>
               <button

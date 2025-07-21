@@ -28,7 +28,7 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: PremiereEcouteWeb.ErrorHTML, json: PremiereEcouteWeb.ErrorJSON],
+    formats: [html: PremiereEcouteWeb.Errors.ErrorHTML, json: PremiereEcouteWeb.Errors.ErrorJSON],
     layout: false
   ],
   pubsub_server: PremiereEcoute.PubSub,

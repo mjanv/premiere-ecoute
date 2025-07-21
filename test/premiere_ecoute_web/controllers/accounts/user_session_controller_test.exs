@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.UserSessionControllerTest do
+defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
   use PremiereEcouteWeb.ConnCase
 
   alias PremiereEcoute.Accounts

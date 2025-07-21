@@ -208,7 +208,7 @@ defmodule PremiereEcouteWeb.UserAuthTest do
     end
   end
 
-  describe "on_mount :mount_current_scope" do
+  describe "on_mount :current_scope" do
     setup %{conn: conn} do
       %{conn: UserAuth.fetch_current_scope_for_user(conn, [])}
     end
@@ -217,29 +217,26 @@ defmodule PremiereEcouteWeb.UserAuthTest do
       user_token = Accounts.generate_user_session_token(user)
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
-      {:cont, updated_socket} =
-        UserAuth.on_mount(:mount_current_scope, %{}, session, %LiveView.Socket{})
+      {:cont, socket} = UserAuth.on_mount(:current_scope, %{}, session, %LiveView.Socket{})
 
-      assert updated_socket.assigns.current_scope.user.id == user.id
+      assert socket.assigns.current_scope.user.id == user.id
     end
 
     test "assigns nil to current_scope assign if there isn't a valid user_token", %{conn: conn} do
       user_token = "invalid_token"
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
-      {:cont, updated_socket} =
-        UserAuth.on_mount(:mount_current_scope, %{}, session, %LiveView.Socket{})
+      {:cont, socket} = UserAuth.on_mount(:current_scope, %{}, session, %LiveView.Socket{})
 
-      assert updated_socket.assigns.current_scope == nil
+      assert socket.assigns.current_scope == nil
     end
 
     test "assigns nil to current_scope assign if there isn't a user_token", %{conn: conn} do
       session = conn |> get_session()
 
-      {:cont, updated_socket} =
-        UserAuth.on_mount(:mount_current_scope, %{}, session, %LiveView.Socket{})
+      {:cont, socket} = UserAuth.on_mount(:current_scope, %{}, session, %LiveView.Socket{})
 
-      assert updated_socket.assigns.current_scope == nil
+      assert socket.assigns.current_scope == nil
     end
   end
 
@@ -248,10 +245,9 @@ defmodule PremiereEcouteWeb.UserAuthTest do
       user_token = Accounts.generate_user_session_token(user)
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
-      {:cont, updated_socket} =
-        UserAuth.on_mount(:require_authenticated, %{}, session, %LiveView.Socket{})
+      {:cont, socket} = UserAuth.on_mount(:require_authenticated, %{}, session, %LiveView.Socket{})
 
-      assert updated_socket.assigns.current_scope.user.id == user.id
+      assert socket.assigns.current_scope.user.id == user.id
     end
 
     test "redirects to login page if there isn't a valid user_token", %{conn: conn} do
@@ -263,8 +259,8 @@ defmodule PremiereEcouteWeb.UserAuthTest do
         assigns: %{__changed__: %{}, flash: %{}}
       }
 
-      {:halt, updated_socket} = UserAuth.on_mount(:require_authenticated, %{}, session, socket)
-      assert updated_socket.assigns.current_scope == nil
+      {:halt, socket} = UserAuth.on_mount(:require_authenticated, %{}, session, socket)
+      assert socket.assigns.current_scope == nil
     end
 
     test "redirects to login page if there isn't a user_token", %{conn: conn} do
@@ -275,12 +271,12 @@ defmodule PremiereEcouteWeb.UserAuthTest do
         assigns: %{__changed__: %{}, flash: %{}}
       }
 
-      {:halt, updated_socket} = UserAuth.on_mount(:require_authenticated, %{}, session, socket)
-      assert updated_socket.assigns.current_scope == nil
+      {:halt, socket} = UserAuth.on_mount(:require_authenticated, %{}, session, socket)
+      assert socket.assigns.current_scope == nil
     end
   end
 
-  describe "on_mount :require_sudo_mode" do
+  describe "on_mount :sudo_mode" do
     test "allows users that have authenticated in the last 10 minutes", %{conn: conn, user: user} do
       user_token = Accounts.generate_user_session_token(user)
       session = conn |> put_session(:user_token, user_token) |> get_session()
@@ -290,8 +286,7 @@ defmodule PremiereEcouteWeb.UserAuthTest do
         assigns: %{__changed__: %{}, flash: %{}}
       }
 
-      assert {:cont, _updated_socket} =
-               UserAuth.on_mount(:require_sudo_mode, %{}, session, socket)
+      assert {:cont, _} = UserAuth.on_mount(:sudo_mode, %{}, session, socket)
     end
 
     test "redirects when authentication is too old", %{conn: conn, user: user} do
@@ -307,8 +302,7 @@ defmodule PremiereEcouteWeb.UserAuthTest do
         assigns: %{__changed__: %{}, flash: %{}}
       }
 
-      assert {:halt, _updated_socket} =
-               UserAuth.on_mount(:require_sudo_mode, %{}, session, socket)
+      assert {:halt, _} = UserAuth.on_mount(:sudo_mode, %{}, session, socket)
     end
   end
 

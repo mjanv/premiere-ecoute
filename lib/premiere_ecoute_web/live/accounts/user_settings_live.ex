@@ -1,7 +1,7 @@
-defmodule PremiereEcouteWeb.UserLive.Settings do
+defmodule PremiereEcouteWeb.Accounts.UserSettingsLive do
   use PremiereEcouteWeb, :live_view
 
-  on_mount {PremiereEcouteWeb.UserAuth, :require_sudo_mode}
+  on_mount {PremiereEcouteWeb.UserAuth, :sudo_mode}
 
   alias PremiereEcoute.Accounts
 

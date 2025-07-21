@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.UserLive.LoginTest do
+defmodule PremiereEcouteWeb.Accounts.UserLoginLiveTest do
   use PremiereEcouteWeb.ConnCase
 
   describe "login page" do

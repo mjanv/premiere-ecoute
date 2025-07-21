@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.UserLive.Registration do
+defmodule PremiereEcouteWeb.Accounts.UserRegistrationLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts
