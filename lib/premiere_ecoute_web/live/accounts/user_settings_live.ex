@@ -29,13 +29,7 @@ defmodule PremiereEcouteWeb.Accounts.UserSettingsLive do
         phx-submit="update_password"
         phx-trigger-action={@trigger_submit}
       >
-        <input
-          name={@password_form[:email].name}
-          type="hidden"
-          id="hidden_user_email"
-          autocomplete="username"
-          value={@current_email}
-        />
+        <input name={@password_form[:email].name} type="hidden" id="hidden_user_email" autocomplete="username" value={@current_email} />
         <.input field={@password_form[:password]} type="password" label="New password" autocomplete="new-password" required />
         <.input
           field={@password_form[:password_confirmation]}

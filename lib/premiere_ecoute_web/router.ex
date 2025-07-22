@@ -64,6 +64,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/", SessionsLive, :index
       live "/:id", SessionLive, :show
       live "/discography/album/select", Discography.AlbumSelectionLive, :index
+      live "/wrapped/retrospective", RetrospectiveLive, :index
     end
 
     live_session :public_sessions do

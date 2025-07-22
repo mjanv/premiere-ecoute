@@ -3,10 +3,7 @@
     <!-- Main Content -->
     <div class="flex h-screen">
       <!-- Left Panel - Album Selection -->
-      <div
-        class="w-1/2 border-r p-6"
-        style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
-      >
+      <div class="w-1/2 border-r p-6" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
         <h2 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">
           {gettext("Album Selection")}
         </h2>
@@ -27,8 +24,7 @@
 <!-- Search Results Overlay -->
           <%= if @search_albums.loading do %>
             <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4 text-center text-gray-400">
-              <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto">
-              </div>
+              <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
               <p class="mt-2 text-sm">{gettext("Searching albums...")}</p>
             </div>
           <% end %>
@@ -254,10 +250,7 @@
         <%= if @selected_album.ok? && @selected_album.result do %>
           <div class="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
             <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
-              <div
-                class="rounded-lg p-4 hover:bg-gray-600 transition-colors"
-                style="background-color: var(--color-dark-800);"
-              >
+              <div class="rounded-lg p-4 hover:bg-gray-600 transition-colors" style="background-color: var(--color-dark-800);">
                 <div class="flex justify-between items-center">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center space-x-3">

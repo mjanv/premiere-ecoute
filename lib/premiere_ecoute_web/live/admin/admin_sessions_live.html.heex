@@ -50,11 +50,7 @@
           </thead>
           <tbody class="bg-gray-800 divide-y divide-gray-700">
             <%= for session <- @page.entries do %>
-              <tr
-                class="hover:bg-gray-700 cursor-pointer"
-                phx-click="show_session_modal"
-                phx-value-session_id={session.id}
-              >
+              <tr class="hover:bg-gray-700 cursor-pointer" phx-click="show_session_modal" phx-value-session_id={session.id}>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{status_class(session.status)}"}>
                     {status_text(session.status)}
@@ -71,11 +67,7 @@
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-8 w-8">
                       <%= if session.album && session.album.cover_url do %>
-                        <img
-                          class="h-8 w-8 rounded object-cover"
-                          src={session.album.cover_url}
-                          alt={session.album.name}
-                        />
+                        <img class="h-8 w-8 rounded object-cover" src={session.album.cover_url} alt={session.album.name} />
                       <% else %>
                         <div class="h-8 w-8 rounded bg-gray-600 flex items-center justify-center">
                           <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,11 +234,7 @@
                       </span>
                     <% else %>
                       <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fill-rule="evenodd"
-                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                          clip-rule="evenodd"
-                        />
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                       </svg>
                     <% end %>
                   </div>

@@ -222,13 +222,7 @@
                 <div class="flex justify-center space-x-6">
                   <div class="flex items-center">
                     <label class="flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        phx-click="toggle"
-                        phx-value-flag="votes"
-                        checked={@show[:votes]}
-                        class="sr-only"
-                      />
+                      <input type="checkbox" phx-click="toggle" phx-value-flag="votes" checked={@show[:votes]} class="sr-only" />
                       <div class={[
                         "relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ease-in-out mr-3",
                         if(@show[:votes], do: "bg-purple-500", else: "bg-white/20")
@@ -246,13 +240,7 @@
                   </div>
                   <div class="flex items-center">
                     <label class="flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        phx-click="toggle"
-                        phx-value-flag="scores"
-                        checked={@show[:scores]}
-                        class="sr-only"
-                      />
+                      <input type="checkbox" phx-click="toggle" phx-value-flag="scores" checked={@show[:scores]} class="sr-only" />
                       <div class={[
                         "relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ease-in-out mr-3",
                         if(@show[:scores], do: "bg-purple-500", else: "bg-white/20")

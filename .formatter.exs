@@ -1,5 +1,5 @@
 [
-  line_length: 120,
+  line_length: 130,
   import_deps: [:ecto, :ecto_sql, :phoenix],
   subdirectories: ["priv/*/migrations"],
   plugins: [Phoenix.LiveView.HTMLFormatter],

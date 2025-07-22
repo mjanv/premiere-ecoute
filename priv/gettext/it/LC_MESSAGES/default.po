@@ -36,7 +36,7 @@ msgstr "Annulla"
 msgid "Community Rating"
 msgstr "Valutazione della Comunità"
 
-#: lib/premiere_ecoute_web/components/header.ex:249
+#: lib/premiere_ecoute_web/components/header.ex:265
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:79
 #, elixir-autogen, elixir-format
 msgid "Connect with Twitch"
@@ -83,7 +83,7 @@ msgstr "Condividi il tuo gusto musicale con il mondo. Crea sessioni di ascolto, 
 msgid "Start New Session"
 msgstr "Inizia Nuova Sessione"
 
-#: lib/premiere_ecoute_web/components/header.ex:217
+#: lib/premiere_ecoute_web/components/header.ex:233
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:8
 #, elixir-autogen, elixir-format
 msgid "Account"
@@ -145,6 +145,8 @@ msgstr "Spettatori"
 msgid "Active Sessions"
 msgstr "Sessioni Attive"
 
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:92
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:156
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:192
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:274
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:356
@@ -546,17 +548,17 @@ msgstr "Riproduzione Spotify ripresa"
 msgid "Attempting to reconnect"
 msgstr "Tentativo di riconnessione"
 
-#: lib/premiere_ecoute_web/components/header.ex:161
+#: lib/premiere_ecoute_web/components/header.ex:177
 #, elixir-autogen, elixir-format
 msgid "Create Session"
 msgstr "Crea Sessione"
 
-#: lib/premiere_ecoute_web/components/header.ex:234
+#: lib/premiere_ecoute_web/components/header.ex:250
 #, elixir-autogen, elixir-format
 msgid "Log Out"
 msgstr "Disconnetti"
 
-#: lib/premiere_ecoute_web/components/header.ex:145
+#: lib/premiere_ecoute_web/components/header.ex:161
 #, elixir-autogen, elixir-format
 msgid "My Sessions"
 msgstr "Le Mie Sessioni"
@@ -571,7 +573,7 @@ msgstr "Qualcosa è andato storto!"
 msgid "We can't find the internet"
 msgstr "Non riusciamo a trovare internet"
 
-#: lib/premiere_ecoute_web/components/header.ex:181
+#: lib/premiere_ecoute_web/components/header.ex:197
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:258
 #, elixir-autogen, elixir-format
 msgid "Admin"
@@ -988,3 +990,64 @@ msgstr "Privacy"
 #, elixir-autogen, elixir-format
 msgid "Terms"
 msgstr "Termini"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:220
+#, elixir-autogen, elixir-format
+msgid "Album details not found"
+msgstr "Dettagli album non trovati"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:144
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:226
+#, elixir-autogen, elixir-format
+msgid "Close"
+msgstr "Chiudi"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:168
+#, elixir-autogen, elixir-format
+msgid "Community Score"
+msgstr "Punteggio Comunità"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:138
+#, elixir-autogen, elixir-format
+msgid "Failed to load album details"
+msgstr "Impossibile caricare i dettagli dell'album"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:67
+#, elixir-autogen, elixir-format
+msgid "Failed to load albums"
+msgstr "Impossibile caricare gli album"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:77
+#, elixir-autogen, elixir-format
+msgid "No Albums Found"
+msgstr "Nessun Album Trovato"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:68
+#, elixir-autogen, elixir-format
+msgid "Please try refreshing the page"
+msgstr "Prova ad aggiornare la pagina"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:173
+#, elixir-autogen, elixir-format
+msgid "Your Score"
+msgstr "Il Tuo Punteggio"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:38
+#, elixir-autogen, elixir-format
+msgid "Month"
+msgstr "Mese"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:78
+#, elixir-autogen, elixir-format
+msgid "No albums listened during this period"
+msgstr "Nessun album ascoltato durante questo periodo"
+
+#: lib/premiere_ecoute_web/components/header.ex:145
+#, elixir-autogen, elixir-format
+msgid "Retrospective"
+msgstr "Retrospettiva"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:44
+#, elixir-autogen, elixir-format
+msgid "Year"
+msgstr "Anno"
