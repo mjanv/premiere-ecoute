@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Sessions.RetrospectiveTest do
     {:ok, session1} = ListeningSession.create(%{user_id: user.id, album_id: album1.id})
     {:ok, session1} = ListeningSession.start(session1)
     {:ok, session1} = ListeningSession.stop(session1)
-    {:ok, report1} = Report.generate(session1)
+    {:ok, _report1} = Report.generate(session1)
 
     {:ok, album2} = Album.create(spotify_album_fixture("5tzRuO6GP7WRvP3rEOPAO9"))
     {:ok, session2} = ListeningSession.create(%{user_id: user.id, album_id: album2.id})
@@ -48,13 +48,13 @@ defmodule PremiereEcoute.Sessions.RetrospectiveTest do
       })
 
     {:ok, session2} = ListeningSession.stop(session2)
-    {:ok, report2} = Report.generate(session2)
+    {:ok, _report2} = Report.generate(session2)
 
     {:ok, album3} = Album.create(spotify_album_fixture("0S0KGZnfBGSIssfF54WSJh"))
     {:ok, session3} = ListeningSession.create(%{user_id: user.id, album_id: album3.id})
     {:ok, session3} = ListeningSession.start(session3)
     {:ok, session3} = ListeningSession.stop(session3)
-    {:ok, report3} = Report.generate(session3)
+    {:ok, _report3} = Report.generate(session3)
 
     {:ok, %{user: user, sessions: [session1, session2, session3]}}
   end
@@ -83,9 +83,9 @@ defmodule PremiereEcoute.Sessions.RetrospectiveTest do
 
       assert %{session: %ListeningSession{}, tracks: [track1, track2]} = details
       assert %{track_album: %Track{}, track_summary: summary1} = track1
-      assert %{"streamer_score" => 0.0, "viewer_score" => 8.0} = summary1
+      assert %{"streamer_score" => +0.0, "viewer_score" => 8.0} = summary1
       assert %{track_album: %Track{}, track_summary: summary2} = track2
-      assert %{"streamer_score" => 0.0, "viewer_score" => 7.0} = summary2
+      assert %{"streamer_score" => +0.0, "viewer_score" => 7.0} = summary2
     end
   end
 end
