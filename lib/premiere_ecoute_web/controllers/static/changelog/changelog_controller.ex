@@ -8,6 +8,6 @@ defmodule PremiereEcouteWeb.Static.Changelog.ChangelogController do
   end
 
   def show(conn, %{"id" => id}) do
-    render(conn, "show.html", entry: Changelog.get_entry(id))
+    render(conn, "entry.html", entry: Changelog.get_entry(id))
   end
 end

@@ -1,20 +1,21 @@
 defmodule PremiereEcouteWeb.Static.Legal.LegalController do
   use PremiereEcouteWeb, :controller
 
+  alias PremiereEcouteWeb.Static.Legal
+
   def privacy(conn, _params) do
-    render(conn, "privacy.html")
+    render(conn, "document.html", document: Legal.document("privacy"))
   end
 
   def cookies(conn, _params) do
-    render(conn, "cookies.html")
+    render(conn, "document.html", document: Legal.document("cookies"))
   end
 
   def terms(conn, _params) do
-    render(conn, "terms.html")
+    render(conn, "document.html", document: Legal.document("terms"))
   end
 
   def contact(conn, _params) do
-    locale = Gettext.get_locale(PremiereEcouteWeb.Gettext)
-    render(conn, "contact_#{locale}.html")
+    render(conn, "document.html", document: Legal.document("contact"))
   end
 end
