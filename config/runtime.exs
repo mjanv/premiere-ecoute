@@ -22,6 +22,7 @@ config :premiere_ecoute,
   twitch_eventsub_secret: env!("TWITCH_WEBHOOK_SECRET")
 
 config :premiere_ecoute, PremiereEcoute.Repo,
+  schema: "public",
   database: env!("POSTGRES_DATABASE", :string, "premiere_ecoute_#{config_env()}"),
   username: env!("POSTGRES_USERNAME"),
   password: env!("POSTGRES_PASSWORD"),

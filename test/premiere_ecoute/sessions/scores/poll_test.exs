@@ -169,7 +169,7 @@ defmodule PremiereEcoute.Sessions.Scores.PollTest do
         {:ok, _} = Poll.create(poll)
       end
 
-      found_polls = Poll.all(where: [session_id: session.id])
+      found_polls = Poll.all(where: [session_id: session.id], order_by: [asc: :poll_id])
 
       assert length(found_polls) == 2
       assert Enum.all?(found_polls, &(&1.session_id == session.id))

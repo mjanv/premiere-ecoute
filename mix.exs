@@ -63,6 +63,7 @@ defmodule PremiereEcoute.MixProject do
       # Backend
       {:dotenvy, "~> 1.0"},
       {:uuid, "~> 1.1"},
+      {:timex, "~> 3.7"},
       {:req, "~> 0.5"},
       {:hackney, "~> 1.20"},
       {:jason, "~> 1.2"},
