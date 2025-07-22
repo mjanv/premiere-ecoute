@@ -1,0 +1,237 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
+  <div class="min-h-screen bg-gray-950 text-white">
+  <!-- Header -->
+  <div class="bg-gray-900 border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      <div class="flex items-center justify-center space-x-4">
+        <!-- Navigation Arrows and Period Display -->
+        <button
+          phx-click="navigate"
+          phx-value-direction="previous"
+          class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          &lt;
+        </button>
+
+        <div class="px-8 py-3 rounded-lg text-white font-medium min-w-64 text-center text-xl">
+          <%= if @selected_period == :month do %>
+            {Date.new!(@selected_year, @selected_month, 1) |> Calendar.strftime("%B")} {@selected_year}
+          <% else %>
+            {@selected_year}
+          <% end %>
+        </div>
+
+        <button
+          phx-click="navigate"
+          phx-value-direction="next"
+          class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          &gt;
+        </button>
+
+<!-- Period Toggle -->
+        <div class="ml-8 flex items-center">
+          <div class="bg-gray-800 rounded-lg p-1 flex">
+            <button
+              phx-click={if @selected_period != :month, do: "toggle_period"}
+              class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_period == :month, do: "bg-gray-700 text-white", else: "text-gray-400 hover:text-white"}"}
+            >
+              {gettext("Month")}
+            </button>
+            <button
+              phx-click={if @selected_period != :year, do: "toggle_period"}
+              class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_period == :year, do: "bg-gray-700 text-white", else: "text-gray-400 hover:text-white"}"}
+            >
+              {gettext("Year")}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Album Cover Wall -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+    <.async_result :let={albums_data} assign={@albums_data}>
+      <:loading>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <%= for _ <- 1..12 do %>
+            <div class="animate-pulse">
+              <div class="bg-gray-800 aspect-square w-full"></div>
+            </div>
+          <% end %>
+        </div>
+      </:loading>
+
+      <:failed>
+        <div class="bg-red-900/20 border border-red-800 rounded-lg p-8 text-center">
+          <p class="text-red-400 text-lg">{gettext("Failed to load albums")}</p>
+          <p class="text-gray-400 mt-2">{gettext("Please try refreshing the page")}</p>
+        </div>
+      </:failed>
+
+      <%= if Enum.empty?(albums_data) do %>
+        <div class="p-8 text-center">
+          <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.367 4.367 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+          </svg>
+          <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Albums Found")}</h3>
+          <p class="text-gray-400">{gettext("No albums listened during this period")}</p>
+        </div>
+      <% else %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <%= for album_data <- albums_data do %>
+            <div
+              class="group cursor-pointer transform transition-all duration-200 hover:scale-105"
+              phx-click="show_album_details"
+              phx-value-session_id={album_data.session.id}
+            >
+              <!-- Album Cover with Score Overlay -->
+              <div class="relative">
+                <img
+                  src={album_data.album.cover_url}
+                  alt={gettext("Album cover")}
+                  class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
+                />
+                <!-- Centered Large Score -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div
+                    class="text-white/50 group-hover:text-white-400/50 font-bold transition-all duration-200"
+                    style="font-size: 12rem; -webkit-text-stroke: 4px black; text-shadow: 0 0 0 4px white;"
+                  >
+                    {album_data.report.session_summary["viewer_score"]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </.async_result>
+  </div>
+
+<!-- Album Details Modal -->
+  <%= if @show_modal do %>
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-center justify-center min-h-screen px-4 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity" phx-click="close_modal"></div>
+
+<!-- Modal panel -->
+        <div class="relative inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-900 shadow-xl rounded-lg">
+          <.async_result :let={modal_data} assign={@modal_data}>
+            <:loading>
+              <div class="px-6 py-8">
+                <div class="flex animate-pulse">
+                  <div class="w-48 h-48 bg-gray-800 rounded-lg"></div>
+                  <div class="ml-6 flex-1">
+                    <div class="h-8 bg-gray-800 rounded w-3/4 mb-4"></div>
+                    <div class="h-4 bg-gray-800 rounded w-1/2 mb-2"></div>
+                    <div class="h-4 bg-gray-800 rounded w-1/3"></div>
+                  </div>
+                </div>
+              </div>
+            </:loading>
+
+            <:failed>
+              <div class="px-6 py-8">
+                <div class="text-center">
+                  <p class="text-red-400">{gettext("Failed to load album details")}</p>
+                  <button
+                    type="button"
+                    phx-click="close_modal"
+                    class="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+                  >
+                    {gettext("Close")}
+                  </button>
+                </div>
+              </div>
+            </:failed>
+
+            <%= if modal_data do %>
+              <!-- Modal Header -->
+              <div class="flex items-start justify-between p-6 border-b border-gray-800">
+                <div class="flex items-start space-x-6">
+                  <img
+                    src={modal_data.session.album.cover_url}
+                    alt={gettext("Album cover")}
+                    class="w-24 h-24 rounded-lg shadow-lg"
+                  />
+                  <div>
+                    <h2 class="text-2xl font-bold text-white mb-2" id="modal-title">
+                      {modal_data.session.album.name}
+                    </h2>
+                    <p class="text-lg text-gray-300 mb-1">{modal_data.session.album.artist}</p>
+                    <%= if modal_data.session.report.session_summary do %>
+                      <div class="flex items-center space-x-4 mt-3">
+                        <div class="bg-blue-500/20 px-3 py-1 rounded-full">
+                          <span class="text-blue-400 text-sm font-medium">
+                            {gettext("Community Score")}: {modal_data.session.report.session_summary["viewer_score"]}
+                          </span>
+                        </div>
+                        <div class="bg-purple-500/20 px-3 py-1 rounded-full">
+                          <span class="text-purple-400 text-sm font-medium">
+                            {gettext("Your Score")}: {modal_data.session.report.session_summary["streamer_score"]}
+                          </span>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  phx-click="close_modal"
+                  class="ml-4 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-lg p-2 transition-colors"
+                >
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+<!-- Track List -->
+              <div class="p-6 max-h-96 overflow-y-auto">
+                <div class="space-y-2">
+                  <%= for track <- modal_data.tracks do %>
+                    <div class="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors">
+                      <div class="flex items-center space-x-3">
+                        <span class="text-gray-400 text-sm w-6 text-center">{track.track_album.track_number}</span>
+                        <div>
+                          <p class="text-white font-medium">{track.track_album.name}</p>
+                        </div>
+                      </div>
+                      <div class="flex items-center space-x-4">
+                        <div class="text-blue-400 font-medium text-sm bg-blue-500/20 px-2 py-1 rounded">
+                          {track.track_summary["viewer_score"]}
+                        </div>
+                        <div class="text-purple-400 font-medium text-sm bg-purple-500/20 px-2 py-1 rounded">
+                          {track.track_summary["streamer_score"]}
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% else %>
+              <div class="px-6 py-8 text-center">
+                <p class="text-gray-400">{gettext("Album details not found")}</p>
+                <button
+                  type="button"
+                  phx-click="close_modal"
+                  class="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+                >
+                  {gettext("Close")}
+                </button>
+              </div>
+            <% end %>
+          </.async_result>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  </div>
+</Layouts.app>

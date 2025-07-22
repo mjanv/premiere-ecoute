@@ -1,160 +1,67 @@
-<style>
-  html, body {
-    background-color: white !important;
-    color: #24292f !important;
-    font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.5;
-    margin: 0;
-    padding: 0;
-  }
+<div class="static-page">
+  <div class="static-container">
+    <a href="/" class="static-back-link">&larr; Accueil</a>
 
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
+    <h1 class="static-title">Conditions Générales d'Utilisation</h1>
 
-  h1 {
-    color: #24292f;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
-  }
+    <div class="static-highlight">
+      <p><strong class="static-strong">Dernière mise à jour :</strong> {Date.utc_today() |> Date.to_string()}</p>
+    </div>
 
-  h2 {
-    color: #24292f;
-    font-size: 1.5rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #d1d9e0;
-  }
-
-  p, li {
-    margin-bottom: 1rem;
-    color: #656d76;
-  }
-
-  ul {
-    margin-bottom: 1rem;
-    padding-left: 1.5rem;
-  }
-
-  strong {
-    color: #24292f;
-    font-weight: 600;
-  }
-
-  a {
-    color: #0969da;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  .back-to-home {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    padding: 0.5rem 1rem;
-    background-color: #f6f8fa;
-    border: 1px solid #d1d9e0;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #656d76;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.15s ease;
-  }
-
-  .back-to-home:hover {
-    background-color: #eaeef2;
-    border-color: #bdc1c6;
-    color: #24292f;
-  }
-
-  .highlight {
-    background-color: #fff8c4;
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 4px solid #f59e0b;
-    margin: 1.5rem 0;
-  }
-
-  .contact-info {
-    background-color: #f6f8fa;
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 1.5rem 0;
-  }
-</style>
-
-<div class="container">
-  <a href="/" class="back-to-home">&larr; Accueil</a>
-
-  <h1>Conditions Generales d'Utilisation</h1>
-
-  <div class="highlight">
-    <p><strong>Derniere mise a jour :</strong> {Date.utc_today() |> Date.to_string()}</p>
-  </div>
-
-  <p>
-    Les presentes Conditions Generales d'Utilisation (« CGU ») regissent l'acces et l'utilisation de la plateforme <strong>Premiere Ecoute</strong>, service de streaming musical collaboratif en ligne.
-  </p>
-
-  <h2>1. Presentation du service</h2>
-  <p><strong>Premiere Ecoute</strong> est une plateforme qui permet aux utilisateurs de :</p>
-  <ul>
-    <li>Creer et participer a des sessions d'ecoute collaborative en temps reel</li>
-    <li>Decouvrir et evaluer des albums musicaux en communaute</li>
-    <li>Interagir avec d'autres passionnes de musique</li>
-    <li>Acceder a un catalogue musical via l'integration Spotify</li>
-  </ul>
-
-  <h2>2. Conditions d'acces</h2>
-  <p>
-    Le Service est accessible aux personnes agees d'au moins <strong>16 ans</strong> (age de consentement numerique en France).
-  </p>
-  <p>L'utilisation du Service necessite un <strong>compte Twitch valide</strong> pour l'authentification.</p>
-
-  <h2>3. Utilisation du service</h2>
-  <p>Vous vous engagez a :</p>
-  <ul>
-    <li>Respecter les droits d'auteur et la propriete intellectuelle</li>
-    <li>Ne pas perturber le bon fonctionnement du Service</li>
-    <li>Respecter les autres utilisateurs</li>
-    <li>Ne pas contourner les mesures de securite</li>
-  </ul>
-
-  <h2>4. Conduites interdites</h2>
-  <p><strong>Il est strictement interdit de :</strong></p>
-  <ul>
-    <li>Publier du contenu illegal, offensant ou diffamatoire</li>
-    <li>Harceler, menacer ou intimider d'autres utilisateurs</li>
-    <li>Diffuser des virus, malwares ou codes malveillants</li>
-    <li>Violer les droits d'auteur ou de propriete intellectuelle</li>
-  </ul>
-
-  <h2>5. Protection des donnees</h2>
-  <p>
-    La collecte et le traitement de vos donnees personnelles sont regis par notre <a href="/legal/privacy">Politique de Confidentialite</a>.
-  </p>
-
-  <h2>6. Droit applicable</h2>
-  <p>
-    Les presentes CGU sont regies par le droit francais. Les tribunaux francais sont seuls competents en cas de litige.
-  </p>
-
-  <h2>7. Contact</h2>
-  <div class="contact-info">
-    <p><strong>Premiere Ecoute</strong></p>
-    <p>
-      <strong>Support :</strong> support@premiere-ecoute.fr<br />
-      <strong>Juridique :</strong> legal@premiere-ecoute.fr
+    <p class="static-text">
+      Les présentes Conditions Générales d'Utilisation (« CGU ») régissent l'accès et l'utilisation de la plateforme <strong class="static-strong">Premiere Ecoute</strong>, service de streaming musical collaboratif en ligne.
     </p>
+
+    <h2 class="static-subtitle">1. Présentation du service</h2>
+    <p class="static-text"><strong class="static-strong">Premiere Ecoute</strong> est une plateforme qui permet aux utilisateurs de :</p>
+    <ul class="static-list">
+      <li class="static-list-item">Créer et participer à des sessions d'écoute collaborative en temps réel</li>
+      <li class="static-list-item">Découvrir et évaluer des albums musicaux en communauté</li>
+      <li class="static-list-item">Interagir avec d'autres passionnés de musique</li>
+      <li class="static-list-item">Accéder à un catalogue musical via l'intégration Spotify</li>
+    </ul>
+
+    <h2 class="static-subtitle">2. Conditions d'accès</h2>
+    <p class="static-text">
+      Le Service est accessible aux personnes âgées d'au moins <strong class="static-strong">16 ans</strong> (âge de consentement numérique en France).
+    </p>
+    <p class="static-text">L'utilisation du Service nécessite un <strong class="static-strong">compte Twitch valide</strong> pour l'authentification.</p>
+
+    <h2 class="static-subtitle">3. Utilisation du service</h2>
+    <p class="static-text">Vous vous engagez à :</p>
+    <ul class="static-list">
+      <li class="static-list-item">Respecter les droits d'auteur et la propriété intellectuelle</li>
+      <li class="static-list-item">Ne pas perturber le bon fonctionnement du Service</li>
+      <li class="static-list-item">Respecter les autres utilisateurs</li>
+      <li class="static-list-item">Ne pas contourner les mesures de sécurité</li>
+    </ul>
+
+    <h2 class="static-subtitle">4. Conduites interdites</h2>
+    <p class="static-text"><strong class="static-strong">Il est strictement interdit de :</strong></p>
+    <ul class="static-list">
+      <li class="static-list-item">Publier du contenu illégal, offensant ou diffamatoire</li>
+      <li class="static-list-item">Harceler, menacer ou intimider d'autres utilisateurs</li>
+      <li class="static-list-item">Diffuser des virus, malwares ou codes malveillants</li>
+      <li class="static-list-item">Violer les droits d'auteur ou de propriété intellectuelle</li>
+    </ul>
+
+    <h2 class="static-subtitle">5. Protection des données</h2>
+    <p class="static-text">
+      La collecte et le traitement de vos données personnelles sont régis par notre <a href="/legal/privacy" class="static-link">Politique de Confidentialité</a>.
+    </p>
+
+    <h2 class="static-subtitle">6. Droit applicable</h2>
+    <p class="static-text">
+      Les présentes CGU sont régies par le droit français. Les tribunaux français sont seuls compétents en cas de litige.
+    </p>
+
+    <h2 class="static-subtitle">7. Contact</h2>
+    <div class="static-contact-info">
+      <p class="static-text"><strong class="static-strong">Premiere Ecoute</strong></p>
+      <p class="static-text">
+        <strong class="static-strong">Support :</strong> support@premiere-ecoute.fr<br />
+        <strong class="static-strong">Juridique :</strong> legal@premiere-ecoute.fr
+      </p>
+    </div>
   </div>
 </div>

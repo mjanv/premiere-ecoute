@@ -52,7 +52,25 @@
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                 />
               </svg>
-              {gettext("Browse Sessions")}
+              {gettext("My Sessions")}
+            </.link>
+
+            <.link
+              navigate={~p"/sessions/wrapped/retrospective"}
+              class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
+              style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
+              onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
+              onmouseout="this.style.color='var(--color-dark-300)'; this.style.borderColor='var(--color-dark-600)'; this.style.backgroundColor='var(--color-dark-900)';"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              {gettext("My Retrospective")}
             </.link>
           <% end %>
           <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:viewer] do %>
