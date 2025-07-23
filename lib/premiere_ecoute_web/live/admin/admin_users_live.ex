@@ -7,7 +7,6 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page_title, "Admin Users")
     |> assign(:users, Accounts.User.all())
     |> assign(:selected_user, nil)
     |> assign(:show_user_modal, false)

@@ -5,36 +5,25 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    # AIDEV-NOTE: Get current user from authentication scope
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
 
-    socket =
-      socket
-      |> assign(:page_title, "Account Settings")
-      |> assign(:current_user, current_user)
-      # In this app, Twitch user is the main user
-      |> assign(:twitch_user, current_user)
-      |> assign(:sessions_count, 0)
-
-    {:ok, socket}
+    socket
+    |> assign(:current_user, current_user)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
   def handle_params(_params, url, socket) do
-    # AIDEV-NOTE: Extract current path for locale switcher
-    current_path = URI.parse(url).path || "/"
-    {:noreply, assign(socket, :current_path, current_path)}
+    {:noreply, assign(socket, :current_path, URI.parse(url).path || "/")}
   end
 
   @impl true
   def handle_event("connect_spotify", _params, socket) do
-    # AIDEV-NOTE: Redirect to Spotify OAuth flow
     {:noreply, redirect(socket, to: ~p"/auth/spotify")}
   end
 
   @impl true
   def handle_event("connect_twitch", _params, socket) do
-    # AIDEV-NOTE: Redirect to Twitch OAuth flow
     {:noreply, redirect(socket, to: ~p"/auth/twitch")}
   end
 

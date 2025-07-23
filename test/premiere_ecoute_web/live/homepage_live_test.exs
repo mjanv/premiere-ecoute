@@ -49,10 +49,10 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
       assert html =~ "Welcome back"
       assert html =~ "Explore listening sessions and join the community discussions."
 
-      # Features preview still shown
-      assert html =~ "Album Discovery"
-      assert html =~ "Community Rating"
-      assert html =~ "Live Sessions"
+      # Features preview not shown
+      refute html =~ "Album Discovery"
+      refute html =~ "Community Rating"
+      refute html =~ "Live Sessions"
 
       # No streamer action buttons
       refute html =~ "Start New Session"

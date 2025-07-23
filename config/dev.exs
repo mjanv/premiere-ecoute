@@ -31,6 +31,7 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
 
 config :premiere_ecoute, dev_routes: true
 
+config :logger, level: :info
 config :logger, :default_formatter, format: "[$level] $message\n"
 
 config :phoenix, :stacktrace_depth, 20

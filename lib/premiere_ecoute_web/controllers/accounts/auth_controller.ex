@@ -6,6 +6,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcouteWeb.UserAuth
 
   def request(conn, %{"provider" => "twitch"}) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
@@ -101,11 +102,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     case result do
       {:ok, spotify_data} ->
         # AIDEV-NOTE: Get user from state parameter (user ID)
-        user =
-          case Integer.parse(state) do
-            {user_id, ""} -> Accounts.get_user!(user_id)
-            _ -> nil
-          end
+        user = Accounts.get_user!(state)
 
         Logger.info("Spotify callback - resolved user from state: #{inspect(user && user.id)}")
 
@@ -120,18 +117,17 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
             case Accounts.User.update_spotify_tokens(user, spotify_data) do
               {:ok, _} ->
                 conn
-                |> put_flash(
-                  :info,
-                  "Spotify connected! You can now control playback from the dashboard."
-                )
-                |> redirect(to: ~p"/users/account")
+                |> put_session(:user_return_to, ~p"/users/account")
+                |> put_flash(:info, "Spotify connected! You can now control playback from the dashboard.")
+                |> UserAuth.log_in_user(user, %{})
 
               {:error, _changeset} ->
                 Logger.error("Failed to store Spotify tokens for user #{user.id}")
 
                 conn
+                |> put_session(:user_return_to, ~p"/users/account")
                 |> put_flash(:error, "Failed to connect Spotify account")
-                |> redirect(to: ~p"/users/account")
+                |> UserAuth.log_in_user(user, %{})
             end
         end
 

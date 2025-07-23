@@ -7,7 +7,6 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page_title, "Admin Albums")
     |> assign(:page, Album.page([], 1, 10))
     |> assign(:selected_album, nil)
     |> assign(:show_modal, false)

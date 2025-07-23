@@ -11,7 +11,6 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     PremiereEcouteWeb.PubSub.subscribe("listening_sessions")
 
     socket
-    |> assign(:page_title, "Streamer Dashboard")
     |> assign(:search_form, to_form(%{"query" => ""}))
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:selected_album, AsyncResult.ok(nil))

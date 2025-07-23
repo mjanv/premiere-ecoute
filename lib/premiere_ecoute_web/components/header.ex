@@ -16,15 +16,11 @@ defmodule PremiereEcouteWeb.Components.Header do
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: var(--color-primary-600);">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
             </svg>
           </div>
-          <.link
-            navigate={~p"/"}
-            class="text-2xl font-bold hover:opacity-80 transition-opacity"
-            style="color: var(--color-primary-400);"
-          >
+          <.link href={~p"/"} class="text-2xl font-bold hover:opacity-80 transition-opacity" style="color: var(--color-primary-400);">
             Premiere Ecoute
           </.link>
         </div>
@@ -128,7 +124,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                   <%= if @current_user.role in [:streamer, :admin] do %>
                     <!-- Album Dashboard (first item) -->
                     <.link
-                      navigate={~p"/sessions/wrapped/retrospective"}
+                      href={~p"/sessions/wrapped/retrospective"}
                       class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                     >
                       <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +140,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     
     <!-- My Sessions (second item) -->
                     <.link
-                      navigate={~p"/sessions"}
+                      href={~p"/sessions"}
                       class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                     >
                       <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +156,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     
     <!-- Create Session (third item) -->
                     <.link
-                      navigate={~p"/sessions/discography/album/select"}
+                      href={~p"/sessions/discography/album/select"}
                       class="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-gray-200 transition-colors"
                     >
                       <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +171,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     <!-- Divider -->
                     <div class="border-t border-gray-600 my-1"></div>
                     <.link
-                      navigate={~p"/admin"}
+                      href={~p"/admin"}
                       class="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-gray-200 transition-colors"
                     >
                       <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +207,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                   
     <!-- Account -->
                   <.link
-                    navigate={~p"/users/account"}
+                    href={~p"/users/account"}
                     class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                   >
                     <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

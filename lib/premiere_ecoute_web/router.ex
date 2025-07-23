@@ -48,7 +48,7 @@ defmodule PremiereEcouteWeb.Router do
   scope "/users", PremiereEcouteWeb.Accounts do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :users do
+    live_session :users, on_mount: [{UserAuth, :current_scope}] do
       live "/settings", UserSettingsLive, :edit
       live "/settings/confirm-email/:token", UserSettingsLive, :confirm_email
       live "/account", AccountLive, :index

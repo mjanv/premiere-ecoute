@@ -11,18 +11,13 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page_title, "Admin Dashboard")
-    |> assign(:stats, get_stats())
-    |> then(fn socket -> {:ok, socket} end)
-  end
-
-  defp get_stats do
-    %{
+    |> assign(:stats, %{
       users_count: Repo.aggregate(User, :count, :id),
       sessions_count: Sessions.ListeningSession.count(:id),
       albums_count: Album.count(:id),
       votes_count: Scores.Vote.count(:id),
       polls_count: Scores.Poll.count(:id)
-    }
+    })
+    |> then(fn socket -> {:ok, socket} end)
   end
 end

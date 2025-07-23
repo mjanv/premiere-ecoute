@@ -7,7 +7,6 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page_title, "Admin Sessions")
     |> assign(:page, ListeningSession.page([], 1, 10))
     |> assign(:selected_session, nil)
     |> assign(:show_modal, false)

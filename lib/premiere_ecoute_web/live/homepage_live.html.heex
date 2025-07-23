@@ -6,8 +6,8 @@
         <!-- Hero Section -->
         <div class="mb-12">
           <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 bg-gradient-purple">
-            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
             </svg>
           </div>
 
@@ -27,7 +27,7 @@
           <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:streamer, :admin] do %>
             <!-- AIDEV-NOTE: Streamer/Admin user - show session buttons -->
             <.link
-              navigate={~p"/sessions/discography/album/select"}
+              href={~p"/sessions/discography/album/select"}
               class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-white font-semibold rounded-lg transition-all text-lg hover:scale-105 bg-gradient-purple hover:shadow-lg"
               style="box-shadow: 0 4px 14px 0 rgba(139, 79, 255, 0.25);"
             >
@@ -38,7 +38,7 @@
             </.link>
 
             <.link
-              navigate={~p"/sessions"}
+              href={~p"/sessions"}
               class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
               style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
               onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
@@ -56,7 +56,7 @@
             </.link>
 
             <.link
-              navigate={~p"/sessions/wrapped/retrospective"}
+              href={~p"/sessions/wrapped/retrospective"}
               class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
               style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
               onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
@@ -98,69 +98,90 @@
             </.link>
           <% end %>
         </div>
-        
-<!-- Features Preview -->
-        <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="text-center">
-            <div
-              class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
-              style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
-            >
-              <svg class="w-6 h-6" style="color: var(--color-primary-400);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                />
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">{gettext("Album Discovery")}</h3>
-            <p class="text-sm" style="color: var(--color-dark-400);">
-              {gettext("Search and explore albums from Spotify's vast music library")}
-            </p>
-          </div>
 
-          <div class="text-center">
-            <div
-              class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
-              style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
-            >
-              <svg class="w-6 h-6" style="color: var(--color-primary-400);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
+        <%= if is_nil(@current_scope) do %>
+          <!-- AIDEV-NOTE: Features Preview - only show for anonymous users -->
+          <!-- Features Preview -->
+          <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+              <div
+                class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--color-primary-400);"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-white mb-2">{gettext("Album Discovery")}</h3>
+              <p class="text-sm" style="color: var(--color-dark-400);">
+                {gettext("Search and explore albums from Spotify's vast music library")}
+              </p>
             </div>
-            <h3 class="text-lg font-semibold text-white mb-2">{gettext("Community Rating")}</h3>
-            <p class="text-sm" style="color: var(--color-dark-400);">
-              {gettext("Rate tracks together and see what the community thinks")}
-            </p>
-          </div>
 
-          <div class="text-center">
-            <div
-              class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
-              style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
-            >
-              <svg class="w-6 h-6" style="color: var(--color-primary-400);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
+            <div class="text-center">
+              <div
+                class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--color-primary-400);"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-white mb-2">{gettext("Community Rating")}</h3>
+              <p class="text-sm" style="color: var(--color-dark-400);">
+                {gettext("Rate tracks together and see what the community thinks")}
+              </p>
             </div>
-            <h3 class="text-lg font-semibold text-white mb-2">{gettext("Live Sessions")}</h3>
-            <p class="text-sm" style="color: var(--color-dark-400);">
-              {gettext("Host real-time listening parties with live voting and feedback")}
-            </p>
+
+            <div class="text-center">
+              <div
+                class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--color-primary-400);"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-white mb-2">{gettext("Live Sessions")}</h3>
+              <p class="text-sm" style="color: var(--color-dark-400);">
+                {gettext("Host real-time listening parties with live voting and feedback")}
+              </p>
+            </div>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
     
@@ -169,7 +190,7 @@
       <div class="max-w-5xl mx-auto text-center">
         <div class="flex justify-center items-center space-x-3">
           <.link
-            navigate={~p"/changelog"}
+            href={~p"/changelog"}
             class="text-sm font-medium transition-colors hover:text-white"
             style="color: var(--color-dark-300);"
           >
@@ -177,7 +198,7 @@
           </.link>
           <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
           <.link
-            navigate={~p"/legal/privacy"}
+            href={~p"/legal/privacy"}
             class="text-sm font-medium transition-colors hover:text-white"
             style="color: var(--color-dark-300);"
           >
@@ -185,7 +206,7 @@
           </.link>
           <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
           <.link
-            navigate={~p"/legal/cookies"}
+            href={~p"/legal/cookies"}
             class="text-sm font-medium transition-colors hover:text-white"
             style="color: var(--color-dark-300);"
           >
@@ -193,7 +214,7 @@
           </.link>
           <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
           <.link
-            navigate={~p"/legal/terms"}
+            href={~p"/legal/terms"}
             class="text-sm font-medium transition-colors hover:text-white"
             style="color: var(--color-dark-300);"
           >
@@ -201,7 +222,7 @@
           </.link>
           <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
           <.link
-            navigate={~p"/legal/contact"}
+            href={~p"/legal/contact"}
             class="text-sm font-medium transition-colors hover:text-white"
             style="color: var(--color-dark-300);"
           >

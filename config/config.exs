@@ -76,6 +76,7 @@ config :logger, :default_formatter,
   metadata: [:request_id]
 
 config :phoenix, :json_library, Jason
+config :phoenix, :logger, false
 
 config :premiere_ecoute, PremiereEcouteWeb.Gettext,
   locales: ~w(en fr it),
