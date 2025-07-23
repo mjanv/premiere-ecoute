@@ -156,7 +156,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
         # Create new user with Twitch auth data
         case Accounts.register_user(%{
                email: email,
-               password: Base.encode64(:crypto.strong_rand_bytes(32))
+               password: "super_password"  # Base.encode64(:crypto.strong_rand_bytes(32))
              }) do
           {:ok, user} ->
             Accounts.User.update_twitch_auth(user, auth_data)

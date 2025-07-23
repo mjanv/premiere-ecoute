@@ -12,6 +12,10 @@ defmodule PremiereEcouteWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
 
+  socket "/socket", PremiereEcouteWeb.UserSocket,
+    websocket: true,
+    longpoll: true
+
   plug Plug.Static,
     at: "/",
     from: :premiere_ecoute,
