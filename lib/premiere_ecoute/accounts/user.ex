@@ -1,11 +1,8 @@
 defmodule PremiereEcoute.Accounts.User do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
-
-  alias PremiereEcoute.Repo
+  use PremiereEcoute.Core.Schema,
+    derive_only: [:id, :email, :role]
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -193,8 +190,6 @@ defmodule PremiereEcoute.Accounts.User do
 
   def get!(id), do: Repo.get!(__MODULE__, id)
 
-  def get_by(opts), do: Repo.get_by(__MODULE__, opts)
-
   def register_user(attrs) do
     %__MODULE__{}
     |> changeset(attrs)
@@ -339,6 +334,4 @@ defmodule PremiereEcoute.Accounts.User do
     )
     |> Repo.update()
   end
-
-  def all, do: Repo.all(__MODULE__)
 end

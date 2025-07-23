@@ -1,40 +1,38 @@
 defmodule PremiereEcouteWeb.SessionChannel do
+  @moduledoc false
+
   use PremiereEcouteWeb, :channel
 
+  alias PremiereEcoute.Sessions.Scores.Report
+
   @impl true
-  def join("session:lobby", payload, socket) do
-    IO.inspect("JOIN")
-    Process.send_after(self(), :tick, 3_000)
-    if authorized?(payload) do
-      {:ok, socket}
-    else
-      {:error, %{reason: "unauthorized"}}
+  def join("session:" <> id, _payload, socket) do
+    send(self(), :after_join)
+    {:ok, assign(socket, :session_id, id)}
+  end
+
+  @impl true
+  def handle_info(:after_join, socket) do
+    case Report.get_by(session_id: socket.assigns.session_id) do
+      nil -> :ok
+      report -> push(socket, "session_summary", report.session_summary)
     end
-  end
 
-  # Channels can be used in a request/response fashion
-  # by sending replies to requests from the client
-  @impl true
-  def handle_in("ping", payload, socket) do
-    {:reply, {:ok, payload}, socket}
-  end
-
-  # It is also common to receive messages from the client and
-  # broadcast to everyone in the current topic (session:lobby).
-  @impl true
-  def handle_in("shout", payload, socket) do
-    broadcast(socket, "shout", payload)
     {:noreply, socket}
   end
 
-  def handle_info(:tick, socket) do
-    Process.send_after(self(), :tick, 3_000)
-    push(socket, "new_message", %{content: "hello!"})
+  def handle_info({:session_summary, %{viewer_score: viewer_score}}, socket) do
+    push(socket, "session_summary", %{"viewer_score" => viewer_score})
     {:noreply, socket}
   end
 
-  # Add authorization logic here as required.
-  defp authorized?(_payload) do
-    true
+  def handle_info({:next_track, track}, socket) do
+    push(socket, "track", track)
+    {:noreply, socket}
+  end
+
+  def handle_info({:previous_track, track}, socket) do
+    push(socket, "track", track)
+    {:noreply, socket}
   end
 end

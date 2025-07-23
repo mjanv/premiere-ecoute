@@ -3,7 +3,8 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
 
   use PremiereEcoute.Core.Schema,
     root: [:tracks],
-    identity: [:spotify_id]
+    identity: [:spotify_id],
+    derive_only: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Track

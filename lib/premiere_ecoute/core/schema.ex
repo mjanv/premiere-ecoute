@@ -4,6 +4,15 @@ defmodule PremiereEcoute.Core.Schema do
   defmacro __using__(opts) do
     root = Keyword.get(opts, :root, [])
     identity = Keyword.get(opts, :identity, [])
+    derive_only = Keyword.get(opts, :derive_only, [])
+    derive_except = Keyword.get(opts, :derive_except, [])
+
+    encoder_opts =
+      if Enum.empty?(derive_only) do
+        [except: [:__meta__] == derive_except]
+      else
+        [only: derive_only]
+      end
 
     quote do
       use Ecto.Schema
@@ -12,6 +21,8 @@ defmodule PremiereEcoute.Core.Schema do
       import Ecto.Query
 
       alias PremiereEcoute.Repo
+
+      @derive {Jason.Encoder, unquote(encoder_opts)}
 
       # Preload
       def preload({:ok, entity}), do: {:ok, preload(entity)}

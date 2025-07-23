@@ -19,12 +19,13 @@ defmodule PremiereEcouteWeb.ChannelCase do
 
   using do
     quote do
-      # Import conveniences for testing with channels
       import Phoenix.ChannelTest
       import PremiereEcouteWeb.ChannelCase
 
-      # The default endpoint for testing
       @endpoint PremiereEcouteWeb.Endpoint
+
+      import PremiereEcoute.AccountsFixtures
+      import PremiereEcoute.Sessions.Discography.AlbumFixtures
     end
   end
 

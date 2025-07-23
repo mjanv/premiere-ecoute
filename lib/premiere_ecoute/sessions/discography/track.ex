@@ -1,7 +1,8 @@
 defmodule PremiereEcoute.Sessions.Discography.Track do
   @moduledoc false
 
-  use PremiereEcoute.Core.Schema
+  use PremiereEcoute.Core.Schema,
+    derive_only: [:id, :name, :track_number]
 
   alias PremiereEcoute.Sessions.Discography.Album
 

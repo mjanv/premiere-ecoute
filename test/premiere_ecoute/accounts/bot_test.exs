@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
   alias PremiereEcoute.Accounts.Bot
 
   setup do
+    :persistent_term.erase(:bot)
     on_exit(fn -> :persistent_term.erase(:bot) end)
 
     :ok

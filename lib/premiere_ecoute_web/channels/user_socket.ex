@@ -3,7 +3,9 @@ defmodule PremiereEcouteWeb.UserSocket do
 
   use Phoenix.Socket
 
-  channel "session:lobby", PremiereEcouteWeb.SessionChannel
+  channel "session:*", PremiereEcouteWeb.SessionChannel
+  channel "sessions:lobby", PremiereEcouteWeb.SessionsChannel
+
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
@@ -21,7 +23,7 @@ defmodule PremiereEcouteWeb.UserSocket do
   # performing token verification on connect.
   @impl true
   def connect(_params, socket, _connect_info) do
-    {:ok, socket}
+    {:ok, assign(socket, :user_id, UUID.uuid4())}
   end
 
   # Socket IDs are topics that allow you to identify all sockets for a given user:
@@ -35,5 +37,5 @@ defmodule PremiereEcouteWeb.UserSocket do
   #
   # Returning `nil` makes this socket anonymous.
   @impl true
-  def id(_socket), do: nil
+  def id(socket), do: "user_socket:#{socket.assigns.user_id}"
 end

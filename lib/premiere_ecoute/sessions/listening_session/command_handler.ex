@@ -77,7 +77,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- SpotifyApi.impl().start_resume_playback(scope, session.current_track),
-         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Next track: #{session.current_track.name}") do
+         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Next track: #{session.current_track.name}"),
+         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
       {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
@@ -88,7 +89,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.previous_track(session),
          {:ok, _} <- SpotifyApi.impl().start_resume_playback(scope, session.current_track),
-         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Previous track: #{session.current_track.name}") do
+         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Previous track: #{session.current_track.name}"),
+         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
@@ -101,7 +103,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- SpotifyApi.impl().pause_playback(scope),
          {:ok, _} <- TwitchApi.impl().cancel_all_subscriptions(scope),
          {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Good bye !"),
-         {:ok, session} <- ListeningSession.stop(session) do
+         {:ok, session} <- ListeningSession.stop(session),
+         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", :stop) do
       {:ok, session, [%SessionStopped{session_id: session.id}]}
     else
       reason ->

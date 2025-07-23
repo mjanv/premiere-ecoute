@@ -37,7 +37,7 @@ const Hooks = {
       })
     }
   },
-  
+
   OpenUrl: {
     mounted() {
       this.handleEvent("open_url", ({url}) => {

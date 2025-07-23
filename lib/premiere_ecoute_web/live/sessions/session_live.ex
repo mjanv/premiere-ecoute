@@ -141,8 +141,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_info(event, socket) do
-    {:noreply, put_flash(socket, :info, "Received #{inspect(event)}")}
+  def handle_info(_event, socket) do
+    {:noreply, socket}
   end
 
   @impl true
