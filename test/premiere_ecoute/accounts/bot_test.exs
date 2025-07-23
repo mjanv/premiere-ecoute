@@ -4,8 +4,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
   alias PremiereEcoute.Accounts.Bot
 
   setup do
-    :persistent_term.erase(:bot)
-    on_exit(fn -> :persistent_term.erase(:bot) end)
+    Cachex.clear(:users)
 
     :ok
   end
@@ -27,7 +26,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
 
     bot1 = Bot.get()
     bot2 = Bot.get()
-    :persistent_term.put(:bot, :wrong)
+    Cachex.put(:users, :bot, :wrong, expire: 5 * 60 * 1_000)
     bot3 = Bot.get()
 
     assert bot1.id == id

@@ -44,6 +44,6 @@ defmodule PremiereEcoute.Accounts.ApiToken do
     end
   end
 
-  defp token_expired?(nil), do: false
-  defp token_expired?(at), do: DateTime.compare(DateTime.utc_now(), DateTime.add(at, -300, :second)) == :gt
+  def token_expired?(nil), do: false
+  def token_expired?(at), do: DateTime.compare(DateTime.utc_now(), DateTime.add(at, -300, :second)) == :gt
 end
