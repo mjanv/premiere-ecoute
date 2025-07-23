@@ -85,7 +85,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
                  refresh_token: refresh_token,
                  expires_in: expires_in,
                  username: user_info["login"],
-                 display_name: user_info["display_name"]
+                 display_name: user_info["display_name"],
+                 broadcaster_type: user_info["broadcaster_type"]
                }}
 
             {:error, reason} ->

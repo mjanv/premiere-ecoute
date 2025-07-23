@@ -166,7 +166,7 @@ defmodule PremiereEcoute.Accounts do
       iex> update_user_role(user, :streamer)
       {:ok, %User{}}
 
-      iex> update_user_role(user, %{role: "is invalid"})
+      iex> update_user_role(user, :god)
       {:error, %Ecto.Changeset{}}
 
   """

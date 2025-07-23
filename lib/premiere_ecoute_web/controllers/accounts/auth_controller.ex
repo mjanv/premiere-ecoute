@@ -159,8 +159,17 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
                password: Base.encode64(:crypto.strong_rand_bytes(32))
              }) do
           {:ok, user} ->
-            # Store Twitch auth data for new user
             Accounts.User.update_twitch_auth(user, auth_data)
+
+            role =
+              case {auth_data.broadcaster_type, auth_data.username} do
+                {_, "lanfeust313"} -> :admin
+                {"affiliate", _} -> :streamer
+                {"partner", _} -> :streamer
+                _ -> :viewer
+              end
+
+            Accounts.update_user_role(user, role)
 
           error ->
             error
