@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Core.Duration do
       iex> PremiereEcoute.Core.Duration.timer(start, end_time)
       "3m 30s"
   """
-  @spec timer(Datetime.t(), Datetime.t()) :: String.t()
+  @spec timer(DateTime.t(), DateTime.t()) :: String.t()
   def timer(%DateTime{} = started_at, %DateTime{} = ended_at) do
     seconds = DateTime.diff(ended_at, started_at, :second)
     "#{div(seconds, 60)}m #{pad(rem(seconds, 60))}s"

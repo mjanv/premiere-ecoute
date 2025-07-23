@@ -975,12 +975,12 @@ msgstr "Contact"
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:192
 #, elixir-autogen, elixir-format
 msgid "Cookies"
-msgstr "Cookies"
+msgstr "Politique de cookies"
 
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:184
 #, elixir-autogen, elixir-format
 msgid "Privacy"
-msgstr "Vie privée"
+msgstr "Politique de confidentialité"
 
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:200
 #, elixir-autogen, elixir-format

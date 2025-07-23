@@ -9,48 +9,38 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
   alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Report
-  alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
 
   @impl true
-  def mount(%{"id" => session_id}, _session, socket) do
+  def mount(%{"id" => id}, _session, socket) do
     if connected?(socket) do
       Process.send_after(self(), :refresh, 0)
     end
 
-    listening_session =
-      case Integer.parse(session_id) do
-        {int_id, ""} -> ListeningSession.get(int_id)
-        _ -> nil
-      end
-
-    case listening_session do
+    case ListeningSession.get(id) do
       nil ->
-        {:ok,
-         socket
-         |> put_flash(:error, "Session not found")
-         |> redirect(to: ~p"/")}
+        socket
+        |> put_flash(:error, "Session not found")
+        |> redirect(to: ~p"/")
+        |> then(fn socket -> {:ok, socket} end)
 
       listening_session ->
         if connected?(socket) do
-          Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{session_id}")
+          Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
         end
 
-        # AIDEV-NOTE: Get current user for Spotify integration
         current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
 
-        {:ok,
-         socket
-         |> assign(:listening_session, listening_session)
-         |> assign(:player_state, nil)
-         |> assign(:session_id, session_id)
-         |> assign(:current_user, current_user)
-         |> assign(:show, %{votes: true, scores: true})
-         |> assign(:user_current_rating, nil)
-         |> assign(:report, nil)
-         |> assign_async(:report, fn ->
-           {:ok, %{report: Report.get_by(session_id: session_id)}}
-         end)}
+        socket
+        |> assign(:listening_session, listening_session)
+        |> assign(:player_state, nil)
+        |> assign(:session_id, id)
+        |> assign(:current_user, current_user)
+        |> assign(:show, %{votes: true, scores: true})
+        |> assign(:user_current_rating, nil)
+        |> assign(:report, nil)
+        |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
+        |> then(fn socket -> {:ok, socket} end)
     end
   end
 
@@ -142,14 +132,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_info(%Vote{} = _vote, socket) do
+  def handle_info({:session_summary, _}, socket) do
     session_id = socket.assigns.session_id
 
-    {:noreply,
-     socket
-     |> assign_async(:report, fn ->
-       {:ok, %{report: Report.get_by(session_id: session_id)}}
-     end)}
+    socket
+    |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true

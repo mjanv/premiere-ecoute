@@ -6,7 +6,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   require Logger
 
   alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
 
   @impl true
   def mount(socket) do
@@ -64,17 +65,15 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   def handle_event("next_track", _params, socket) do
     %{listening_session: session} = socket.assigns
 
-    case ListeningSession.next_track(session) do
-      {:ok, session} ->
-        SpotifyApi.start_resume_playback(socket.assigns.current_scope, session.current_track)
+    %SkipNextTrackListeningSession{session_id: session.id, scope: socket.assigns.current_scope}
+    |> PremiereEcoute.apply()
+    |> case do
+      {:ok, session, _} ->
         send(self(), {:session_updated, session})
-        {:noreply, put_flash(socket, :info, gettext("Next track"))}
+        {:noreply, assign(socket, :listening_session, session)}
 
-      {:error, :no_tracks_left} ->
-        {:noreply, put_flash(socket, :info, gettext("Already at the last track"))}
-
-      {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, gettext("Failed to go to next track"))}
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Already at the last track")}
     end
   end
 
@@ -82,17 +81,15 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   def handle_event("previous_track", _params, socket) do
     %{listening_session: session} = socket.assigns
 
-    case ListeningSession.previous_track(session) do
-      {:ok, session} ->
-        SpotifyApi.start_resume_playback(socket.assigns.current_scope, session.current_track)
+    %SkipPreviousTrackListeningSession{session_id: session.id, scope: socket.assigns.current_scope}
+    |> PremiereEcoute.apply()
+    |> case do
+      {:ok, session, _} ->
         send(self(), {:session_updated, session})
-        {:noreply, put_flash(socket, :info, gettext("Previous track"))}
+        {:noreply, assign(socket, :listening_session, session)}
 
-      {:error, :no_tracks_left} ->
-        {:noreply, put_flash(socket, :info, gettext("Already at the first track"))}
-
-      {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, gettext("Failed to go to previous track"))}
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Already at the first track")}
     end
   end
 

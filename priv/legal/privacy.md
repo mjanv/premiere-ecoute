@@ -8,7 +8,6 @@
 
 Chez **Premiere Ecoute**, nous nous engageons à protéger et respecter votre vie privée. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos données personnelles, conformément au **Règlement Général sur la Protection des Données (RGPD)** et à la législation française.
 
----
 
 ## 1. Responsable du traitement
 
@@ -22,7 +21,6 @@ Le responsable du traitement des données est :
 
 Pour toute question relative à cette politique, vous pouvez nous contacter à ces adresses.
 
----
 
 ## 2. Données personnelles collectées
 
@@ -51,7 +49,6 @@ Lors de l’utilisation de la plateforme, nous collectons :
 * **Identifiants uniques des messages Twitch** liés aux votes ou évaluations
 * **Aucune donnée technique** (comme l’adresse IP, le navigateur ou le système d’exploitation) n’est collectée
 
----
 
 ## 3. Base juridique du traitement
 
@@ -62,7 +59,6 @@ Le traitement de vos données repose sur les bases légales suivantes :
 * **Intérêt légitime** : pour améliorer le service et assurer sa sécurité
 * **Obligation légale** : pour répondre à des exigences réglementaires
 
----
 
 ## 4. Utilisation des données
 
@@ -76,7 +72,6 @@ Nous utilisons vos données afin de :
 * Assurer la sécurité du service
 * Respecter les obligations légales en vigueur
 
----
 
 ## 5. Partage des données
 
@@ -90,7 +85,6 @@ Les seules situations dans lesquelles des données peuvent être partagées sont
 
 En dehors de ces cas, vos données restent **strictement confidentielles** et ne sont **transmises à aucun tiers**.
 
----
 
 ## 6. Durée de conservation
 
@@ -101,7 +95,6 @@ Nous conservons vos données pour les durées suivantes :
 * **Données techniques** : maximum 13 mois (conformément à la CNIL)
 * **Données liées à la sécurité** : 1 an après résolution d’un incident
 
----
 
 ## 7. Vos droits (RGPD)
 
@@ -117,13 +110,6 @@ Vous disposez des droits suivants sur vos données :
 
 Pour exercer vos droits, écrivez-nous à [maxime.janvier@gmail.com](mailto:maxime.janvier@gmail.com). Nous répondons et mettrons en place vos demandes au maximum sous 30 jours.
 
----
-
-## 8. Transferts hors UE
-
-Voici une version réécrite, fidèle à ton usage réel et plus précise juridiquement :
-
----
 
 ## 8. Transferts hors UE
 
@@ -133,7 +119,6 @@ Les seules interactions avec des services tiers (notamment Twitch et Spotify) se
 
 Ces services peuvent, de leur côté, traiter des données en dehors de l’UE conformément à leurs propres politiques de confidentialité. Pour plus d'informations, nous vous invitons à consulter celles de [Twitch](https://www.twitch.tv/p/legal/privacy-policy/) et [Spotify](https://www.spotify.com/legal/privacy-policy/).
 
----
 
 ## 9. Sécurité des données
 
@@ -145,7 +130,6 @@ Nous mettons en œuvre des mesures techniques et organisationnelles robustes, te
 * Tests réguliers de sécurité
 * Sensibilisation de l’équipe à la protection des données
 
----
 
 ## 10. Cookies
 
@@ -157,19 +141,16 @@ Nous utilisons uniquement des **cookies strictement nécessaires** au bon foncti
 
 Ces cookies ne nécessitent pas de consentement. Pour plus d’informations, consultez notre [Politique de Cookies](/legal/cookies).
 
----
 
 ## 11. Utilisation par des mineurs
 
 Nos services ne sont pas destinés aux personnes de moins de 16 ans. Si un mineur nous a transmis des données personnelles par erreur, merci de nous le signaler immédiatement.
 
----
 
 ## 12. Modifications de la politique
 
 Nous pouvons mettre à jour cette politique à tout moment. En cas de changement important, nous vous en informerons au moins 30 jours à l’avance par email ou via la plateforme.
 
----
 
 ## 13. Réclamation auprès de l’autorité de contrôle
 
@@ -181,7 +162,6 @@ Si vous estimez que vos droits ne sont pas respectés, vous pouvez déposer une 
 > 75334 Paris CEDEX 07 – France
 > 📞 +33 1 53 73 22 22
 
----
 
 ## 14. Contact
 

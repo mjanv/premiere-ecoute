@@ -26,6 +26,32 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
           }
   end
 
+  defmodule SkipNextTrackListeningSession do
+    @moduledoc false
+
+    alias PremiereEcoute.Accounts.Scope
+
+    defstruct [:session_id, :scope]
+
+    @type t :: %__MODULE__{
+            session_id: String.t(),
+            scope: Scope.t()
+          }
+  end
+
+  defmodule SkipPreviousTrackListeningSession do
+    @moduledoc false
+
+    alias PremiereEcoute.Accounts.Scope
+
+    defstruct [:session_id, :scope]
+
+    @type t :: %__MODULE__{
+            session_id: String.t(),
+            scope: Scope.t()
+          }
+  end
+
   defmodule StopListeningSession do
     @moduledoc false
 

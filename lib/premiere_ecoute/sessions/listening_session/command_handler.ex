@@ -12,8 +12,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted
+  alias PremiereEcoute.Sessions.ListeningSession.Events.PreviousTrackStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionNotPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
@@ -24,6 +28,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession)
+  command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession)
+  command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession)
 
   def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id, vote_options: vote_options}) do
@@ -64,6 +70,28 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       reason ->
         Logger.error("Cannot start listening session due to: #{inspect(reason)}")
         {:error, []}
+    end
+  end
+
+  def handle(%SkipNextTrackListeningSession{session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, session} <- ListeningSession.next_track(session),
+         {:ok, _} <- SpotifyApi.impl().start_resume_playback(scope, session.current_track),
+         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Next track: #{session.current_track.name}") do
+      {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
+    else
+      _ -> {:error, []}
+    end
+  end
+
+  def handle(%SkipPreviousTrackListeningSession{session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, session} <- ListeningSession.previous_track(session),
+         {:ok, _} <- SpotifyApi.impl().start_resume_playback(scope, session.current_track),
+         {:ok, _} <- TwitchApi.impl().send_chat_message(scope, "Previous track: #{session.current_track.name}") do
+      {:ok, session, [%PreviousTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
+    else
+      _ -> {:error, []}
     end
   end
 

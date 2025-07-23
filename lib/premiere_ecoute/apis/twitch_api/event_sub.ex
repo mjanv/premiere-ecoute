@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
 
   require Logger
 
+  alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
 
@@ -111,7 +112,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   defp version(_), do: "0"
 
   defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.chat.message") do
-    %{broadcaster_user_id: user_id, user_id: user_id}
+    bot = Bot.get()
+    %{broadcaster_user_id: user_id, user_id: bot.twitch_user_id}
   end
 
   defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.follow"),

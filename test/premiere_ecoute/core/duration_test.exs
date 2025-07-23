@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Core.DurationTest do
 
     test "returns a valid timer for duration in milliseconds" do
       assert Duration.timer(0) == "00:00"
-      assert Duration.timer(14567) == "00:14"
+      assert Duration.timer(14_567) == "00:14"
       assert Duration.timer((10 * 60 + 37) * 1_000) == "10:37"
       assert Duration.timer((999 * 60 + 17) * 1_000) == "999:17"
     end

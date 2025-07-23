@@ -29,6 +29,22 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
     @type t :: %__MODULE__{session_id: String.t()}
   end
 
+  defmodule NextTrackStarted do
+    @moduledoc false
+
+    defstruct [:session_id, :track_id]
+
+    @type t :: %__MODULE__{session_id: String.t(), track_id: String.t()}
+  end
+
+  defmodule PreviousTrackStarted do
+    @moduledoc false
+
+    defstruct [:session_id, :track_id]
+
+    @type t :: %__MODULE__{session_id: String.t(), track_id: String.t()}
+  end
+
   defmodule SessionStopped do
     @moduledoc false
 

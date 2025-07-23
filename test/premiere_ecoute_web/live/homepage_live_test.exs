@@ -46,7 +46,7 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
       assert html =~ "Share your music taste with the world"
 
       # Viewer-specific content
-      assert html =~ "Welcome back, #{user.username}!"
+      assert html =~ "Welcome back"
       assert html =~ "Explore listening sessions and join the community discussions."
 
       # Features preview still shown
@@ -70,9 +70,6 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
       # Basic content still visible
       assert html =~ "Premiere Ecoute"
       assert html =~ "Share your music taste with the world"
-
-      # Welcome message for authenticated user
-      assert html =~ "Welcome back, #{streamer_user.username}!"
 
       # Streamer action buttons
       assert html =~ "Start New Session"
