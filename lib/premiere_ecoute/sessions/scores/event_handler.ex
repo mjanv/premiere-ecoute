@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandler do
         message: message,
         is_streamer: is_streamer
       }) do
-    with {:ok, {session_id, track_id}} <- Cachex.get(:sessions, broadcaster_id),
+    with {:ok, {session_id, track_id}} when not is_nil(track_id) <- Cachex.get(:sessions, broadcaster_id),
          session <- ListeningSession.get(session_id),
          {:ok, value} <- Vote.from_message(message, session.vote_options),
          vote <- %Vote{viewer_id: user_id, session_id: session_id, track_id: track_id, value: value, is_streamer: is_streamer},

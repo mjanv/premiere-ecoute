@@ -50,24 +50,24 @@ export default function Index() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [channel, setChannel] = useState<any>(null);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
-  
+
   // App state
   const [currentScreen, setCurrentScreen] = useState<'sessions' | 'session-detail'>('sessions');
   const [sessions, setSessions] = useState<ListeningSession[]>([]);
   const [viewerScore, setViewerScore] = useState<number | null>(null);
   const [selectedSessionData, setSelectedSessionData] = useState<ListeningSession | null>(null);
   const [currentTrack, setCurrentTrack] = useState<any | null>(null);
-  
+
   // AIDEV-NOTE: Animation for live dot pulsing effect
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  
+
   // AIDEV-NOTE: Auto-refresh timer for sessions list
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // AIDEV-NOTE: Manual IP override for troubleshooting
   // Set this to your computer's IP address if auto-detection fails
   const MANUAL_IP_OVERRIDE: string | null = null; // Update this to your computer's actual IP
-  
+
   // AIDEV-NOTE: Start pulsing animation for live dot
   useEffect(() => {
     const startPulse = () => {
@@ -86,19 +86,19 @@ export default function Index() {
         ])
       ).start();
     };
-    
+
     if (connectionStatus === 'connected') {
       startPulse();
     }
   }, [connectionStatus, pulseAnim]);
-  
+
   // AIDEV-NOTE: Auto-refresh sessions list every 5 seconds
   useEffect(() => {
     const startAutoRefresh = () => {
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
       }
-      
+
       refreshIntervalRef.current = setInterval(() => {
         if (channel && connectionStatus === 'connected' && currentScreen === 'sessions') {
           console.log('Auto-refreshing sessions list...');
@@ -106,7 +106,7 @@ export default function Index() {
         }
       }, 5000); // Refresh every 5 seconds
     };
-    
+
     if (connectionStatus === 'connected' && currentScreen === 'sessions' && channel) {
       startAutoRefresh();
     } else {
@@ -115,7 +115,7 @@ export default function Index() {
         refreshIntervalRef.current = null;
       }
     }
-    
+
     // Cleanup on unmount
     return () => {
       if (refreshIntervalRef.current) {
@@ -288,7 +288,7 @@ export default function Index() {
       lobbyChannel.onError((payload: any) => {
         console.error("Channel errored:", payload);
       });
-      
+
       // Listen for real-time session updates from server
       lobbyChannel.on('sessions_updated', (payload: any) => {
         console.log('Real-time sessions update received:', payload);
@@ -319,15 +319,15 @@ export default function Index() {
   const handleSessionSelect = (sessionId: string) => {
     const session = sessions.find(s => s.id === sessionId);
     if (!session) return;
-    
+
     setSelectedSessionData(session);
     setCurrentScreen('session-detail');
     setViewerScore(null); // Reset viewer score
-    
+
     // AIDEV-NOTE: Join specific session channel as per backend test
     if (socket) {
       const sessionChannel = socket.channel(`session:${sessionId}`, {});
-      
+
       sessionChannel.join()
         .receive("ok", (resp: any) => {
           console.log(`Joined session:${sessionId} channel successfully`, resp);
@@ -335,20 +335,20 @@ export default function Index() {
         .receive("error", (resp: any) => {
           console.error(`Unable to join session:${sessionId} channel`, resp);
         });
-      
+
       // AIDEV-NOTE: Listen for session_summary events with viewer_score as per backend test
       sessionChannel.on("session_summary", (payload: SessionSummary) => {
         console.log("Session summary received:", payload);
         setViewerScore(payload.viewer_score);
       });
-      
+
       // AIDEV-NOTE: Listen for track change events (next_track/previous_track)
       sessionChannel.on("track", (payload: any) => {
         console.log("Track change received:", payload);
-        
+
         // Payload is already the track object, no need to parse JSON
         let track = payload;
-        
+
         // If payload is a string, parse it
         if (typeof payload === 'string') {
           try {
@@ -358,10 +358,10 @@ export default function Index() {
             return;
           }
         }
-        
+
         console.log("Track data:", track);
         setCurrentTrack(track);
-        
+
         // Update the current session data with new track info
         setSelectedSessionData(prevData => {
           if (prevData) {
@@ -377,7 +377,7 @@ export default function Index() {
           return prevData;
         });
       });
-      
+
       // Update channel reference
       setChannel(sessionChannel);
     }
@@ -388,12 +388,12 @@ export default function Index() {
     if (channel) {
       channel.leave();
     }
-    
+
     setCurrentScreen('sessions');
     setSelectedSessionData(null);
     setViewerScore(null);
     setCurrentTrack(null);
-    
+
     // Rejoin sessions lobby and immediately refresh
     if (socket && connectionStatus === 'connected') {
       const lobbyChannel = socket.channel("sessions:lobby", {});
@@ -432,20 +432,20 @@ export default function Index() {
             <Text style={styles.appName}>Premiere Ecoute</Text>
             <View style={styles.statusContainer}>
               {connectionStatus === 'connected' ? (
-                <Animated.View 
+                <Animated.View
                   style={[
-                    styles.statusDot, 
-                    { 
+                    styles.statusDot,
+                    {
                       backgroundColor: getConnectionStatusColor(),
                       transform: [{ scale: pulseAnim }]
                     }
-                  ]} 
+                  ]}
                 />
               ) : (
                 <View style={[styles.statusDot, { backgroundColor: getConnectionStatusColor() }]} />
               )}
               <Text style={styles.statusText}>
-                {connectionStatus === 'connected' ? 'Live' : 
+                {connectionStatus === 'connected' ? 'Live' :
                  connectionStatus === 'connecting' ? 'Connecting...' : 'Offline'}
               </Text>
             </View>
@@ -471,8 +471,8 @@ export default function Index() {
         ) : (
           <ScrollView style={styles.sessionsList} showsVerticalScrollIndicator={false}>
             {sessions.filter(session => session.status === 'active').map((session) => (
-              <TouchableOpacity 
-                key={session.id} 
+              <TouchableOpacity
+                key={session.id}
                 style={styles.sessionItem}
                 onPress={() => handleSessionSelect(session.id)}
               >
@@ -480,8 +480,8 @@ export default function Index() {
                   {/* Album Cover */}
                   <View style={styles.albumCoverContainer}>
                     {session.album.cover_url ? (
-                      <Image 
-                        source={{ uri: session.album.cover_url }} 
+                      <Image
+                        source={{ uri: session.album.cover_url }}
                         style={styles.albumCover}
                         resizeMode="cover"
                       />
@@ -496,11 +496,11 @@ export default function Index() {
                       </LinearGradient>
                     )}
                     <View style={styles.liveIndicatorOverlay}>
-                      <Animated.View 
+                      <Animated.View
                         style={[
                           styles.liveDot,
                           { transform: [{ scale: pulseAnim }] }
-                        ]} 
+                        ]}
                       />
                     </View>
                   </View>
@@ -564,8 +564,8 @@ export default function Index() {
             {/* Smaller Blurred Album Cover Background */}
             {selectedSessionData.album.cover_url && (
               <>
-                <Image 
-                  source={{ uri: selectedSessionData.album.cover_url }} 
+                <Image
+                  source={{ uri: selectedSessionData.album.cover_url }}
                   style={styles.smallBlurredAlbumCover}
                   resizeMode="cover"
                   blurRadius={6}
@@ -574,7 +574,7 @@ export default function Index() {
                 <View style={styles.smallAlbumCoverOverlay} />
               </>
             )}
-            
+
             {/* Centered Score */}
             <View style={styles.centeredScoreContainer}>
               {viewerScore !== null ? (
@@ -593,7 +593,7 @@ export default function Index() {
           </Text>
           <View style={styles.trackProgressBar}>
             <View style={[
-              styles.trackProgressBarFill, 
+              styles.trackProgressBarFill,
               { width: `${((currentTrack?.track_number || selectedSessionData.current_track?.track_number || 1) / selectedSessionData.album.total_tracks) * 100}%` }
             ]} />
           </View>
@@ -857,7 +857,7 @@ const styles = StyleSheet.create({
     top: 15,
     left: 15,
   },
-  
+
   // Centered Score Container - Simple absolute positioning
   centeredScoreContainer: {
     position: 'absolute',

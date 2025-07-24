@@ -25,7 +25,6 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     end
   end
 
-
   def parse_playlist(data) do
     %Playlist{
       spotify_id: data["id"],

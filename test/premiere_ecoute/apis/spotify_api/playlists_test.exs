@@ -15,15 +15,16 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       {:ok, playlist} = SpotifyApi.get_playlist(id)
 
       assert %Playlist{
-        spotify_id: "2gW4sqiC2OXZLe9m0yDQX7",
-        spotify_owner_id: "ku296zgwbo0e3qff8cylptsjq",
-        owner_name: "Flonflon",
-        name: "FLONFLON MUSIC FRIDAY",
-        cover_url: cover_url,
-        tracks: tracks
-      } = playlist
+               spotify_id: "2gW4sqiC2OXZLe9m0yDQX7",
+               spotify_owner_id: "ku296zgwbo0e3qff8cylptsjq",
+               owner_name: "Flonflon",
+               name: "FLONFLON MUSIC FRIDAY",
+               cover_url: cover_url,
+               tracks: tracks
+             } = playlist
 
       assert Regex.match?(~r/^https:\/\/image-cdn-[a-z0-9\-]+\.spotifycdn\.com\/image\/[a-f0-9]{40}$/, cover_url)
+
       for track <- tracks do
         assert %Track{} = track
       end

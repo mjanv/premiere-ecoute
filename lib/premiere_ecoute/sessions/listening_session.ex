@@ -30,6 +30,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     field :ended_at, :utc_datetime
 
     belongs_to :user, User, foreign_key: :user_id
+
     belongs_to :album, Album, foreign_key: :album_id
     belongs_to :current_track, Album.Track, foreign_key: :current_track_id
 
@@ -53,13 +54,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:album_spotify_id)
     |> foreign_key_constraint(:current_track_id)
-  end
-
-  def changeset(attrs) do
-    %__MODULE__{}
-    |> cast(attrs, [:album_id, :user_id, :current_track_id])
-    |> validate_required([:album_id, :user_id])
-    |> put_change(:status, :preparing)
   end
 
   def create(attrs) do

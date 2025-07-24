@@ -19,8 +19,8 @@ defmodule PremiereEcoute.Sessions.Discography.PlaylistFixtures do
           album_spotify_id: "7eD4M0bxUGIFRCi0wWhkbt",
           user_spotify_id: "ku296zgwbo0e3qff8cylptsjq",
           artist: "Unknown Artist",
-          duration_ms: 217901,
-          added_at: ~N[2025-07-18 07:59:47],
+          duration_ms: 217_901,
+          added_at: ~N[2025-07-18 07:59:47]
         }
       ]
     }
