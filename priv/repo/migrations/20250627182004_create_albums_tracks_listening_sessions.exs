@@ -16,8 +16,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
 
     create unique_index(:albums, [:spotify_id])
 
-    # Tracks table
-    create table(:tracks) do
+    create table(:album_tracks) do
       add :spotify_id, :string, null: false, size: 255
       add :name, :string, null: false, size: 500
       add :track_number, :integer, null: false
@@ -27,8 +26,8 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:tracks, [:album_id])
-    create unique_index(:tracks, [:spotify_id, :album_id])
+    create index(:album_tracks, [:album_id])
+    create unique_index(:album_tracks, [:spotify_id, :album_id])
 
     create table(:listening_sessions) do
       add :status, :string, null: false, default: "preparing"
@@ -38,7 +37,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateAlbumsTracksListeningSessions do
 
       add :user_id, references(:users, on_delete: :delete_all)
       add :album_id, references(:albums), null: false
-      add :current_track_id, references(:tracks, on_delete: :nilify_all)
+      add :current_track_id, references(:album_tracks, on_delete: :nilify_all)
 
       timestamps(type: :utc_datetime)
     end

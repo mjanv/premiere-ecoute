@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
   alias PremiereEcoute.Apis.SpotifyApi
 
   alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.Discography.Album.Track
 
   @moduletag :spotify
 

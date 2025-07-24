@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
       add :ended_at, :naive_datetime
 
       add :session_id, references(:listening_sessions, on_delete: :delete_all), null: false
-      add :track_id, references(:tracks, on_delete: :delete_all), null: false
+      add :track_id, references(:album_tracks, on_delete: :delete_all), null: false
 
       timestamps()
     end

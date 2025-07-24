@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
   describe "create/1" do

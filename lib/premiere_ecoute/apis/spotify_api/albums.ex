@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
   alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.Discography.Album.Track
 
   @doc """
   Get an album

@@ -8,7 +8,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Track
   alias PremiereEcoute.Sessions.Scores.Report
 
   @type t :: %__MODULE__{
@@ -18,7 +17,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
           ended_at: DateTime.t() | nil,
           user: entity(User.t()),
           album: entity(Album.t()),
-          current_track: entity(Track.t()),
+          current_track: entity(Album.Track.t()),
           report: entity(Report.t()),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
@@ -32,14 +31,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     belongs_to :user, User, foreign_key: :user_id
     belongs_to :album, Album, foreign_key: :album_id
-    belongs_to :current_track, Track, foreign_key: :current_track_id
+    belongs_to :current_track, Album.Track, foreign_key: :current_track_id
 
     has_one :report, Report, foreign_key: :session_id
 
     timestamps(type: :utc_datetime)
   end
 
-  @doc false
   def changeset(listening_session, attrs) do
     listening_session
     |> cast(attrs, [

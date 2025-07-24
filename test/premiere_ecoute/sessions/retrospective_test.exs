@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.RetrospectiveTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores.Report

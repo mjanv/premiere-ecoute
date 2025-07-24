@@ -1,6 +1,6 @@
-defmodule PremiereEcoute.Sessions.Discography.Track do
+defmodule PremiereEcoute.Sessions.Discography.Album.Track do
   @moduledoc """
-  # Track Schema
+  Album Track
 
   Schema representing individual music tracks within albums, storing track metadata from Spotify including name, track number, duration, and unique identifiers. Tracks belong to albums and serve as the fundamental unit for music playback and rating within listening sessions.
   """
@@ -22,7 +22,7 @@ defmodule PremiereEcoute.Sessions.Discography.Track do
           updated_at: DateTime.t() | nil
         }
 
-  schema "tracks" do
+  schema "album_tracks" do
     field :spotify_id, :string
     field :name, :string
     field :track_number, :integer
@@ -33,7 +33,6 @@ defmodule PremiereEcoute.Sessions.Discography.Track do
     timestamps(type: :utc_datetime)
   end
 
-  @doc false
   def changeset(track, attrs) do
     track
     |> cast(attrs, [:spotify_id, :name, :track_number, :duration_ms])

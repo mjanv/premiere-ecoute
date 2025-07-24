@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     json: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.Discography.Album.Track
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -41,7 +41,6 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     timestamps(type: :utc_datetime)
   end
 
-  @doc false
   def changeset(album, attrs) do
     album
     |> cast(attrs, [:spotify_id, :name, :artist, :release_date, :cover_url, :total_tracks])

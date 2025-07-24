@@ -33,6 +33,7 @@ defmodule PremiereEcouteWeb.ConnCase do
 
       import PremiereEcoute.AccountsFixtures
       import PremiereEcoute.Sessions.Discography.AlbumFixtures
+      import PremiereEcoute.Sessions.Discography.PlaylistFixtures
     end
   end
 

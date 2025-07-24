@@ -31,7 +31,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Sessions.Discography.Album
-    alias PremiereEcoute.Sessions.Discography.Track
+    alias PremiereEcoute.Sessions.Discography.Album.Track
 
     # Albums
     @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}
@@ -111,6 +111,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   defdelegate previous_track(scope), to: __MODULE__.Player
   defdelegate start_resume_playback(scope, album), to: __MODULE__.Player
   defdelegate add_item_to_playback_queue(scope, item), to: __MODULE__.Player
+
+  # Playlists
+  defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists
 
   # Search
   defdelegate search_albums(query), to: __MODULE__.Search

@@ -129,7 +129,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   # AIDEV-NOTE: Helper functions for vote type detection and scoring logic
 
-  @doc false
   defp vote_options_are_integers?(vote_options) do
     Enum.all?(vote_options, fn option ->
       case Integer.parse(option) do
@@ -139,7 +138,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     end)
   end
 
-  @doc false
   defp calculate_average_score(votes) when is_list(votes) do
     if Enum.empty?(votes) do
       0.0
@@ -157,7 +155,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     end
   end
 
-  @doc false
   defp calculate_most_frequent(votes) when is_list(votes) do
     if Enum.empty?(votes) do
       "even"
@@ -296,7 +293,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   # AIDEV-NOTE: Helper functions for track-level score calculations
 
-  @doc false
   defp calculate_track_viewer_score(track_id, vote_options, votes, polls) do
     # Get individual viewer votes for this track
     individual_votes =
@@ -364,7 +360,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     end
   end
 
-  @doc false
   defp calculate_track_streamer_score(track_id, vote_options, votes) do
     streamer_votes =
       votes
@@ -382,7 +377,6 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
     end
   end
 
-  @doc false
   defp extract_poll_score(poll, vote_options) do
     # AIDEV-NOTE: Extract average/most frequent score from poll data
     if vote_options_are_integers?(vote_options) do

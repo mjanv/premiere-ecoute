@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   use PremiereEcoute.Core.Schema
 
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.Discography.Track
+  alias PremiereEcoute.Sessions.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
   @type t :: %__MODULE__{
@@ -39,7 +39,6 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   end
 
   def from_message(message, vote_options) do
-    # AIDEV-NOTE: Validate vote against session's vote_options (integer or string based)
     if message in vote_options do
       {:ok, message}
     else
@@ -47,7 +46,6 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     end
   end
 
-  # AIDEV-NOTE: Legacy function for backward compatibility
   def from_message(message) do
     from_message(message, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
   end
