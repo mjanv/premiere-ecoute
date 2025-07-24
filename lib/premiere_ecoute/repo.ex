@@ -25,6 +25,7 @@ defmodule PremiereEcoute.Repo do
       %{email: ["must be 5 characters"]}
 
   """
+  @spec traverse_errors(Ecto.Changeset.t()) :: map()
   def traverse_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
       Regex.replace(~r"%{(\w+)}", msg, fn _, key ->

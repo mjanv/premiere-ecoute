@@ -22,7 +22,21 @@ defmodule PremiereEcoute.MixProject do
       listeners: [Phoenix.CodeReloader],
       docs: [
         main: "readme",
-        extras: ["README.md"]
+        extras: ["README.md"],
+        groups_for_modules: [
+          Accounts: ~r/^PremiereEcoute\.Accounts(\.|$)/,
+          Sessions: ~r/^PremiereEcoute\.Sessions(\.|$)/,
+          Core: ~r/^PremiereEcoute\.Core(\.|$)/,
+          APIs: ~r/^PremiereEcoute\.Apis(\.|$)/,
+          Backend: ~r/^PremiereEcoute(\.|$)/,
+          "Web - Accounts": ~r/^PremiereEcouteWeb\.Accounts(\.|$)/,
+          "Web - Sessions": ~r/^PremiereEcouteWeb\.Sessions(\.|$)/,
+          "Web - Static": ~r/^PremiereEcouteWeb\.Static(\.|$)/,
+          "Web - Webhooks": ~r/^PremiereEcouteWeb\.Webhooks(\.|$)/,
+          "Web - Plugs": ~r/^PremiereEcouteWeb\.Plugs(\.|$)/,
+          "Web - Errors": ~r/^PremiereEcouteWeb\.Errors(\.|$)/,
+          Web: ~r/^PremiereEcouteWeb(\.|$)/
+        ]
       ]
     ]
   end
@@ -145,8 +159,8 @@ defmodule PremiereEcoute.MixProject do
         "cmd firefox cover/excoveralls.html"
       ],
       # Deployment
-      docs: ["doctor", "docs"],
-      ready: ["format", "quality", "cmd mix test --color"],
+      docs: ["doctor", "docs --output priv/docs"],
+      ready: ["format", "quality", "cmd mix test --color", "docs"],
       deploy: ["cmd fly deploy"],
       db: ["cmd fly postgres connect -a premiere-ecoute-db"]
     ]

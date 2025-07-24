@@ -1,10 +1,16 @@
 defmodule PremiereEcoute.Sessions.Discography.Album do
-  @moduledoc false
+  @moduledoc """
+  Music album in the discography system.
+
+  An album is a collection of tracks from Spotify's catalog that can be used
+  in listening sessions. Albums are identified by their Spotify ID and contain
+  metadata such as name, artist, release date, and cover art.
+  """
 
   use PremiereEcoute.Core.Schema,
     root: [:tracks],
     identity: [:spotify_id],
-    derive_only: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
+    json: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Track

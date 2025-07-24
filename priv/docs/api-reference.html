@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.38.2">
+    <meta name="project" content="Premiere Ecoute v0.1.0">
+
+
+    <title>API Reference — Premiere Ecoute v0.1.0</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-KV3YOVJ3.css" />
+
+    <script defer src="dist/sidebar_items-384F9616.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-DPJLHKSM.js"></script>
+
+  </head>
+  <body>
+    <script>(()=>{var t="ex_doc:settings",e="dark";var o="dark",s="light";var E="sidebar_state",n="closed";var r="sidebar_width";var a="sidebar-open";var i=new URLSearchParams(window.location.search),S=i.get("theme")||JSON.parse(localStorage.getItem(t)||"{}").theme;(S===o||S!==s&&window.matchMedia("(prefers-color-scheme: dark)").matches)&&document.body.classList.add(e);var d=sessionStorage.getItem(E),A=d!==n&&!window.matchMedia(`screen and (max-width: ${768}px)`).matches;document.body.classList.toggle(a,A);var c=sessionStorage.getItem(r);c&&document.body.style.setProperty("--sidebarWidth",`${c}px`);var p=/(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);document.documentElement.classList.toggle("apple-os",p);})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="https://premiere-ecoute.fly.dev/" class="sidebar-projectName" translate="no">
+Premiere Ecoute
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v0.1.0
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras=""></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Premiere Ecoute</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search" tabindex="-1">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>API Reference <small class="app-vsn">Premiere Ecoute v#0.1.0</small></h1>
+
+      <a href="https://github.com/mjanv/premiere_ecoute" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+    <section class="details-list">
+      <h2 id="modules" class="section-heading">Modules</h2>
+      <div class="summary">
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Accounts.html" translate="no">PremiereEcoute.Accounts</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>The Accounts context.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Accounts.ApiToken.html" translate="no">PremiereEcoute.Accounts.ApiToken</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>API Token Manager</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Accounts.Scope.html" translate="no">PremiereEcoute.Accounts.Scope</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Defines the scope of the caller to be used throughout the app.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Accounts.User.html" translate="no">PremiereEcoute.Accounts.User</a>
+
+  </div>
+
+    <div class="summary-synopsis"></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Apis.SpotifyApi.html" translate="no">PremiereEcoute.Apis.SpotifyApi</a>
+
+  </div>
+
+    <div class="summary-synopsis"></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Apis.SpotifyApi.Accounts.html" translate="no">PremiereEcoute.Apis.SpotifyApi.Accounts</a>
+
+  </div>
+
+    <div class="summary-synopsis"></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html" translate="no">PremiereEcoute.Apis.SpotifyApi.Behavior</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Spotify API Behavior</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Apis.SpotifyApi.Player.html" translate="no">PremiereEcoute.Apis.SpotifyApi.Player</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Spotify Web API Player endpoints for controlling playback.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Apis.TwitchApi.html" translate="no">PremiereEcoute.Apis.TwitchApi</a>
+
+  </div>
+
+    <div class="summary-synopsis"></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Apis.TwitchApi.Accounts.html" translate="no">PremiereEcoute.Apis.TwitchApi.Accounts</a>
+
+  </div>
+
+    <div class="summary-synopsis"></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Apis.TwitchApi.Behavior.html" translate="no">PremiereEcoute.Apis.TwitchApi.Behavior</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Twitch API Behavior</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Core.Duration.html" translate="no">PremiereEcoute.Core.Duration</a>
+
+  </div>
+
+    <div class="summary-synopsis"></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Release.html" translate="no">PremiereEcoute.Release</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Used for executing DB release tasks when run in production without Mix
+installed.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Repo.html" translate="no">PremiereEcoute.Repo</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Primary database repository for the Premiere Ecoute application.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Sessions.Discography.html" translate="no">PremiereEcoute.Sessions.Discography</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Context module for managing music discography data.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Sessions.Discography.Album.html" translate="no">PremiereEcoute.Sessions.Discography.Album</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Music album in the discography system.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Sessions.Discography.Track.html" translate="no">PremiereEcoute.Sessions.Discography.Track</a>
+
+  </div>
+
+    <div class="summary-synopsis"></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcoute.Sessions.Retrospective.html" translate="no">PremiereEcoute.Sessions.Retrospective</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Business logic for the streamer dashboard functionality.
+Provides queries and data aggregation for displaying albums listened during time periods.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.html" translate="no">PremiereEcouteWeb</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>The entrypoint for defining your web interface, such
+as controllers, components, channels, and so on.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Accounts.AccountLive.html" translate="no">PremiereEcouteWeb.Accounts.AccountLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Accounts.AuthController.html" translate="no">PremiereEcouteWeb.Accounts.AuthController</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Accounts.UserConfirmationLive.html" translate="no">PremiereEcouteWeb.Accounts.UserConfirmationLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Accounts.UserLoginLive.html" translate="no">PremiereEcouteWeb.Accounts.UserLoginLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Accounts.UserRegistrationLive.html" translate="no">PremiereEcouteWeb.Accounts.UserRegistrationLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Accounts.UserSessionController.html" translate="no">PremiereEcouteWeb.Accounts.UserSessionController</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Accounts.UserSettingsLive.html" translate="no">PremiereEcouteWeb.Accounts.UserSettingsLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Components.Header.html" translate="no">PremiereEcouteWeb.Components.Header</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Provides header component for navigation and user menu.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.CoreComponents.html" translate="no">PremiereEcouteWeb.CoreComponents</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Provides core UI components.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Endpoint.html" translate="no">PremiereEcouteWeb.Endpoint</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Errors.ErrorHTML.html" translate="no">PremiereEcouteWeb.Errors.ErrorHTML</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>This module is invoked by your endpoint in case of errors on HTML requests.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Errors.ErrorJSON.html" translate="no">PremiereEcouteWeb.Errors.ErrorJSON</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>This module is invoked by your endpoint in case of errors on JSON requests.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Gettext.html" translate="no">PremiereEcouteWeb.Gettext</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Internationalization (i18n) backend</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.HomepageLive.html" translate="no">PremiereEcouteWeb.HomepageLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Layouts.html" translate="no">PremiereEcouteWeb.Layouts</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>This module holds different layouts used by your application.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Plugs.RenewTokens.html" translate="no">PremiereEcouteWeb.Plugs.RenewTokens</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Plug that automatically renews expired Spotify tokens for authenticated users.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Router.html" translate="no">PremiereEcouteWeb.Router</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive.html" translate="no">PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Sessions.OverlayLive.html" translate="no">PremiereEcouteWeb.Sessions.OverlayLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Sessions.RetrospectiveLive.html" translate="no">PremiereEcouteWeb.Sessions.RetrospectiveLive</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>LiveView for the streamer dashboard showing albums listened in time periods as a cover wall.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Sessions.SessionLive.html" translate="no">PremiereEcouteWeb.Sessions.SessionLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Sessions.SessionsLive.html" translate="no">PremiereEcouteWeb.Sessions.SessionsLive</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Static.Changelog.ChangelogController.html" translate="no">PremiereEcouteWeb.Static.Changelog.ChangelogController</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Static.Changelog.ChangelogHTML.html" translate="no">PremiereEcouteWeb.Static.Changelog.ChangelogHTML</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Static.Legal.LegalController.html" translate="no">PremiereEcouteWeb.Static.Legal.LegalController</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Static.Legal.LegalHTML.html" translate="no">PremiereEcouteWeb.Static.Legal.LegalHTML</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Telemetry.html" translate="no">PremiereEcouteWeb.Telemetry</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="PremiereEcouteWeb.Webhooks.TwitchController.html" translate="no">PremiereEcouteWeb.Webhooks.TwitchController</a>
+
+  </div>
+
+</div>
+
+      </div>
+    </section>
+
+
+    <section class="details-list">
+      <h2 id="tasks" class="section-heading">Mix Tasks</h2>
+      <div class="summary">
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Mix.Tasks.Gettext.Check.html" translate="no">mix gettext.check</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Runs gettext.extract, gettext.merge, and greps for missing translations.</p></div>
+
+</div>
+
+      </div>
+    </section>
+
+</div>
+    <footer class="footer">
+      <p>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Premiere Ecoute.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.38.2) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

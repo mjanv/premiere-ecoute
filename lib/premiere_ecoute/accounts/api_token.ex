@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Accounts.ApiToken do
   @moduledoc """
-  Plug that automatically renews expired Spotify tokens for authenticated users.
+  API Token Manager
+
+  Utility module for managing OAuth2 token renewal for both Spotify and Twitch APIs. Provides automatic token refresh functionality when tokens are approaching expiration, ensuring continuous API access for authenticated users without manual intervention.
   """
 
   require Logger

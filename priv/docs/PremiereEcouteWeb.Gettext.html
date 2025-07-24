@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.38.2">
+    <meta name="project" content="Premiere Ecoute v0.1.0">
+
+
+    <title>PremiereEcouteWeb.Gettext — Premiere Ecoute v0.1.0</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-KV3YOVJ3.css" />
+
+    <script defer src="dist/sidebar_items-384F9616.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-DPJLHKSM.js"></script>
+
+  </head>
+  <body>
+    <script>(()=>{var t="ex_doc:settings",e="dark";var o="dark",s="light";var E="sidebar_state",n="closed";var r="sidebar_width";var a="sidebar-open";var i=new URLSearchParams(window.location.search),S=i.get("theme")||JSON.parse(localStorage.getItem(t)||"{}").theme;(S===o||S!==s&&window.matchMedia("(prefers-color-scheme: dark)").matches)&&document.body.classList.add(e);var d=sessionStorage.getItem(E),A=d!==n&&!window.matchMedia(`screen and (max-width: ${768}px)`).matches;document.body.classList.toggle(a,A);var c=sessionStorage.getItem(r);c&&document.body.style.setProperty("--sidebarWidth",`${c}px`);var p=/(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);document.documentElement.classList.toggle("apple-os",p);})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="https://premiere-ecoute.fly.dev/" class="sidebar-projectName" translate="no">
+Premiere Ecoute
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v0.1.0
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras=""></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-module" id="main" data-type="modules">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Premiere Ecoute</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search" tabindex="-1">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>
+      <span translate="no">PremiereEcouteWeb.Gettext</span> 
+      <small class="app-vsn" translate="no">(Premiere Ecoute v0.1.0)</small>
+
+    </h1>
+
+      <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute_web/gettext.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+    <section id="moduledoc">
+<p>Internationalization (i18n) backend</p><p>This module provides the Gettext backend for handling translations and
+localization throughout the application. It serves as the primary interface
+for translating user-facing text into multiple languages.</p><h2 id="module-translation-files" class="section-heading"><a href="#module-translation-files" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Translation Files</span></h2><p>Translation files are located in <code class="inline">priv/gettext/</code> with the following structure:</p><pre><code class="makeup elixir" translate="no"><span class="n">priv</span><span class="o">/</span><span class="n">gettext</span><span class="o">/</span><span class="w">
+</span><span class="err">├</span><span class="err">─</span><span class="err">─</span><span class="w"> </span><span class="n">fr</span><span class="o">/</span><span class="nc">LC_MESSAGES</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">po</span><span class="w">
+</span><span class="err">├</span><span class="err">─</span><span class="err">─</span><span class="w"> </span><span class="n">it</span><span class="o">/</span><span class="nc">LC_MESSAGES</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">po</span><span class="w">
+</span><span class="err">└</span><span class="err">─</span><span class="err">─</span><span class="w"> </span><span class="n">default</span><span class="o">.</span><span class="n">pot</span></code></pre><h2 id="module-usage" class="section-heading"><a href="#module-usage" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Usage</span></h2><pre><code class="heex">&lt;h1&gt;{gettext(&quot;Welcome to PremiereEcoute&quot;)}&lt;/h1&gt;
+&lt;p&gt;{gettext(&quot;Connect with %{platform}&quot;, platform: &quot;Twitch&quot;)}&lt;/p&gt;</code></pre><h2 id="module-translation-workflow" class="section-heading"><a href="#module-translation-workflow" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Translation Workflow</span></h2><ol><li><strong>Extract</strong>: Run <a href="https://hexdocs.pm/gettext/0.26.2/Mix.Tasks.Gettext.Extract.html"><code class="inline">mix gettext.extract</code></a> to find new translatable strings</li><li><strong>Merge</strong>: Run <code class="inline">mix gettext.merge priv/gettext</code> to update .po files</li><li><strong>Translate</strong>: Edit .po files to add translations for each language</li><li><strong>Compile</strong>: Translations are compiled into the application at build time</li></ol>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#gettext/1" data-no-tooltip="" translate="no">gettext(msgid)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#handle_missing_bindings/2" data-no-tooltip="" translate="no">handle_missing_bindings(exception, incomplete)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">Gettext.Backend.handle_missing_bindings/2</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#handle_missing_plural_translation/7" data-no-tooltip="" translate="no">handle_missing_plural_translation(locale, domain, msgctxt, msgid, msgid_plural, n, bindings)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">Gettext.Backend.handle_missing_plural_translation/7</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#handle_missing_translation/5" data-no-tooltip="" translate="no">handle_missing_translation(locale, domain, msgctxt, msgid, bindings)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">Gettext.Backend.handle_missing_translation/5</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#locale/0" data-no-tooltip="" translate="no">locale()</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Gets the locale for the current process</p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Functions</span>
+    </h1>
+    <div class="functions-list">
+<section class="detail" id="gettext/1">
+
+  <div class="detail-header">
+    <a href="#gettext/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">gettext(msgid)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute_web/gettext.ex#L37" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="handle_missing_bindings/2">
+
+  <div class="detail-header">
+    <a href="#handle_missing_bindings/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">handle_missing_bindings(exception, incomplete)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute_web/gettext.ex#L35" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="https://hexdocs.pm/gettext/0.26.2/Gettext.Backend.html#c:handle_missing_bindings/2"><code class="inline">Gettext.Backend.handle_missing_bindings/2</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="handle_missing_plural_translation/7">
+
+  <div class="detail-header">
+    <a href="#handle_missing_plural_translation/7" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">handle_missing_plural_translation(locale, domain, msgctxt, msgid, msgid_plural, n, bindings)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute_web/gettext.ex#L35" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="https://hexdocs.pm/gettext/0.26.2/Gettext.Backend.html#c:handle_missing_plural_translation/7"><code class="inline">Gettext.Backend.handle_missing_plural_translation/7</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="handle_missing_translation/5">
+
+  <div class="detail-header">
+    <a href="#handle_missing_translation/5" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">handle_missing_translation(locale, domain, msgctxt, msgid, bindings)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute_web/gettext.ex#L35" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="https://hexdocs.pm/gettext/0.26.2/Gettext.Backend.html#c:handle_missing_translation/5"><code class="inline">Gettext.Backend.handle_missing_translation/5</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="locale/0">
+
+  <div class="detail-header">
+    <a href="#locale/0" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">locale()</h1>
+
+
+        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute_web/gettext.ex#L43" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> locale() :: <a href="https://hexdocs.pm/gettext/0.26.2/Gettext.html#t:locale/0">Gettext.locale</a>()</pre>
+
+      </div>
+
+<p>Gets the locale for the current process</p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+      <p>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Premiere Ecoute.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.38.2) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

@@ -1,8 +1,12 @@
 defmodule PremiereEcoute.Sessions.Discography.Track do
-  @moduledoc false
+  @moduledoc """
+  # Track Schema
+
+  Schema representing individual music tracks within albums, storing track metadata from Spotify including name, track number, duration, and unique identifiers. Tracks belong to albums and serve as the fundamental unit for music playback and rating within listening sessions.
+  """
 
   use PremiereEcoute.Core.Schema,
-    derive_only: [:id, :name, :track_number]
+    json: [:id, :name, :track_number]
 
   alias PremiereEcoute.Sessions.Discography.Album
 
@@ -13,7 +17,7 @@ defmodule PremiereEcoute.Sessions.Discography.Track do
           track_number: integer() | nil,
           duration_ms: integer() | nil,
           album_id: integer() | nil,
-          album: Album.t() | Ecto.Association.NotLoaded.t() | nil,
+          album: entity(Album.t()),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }

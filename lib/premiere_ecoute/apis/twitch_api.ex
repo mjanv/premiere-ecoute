@@ -1,5 +1,25 @@
 defmodule PremiereEcoute.Apis.TwitchApi do
-  @moduledoc "Twitch API"
+  @moduledoc """
+  # Twitch API Client
+
+  Central client for Twitch API integration providing authentication, chat messaging, event subscriptions, and poll management functionality. This module acts as the main interface for all Twitch-related operations, delegating to specialized submodules for specific API domains while handling common concerns like authentication, request configuration, and telemetry.
+
+  ## Accounts
+
+  Handles OAuth2 authorization flow with Twitch, including generating authorization URLs, exchanging authorization codes for access tokens, and refreshing expired tokens. Manages both user and application access tokens with automatic token retrieval and caching.
+
+  ## Chat
+
+  Provides chat messaging capabilities for Twitch channels, including sending regular messages and announcements with color formatting. Messages are sent on behalf of authenticated users with appropriate channel permissions.
+
+  ## EventSub
+
+  Manages Twitch EventSub subscriptions for real-time event notifications. Supports subscribing to various event types, managing active subscriptions, and canceling subscriptions when no longer needed.
+
+  ## Polls
+
+  Facilitates Twitch poll creation and management, allowing broadcasters to create interactive polls, retrieve poll status, and end active polls. Polls enable audience engagement through voting mechanisms.
+  """
 
   require Logger
 
@@ -7,7 +27,9 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
 
   defmodule Behavior do
-    @moduledoc false
+    @moduledoc """
+    Twitch API Behavior
+    """
 
     alias PremiereEcoute.Accounts.Scope
 

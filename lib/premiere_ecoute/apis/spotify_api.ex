@@ -1,11 +1,33 @@
 defmodule PremiereEcoute.Apis.SpotifyApi do
-  @moduledoc "Spotify API"
+  @moduledoc """
+  # Spotify API Client
+
+  Central client for Spotify Web API integration providing music search, album retrieval, player control, and authentication functionality. This module acts as the main interface for all Spotify-related operations, delegating to specialized submodules for specific API domains while handling common concerns like authentication, request configuration, and telemetry.
+
+  ## Accounts
+
+  Handles OAuth2 authorization flow with Spotify, including generating authorization URLs, exchanging authorization codes for access tokens, and refreshing expired tokens. Supports both client credentials flow for public data and authorization code flow for user-specific operations.
+
+  ## Albums
+
+  Provides access to Spotify's album catalog, enabling retrieval of detailed album information including tracks, metadata, and artwork. Album data is parsed into structured domain objects for use throughout the application.
+
+  ## Player
+
+  Controls Spotify playback for authenticated users with premium accounts. Supports play/pause operations, track navigation, queue management, and playback state monitoring. Integrates with user's active Spotify devices for seamless music control.
+
+  ## Search
+
+  Enables searching Spotify's music catalog for albums, tracks, and artists. Returns structured results that can be used for music discovery and selection within listening sessions.
+  """
 
   alias PremiereEcoute.Telemetry
   alias PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics
 
   defmodule Behavior do
-    @moduledoc "Defines the Spotify interface"
+    @moduledoc """
+    Spotify API Behavior
+    """
 
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Sessions.Discography.Album
@@ -20,8 +42,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     @callback pause_playback(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
     @callback next_track(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
     @callback previous_track(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
-    @callback start_resume_playback(scope :: Scope.t(), item :: Album.t() | Track.t()) ::
-                {:ok, String.t()} | {:error, term()}
+    @callback start_resume_playback(scope :: Scope.t(), item :: Album.t() | Track.t()) :: {:ok, String.t()} | {:error, term()}
     @callback add_item_to_playback_queue(scope :: Scope.t(), item :: Album.t() | Track.t()) ::
                 {:ok, String.t() | [String.t()]} | {:error, term()}
 

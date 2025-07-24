@@ -12,8 +12,8 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
           viewer_id: String.t() | nil,
           value: integer() | nil,
           is_streamer: boolean(),
-          session: ListeningSession.t() | nil | Ecto.Association.NotLoaded.t(),
-          track: Track.t() | nil | Ecto.Association.NotLoaded.t(),
+          session: entity(ListeningSession.t()),
+          track: entity(Track.t()),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }

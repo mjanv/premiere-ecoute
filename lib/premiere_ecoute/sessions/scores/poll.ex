@@ -14,8 +14,8 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
           total_votes: integer() | nil,
           votes: map() | nil,
           ended_at: NaiveDateTime.t() | nil,
-          session: ListeningSession.t() | nil | Ecto.Association.NotLoaded.t(),
-          track: Track.t() | nil | Ecto.Association.NotLoaded.t(),
+          session: entity(ListeningSession.t()),
+          track: entity(Track.t()),
           inserted_at: NaiveDateTime.t() | nil,
           updated_at: NaiveDateTime.t() | nil
         }

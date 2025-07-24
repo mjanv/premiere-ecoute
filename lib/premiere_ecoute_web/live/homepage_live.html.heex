@@ -1,115 +1,148 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
   <div class="text-white flex flex-col" style="background-color: var(--color-dark-950); min-height: calc(100vh - 5rem);">
-    <!-- Main Content -->
-    <div class="flex-1 flex items-center justify-center py-8">
-      <div class="text-center max-w-5xl px-6">
-        <!-- Hero Section -->
-        <div class="mb-12">
-          <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 bg-gradient-purple">
-            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-            </svg>
+    <!-- AIDEV-NOTE: Hero section with left/right layout: title+description left, mockups right -->
+    <!-- Hero Section -->
+    <div class="flex-1 py-16">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+<!-- Left side: Title and Description -->
+          <div class="order-2 lg:order-1">
+            <h1 class="text-5xl lg:text-6xl text-white mb-6 font-extrabold leading-tight">
+              Premiere Ecoute
+            </h1>
+
+            <p class="text-xl mb-8 leading-relaxed" style="color: var(--color-dark-300);">
+              {gettext(
+                "Share your music taste with the world. Create listening sessions, rate albums together, and discover new favorites through community feedback."
+              )}
+            </p>
+            
+<!-- Action Buttons -->
+            <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
+              <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:streamer, :admin] do %>
+                <!-- AIDEV-NOTE: Streamer/Admin user - show session buttons -->
+                <.link
+                  href={~p"/sessions/discography/album/select"}
+                  class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-white font-semibold rounded-lg transition-all text-lg hover:scale-105 bg-gradient-purple hover:shadow-lg"
+                  style="box-shadow: 0 4px 14px 0 rgba(139, 79, 255, 0.25);"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  {gettext("Start New Session")}
+                </.link>
+
+                <.link
+                  href={~p"/sessions"}
+                  class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
+                  style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
+                  onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
+                  onmouseout="this.style.color='var(--color-dark-300)'; this.style.borderColor='var(--color-dark-600)'; this.style.backgroundColor='var(--color-dark-900)';"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                  </svg>
+                  {gettext("My Sessions")}
+                </.link>
+
+                <.link
+                  href={~p"/sessions/wrapped/retrospective"}
+                  class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
+                  style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
+                  onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
+                  onmouseout="this.style.color='var(--color-dark-300)'; this.style.borderColor='var(--color-dark-600)'; this.style.backgroundColor='var(--color-dark-900)';"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                  </svg>
+                  {gettext("My Retrospective")}
+                </.link>
+              <% end %>
+              <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:viewer] do %>
+                <!-- AIDEV-NOTE: Viewer user - show welcome message -->
+                <div>
+                  <p class="text-lg text-gray-300 mb-4">
+                    {gettext("Welcome back, %{username}!", username: @current_scope.user.twitch_username || "User")}
+                  </p>
+                  <p class="text-gray-400">
+                    {gettext("Explore listening sessions and join the community discussions.")}
+                  </p>
+                </div>
+              <% end %>
+              <%= if is_nil(@current_scope) do %>
+                <!-- AIDEV-NOTE: Anonymous user - show big Connect with Twitch button -->
+                <.link
+                  href={~p"/auth/twitch"}
+                  class="w-full sm:w-auto inline-flex items-center justify-center px-12 py-6 text-white font-bold rounded-lg transition-all text-xl hover:scale-105 bg-purple-600 hover:bg-purple-700 hover:shadow-lg"
+                  style="box-shadow: 0 4px 14px 0 rgba(147, 51, 234, 0.25);"
+                >
+                  <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                  </svg>
+                  {gettext("Connect with Twitch")}
+                </.link>
+              <% end %>
+            </div>
+          </div>
+          
+<!-- Right side: Mockups -->
+          <div class="order-1 lg:order-2 relative">
+            <!-- AIDEV-NOTE: DaisyUI mockups - browser with overlapping phone -->
+            <!-- Browser Mockup - takes 80% width -->
+            <div class="mockup-browser border bg-base-300 border-base-300 shadow-2xl w-full max-w-none" style="width: 100%;">
+              <div class="mockup-browser-toolbar">
+                <div class="input border border-base-300">https://premiere-ecoute.fly.dev</div>
+              </div>
+              <div class="px-6 py-40" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+            </div>
+            
+<!-- Phone Mockup - positioned with slight overlap -->
+            <div class="absolute top-1/2 -translate-y-4/10 -right-45">
+              <div class="mockup-phone border-primary scale-[0.3]">
+                <div class="mockup-phone-camera"></div>
+                <div class="mockup-phone-display">
+                  <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- AIDEV-NOTE: Features Preview section - only for unauthenticated users -->
+    <%= if is_nil(@current_scope) do %>
+      <!-- Features Preview -->
+      <div class="py-12">
+        <div class="max-w-7xl mx-auto px-6">
+          <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-white mb-4">
+              {gettext("Everything you need for music discovery")}
+            </h2>
+            <p class="text-lg" style="color: var(--color-dark-300);">
+              {gettext("Join the community and explore music together")}
+            </p>
           </div>
 
-          <h1 class="text-6xl text-white mb-6 font-extrabold">
-            Premiere Ecoute
-          </h1>
-
-          <p class="text-xl mb-8 leading-relaxed" style="color: var(--color-dark-300);">
-            {gettext(
-              "Share your music taste with the world. Create listening sessions, rate albums together, and discover new favorites through community feedback."
-            )}
-          </p>
-        </div>
-        
-<!-- Action Buttons -->
-        <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
-          <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:streamer, :admin] do %>
-            <!-- AIDEV-NOTE: Streamer/Admin user - show session buttons -->
-            <.link
-              href={~p"/sessions/discography/album/select"}
-              class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-white font-semibold rounded-lg transition-all text-lg hover:scale-105 bg-gradient-purple hover:shadow-lg"
-              style="box-shadow: 0 4px 14px 0 rgba(139, 79, 255, 0.25);"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              {gettext("Start New Session")}
-            </.link>
-
-            <.link
-              href={~p"/sessions"}
-              class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
-              style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
-              onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
-              onmouseout="this.style.color='var(--color-dark-300)'; this.style.borderColor='var(--color-dark-600)'; this.style.backgroundColor='var(--color-dark-900)';"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
-              {gettext("My Sessions")}
-            </.link>
-
-            <.link
-              href={~p"/sessions/wrapped/retrospective"}
-              class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
-              style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
-              onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
-              onmouseout="this.style.color='var(--color-dark-300)'; this.style.borderColor='var(--color-dark-600)'; this.style.backgroundColor='var(--color-dark-900)';"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-              {gettext("My Retrospective")}
-            </.link>
-          <% end %>
-          <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:viewer] do %>
-            <!-- AIDEV-NOTE: Viewer user - show welcome message -->
-            <div class="text-center">
-              <p class="text-lg text-gray-300 mb-4">
-                {gettext("Welcome back, %{username}!", username: @current_scope.user.twitch_username || "User")}
-              </p>
-              <p class="text-gray-400">
-                {gettext("Explore listening sessions and join the community discussions.")}
-              </p>
-            </div>
-          <% end %>
-          <%= if is_nil(@current_scope) do %>
-            <!-- AIDEV-NOTE: Anonymous user - show big Connect with Twitch button -->
-            <.link
-              href={~p"/auth/twitch"}
-              class="w-full sm:w-auto inline-flex items-center justify-center px-12 py-6 text-white font-bold rounded-lg transition-all text-xl hover:scale-105 bg-purple-600 hover:bg-purple-700 hover:shadow-lg"
-              style="box-shadow: 0 4px 14px 0 rgba(147, 51, 234, 0.25);"
-            >
-              <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-              </svg>
-              {gettext("Connect with Twitch")}
-            </.link>
-          <% end %>
-        </div>
-
-        <%= if is_nil(@current_scope) do %>
-          <!-- AIDEV-NOTE: Features Preview - only show for anonymous users -->
-          <!-- Features Preview -->
-          <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center p-6">
               <div
-                class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                class="w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6"
                 style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
               >
                 <svg
-                  class="w-6 h-6"
+                  class="w-8 h-8"
                   style="color: var(--color-primary-400);"
                   fill="none"
                   stroke="currentColor"
@@ -123,19 +156,21 @@
                   />
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-white mb-2">{gettext("Album Discovery")}</h3>
-              <p class="text-sm" style="color: var(--color-dark-400);">
-                {gettext("Search and explore albums from Spotify's vast music library")}
+              <h3 class="text-xl font-semibold text-white mb-3">{gettext("Album Discovery")}</h3>
+              <p class="text-base leading-relaxed" style="color: var(--color-dark-400);">
+                {gettext(
+                  "Search and explore albums from Spotify's vast music library. Find your next favorite artist or rediscover classics."
+                )}
               </p>
             </div>
 
-            <div class="text-center">
+            <div class="text-center p-6">
               <div
-                class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                class="w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6"
                 style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
               >
                 <svg
-                  class="w-6 h-6"
+                  class="w-8 h-8"
                   style="color: var(--color-primary-400);"
                   fill="none"
                   stroke="currentColor"
@@ -149,19 +184,21 @@
                   />
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-white mb-2">{gettext("Community Rating")}</h3>
-              <p class="text-sm" style="color: var(--color-dark-400);">
-                {gettext("Rate tracks together and see what the community thinks")}
+              <h3 class="text-xl font-semibold text-white mb-3">{gettext("Community Rating")}</h3>
+              <p class="text-base leading-relaxed" style="color: var(--color-dark-400);">
+                {gettext(
+                  "Rate tracks together and see what the community thinks. Build consensus and discover hidden gems through collective wisdom."
+                )}
               </p>
             </div>
 
-            <div class="text-center">
+            <div class="text-center p-6">
               <div
-                class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                class="w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6"
                 style="background-color: var(--color-primary-950); border: 1px solid var(--color-primary-800);"
               >
                 <svg
-                  class="w-6 h-6"
+                  class="w-8 h-8"
                   style="color: var(--color-primary-400);"
                   fill="none"
                   stroke="currentColor"
@@ -175,15 +212,17 @@
                   />
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-white mb-2">{gettext("Live Sessions")}</h3>
-              <p class="text-sm" style="color: var(--color-dark-400);">
-                {gettext("Host real-time listening parties with live voting and feedback")}
+              <h3 class="text-xl font-semibold text-white mb-3">{gettext("Live Sessions")}</h3>
+              <p class="text-base leading-relaxed" style="color: var(--color-dark-400);">
+                {gettext(
+                  "Host real-time listening parties with live voting and feedback. Connect with streamers and fellow music lovers."
+                )}
               </p>
             </div>
           </div>
-        <% end %>
+        </div>
       </div>
-    </div>
+    <% end %>
     
 <!-- Footer -->
     <footer class="py-4 px-6" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">

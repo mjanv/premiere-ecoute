@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
 
   setup do
     Cachex.clear(:users)
+    on_exit(fn -> Cachex.clear(:users) end)
 
     :ok
   end

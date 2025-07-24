@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
-  @moduledoc false
+  @moduledoc """
+  # Twitch OAuth2 Authentication
+
+  Handles OAuth2 authentication flows with Twitch API, supporting both application access tokens for general API access and user authorization code flow for user-specific operations. Manages token caching, user profile retrieval, and automatic token refresh with comprehensive error handling and logging.
+  """
 
   require Logger
 

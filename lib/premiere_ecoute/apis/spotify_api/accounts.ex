@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
-  @moduledoc false
+  @moduledoc """
+  # Spotify OAuth2 Authentication
+
+  Handles OAuth2 authentication flows with Spotify Web API, supporting both client credentials flow for public data access and authorization code flow for user-specific operations. Manages token generation, exchange, and refresh operations with comprehensive error handling and logging.
+  """
 
   require Logger
 

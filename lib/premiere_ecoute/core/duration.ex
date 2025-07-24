@@ -1,6 +1,6 @@
 defmodule PremiereEcoute.Core.Duration do
   @moduledoc """
-  Utilities for formatting time durations and datetime values.
+  # Utilities for formatting time durations and datetime values.
 
   Provides functions to format millisecond durations as MM:SS timers, calculate elapsed time between datetime values, and display formatted timestamps.
   """

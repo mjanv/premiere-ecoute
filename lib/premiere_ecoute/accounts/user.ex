@@ -1,8 +1,12 @@
 defmodule PremiereEcoute.Accounts.User do
-  @moduledoc false
+  @moduledoc """
+  # User Account Schema
+
+  Core user schema managing authentication, authorization, and OAuth integrations with Spotify and Twitch APIs. Handles user registration, password management, role-based access control, and secure token storage for third-party service integrations with automatic token refresh capabilities.
+  """
 
   use PremiereEcoute.Core.Schema,
-    derive_only: [:id, :email, :role]
+    json: [:id, :email, :role]
 
   @type t :: %__MODULE__{
           id: integer() | nil,

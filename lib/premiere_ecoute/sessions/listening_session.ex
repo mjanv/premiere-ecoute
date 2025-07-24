@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   use PremiereEcoute.Core.Schema,
     root: [album: [:tracks], user: [], current_track: []],
-    derive_only: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
+    json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Repo
@@ -16,10 +16,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
           status: atom(),
           started_at: DateTime.t() | nil,
           ended_at: DateTime.t() | nil,
-          user: User.t() | nil | Ecto.Association.NotLoaded.t(),
-          album: Album.t() | nil | Ecto.Association.NotLoaded.t(),
-          current_track: Track.t() | nil | Ecto.Association.NotLoaded.t(),
-          report: Report.t() | nil | Ecto.Association.NotLoaded.t(),
+          user: entity(User.t()),
+          album: entity(Album.t()),
+          current_track: entity(Track.t()),
+          report: entity(Report.t()),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }

@@ -21,6 +21,7 @@ defmodule PremiereEcoute.Accounts.Bot do
               {:ok, user} ->
                 Cachex.put(:users, :bot, user, expire: 5 * 60 * 1_000)
                 user
+
               {:error, user} ->
                 user
             end
