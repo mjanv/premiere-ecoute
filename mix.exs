@@ -7,7 +7,7 @@ defmodule PremiereEcoute.MixProject do
       name: "Premiere Ecoute",
       version: "0.1.0",
       elixir: "~> 1.18",
-      source_url: "https://github.com/mjanv/premiere_ecoute",
+      source_url: "https://github.com/mjanv/premiere-ecoute",
       homepage_url: "https://premiere-ecoute.fly.dev/",
       elixirc_paths: elixirc_paths(Mix.env()),
       elixirc_options: [ignore_module_conflict: true],
@@ -22,12 +22,15 @@ defmodule PremiereEcoute.MixProject do
       listeners: [Phoenix.CodeReloader],
       docs: [
         main: "readme",
-        extras: ["README.md"],
+        extras: ["README.md"] ++ Path.wildcard("docs/**/*.md"),
+        groups_for_extras: [
+          Doc: Path.wildcard("docs/*.md")
+        ],
         groups_for_modules: [
-          Accounts: ~r/^PremiereEcoute\.Accounts(\.|$)/,
-          Sessions: ~r/^PremiereEcoute\.Sessions(\.|$)/,
-          Core: ~r/^PremiereEcoute\.Core(\.|$)/,
-          APIs: ~r/^PremiereEcoute\.Apis(\.|$)/,
+          "Backend - Accounts": ~r/^PremiereEcoute\.Accounts(\.|$)/,
+          "Backend - Sessions": ~r/^PremiereEcoute\.Sessions(\.|$)/,
+          "Backend - Core": ~r/^PremiereEcoute\.Core(\.|$)/,
+          "Backend - APIs": ~r/^PremiereEcoute\.Apis(\.|$)/,
           Backend: ~r/^PremiereEcoute(\.|$)/,
           "Web - Accounts": ~r/^PremiereEcouteWeb\.Accounts(\.|$)/,
           "Web - Sessions": ~r/^PremiereEcouteWeb\.Sessions(\.|$)/,

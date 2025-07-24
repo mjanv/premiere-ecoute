@@ -1,8 +1,12 @@
 defmodule PremiereEcoute.Release do
   @moduledoc """
-  Used for executing DB release tasks when run in production without Mix
-  installed.
+  Release tools
+
+  Used for executing DB release tasks when run in production without Mix installed.
   """
+
+  alias PremiereEcoute.Apis.FlyApi
+
   @app :premiere_ecoute
 
   def migrate do
@@ -11,6 +15,8 @@ defmodule PremiereEcoute.Release do
     # config = PremiereEcoute.EventStore.config()
     # :ok = EventStore.Tasks.Create.exec(config, [])
     # :ok = EventStore.Tasks.Init.exec(config, [])
+
+    FlyApi.start_machine("premiere-ecoute-db", "32873324f67238") |> IO.inspect()
 
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
@@ -30,6 +36,7 @@ defmodule PremiereEcoute.Release do
   defp load_app do
     # Application.ensure_all_started(:postgrex)
     Application.ensure_all_started(:ssl)
+    Application.ensure_all_started(:req)
     Application.ensure_loaded(@app)
   end
 end

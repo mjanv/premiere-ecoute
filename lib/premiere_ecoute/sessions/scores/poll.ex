@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.Scores.Poll do
-  @moduledoc false
+  @moduledoc """
+  Poll schema and operations
+
+  Manages voting polls associated with listening sessions and tracks. This module provides data persistence for poll results, vote tallying, and validation to ensure vote counts are consistent with totals.
+  """
 
   use PremiereEcoute.Core.Schema
 

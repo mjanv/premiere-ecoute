@@ -8,7 +8,7 @@
     <meta name="project" content="Premiere Ecoute v0.1.0">
 
 
-    <title>PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive — Premiere Ecoute v0.1.0</title>
+    <title>PremiereEcoute.Sessions.Scores.Vote.Graph — Premiere Ecoute v0.1.0</title>
 
     <link rel="stylesheet" href="dist/html-elixir-KV3YOVJ3.css" />
 
@@ -75,18 +75,22 @@ Premiere Ecoute
 <div id="top-content">
   <div class="heading-with-actions top-heading">
     <h1>
-      <span translate="no">PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive</span> 
+      <span translate="no">PremiereEcoute.Sessions.Scores.Vote.Graph</span> 
       <small class="app-vsn" translate="no">(Premiere Ecoute v0.1.0)</small>
 
     </h1>
 
-      <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.ex#L1" title="View Source" class="icon-action" rel="help">
+      <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/sessions/scores/vote/graph.ex#L1" title="View Source" class="icon-action" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         <span class="sr-only">View Source</span>
       </a>
 
   </div>
 
+
+    <section id="moduledoc">
+<h1>Vote Graph Analytics</h1><p>Provides graph-based analytics and visualization data for vote scoring, including rolling averages and statistical computations over time-series voting data.</p>
+    </section>
 
 </div>
 
@@ -104,19 +108,11 @@ Premiere Ecoute
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#get_vote_options/1" data-no-tooltip="" translate="no">get_vote_options(_)</a>
+        <a href="#rolling_average/2" data-no-tooltip="" translate="no">rolling_average(session_id, aggregation \\ :vote)</a>
 
       </div>
 
-    </div>
-
-    <div class="summary-row">
-      <div class="summary-signature">
-        <a href="#render/1" data-no-tooltip="" translate="no">render(assigns)</a>
-
-      </div>
-
-        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">Phoenix.LiveView.render/1</code></a>.</p></div>
+        <div class="summary-synopsis"><p>Computes a rolling average for votes in a session using SQL window functions.</p></div>
 
     </div>
 
@@ -133,17 +129,19 @@ Premiere Ecoute
       <span class="text">Functions</span>
     </h1>
     <div class="functions-list">
-<section class="detail" id="get_vote_options/1">
+<section class="detail" id="rolling_average/2">
+
+    <span id="rolling_average/1"></span>
 
   <div class="detail-header">
-    <a href="#get_vote_options/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+    <a href="#rolling_average/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
     </a>
     <div class="heading-with-actions">
-      <h1 class="signature" translate="no">get_vote_options(_)</h1>
+      <h1 class="signature" translate="no">rolling_average(session_id, aggregation \\ :vote)</h1>
 
 
-        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.ex#L120" class="icon-action" rel="help" aria-label="View Source">
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/sessions/scores/vote/graph.ex#L16" class="icon-action" rel="help" aria-label="View Source">
           <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         </a>
 
@@ -152,29 +150,8 @@ Premiere Ecoute
 
   <section class="docstring">
 
-
-  </section>
-</section>
-<section class="detail" id="render/1">
-
-  <div class="detail-header">
-    <a href="#render/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
-      <i class="ri-link-m" aria-hidden="true"></i>
-    </a>
-    <div class="heading-with-actions">
-      <h1 class="signature" translate="no">render(assigns)</h1>
-
-
-        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.ex#L1" class="icon-action" rel="help" aria-label="View Source">
-          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-        </a>
-
-    </div>
-  </div>
-
-  <section class="docstring">
-
-<p>Callback implementation for <a href="https://hexdocs.pm/phoenix_live_view/1.0.17/Phoenix.LiveView.html#c:render/1"><code class="inline">Phoenix.LiveView.render/1</code></a>.</p>
+<p>Computes a rolling average for votes in a session using SQL window functions.</p><p>Returns a list of {timestamp, average} tuples where each average
+is computed from all votes up to that point in time.</p>
   </section>
 </section>
 

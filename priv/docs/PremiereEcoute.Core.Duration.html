@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="dist/html-elixir-KV3YOVJ3.css" />
 
-    <script defer src="dist/sidebar_items-384F9616.js"></script>
+    <script defer src="dist/sidebar_items-9A188D75.js"></script>
     <script defer src="docs_config.js"></script>
     <script defer src="dist/html-DPJLHKSM.js"></script>
 
@@ -80,7 +80,7 @@ Premiere Ecoute
 
     </h1>
 
-      <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L1" title="View Source" class="icon-action" rel="help">
+      <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L1" title="View Source" class="icon-action" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         <span class="sr-only">View Source</span>
       </a>
@@ -159,7 +159,7 @@ Premiere Ecoute
       <h1 class="signature" translate="no">clock(datetime)</h1>
 
 
-        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L56" class="icon-action" rel="help" aria-label="View Source">
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L56" class="icon-action" rel="help" aria-label="View Source">
           <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         </a>
 
@@ -175,10 +175,10 @@ Premiere Ecoute
       </div>
 
 <p>Formats datetime as a human-readable timestamp.</p><h2 id="clock/1-examples" class="section-heading"><a href="#clock/1-examples" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Examples</span></h2><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ld">~U[2024-03-15 14:30:00Z]</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">clock</span><span class="p" data-group-id="7013203446-1">(</span><span class="n">dt</span><span class="p" data-group-id="7013203446-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">clock</span><span class="p" data-group-id="1974111781-1">(</span><span class="n">dt</span><span class="p" data-group-id="1974111781-1">)</span><span class="w">
 </span><span class="s">&quot;Mar 15, 2024 at 02:30 PM&quot;</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">clock</span><span class="p" data-group-id="7013203446-2">(</span><span class="s">&quot;invalid&quot;</span><span class="p" data-group-id="7013203446-2">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">clock</span><span class="p" data-group-id="1974111781-2">(</span><span class="s">&quot;invalid&quot;</span><span class="p" data-group-id="1974111781-2">)</span><span class="w">
 </span><span class="s">&quot;--&quot;</span></code></pre>
   </section>
 </section>
@@ -192,7 +192,7 @@ Premiere Ecoute
       <h1 class="signature" translate="no">timer(duration_ms)</h1>
 
 
-        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L20" class="icon-action" rel="help" aria-label="View Source">
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L20" class="icon-action" rel="help" aria-label="View Source">
           <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         </a>
 
@@ -207,10 +207,10 @@ Premiere Ecoute
 
       </div>
 
-<p>Formats millisecond duration as MM:SS timer format.</p><h2 id="timer/1-examples" class="section-heading"><a href="#timer/1-examples" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Examples</span></h2><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">timer</span><span class="p" data-group-id="3232062893-1">(</span><span class="mi">125_000</span><span class="p" data-group-id="3232062893-1">)</span><span class="w">
+<p>Formats millisecond duration as MM:SS timer format.</p><h2 id="timer/1-examples" class="section-heading"><a href="#timer/1-examples" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Examples</span></h2><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">timer</span><span class="p" data-group-id="9609649758-1">(</span><span class="mi">125_000</span><span class="p" data-group-id="9609649758-1">)</span><span class="w">
 </span><span class="s">&quot;02:05&quot;</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">timer</span><span class="p" data-group-id="3232062893-2">(</span><span class="s">&quot;invalid&quot;</span><span class="p" data-group-id="3232062893-2">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">timer</span><span class="p" data-group-id="9609649758-2">(</span><span class="s">&quot;invalid&quot;</span><span class="p" data-group-id="9609649758-2">)</span><span class="w">
 </span><span class="s">&quot;--:--&quot;</span></code></pre>
   </section>
 </section>
@@ -224,7 +224,7 @@ Premiere Ecoute
       <h1 class="signature" translate="no">timer(started_at, ended_at)</h1>
 
 
-        <a href="https://github.com/mjanv/premiere_ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L38" class="icon-action" rel="help" aria-label="View Source">
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/core/duration.ex#L38" class="icon-action" rel="help" aria-label="View Source">
           <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         </a>
 
@@ -241,7 +241,7 @@ Premiere Ecoute
 
 <p>Calculates elapsed time between two datetime values in minutes and seconds format.</p><h2 id="timer/2-examples" class="section-heading"><a href="#timer/2-examples" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Examples</span></h2><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ld">~U[2024-01-01 10:00:00Z]</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">end_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ld">~U[2024-01-01 10:03:30Z]</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">timer</span><span class="p" data-group-id="7565847866-1">(</span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="n">end_time</span><span class="p" data-group-id="7565847866-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">PremiereEcoute.Core.Duration</span><span class="o">.</span><span class="n">timer</span><span class="p" data-group-id="8230045328-1">(</span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="n">end_time</span><span class="p" data-group-id="8230045328-1">)</span><span class="w">
 </span><span class="s">&quot;3m 30s&quot;</span></code></pre>
   </section>
 </section>
