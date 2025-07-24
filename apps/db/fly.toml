@@ -6,6 +6,10 @@
 app = 'premiere-ecoute-db'
 primary_region = 'cdg'
 
+[build]
+  image = "flyio/postgres-flex:17.2"
+
+
 [env]
   FLY_SCALE_TO_ZERO = '1h'
   PRIMARY_REGION = 'cdg'
@@ -18,6 +22,7 @@ primary_region = 'cdg'
   protocol = 'tcp'
   internal_port = 5432
   auto_start_machines = true
+  auto_stop_machines = true
 
   [[services.ports]]
     port = 5432
@@ -32,6 +37,7 @@ primary_region = 'cdg'
   protocol = 'tcp'
   internal_port = 5433
   auto_start_machines = true
+  auto_stop_machines = true
 
   [[services.ports]]
     port = 5433

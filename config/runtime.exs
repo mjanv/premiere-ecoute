@@ -54,7 +54,7 @@ if config_env() == :prod do
     url: [host: env!("PHX_HOST"), port: 443, scheme: "https"],
     http: [
       ip: {0, 0, 0, 0},
-      port: env!("PORT", :string, 4000)
+      port: env!("PORT", :integer, 4000)
     ],
     secret_key_base: env!("SECRET_KEY_BASE")
 
