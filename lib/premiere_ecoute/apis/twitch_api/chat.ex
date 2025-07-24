@@ -10,8 +10,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
   def send_chat_message(%Scope{user: %{twitch_user_id: user_id}}, message) do
     bot = Bot.get()
 
-    Logger.info("#{inspect(bot)}")
-
     TwitchApi.api(:helix, bot.twitch_access_token)
     |> Req.post(
       url: "/chat/messages",

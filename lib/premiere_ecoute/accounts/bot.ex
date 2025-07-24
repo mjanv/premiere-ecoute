@@ -17,9 +17,13 @@ defmodule PremiereEcoute.Accounts.Bot do
             nil
 
           %Accounts.User{} = user ->
-            renew_twitch_token(user)
-            Cachex.put(:users, :bot, user, expire: 5 * 60 * 1_000)
-            user
+            case renew_twitch_token(user) do
+              {:ok, user} ->
+                Cachex.put(:users, :bot, user, expire: 5 * 60 * 1_000)
+                user
+              {:error, user} ->
+                user
+            end
         end
 
       {:ok, user} ->
@@ -32,12 +36,12 @@ defmodule PremiereEcoute.Accounts.Bot do
 
   def renew_twitch_token(user) do
     with {:ok, tokens} <- TwitchApi.renew_token(user.twitch_refresh_token),
-         {:ok, _} <- User.update_twitch_tokens(user, tokens) do
-      :ok
+         {:ok, user} <- User.update_twitch_tokens(user, tokens) do
+      {:ok, user}
     else
-      reason ->
+      {:error, reason} ->
         Logger.error("Failed to renew Bot twitch tokens: #{inspect(reason)}")
-        :error
+        {:error, user}
     end
   end
 end
