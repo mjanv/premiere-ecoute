@@ -70,12 +70,12 @@ defmodule PremiereEcoute.Accounts.Services.RegistrationTest do
       {:ok, user} = Registration.register_spotify_user(data, user.id)
 
       assert %User{
-        email: "user1004@twitch.tv",
-        role: :streamer,
-        twitch_user_id: "441903922",
-        spotify_access_token: access_token,
-        spotify_refresh_token: refresh_token
-      } = user
+               email: "user1004@twitch.tv",
+               role: :streamer,
+               twitch_user_id: "441903922",
+               spotify_access_token: access_token,
+               spotify_refresh_token: refresh_token
+             } = user
 
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
