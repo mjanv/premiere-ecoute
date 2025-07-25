@@ -3,7 +3,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
   require Logger
 
-  alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.Services.Registration
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcouteWeb.UserAuth
@@ -26,14 +26,11 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     redirect_uri = Application.get_env(:premiere_ecoute, :spotify_redirect_uri)
 
     if client_id && redirect_uri do
-      user_id =
-        case conn.assigns[:current_scope] do
-          %{user: %{id: id}} -> to_string(id)
-          _ -> nil
-        end
+      user = conn.assigns.current_scope.user
+      id = user && user.id
 
-      if user_id do
-        redirect(conn, external: SpotifyApi.authorization_url(user_id))
+      if id do
+        redirect(conn, external: SpotifyApi.authorization_url(to_string(id)))
       else
         conn
         |> put_flash(:error, "You must be logged in to connect Spotify")
@@ -47,108 +44,40 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   end
 
   def callback(conn, %{"provider" => "twitch", "code" => code}) do
-    case TwitchApi.authorization_code(code) do
-      {:ok, auth_data} ->
-        case find_or_create_user(auth_data) do
-          {:ok, user} ->
-            conn
-            |> put_session(:user_return_to, ~p"/")
-            |> put_flash(:info, "Successfully authenticated with Twitch!")
-            |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
-
-          {:error, reason} ->
-            Logger.error("Failed to create user from Twitch auth: #{inspect(reason)}")
-
-            conn
-            |> put_flash(:error, "Authentication failed")
-            |> redirect(to: ~p"/")
-        end
-
-      {:error, reason} ->
-        Logger.error("Twitch OAuth failed: #{inspect(reason)}")
-
+    with {:ok, auth_data} <- TwitchApi.authorization_code(code),
+         {:ok, user} <- Registration.register_twitch_user(auth_data) do
+      conn
+      |> put_session(:user_return_to, ~p"/")
+      |> put_flash(:info, "Successfully authenticated with Twitch!")
+      |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
+    else
+      {:error, _} ->
         conn
         |> put_flash(:error, "Twitch authentication failed")
         |> redirect(to: ~p"/")
     end
   end
 
-  def callback(conn, %{"provider" => "twitch", "error" => error}) do
-    Logger.error("Twitch OAuth error: #{inspect(error)}")
-
-    conn
-    |> put_flash(:error, "Twitch authentication failed")
-    |> redirect(to: ~p"/")
-  end
-
   def callback(conn, %{"provider" => "spotify", "code" => code, "state" => state}) do
-    case SpotifyApi.authorization_code(code, state) do
-      {:ok, spotify_data} ->
-        # AIDEV-NOTE: Get user from state parameter (user ID)
-        case Accounts.get_user!(state) do
-          nil ->
-            conn
-            |> put_flash(:error, "You must be logged in to connect Spotify")
-            |> redirect(to: ~p"/")
-
-          user ->
-            case Accounts.User.update_spotify_tokens(user, spotify_data) do
-              {:ok, _} ->
-                conn
-                |> put_session(:user_return_to, ~p"/users/account")
-                |> put_flash(:info, "Spotify connected! You can now control playback from the dashboard.")
-                |> UserAuth.log_in_user(user, %{})
-
-              {:error, _changeset} ->
-                Logger.error("Failed to store Spotify tokens for user #{user.id}")
-
-                conn
-                |> put_session(:user_return_to, ~p"/users/account")
-                |> put_flash(:error, "Failed to connect Spotify account")
-                |> UserAuth.log_in_user(user, %{})
-            end
-        end
-
-      {:error, reason} ->
-        Logger.error("Spotify OAuth failed: #{inspect(reason)}")
-
+    with {:ok, auth_data} <- SpotifyApi.authorization_code(code, state),
+         {:ok, user} <- Registration.register_spotify_user(auth_data, state) do
+      conn
+      |> put_session(:user_return_to, ~p"/users/account")
+      |> put_flash(:info, "Successfully authenticated with Spotify!")
+      |> UserAuth.log_in_user(user, %{})
+    else
+      {:error, _} ->
         conn
-        |> put_flash(:error, "Spotify authentication failed: #{reason}")
+        |> put_flash(:error, "Failed to connect Spotify account")
         |> redirect(to: ~p"/")
     end
   end
 
-  def callback(conn, %{"provider" => "spotify", "error" => error}) do
-    Logger.error("Spotify OAuth error: #{error}")
+  def callback(conn, %{"provider" => provider, "error" => error}) do
+    Logger.error("OAuth #{provider} error: #{inspect(error)}")
 
     conn
-    |> put_flash(:info, "Spotify authentication failed")
+    |> put_flash(:info, "#{String.capitalize(provider)} authentication failed")
     |> redirect(to: ~p"/")
-  end
-
-  defp find_or_create_user(auth_data) do
-    email = "#{auth_data.username}@twitch.tv"
-
-    case Accounts.get_user_by_email(email) do
-      nil ->
-        %{
-          email: email,
-          password: Base.encode64(:crypto.strong_rand_bytes(32))
-        }
-        |> Accounts.register_user()
-        |> case do
-          {:ok, user} ->
-            Accounts.User.update_twitch_auth(user, auth_data)
-            role = Accounts.Role.from_auth(auth_data)
-            Accounts.update_user_role(user, role)
-
-          error ->
-            error
-        end
-
-      user ->
-        # Update existing user with latest Twitch auth data
-        Accounts.User.update_twitch_auth(user, auth_data)
-    end
   end
 end
