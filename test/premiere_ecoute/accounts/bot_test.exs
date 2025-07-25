@@ -2,10 +2,11 @@ defmodule PremiereEcoute.Accounts.BotTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Accounts.Bot
+  alias PremiereEcoute.Core.Cache
 
   setup do
-    Cachex.clear(:users)
-    on_exit(fn -> Cachex.clear(:users) end)
+    Cache.clear(:users)
+    on_exit(fn -> Cache.clear(:users) end)
 
     :ok
   end
@@ -27,7 +28,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
 
     bot1 = Bot.get()
     bot2 = Bot.get()
-    Cachex.put(:users, :bot, :wrong, expire: 5 * 60 * 1_000)
+    Cache.put(:users, :bot, :wrong, expire: 5 * 60 * 1_000)
     bot3 = Bot.get()
 
     assert bot1.id == id

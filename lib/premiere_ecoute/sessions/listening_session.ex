@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Core.Cache
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Scores.Report
@@ -65,7 +66,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
         session = preload(session)
 
         if session.user && session.user.twitch_user_id do
-          Cachex.put(:sessions, session.user.twitch_user_id, {session.id, nil})
+          Cache.put(:sessions, session.user.twitch_user_id, {session.id, nil})
         end
 
         {:ok, session}
@@ -153,7 +154,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
         session = preload(session)
 
         if session.user && session.user.twitch_user_id do
-          Cachex.put(:sessions, session.user.twitch_user_id, {session.id, track_id})
+          Cache.put(:sessions, session.user.twitch_user_id, {session.id, track_id})
         end
 
         {:ok, session}

@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Core.Cache
 
   def get_event_subscriptions(%Scope{user: %{twitch_user_id: user_id}}) do
     TwitchApi.api(:helix)
@@ -18,7 +19,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
         subscriptions
         |> Enum.map(fn s -> Map.take(s, ["id", "type"]) end)
         |> Enum.map(fn s ->
-          Cachex.put(:polls, {user_id, s["type"]}, s["id"])
+          Cache.put(:polls, {user_id, s["type"]}, s["id"])
           s
         end)
         |> then(fn subscriptions -> {:ok, subscriptions} end)
@@ -50,7 +51,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     )
     |> case do
       {:ok, %{status: 202, body: %{"data" => [%{"id" => id} = poll | _]}}} ->
-        Cachex.put(:polls, {user_id, type}, id)
+        Cache.put(:polls, {user_id, type}, id)
         {:ok, poll}
 
       {:ok, %{status: status, body: body}} ->
@@ -64,7 +65,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   end
 
   def unsubscribe(%Scope{user: %{twitch_user_id: user_id}}, type) do
-    case Cachex.get(:polls, {user_id, type}) do
+    case Cache.get(:polls, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
         TwitchApi.api(:helix)
         |> Req.delete(

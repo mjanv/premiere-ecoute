@@ -153,23 +153,15 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
     case Accounts.get_user_by_email(email) do
       nil ->
-        # Create new user with Twitch auth data
-        case Accounts.register_user(%{
-               email: email,
-               # Base.encode64(:crypto.strong_rand_bytes(32))
-               password: "super_password"
-             }) do
+        %{
+          email: email,
+          password: Base.encode64(:crypto.strong_rand_bytes(32))
+        }
+        |> Accounts.register_user()
+        |> case do
           {:ok, user} ->
             Accounts.User.update_twitch_auth(user, auth_data)
-
-            role =
-              case {auth_data.broadcaster_type, auth_data.username} do
-                {_, "lanfeust313"} -> :admin
-                {"affiliate", _} -> :streamer
-                {"partner", _} -> :streamer
-                _ -> :viewer
-              end
-
+            role = Accounts.Role.from_auth(auth_data)
             Accounts.update_user_role(user, role)
 
           error ->

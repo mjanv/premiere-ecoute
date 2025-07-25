@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
 
   require Logger
 
+  alias PremiereEcoute.Core.Cache
+
   def access_token do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     client_secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
@@ -24,7 +26,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
       )
       |> case do
         {:ok, %{status: 200, body: %{"access_token" => token, "expires_in" => expires_in}}} ->
-          Cachex.put(:tokens, :app_access_token, token, expire: expires_in * 1_000)
+          Cache.put(:tokens, :app_access_token, token, expire: expires_in * 1_000)
           {:ok, token}
 
         {:ok, %{status: status, body: body}} ->

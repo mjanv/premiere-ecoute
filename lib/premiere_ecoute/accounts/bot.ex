@@ -6,11 +6,12 @@ defmodule PremiereEcoute.Accounts.Bot do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Core.Cache
 
   @bot "premiereecoutebot@twitch.tv"
 
   def get do
-    case Cachex.get(:users, :bot) do
+    case Cache.get(:users, :bot) do
       {:ok, nil} ->
         case Accounts.get_user_by_email(@bot) do
           nil ->
@@ -19,7 +20,7 @@ defmodule PremiereEcoute.Accounts.Bot do
           %Accounts.User{} = user ->
             case renew_twitch_token(user) do
               {:ok, user} ->
-                Cachex.put(:users, :bot, user, expire: 5 * 60 * 1_000)
+                Cache.put(:users, :bot, user, expire: 5 * 60 * 1_000)
                 user
 
               {:error, user} ->

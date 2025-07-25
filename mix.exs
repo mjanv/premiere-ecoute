@@ -136,8 +136,8 @@ defmodule PremiereEcoute.MixProject do
         "compile --warnings-as-errors",
         "format --check-formatted",
         "credo --strict",
-        "dialyzer --format short"
-        # "gettext.check"
+        "dialyzer --format short",
+        "gettext.check"
       ],
       # Audit
       audit: [
