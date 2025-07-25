@@ -43,7 +43,6 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
 
       # Basic content still visible
       assert html =~ "Premiere Ecoute"
-      assert html =~ "Share your music taste with the world"
 
       # Viewer-specific content
       assert html =~ "Welcome back"
@@ -69,7 +68,6 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
 
       # Basic content still visible
       assert html =~ "Premiere Ecoute"
-      assert html =~ "Share your music taste with the world"
 
       # Streamer action buttons
       assert html =~ "Start New Session"

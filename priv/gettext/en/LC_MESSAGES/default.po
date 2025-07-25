@@ -11,7 +11,7 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:159
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:314
 #, elixir-autogen, elixir-format
 msgid "Album Discovery"
 msgstr ""
@@ -26,13 +26,13 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:187
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:342
 #, elixir-autogen, elixir-format
 msgid "Community Rating"
 msgstr ""
 
 #: lib/premiere_ecoute_web/components/header.ex:253
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:93
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:248
 #, elixir-autogen, elixir-format
 msgid "Connect with Twitch"
 msgstr ""
@@ -48,17 +48,17 @@ msgstr ""
 msgid "Delete Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:215
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:370
 #, elixir-autogen, elixir-format
 msgid "Live Sessions"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:16
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:233
 #, elixir-autogen, elixir-format
 msgid "Share your music taste with the world. Create listening sessions, rate albums together, and discover new favorites through community feedback."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:33
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:39
 #, elixir-autogen, elixir-format
 msgid "Start New Session"
 msgstr ""
@@ -509,7 +509,7 @@ msgid "Log Out"
 msgstr ""
 
 #: lib/premiere_ecoute_web/components/header.ex:154
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:51
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:88
 #, elixir-autogen, elixir-format
 msgid "My Sessions"
 msgstr ""
@@ -769,6 +769,7 @@ msgid "Twitch Username"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:179
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:306
 #, elixir-autogen, elixir-format
 msgid "Unknown"
 msgstr ""
@@ -852,7 +853,7 @@ msgstr ""
 msgid "Choose vote format"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:79
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:165
 #, elixir-autogen, elixir-format
 msgid "Explore listening sessions and join the community discussions."
 msgstr ""
@@ -897,7 +898,7 @@ msgstr ""
 msgid "Vote Options"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:76
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:162
 #, elixir-autogen, elixir-format
 msgid "Welcome back, %{username}!"
 msgstr ""
@@ -912,27 +913,28 @@ msgstr ""
 msgid "Bot"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:236
+#: lib/premiere_ecoute_web/controllers/static/changelog/html/entry.html.heex:3
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:391
 #, elixir-autogen, elixir-format
 msgid "Changelog"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:268
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:423
 #, elixir-autogen, elixir-format
 msgid "Contact"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:252
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:407
 #, elixir-autogen, elixir-format
 msgid "Cookies"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:244
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:399
 #, elixir-autogen, elixir-format
 msgid "Privacy"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:260
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:415
 #, elixir-autogen, elixir-format
 msgid "Terms"
 msgstr ""
@@ -998,32 +1000,97 @@ msgstr ""
 msgid "Year"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:131
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:286
 #, elixir-autogen, elixir-format
 msgid "Everything you need for music discovery"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:217
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:372
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Host real-time listening parties with live voting and feedback. Connect with streamers and fellow music lovers."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:134
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:289
 #, elixir-autogen, elixir-format
 msgid "Join the community and explore music together"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:189
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:344
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Rate tracks together and see what the community thinks. Build consensus and discover hidden gems through collective wisdom."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:161
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:316
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Search and explore albums from Spotify's vast music library. Find your next favorite artist or rediscover classics."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:69
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:137
 #, elixir-autogen, elixir-format, fuzzy
 msgid "My Retrospective"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:41
+#, elixir-autogen, elixir-format
+msgid "Create a new listening session by selecting an album from Spotify."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:199
+#, elixir-autogen, elixir-format
+msgid "Explore Sessions"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:139
+#, elixir-autogen, elixir-format
+msgid "Go back in your music discovery journey."
+msgstr ""
+
+#: lib/premiere_ecoute_web/controllers/static/changelog/html/index.html.heex:3
+#, elixir-autogen, elixir-format
+msgid "Home"
+msgstr ""
+
+#: lib/premiere_ecoute_web/controllers/static/legal/html/document.html.heex:3
+#, elixir-autogen, elixir-format
+msgid "Homepage"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:201
+#, elixir-autogen, elixir-format
+msgid "Join live listening sessions and discover new music with the community. Rate tracks and share your thoughts with fellow music lovers."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:12
+#, elixir-autogen, elixir-format
+msgid "My Activities"
+msgstr ""
+
+#: lib/premiere_ecoute_web/controllers/static/changelog/html/index.html.heex:4
+#, elixir-autogen, elixir-format
+msgid "Premiere Ecoute Changelog"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:90
+#, elixir-autogen, elixir-format, fuzzy
+msgid "View and manage all your listening sessions."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:205
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:287
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:369
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Unknown Album"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:208
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:290
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:372
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Unknown Artist"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:43
+#: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:77
+#, elixir-autogen, elixir-format
+msgid "N/A"
 msgstr ""

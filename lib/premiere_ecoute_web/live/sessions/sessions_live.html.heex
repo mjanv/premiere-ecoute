@@ -202,10 +202,10 @@
 
                           <div>
                             <h4 class="font-semibold text-white text-lg">
-                              {if session.album, do: session.album.name, else: "Unknown Album"}
+                              {if session.album, do: session.album.name, else: gettext("Unknown Album")}
                             </h4>
                             <p class="text-gray-400">
-                              {if session.album, do: session.album.artist, else: "Unknown Artist"}
+                              {if session.album, do: session.album.artist, else: gettext("Unknown Artist")}
                             </p>
                           </div>
                         </div>
@@ -284,10 +284,10 @@
 
                           <div>
                             <h4 class="font-semibold text-white text-lg">
-                              {if session.album, do: session.album.name, else: "Unknown Album"}
+                              {if session.album, do: session.album.name, else: gettext("Unknown Album")}
                             </h4>
                             <p class="text-gray-400">
-                              {if session.album, do: session.album.artist, else: "Unknown Artist"}
+                              {if session.album, do: session.album.artist, else: gettext("Unknown Artist")}
                             </p>
                           </div>
                         </div>
@@ -366,10 +366,10 @@
 
                           <div>
                             <h4 class="font-semibold text-white text-lg">
-                              {if session.album, do: session.album.name, else: "Unknown Album"}
+                              {if session.album, do: session.album.name, else: gettext("Unknown Album")}
                             </h4>
                             <p class="text-gray-400">
-                              {if session.album, do: session.album.artist, else: "Unknown Artist"}
+                              {if session.album, do: session.album.artist, else: gettext("Unknown Artist")}
                             </p>
                             <p class="text-sm text-gray-500">
                               {time_ago(session.ended_at)}

@@ -61,7 +61,7 @@ defmodule PremiereEcoute.Accounts.User do
       :twitch_username
     ])
     |> validate_email(opts)
-    |> validate_inclusion(:role, [:viewer, :streamer, :admin])
+    |> validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
   end
 
   def email_changeset(user, attrs \\ %{}, opts \\ []) do

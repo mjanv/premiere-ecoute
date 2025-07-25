@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Accounts.ApiToken do
       %{scope | user: user}
     else
       {:error, reason} ->
-        Logger.error("Failed to renew Spotify token: #{inspect(reason)}")
+        Logger.error("Failed to renew Twitch token: #{inspect(reason)}")
         conn.assigns[:current_scope]
 
       _ ->
@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Accounts.ApiToken do
       %{scope | user: user}
     else
       {:error, reason} ->
-        Logger.error("Failed to renew Twitch token: #{inspect(reason)}")
+        Logger.error("Failed to renew Spotify token: #{inspect(reason)}")
         conn.assigns[:current_scope]
 
       _ ->

@@ -1,8 +1,8 @@
 defmodule PremiereEcoute.Accounts.Role do
   @moduledoc false
 
-  @spec(map()) :: :admin | :bot | :streamer | :viewerr
-  def role(auth_data) do
+  @spec from_auth(map()) :: :admin | :bot | :streamer | :viewer
+  def from_auth(auth_data) do
     case {auth_data.broadcaster_type, auth_data.username} do
       {_, "lanfeust313"} -> :admin
       {_, "premiereecoutebot"} -> :bot

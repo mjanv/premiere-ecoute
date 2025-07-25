@@ -4,11 +4,13 @@
 > It encodes our coding standards, guard-rails, and workflow tricks so the *human 30 %* (architecture, tests, domain judgment) stays in human hands.
 > This principle emphasizes human oversight for critical aspects like architecture, testing, and domain-specific decisions, ensuring AI assists rather than fully dictates development.
 
-## 0. Project overview
+@docs/README.md
+@docs/architecture.md
+@docs/coding_standards.md
 
 ---
 
-## 1. Non-negotiable golden rules
+## Non-negotiable golden rules
 
 AI may do:
 
@@ -30,7 +32,7 @@ AI must NOT do:
 
 ---
 
-## 2. Build, test & utility commands
+## Build, test & utility commands
 
 Use mix tasks for consistency
 
@@ -46,21 +48,25 @@ mix quality # run all quality checks (compile with warnings-as-errors, format ch
 mix test # run all unit tests (with database migrations)
 mix phx.server # start Phoenix server (available at http://localhost:4000)
 ```
+
+## Database Backup Strategy
+
+Database backups for the Fly.io PostgreSQL database:
+
+```
+./scripts/backup_database.sh # create timestamped backup in data/
+./scripts/backup.sh # same as above (wrapper)
+./scripts/backup_database.sh --help # show usage instructions
+```
+
+- Backups are stored as compressed SQL files in `data/` with timestamps
+- Automatic cleanup keeps backups for 30 days
+- Uses `flyctl postgres proxy` for secure connections
+- Fallback to direct `flyctl postgres connect` method if proxy fails
+
 ---
 
-## 3. Coding standards
-
-### Pipeline
-
-Embrace Elixir's pipeline operator (`|>`) for any sequence of three or more function calls. Pipelines transform nested, inside-out code into clear, left-to-right data flow that mirrors natural thinking patterns.
-
-### Module Import Ordering
-
-Maintain consistent keyword ordering at the top of modules for enhanced readability and clear dependency hierarchies. Always arrange module keywords in this specific sequence: `use`, `require`, `import`, then `alias`.
-
----
-
-## 4. Anchor comments
+## Anchor comments
 
 Add specially formatted comments throughout the codebase, where appropriate, for yourself as inline knowledge that can be easily `grep`ped for.
 
@@ -84,39 +90,6 @@ Example:
 def render_feed(...) do
     ...
 ```
-
----
-
-## 5. Architecture Overview
-
-**Core Application Structure:**
-- Phoenix web application with LiveView for real-time UI
-- Event-driven architecture using a custom Command Bus pattern
-- Integration with Spotify and Twitch APIs for music streaming and chat interaction
-- User authentication with OAuth2 (Spotify/Twitch)
-- SQLite database with Ecto ORM
-
-**Key Architectural Components:**
-
-1. **Command Bus Pattern** (`lib/premiere_ecoute/core/command_bus.ex`):
-   - Central command processing with validation, handling, and event dispatch
-   - Registry-based handler lookup system
-   - Structured error handling and event propagation
-
-2. **API Integration Layer** (`lib/premiere_ecoute/apis/`):
-   - Spotify API for music search, albums, player control
-   - Twitch API for authentication, polls, and EventSub websocket integration
-   - Modular API clients with separate concerns (accounts, player, search, etc.)
-
-3. **Session Management** (`lib/premiere_ecoute/sessions/`):
-   - Listening sessions with album tracking
-   - User voting and scoring system
-   - Event-sourced session state management
-
-4. **Supervision Tree:**
-   - `PremiereEcoute.Application` - Main application supervisor
-   - `PremiereEcoute.Supervisor` - Core business logic supervision
-   - `PremiereEcoute.Core.Supervisor` - Command bus and event handling
 
 ---
 

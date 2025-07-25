@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Core.Schema do
     json = Keyword.get(opts, :json, [])
     no_json = Keyword.get(opts, :no_json, [])
 
-    encoder_opts = if Enum.empty?(json), do: [except: [:__meta__] == no_json], else: [only: json]
+    encoder_opts = if Enum.empty?(json), do: [except: [:__meta__, :__struct__] ++ no_json], else: [only: json]
 
     quote do
       use Ecto.Schema
@@ -18,9 +18,10 @@ defmodule PremiereEcoute.Core.Schema do
       alias PremiereEcoute.Repo
 
       @derive {Jason.Encoder, unquote(encoder_opts)}
+      # @derive {Inspect, expect: []}
 
       @type entity(type) :: type | nil | Ecto.Association.NotLoaded.t()
-      @type opt(type) :: type | nil
+      @type nullable(type) :: type | nil
 
       # Preload
       def preload({:ok, entity}), do: {:ok, preload(entity)}

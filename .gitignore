@@ -38,7 +38,9 @@ npm-debug.log
 # Database files
 *.db-shm
 *.db-wal
+*.sql
 
 # Environment files
 .env
 .env.*
+

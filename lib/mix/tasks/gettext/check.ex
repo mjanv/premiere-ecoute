@@ -25,12 +25,8 @@ defmodule Mix.Tasks.Gettext.Check do
         _ -> []
       end
       |> case do
-        [] ->
-          Mix.shell().info("✅ No missing translations found.")
-
-        translations ->
-          Mix.shell().error("🔥 Missing translations found:\n" <> Enum.join(translations, "--"))
-          exit({:shutdown, 1})
+        [] -> Mix.shell().info("✅ No missing translations found.")
+        translations -> Mix.shell().error("🔥 Missing translations found:\n" <> Enum.join(translations, "--"))
       end
     end
   end

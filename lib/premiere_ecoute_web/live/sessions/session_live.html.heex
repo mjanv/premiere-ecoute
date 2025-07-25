@@ -303,7 +303,7 @@
                     <span class="font-medium text-white">
                       {if @listening_session.album.release_date,
                         do: Calendar.strftime(@listening_session.album.release_date, "%-d %B %Y"),
-                        else: "Unknown"}
+                        else: gettext("Unknown")}
                     </span>
                   </div>
                   <div>

@@ -7,7 +7,7 @@
 - [asdf](https://asdf-vm.com/) installed
 - [Spotify Developer Account](https://developer.spotify.com/) (for API access)
 - [Twitch Developer Account](https://dev.twitch.tv/) (for chat integration)
-- PostgreSQL (production) or SQLite (development)
+- PostgreSQL (production)
 
 ### Setup
 

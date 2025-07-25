@@ -58,20 +58,18 @@ if config_env() == :prod do
     ],
     secret_key_base: env!("SECRET_KEY_BASE")
 
-  grafana =
-    if env!("GRAFANA_HOST", :string, nil) do
-      [
-        host: env!("GRAFANA_HOST"),
-        auth_token: env!("GRAFANA_TOKEN"),
-        upload_dashboards_on_start: true,
-        folder_name: "Premiere Ecoute",
-        annotate_app_lifecycle: true
-      ]
-    else
-      :disabled
-    end
-
   config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
     manual_metrics_start_delay: :no_delay,
-    grafana: grafana
+    grafana:
+      (if(env!("GRAFANA_HOST", :string, nil)) do
+         [
+           host: env!("GRAFANA_HOST"),
+           auth_token: env!("GRAFANA_TOKEN"),
+           upload_dashboards_on_start: true,
+           folder_name: "Premiere Ecoute",
+           annotate_app_lifecycle: true
+         ]
+       else
+         :disabled
+       end)
 end

@@ -4,84 +4,239 @@
     <!-- Hero Section -->
     <div class="flex-1 py-16">
       <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-<!-- Left side: Title and Description -->
-          <div class="order-2 lg:order-1">
-            <h1 class="text-5xl lg:text-6xl text-white mb-6 font-extrabold leading-tight">
-              Premiere Ecoute
-            </h1>
-
-            <p class="text-xl mb-8 leading-relaxed" style="color: var(--color-dark-300);">
-              {gettext(
-                "Share your music taste with the world. Create listening sessions, rate albums together, and discover new favorites through community feedback."
-              )}
-            </p>
-            
-<!-- Action Buttons -->
-            <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
-              <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:streamer, :admin] do %>
-                <!-- AIDEV-NOTE: Streamer/Admin user - show session buttons -->
+        <%= if @current_scope && @current_scope.user do %>
+          <!-- AIDEV-NOTE: Authenticated users - show full-width navigation cards -->
+          <div class="w-full">
+            <%= if @current_scope.user.role in [:streamer, :admin] do %>
+              <!-- AIDEV-NOTE: Streamer/Admin user - show navigation cards -->
+              <h2 class="text-4xl font-bold text-white mb-8">{gettext("My Activities")}</h2>
+              <div class="space-y-6">
                 <.link
                   href={~p"/sessions/discography/album/select"}
-                  class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-white font-semibold rounded-lg transition-all text-lg hover:scale-105 bg-gradient-purple hover:shadow-lg"
-                  style="box-shadow: 0 4px 14px 0 rgba(139, 79, 255, 0.25);"
+                  class="block w-full p-8 rounded-xl border transition-all hover:scale-[1.02] hover:shadow-xl hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:border-purple-500"
+                  style="background-color: var(--color-dark-900); border-color: var(--color-dark-700);"
+                  onmouseover="this.style.background='linear-gradient(to right, rgb(147 51 234), rgb(126 58 242))'; this.style.borderColor='rgb(168 85 247)';"
+                  onmouseout="this.style.background='var(--color-dark-900)'; this.style.borderColor='var(--color-dark-700)';"
                 >
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                  </svg>
-                  {gettext("Start New Session")}
+                  <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-16 h-16 rounded-lg flex items-center justify-center"
+                        style="background-color: var(--color-dark-800); border: 1px solid var(--color-dark-600);"
+                      >
+                        <svg
+                          class="w-8 h-8"
+                          style="color: var(--color-dark-300);"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="text-2xl font-bold text-white mb-2">{gettext("Start New Session")}</h3>
+                      <p class="text-base leading-relaxed" style="color: var(--color-dark-400);">
+                        {gettext("Create a new listening session by selecting an album from Spotify.")}
+                      </p>
+                    </div>
+                    <div class="flex-shrink-0">
+                      <svg
+                        class="w-6 h-6"
+                        style="color: var(--color-dark-400);"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
                 </.link>
 
                 <.link
                   href={~p"/sessions"}
-                  class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
-                  style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
-                  onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
-                  onmouseout="this.style.color='var(--color-dark-300)'; this.style.borderColor='var(--color-dark-600)'; this.style.backgroundColor='var(--color-dark-900)';"
+                  class="block w-full p-8 rounded-xl border transition-all hover:scale-[1.02] hover:shadow-xl hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:border-purple-500"
+                  style="background-color: var(--color-dark-900); border-color: var(--color-dark-700);"
+                  onmouseover="this.style.background='linear-gradient(to right, rgb(147 51 234), rgb(126 58 242))'; this.style.borderColor='rgb(168 85 247)';"
+                  onmouseout="this.style.background='var(--color-dark-900)'; this.style.borderColor='var(--color-dark-700)';"
                 >
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
-                  </svg>
-                  {gettext("My Sessions")}
+                  <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-16 h-16 rounded-lg flex items-center justify-center"
+                        style="background-color: var(--color-dark-800); border: 1px solid var(--color-dark-600);"
+                      >
+                        <svg
+                          class="w-8 h-8"
+                          style="color: var(--color-dark-300);"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="text-2xl font-bold text-white mb-2">{gettext("My Sessions")}</h3>
+                      <p class="text-base leading-relaxed" style="color: var(--color-dark-400);">
+                        {gettext("View and manage all your listening sessions.")}
+                      </p>
+                    </div>
+                    <div class="flex-shrink-0">
+                      <svg
+                        class="w-6 h-6"
+                        style="color: var(--color-dark-400);"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
                 </.link>
 
                 <.link
                   href={~p"/sessions/wrapped/retrospective"}
-                  class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border font-semibold rounded-lg transition-all text-lg hover:scale-105"
-                  style="border-color: var(--color-dark-600); color: var(--color-dark-300); background-color: var(--color-dark-900);"
-                  onmouseover="this.style.color='white'; this.style.borderColor='var(--color-dark-500)'; this.style.backgroundColor='var(--color-dark-800)';"
-                  onmouseout="this.style.color='var(--color-dark-300)'; this.style.borderColor='var(--color-dark-600)'; this.style.backgroundColor='var(--color-dark-900)';"
+                  class="block w-full p-8 rounded-xl border transition-all hover:scale-[1.02] hover:shadow-xl hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:border-purple-500"
+                  style="background-color: var(--color-dark-900); border-color: var(--color-dark-700);"
+                  onmouseover="this.style.background='linear-gradient(to right, rgb(147 51 234), rgb(126 58 242))'; this.style.borderColor='rgb(168 85 247)';"
+                  onmouseout="this.style.background='var(--color-dark-900)'; this.style.borderColor='var(--color-dark-700)';"
                 >
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                  {gettext("My Retrospective")}
+                  <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-16 h-16 rounded-lg flex items-center justify-center"
+                        style="background-color: var(--color-dark-800); border: 1px solid var(--color-dark-600);"
+                      >
+                        <svg
+                          class="w-8 h-8"
+                          style="color: var(--color-dark-300);"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="text-2xl font-bold text-white mb-2">{gettext("My Retrospective")}</h3>
+                      <p class="text-base leading-relaxed" style="color: var(--color-dark-400);">
+                        {gettext("Go back in your music discovery journey.")}
+                      </p>
+                    </div>
+                    <div class="flex-shrink-0">
+                      <svg
+                        class="w-6 h-6"
+                        style="color: var(--color-dark-400);"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
                 </.link>
-              <% end %>
-              <%= if @current_scope && @current_scope.user && @current_scope.user.role in [:viewer] do %>
-                <!-- AIDEV-NOTE: Viewer user - show welcome message -->
-                <div>
-                  <p class="text-lg text-gray-300 mb-4">
+              </div>
+            <% end %>
+            <%= if @current_scope.user.role in [:viewer] do %>
+              <!-- AIDEV-NOTE: Viewer user - show welcome message with exploration cards -->
+              <div class="space-y-6">
+                <div class="text-center p-8">
+                  <h2 class="text-3xl font-bold text-white mb-4">
                     {gettext("Welcome back, %{username}!", username: @current_scope.user.twitch_username || "User")}
-                  </p>
-                  <p class="text-gray-400">
+                  </h2>
+                  <p class="text-xl" style="color: var(--color-dark-300);">
                     {gettext("Explore listening sessions and join the community discussions.")}
                   </p>
                 </div>
-              <% end %>
-              <%= if is_nil(@current_scope) do %>
-                <!-- AIDEV-NOTE: Anonymous user - show big Connect with Twitch button -->
+
+                <.link
+                  href={~p"/sessions"}
+                  class="block w-full p-8 rounded-xl border transition-all hover:scale-[1.02] hover:shadow-xl hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:border-purple-500"
+                  style="background-color: var(--color-dark-900); border-color: var(--color-dark-700);"
+                  onmouseover="this.style.background='linear-gradient(to right, rgb(147 51 234), rgb(126 58 242))'; this.style.borderColor='rgb(168 85 247)';"
+                  onmouseout="this.style.background='var(--color-dark-900)'; this.style.borderColor='var(--color-dark-700)';"
+                >
+                  <div class="flex items-start space-x-6">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-16 h-16 rounded-lg flex items-center justify-center"
+                        style="background-color: var(--color-dark-800); border: 1px solid var(--color-dark-600);"
+                      >
+                        <svg
+                          class="w-8 h-8"
+                          style="color: var(--color-dark-300);"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="text-2xl font-bold text-white mb-2">{gettext("Explore Sessions")}</h3>
+                      <p class="text-base leading-relaxed" style="color: var(--color-dark-400);">
+                        {gettext(
+                          "Join live listening sessions and discover new music with the community. Rate tracks and share your thoughts with fellow music lovers."
+                        )}
+                      </p>
+                    </div>
+                    <div class="flex-shrink-0">
+                      <svg
+                        class="w-6 h-6"
+                        style="color: var(--color-dark-400);"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </.link>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <!-- AIDEV-NOTE: Anonymous users - show traditional layout with title, description, and mockups -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+<!-- Left side: Title and Description -->
+            <div class="order-2 lg:order-1">
+              <h1 class="text-5xl lg:text-6xl text-white mb-6 font-extrabold leading-tight">
+                Premiere Ecoute
+              </h1>
+
+              <p class="text-xl mb-8 leading-relaxed" style="color: var(--color-dark-300);">
+                {gettext(
+                  "Share your music taste with the world. Create listening sessions, rate albums together, and discover new favorites through community feedback."
+                )}
+              </p>
+              
+<!-- Action Buttons -->
+              <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
                 <.link
                   href={~p"/auth/twitch"}
                   class="w-full sm:w-auto inline-flex items-center justify-center px-12 py-6 text-white font-bold rounded-lg transition-all text-xl hover:scale-105 bg-purple-600 hover:bg-purple-700 hover:shadow-lg"
@@ -92,32 +247,32 @@
                   </svg>
                   {gettext("Connect with Twitch")}
                 </.link>
-              <% end %>
-            </div>
-          </div>
-          
-<!-- Right side: Mockups -->
-          <div class="order-1 lg:order-2 relative">
-            <!-- AIDEV-NOTE: DaisyUI mockups - browser with overlapping phone -->
-            <!-- Browser Mockup - takes 80% width -->
-            <div class="mockup-browser border bg-base-300 border-base-300 shadow-2xl w-full max-w-none" style="width: 100%;">
-              <div class="mockup-browser-toolbar">
-                <div class="input border border-base-300">https://premiere-ecoute.fly.dev</div>
               </div>
-              <div class="px-6 py-40" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
             </div>
             
+<!-- Right side: Mockups -->
+            <div class="order-1 lg:order-2 relative">
+              <!-- AIDEV-NOTE: DaisyUI mockups - browser with overlapping phone, only shown to unauthenticated users -->
+              <!-- Browser Mockup - takes 80% width -->
+              <div class="mockup-browser border bg-base-300 border-base-300 shadow-2xl w-full max-w-none" style="width: 100%;">
+                <div class="mockup-browser-toolbar">
+                  <div class="input border border-base-300">https://premiere-ecoute.fly.dev</div>
+                </div>
+                <div class="px-6 py-40" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+              </div>
+              
 <!-- Phone Mockup - positioned with slight overlap -->
-            <div class="absolute top-1/2 -translate-y-4/10 -right-45">
-              <div class="mockup-phone border-primary scale-[0.3]">
-                <div class="mockup-phone-camera"></div>
-                <div class="mockup-phone-display">
-                  <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500"></div>
+              <div class="absolute top-1/2 -translate-y-4/10 -right-45 pointer-events-none">
+                <div class="mockup-phone border-primary scale-[0.3]">
+                  <div class="mockup-phone-camera"></div>
+                  <div class="mockup-phone-display">
+                    <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
     
