@@ -3,7 +3,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
   require Logger
 
-  alias PremiereEcoute.Accounts.Services.Registration
+  alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcouteWeb.UserAuth
@@ -45,7 +45,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
   def callback(conn, %{"provider" => "twitch", "code" => code}) do
     with {:ok, auth_data} <- TwitchApi.authorization_code(code),
-         {:ok, user} <- Registration.register_twitch_user(auth_data) do
+         {:ok, user} <- AccountRegistration.register_twitch_user(auth_data) do
       conn
       |> put_session(:user_return_to, ~p"/")
       |> put_flash(:info, "Successfully authenticated with Twitch!")
@@ -60,7 +60,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
 
   def callback(conn, %{"provider" => "spotify", "code" => code, "state" => state}) do
     with {:ok, auth_data} <- SpotifyApi.authorization_code(code, state),
-         {:ok, user} <- Registration.register_spotify_user(auth_data, state) do
+         {:ok, user} <- AccountRegistration.register_spotify_user(auth_data, state) do
       conn
       |> put_session(:user_return_to, ~p"/users/account")
       |> put_flash(:info, "Successfully authenticated with Spotify!")

@@ -96,6 +96,8 @@ defmodule PremiereEcoute.MixProject do
       {:nimble_publisher, "~> 1.1"},
       {:makeup_elixir, ">= 0.0.0"},
       {:makeup_erlang, ">= 0.0.0"},
+      {:oban, "~> 2.19"},
+      {:oban_web, "~> 2.11"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -113,7 +115,8 @@ defmodule PremiereEcoute.MixProject do
       # Development
       {:doctor, "~> 0.22.0", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:tidewave, "~> 0.1", only: :dev}
+      {:tidewave, "~> 0.1", only: :dev},
+      {:igniter, "~> 0.5", only: :dev}
     ]
   end
 

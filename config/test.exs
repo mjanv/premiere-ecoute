@@ -1,5 +1,7 @@
 import Config
 
+config :premiere_ecoute, Oban, testing: :manual
+
 config :premiere_ecoute,
   handlers: [
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,

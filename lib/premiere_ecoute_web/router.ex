@@ -1,6 +1,7 @@
 defmodule PremiereEcouteWeb.Router do
   use PremiereEcouteWeb, :router
 
+  import Oban.Web.Router
   import PremiereEcouteWeb.UserAuth
 
   alias PremiereEcouteWeb.Plugs
@@ -67,9 +68,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/wrapped/retrospective", RetrospectiveLive, :index
     end
 
-    live_session :public_sessions do
-      live "/:id/overlay", OverlayLive, :show
-    end
+    live "/:id/overlay", OverlayLive, :show
   end
 
   scope "/admin", PremiereEcouteWeb.Admin do
@@ -119,6 +118,12 @@ defmodule PremiereEcouteWeb.Router do
       pipe_through [:browser]
 
       live_dashboard "/dashboard", metrics: PremiereEcouteWeb.Telemetry
+    end
+
+    scope "/" do
+      pipe_through :browser
+
+      oban_dashboard("/oban")
     end
   end
 end

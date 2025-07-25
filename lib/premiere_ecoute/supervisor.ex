@@ -13,7 +13,8 @@ defmodule PremiereEcoute.Supervisor do
       PremiereEcoute.Telemetry.PromEx,
       PremiereEcoute.Repo,
       PremiereEcoute.EventStore,
-      PremiereEcoute.Core.Supervisor
+      PremiereEcoute.Core.Supervisor,
+      {Oban, Application.fetch_env!(:premiere_ecoute, Oban)}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

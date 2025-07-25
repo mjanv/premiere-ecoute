@@ -41,6 +41,12 @@ config :premiere_ecoute, PremiereEcoute.EventStore,
   serializer: EventStore.JsonbSerializer,
   types: EventStore.PostgresTypes
 
+config :premiere_ecoute, Oban,
+  engine: Oban.Engines.Basic,
+  notifier: Oban.Notifiers.Postgres,
+  queues: [default: 10],
+  repo: PremiereEcoute.Repo
+
 config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   disabled: false,
   manual_metrics_start_delay: :no_delay,
