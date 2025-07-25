@@ -12,6 +12,11 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
     end
 
+    socket =
+      socket
+      # Default score mode
+      |> assign(:score, :streamer)
+
     case Report.get_by(session_id: id) do
       nil -> {:ok, assign(socket, :summary, AsyncResult.loading())}
       report -> {:ok, assign(socket, :summary, AsyncResult.ok(report.session_summary))}
@@ -19,8 +24,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(%{"score" => score}, _url, socket) do
+    {:noreply, assign(socket, :score, parse_score(score))}
   end
 
   @impl true
@@ -32,4 +37,17 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   def handle_info(_event, socket) do
     {:noreply, socket}
   end
+
+  defp parse_score("viewer"), do: :viewer
+  defp parse_score("streamer"), do: :streamer
+  defp parse_score("viewer streamer"), do: :both
+  defp parse_score(_), do: :streamer
+
+  defp get_overlay_width(:both), do: 160
+  defp get_overlay_width(_), do: 120
+
+  defp score_value(summary, :viewer), do: summary.viewer_score
+  defp score_value(summary, :streamer), do: summary.streamer_score
+  defp score_label(:viewer), do: "VIEWER"
+  defp score_label(:streamer), do: "STREAMER"
 end

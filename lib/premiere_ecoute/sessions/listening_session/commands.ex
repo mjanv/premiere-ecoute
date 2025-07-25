@@ -4,13 +4,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   defmodule PrepareListeningSession do
     @moduledoc false
 
-    defstruct [:user_id, :album_id, :vote_options]
+    @type t :: %__MODULE__{user_id: integer(), album_id: String.t(), vote_options: [String.t()]}
 
-    @type t :: %__MODULE__{
-            user_id: integer(),
-            album_id: String.t(),
-            vote_options: [String.t()]
-          }
+    defstruct [:user_id, :album_id, :vote_options]
   end
 
   defmodule StartListeningSession do
@@ -18,12 +14,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    defstruct [:session_id, :scope]
+    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
 
-    @type t :: %__MODULE__{
-            session_id: String.t(),
-            scope: Scope.t()
-          }
+    defstruct [:session_id, :scope]
   end
 
   defmodule SkipNextTrackListeningSession do
@@ -31,12 +24,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    defstruct [:session_id, :scope]
+    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
 
-    @type t :: %__MODULE__{
-            session_id: String.t(),
-            scope: Scope.t()
-          }
+    defstruct [:session_id, :scope]
   end
 
   defmodule SkipPreviousTrackListeningSession do
@@ -44,12 +34,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    defstruct [:session_id, :scope]
+    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
 
-    @type t :: %__MODULE__{
-            session_id: String.t(),
-            scope: Scope.t()
-          }
+    defstruct [:session_id, :scope]
   end
 
   defmodule StopListeningSession do
@@ -57,11 +44,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    defstruct [:session_id, :scope]
+    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
 
-    @type t :: %__MODULE__{
-            session_id: String.t(),
-            scope: Scope.t()
-          }
+    defstruct [:session_id, :scope]
   end
 end

@@ -82,33 +82,11 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   end
 
   def callback(conn, %{"provider" => "spotify", "code" => code, "state" => state}) do
-    Logger.info("Spotify callback started with code: #{String.slice(code, 0, 20)}... and state: #{state}")
-
-    result =
-      try do
-        SpotifyApi.authorization_code(code, state)
-      rescue
-        e ->
-          Logger.error("Exception in SpotifyApi.authorization_code: #{inspect(e)}")
-          {:error, "Exception: #{inspect(e)}"}
-      catch
-        :exit, reason ->
-          Logger.error("Exit in SpotifyApi.authorization_code: #{inspect(reason)}")
-          {:error, "Exit: #{inspect(reason)}"}
-      end
-
-    Logger.info("SpotifyApi.authorization_code result: #{inspect(result)}")
-
-    case result do
+    case SpotifyApi.authorization_code(code, state) do
       {:ok, spotify_data} ->
         # AIDEV-NOTE: Get user from state parameter (user ID)
-        user = Accounts.get_user!(state)
-
-        Logger.info("Spotify callback - resolved user from state: #{inspect(user && user.id)}")
-
-        case user do
+        case Accounts.get_user!(state) do
           nil ->
-            # AIDEV-NOTE: User not logged in, redirect to login
             conn
             |> put_flash(:error, "You must be logged in to connect Spotify")
             |> redirect(to: ~p"/")

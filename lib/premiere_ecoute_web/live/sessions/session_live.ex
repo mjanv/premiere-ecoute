@@ -39,6 +39,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         |> assign(:show, %{votes: true, scores: true})
         |> assign(:user_current_rating, nil)
         |> assign(:report, nil)
+        # AIDEV-NOTE: Default overlay score type
+        |> assign(:overlay_score_type, "streamer")
         |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
         |> then(fn socket -> {:ok, socket} end)
     end
@@ -83,15 +85,22 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     {:noreply, assign(socket, :show, Map.update!(assigns.show, String.to_atom(flag), fn v -> !v end))}
   end
 
+  # AIDEV-NOTE: Handle overlay score type selection change
+  @impl true
+  def handle_event("change_overlay_score_type", params, socket) do
+    score_type = params["score_type"] || params[:score_type] || "streamer"
+    {:noreply, assign(socket, :overlay_score_type, score_type)}
+  end
+
   @impl true
   def handle_event("open_overlay", _params, socket) do
-    overlay_url = "#{socket.host_uri}/sessions/#{socket.assigns.listening_session.id}/overlay"
+    overlay_url = build_overlay_url(socket)
     {:noreply, push_event(socket, "open_url", %{url: overlay_url})}
   end
 
   @impl true
   def handle_event("copy_overlay_url", _params, socket) do
-    overlay_url = "#{socket.host_uri}/sessions/#{socket.assigns.listening_session.id}/overlay"
+    overlay_url = build_overlay_url(socket)
 
     {:noreply,
      socket
@@ -393,6 +402,23 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         ]
 
         Enum.at(colors, rem(index, length(colors)), "bg-gray-500")
+    end
+  end
+
+  # AIDEV-NOTE: Build overlay URL with score parameter (for socket use)
+  defp build_overlay_url(socket) do
+    get_current_overlay_url(socket.host_uri, socket.assigns.listening_session.id, socket.assigns.overlay_score_type)
+  end
+
+  # AIDEV-NOTE: Build overlay URL with score parameter (for template use)
+  defp get_current_overlay_url(host_uri, session_id, score_type) do
+    base_url = "#{host_uri}/sessions/#{session_id}/overlay"
+
+    case score_type do
+      "streamer" -> "#{base_url}?score=streamer"
+      "viewer" -> "#{base_url}?score=viewer"
+      "both" -> "#{base_url}?score=viewer+streamer"
+      _ -> base_url
     end
   end
 end
