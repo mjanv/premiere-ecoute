@@ -42,6 +42,7 @@ config :premiere_ecoute, PremiereEcoute.EventStore,
   types: EventStore.PostgresTypes
 
 config :premiere_ecoute, Oban,
+  prefix: "oban",
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
   queues: [default: 10],

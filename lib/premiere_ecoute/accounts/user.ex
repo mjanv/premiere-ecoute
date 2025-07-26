@@ -8,6 +8,8 @@ defmodule PremiereEcoute.Accounts.User do
   use PremiereEcoute.Core.Schema,
     json: [:id, :email, :role]
 
+  alias PremiereEcoute.Accounts.UserToken
+
   @type t :: %__MODULE__{
           id: integer() | nil,
           email: String.t() | nil,
@@ -179,10 +181,9 @@ defmodule PremiereEcoute.Accounts.User do
   @doc """
   Verifies the password.
 
-  If there is no user or the user doesn't have a password, we call
-  `Bcrypt.no_user_verify/0` to avoid timing attacks.
+  If there is no user or the user doesn't have a password, we call `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%PremiereEcoute.Accounts.User{hashed_password: hashed_password}, password)
+  def valid_password?(%__MODULE__{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
   end
@@ -192,18 +193,54 @@ defmodule PremiereEcoute.Accounts.User do
     false
   end
 
+  @doc """
+  Gets a single user.
+
+  Raises `Ecto.NoResultsError` if the User does not exist.
+
+  ## Examples
+
+      iex> get_user!(123)
+      %User{}
+
+      iex> get_user!(456)
+      ** (Ecto.NoResultsError)
+
+  """
   def get!(id), do: Repo.get!(__MODULE__, id)
+  def get_user!(id), do: Repo.get!(__MODULE__, id)
 
-  def register_user(attrs) do
-    %__MODULE__{}
-    |> changeset(attrs)
-    |> Repo.insert()
+  @doc """
+  Gets a user by email and password.
+
+  ## Examples
+
+      iex> get_user_by_email_and_password("foo@example.com", "correct_password")
+      %User{}
+
+      iex> get_user_by_email_and_password("foo@example.com", "invalid_password")
+      nil
+
+  """
+  def get_user_by_email_and_password(email, password)
+      when is_binary(email) and is_binary(password) do
+    user = Repo.get_by(__MODULE__, email: email)
+    if valid_password?(user, password), do: user
   end
 
-  def update(changeset) do
-    changeset
-    |> Repo.update()
-  end
+  @doc """
+  Gets a user by email.
+
+  ## Examples
+
+      iex> get_user_by_email("foo@example.com")
+      %User{}
+
+      iex> get_user_by_email("unknown@example.com")
+      nil
+
+  """
+  def get_user_by_email(email), do: get_by(email: email)
 
   def update_spotify_tokens(user, %{
         access_token: access_token,
@@ -337,5 +374,102 @@ defmodule PremiereEcoute.Accounts.User do
       ]
     )
     |> Repo.update()
+  end
+
+  @doc """
+  Checks whether the user is in sudo mode.
+
+  The user is in sudo mode when the last authentication was done no further
+  than 20 minutes ago. The limit can be given as second argument in minutes.
+  """
+  def sudo_mode?(user, minutes \\ -20)
+
+  def sudo_mode?(%__MODULE__{authenticated_at: %DateTime{} = ts}, minutes) do
+    DateTime.after?(ts, DateTime.utc_now() |> DateTime.add(minutes, :minute))
+  end
+
+  def sudo_mode?(_user, _minutes), do: false
+
+  @doc """
+  Updates the user email using the given token.
+
+  If the token matches, the user email is updated and the token is deleted.
+  """
+  def update_user_email(user, token) do
+    context = "change:#{user.email}"
+
+    with {:ok, query} <- UserToken.verify_change_email_token_query(token, context),
+         %UserToken{sent_to: email} <- Repo.one(query),
+         {:ok, _} <- Repo.transaction(user_email_multi(user, email, context)) do
+      :ok
+    else
+      _ -> :error
+    end
+  end
+
+  defp user_email_multi(user, email, context) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, email_changeset(user, %{email: email}))
+    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, [context]))
+  end
+
+  @doc """
+  Updates the user password.
+
+  Returns the updated user, as well as a list of expired tokens.
+
+  ## Examples
+
+      iex> update_user_password(user, %{password: ...})
+      {:ok, %User{}, [...]}
+
+      iex> update_user_password(user, %{password: "too short"})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_user_password(user, attrs) do
+    user
+    |> password_changeset(attrs)
+    |> update_user_and_delete_all_tokens()
+    |> case do
+      {:ok, user, expired_tokens} -> {:ok, user, expired_tokens}
+      {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  @doc """
+  Updates the user role.
+
+  Returns the updated user.
+
+  ## Examples
+
+      iex> update_user_role(user, :streamer)
+      {:ok, %User{}}
+
+      iex> update_user_role(user, :god)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_user_role(user, role) do
+    user
+    |> Ecto.Changeset.cast(%{role: role}, [:role])
+    |> Ecto.Changeset.validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
+    |> Repo.update()
+  end
+
+  def update_user_and_delete_all_tokens(changeset) do
+    %{data: %__MODULE__{} = user} = changeset
+
+    with {:ok, %{user: user, tokens_to_expire: expired_tokens}} <-
+           Ecto.Multi.new()
+           |> Ecto.Multi.update(:user, changeset)
+           |> Ecto.Multi.all(:tokens_to_expire, UserToken.by_user_and_contexts_query(user, :all))
+           |> Ecto.Multi.delete_all(:tokens, fn %{tokens_to_expire: tokens_to_expire} ->
+             UserToken.delete_all_query(tokens_to_expire)
+           end)
+           |> Repo.transaction() do
+      {:ok, user, expired_tokens}
+    end
   end
 end

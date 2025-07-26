@@ -23,16 +23,16 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
         }
 
   @spec register_twitch_user(twitch_data()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
-  def register_twitch_user(payload) do
-    with email <- "#{payload.username}@twitch.tv",
-         nil <- Accounts.get_user_by_email(email),
+  def register_twitch_user(%{username: username} = payload) do
+    with email <- "#{username}@twitch.tv",
+         nil <- User.get_user_by_email(email),
          attrs <- %{email: email, role: role(payload), password: random(32)},
-         {:ok, user} <- Accounts.register_user(attrs),
+         {:ok, user} <- User.create(attrs),
          {:ok, user} <- User.update_twitch_auth(user, payload) do
       {:ok, user}
     else
       %User{} = user ->
-        Accounts.User.update_twitch_auth(user, payload)
+        User.update_twitch_auth(user, payload)
 
       {:error, reason} ->
         Logger.error("Failed to create user from Twitch authentification: #{inspect(reason)}")

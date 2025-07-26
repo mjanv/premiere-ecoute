@@ -23,7 +23,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
   def handle_event("search_albums", %{"query" => query}, socket) when byte_size(query) > 2 do
     socket
     |> assign(:search_albums, AsyncResult.loading())
-    |> start_async(:search, fn -> PremiereEcoute.search_albums(query) end)
+    |> start_async(:search, fn -> PremiereEcoute.Apis.spotify().search_albums(query) end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -33,7 +33,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     socket
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:selected_album, AsyncResult.loading())
-    |> start_async(:select, fn -> PremiereEcoute.get_album(album_id) end)
+    |> start_async(:select, fn -> PremiereEcoute.Apis.spotify().get_album(album_id) end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 

@@ -20,12 +20,11 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandler do
         message: message,
         is_streamer: is_streamer
       }) do
-    with {:ok, {session_id, track_id}} when not is_nil(track_id) <- Cache.get(:sessions, broadcaster_id),
-         session <- ListeningSession.get(session_id),
-         {:ok, value} <- Vote.from_message(message, session.vote_options),
+    with {:ok, {session_id, vote_options, track_id}} when not is_nil(track_id) <- Cache.get(:sessions, broadcaster_id),
+         {:ok, value} <- Vote.from_message(message, vote_options),
          vote <- %Vote{viewer_id: user_id, session_id: session_id, track_id: track_id, value: value, is_streamer: is_streamer},
          {:ok, _} <- Vote.create(vote),
-         {:ok, report} <- Report.generate(session),
+         {:ok, report} <- Report.generate(%ListeningSession{id: session_id}),
          :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", {:session_summary, report.session_summary}) do
       :ok
     else

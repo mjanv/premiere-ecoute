@@ -17,12 +17,10 @@ defmodule PremiereEcoute.AccountsFixtures do
   end
 
   def unconfirmed_user_fixture(attrs \\ %{}) do
-    {:ok, user} =
-      attrs
-      |> valid_user_attributes()
-      |> Accounts.register_user()
-
-    user
+    attrs
+    |> valid_user_attributes()
+    |> Accounts.create_user()
+    |> then(fn {:ok, user} -> user end)
   end
 
   def user_fixture(attrs \\ %{}) do

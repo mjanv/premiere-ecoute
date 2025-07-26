@@ -2,8 +2,12 @@ defmodule PremiereEcoute.Accounts.UserToken do
   @moduledoc false
 
   use Ecto.Schema
+
   import Ecto.Query
+
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Repo
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -89,12 +93,7 @@ defmodule PremiereEcoute.Accounts.UserToken do
     hashed_token = :crypto.hash(@hash_algorithm, token)
 
     {Base.url_encode64(token, padding: false),
-     %UserToken{
-       token: hashed_token,
-       context: context,
-       sent_to: sent_to,
-       user_id: user.id
-     }}
+     %UserToken{token: hashed_token, context: context, sent_to: sent_to, user_id: user.id}}
   end
 
   @doc """
@@ -175,5 +174,117 @@ defmodule PremiereEcoute.Accounts.UserToken do
   """
   def delete_all_query(tokens) do
     from t in UserToken, where: t.id in ^Enum.map(tokens, & &1.id)
+  end
+
+  @doc """
+  Generates a session token.
+  """
+  def generate_user_session_token(user) do
+    {token, user_token} = build_session_token(user)
+    Repo.insert!(user_token)
+    token
+  end
+
+  @doc """
+  Gets the user with the given signed token.
+
+  If the token is valid `{user, token_inserted_at}` is returned, otherwise `nil` is returned.
+  """
+  def get_user_by_session_token(token) do
+    {:ok, query} = verify_session_token_query(token)
+    Repo.one(query)
+  end
+
+  @doc """
+  Gets the user with the given magic link token.
+  """
+  def get_user_by_magic_link_token(token) do
+    with {:ok, query} <- verify_magic_link_token_query(token),
+         {user, _token} <- Repo.one(query) do
+      user
+    else
+      _ -> nil
+    end
+  end
+
+  @doc """
+  Logs the user in by magic link.
+
+  There are three cases to consider:
+
+  1. The user has already confirmed their email. They are logged in
+     and the magic link is expired.
+
+  2. The user has not confirmed their email and no password is set.
+     In this case, the user gets confirmed, logged in, and all tokens -
+     including session ones - are expired. In theory, no other tokens
+     exist but we delete all of them for best security practices.
+
+  3. The user has not confirmed their email but a password is set.
+     This cannot happen in the default implementation but may be the
+     source of security pitfalls. See the "Mixing magic link and password registration" section of
+     `mix help phx.gen.auth`.
+  """
+  def login_user_by_magic_link(token) do
+    {:ok, query} = verify_magic_link_token_query(token)
+
+    case Repo.one(query) do
+      # Prevent session fixation attacks by disallowing magic links for unconfirmed users with password
+      {%User{confirmed_at: nil, hashed_password: hash}, _token} when not is_nil(hash) ->
+        raise """
+        magic link log in is not allowed for unconfirmed users with a password set!
+
+        This cannot happen with the default implementation, which indicates that you
+        might have adapted the code to a different use case. Please make sure to read the
+        "Mixing magic link and password registration" section of `mix help phx.gen.auth`.
+        """
+
+      {%User{confirmed_at: nil} = user, _token} ->
+        user
+        |> User.confirm_changeset()
+        |> User.update_user_and_delete_all_tokens()
+
+      {user, token} ->
+        Repo.delete!(token)
+        {:ok, user, []}
+
+      nil ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc ~S"""
+  Delivers the update email instructions to the given user.
+
+  ## Examples
+
+      iex> deliver_user_update_email_instructions(user, current_email, &url(~p"/users/settings/confirm-email/#{&1}"))
+      {:ok, %{to: ..., body: ...}}
+
+  """
+  def deliver_user_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
+      when is_function(update_email_url_fun, 1) do
+    {encoded_token, user_token} = build_email_token(user, "change:#{current_email}")
+
+    Repo.insert!(user_token)
+    {:ok, %{to: "", body: "", text_body: encoded_token}}
+  end
+
+  @doc ~S"""
+  Delivers the magic link login instructions to the given user.
+  """
+  def deliver_login_instructions(%User{} = user, magic_link_url_fun)
+      when is_function(magic_link_url_fun, 1) do
+    {encoded_token, user_token} = build_email_token(user, "login")
+    Repo.insert!(user_token)
+    {:ok, %{to: "", body: "", text_body: encoded_token}}
+  end
+
+  @doc """
+  Deletes the signed token with the given context.
+  """
+  def delete_user_session_token(token) do
+    Repo.delete_all(by_token_and_context_query(token, "session"))
+    :ok
   end
 end

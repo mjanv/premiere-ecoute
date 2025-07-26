@@ -1,10 +1,10 @@
-defmodule UserCreated do
+defmodule AccountCreated do
   @moduledoc false
 
   defstruct [:id]
 end
 
-defmodule UserNotCreated do
+defmodule AccountDeleted do
   @moduledoc false
 
   defstruct [:id]

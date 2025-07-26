@@ -5,14 +5,16 @@ defmodule PremiereEcoute.Release do
   Used for executing DB release tasks when run in production without Mix installed.
   """
 
+  alias EventStore.Tasks
+
   @app :premiere_ecoute
 
   def migrate do
     load_app()
 
-    # config = PremiereEcoute.EventStore.config()
-    # :ok = EventStore.Tasks.Create.exec(config, [])
-    # :ok = EventStore.Tasks.Init.exec(config, [])
+    config = PremiereEcoute.EventStore.config()
+    :ok = Tasks.Create.exec(config, [])
+    :ok = Tasks.Init.exec(config, [])
 
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
