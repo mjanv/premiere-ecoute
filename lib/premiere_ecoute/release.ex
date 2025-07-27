@@ -16,7 +16,7 @@ defmodule PremiereEcoute.Release do
     :ok = Tasks.Create.exec(config, [])
     :ok = Tasks.Init.exec(config, [])
 
-    for repo <- repos() do
+    for repo <- Application.fetch_env!(@app, :ecto_repos) do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
     end
   end
@@ -27,12 +27,7 @@ defmodule PremiereEcoute.Release do
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
 
-  defp repos do
-    Application.fetch_env!(@app, :ecto_repos)
-  end
-
   defp load_app do
-    # Application.ensure_all_started(:postgrex)
     Application.ensure_all_started(:ssl)
     Application.ensure_loaded(@app)
   end

@@ -7,6 +7,7 @@ defmodule PremiereEcoute.EventStore do
 
   use EventStore, otp_app: :premiere_ecoute
 
+  @spec read(String.t()) :: [any()]
   def read(stream_uuid) do
     case __MODULE__.read_stream_forward(stream_uuid) do
       {:ok, events} -> Enum.map(events, fn %EventStore.RecordedEvent{data: event} -> event end)
@@ -14,37 +15,48 @@ defmodule PremiereEcoute.EventStore do
     end
   end
 
-  def append(event, stream_uuid, metadata \\ %{}) do
+  @spec paginate(String.t(), Keyword.t()) :: [EventStore.RecordedEvent.t()]
+  def paginate(stream_uuid, opts \\ [page: 1, size: 10]) do
+    case __MODULE__.read_stream_forward(stream_uuid, (opts[:page] - 1) * opts[:size] + 1, opts[:size]) do
+      {:ok, events} -> Enum.map(events, fn %EventStore.RecordedEvent{} = event -> Map.from_struct(event) end)
+      {:error, _} -> []
+    end
+  end
+
+  def append(event, opts \\ []) do
     event = %EventData{
-      event_type: Atom.to_string(event.__struct__),
       data: event,
-      metadata: metadata
+      event_id: UUID.uuid4(),
+      event_type: Atom.to_string(event.__struct__),
+      metadata: opts[:metadata] || %{}
     }
 
-    __MODULE__.append_to_stream(stream_uuid, :any_version, [event])
+    if opts[:stream] do
+      __MODULE__.append_to_stream(singular(opts[:stream]) <> to_string(event.data.id), :any_version, [event])
+      __MODULE__.link_to_stream(plural(opts[:stream]), :any_version, [event.event_id])
+    end
+
+    :ok
   end
 
-  def ok({:ok, data}, stream_uuid, f) do
-    append(f.(data), stream_uuid)
+  defp singular(stream), do: stream <> "-"
+  defp plural(stream), do: stream <> "s"
+
+  def ok(pattern, stream \\ nil, f)
+
+  def ok({:ok, data}, stream, f) do
+    append(f.(data), stream: stream)
     {:ok, data}
   end
 
-  def ok(pattern, _stream_uuid, _f), do: pattern
+  def ok(pattern, _stream, _f), do: pattern
 
-  def error({:error, data}, stream_uuid, g) do
-    append(g.(data), stream_uuid)
+  def error(pattern, stream \\ nil, g)
+
+  def error({:error, data}, stream, g) do
+    append(g.(data), stream: stream)
     {:error, data}
   end
 
-  def error(pattern, _stream_uuid, _g), do: pattern
-
-  def ok_or({:ok, data}, stream_uuid, f, _g) do
-    append(f.(data), stream_uuid)
-    {:ok, data}
-  end
-
-  def ok_or({:error, data}, stream_uuid, _f, g) do
-    append(g.(data), stream_uuid)
-    {:error, data}
-  end
+  def error(pattern, _stream, _g), do: pattern
 end

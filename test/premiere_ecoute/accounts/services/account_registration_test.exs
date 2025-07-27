@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
   alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.EventStore
 
   defp twitch_data do
     %{
@@ -39,6 +40,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
+
+      events = EventStore.read("user-#{user.id}")
+      assert events == [%AccountCreated{id: "#{user.id}", twitch_user_id: "441903922"}]
     end
 
     test "find an existing user" do
@@ -58,6 +62,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
+
+      events = EventStore.read("user-#{user.id}")
+      assert events == [%AccountCreated{id: "#{user.id}", twitch_user_id: "441903922"}]
     end
   end
 

@@ -178,5 +178,157 @@
         </div>
       </div>
     </div>
+    
+<!-- Event Store Section -->
+    <div class="mt-8">
+      <div class="bg-gray-800 rounded-lg border border-gray-700">
+        <div class="px-6 py-4 border-b border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-semibold text-white">{gettext("Event Store")}</h2>
+              <p class="mt-1 text-sm text-gray-400">{gettext("Browse and inspect stored events")}</p>
+            </div>
+            <form phx-change="change_stream">
+              <input
+                type="text"
+                name="stream"
+                value={@event_store.stream}
+                placeholder="Enter stream name (e.g. accounts, users)"
+                class="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+              />
+            </form>
+          </div>
+        </div>
+
+        <div class="p-6">
+          
+<!-- Events Table -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-700">
+              <thead class="bg-gray-700">
+                <tr>
+                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-16">
+                    {gettext("#")}
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    {gettext("Stream")}
+                  </th>
+                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-20">
+                    {gettext("Version")}
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    {gettext("Event")}
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    {gettext("Data")}
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    {gettext("Created At")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-gray-800 divide-y divide-gray-700">
+                <%= for event <- @event_store.events do %>
+                  <tr class="hover:bg-gray-700">
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-white">
+                      {event.event_number}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {event.stream_uuid}
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {event.stream_version}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-medium">
+                        {String.replace(event.event_type || "Unknown", "Elixir.", "")}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-300">
+                      <div class="flex flex-wrap gap-2">
+                        <%= for {key, value} <- Map.from_struct(event.data) do %>
+                          <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-purple-100 text-purple-800">
+                            <span class="font-medium">{key}:</span>
+                            <span class="ml-1">{inspect(value)}</span>
+                          </span>
+                        <% end %>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {Calendar.strftime(event.created_at, "%Y-%m-%d %H:%M:%S")}
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+          
+<!-- Pagination Controls -->
+          <div class="mt-6 flex items-center justify-center">
+            <nav class="flex items-center space-x-1">
+              <!-- Previous Button -->
+              <%= if @event_store.page > 1 do %>
+                <button
+                  phx-click="change_page"
+                  phx-value-page={@event_store.page - 1}
+                  class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-l-md hover:bg-gray-700 hover:text-white transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  {gettext("Previous")}
+                </button>
+              <% else %>
+                <span class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-gray-900 border border-gray-700 rounded-l-md cursor-not-allowed">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  {gettext("Previous")}
+                </span>
+              <% end %>
+              
+<!-- Page Numbers -->
+              <% max_page = if length(@event_store.events) < @event_store.size, do: @event_store.page, else: @event_store.page + 2 %>
+              <%= for page_num <- max(1, @event_store.page - 2)..max_page do %>
+                <%= if page_num == @event_store.page do %>
+                  <span class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600">
+                    {page_num}
+                  </span>
+                <% else %>
+                  <button
+                    phx-click="change_page"
+                    phx-value-page={page_num}
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 hover:bg-gray-700 hover:text-white transition-colors"
+                  >
+                    {page_num}
+                  </button>
+                <% end %>
+              <% end %>
+              
+<!-- Next Button -->
+              <%= if length(@event_store.events) == @event_store.size do %>
+                <button
+                  phx-click="change_page"
+                  phx-value-page={@event_store.page + 1}
+                  class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-r-md hover:bg-gray-700 hover:text-white transition-colors"
+                >
+                  {gettext("Next")}
+                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              <% else %>
+                <span class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-gray-900 border border-gray-700 rounded-r-md cursor-not-allowed">
+                  {gettext("Next")}
+                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              <% end %>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

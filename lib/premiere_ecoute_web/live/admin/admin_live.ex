@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.EventStore
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Discography.Album
@@ -18,6 +19,26 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
       votes_count: Scores.Vote.count(:id),
       polls_count: Scores.Poll.count(:id)
     })
+    |> assign(:event_store, %{
+      stream: "accounts",
+      page: 1,
+      size: 10,
+      events: EventStore.paginate("accounts", page: 1, size: 10)
+    })
     |> then(fn socket -> {:ok, socket} end)
+  end
+
+  # AIDEV-NOTE: handle event store form changes and pagination
+  def handle_event("change_stream", %{"stream" => stream}, socket) do
+    events = EventStore.paginate(stream, page: 1, size: socket.assigns.event_store.size)
+    event_store = %{socket.assigns.event_store | stream: stream, page: 1, events: events}
+    {:noreply, assign(socket, :event_store, event_store)}
+  end
+
+  def handle_event("change_page", %{"page" => page_str}, socket) do
+    page = String.to_integer(page_str)
+    events = EventStore.paginate(socket.assigns.event_store.stream, page: page, size: socket.assigns.event_store.size)
+    event_store = %{socket.assigns.event_store | page: page, events: events}
+    {:noreply, assign(socket, :event_store, event_store)}
   end
 end

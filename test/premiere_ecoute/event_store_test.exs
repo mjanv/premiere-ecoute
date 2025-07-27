@@ -3,85 +3,133 @@ defmodule PremiereEcoute.EventStoreTest do
 
   alias PremiereEcoute.EventStore
 
-  describe "append/2" do
-    test "add event to a stream" do
-      :ok = EventStore.append(%AccountCreated{id: UUID.uuid4()}, UUID.uuid4())
-    end
+  setup do
+    EventStore.delete_stream("users", :any_version, :hard)
+    EventStore.delete_stream("accounts", :any_version, :hard)
+    EventStore.delete_stream("players", :any_version, :hard)
 
-    # test "add event to a default stream" do
-    #   :ok = EventStore.append(%AccountCreated{id: UUID.uuid4()})
-    # end
+    :ok
+  end
+
+  describe "append/2" do
+    test "add event to a default stream" do
+      :ok = EventStore.append(%AccountCreated{id: UUID.uuid4()}, stream: "user")
+    end
   end
 
   describe "read/2" do
-    test "read events from a stream" do
-      stream_uuid = UUID.uuid4()
-
-      :ok = EventStore.append(%AccountCreated{id: "id1"}, stream_uuid)
-      :ok = EventStore.append(%AccountCreated{id: "id2"}, stream_uuid)
-
-      events = EventStore.read(stream_uuid)
-
-      assert events == [%AccountCreated{id: "id1"}, %AccountCreated{id: "id2"}]
-    end
-
     test "read events from a default stream" do
-      stream_uuid = UUID.uuid4()
+      user_id = UUID.uuid4()
 
-      :ok = EventStore.append(%AccountCreated{id: "id3"}, stream_uuid)
-      :ok = EventStore.append(%AccountDeleted{id: "id3"}, stream_uuid)
+      :ok = EventStore.append(%AccountCreated{id: user_id}, stream: "user")
+      :ok = EventStore.append(%AccountDeleted{id: user_id}, stream: "user")
 
-      events = EventStore.read(stream_uuid)
+      events = EventStore.read("user-#{user_id}")
 
-      assert events == [%AccountCreated{id: "id3"}, %AccountDeleted{id: "id3"}]
+      assert events == [%AccountCreated{id: user_id}, %AccountDeleted{id: user_id}]
+    end
+
+    test "read events from a common stream" do
+      :ok = EventStore.append(%AccountCreated{id: "id1"}, stream: "player")
+      :ok = EventStore.append(%AccountCreated{id: "id2"}, stream: "player")
+      :ok = EventStore.append(%AccountCreated{id: "id3"}, stream: "player")
+
+      events = EventStore.read("players")
+
+      assert events == [%AccountCreated{id: "id1"}, %AccountCreated{id: "id2"}, %AccountCreated{id: "id3"}]
     end
   end
 
-  test "An event can be dispatched on the {:ok, data} pattern" do
-    out =
-      {:ok, %{id: "abc"}}
-      |> EventStore.ok("a", fn data -> %AccountCreated{id: data.id} end)
-      |> EventStore.error("a", fn _reason -> %AccountDeleted{} end)
+  describe "paginate/2" do
+    test "read events from a common stream" do
+      for i <- 1..25 do
+        :ok = EventStore.append(%AccountCreated{id: "id#{i}"}, stream: "account")
+      end
 
-    events = EventStore.read("a")
+      events1 = EventStore.paginate("accounts", page: 1, size: 10)
+      events2 = EventStore.paginate("accounts", page: 2, size: 10)
+      events3 = EventStore.paginate("accounts", page: 3, size: 10)
 
-    assert out == {:ok, %{id: "abc"}}
-    assert events == [%AccountCreated{id: "abc"}]
+      assert length(events1) == 10
+      assert length(events2) == 10
+      assert length(events3) == 5
+
+      assert %{
+               event_number: 1,
+               event_id: _,
+               stream_uuid: "account-id1",
+               stream_version: 1,
+               event_type: "Elixir.AccountCreated",
+               data: %AccountCreated{id: "id1", twitch_user_id: nil},
+               metadata: %{},
+               created_at: _
+             } = hd(events1)
+
+      assert %{
+               event_number: 11,
+               event_id: _,
+               stream_uuid: "account-id11",
+               stream_version: 1,
+               event_type: "Elixir.AccountCreated",
+               data: %AccountCreated{id: "id11", twitch_user_id: nil},
+               metadata: %{},
+               created_at: _
+             } = hd(events2)
+
+      assert %{
+               event_number: 21,
+               event_id: _,
+               stream_uuid: "account-id21",
+               stream_version: 1,
+               event_type: "Elixir.AccountCreated",
+               data: %AccountCreated{id: "id21", twitch_user_id: nil},
+               metadata: %{},
+               created_at: _
+             } = hd(events3)
+    end
   end
 
-  test "An event can be dispatched on the {:error, reason} pattern" do
-    out =
-      {:error, :closed}
-      |> EventStore.ok("b", fn data -> %AccountCreated{id: data.id} end)
-      |> EventStore.error("b", fn _reason -> %AccountDeleted{} end)
+  describe "ok/2 & error/2" do
+    test "An event can be dispatched on the {:ok, data} pattern on the user stream" do
+      user_id = UUID.uuid4()
 
-    events = EventStore.read("b")
+      out =
+        {:ok, %{id: user_id}}
+        |> EventStore.ok("user", fn data -> %AccountCreated{id: data.id} end)
+        |> EventStore.error("user", fn reason -> %AccountDeleted{id: reason.id} end)
 
-    assert out == {:error, :closed}
-    assert events == [%AccountDeleted{}]
-  end
+      events = EventStore.read("user-#{user_id}")
 
-  test "Events can be dispatched on the {:ok, data} or {:error, reason} pattern" do
-    out1 =
-      {:error, :closed}
-      |> EventStore.ok_or(
-        "c",
-        fn _data -> %AccountCreated{} end,
-        fn _reason -> %AccountDeleted{} end
-      )
+      assert out == {:ok, %{id: user_id}}
+      assert events == [%AccountCreated{id: user_id}]
+    end
 
-    out2 =
-      {:ok, %{id: "abc"}}
-      |> EventStore.ok_or(
-        "c",
-        fn data -> %AccountCreated{id: data.id} end,
-        fn _reason -> %AccountDeleted{} end
-      )
+    test "An event can be dispatched on the {:ok, data} pattern on common stream" do
+      user_id = UUID.uuid4()
 
-    events = EventStore.read("c")
+      out =
+        {:ok, %{id: user_id}}
+        |> EventStore.ok("user", fn data -> %AccountCreated{id: data.id} end)
+        |> EventStore.error("user", fn reason -> %AccountDeleted{id: reason.id} end)
 
-    assert out1 == {:error, :closed}
-    assert out2 == {:ok, %{id: "abc"}}
-    assert events == [%AccountDeleted{}, %AccountCreated{id: "abc"}]
+      events = EventStore.read("user-#{user_id}")
+
+      assert out == {:ok, %{id: user_id}}
+      assert events == [%AccountCreated{id: user_id}]
+    end
+
+    test "An event can be dispatched on the {:error, reason} pattern on common stream" do
+      user_id = UUID.uuid4()
+
+      out =
+        {:error, %{id: user_id}}
+        |> EventStore.ok("user", fn data -> %AccountCreated{id: data.id} end)
+        |> EventStore.error("user", fn reason -> %AccountDeleted{id: reason.id} end)
+
+      events = EventStore.read("user-#{user_id}")
+
+      assert out == {:error, %{id: user_id}}
+      assert events == [%AccountDeleted{id: user_id}]
+    end
   end
 end
