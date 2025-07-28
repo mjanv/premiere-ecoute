@@ -53,6 +53,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/settings", UserSettingsLive, :edit
       live "/settings/confirm-email/:token", UserSettingsLive, :confirm_email
       live "/account", AccountLive, :index
+      live "/follows", FollowsLive, :index
     end
 
     post "/update-password", UserSessionController, :update_password

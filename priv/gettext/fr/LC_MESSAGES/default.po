@@ -1129,6 +1129,9 @@ msgstr "Événement"
 msgid "Event Store"
 msgstr "Magasin d'Événements"
 
+msgid "Follows"
+msgstr "Abonnements"
+
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:214
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Stream"

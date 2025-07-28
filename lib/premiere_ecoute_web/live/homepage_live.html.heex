@@ -2,13 +2,41 @@
   <div class="text-white flex flex-col" style="background-color: var(--color-dark-950); min-height: calc(100vh - 5rem);">
     <!-- AIDEV-NOTE: Hero section with left/right layout: title+description left, mockups right -->
     <!-- Hero Section -->
-    <div class="flex-1 py-16">
+    <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
         <%= if @current_scope && @current_scope.user do %>
           <!-- AIDEV-NOTE: Authenticated users - show full-width navigation cards -->
           <div class="w-full">
             <%= if @current_scope.user.role in [:streamer, :admin] do %>
               <!-- AIDEV-NOTE: Streamer/Admin user - show navigation cards -->
+
+              <!-- Followed Channels Section -->
+              <%= if @current_user && @current_user.channels && !Enum.empty?(@current_user.channels) do %>
+                <.link
+                  href={~p"/users/follows"}
+                  class="flex items-center justify-between mb-2 hover:opacity-80 transition-opacity"
+                >
+                  <div class="flex items-center space-x-3">
+                    <span class="text-sm font-medium text-gray-400">Followed Channels</span>
+                    <div class="flex -space-x-1">
+                      <%= for channel <- @current_user.channels |> Enum.take(5) do %>
+                        <div class="w-6 h-6 rounded-full bg-purple-600 border border-gray-700 flex items-center justify-center text-white font-semibold text-xs">
+                          {String.upcase(String.first(channel.twitch_username || channel.email))}
+                        </div>
+                      <% end %>
+                      <%= if length(@current_user.channels) > 5 do %>
+                        <div class="w-6 h-6 rounded-full bg-gray-600 border border-gray-700 flex items-center justify-center text-white font-semibold text-xs">
+                          +{length(@current_user.channels) - 5}
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                  <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </.link>
+              <% end %>
+
               <h2 class="text-4xl font-bold text-white mb-8">{gettext("My Activities")}</h2>
               <div class="space-y-6">
                 <.link
@@ -156,6 +184,34 @@
             <% end %>
             <%= if @current_scope.user.role in [:viewer] do %>
               <!-- AIDEV-NOTE: Viewer user - show welcome message with exploration cards -->
+
+              <!-- Followed Channels Section -->
+              <%= if @current_user && @current_user.channels && !Enum.empty?(@current_user.channels) do %>
+                <.link
+                  href={~p"/users/follows"}
+                  class="flex items-center justify-between mb-2 hover:opacity-80 transition-opacity"
+                >
+                  <div class="flex items-center space-x-3">
+                    <span class="text-sm font-medium text-gray-400">Followed Channels</span>
+                    <div class="flex -space-x-1">
+                      <%= for channel <- @current_user.channels |> Enum.take(5) do %>
+                        <div class="w-6 h-6 rounded-full bg-purple-600 border border-gray-700 flex items-center justify-center text-white font-semibold text-xs">
+                          {String.upcase(String.first(channel.twitch_username || channel.email))}
+                        </div>
+                      <% end %>
+                      <%= if length(@current_user.channels) > 5 do %>
+                        <div class="w-6 h-6 rounded-full bg-gray-600 border border-gray-700 flex items-center justify-center text-white font-semibold text-xs">
+                          +{length(@current_user.channels) - 5}
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                  <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </.link>
+              <% end %>
+
               <div class="space-y-6">
                 <div class="text-center p-8">
                   <h2 class="text-3xl font-bold text-white mb-4">

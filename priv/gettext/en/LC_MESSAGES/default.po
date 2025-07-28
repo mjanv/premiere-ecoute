@@ -16,6 +16,9 @@ msgstr ""
 msgid "Album Discovery"
 msgstr ""
 
+msgid "Follows"
+msgstr "Follows"
+
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:26
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to delete this listening session? This action cannot be undone and will remove all associated data including votes and reports."
