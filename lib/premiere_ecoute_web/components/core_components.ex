@@ -436,9 +436,6 @@ defmodule PremiereEcouteWeb.CoreComponents do
   Translates an error message using gettext.
   """
   def translate_error({msg, opts}) do
-    # You can make use of gettext to translate error messages by
-    # uncommenting and adjusting the following code:
-
     # if count = opts[:count] do
     #   Gettext.dngettext(PremiereEcouteWeb.Gettext, "errors", msg, msg, count, opts)
     # else
@@ -450,9 +447,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
     end)
   end
 
-  @doc """
-  Translates the errors for a field from a keyword list of errors.
-  """
+  @doc "Translates the errors for a field from a keyword list of errors."
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end

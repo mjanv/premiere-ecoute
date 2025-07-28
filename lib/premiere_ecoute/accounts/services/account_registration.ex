@@ -23,11 +23,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
           required(:expires_in) => integer()
         }
 
-  @spec register_twitch_user(twitch_data()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
-  def register_twitch_user(%{username: username} = payload) do
+  @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def register_twitch_user(%{username: username} = payload, password \\ nil) do
     with email <- "#{username}@twitch.tv",
          nil <- User.get_user_by_email(email),
-         attrs <- %{email: email, role: role(payload), password: random(32)},
+         attrs <- %{email: email, role: role(payload), password: password || random(32)},
          {:ok, user} <- User.create(attrs),
          {:ok, user} <- User.update_twitch_auth(user, payload) do
       {:ok, user}

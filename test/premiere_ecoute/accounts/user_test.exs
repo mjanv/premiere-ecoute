@@ -5,6 +5,12 @@ defmodule PremiereEcoute.Accounts.UserTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.UserToken
 
+  describe "inspect/2 for the User module" do
+    test "does not include password" do
+      refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
+    end
+  end
+
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do
       refute Accounts.get_user_by_email("unknown@example.com")
@@ -241,12 +247,6 @@ defmodule PremiereEcoute.Accounts.UserTest do
 
       refute changeset.valid?
       assert %{role: ["is invalid"]} = errors_on(changeset)
-    end
-  end
-
-  describe "inspect/2 for the User module" do
-    test "does not include password" do
-      refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
 end

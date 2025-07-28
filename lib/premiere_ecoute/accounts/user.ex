@@ -6,8 +6,10 @@ defmodule PremiereEcoute.Accounts.User do
   """
 
   use PremiereEcoute.Core.Schema,
+    root: [:channels],
     json: [:id, :email, :role]
 
+  alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
 
   @type t :: %__MODULE__{
@@ -47,6 +49,9 @@ defmodule PremiereEcoute.Accounts.User do
     field :twitch_refresh_token, :string, redact: true
     field :twitch_expires_at, :utc_datetime
     field :twitch_username, :string
+
+    has_many :follows, Follow, foreign_key: :user_id
+    has_many :channels, through: [:follows, :streamer]
 
     timestamps(type: :utc_datetime)
   end
