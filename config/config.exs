@@ -24,6 +24,10 @@ config :premiere_ecoute, :scopes,
     test_login_helper: :register_and_log_in_user
   ]
 
+config :premiere_ecoute, PremiereEcoute.Accounts,
+  admins: ["lanfeust313"],
+  bots: ["premiereecoutebot"]
+
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -45,7 +49,7 @@ config :premiere_ecoute, Oban,
   prefix: "oban",
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [default: 10],
+  queues: [default: 10, twitch: 1],
   repo: PremiereEcoute.Repo
 
 config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,

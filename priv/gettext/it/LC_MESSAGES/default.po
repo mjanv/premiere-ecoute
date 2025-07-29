@@ -114,6 +114,7 @@ msgstr "Twitch"
 msgid "Listening Session"
 msgstr "Sessione di Ascolto"
 
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:81
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:67
 #, elixir-autogen, elixir-format
 msgid "Viewers"
@@ -206,8 +207,8 @@ msgstr "Impossibile caricare le sessioni"
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:268
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:47
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:47
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:47
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:243
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:130
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:326
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr "Azioni"
@@ -229,8 +230,8 @@ msgstr "Connetti il tuo account Spotify per cercare e riprodurre musica"
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:146
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:211
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:216
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:234
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:299
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:317
 #, elixir-autogen, elixir-format
 msgid "Connected"
 msgstr "Connesso"
@@ -388,7 +389,7 @@ msgstr "Avvia Sessione"
 msgid "Stop Poll"
 msgstr "Ferma Sondaggio"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:254
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:337
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:85
 #, elixir-autogen, elixir-format
 msgid "Streamer"
@@ -529,7 +530,7 @@ msgid "We can't find the internet"
 msgstr "Non riusciamo a trovare internet"
 
 #: lib/premiere_ecoute_web/components/header.ex:185
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:255
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:338
 #, elixir-autogen, elixir-format
 msgid "Admin"
 msgstr "Amministratore"
@@ -588,12 +589,12 @@ msgstr "Torna alla Dashboard"
 msgid "Cannot delete album"
 msgstr "Impossibile eliminare l'album"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:200
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:283
 #, elixir-autogen, elixir-format
 msgid "Connected Services"
 msgstr "Servizi Connessi"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:41
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:124
 #, elixir-autogen, elixir-format
 msgid "Connections"
 msgstr "Connessioni"
@@ -609,13 +610,13 @@ msgstr "Creato"
 msgid "Current Track"
 msgstr "Brano Attuale"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:216
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:234
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:299
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:317
 #, elixir-autogen, elixir-format
 msgid "Disconnected"
 msgstr "Disconnesso"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:175
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:258
 #, elixir-autogen, elixir-format
 msgid "Email"
 msgstr "Email"
@@ -630,7 +631,7 @@ msgstr "Terminato"
 msgid "Failed to delete session"
 msgstr "Impossibile eliminare la sessione"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.ex:50
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.ex:66
 #, elixir-autogen, elixir-format
 msgid "Failed to update user role"
 msgstr "Impossibile aggiornare il ruolo utente"
@@ -640,7 +641,7 @@ msgstr "Impossibile aggiornare il ruolo utente"
 msgid "Grafana Dashboard"
 msgstr "Dashboard Grafana"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:44
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:127
 #, elixir-autogen, elixir-format
 msgid "Joined"
 msgstr "Unito"
@@ -675,7 +676,7 @@ msgstr "Gestisci account utente e ruoli"
 msgid "Manage your PremiereEcoute application"
 msgstr "Gestisci la tua applicazione PremiereEcoute"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:192
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:275
 #, elixir-autogen, elixir-format
 msgid "Member Since"
 msgstr "Membro dal"
@@ -716,8 +717,8 @@ msgid "Release Date"
 msgstr "Data di Rilascio"
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:62
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:38
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:187
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:121
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:270
 #, elixir-autogen, elixir-format
 msgid "Role"
 msgstr "Ruolo"
@@ -767,7 +768,7 @@ msgstr "Iniziato"
 msgid "Status"
 msgstr "Stato"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:181
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:264
 #, elixir-autogen, elixir-format
 msgid "Twitch Username"
 msgstr "Nome Utente Twitch"
@@ -784,19 +785,19 @@ msgid "Unknown User"
 msgstr "Utente Sconosciuto"
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:38
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:35
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:118
 #, elixir-autogen, elixir-format
 msgid "User"
 msgstr "Utente"
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:226
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:172
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:255
 #, elixir-autogen, elixir-format
 msgid "User Information"
 msgstr "Informazioni Utente"
 
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:83
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:26
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:109
 #, elixir-autogen, elixir-format
 msgid "Users"
 msgstr "Utenti"
@@ -847,7 +848,7 @@ msgstr "Valutazione 0-10"
 msgid "1-5 Rating"
 msgstr "Valutazione 1-5"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:248
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:331
 #, elixir-autogen, elixir-format
 msgid "Change Role"
 msgstr "Cambia Ruolo"
@@ -862,7 +863,7 @@ msgstr "Scegli formato di votazione"
 msgid "Explore listening sessions and join the community discussions."
 msgstr "Esplora le sessioni di ascolto e unisciti alle discussioni della comunità."
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:118
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:201
 #, elixir-autogen, elixir-format
 msgid "Manage"
 msgstr "Gestisci"
@@ -872,12 +873,12 @@ msgstr "Gestisci"
 msgid "Smash or Pass"
 msgstr "Smash o Pass"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:27
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:110
 #, elixir-autogen, elixir-format
 msgid "Total users: "
 msgstr "Utenti totali: "
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:263
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:346
 #, elixir-autogen, elixir-format
 msgid "Update Role"
 msgstr "Aggiorna Ruolo"
@@ -887,7 +888,7 @@ msgstr "Aggiorna Ruolo"
 msgid "User Management"
 msgstr "Gestione Utenti"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:253
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:336
 #, elixir-autogen, elixir-format
 msgid "Viewer"
 msgstr "Spettatore"
@@ -912,7 +913,7 @@ msgstr "Bentornato, %{username}!"
 msgid "Welcome !"
 msgstr "Benvenuto !"
 
-#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:256
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:339
 #, elixir-autogen, elixir-format
 msgid "Bot"
 msgstr "Bot"
@@ -1143,3 +1144,18 @@ msgstr "Versione"
 #, elixir-autogen, elixir-format
 msgid "Follows"
 msgstr "Seguiti"
+
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:41
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Admins"
+msgstr "Amministratore"
+
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:101
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Bots"
+msgstr "Bot"
+
+#: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:61
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Streamers"
+msgstr "Streamer"

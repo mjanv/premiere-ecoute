@@ -60,7 +60,7 @@ defmodule PremiereEcoute.Core.Schema do
       def upsert(entity, attrs), do: preload(Repo.insert_or_update(changeset(entity, attrs)))
 
       # Delete operations
-      def delete(entity), do: Repo.delete(entity, allow_stale: true)
+      def delete(entity), do: Repo.delete(changeset(entity, %{}), allow_stale: true)
       def delete_all(query \\ __MODULE__), do: Repo.delete_all(query)
 
       # Statistics

@@ -47,6 +47,10 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     |> validate_required([:spotify_id, :name, :artist, :total_tracks])
     |> validate_number(:total_tracks, greater_than: 0)
     |> unique_constraint(:spotify_id)
+    |> foreign_key_constraint(:listening_sessions,
+      name: :listening_sessions_album_id_fkey,
+      message: "are still linked to this album"
+    )
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
   end
 
@@ -55,12 +59,5 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     |> Map.from_struct()
     |> Map.update!(:tracks, fn tracks -> Enum.map(tracks, &Map.from_struct/1) end)
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
-  end
-
-  def delete(album) do
-    album
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.foreign_key_constraint(:album_id, name: "listening_sessions_album_id_fkey")
-    |> Repo.delete(allow_stale: true)
   end
 end

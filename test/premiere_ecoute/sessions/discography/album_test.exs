@@ -189,15 +189,16 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       assert is_nil(Album.get_by(spotify_id: spotify_id))
     end
 
-    @tag :skip
     test "cannot delete an album associated to at least one listening session" do
       user = user_fixture()
       {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
       {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
-      {:error, _} = Album.delete(album)
+      {:error, changeset} = Album.delete(album)
 
-      assert not assert(is_nil(Album.get_by(spotify_id: spotify_id)))
+      assert Repo.traverse_errors(changeset) == %{listening_sessions: ["are still linked to this album"]}
+
+      assert !is_nil(Album.get_by(spotify_id: spotify_id))
     end
   end
 end

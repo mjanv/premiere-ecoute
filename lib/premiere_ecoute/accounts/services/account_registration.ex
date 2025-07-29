@@ -23,6 +23,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
           required(:expires_in) => integer()
         }
 
+  @admins Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :admins])
+  @bots Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :bots])
+
   @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_twitch_user(%{username: username} = payload, password \\ nil) do
     with email <- "#{username}@twitch.tv",
@@ -60,8 +63,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   @spec role(map()) :: :admin | :bot | :streamer | :viewer
   def role(auth_data) do
     case {auth_data.broadcaster_type, auth_data.username} do
-      {_, "lanfeust313"} -> :admin
-      {_, "premiereecoutebot"} -> :bot
+      {_, username} when username in @admins -> :admin
+      {_, username} when username in @bots -> :bot
       {"affiliate", _} -> :streamer
       {"partner", _} -> :streamer
       _ -> :viewer

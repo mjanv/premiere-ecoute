@@ -19,6 +19,8 @@ defmodule PremiereEcouteWeb.ChannelCase do
 
   using do
     quote do
+      use Oban.Testing, repo: PremiereEcoute.Repo, prefix: "oban"
+
       import Phoenix.ChannelTest
       import PremiereEcouteWeb.ChannelCase
 

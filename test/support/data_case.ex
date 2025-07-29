@@ -20,6 +20,8 @@ defmodule PremiereEcoute.DataCase do
 
   using do
     quote do
+      use Oban.Testing, repo: PremiereEcoute.Repo, prefix: "oban"
+
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
@@ -32,10 +34,10 @@ defmodule PremiereEcoute.DataCase do
 
       import Hammox
 
-      alias PremiereEcoute.Repo
-
       setup :set_mox_from_context
       setup :verify_on_exit!
+
+      alias PremiereEcoute.Repo
     end
   end
 

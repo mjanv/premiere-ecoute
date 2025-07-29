@@ -25,6 +25,7 @@ defmodule PremiereEcouteWeb.ConnCase do
       @endpoint PremiereEcouteWeb.Endpoint
 
       use PremiereEcouteWeb, :verified_routes
+      use Oban.Testing, repo: PremiereEcoute.Repo, prefix: "oban"
 
       import Plug.Conn
       import Phoenix.ConnTest
