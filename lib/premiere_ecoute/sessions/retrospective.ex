@@ -31,11 +31,11 @@ defmodule PremiereEcoute.Sessions.Retrospective do
   ## Examples
 
       # Get albums from current month
-      iex> StreamerDashboard.get_albums_by_period(user_id, :month)
+      iex> get_albums_by_period(user_id, :month)
       [%{album: %Album{}, global_score: 8.5, session_date: ~U[...], ...}]
 
       # Get albums from specific year
-      iex> StreamerDashboard.get_albums_by_period(user_id, :year, %{year: 2023})
+      iex> get_albums_by_period(user_id, :year, %{year: 2023})
       [%{album: %Album{}, global_score: 7.2, session_date: ~U[...], ...}]
       [...]
   """

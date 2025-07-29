@@ -5,7 +5,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Sessions.Retrospective
+  alias PremiereEcoute.Sessions
 
   @impl true
   def mount(_params, _session, socket) do
@@ -28,7 +28,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
     socket
     |> assign_async(:albums_data, fn ->
-      albums = Retrospective.get_albums_by_period(user_id, period, %{year: year, month: month})
+      albums = Sessions.get_albums_by_period(user_id, period, %{year: year, month: month})
       {:ok, %{albums_data: albums}}
     end)
     |> then(fn socket -> {:ok, socket} end)
@@ -54,7 +54,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
     socket
     |> assign_async(:albums_data, fn ->
-      albums = Retrospective.get_albums_by_period(user_id, period, %{year: year, month: month})
+      albums = Sessions.get_albums_by_period(user_id, period, %{year: year, month: month})
       {:ok, %{albums_data: albums}}
     end)
     |> then(fn socket -> {:noreply, socket} end)
@@ -116,7 +116,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   # Private helper functions
 
   defp load_modal_data(session_id) do
-    case Retrospective.get_album_session_details(session_id) do
+    case Sessions.get_album_session_details(session_id) do
       {:ok, details} ->
         {:ok, %{modal_data: details}}
 

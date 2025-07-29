@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Core.Cache
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
@@ -162,5 +163,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  def active_sessions(user) do
+    from(s in __MODULE__,
+      where: s.status == :active,
+      join: f in Follow,
+      on: f.streamer_id == s.user_id,
+      where: f.user_id == ^user.id
+    )
+    |> Repo.all()
+    |> preload()
   end
 end

@@ -1,15 +1,17 @@
 defmodule PremiereEcoute.Sessions.ListeningSessionTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
   setup do
-    user = user_fixture()
+    user = user_fixture(%{role: :streamer})
+    viewer = user_fixture(%{role: :viewer})
     {:ok, album} = Album.create(album_fixture())
 
-    {:ok, %{user: user, album: album}}
+    {:ok, %{user: user, viewer: viewer, album: album}}
   end
 
   describe "create/1" do
@@ -290,6 +292,38 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       ListeningSession.delete(session)
 
       assert is_nil(ListeningSession.get(session.id))
+    end
+  end
+
+  describe "active_sessions/1" do
+    test "can list all active sessions linked to a viewer", %{viewer: viewer, user: user, album: album} do
+      {:ok, _} = Accounts.follow(viewer, user)
+      {:ok, session1} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session1} = ListeningSession.start(session1)
+      {:ok, session2} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session2} = ListeningSession.start(session2)
+
+      sessions = ListeningSession.active_sessions(viewer)
+
+      assert sessions == [session1, session2]
+    end
+
+    test "can list not actives sessions if no followed streamer", %{viewer: viewer, user: user, album: album} do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, _} = ListeningSession.start(session)
+
+      sessions = ListeningSession.active_sessions(viewer)
+
+      assert sessions == []
+    end
+
+    test "can list no actives sessions if no active session", %{viewer: viewer, user: user, album: album} do
+      {:ok, _} = Accounts.follow(viewer, user)
+      {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      sessions = ListeningSession.active_sessions(viewer)
+
+      assert sessions == []
     end
   end
 end

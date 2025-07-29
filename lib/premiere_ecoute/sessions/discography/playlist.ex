@@ -30,16 +30,16 @@ defmodule PremiereEcoute.Sessions.Discography.Playlist do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(album, attrs) do
-    album
+  def changeset(playlist, attrs) do
+    playlist
     |> cast(attrs, [:spotify_id, :name, :spotify_owner_id, :owner_name, :cover_url])
     |> validate_required([:spotify_id, :name, :spotify_owner_id, :owner_name, :cover_url])
     |> unique_constraint(:spotify_id)
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
   end
 
-  def create(%__MODULE__{} = album) do
-    album
+  def create(%__MODULE__{} = playlist) do
+    playlist
     |> Map.from_struct()
     |> Map.update!(:tracks, fn tracks -> Enum.map(tracks, &Map.from_struct/1) end)
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
