@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.Services.AccountCompliance
 
   @impl true
   def mount(_params, _session, socket) do
@@ -9,6 +10,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
     socket
     |> assign(:current_user, current_user)
+    |> assign(:show_download_modal, false)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -76,5 +78,52 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
   @impl true
   def handle_event("delete_account", _params, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("show_download_modal", _params, socket) do
+    {:noreply, assign(socket, :show_download_modal, true)}
+  end
+
+  @impl true
+  def handle_event("hide_download_modal", _params, socket) do
+    {:noreply, assign(socket, :show_download_modal, false)}
+  end
+
+  @impl true
+  def handle_event("stop_propagation", _params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("download_data", _params, socket) do
+    # AIDEV-NOTE: GDPR data download implementation
+    case socket.assigns.current_scope do
+      nil ->
+        socket
+        |> put_flash(:error, "User not found")
+        |> assign(:show_download_modal, false)
+
+      scope ->
+        case AccountCompliance.download_associated_data(scope) do
+          {:ok, json_data} ->
+            filename = "premiere_ecoute_data_#{scope.user.id}_#{Date.utc_today()}.json"
+
+            socket
+            |> push_event("download_file", %{
+              data: json_data,
+              filename: filename,
+              content_type: "application/json"
+            })
+            |> assign(:show_download_modal, false)
+            |> put_flash(:info, "Data download started")
+
+          {:error, _reason} ->
+            socket
+            |> put_flash(:error, "Failed to generate data export")
+            |> assign(:show_download_modal, false)
+        end
+    end
+    |> then(fn socket -> {:noreply, socket} end)
   end
 end

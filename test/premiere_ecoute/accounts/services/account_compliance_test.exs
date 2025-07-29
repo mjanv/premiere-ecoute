@@ -1,11 +1,16 @@
 defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
-  alias PremiereEcoute.Accounts.Services.AccountCompliance
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
+  alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   setup do
     streamer = user_fixture(%{role: :streamer, twitch_user_id: "streamer123", twitch_username: "streamer"})
@@ -35,8 +40,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
   end
 
   describe "download_associated_data/1" do
-    test "do nothing", %{viewer: viewer} do
-      {:ok, data} = AccountCompliance.download_associated_data(Scope.for_user(viewer))
+    test "download viewer data as JSON", %{viewer: viewer} do
+      {:ok, data} = Accounts.download_associated_data(Scope.for_user(viewer))
 
       data = Jason.decode!(data)
 
@@ -102,6 +107,43 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
                  "timestamp" => _
                }
              ] = events
+    end
+  end
+
+  describe "delete_account/1" do
+    test "delete a viewer account", %{viewer: viewer} do
+      {:ok, deleted_user} = Accounts.delete_account(Scope.for_user(viewer))
+
+      assert deleted_user.id == viewer.id
+      assert is_nil(User.get(viewer.id))
+
+      assert Enum.empty?(UserToken.all(where: [user_id: viewer.id], order_by: [:id]))
+      assert Enum.empty?(Follow.all(where: [user_id: viewer.id]))
+      assert Enum.empty?(Follow.all(where: [streamer_id: viewer.id]))
+      assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch_user_id]))
+      assert Enum.empty?(ListeningSession.all(where: [user_id: viewer.id]))
+      assert Enum.empty?(EventStore.read("user-#{viewer.id}"))
+    end
+
+    test "delete a streamer account", %{streamer: streamer} do
+      {:ok, deleted_user} = Accounts.delete_account(Scope.for_user(streamer))
+
+      assert deleted_user.id == streamer.id
+      assert is_nil(User.get(streamer.id))
+
+      assert Enum.empty?(UserToken.all(where: [user_id: streamer.id], order_by: [:id]))
+      assert Enum.empty?(Follow.all(where: [user_id: streamer.id]))
+      assert Enum.empty?(Follow.all(where: [streamer_id: streamer.id]))
+      assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch_user_id]))
+      assert Enum.empty?(ListeningSession.all(where: [user_id: streamer.id]))
+      assert Enum.empty?(EventStore.read("user-#{streamer.id}"))
+    end
+
+    test "deleting non-existent user raises appropriate error" do
+      user = user_fixture(%{role: :viewer, twitch_user_id: "test123"})
+      Repo.delete!(user)
+
+      assert_raise Ecto.StaleEntryError, fn -> Accounts.delete_account(Scope.for_user(user)) end
     end
   end
 end

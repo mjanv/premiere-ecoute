@@ -20,6 +20,7 @@ defmodule PremiereEcoute.Accounts do
   defdelegate update_user_password(user, attrs), to: User
   defdelegate update_user_role(user, role), to: User
   defdelegate download_associated_data(scope), to: Services.AccountCompliance
+  defdelegate delete_account(scope), to: Services.AccountCompliance
 
   ## User Token
   defdelegate generate_user_session_token(user), to: UserToken

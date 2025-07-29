@@ -5,7 +5,7 @@ defmodule PremiereEcoute.EventStore do
   Provides event persistence and retrieval capabilities with conditional event appending based on operation results. This module wraps the EventStore library to offer simplified interfaces for reading event streams and appending events with optional metadata.
   """
 
-  use EventStore, otp_app: :premiere_ecoute
+  use EventStore, otp_app: :premiere_ecoute, enable_hard_deletes: false
 
   @spec read(String.t(), :event | :raw) :: [any()]
   def read(stream_uuid, type \\ :event)

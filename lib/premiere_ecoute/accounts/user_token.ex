@@ -1,13 +1,10 @@
 defmodule PremiereEcoute.Accounts.UserToken do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Query
+  use PremiereEcoute.Core.Schema
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.UserToken
-  alias PremiereEcoute.Repo
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -26,6 +23,11 @@ defmodule PremiereEcoute.Accounts.UserToken do
     belongs_to :user, PremiereEcoute.Accounts.User
 
     timestamps(type: :utc_datetime, updated_at: false)
+  end
+
+  def changeset(token, _attrs) do
+    token
+    |> Ecto.Changeset.change()
   end
 
   @doc """
