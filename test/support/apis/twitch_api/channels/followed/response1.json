@@ -1,0 +1,26 @@
+{
+  "total": 3,
+  "data": [
+    {
+      "broadcaster_id": "11111",
+      "broadcaster_login": "userloginname",
+      "broadcaster_name": "UserDisplayName",
+      "followed_at": "2022-05-24T22:22:08Z"
+    },
+    {
+      "broadcaster_id": "22222",
+      "broadcaster_login": "streamqueen",
+      "broadcaster_name": "StreamQueen",
+      "followed_at": "2023-01-12T14:45:30Z"
+    },
+    {
+      "broadcaster_id": "33333",
+      "broadcaster_login": "musicmania",
+      "broadcaster_name": "MusicMania",
+      "followed_at": "2022-09-18T18:10:00Z"
+    }
+  ],
+  "pagination": {
+    "cursor": "eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6NX19"
+  }
+}

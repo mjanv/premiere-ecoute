@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUserFollow do
     create table(:user_follows) do
       add :user_id, references(:users, on_delete: :delete_all)
       add :streamer_id, references(:users, on_delete: :delete_all)
+      add :followed_at, :naive_datetime
 
       timestamps(type: :utc_datetime)
     end

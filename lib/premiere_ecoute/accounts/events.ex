@@ -9,3 +9,15 @@ defmodule AccountDeleted do
 
   defstruct [:id]
 end
+
+defmodule ChannelFollowed do
+  @moduledoc false
+
+  defstruct [:id, :streamer_id]
+end
+
+defmodule ChannelUnfollowed do
+  @moduledoc false
+
+  defstruct [:id, :streamer_id]
+end

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.38.2">
+    <meta name="project" content="Premiere Ecoute v0.1.0">
+
+
+    <title>PremiereEcoute.Apis.SpotifyApi — Premiere Ecoute v0.1.0</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-KV3YOVJ3.css" />
+
+    <script defer src="dist/sidebar_items-E8ABDFF2.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-DPJLHKSM.js"></script>
+
+  </head>
+  <body>
+    <script>(()=>{var t="ex_doc:settings",e="dark";var o="dark",s="light";var E="sidebar_state",n="closed";var r="sidebar_width";var a="sidebar-open";var i=new URLSearchParams(window.location.search),S=i.get("theme")||JSON.parse(localStorage.getItem(t)||"{}").theme;(S===o||S!==s&&window.matchMedia("(prefers-color-scheme: dark)").matches)&&document.body.classList.add(e);var d=sessionStorage.getItem(E),A=d!==n&&!window.matchMedia(`screen and (max-width: ${768}px)`).matches;document.body.classList.toggle(a,A);var c=sessionStorage.getItem(r);c&&document.body.style.setProperty("--sidebarWidth",`${c}px`);var p=/(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);document.documentElement.classList.toggle("apple-os",p);})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="https://premiere-ecoute.fly.dev/" class="sidebar-projectName" translate="no">
+Premiere Ecoute
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v0.1.0
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras=""></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-module" id="main" data-type="modules">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Premiere Ecoute</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search" tabindex="-1">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>
+      <span translate="no">PremiereEcoute.Apis.SpotifyApi</span> 
+      <small class="app-vsn" translate="no">(Premiere Ecoute v0.1.0)</small>
+
+    </h1>
+
+      <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+    <section id="moduledoc">
+<h1>Spotify API Client</h1><p>Central client for Spotify Web API integration providing music search, album retrieval, player control, and authentication functionality. This module acts as the main interface for all Spotify-related operations, delegating to specialized submodules for specific API domains while handling common concerns like authentication, request configuration, and telemetry.</p><h2 id="module-accounts" class="section-heading"><a href="#module-accounts" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Accounts</span></h2><p>Handles OAuth2 authorization flow with Spotify, including generating authorization URLs, exchanging authorization codes for access tokens, and refreshing expired tokens. Supports both client credentials flow for public data and authorization code flow for user-specific operations.</p><h2 id="module-albums" class="section-heading"><a href="#module-albums" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Albums</span></h2><p>Provides access to Spotify's album catalog, enabling retrieval of detailed album information including tracks, metadata, and artwork. Album data is parsed into structured domain objects for use throughout the application.</p><h2 id="module-player" class="section-heading"><a href="#module-player" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Player</span></h2><p>Controls Spotify playback for authenticated users with premium accounts. Supports play/pause operations, track navigation, queue management, and playback state monitoring. Integrates with user's active Spotify devices for seamless music control.</p><h2 id="module-search" class="section-heading"><a href="#module-search" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Search</span></h2><p>Enables searching Spotify's music catalog for albums, tracks, and artists. Returns structured results that can be used for music discovery and selection within listening sessions.</p>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#add_item_to_playback_queue/2" data-no-tooltip="" translate="no">add_item_to_playback_queue(scope, item)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.add_item_to_playback_queue/2</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#api/1" data-no-tooltip="" translate="no">api(atom)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#authorization_code/2" data-no-tooltip="" translate="no">authorization_code(code, state)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>See <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.authorization_code/2</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#authorization_url/0" data-no-tooltip="" translate="no">authorization_url()</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>See <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.authorization_url/0</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#authorization_url/1" data-no-tooltip="" translate="no">authorization_url(state)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>See <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.authorization_url/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#client_credentials/0" data-no-tooltip="" translate="no">client_credentials()</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>See <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.client_credentials/0</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#get_album/1" data-no-tooltip="" translate="no">get_album(album_id)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.get_album/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#get_playback_state/1" data-no-tooltip="" translate="no">get_playback_state(scope)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.get_playback_state/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#get_playlist/1" data-no-tooltip="" translate="no">get_playlist(playlist_id)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>See <code class="inline">PremiereEcoute.Apis.SpotifyApi.Playlists.get_playlist/1</code>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#impl/0" data-no-tooltip="" translate="no">impl()</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#next_track/1" data-no-tooltip="" translate="no">next_track(scope)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.next_track/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#pause_playback/1" data-no-tooltip="" translate="no">pause_playback(scope)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.pause_playback/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#previous_track/1" data-no-tooltip="" translate="no">previous_track(scope)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.previous_track/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#renew_token/1" data-no-tooltip="" translate="no">renew_token(refresh_token)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>See <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.renew_token/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#search_albums/1" data-no-tooltip="" translate="no">search_albums(query)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.search_albums/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#start_playback/1" data-no-tooltip="" translate="no">start_playback(scope)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.start_playback/1</code></a>.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#start_resume_playback/2" data-no-tooltip="" translate="no">start_resume_playback(scope, album)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Callback implementation for <a><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.start_resume_playback/2</code></a>.</p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Functions</span>
+    </h1>
+    <div class="functions-list">
+<section class="detail" id="add_item_to_playback_queue/2">
+
+  <div class="detail-header">
+    <a href="#add_item_to_playback_queue/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">add_item_to_playback_queue(scope, item)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L113" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:add_item_to_playback_queue/2"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.add_item_to_playback_queue/2</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="api/1">
+
+  <div class="detail-header">
+    <a href="#api/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">api(atom)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L61" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> api(:web | :accounts) :: <a href="https://hexdocs.pm/req/0.5.15/Req.Request.html#t:t/0">Req.Request.t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="authorization_code/2">
+
+  <div class="detail-header">
+    <a href="#authorization_code/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">authorization_code(code, state)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L100" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>See <a href="PremiereEcoute.Apis.SpotifyApi.Accounts.html#authorization_code/2"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.authorization_code/2</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="authorization_url/0">
+
+  <div class="detail-header">
+    <a href="#authorization_url/0" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">authorization_url()</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L98" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>See <a href="PremiereEcoute.Apis.SpotifyApi.Accounts.html#authorization_url/0"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.authorization_url/0</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="authorization_url/1">
+
+  <div class="detail-header">
+    <a href="#authorization_url/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">authorization_url(state)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L99" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>See <a href="PremiereEcoute.Apis.SpotifyApi.Accounts.html#authorization_url/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.authorization_url/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="client_credentials/0">
+
+  <div class="detail-header">
+    <a href="#client_credentials/0" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">client_credentials()</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L97" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>See <a href="PremiereEcoute.Apis.SpotifyApi.Accounts.html#client_credentials/0"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.client_credentials/0</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="get_album/1">
+
+  <div class="detail-header">
+    <a href="#get_album/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">get_album(album_id)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L104" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:get_album/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.get_album/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="get_playback_state/1">
+
+  <div class="detail-header">
+    <a href="#get_playback_state/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">get_playback_state(scope)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L107" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:get_playback_state/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.get_playback_state/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="get_playlist/1">
+
+  <div class="detail-header">
+    <a href="#get_playlist/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">get_playlist(playlist_id)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L116" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>See <code class="inline">PremiereEcoute.Apis.SpotifyApi.Playlists.get_playlist/1</code>.</p>
+  </section>
+</section>
+<section class="detail" id="impl/0">
+
+  <div class="detail-header">
+    <a href="#impl/0" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">impl()</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L58" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="next_track/1">
+
+  <div class="detail-header">
+    <a href="#next_track/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">next_track(scope)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L110" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:next_track/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.next_track/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="pause_playback/1">
+
+  <div class="detail-header">
+    <a href="#pause_playback/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">pause_playback(scope)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L109" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:pause_playback/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.pause_playback/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="previous_track/1">
+
+  <div class="detail-header">
+    <a href="#previous_track/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">previous_track(scope)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L111" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:previous_track/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.previous_track/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="renew_token/1">
+
+  <div class="detail-header">
+    <a href="#renew_token/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">renew_token(refresh_token)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L101" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>See <a href="PremiereEcoute.Apis.SpotifyApi.Accounts.html#renew_token/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Accounts.renew_token/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="search_albums/1">
+
+  <div class="detail-header">
+    <a href="#search_albums/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">search_albums(query)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L119" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:search_albums/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.search_albums/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="start_playback/1">
+
+  <div class="detail-header">
+    <a href="#start_playback/1" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">start_playback(scope)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L108" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:start_playback/1"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.start_playback/1</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="start_resume_playback/2">
+
+  <div class="detail-header">
+    <a href="#start_resume_playback/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">start_resume_playback(scope, album)</h1>
+
+
+        <a href="https://github.com/mjanv/premiere-ecoute/blob/main/lib/premiere_ecoute/apis/spotify_api.ex#L112" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>Callback implementation for <a href="PremiereEcoute.Apis.SpotifyApi.Behavior.html#c:start_resume_playback/2"><code class="inline">PremiereEcoute.Apis.SpotifyApi.Behavior.start_resume_playback/2</code></a>.</p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+      <p>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Premiere Ecoute.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.38.2) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

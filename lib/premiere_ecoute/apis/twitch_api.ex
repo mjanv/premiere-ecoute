@@ -33,6 +33,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     """
 
     alias PremiereEcoute.Accounts.Scope
+    alias PremiereEcoute.Accounts.User
 
     # Chat
     @callback send_chat_message(Scope.t(), message :: String.t()) ::
@@ -51,6 +52,10 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     @callback create_poll(Scope.t(), poll :: map()) :: {:ok, map()} | {:error, term()}
     @callback end_poll(Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback get_poll(Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
+
+    # Channels
+    @callback get_followed_channels(Scope.t()) :: {:ok, [map()]} | {:error, term()}
+    @callback get_followed_channel(Scope.t(), user :: User.t()) :: {:ok, map()} | {:error, term()}
   end
 
   @behaviour __MODULE__.Behavior
@@ -105,4 +110,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defdelegate create_poll(scope, poll), to: __MODULE__.Polls
   defdelegate end_poll(scope, poll_id), to: __MODULE__.Polls
   defdelegate get_poll(scope, poll_id), to: __MODULE__.Polls
+
+  defdelegate get_followed_channels(scope), to: __MODULE__.Channels
+  defdelegate get_followed_channel(scope, user), to: __MODULE__.Channels
 end

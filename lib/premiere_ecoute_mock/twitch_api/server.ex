@@ -177,6 +177,10 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
     no_content(conn)
   end
 
+  get "/channels/followed" do
+    json(conn, 200, data([], %{"total" => 0}))
+  end
+
   defp no_content(conn) do
     conn
     |> put_resp_content_type("application/json")

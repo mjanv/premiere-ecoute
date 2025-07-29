@@ -3,11 +3,13 @@ defmodule PremiereEcoute.Accounts do
   The Accounts context.
   """
 
+  alias PremiereEcoute.Accounts.Services
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
 
   ## User
+  defdelegate preload_user(user), to: User, as: :preload
   defdelegate get_user_by_email(email), to: User
   defdelegate get_user_by_email_and_password(email, password), to: User
   defdelegate get_user!(id), to: User
@@ -28,6 +30,8 @@ defmodule PremiereEcoute.Accounts do
   defdelegate delete_user_session_token(token), to: UserToken
 
   ## Follow
-  defdelegate follow(user, streamer), to: Follow
+  defdelegate follow(user, streamer, opts \\ %{}), to: Follow
   defdelegate unfollow(user, streamer), to: Follow
+  defdelegate discover_follows(user), to: Follow
+  defdelegate follow_streamer(scope, streamer), to: Services.AccountFollow
 end

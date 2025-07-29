@@ -42,7 +42,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert data[:refresh_token] == refresh_token
 
       events = EventStore.read("user-#{user.id}")
-      assert events == [%AccountCreated{id: "#{user.id}", twitch_user_id: "441903922"}]
+      assert events == [%AccountCreated{id: user.id, twitch_user_id: "441903922"}]
     end
 
     test "find an existing user" do
@@ -64,7 +64,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert data[:refresh_token] == refresh_token
 
       events = EventStore.read("user-#{user.id}")
-      assert events == [%AccountCreated{id: "#{user.id}", twitch_user_id: "441903922"}]
+      assert events == [%AccountCreated{id: user.id, twitch_user_id: "441903922"}]
     end
   end
 

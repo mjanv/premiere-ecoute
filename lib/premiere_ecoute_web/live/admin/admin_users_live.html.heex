@@ -20,6 +20,89 @@
         </div>
       </div>
     </div>
+    
+<!-- User Statistics by Role -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <!-- Admin Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-purple-900">
+            <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :admin, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Admins")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Streamer Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-blue-900">
+            <svg class="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :streamer, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Streamers")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Viewer Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-gray-700">
+            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :viewer, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Viewers")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Bot Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-red-900">
+            <svg class="w-8 h-8 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :bot, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Bots")}</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700">

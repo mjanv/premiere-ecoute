@@ -5,7 +5,9 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
 
-  describe "follow/2" do
+  alias PremiereEcoute.EventStore
+
+  describe "follow/3" do
     test "add a streamer to any role follow list" do
       for role <- [:viewer, :streamer, :admin, :bot] do
         %{id: user_id} = user = user_fixture(%{role: role})
@@ -13,7 +15,20 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
 
         {:ok, follow} = Accounts.follow(user, streamer)
 
-        assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = follow
+        assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: nil} = follow
+        assert EventStore.read("user-#{user_id}") == [%ChannelFollowed{id: user.id, streamer_id: streamer.id}]
+      end
+    end
+
+    test "add a followed_at date to the follow" do
+      for role <- [:viewer, :streamer, :admin, :bot] do
+        %{id: user_id} = user = user_fixture(%{role: role})
+        %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
+
+        {:ok, follow} = Accounts.follow(user, streamer, %{followed_at: ~N[2020-07-18 07:59:47]})
+
+        assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: ~N[2020-07-18 07:59:47]} = follow
+        assert EventStore.read("user-#{user_id}") == [%ChannelFollowed{id: user.id, streamer_id: streamer.id}]
       end
     end
 
@@ -57,6 +72,11 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
 
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = follow
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = unfollow
+
+      assert EventStore.read("user-#{user_id}") == [
+               %ChannelFollowed{id: user.id, streamer_id: streamer.id},
+               %ChannelUnfollowed{id: user.id, streamer_id: streamer.id}
+             ]
     end
 
     test "cannot unfollow a streamer not part of a viewer follow list" do
@@ -86,6 +106,27 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
                %User{role: :streamer},
                %User{role: :streamer}
              ] = user.channels
+    end
+  end
+
+  describe "discover_follows/1" do
+    test "returns the list of non-followed streamers by a viewer" do
+      user = user_fixture(%{role: :viewer})
+
+      follows = for _ <- 1..5, do: user_fixture(%{role: :streamer})
+      nonfollows = for _ <- 1..3, do: user_fixture(%{role: :streamer})
+
+      Enum.each(follows, fn f -> Accounts.follow(user, f) end)
+
+      discovers = Accounts.discover_follows(user)
+
+      assert discovers == nonfollows
+    end
+
+    test "returns an empty list when no streamers are defined" do
+      user = user_fixture(%{role: :viewer})
+
+      assert Accounts.discover_follows(user) == []
     end
   end
 end

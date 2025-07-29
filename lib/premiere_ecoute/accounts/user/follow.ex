@@ -12,10 +12,13 @@ defmodule PremiereEcoute.Accounts.User.Follow do
     json: [:user, :streamer]
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.EventStore
 
   schema "user_follows" do
     belongs_to :user, User
     belongs_to :streamer, User
+
+    field :followed_at, :naive_datetime
 
     timestamps(type: :utc_datetime)
   end
@@ -27,7 +30,7 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   """
   def changeset(follow, attrs) do
     follow
-    |> cast(attrs, [:user_id, :streamer_id])
+    |> cast(attrs, [:user_id, :streamer_id, :followed_at])
     |> validate_required([:user_id, :streamer_id])
     |> validate_change(:streamer_id, fn :streamer_id, _ ->
       case Map.get(attrs, :streamer_role) do
@@ -43,8 +46,10 @@ defmodule PremiereEcoute.Accounts.User.Follow do
 
   Establishes a follow connection by creating a new Follow record with the provided user and streamer entities. The function automatically extracts the necessary IDs and role information to create the relationship through the changeset validation process.
   """
-  def follow(user, streamer) do
-    create(%{user_id: user.id, streamer_id: streamer.id, streamer_role: streamer.role})
+  def follow(user, streamer, opts \\ %{}) do
+    %{user_id: user.id, streamer_id: streamer.id, streamer_role: streamer.role, followed_at: opts[:followed_at]}
+    |> create()
+    |> EventStore.ok("user", fn follow -> %ChannelFollowed{id: follow.user_id, streamer_id: follow.streamer_id} end)
   end
 
   @doc """
@@ -63,5 +68,15 @@ defmodule PremiereEcoute.Accounts.User.Follow do
       follow ->
         Repo.delete(follow)
     end
+    |> EventStore.ok("user", fn unfollow -> %ChannelUnfollowed{id: unfollow.user_id, streamer_id: unfollow.streamer_id} end)
+  end
+
+  def discover_follows(%User{id: id}) do
+    from(u in User,
+      where: u.role == :streamer,
+      where: u.id != ^id,
+      where: u.id not in subquery(from f in __MODULE__, where: f.user_id == ^id, select: f.streamer_id)
+    )
+    |> Repo.all()
   end
 end

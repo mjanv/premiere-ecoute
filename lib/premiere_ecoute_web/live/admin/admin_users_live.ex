@@ -6,8 +6,16 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
   alias PremiereEcoute.Accounts
 
   def mount(_params, _session, socket) do
+    users = Accounts.User.all()
+    # AIDEV-NOTE: Calculate user statistics by role for admin dashboard
+    user_stats =
+      users
+      |> Enum.group_by(& &1.role)
+      |> Enum.into(%{}, fn {role, users} -> {role, length(users)} end)
+
     socket
-    |> assign(:users, Accounts.User.all())
+    |> assign(:users, users)
+    |> assign(:user_stats, user_stats)
     |> assign(:selected_user, nil)
     |> assign(:show_user_modal, false)
     |> then(fn socket -> {:ok, socket} end)
@@ -40,8 +48,16 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
     |> Accounts.update_user_role(String.to_atom(role))
     |> case do
       {:ok, user} ->
+        users = Accounts.User.all()
+        # AIDEV-NOTE: Recalculate user statistics after role change
+        user_stats =
+          users
+          |> Enum.group_by(& &1.role)
+          |> Enum.into(%{}, fn {role, users} -> {role, length(users)} end)
+
         socket
-        |> assign(:users, Accounts.User.all())
+        |> assign(:users, users)
+        |> assign(:user_stats, user_stats)
         |> assign(:selected_user, user)
         |> then(fn socket -> {:noreply, socket} end)
 

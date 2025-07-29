@@ -31,7 +31,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
          {:ok, user} <- User.create(attrs),
          {:ok, user} <- User.update_twitch_auth(user, payload) do
       {:ok, user}
-      |> EventStore.ok("user", fn user -> %AccountCreated{id: to_string(user.id), twitch_user_id: user.twitch_user_id} end)
+      |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id, twitch_user_id: user.twitch_user_id} end)
     else
       %User{} = user ->
         User.update_twitch_auth(user, payload)
