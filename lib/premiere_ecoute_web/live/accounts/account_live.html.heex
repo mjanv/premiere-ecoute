@@ -317,7 +317,7 @@
                     {gettext("Permanently delete your account and all associated data. This action cannot be undone.")}
                   </p>
                   <button
-                    phx-click="delete_account"
+                    phx-click="show_delete_modal"
                     class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
                   >
                     {gettext("Delete Account")}
@@ -371,6 +371,65 @@
               class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
             >
               {gettext("Download")}
+            </button>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    
+<!-- AIDEV-NOTE: Account deletion warning modal -->
+    <%= if @show_delete_modal do %>
+      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_delete_modal">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4" phx-click="stop_propagation">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-red-400">{gettext("Delete Account")}</h3>
+          </div>
+
+          <div class="mb-6">
+            <div class="bg-red-600/10 border border-red-600/30 rounded-lg p-4 mb-4">
+              <p class="text-red-300 text-sm font-medium mb-2">
+                ⚠️ {gettext("This action is immediate and irreversible!")}
+              </p>
+              <p class="text-gray-300 text-sm">
+                {gettext("Your account and all associated data will be permanently deleted:")}
+              </p>
+            </div>
+
+            <ul class="text-gray-400 text-sm space-y-1 ml-4">
+              <li>• {gettext("Profile and authentication data")}</li>
+              <li>• {gettext("All listening sessions you created")}</li>
+              <li>• {gettext("Your votes and follows")}</li>
+              <li>• {gettext("Connected Spotify and Twitch accounts")}</li>
+            </ul>
+
+            <div class="mt-4 p-3 bg-yellow-600/10 border border-yellow-600/30 rounded-lg">
+              <p class="text-yellow-300 text-sm">
+                💡 {gettext("Tip: Download your data first if you need a backup")}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex space-x-3">
+            <button
+              phx-click="hide_delete_modal"
+              class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+            >
+              {gettext("Cancel")}
+            </button>
+            <button
+              phx-click="confirm_delete_account"
+              class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+            >
+              {gettext("Delete Forever")}
             </button>
           </div>
         </div>

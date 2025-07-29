@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
     socket
     |> assign(:current_user, current_user)
     |> assign(:show_download_modal, false)
+    |> assign(:show_delete_modal, false)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -76,8 +77,41 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
   end
 
   @impl true
-  def handle_event("delete_account", _params, socket) do
-    {:noreply, socket}
+  def handle_event("show_delete_modal", _params, socket) do
+    {:noreply, assign(socket, :show_delete_modal, true)}
+  end
+
+  @impl true
+  def handle_event("hide_delete_modal", _params, socket) do
+    {:noreply, assign(socket, :show_delete_modal, false)}
+  end
+
+  @impl true
+  def handle_event("confirm_delete_account", _params, socket) do
+    # AIDEV-NOTE: Account deletion with automatic logout
+    case socket.assigns.current_scope do
+      nil ->
+        socket
+        |> put_flash(:error, "User not found")
+        |> assign(:show_delete_modal, false)
+
+      scope ->
+        case Accounts.delete_account(scope) do
+          {:ok, _deleted_user} ->
+            # AIDEV-NOTE: User tokens are already deleted by delete_account function
+            # Redirect to homepage where authentication will be handled naturally
+            socket
+            |> put_flash(:info, "Your account has been permanently deleted. You have been logged out.")
+            |> assign(:show_delete_modal, false)
+            |> redirect(to: ~p"/")
+
+          {:error, _reason} ->
+            socket
+            |> put_flash(:error, "Failed to delete account. Please try again.")
+            |> assign(:show_delete_modal, false)
+        end
+    end
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true

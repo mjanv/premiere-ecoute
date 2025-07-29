@@ -122,7 +122,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Follow.all(where: [streamer_id: viewer.id]))
       assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch_user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: viewer.id]))
-      assert Enum.empty?(EventStore.read("user-#{viewer.id}"))
+
+      assert [_, _, %AccountDeleted{}] = EventStore.read("user-#{viewer.id}")
     end
 
     test "delete a streamer account", %{streamer: streamer} do
@@ -136,7 +137,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Follow.all(where: [streamer_id: streamer.id]))
       assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch_user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: streamer.id]))
-      assert Enum.empty?(EventStore.read("user-#{streamer.id}"))
+
+      assert [_, %AccountDeleted{}] = EventStore.read("user-#{streamer.id}")
     end
 
     test "deleting non-existent user raises appropriate error" do

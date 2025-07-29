@@ -31,7 +31,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   def register_twitch_user(%{username: username, user_id: user_id} = payload, password \\ nil) do
     with email <- "#{username}@twitch.tv",
          nil <- User.get_user_by_email(email),
-         attrs <- %{email: email, role: role(payload), password: password || random(32), twitch_user_id: user_id},
+         attrs <- %{email: email, role: role(payload), confirmed_at: DateTime.utc_now(), password: password || random(32), twitch_user_id: user_id},
          {:ok, user} <- User.create(attrs),
          {:ok, user} <- User.update_twitch_auth(user, payload),
          :ok <- AccountFollow.follow_streamers(Scope.for_user(user)) do

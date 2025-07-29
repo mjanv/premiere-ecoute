@@ -49,11 +49,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     |> Ecto.Multi.delete_all(:streamer_follows, from(f in Follow, where: f.streamer_id == ^user.id))
     |> Ecto.Multi.delete_all(:votes, from(v in Vote, where: v.viewer_id == ^user.twitch_user_id))
     |> Ecto.Multi.delete_all(:sessions, from(s in ListeningSession, where: s.user_id == ^user.id))
-    |> Ecto.Multi.run(:events, fn _repo, _changes ->
-      :ok = EventStore.delete_stream("user-#{user.id}", :any_version, :soft)
+    |> Ecto.Multi.delete(:user, user)
+    |> Ecto.Multi.run(:event, fn _, _ ->
+      :ok = EventStore.append(%AccountDeleted{id: user.id}, stream: "user")
       {:ok, nil}
     end)
-    |> Ecto.Multi.delete(:user, user)
     |> Repo.transaction()
     |> case do
       {:ok, %{user: deleted_user}} -> {:ok, deleted_user}
