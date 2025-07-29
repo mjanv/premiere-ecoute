@@ -49,21 +49,6 @@ mix test # run all unit tests (with database migrations)
 mix phx.server # start Phoenix server (available at http://localhost:4000)
 ```
 
-## Database Backup Strategy
-
-Database backups for the Fly.io PostgreSQL database:
-
-```
-./scripts/backup_database.sh # create timestamped backup in data/
-./scripts/backup.sh # same as above (wrapper)
-./scripts/backup_database.sh --help # show usage instructions
-```
-
-- Backups are stored as compressed SQL files in `data/` with timestamps
-- Automatic cleanup keeps backups for 30 days
-- Uses `flyctl postgres proxy` for secure connections
-- Fallback to direct `flyctl postgres connect` method if proxy fails
-
 ---
 
 ## Anchor comments

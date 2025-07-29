@@ -16,7 +16,11 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
         {:ok, follow} = Accounts.follow(user, streamer)
 
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: nil} = follow
-        assert EventStore.read("user-#{user_id}") == [%ChannelFollowed{id: user.id, streamer_id: streamer.id}]
+
+        assert EventStore.read("user-#{user_id}") == [
+                 %AccountCreated{id: user.id, twitch_user_id: nil},
+                 %ChannelFollowed{id: user.id, streamer_id: streamer.id}
+               ]
       end
     end
 
@@ -28,7 +32,11 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
         {:ok, follow} = Accounts.follow(user, streamer, %{followed_at: ~N[2020-07-18 07:59:47]})
 
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: ~N[2020-07-18 07:59:47]} = follow
-        assert EventStore.read("user-#{user_id}") == [%ChannelFollowed{id: user.id, streamer_id: streamer.id}]
+
+        assert EventStore.read("user-#{user_id}") == [
+                 %AccountCreated{id: user.id, twitch_user_id: nil},
+                 %ChannelFollowed{id: user.id, streamer_id: streamer.id}
+               ]
       end
     end
 
@@ -74,6 +82,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = unfollow
 
       assert EventStore.read("user-#{user_id}") == [
+               %AccountCreated{id: user.id, twitch_user_id: nil},
                %ChannelFollowed{id: user.id, streamer_id: streamer.id},
                %ChannelUnfollowed{id: user.id, streamer_id: streamer.id}
              ]

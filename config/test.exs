@@ -1,6 +1,6 @@
 import Config
 
-config :premiere_ecoute, Oban, testing: :manual
+config :premiere_ecoute, Oban, testing: :inline
 
 config :premiere_ecoute,
   handlers: [

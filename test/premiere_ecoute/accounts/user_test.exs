@@ -41,10 +41,8 @@ defmodule PremiereEcoute.Accounts.UserTest do
   end
 
   describe "get_user!/1" do
-    test "raises if id is invalid" do
-      assert_raise Ecto.NoResultsError, fn ->
-        Accounts.get_user!(-1)
-      end
+    test "return nil if id is invalid" do
+      assert Accounts.get_user!(-1) == nil
     end
 
     test "returns the user with the given id" do

@@ -60,7 +60,7 @@ defmodule PremiereEcoute.Sessions.RetrospectiveTest do
   end
 
   describe "get_albums_by_period/3" do
-    test "?", %{user: user} do
+    test "returns the list of albums grouped per month", %{user: user} do
       retrospective = Retrospective.get_albums_by_period(user.id, :month)
 
       assert length(retrospective) == 3

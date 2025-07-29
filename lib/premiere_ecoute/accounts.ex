@@ -12,13 +12,14 @@ defmodule PremiereEcoute.Accounts do
   defdelegate preload_user(user), to: User, as: :preload
   defdelegate get_user_by_email(email), to: User
   defdelegate get_user_by_email_and_password(email, password), to: User
-  defdelegate get_user!(id), to: User
+  defdelegate get_user!(id), to: User, as: :get
   defdelegate sudo_mode?(user, minutes \\ -20), to: User
   defdelegate create_user(attrs), to: User, as: :create
   defdelegate update_user_email(user, token), to: User
   defdelegate change_user_password(user, attrs \\ %{}, opts \\ []), to: User, as: :password_changeset
   defdelegate update_user_password(user, attrs), to: User
   defdelegate update_user_role(user, role), to: User
+  defdelegate download_associated_data(scope), to: Services.AccountCompliance
 
   ## User Token
   defdelegate generate_user_session_token(user), to: UserToken
@@ -34,4 +35,5 @@ defmodule PremiereEcoute.Accounts do
   defdelegate unfollow(user, streamer), to: Follow
   defdelegate discover_follows(user), to: Follow
   defdelegate follow_streamer(scope, streamer), to: Services.AccountFollow
+  defdelegate follow_streamers(scope), to: Services.AccountFollow
 end

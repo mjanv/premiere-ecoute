@@ -10,6 +10,10 @@ Ensure proper use of:
 - Ecto query optimization
 - Phoenix LiveView patterns
 
+### Ecto queries
+
+When working with Ecto queries, always place queries in the appropriate backend context modules. Never write Ecto queries directly in controllers or LiveViews. This maintains proper separation of concerns and follows Phoenix/Elixir best practices.
+
 ## Style guide
 
 Follow standard Elixir Style Guide: https://github.com/rrrene/elixir-style-guide

@@ -55,7 +55,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
     # Channels
     @callback get_followed_channels(Scope.t()) :: {:ok, [map()]} | {:error, term()}
-    @callback get_followed_channel(Scope.t(), user :: User.t()) :: {:ok, map()} | {:error, term()}
+    @callback get_followed_channel(Scope.t(), user :: User.t()) :: {:ok, map() | nil} | {:error, term()}
   end
 
   @behaviour __MODULE__.Behavior

@@ -4,8 +4,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   require Logger
 
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.Services.AccountFollow
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.EventStore
 
   @type twitch_data() :: %{
           required(:user_id) => String.t(),
@@ -27,14 +28,14 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   @bots Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :bots])
 
   @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
-  def register_twitch_user(%{username: username} = payload, password \\ nil) do
+  def register_twitch_user(%{username: username, user_id: user_id} = payload, password \\ nil) do
     with email <- "#{username}@twitch.tv",
          nil <- User.get_user_by_email(email),
-         attrs <- %{email: email, role: role(payload), password: password || random(32)},
+         attrs <- %{email: email, role: role(payload), password: password || random(32), twitch_user_id: user_id},
          {:ok, user} <- User.create(attrs),
-         {:ok, user} <- User.update_twitch_auth(user, payload) do
+         {:ok, user} <- User.update_twitch_auth(user, payload),
+         :ok <- AccountFollow.follow_streamers(Scope.for_user(user)) do
       {:ok, user}
-      |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id, twitch_user_id: user.twitch_user_id} end)
     else
       %User{} = user ->
         User.update_twitch_auth(user, payload)

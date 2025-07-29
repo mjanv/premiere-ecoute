@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
   alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
   alias PremiereEcoute.EventStore
 
   defp twitch_data do
@@ -23,6 +24,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       refresh_token: :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false),
       expires_in: 3600
     }
+  end
+
+  setup do
+    stub(TwitchApi, :get_followed_channel, fn _, _ -> {:ok, nil} end)
+
+    :ok
   end
 
   describe "register_twitch_user/1" do

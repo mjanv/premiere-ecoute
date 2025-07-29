@@ -7,10 +7,19 @@ defmodule PremiereEcoute.EventStore do
 
   use EventStore, otp_app: :premiere_ecoute
 
-  @spec read(String.t()) :: [any()]
-  def read(stream_uuid) do
+  @spec read(String.t(), :event | :raw) :: [any()]
+  def read(stream_uuid, type \\ :event)
+
+  def read(stream_uuid, :event) do
     case __MODULE__.read_stream_forward(stream_uuid) do
       {:ok, events} -> Enum.map(events, fn %EventStore.RecordedEvent{data: event} -> event end)
+      {:error, _} -> []
+    end
+  end
+
+  def read(stream_uuid, :raw) do
+    case __MODULE__.read_stream_forward(stream_uuid) do
+      {:ok, events} -> events
       {:error, _} -> []
     end
   end

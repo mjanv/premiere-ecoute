@@ -7,10 +7,11 @@ defmodule PremiereEcoute.Accounts.User do
 
   use PremiereEcoute.Core.Schema,
     root: [:channels],
-    json: [:id, :email, :role]
+    json: [:id, :email, :role, :twitch_user_id, :twitch_username]
 
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.EventStore
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -246,6 +247,12 @@ defmodule PremiereEcoute.Accounts.User do
 
   """
   def get_user_by_email(email), do: get_by(email: email)
+
+  def create(attrs) do
+    attrs
+    |> super()
+    |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id, twitch_user_id: user.twitch_user_id} end)
+  end
 
   def update_spotify_tokens(user, %{
         access_token: access_token,
