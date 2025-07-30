@@ -122,7 +122,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
         {:ok, preload(report)}
 
       {:error, reason} ->
-        Logger.error("Cannot generate report due to: #{inspect(reason)}")
+        Logger.error(reason)
         {:error, reason}
     end
   end

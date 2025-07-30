@@ -29,10 +29,11 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
                value: "smash",
                is_streamer: false,
                session_id: session_id,
-               viewer_id: "twitch_user_42",
+               viewer_id: hashed_viewer_id,
                track_id: track_id
              } = vote
 
+      assert Vote.hash(attrs.viewer_id, session_id) == hashed_viewer_id
       assert session_id == session.id
       assert track_id == attrs.track_id
     end
@@ -52,10 +53,11 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
                value: "3",
                is_streamer: true,
                session_id: session_id,
-               viewer_id: "twitch_streamer_42",
+               viewer_id: hashed_viewer_id,
                track_id: track_id
              } = vote
 
+      assert Vote.hash(attrs.viewer_id, session_id) == hashed_viewer_id
       assert track_id == attrs.track_id
       assert session_id == attrs.session_id
     end
@@ -100,8 +102,10 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
       assert %Vote{
                value: "2",
                is_streamer: false,
-               viewer_id: "twitch_user_42"
+               viewer_id: hashed_viewer_id
              } = vote
+
+      assert Vote.hash(attrs.viewer_id, session.id) == hashed_viewer_id
     end
 
     test "does not get an unknown viewer vote" do
@@ -112,7 +116,7 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
   end
 
   describe "all/1" do
-    test "read all votes from a listening session", %{album: album, session: session} do
+    setup %{album: album, session: session} do
       %ListeningSession{id: id} = session
       %Album{tracks: [%Track{id: t1_id}, %Track{id: t2_id}]} = album
 
@@ -127,38 +131,101 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
         {:ok, _} = Vote.create(vote)
       end
 
-      registered_votes = Vote.all(where: [session_id: id])
+      :ok
+    end
+
+    test "read all votes from a listening session", %{album: album, session: session} do
+      session_id = session.id
+      %Album{tracks: [%Track{id: t1_id}, %Track{id: t2_id}]} = album
+      viewer1_id = Vote.hash("1", session.id)
+      viewer2_id = Vote.hash("2", session.id)
+
+      registered_votes = Vote.all(where: [session_id: session_id])
 
       assert [
                %Vote{
-                 viewer_id: "1",
-                 session_id: ^id,
+                 viewer_id: ^viewer1_id,
+                 session_id: ^session_id,
                  track_id: ^t1_id,
                  is_streamer: true,
                  value: "1"
                },
                %Vote{
-                 viewer_id: "1",
-                 session_id: ^id,
+                 viewer_id: ^viewer1_id,
+                 session_id: ^session_id,
                  track_id: ^t2_id,
                  is_streamer: true,
                  value: "2"
                },
                %Vote{
-                 viewer_id: "2",
-                 session_id: ^id,
+                 viewer_id: ^viewer2_id,
+                 session_id: ^session_id,
                  track_id: ^t1_id,
                  is_streamer: false,
                  value: "0"
                },
                %Vote{
-                 viewer_id: "2",
-                 session_id: ^id,
+                 viewer_id: ^viewer2_id,
+                 session_id: ^session_id,
                  track_id: ^t2_id,
                  is_streamer: false,
                  value: "1"
                }
              ] = registered_votes
+    end
+
+    test "read all votes from a specific user from a listening session", %{album: album, session: session} do
+      session_id = session.id
+      %Album{tracks: [%Track{id: t1_id}, %Track{id: t2_id}]} = album
+      viewer1_id = Vote.hash("1", session.id)
+      viewer2_id = Vote.hash("2", session.id)
+
+      registered_votes1 = Vote.all(where: [viewer_id: "1", session_id: session_id])
+      registered_votes2 = Vote.all(where: [viewer_id: "2", session_id: session_id])
+
+      assert [
+               %Vote{
+                 viewer_id: ^viewer1_id,
+                 session_id: ^session_id,
+                 track_id: ^t1_id,
+                 is_streamer: true,
+                 value: "1"
+               },
+               %Vote{
+                 viewer_id: ^viewer1_id,
+                 session_id: ^session_id,
+                 track_id: ^t2_id,
+                 is_streamer: true,
+                 value: "2"
+               }
+             ] = registered_votes1
+
+      assert [
+               %Vote{
+                 viewer_id: ^viewer2_id,
+                 session_id: ^session_id,
+                 track_id: ^t1_id,
+                 is_streamer: false,
+                 value: "0"
+               },
+               %Vote{
+                 viewer_id: ^viewer2_id,
+                 session_id: ^session_id,
+                 track_id: ^t2_id,
+                 is_streamer: false,
+                 value: "1"
+               }
+             ] = registered_votes2
+    end
+
+    test "cannot read all votes from a specific user", %{album: album, session: session} do
+      session_id = session.id
+      %Album{tracks: [%Track{id: t1_id}, %Track{id: t2_id}]} = album
+      viewer1_id = Vote.hash("1", session.id)
+      viewer2_id = Vote.hash("2", session.id)
+
+      assert Vote.all(where: [viewer_id: "1"]) == []
+      assert Vote.all(where: [viewer_id: "2"]) == []
     end
   end
 end

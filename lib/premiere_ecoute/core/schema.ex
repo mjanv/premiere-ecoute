@@ -70,7 +70,7 @@ defmodule PremiereEcoute.Core.Schema do
       def min(query \\ __MODULE__, field), do: Repo.aggregate(query, :min, field)
       def sum(query \\ __MODULE__, field), do: Repo.aggregate(query, :sum, field)
 
-      defoverridable create: 1, update: 2, upsert: 2, delete: 1
+      defoverridable get_by: 2, all: 1, create: 1, update: 2, upsert: 2, delete: 1
     end
   end
 end

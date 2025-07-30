@@ -33,16 +33,43 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     vote
     |> cast(attrs, [:viewer_id, :session_id, :track_id, :is_streamer, :value])
     |> validate_required([:viewer_id, :session_id, :track_id, :is_streamer, :value])
+    |> hash_viewer_id()
     |> unique_constraint([:viewer_id, :session_id, :track_id], name: :vote_index)
     |> foreign_key_constraint(:session_id)
   end
 
-  def from_message(message, vote_options) do
-    if message in vote_options do
-      {:ok, message}
-    else
-      {:error, message}
+  defp hash_viewer_id(changeset) do
+    case get_change(changeset, :viewer_id) do
+      nil -> changeset
+      id -> put_change(changeset, :viewer_id, hash(id, get_field(changeset, :session_id)))
     end
+  end
+
+  def get_by(query, clauses) do
+    clauses = Keyword.update(clauses, :viewer_id, nil, fn id -> hash(id, clauses[:session_id]) end)
+
+    super(query, clauses)
+  end
+
+  def all(clauses) do
+    clauses =
+      Keyword.update(clauses, :where, [], fn where ->
+        if where[:viewer_id] do
+          Keyword.update(where, :viewer_id, nil, fn id -> hash(id, where[:session_id]) end)
+        else
+          where
+        end
+      end)
+
+    super(clauses)
+  end
+
+  def hash(viewer_id, session_id) do
+    Base.encode64(:crypto.hash(:sha256, "#{viewer_id}:#{session_id}"), case: :lower)
+  end
+
+  def from_message(message, vote_options) do
+    if message in vote_options, do: {:ok, message}, else: {:error, message}
   end
 
   def from_message(message) do
