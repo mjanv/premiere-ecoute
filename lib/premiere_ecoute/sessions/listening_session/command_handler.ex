@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   @moduledoc false
 
   use PremiereEcoute.Core.CommandBus.Handler
-  use Gettext, backend: PremiereEcouteWeb.Gettext
+  use Gettext, backend: PremiereEcoute.Gettext
 
   require Logger
 
@@ -23,7 +23,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
   alias PremiereEcoute.Sessions.Scores.Report
 
-  alias PremiereEcouteWeb.Gettext
+  alias PremiereEcoute.Gettext
 
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession)
@@ -77,7 +77,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "Next track: #{session.current_track.name}"),
-         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
+         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
       {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
@@ -89,7 +89,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.previous_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "Previous track: #{session.current_track.name}"),
-         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
+         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
@@ -103,7 +103,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "Good bye !"),
          {:ok, session} <- ListeningSession.stop(session),
-         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", :stop) do
+         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
       {:ok, session, [%SessionStopped{session_id: session.id}]}
     else
       reason ->

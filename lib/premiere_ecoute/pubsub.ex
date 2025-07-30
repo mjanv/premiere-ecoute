@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.PubSub do
+defmodule PremiereEcoute.PubSub do
   @moduledoc false
 
   @pubsub PremiereEcoute.PubSub

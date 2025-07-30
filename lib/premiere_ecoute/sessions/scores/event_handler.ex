@@ -25,7 +25,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandler do
          vote <- %Vote{viewer_id: user_id, session_id: session_id, track_id: track_id, value: value, is_streamer: is_streamer},
          {:ok, _} <- Vote.create(vote),
          {:ok, report} <- Report.generate(%ListeningSession{id: session_id}),
-         :ok <- PremiereEcouteWeb.PubSub.broadcast("session:#{session_id}", {:session_summary, report.session_summary}) do
+         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, report.session_summary}) do
       :ok
     else
       _ -> :ok

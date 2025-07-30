@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
   alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
 
   defp twitch_data do

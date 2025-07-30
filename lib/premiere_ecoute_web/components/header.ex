@@ -8,10 +8,34 @@ defmodule PremiereEcouteWeb.Components.Header do
   Renders the application header with navigation and user menu.
   """
   attr :current_user, :any, default: nil, doc: "the current authenticated user"
+  attr :current_scope, :any, default: nil, doc: "the current user scope (including impersonation context)"
   attr :current_page, :string, default: nil, doc: "the current page identifier"
 
   def app_header(assigns) do
     ~H"""
+    <!-- AIDEV-NOTE: Impersonation banner - shown when admin is impersonating another user -->
+    <%= if @current_scope && Map.get(@current_scope, :impersonating?, false) do %>
+      <div class="bg-yellow-600 px-6 py-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-white font-medium">
+              Admin Impersonation: Viewing as {@current_scope.user.twitch_username}
+            </span>
+          </div>
+          <.link
+            href={~p"/admin/impersonation"}
+            method="delete"
+            class="bg-white text-yellow-600 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+          >
+            Switch Back to Admin
+          </.link>
+        </div>
+      </div>
+    <% end %>
+
     <header class="border-b px-6 py-4" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
@@ -33,13 +57,13 @@ defmodule PremiereEcouteWeb.Components.Header do
               class="inline-flex items-center px-3 py-2 border rounded-lg text-sm font-medium text-gray-300 hover:text-white transition-colors"
               style="border-color: var(--color-dark-700); background-color: var(--color-dark-900);"
             >
-              <%= if Gettext.get_locale(PremiereEcouteWeb.Gettext) == "fr" do %>
+              <%= if Gettext.get_locale(PremiereEcoute.Gettext) == "fr" do %>
                 <img src="/images/flags/fr.svg" alt="French" class="w-4 h-4 mr-2" />
               <% end %>
-              <%= if Gettext.get_locale(PremiereEcouteWeb.Gettext) == "it" do %>
+              <%= if Gettext.get_locale(PremiereEcoute.Gettext) == "it" do %>
                 <img src="/images/flags/it.svg" alt="Italiano" class="w-4 h-4 mr-2" />
               <% end %>
-              <%= if Gettext.get_locale(PremiereEcouteWeb.Gettext) == "en" do %>
+              <%= if Gettext.get_locale(PremiereEcoute.Gettext) == "en" do %>
                 <img src="/images/flags/en.svg" alt="English" class="w-4 h-4 mr-2" />
               <% end %>
               <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

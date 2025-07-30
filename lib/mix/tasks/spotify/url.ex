@@ -2,6 +2,7 @@ defmodule Mix.Tasks.Spotify.Url do
   @moduledoc false
 
   use Mix.Task
+  use Boundary, classify_to: PremiereEcouteMix
 
   alias PremiereEcoute.Apis.SpotifyApi
 

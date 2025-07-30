@@ -1,22 +1,22 @@
-defmodule AccountCreated do
+defmodule PremiereEcoute.Events.AccountCreated do
   @moduledoc false
 
   use PremiereEcoute.Core.Event, fields: [:twitch_user_id]
 end
 
-defmodule AccountDeleted do
+defmodule PremiereEcoute.Events.AccountDeleted do
   @moduledoc false
 
   use PremiereEcoute.Core.Event
 end
 
-defmodule ChannelFollowed do
+defmodule PremiereEcoute.Events.ChannelFollowed do
   @moduledoc false
 
   use PremiereEcoute.Core.Event, fields: [:streamer_id]
 end
 
-defmodule ChannelUnfollowed do
+defmodule PremiereEcoute.Events.ChannelUnfollowed do
   @moduledoc false
 
   use PremiereEcoute.Core.Event, fields: [:streamer_id]

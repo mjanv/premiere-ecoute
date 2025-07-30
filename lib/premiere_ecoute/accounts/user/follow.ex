@@ -20,6 +20,8 @@ defmodule PremiereEcoute.Accounts.User.Follow do
     json: [:user, :streamer]
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Events.ChannelFollowed
+  alias PremiereEcoute.Events.ChannelUnfollowed
   alias PremiereEcoute.EventStore
 
   schema "user_follows" do

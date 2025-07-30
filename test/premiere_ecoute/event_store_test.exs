@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.EventStoreTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.Events.AccountCreated
+  alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.EventStore
 
   setup do
@@ -59,7 +61,7 @@ defmodule PremiereEcoute.EventStoreTest do
                event_id: _,
                stream_uuid: "account-id1",
                stream_version: 1,
-               event_type: "Elixir.AccountCreated",
+               event_type: "Elixir.PremiereEcoute.Events.AccountCreated",
                data: %AccountCreated{id: "id1", twitch_user_id: nil},
                metadata: %{},
                created_at: _
@@ -70,7 +72,7 @@ defmodule PremiereEcoute.EventStoreTest do
                event_id: _,
                stream_uuid: "account-id11",
                stream_version: 1,
-               event_type: "Elixir.AccountCreated",
+               event_type: "Elixir.PremiereEcoute.Events.AccountCreated",
                data: %AccountCreated{id: "id11", twitch_user_id: nil},
                metadata: %{},
                created_at: _
@@ -81,7 +83,7 @@ defmodule PremiereEcoute.EventStoreTest do
                event_id: _,
                stream_uuid: "account-id21",
                stream_version: 1,
-               event_type: "Elixir.AccountCreated",
+               event_type: "Elixir.PremiereEcoute.Events.AccountCreated",
                data: %AccountCreated{id: "id21", twitch_user_id: nil},
                metadata: %{},
                created_at: _

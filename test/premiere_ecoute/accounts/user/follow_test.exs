@@ -5,6 +5,9 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
 
+  alias PremiereEcoute.Events.AccountCreated
+  alias PremiereEcoute.Events.ChannelFollowed
+  alias PremiereEcoute.Events.ChannelUnfollowed
   alias PremiereEcoute.EventStore
 
   describe "follow/3" do

@@ -14,6 +14,7 @@ defmodule PremiereEcoute.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
+      compilers: [:boundary] ++ Mix.compilers(),
       test_coverage: [tool: ExCoveralls],
       dialyzer: [
         plt_add_apps: [:mix],
@@ -116,7 +117,8 @@ defmodule PremiereEcoute.MixProject do
       {:doctor, "~> 0.22.0", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:tidewave, "~> 0.1", only: :dev},
-      {:igniter, "~> 0.5", only: :dev}
+      {:igniter, "~> 0.5", only: :dev},
+      {:boundary, "~> 0.10"}
     ]
   end
 

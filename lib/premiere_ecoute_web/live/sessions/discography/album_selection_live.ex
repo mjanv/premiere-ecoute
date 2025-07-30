@@ -8,7 +8,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    PremiereEcouteWeb.PubSub.subscribe("listening_sessions")
+    PremiereEcoute.PubSub.subscribe("listening_sessions")
 
     socket
     |> assign(:search_form, to_form(%{"query" => ""}))

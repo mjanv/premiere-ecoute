@@ -1,12 +1,13 @@
 defmodule Mix.Tasks.Gettext.Check do
   use Mix.Task
+  use Boundary, classify_to: PremiereEcouteMix
 
   @shortdoc "Checks that all gettext strings are extracted and translated"
   @moduledoc """
   Runs gettext.extract, gettext.merge, and greps for missing translations.
   """
 
-  @locales Application.compile_env(:premiere_ecoute, [PremiereEcouteWeb.Gettext, :locales])
+  @locales Application.compile_env(:premiere_ecoute, [PremiereEcoute.Gettext, :locales])
 
   @impl true
   def run(_args) do

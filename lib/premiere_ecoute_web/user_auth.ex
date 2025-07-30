@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.UserAuth do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User
 
   # Make the remember me cookie valid for 14 days. This should match
   # the session validity setting in UserToken.
@@ -62,15 +63,58 @@ defmodule PremiereEcouteWeb.UserAuth do
   end
 
   @doc """
+  Starts user impersonation for admin users.
+
+  Generates a session token for the target user and stores it in the session
+  under :impersonated_token. Only admin users can impersonate other users.
+  """
+  def start_impersonation(conn, %User{role: :admin} = _admin_user, %User{} = target_user) do
+    impersonation_token = Accounts.generate_user_session_token(target_user)
+    put_session(conn, :impersonated_token, impersonation_token)
+  end
+
+  def start_impersonation(conn, _non_admin_user, _target_user) do
+    conn
+    |> put_flash(:error, "Only administrators can impersonate users")
+  end
+
+  @doc """
+  Ends user impersonation by clearing the impersonated token from the session.
+  """
+  def end_impersonation(conn) do
+    delete_session(conn, :impersonated_token)
+  end
+
+  @doc """
   Authenticates the user by looking into the session and remember me token.
 
   Will reissue the session token if it is older than the configured age.
+  Handles impersonation context if an impersonated token is present.
   """
   def fetch_current_scope_for_user(conn, _opts) do
     with {token, conn} <- ensure_user_token(conn),
          {user, token_inserted_at} <- Accounts.get_user_by_session_token(token) do
+      # Check for impersonation
+      scope =
+        case get_session(conn, :impersonated_token) do
+          nil ->
+            # Normal authentication
+            Scope.for_user(user)
+
+          impersonated_token ->
+            # Impersonation active - validate impersonated token
+            case Accounts.get_user_by_session_token(impersonated_token) do
+              {target_user, _} ->
+                Scope.for_impersonation(user, target_user)
+
+              nil ->
+                # Invalid impersonation token, clear it and use normal scope
+                Scope.for_user(user)
+            end
+        end
+
       conn
-      |> assign(:current_scope, Scope.for_user(user))
+      |> assign(:current_scope, scope)
       |> maybe_reissue_user_session_token(user, token_inserted_at)
     else
       nil -> assign(conn, :current_scope, Scope.for_user(nil))
@@ -284,12 +328,30 @@ defmodule PremiereEcouteWeb.UserAuth do
 
   defp mount_current_scope(socket, session) do
     Phoenix.Component.assign_new(socket, :current_scope, fn ->
-      {user, _} =
-        if user_token = session["user_token"] do
-          Accounts.get_user_by_session_token(user_token)
-        end || {nil, nil}
+      admin_token = session["user_token"]
+      impersonated_token = session["impersonated_token"]
 
-      Scope.for_user(user)
+      case {admin_token, impersonated_token} do
+        {nil, _} ->
+          Scope.for_user(nil)
+
+        {admin_token, nil} ->
+          {admin_user, _} = Accounts.get_user_by_session_token(admin_token) || {nil, nil}
+          Scope.for_user(admin_user)
+
+        {admin_token, impersonated_token} ->
+          case {Accounts.get_user_by_session_token(admin_token), Accounts.get_user_by_session_token(impersonated_token)} do
+            {{admin_user, _}, {target_user, _}} ->
+              Scope.for_impersonation(admin_user, target_user)
+
+            {{admin_user, _}, nil} ->
+              # Invalid impersonation token, fall back to admin
+              Scope.for_user(admin_user)
+
+            _ ->
+              Scope.for_user(nil)
+          end
+      end
     end)
   end
 

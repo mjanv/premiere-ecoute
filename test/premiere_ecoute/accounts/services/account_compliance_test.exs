@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.EventStore
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album

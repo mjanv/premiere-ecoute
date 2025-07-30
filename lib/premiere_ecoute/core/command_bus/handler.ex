@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Core.CommandBus.Handler do
 
   defmacro __using__(_opts) do
     quote do
-      use Gettext, backend: PremiereEcouteWeb.Gettext
+      use Gettext, backend: PremiereEcoute.Gettext
 
       import unquote(__MODULE__)
       @before_compile unquote(__MODULE__)

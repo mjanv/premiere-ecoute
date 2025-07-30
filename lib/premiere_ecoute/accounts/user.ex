@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
 
   @type t :: %__MODULE__{

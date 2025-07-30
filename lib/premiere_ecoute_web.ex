@@ -17,6 +17,8 @@ defmodule PremiereEcouteWeb do
   those modules here.
   """
 
+  use Boundary, deps: [PremiereEcoute], exports: [Endpoint]
+
   def static_paths, do: ~w(doc assets fonts images favicon.ico robots.txt)
 
   def router do
@@ -74,7 +76,7 @@ defmodule PremiereEcouteWeb do
 
   defp html_helpers do
     quote do
-      use Gettext, backend: PremiereEcouteWeb.Gettext
+      use Gettext, backend: PremiereEcoute.Gettext
 
       import Phoenix.HTML
       import PremiereEcouteWeb.CoreComponents

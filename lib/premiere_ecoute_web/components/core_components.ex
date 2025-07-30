@@ -437,9 +437,9 @@ defmodule PremiereEcouteWeb.CoreComponents do
   """
   def translate_error({msg, opts}) do
     # if count = opts[:count] do
-    #   Gettext.dngettext(PremiereEcouteWeb.Gettext, "errors", msg, msg, count, opts)
+    #   Gettext.dngettext(PremiereEcoute.Gettext, "errors", msg, msg, count, opts)
     # else
-    #   Gettext.dgettext(PremiereEcouteWeb.Gettext, "errors", msg, opts)
+    #   Gettext.dgettext(PremiereEcoute.Gettext, "errors", msg, opts)
     # end
 
     Enum.reduce(opts, msg, fn {key, value}, acc ->

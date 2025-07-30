@@ -89,7 +89,7 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 config :phoenix, :logger, false
 
-config :premiere_ecoute, PremiereEcouteWeb.Gettext,
+config :premiere_ecoute, PremiereEcoute.Gettext,
   locales: ~w(en fr it),
   default_locale: "en"
 

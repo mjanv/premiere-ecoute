@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Core.Event do
     fields = Keyword.get(opts, :fields, [])
 
     quote do
-      @moduledoc false
-
       @derive Jason.Encoder
       defstruct [:id] ++ unquote(fields)
 
@@ -22,7 +20,10 @@ defmodule PremiereEcoute.Core.Event do
 end
 
 defimpl Jason.Encoder, for: EventStore.RecordedEvent do
-  def encode(%{event_id: event_id, event_type: "Elixir." <> event_type, data: data, created_at: created_at}, opts) do
+  def encode(
+        %{event_id: event_id, event_type: "Elixir.PremiereEcoute.Events." <> event_type, data: data, created_at: created_at},
+        opts
+      ) do
     Jason.Encode.map(%{event_id: event_id, event_type: event_type, details: data, timestamp: created_at}, opts)
   end
 end

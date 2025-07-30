@@ -2,6 +2,7 @@ defmodule Mix.Tasks.Twitch.Url do
   @moduledoc false
 
   use Mix.Task
+  use Boundary, classify_to: PremiereEcouteMix
 
   alias PremiereEcoute.Apis.TwitchApi
 

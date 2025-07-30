@@ -7,12 +7,13 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.EventStore
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
 
-  @spec download_associated_data(Scope.t()) :: {:ok, map()}
+  @spec download_associated_data(Scope.t()) :: {:ok, binary()} | {:error, term()}
   def download_associated_data(scope) do
     user = User.preload(scope.user)
     votes = Vote.all(where: [viewer_id: user.twitch_user_id])
@@ -33,6 +34,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     |> anonym(["data", "activity", "votes"], ["session_id", "track_id", "value", "inserted_at"])
     |> Jason.encode!()
     |> then(fn data -> {:ok, data} end)
+  rescue
+    _ -> {:error, "Cannot generate associated data"}
   end
 
   defp anonym(data, path, keys) do

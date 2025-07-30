@@ -37,7 +37,7 @@ PremiereEcouteWeb.CoreComponents.html
 PremiereEcouteWeb.Endpoint.html
 PremiereEcouteWeb.Errors.ErrorHTML.html
 PremiereEcouteWeb.Errors.ErrorJSON.html
-PremiereEcouteWeb.Gettext.html
+PremiereEcoute.Gettext.html
 PremiereEcouteWeb.HomepageLive.html
 PremiereEcouteWeb.Layouts.html
 PremiereEcouteWeb.Plugs.RenewTokens.html

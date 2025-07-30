@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Gettext do
+defmodule PremiereEcoute.Gettext do
   @moduledoc """
   Internationalization (i18n) backend
 

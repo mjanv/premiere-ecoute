@@ -81,6 +81,11 @@ defmodule PremiereEcouteWeb.Router do
       live "/albums", AdminAlbumsLive, :index
       live "/sessions", AdminSessionsLive, :index
     end
+
+    # AIDEV-NOTE: Impersonation routes for admin users only
+    pipe_through [:require_authenticated_user]
+    post "/impersonation", ImpersonationController, :create
+    delete "/impersonation", ImpersonationController, :delete
   end
 
   scope "/auth", PremiereEcouteWeb.Accounts do

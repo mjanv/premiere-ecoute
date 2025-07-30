@@ -1,0 +1,19 @@
+digraph {
+  label="premiere_ecoute application";
+  labelloc=top;
+  rankdir=LR;
+
+  "PremiereEcoute" [shape=box];
+  "PremiereEcoute.Application" [shape=box];
+  "PremiereEcouteMix" [shape=box];
+  "PremiereEcouteMock" [shape=box];
+  "PremiereEcouteWeb" [shape=box];
+
+  "PremiereEcoute" -> "PremiereEcouteWeb";
+  "PremiereEcoute.Application" -> "PremiereEcoute";
+  "PremiereEcoute.Application" -> "PremiereEcouteMix";
+  "PremiereEcoute.Application" -> "PremiereEcouteMock";
+  "PremiereEcoute.Application" -> "PremiereEcouteWeb";
+  "PremiereEcouteMix" -> "PremiereEcoute";
+  "PremiereEcouteWeb" -> "PremiereEcoute";
+}

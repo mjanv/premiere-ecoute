@@ -67,4 +67,36 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
         |> then(fn socket -> {:noreply, socket} end)
     end
   end
+
+  def handle_event("confirm_delete_user", %{"user_id" => user_id}, socket) do
+    user = Accounts.User.get!(user_id)
+
+    # AIDEV-NOTE: Admin can delete any user account using the existing delete_account function
+    # Create a scope for the user to be deleted
+    user_scope = %PremiereEcoute.Accounts.Scope{user: user}
+
+    case Accounts.delete_account(user_scope) do
+      {:ok, _deleted_user} ->
+        # Refresh the users list and stats after deletion
+        users = Accounts.User.all()
+
+        user_stats =
+          users
+          |> Enum.group_by(& &1.role)
+          |> Enum.into(%{}, fn {role, users} -> {role, length(users)} end)
+
+        socket
+        |> assign(:users, users)
+        |> assign(:user_stats, user_stats)
+        |> assign(:selected_user, nil)
+        |> assign(:show_user_modal, false)
+        |> put_flash(:info, gettext("User account has been deleted successfully"))
+        |> then(fn socket -> {:noreply, socket} end)
+
+      {:error, _reason} ->
+        socket
+        |> put_flash(:error, gettext("Failed to delete user account"))
+        |> then(fn socket -> {:noreply, socket} end)
+    end
+  end
 end

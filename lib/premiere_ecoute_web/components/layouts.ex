@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb.Layouts do
   def app(assigns) do
     ~H"""
     <div class="min-h-screen bg-gray-900">
-      <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} />
+      <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
       <main>
         {render_slot(@inner_block)}
       </main>
