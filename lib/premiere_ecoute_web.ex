@@ -52,6 +52,8 @@ defmodule PremiereEcouteWeb do
       use Phoenix.LiveView
 
       on_mount PremiereEcouteWeb.Hooks.RestoreLocale
+      on_mount PremiereEcouteWeb.Hooks.Flash
+
       unquote(html_helpers())
     end
   end
@@ -97,7 +99,5 @@ defmodule PremiereEcouteWeb do
     end
   end
 
-  defmacro __using__(which) when is_atom(which) do
-    apply(__MODULE__, which, [])
-  end
+  defmacro __using__(which) when is_atom(which), do: apply(__MODULE__, which, [])
 end

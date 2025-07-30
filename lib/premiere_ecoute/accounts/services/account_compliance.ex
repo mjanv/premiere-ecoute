@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
 
   import Ecto.Query
 
+  require Logger
+
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
@@ -35,7 +37,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     |> Jason.encode!()
     |> then(fn data -> {:ok, data} end)
   rescue
-    _ -> {:error, "Cannot generate associated data"}
+    error ->
+      Logger.error("#{inspect(error)}")
+      {:error, "Cannot generate associated data"}
   end
 
   defp anonym(data, path, keys) do

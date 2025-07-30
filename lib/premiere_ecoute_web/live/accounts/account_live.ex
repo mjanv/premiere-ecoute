@@ -152,9 +152,9 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
             |> assign(:show_download_modal, false)
             |> put_flash(:info, "Data download started")
 
-          {:error, _reason} ->
+          {:error, reason} ->
             socket
-            |> put_flash(:error, "Failed to generate data export")
+            |> put_flash(:error, "Failed to generate data export: #{inspect(reason)}")
             |> assign(:show_download_modal, false)
         end
     end
