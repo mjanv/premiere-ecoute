@@ -7,7 +7,9 @@ defmodule PremiereEcouteWeb.Hooks.Flash do
 
   def on_mount(_name, _params, _session, socket) do
     if connected?(socket) do
-      PremiereEcoute.PubSub.subscribe("user:#{socket.assigns.current_scope.user.id}")
+      if socket.assigns.current_scope && socket.assigns.current_scope.user do
+        PremiereEcoute.PubSub.subscribe("user:#{socket.assigns.current_scope.user.id}")
+      end
     end
 
     {:cont, attach_hook(socket, :flash, :handle_info, &maybe_flash/2)}
