@@ -17,7 +17,8 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   secret_key_base: "z8umndtKIMuJVwT+jkgJ9QCmnxfUlIb2kzuMhx5qKvlFpvznpzES3xBI1tHempmd",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:premiere_ecoute, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:premiere_ecoute, ~w(--watch)]}
+    tailwind: {Tailwind, :install_and_run, [:premiere_ecoute, ~w(--watch)]},
+    storybook_tailwind: {Tailwind, :install_and_run, [:storybook, ~w(--watch)]}
   ]
 
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
@@ -25,7 +26,8 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
     web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"lib/premiere_ecoute_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
+      ~r"lib/premiere_ecoute_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$",
+      ~r"storybook/.*(exs)$"
     ]
   ]
 

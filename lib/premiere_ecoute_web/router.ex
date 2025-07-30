@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Router do
   use PremiereEcouteWeb, :router
 
   import Oban.Web.Router
+  import PhoenixStorybook.Router
   import PremiereEcouteWeb.UserAuth
 
   alias PremiereEcouteWeb.Plugs
@@ -25,12 +26,18 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_session
   end
 
+  scope "/" do
+    storybook_assets()
+  end
+
   scope "/", PremiereEcouteWeb do
     pipe_through [:browser]
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
     end
+
+    live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
   end
 
   scope "/users", PremiereEcouteWeb.Accounts do

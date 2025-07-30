@@ -73,6 +73,7 @@ defmodule PremiereEcoute.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0.9"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
+      {:phoenix_storybook, "~> 0.9.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
@@ -81,6 +82,7 @@ defmodule PremiereEcoute.MixProject do
       {:dns_cluster, "~> 0.2"},
       # Backend
       {:dotenvy, "~> 1.0"},
+      {:boundary, "~> 0.10"},
       {:uuid, "~> 1.1"},
       {:timex, "~> 3.7"},
       {:req, "~> 0.5"},
@@ -118,8 +120,7 @@ defmodule PremiereEcoute.MixProject do
       {:doctor, "~> 0.22.0", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:tidewave, "~> 0.1", only: :dev},
-      {:igniter, "~> 0.5", only: :dev},
-      {:boundary, "~> 0.10"}
+      {:igniter, "~> 0.5", only: :dev}
     ]
   end
 
@@ -134,6 +135,7 @@ defmodule PremiereEcoute.MixProject do
       "assets.deploy": [
         "tailwind premiere_ecoute --minify",
         "esbuild premiere_ecoute --minify",
+        "tailwind storybook --minify",
         "phx.digest"
       ],
       gettext: ["gettext.extract", "gettext.merge priv/gettext"],
