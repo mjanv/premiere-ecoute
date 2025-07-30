@@ -5,7 +5,6 @@ defmodule PremiereEcoute.Core.Event do
     fields = Keyword.get(opts, :fields, [])
 
     quote do
-      @derive Jason.Encoder
       defstruct [:id] ++ unquote(fields)
 
       defimpl Jason.Encoder, for: __MODULE__ do

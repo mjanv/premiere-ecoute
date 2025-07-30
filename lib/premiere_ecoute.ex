@@ -9,7 +9,8 @@ defmodule PremiereEcoute do
       {Sessions, except: []},
       {Apis, except: []},
       {Telemetry, except: []},
-      PubSub
+      PubSub,
+      DataCase
     ]
 
   alias PremiereEcoute.Core
