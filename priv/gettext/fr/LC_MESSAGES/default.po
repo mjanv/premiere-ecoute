@@ -1274,3 +1274,24 @@ msgstr "Votre compte et toutes les données associées seront supprimés défini
 #, elixir-autogen, elixir-format
 msgid "Your votes and follows"
 msgstr "Vos votes et abonnements"
+
+#: lib/premiere_ecoute_web/components/sidebar.ex:73
+#: lib/premiere_ecoute_web/components/sidebar.ex:98
+#, elixir-autogen, elixir-format
+msgid "Followed Channels"
+msgstr "Chaînes suivies"
+
+#: lib/premiere_ecoute_web/components/sidebar.ex:101
+#, elixir-autogen, elixir-format
+msgid "No followed channels yet"
+msgstr "Aucune chaîne suivie pour le moment"
+
+#: lib/premiere_ecoute_web/components/sidebar.ex:106
+#, elixir-autogen, elixir-format
+msgid "Discover streamers"
+msgstr "Découvrir des streamers"
+
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:15
+#, elixir-autogen, elixir-format
+msgid "Use the navigation panel on the left to access your activities and manage your sessions."
+msgstr "Utilisez le panneau de navigation à gauche pour accéder à vos activités et gérer vos sessions."

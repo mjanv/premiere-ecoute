@@ -50,64 +50,7 @@ defmodule PremiereEcouteWeb.Components.Header do
         </div>
 
         <div class="flex items-center space-x-4">
-          <!-- AIDEV-NOTE: Theme Toggle - positioned left of language selection -->
-          <!-- AIDEV-NOTE: Theme Toggle - Visual toggle switch with sliding indicator -->
-          <!-- Theme Toggle -->
-          <label class="relative inline-flex items-center cursor-pointer group" title="Toggle theme">
-            <!-- Hidden checkbox that controls theme -->
-            <input type="checkbox" class="theme-controller sr-only" value="light" />
-            
-    <!-- Toggle Track -->
-            <div
-              class="relative w-14 h-7 rounded-full transition-colors duration-300 ease-in-out"
-              style="background-color: var(--color-dark-700);"
-            >
-              
-    <!-- Toggle Slider -->
-              <div class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg transform transition-transform duration-300 ease-in-out flex items-center justify-center">
-                <!-- Moon icon (default/dark theme) -->
-                <svg
-                  class="w-3 h-3 text-gray-700 transition-opacity duration-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              </div>
-            </div>
-            
-    <!-- Custom CSS for the toggle animation -->
-            <style>
-              /* When checkbox is checked (light theme active) */
-              .theme-controller:checked + div {
-                background-color: rgb(34 197 94); /* green-500 */
-              }
-              .theme-controller:checked + div > div {
-                transform: translateX(1.75rem); /* Move slider to right */
-              }
-              .theme-controller:checked + div > div svg {
-                opacity: 0; /* Hide moon icon */
-              }
-              .theme-controller:checked + div > div::after {
-                content: "";
-                position: absolute;
-                width: 0.75rem;
-                height: 0.75rem;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23374151'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'/%3E%3C/svg%3E");
-                background-size: contain;
-                background-repeat: no-repeat;
-                opacity: 1;
-              }
-            </style>
-          </label>
-          
-    <!-- Locale Switcher -->
+          <!-- Locale Switcher -->
           <div class="relative" x-data="{ open: false }">
             <button
               @click="open = !open"
@@ -201,51 +144,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                 style="display: none;"
               >
                 <div class="py-1">
-                  <!-- Session management (only for streamers and admins) -->
-                  <%= if @current_user.role in [:streamer, :admin] do %>
-                    <!-- Album Dashboard (first item) -->
-                    <.link
-                      href={~p"/sessions/wrapped/retrospective"}
-                      class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                    >
-                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                        />
-                      </svg>
-                      {gettext("Retrospective")}
-                    </.link>
-                    
-    <!-- My Sessions (second item) -->
-                    <.link
-                      href={~p"/sessions"}
-                      class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                    >
-                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                        />
-                      </svg>
-                      {gettext("My Sessions")}
-                    </.link>
-                    
-    <!-- Create Session (third item) -->
-                    <.link
-                      href={~p"/sessions/discography/album/select"}
-                      class="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-gray-200 transition-colors"
-                    >
-                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m-6 0h6m-6 0H6" />
-                      </svg>
-                      {gettext("Create Session")}
-                    </.link>
-                  <% end %>
+                  <!-- AIDEV-NOTE: Session management links moved to left sidebar, keeping only account-related items here -->
                   
     <!-- Admin (if admin user) -->
                   <%= if @current_user.role == :admin do %>
@@ -285,22 +184,6 @@ defmodule PremiereEcouteWeb.Components.Header do
                   
     <!-- Divider -->
                   <div class="border-t border-gray-600 my-1"></div>
-                  
-    <!-- Follows -->
-                  <.link
-                    href={~p"/users/follows"}
-                    class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                  >
-                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                      />
-                    </svg>
-                    {gettext("Follows")}
-                  </.link>
                   
     <!-- Account -->
                   <.link
@@ -354,27 +237,6 @@ defmodule PremiereEcouteWeb.Components.Header do
       </div>
     </header>
 
-    <!-- AIDEV-NOTE: Spotify connection notification for streamers -->
-    <%= if @current_user && @current_user.role in [:streamer, :admin] && !has_spotify_connected?(@current_user) do %>
-      <div class="bg-green-600 px-6 py-2">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.48.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.32 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-            </svg>
-            <span class="text-white font-medium">
-              Connect your Spotify account to manage music playback
-            </span>
-          </div>
-          <.link
-            href={~p"/auth/spotify"}
-            class="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
-          >
-            Connect Spotify
-          </.link>
-        </div>
-      </div>
-    <% end %>
     """
   end
 
