@@ -28,3 +28,23 @@ for i <- 1..2 do
     IO.ANSI.green() <> "  Created streamer account with email '#{streamer.email}' and password '#{password}'" <> IO.ANSI.reset()
   )
 end
+
+for i <- 1..2 do
+  password = Seeds.user_id()
+
+  payload = %{
+    user_id: Seeds.user_id(),
+    access_token: Seeds.token(32),
+    refresh_token: Seeds.token(32),
+    expires_in: 3600,
+    username: "viewer#{i}",
+    display_name: "Viewer Name",
+    broadcaster_type: ""
+  }
+
+  {:ok, viewer} = PremiereEcoute.Accounts.Services.AccountRegistration.register_twitch_user(payload, password)
+
+  Logger.info(
+    IO.ANSI.green() <> "  Created viewer account with email '#{viewer.email}' and password '#{password}'" <> IO.ANSI.reset()
+  )
+end

@@ -19,10 +19,10 @@ defmodule PremiereEcoute.Sessions.Discography.Playlist do
         }
 
   schema "playlists" do
-    field :spotify_id, :string
     field :name, :string
-    field :spotify_owner_id, :string
     field :owner_name, :string
+    field :spotify_id, :string
+    field :spotify_owner_id, :string
     field :cover_url, :string
 
     has_many :tracks, Track, foreign_key: :playlist_id, on_delete: :delete_all

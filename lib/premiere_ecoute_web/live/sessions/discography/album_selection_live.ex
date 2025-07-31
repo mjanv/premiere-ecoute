@@ -17,7 +17,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:selected_album, AsyncResult.ok(nil))
     |> assign(:current_scope, socket.assigns[:current_scope] || %{})
-    |> assign(:vote_options_preset, "0-10")
+    |> assign(:vote_options_preset, nil)
     # AIDEV-NOTE: Track if user has interacted with vote options
     |> assign(:vote_options_configured, false)
     |> then(fn socket -> {:ok, socket} end)
@@ -43,6 +43,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     # Reset search form
     |> assign(:search_form, to_form(%{"query" => ""}))
     # Reset vote options state
+    |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -60,11 +61,21 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
   end
 
   def handle_event("vote_options_preset_change", %{"preset" => preset}, socket) do
-    socket
-    |> assign(:vote_options_preset, preset)
-    # AIDEV-NOTE: Mark vote options as configured when user changes them
-    |> assign(:vote_options_configured, true)
-    |> then(fn socket -> {:noreply, socket} end)
+    case preset do
+      "" ->
+        # Handle empty selection - don't mark as configured
+        socket
+        |> assign(:vote_options_preset, nil)
+        |> assign(:vote_options_configured, false)
+        |> then(fn socket -> {:noreply, socket} end)
+      
+      _ ->
+        socket
+        |> assign(:vote_options_preset, preset)
+        # AIDEV-NOTE: Mark vote options as configured when user changes them
+        |> assign(:vote_options_configured, true)
+        |> then(fn socket -> {:noreply, socket} end)
+    end
   end
 
   def handle_event(
@@ -140,9 +151,10 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
   def get_vote_options(%{vote_options_preset: "0-10"}), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   def get_vote_options(%{vote_options_preset: "1-5"}), do: ["1", "2", "3", "4", "5"]
   def get_vote_options(%{vote_options_preset: "smash-pass"}), do: ["smash", "pass"]
+  def get_vote_options(%{vote_options_preset: nil}), do: []
 
-  # default fallback
-  def get_vote_options(_), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+  # default fallback - return empty for any other case
+  def get_vote_options(_), do: []
 
   defp get_user_id(socket) do
     case socket.assigns.current_scope do

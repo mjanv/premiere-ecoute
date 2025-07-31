@@ -8,19 +8,30 @@
       </div>
       
 <!-- AIDEV-NOTE: Steps with Ariadne's thread connecting them -->
-      <div class="relative">
+      <div class="relative" id="steps-container">
         <!-- Ariadne's thread - base line -->
         <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result && @vote_options_configured do %>
           <!-- All 4 steps visible - thread goes from step 1 to step 4 -->
-          <div class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full" style="height: calc(100% - 6rem);"></div>
+          <div 
+            class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full ariane-thread-base" 
+            data-step="4"
+            style="bottom: 8rem;"
+          ></div>
         <% else %>
           <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result do %>
             <!-- Steps 1-3 visible - thread goes from step 1 to step 3 -->
-            <div class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full" style="height: 50rem;"></div>
+            <div 
+              class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full ariane-thread-base" 
+              data-step="3"
+            ></div>
           <% else %>
             <%= if @source_type == "album" do %>
               <!-- Steps 1-2 visible - thread goes from step 1 to step 2 -->
-              <div class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full" style="height: 30rem;"></div>
+              <div 
+                class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full ariane-thread-base" 
+                data-step="2"
+                id="thread-to-step-2"
+              ></div>
             <% else %>
               <%= if @source_type do %>
                 <!-- Only step 1 visible - minimal thread -->
@@ -34,29 +45,16 @@
         <div
           class={[
             "absolute left-6 top-12 w-1 rounded-full transition-all duration-700 ease-in-out",
-            "bg-gradient-to-b from-purple-500 via-purple-400 to-purple-300"
+            "bg-gradient-to-b from-purple-500 via-purple-400 to-purple-300",
+            "ariane-thread-progress"
           ]}
-          style={
+          data-progress-step={
             cond do
-              @source_type == "album" && @selected_album.ok? && @selected_album.result && @vote_options_configured ->
-                # All steps completed - full thread
-                "height: calc(100% - 6rem);"
-
-              @source_type == "album" && @selected_album.ok? && @selected_album.result ->
-                # Step 3 reached - covers step 1 to step 3
-                "height: 40rem;"
-
-              @source_type == "album" ->
-                # Step 2 reached - covers step 1 to step 2
-                "height: 20rem;"
-
-              @source_type ->
-                # Step 1 completed
-                "height: 8rem;"
-
-              true ->
-                # No progress
-                "height: 0;"
+              @source_type == "album" && @selected_album.ok? && @selected_album.result && @vote_options_configured -> "4"
+              @source_type == "album" && @selected_album.ok? && @selected_album.result -> "3"
+              @source_type == "album" -> "2"
+              @source_type -> "1"
+              true -> "0"
             end
           }
         >
@@ -124,7 +122,7 @@
         
 <!-- Step 2: Album Selection & Info (only show if Album is selected) -->
         <%= if @source_type == "album" do %>
-          <div class="mb-8 relative">
+          <div class="mb-8 relative" id="step-2">
             <div class="flex items-center mb-6">
               <div class={[
                 "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
@@ -318,7 +316,7 @@
         
 <!-- Step 3: Vote Options (only show if album is selected) -->
         <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result do %>
-          <div class="mb-8 relative">
+          <div class="mb-8 relative" id="step-3">
             <div class="flex items-center mb-6">
               <div class={[
                 "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
@@ -335,10 +333,11 @@
                 <form phx-change="vote_options_preset_change">
                   <select
                     name="preset"
-                    value={@vote_options_preset}
+                    value=""
                     class="rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:ring-opacity-50 border-0"
                     style="background-color: var(--color-dark-800);"
                   >
+                    <option value="" disabled selected>{gettext("Choose vote format...")}</option>
                     <option value="0-10">{gettext("0-10 Rating")}</option>
                     <option value="1-5">{gettext("1-5 Rating")}</option>
                     <option value="smash-pass">{gettext("Smash or Pass")}</option>
@@ -346,13 +345,20 @@
                 </form>
                 
 <!-- Options preview on the right -->
-                <div class="flex flex-wrap gap-1.5">
-                  <%= for option <- get_vote_options(%{vote_options_preset: @vote_options_preset}) do %>
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-600/15 text-purple-300 border border-purple-600/25 hover:bg-purple-600/25 transition-colors">
-                      {option}
-                    </span>
-                  <% end %>
-                </div>
+                <%= if @vote_options_preset && @vote_options_preset != "" do %>
+                  <div class="flex flex-wrap gap-1.5">
+                    <%= for option <- get_vote_options(%{vote_options_preset: @vote_options_preset}) do %>
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-600/15 text-purple-300 border border-purple-600/25 hover:bg-purple-600/25 transition-colors">
+                        {option}
+                      </span>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="text-gray-500 text-sm">
+                    {gettext("Select a format to see options")}
+                    <!-- Debug: preset = {@vote_options_preset || "nil"} -->
+                  </div>
+                <% end %>
               </div>
             </div>
           </div>
@@ -360,7 +366,7 @@
         
 <!-- Step 4: Action Buttons (only show if everything is configured) -->
         <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result && @vote_options_configured do %>
-          <div class="border-t pt-6 relative" style="border-color: var(--color-dark-700);">
+          <div class="pt-6 relative" id="step-4">
             <!-- Final step indicator -->
             <div class="flex items-center mb-6">
               <div class={[
@@ -403,4 +409,97 @@
     const seconds = Math.floor((durationMs % 60000) / 1000);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
+
+  // AIDEV-NOTE: Dynamic Ariane thread height calculation
+  function updateArianesThread() {
+    const container = document.getElementById('steps-container');
+    if (!container) return;
+
+    const baseThread = container.querySelector('.ariane-thread-base');
+    const progressThread = container.querySelector('.ariane-thread-progress');
+    
+    if (!baseThread || !progressThread) return;
+
+    const step = baseThread.getAttribute('data-step');
+    const progressStep = progressThread.getAttribute('data-progress-step');
+    
+    // Find the step number element (not the content) for the current step
+    let targetElement = null;
+    
+    if (step === '4') {
+      // Find the step 4 number circle
+      targetElement = document.querySelector('#step-4 .w-12.h-12');
+    } else if (step === '3') {
+      // Find the step 3 number circle
+      targetElement = document.querySelector('#step-3 .w-12.h-12');
+    } else if (step === '2') {
+      // Find the step 2 number circle
+      targetElement = document.querySelector('#step-2 .w-12.h-12');
+    }
+    
+    if (targetElement) {
+      const containerTop = container.getBoundingClientRect().top;
+      const targetBottom = targetElement.getBoundingClientRect().bottom;
+      const threadStart = 48; // top-12 = 3rem = 48px
+      
+      // Calculate thread height to the step number circle (stop at circle, not beyond)
+      const baseHeight = Math.max(0, targetBottom - containerTop - threadStart);
+      
+      // Update base thread height - always ends at the step number
+      baseThread.style.height = baseHeight + 'px';
+      
+      // Calculate progress thread height - should match current progress step
+      let progressHeight = 0;
+      if (progressStep === '1') {
+        // Find step 1 circle and stop at its bottom
+        const step1Circle = document.querySelector('#steps-container .w-12.h-12');
+        if (step1Circle) {
+          const step1Bottom = step1Circle.getBoundingClientRect().bottom;
+          progressHeight = Math.max(0, step1Bottom - containerTop - threadStart);
+        } else {
+          progressHeight = 128; // fallback
+        }
+      } else if (progressStep === '2') {
+        // Find step 2 circle and stop at its bottom
+        const step2Circle = document.querySelector('#step-2 .w-12.h-12');
+        if (step2Circle) {
+          const step2Bottom = step2Circle.getBoundingClientRect().bottom;
+          progressHeight = Math.max(0, step2Bottom - containerTop - threadStart);
+        } else {
+          progressHeight = baseHeight * 0.6; // fallback
+        }
+      } else if (progressStep === '3') {
+        // Find step 3 circle and stop at its bottom
+        const step3Circle = document.querySelector('#step-3 .w-12.h-12');
+        if (step3Circle) {
+          const step3Bottom = step3Circle.getBoundingClientRect().bottom;
+          progressHeight = Math.max(0, step3Bottom - containerTop - threadStart);
+        } else {
+          progressHeight = baseHeight * 0.85; // fallback
+        }
+      } else if (progressStep === '4') {
+        progressHeight = baseHeight;
+      }
+      
+      progressThread.style.height = progressHeight + 'px';
+    }
+  }
+
+  // Update on page load and when content changes
+  document.addEventListener('DOMContentLoaded', updateArianesThread);
+  
+  // Update when LiveView updates
+  document.addEventListener('phx:update', updateArianesThread);
+  
+  // Update on window resize
+  window.addEventListener('resize', updateArianesThread);
+  
+  // Use ResizeObserver to detect content changes
+  if (window.ResizeObserver) {
+    const observer = new ResizeObserver(updateArianesThread);
+    const container = document.getElementById('steps-container');
+    if (container) {
+      observer.observe(container);
+    }
+  }
 </script>
