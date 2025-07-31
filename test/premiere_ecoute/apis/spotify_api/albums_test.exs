@@ -3,15 +3,28 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
 
   import ExUnit.CaptureLog
 
+  alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Core.Cache
 
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Album.Track
 
-  @moduletag :spotify
+  setup_all do
+    Cache.put(:tokens, :spotify_access_token, "token")
+
+    :ok
+  end
 
   describe "get_album/1" do
     test "list album and track details from an unique identifier" do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/albums/7aJuG4TFXa2hmE4z1yxc3n"},
+        response: "spotify_api/albums/get_album/response.json",
+        status: 200
+      )
+
       id = "7aJuG4TFXa2hmE4z1yxc3n"
 
       {:ok, album} = SpotifyApi.get_album(id)
@@ -110,6 +123,13 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
     end
 
     test "returns an error from an unknown unique identifier" do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/albums/4SLYa6PnWEEC6WyIEaQagI"},
+        response: "spotify_api/albums/get_album/error.json",
+        status: 404
+      )
+
       id = "4SLYa6PnWEEC6WyIEaQagI"
 
       {{:error, reason}, logs} = with_log(fn -> SpotifyApi.get_album(id) end)

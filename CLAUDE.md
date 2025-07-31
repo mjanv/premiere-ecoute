@@ -7,6 +7,7 @@
 @docs/README.md
 @docs/architecture.md
 @docs/coding_standards.md
+@docs/guides/development.md
 
 ---
 
@@ -29,25 +30,6 @@ AI must NOT do:
 3. Re-format code to any other style.
 4. Refactor large modules without human guidance.
 5. Continue work from a prior prompt after "new task" – start a fresh session.
-
----
-
-## Build, test & utility commands
-
-Use mix tasks for consistency
-
-```
-mix setup # install and setup dependencies
-mix deps.get # install dependencies
-mix ecto.setup # create database, run migrations, and seed data
-mix ecto.reset # drop and recreate database
-mix format # format code
-mix credo --strict # static code analysis
-mix dialyzer # type checking
-mix quality # run all quality checks (compile with warnings-as-errors, format check, credo strict, dialyzer)
-mix test # run all unit tests (with database migrations)
-mix phx.server # start Phoenix server (available at http://localhost:4000)
-```
 
 ---
 

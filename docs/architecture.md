@@ -1,4 +1,4 @@
-# Architecture Overview
+# 🏗️ Architecture overview
 
 **Core Application Structure:**
 
@@ -23,3 +23,23 @@
    - Listening sessions with album tracking
    - User voting and scoring system
    - Event-sourced session state management
+
+## 📁 Project Structure
+
+```
+lib/
+├── premiere_ecoute/           # Core business logic
+│   ├── apis/                  # External API integrations
+│   ├── core/                  # Command/Event Bus
+│   ├── sessions/              # Session management
+│   ├── accounts/              # User authentication
+│   └── telemetry/             # Observability
+├── premiere_ecoute_web/       # Web interface
+│   ├── controllers/           # HTTP controllers
+│   ├── live/                  # LiveView modules
+│   └── components/            # UI components
+├── premiere_ecoute_web.ex     # Web interface entry point
+└── premiere_ecoute.ex         # Backend interface entry point
+```
+
+Test folder structure follows as close as possible the structure and filenames of `lib/`.

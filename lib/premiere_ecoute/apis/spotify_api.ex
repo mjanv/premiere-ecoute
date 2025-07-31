@@ -21,6 +21,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   Enables searching Spotify's music catalog for albums, tracks, and artists. Returns structured results that can be used for music discovery and selection within listening sessions.
   """
 
+  require Logger
+
+  alias PremiereEcoute.Core.Cache
   alias PremiereEcoute.Telemetry
   alias PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics
 
@@ -32,6 +35,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Sessions.Discography.Album
     alias PremiereEcoute.Sessions.Discography.Album.Track
+    alias PremiereEcoute.Sessions.Discography.Playlist
 
     # Albums
     @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}
@@ -46,6 +50,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     @callback add_item_to_playback_queue(scope :: Scope.t(), item :: Album.t() | Track.t()) ::
                 {:ok, String.t() | [String.t()]} | {:error, term()}
 
+    # Playlists
+    @callback get_playlist(playlist_id :: String.t()) :: {:ok, Playlist.t()} | {:error, term()}
+    @callback get_user_playlists(scope :: Scope.t()) :: {:ok, [Playlist.t()]} | {:error, term()}
+    @callback add_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
+                {:ok, map()} | {:error, term()}
+    @callback remove_playlist_items(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()], snapshot :: map()) ::
+                {:ok, map()} | {:error, term()}
+
     # Search
     @callback search_albums(query :: String.t()) :: {:ok, [Album.t()]} | {:error, term()}
   end
@@ -57,25 +69,34 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   def impl, do: Application.get_env(@app, :spotify_api, __MODULE__)
 
-  @spec api(:web | :accounts) :: Req.Request.t()
-  def api(:web) do
-    case client_credentials() do
-      {:ok, token} ->
-        Req.new(
-          [
-            base_url: @web,
-            headers: [{"Authorization", "Bearer #{token}"}]
-          ]
-          |> Keyword.merge(Application.get_env(@app, :spotify_req_options, []))
-        )
+  @spec api(:web | :accounts, String.t() | nil) :: Req.Request.t()
+  def api(type, token \\ nil)
 
-      {:error, _} ->
-        Req.new(base_url: @web)
-    end
+  def api(:web, token) do
+    token =
+      with {:ok, nil} <- {:ok, token},
+           {:ok, nil} <- Cache.get(:tokens, :spotify_access_token),
+           {:ok, token} <- PremiereEcoute.Apis.SpotifyApi.Accounts.client_credentials() do
+        token
+      else
+        {:ok, token} ->
+          token
+
+        {:error, reason} ->
+          Logger.error("Cannot retrieve Spotify app access token due to #{inspect(reason)}")
+          ""
+      end
+
+    [
+      base_url: @web,
+      headers: [{"Authorization", "Bearer #{token}"}]
+    ]
+    |> Keyword.merge(Application.get_env(@app, :spotify_req_options, []))
+    |> Req.new()
     |> Telemetry.ReqPipeline.attach(&SpotifyApiMetrics.api_called/1)
   end
 
-  def api(:accounts) do
+  def api(:accounts, _) do
     with id when not is_nil(id) <- Application.get_env(@app, :spotify_client_id),
          secret when not is_nil(secret) <- Application.get_env(@app, :spotify_client_secret) do
       Req.new(
@@ -114,6 +135,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   # Playlists
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists
+  defdelegate get_user_playlists(scope), to: __MODULE__.Playlists
+  defdelegate add_items_to_playlist(scope, id, tracks), to: __MODULE__.Playlists
+  defdelegate remove_playlist_items(scope, id, tracks, snapshot), to: __MODULE__.Playlists
 
   # Search
   defdelegate search_albums(query), to: __MODULE__.Search

@@ -17,7 +17,7 @@ defmodule PremiereEcouteWeb do
   those modules here.
   """
 
-  use Boundary, deps: [PremiereEcoute], exports: [Endpoint]
+  use Boundary, deps: [PremiereEcoute], exports: [Endpoint, CoreComponents]
 
   def static_paths, do: ~w(doc assets fonts images favicon.ico robots.txt)
 

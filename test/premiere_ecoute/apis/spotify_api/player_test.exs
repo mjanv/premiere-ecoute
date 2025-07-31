@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Player
+  alias PremiereEcoute.Core.Cache
 
   alias PremiereEcoute.Sessions.Discography.Album
 
@@ -15,12 +16,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         })
       )
 
-    ApiMock.expect(
-      SpotifyApi,
-      path: {:post, "/api/token"},
-      response: %{"access_token" => "token"},
-      status: 200
-    )
+    Cache.put(:tokens, :spotify_access_token, "token")
 
     {:ok, scope: scope}
   end
@@ -191,13 +187,6 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
 
       ApiMock.expect(
         SpotifyApi,
-        path: {:post, "/api/token"},
-        response: %{"access_token" => "token"},
-        status: 200
-      )
-
-      ApiMock.expect(
-        SpotifyApi,
         path: {:post, "/v1/me/player/queue"},
         params: %{"uri" => "spotify:track:track002"},
         status: 204
@@ -217,13 +206,6 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         path: {:post, "/v1/me/player/queue"},
         params: %{"uri" => "spotify:track:track001"},
         status: 204
-      )
-
-      ApiMock.expect(
-        SpotifyApi,
-        path: {:post, "/api/token"},
-        response: %{"access_token" => "token"},
-        status: 200
       )
 
       ApiMock.expect(

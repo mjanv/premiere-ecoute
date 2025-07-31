@@ -1,0 +1,92 @@
+{
+  "href": "https://api.spotify.com/v1/users/lanfeust313/playlists?offset=0&limit=2&locale=en-US,en;q%3D0.9",
+  "limit": 2,
+  "next": "https://api.spotify.com/v1/users/lanfeust313/playlists?offset=2&limit=2&locale=en-US,en;q%3D0.9",
+  "offset": 0,
+  "previous": null,
+  "total": 16,
+  "items": [
+    {
+      "collaborative": true,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/5dIzUBcdljrcjJLP3B6ZLk"
+      },
+      "href": "https://api.spotify.com/v1/playlists/5dIzUBcdljrcjJLP3B6ZLk",
+      "id": "5dIzUBcdljrcjJLP3B6ZLk",
+      "images": [
+        {
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e0224eb40775d2ad89181f93630ab67616d00001e0260863211a34118f09d8f6434ab67616d00001e02ae871c52286bf992400f4002ab67616d00001e02b85976e1b1bd2d00ff551a01",
+          "height": 640,
+          "width": 640
+        },
+        {
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e0224eb40775d2ad89181f93630ab67616d00001e0260863211a34118f09d8f6434ab67616d00001e02ae871c52286bf992400f4002ab67616d00001e02b85976e1b1bd2d00ff551a01",
+          "height": 300,
+          "width": 300
+        },
+        {
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e0224eb40775d2ad89181f93630ab67616d00001e0260863211a34118f09d8f6434ab67616d00001e02ae871c52286bf992400f4002ab67616d00001e02b85976e1b1bd2d00ff551a01",
+          "height": 60,
+          "width": 60
+        }
+      ],
+      "name": "La playlist idéale : les propositions",
+      "owner": {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ku296zgwbo0e3qff8cylptsjq"
+        },
+        "href": "https://api.spotify.com/v1/users/ku296zgwbo0e3qff8cylptsjq",
+        "id": "ku296zgwbo0e3qff8cylptsjq",
+        "type": "user",
+        "uri": "spotify:user:ku296zgwbo0e3qff8cylptsjq",
+        "display_name": "Flonflon"
+      },
+      "public": true,
+      "snapshot_id": "AABKdnm1KrvJHELSKZIXh7bdC6K//HVW",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/5dIzUBcdljrcjJLP3B6ZLk/tracks",
+        "total": 237
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:5dIzUBcdljrcjJLP3B6ZLk",
+      "primary_color": null
+    },
+    {
+      "collaborative": false,
+      "description": "Tous les titres joués, dans l&#x27;ordre chronologique. #Paris2024",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4ulqK1y6myPKOe3bNUEfvr"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4ulqK1y6myPKOe3bNUEfvr",
+      "id": "4ulqK1y6myPKOe3bNUEfvr",
+      "images": [
+        {
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72cc71cd11ee39285e0e565b684",
+          "height": null,
+          "width": null
+        }
+      ],
+      "name": "Cérémonie d'ouverture JO Paris 2024",
+      "owner": {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/11124351208"
+        },
+        "href": "https://api.spotify.com/v1/users/11124351208",
+        "id": "11124351208",
+        "type": "user",
+        "uri": "spotify:user:11124351208",
+        "display_name": "Ervan Couderc"
+      },
+      "public": true,
+      "snapshot_id": "AAABBFmFFFB5pYUL19e1KNg/eIDbE/sz",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4ulqK1y6myPKOe3bNUEfvr/tracks",
+        "total": 75
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4ulqK1y6myPKOe3bNUEfvr",
+      "primary_color": null
+    }
+  ]
+}

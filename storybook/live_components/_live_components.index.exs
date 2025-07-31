@@ -1,4 +1,4 @@
-defmodule MyAppWeb.LiveComponents do
+defmodule PremiereEcouteWeb.LiveComponents do
   use PhoenixStorybook.Index
 
   def folder_name, do: "Live Components"

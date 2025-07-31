@@ -25,6 +25,66 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     end
   end
 
+  def get_user_playlists(_scope) do
+    SpotifyApi.api(:web)
+    |> Req.get(url: "/me/playlists")
+    |> case do
+      {:ok, %{status: 200, body: %{"items" => items}}} ->
+        {:ok, Enum.map(items, &parse_playlist/1)}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify playlists fetch failed: #{status} - #{inspect(body)}")
+        {:error, "Spotify API error: #{status}"}
+
+      {:error, reason} ->
+        Logger.error("Spotify request failed: #{inspect(reason)}")
+        {:error, "Network error: #{inspect(reason)}"}
+    end
+  end
+
+  def add_items_to_playlist(_scope, id, tracks) do
+    SpotifyApi.api(:web)
+    |> Req.post(
+      url: "/playlists/#{id}/tracks",
+      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.spotify_id}" end)}
+    )
+    |> case do
+      {:ok, %{status: 201, body: body}} ->
+        {:ok, body}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify add items to playlist failed: #{status} - #{inspect(body)}")
+        {:error, "Spotify API error: #{status}"}
+
+      {:error, reason} ->
+        Logger.error("Spotify request failed: #{inspect(reason)}")
+        {:error, "Network error: #{inspect(reason)}"}
+    end
+  end
+
+  def remove_playlist_items(_scope, id, tracks, snapshot) do
+    SpotifyApi.api(:web)
+    |> Req.delete(
+      url: "/playlists/#{id}/tracks",
+      json: %{
+        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{t.spotify_id}"} end),
+        "snapshot_id" => snapshot["snapshot_id"]
+      }
+    )
+    |> case do
+      {:ok, %{status: 200, body: body}} ->
+        {:ok, body}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify remove items to playlist failed: #{status} - #{inspect(body)}")
+        {:error, "Spotify API error: #{status}"}
+
+      {:error, reason} ->
+        Logger.error("Spotify request failed: #{inspect(reason)}")
+        {:error, "Network error: #{inspect(reason)}"}
+    end
+  end
+
   def parse_playlist(data) do
     %Playlist{
       spotify_id: data["id"],
@@ -32,7 +92,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
       spotify_owner_id: data["owner"]["id"],
       name: data["name"],
       cover_url: Parser.parse_album_cover_url(data["images"]),
-      tracks: Enum.map(data["tracks"]["items"], &parse_track/1)
+      tracks:
+        if Map.has_key?(data["tracks"], "items") do
+          Enum.map(data["tracks"]["items"], &parse_track/1)
+        else
+          []
+        end
     }
   end
 

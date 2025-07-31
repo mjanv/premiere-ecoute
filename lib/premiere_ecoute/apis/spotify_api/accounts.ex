@@ -8,12 +8,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
   require Logger
 
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Core.Cache
 
   def client_credentials do
     SpotifyApi.api(:accounts)
     |> Req.post(url: "/token", body: "grant_type=client_credentials")
     |> case do
-      {:ok, %{status: 200, body: %{"access_token" => token}}} ->
+      {:ok, %{status: 200, body: %{"access_token" => token, "expires_in" => expires_in}}} ->
+        Cache.put(:tokens, :spotify_access_token, token, expire: expires_in * 1_000)
         {:ok, token}
 
       {:ok, %{status: status, body: body}} ->

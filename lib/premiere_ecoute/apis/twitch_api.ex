@@ -69,7 +69,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   def api(:helix, token \\ nil) do
     token =
       with {:ok, nil} <- {:ok, token},
-           {:ok, nil} <- Cache.get(:tokens, :app_access_token),
+           {:ok, nil} <- Cache.get(:tokens, :twitch_access_token),
            {:ok, token} <- PremiereEcoute.Apis.TwitchApi.Accounts.access_token() do
         token
       else

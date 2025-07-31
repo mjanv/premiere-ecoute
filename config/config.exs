@@ -47,10 +47,20 @@ config :premiere_ecoute, PremiereEcoute.EventStore,
 
 config :premiere_ecoute, Oban,
   prefix: "oban",
+  repo: PremiereEcoute.Repo,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [default: 10, twitch: 1],
-  repo: PremiereEcoute.Repo
+  queues: [
+    default: 10,
+    twitch: 1,
+    spotify: 1
+  ],
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"@reboot", PremiereEcoute.Apis.Workers.RenewSpotifyTokens}
+     ]}
+  ]
 
 config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   disabled: false,

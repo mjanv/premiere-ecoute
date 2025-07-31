@@ -5,7 +5,7 @@
 Ensure proper use of:
 
 - Pattern matching and guard clauses
-- GenServer/Agent/Task patterns where appropriate
+- GenServer/Agent/Task patterns whenever appropriate
 - Proper OTP principles
 - Ecto query optimization
 - Phoenix LiveView patterns

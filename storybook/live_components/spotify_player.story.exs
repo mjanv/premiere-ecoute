@@ -1,4 +1,4 @@
-defmodule MyAppWeb.Storybook.LiveComponents.SpotifyPlayer do
+defmodule PremiereEcouteWeb.Storybook.LiveComponents.SpotifyPlayer do
   @moduledoc false
 
   use PhoenixStorybook.Story, :live_component

@@ -3,8 +3,6 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
 
   alias PremiereEcoute.Accounts
 
-  @moduletag :skip
-
   setup do
     %{unconfirmed_user: unconfirmed_user_fixture(), user: user_fixture()}
   end
@@ -25,7 +23,7 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
       conn = get(conn, ~p"/")
       response = html_response(conn, 200)
       assert response =~ user.email
-      assert response =~ ~p"/users/settings"
+      assert response =~ ~p"/users/account"
       assert response =~ ~p"/users/log-out"
     end
 
@@ -89,7 +87,7 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
       conn = get(conn, ~p"/")
       response = html_response(conn, 200)
       assert response =~ user.email
-      assert response =~ ~p"/users/settings"
+      assert response =~ ~p"/users/account"
       assert response =~ ~p"/users/log-out"
     end
 
@@ -113,7 +111,7 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
       conn = get(conn, ~p"/")
       response = html_response(conn, 200)
       assert response =~ user.email
-      assert response =~ ~p"/users/settings"
+      assert response =~ ~p"/users/account"
       assert response =~ ~p"/users/log-out"
     end
 

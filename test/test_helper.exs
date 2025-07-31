@@ -8,5 +8,5 @@ for {key, module} <- mocks do
   Application.put_env(:premiere_ecoute, key, Module.concat([module, Mock]))
 end
 
-ExUnit.start(capture_log: true, exclude: [:spotify, :twitch])
+ExUnit.start(capture_log: true, exclude: [:api, :wip])
 Ecto.Adapters.SQL.Sandbox.mode(PremiereEcoute.Repo, :manual)

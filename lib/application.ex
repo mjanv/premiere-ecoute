@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Application do
   @moduledoc false
 
   use Application
-  use Boundary, top_level?: true, deps: [PremiereEcoute, PremiereEcouteWeb, PremiereEcouteMock, PremiereEcouteMix]
+  use Boundary, top_level?: true, deps: [PremiereEcoute, PremiereEcouteWeb, PremiereEcouteMock, PremiereEcouteMix, Storybook]
 
   @impl true
   def start(_type, _args) do

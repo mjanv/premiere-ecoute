@@ -1,14 +1,28 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Core.Cache
 
   alias PremiereEcoute.Sessions.Discography.Album
 
-  @moduletag :spotify
+  setup_all do
+    Cache.put(:tokens, :spotify_access_token, "token")
+
+    :ok
+  end
 
   describe "search_albums/1" do
     test "can list albums from a string query" do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/search"},
+        params: %{"q" => "billie", "type" => "album", "limit" => "20"},
+        response: "spotify_api/search/search_for_item/billie.json",
+        status: 200
+      )
+
       query = "billie"
 
       {:ok, albums} = SpotifyApi.search_albums(query)
