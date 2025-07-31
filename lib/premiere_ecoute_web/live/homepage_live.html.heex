@@ -278,7 +278,7 @@
         <% else %>
           <!-- AIDEV-NOTE: Anonymous users - show traditional layout with title, description, and mockups -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
+            
 <!-- Left side: Title and Description -->
             <div class="order-2 lg:order-1">
               <h1 class="text-5xl lg:text-6xl text-white mb-6 font-extrabold leading-tight">
@@ -290,7 +290,7 @@
                   "Share your music taste with the world. Create listening sessions, rate albums together, and discover new favorites through community feedback."
                 )}
               </p>
-
+              
 <!-- Action Buttons -->
               <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
                 <.link
@@ -305,7 +305,7 @@
                 </.link>
               </div>
             </div>
-
+            
 <!-- Right side: Mockups -->
             <div class="order-1 lg:order-2 relative">
               <!-- AIDEV-NOTE: DaisyUI mockups - browser with overlapping phone, only shown to unauthenticated users -->
@@ -316,7 +316,7 @@
                 </div>
                 <div class="px-6 py-40" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
               </div>
-
+              
 <!-- Phone Mockup - positioned with slight overlap -->
               <div class="absolute top-1/2 -translate-y-4/10 -right-45 pointer-events-none">
                 <div class="mockup-phone border-primary scale-[0.3]">
@@ -331,7 +331,7 @@
         <% end %>
       </div>
     </div>
-
+    
 <!-- AIDEV-NOTE: Features Preview section - only for unauthenticated users -->
     <%= if is_nil(@current_scope) do %>
       <!-- Features Preview -->
@@ -434,7 +434,7 @@
         </div>
       </div>
     <% end %>
-
+    
 <!-- Footer -->
     <footer class="py-4 px-6" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">
       <div class="max-w-5xl mx-auto text-center">

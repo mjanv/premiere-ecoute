@@ -50,7 +50,64 @@ defmodule PremiereEcouteWeb.Components.Header do
         </div>
 
         <div class="flex items-center space-x-4">
-          <!-- Locale Switcher -->
+          <!-- AIDEV-NOTE: Theme Toggle - positioned left of language selection -->
+          <!-- AIDEV-NOTE: Theme Toggle - Visual toggle switch with sliding indicator -->
+          <!-- Theme Toggle -->
+          <label class="relative inline-flex items-center cursor-pointer group" title="Toggle theme">
+            <!-- Hidden checkbox that controls theme -->
+            <input type="checkbox" class="theme-controller sr-only" value="light" />
+            
+    <!-- Toggle Track -->
+            <div
+              class="relative w-14 h-7 rounded-full transition-colors duration-300 ease-in-out"
+              style="background-color: var(--color-dark-700);"
+            >
+              
+    <!-- Toggle Slider -->
+              <div class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg transform transition-transform duration-300 ease-in-out flex items-center justify-center">
+                <!-- Moon icon (default/dark theme) -->
+                <svg
+                  class="w-3 h-3 text-gray-700 transition-opacity duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
+                </svg>
+              </div>
+            </div>
+            
+    <!-- Custom CSS for the toggle animation -->
+            <style>
+              /* When checkbox is checked (light theme active) */
+              .theme-controller:checked + div {
+                background-color: rgb(34 197 94); /* green-500 */
+              }
+              .theme-controller:checked + div > div {
+                transform: translateX(1.75rem); /* Move slider to right */
+              }
+              .theme-controller:checked + div > div svg {
+                opacity: 0; /* Hide moon icon */
+              }
+              .theme-controller:checked + div > div::after {
+                content: "";
+                position: absolute;
+                width: 0.75rem;
+                height: 0.75rem;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23374151'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'/%3E%3C/svg%3E");
+                background-size: contain;
+                background-repeat: no-repeat;
+                opacity: 1;
+              }
+            </style>
+          </label>
+          
+    <!-- Locale Switcher -->
           <div class="relative" x-data="{ open: false }">
             <button
               @click="open = !open"

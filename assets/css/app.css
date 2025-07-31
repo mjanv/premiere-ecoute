@@ -102,6 +102,11 @@
   display: contents;
 }
 
+/* Alpine.js cloak utility to prevent flash of unstyled content */
+[x-cloak] {
+  display: none !important;
+}
+
 /* This file is for your main application CSS */
 
 /* AIDEV-NOTE: Bricolage Grotesque font integration - loaded via root layout */
