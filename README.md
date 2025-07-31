@@ -1,11 +1,8 @@
 # 💿 Premiere Ecoute
 
-<img
-  src="https://images.unsplash.com/photo-1727797216812-a0478ec92b64?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800"
-  style="width: 100%; height: 100px; object-fit: cover; object-position: center;"
-    >
+![Banner](https://images.unsplash.com/photo-1727797216812-a0478ec92b64?ixlib=rb-4.1.0&q=85&fm=jpg&crop=center&cs=srgb&w=1200&h=300&fit=crop)
 
-> Select, listen and note new album releases with your Twitch community
+> <p style="font-size: 18px">Select, listen and note new album releases with your Twitch community</p>
 
 ## What is it ?
 
@@ -40,4 +37,5 @@ Premiere Ecoute turns album listening into an interactive experience where strea
 - 🏗️ Understand how the system works with our [architecture overview](docs/architecture.md) explaining contexts, APIs, and data flow
 - 🤝 Get started contributing to the project with our [contribution guide](docs/guides/contributing.md)
 - 🎨 Read for complete design workflow and component creation in our [frontend guide](docs/guides/frontend.md)
+- 🏛️ Learn how to document developer, legal and release documentations in our [documentation guide](docs/guides/documentation.md)
 - 🚀 Deploy to production following our [deployment guide](docs/guides/deployment.md) instructions
