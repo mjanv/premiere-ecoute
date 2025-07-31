@@ -1,12 +1,12 @@
 defmodule PremiereEcouteWeb.Components.Sidebar do
   @moduledoc """
   Left sidebar component with navigation sections for authenticated users.
-  
+
   Provides "Mes activités" section with:
   - Nouvelle session
   - Mes sessions  
   - Rétrospective
-  
+
   And "Followed channels" section with list of followed streamers.
   """
   use PremiereEcouteWeb, :html
@@ -43,20 +43,15 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   >
                     {gettext("New Session")}
                   </.sidebar_link>
-                  
-                  <.sidebar_link
-                    href={~p"/sessions"}
-                    current_page={@current_page}
-                    page_id="my_sessions"
-                    icon="hero-rectangle-stack"
-                  >
+
+                  <.sidebar_link href={~p"/sessions"} current_page={@current_page} page_id="my_sessions" icon="hero-rectangle-stack">
                     {gettext("My Sessions")}
                   </.sidebar_link>
-                  
+
                   <.sidebar_link
                     href={~p"/sessions/wrapped/retrospective"}
                     current_page={@current_page}
-                    page_id="retrospective" 
+                    page_id="retrospective"
                     icon="hero-chart-bar"
                   >
                     {gettext("Retrospective")}
@@ -64,8 +59,8 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-
-            <!-- Followed Channels section -->
+            
+    <!-- Followed Channels section -->
             <%= if @current_user && has_loaded_channels?(@current_user) && !Enum.empty?(@current_user.channels) do %>
               <div class="mb-6">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
@@ -76,7 +71,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   <%= for channel <- @current_user.channels |> Enum.take(10) do %>
                     <.sidebar_channel_link channel={channel} />
                   <% end %>
-                  
+
                   <%= if has_loaded_channels?(@current_user) && length(@current_user.channels) > 10 do %>
                     <.sidebar_link
                       href={~p"/users/follows"}
@@ -99,10 +94,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </h3>
                 <div class="text-sm text-gray-500 p-3 border rounded-lg" style="border-color: var(--color-dark-700);">
                   <p class="mb-2">{gettext("No followed channels yet")}</p>
-                  <.link
-                    href={~p"/users/follows"}
-                    class="text-purple-400 hover:text-purple-300 underline"
-                  >
+                  <.link href={~p"/users/follows"} class="text-purple-400 hover:text-purple-300 underline">
                     {gettext("Discover streamers")}
                   </.link>
                 </div>
@@ -111,20 +103,20 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
           </div>
         </div>
         
-        <!-- Theme toggle fixed at bottom of sidebar -->
+    <!-- Theme toggle fixed at bottom of sidebar -->
         <div class="p-6">
           <div class="flex justify-center">
             <label class="relative inline-flex items-center cursor-pointer group" title="Toggle theme">
               <!-- Hidden checkbox that controls theme -->
               <input type="checkbox" class="theme-controller sr-only" value="light" />
               
-              <!-- Toggle Track -->
+    <!-- Toggle Track -->
               <div
                 class="relative w-14 h-7 rounded-full transition-colors duration-300 ease-in-out"
                 style="background-color: var(--color-dark-700);"
               >
                 
-                <!-- Toggle Slider -->
+    <!-- Toggle Slider -->
                 <div class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg transform transition-transform duration-300 ease-in-out flex items-center justify-center">
                   <!-- Moon icon (default/dark theme) -->
                   <svg
@@ -143,7 +135,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </div>
               </div>
               
-              <!-- Custom CSS for the toggle animation -->
+    <!-- Custom CSS for the toggle animation -->
               <style>
                 /* When checkbox is checked (light theme active) */
                 .theme-controller:checked + div {

@@ -546,9 +546,10 @@ msgstr "Tableau de Bord Admin"
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:35
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:41
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:35
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Album"
-msgstr "Couverture d'album"
+msgstr "Album"
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:258
 #, elixir-autogen, elixir-format
@@ -758,9 +759,10 @@ msgid "Sessions Management"
 msgstr "Sessions"
 
 #: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:190
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:290
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Start Listening Session"
-msgstr "Session d'Écoute"
+msgstr "Commencer la Session d'Écoute"
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:208
 #, elixir-autogen, elixir-format
@@ -818,6 +820,7 @@ msgid "tracks"
 msgstr "morceaux"
 
 #: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:203
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:290
 #, elixir-autogen, elixir-format
 msgid "Ready to Start"
 msgstr "Prêt à Commencer"
@@ -1295,3 +1298,53 @@ msgstr "Découvrir des streamers"
 #, elixir-autogen, elixir-format
 msgid "Use the navigation panel on the left to access your activities and manage your sessions."
 msgstr "Utilisez le panneau de navigation à gauche pour accéder à vos activités et gérer vos sessions."
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:6
+#, elixir-autogen, elixir-format
+msgid "New Listening Session"
+msgstr "Nouvelle Session d'Écoute"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:7
+#, elixir-autogen, elixir-format
+msgid "Configure your session step by step"
+msgstr "Configurez votre session étape par étape"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:14
+#, elixir-autogen, elixir-format
+msgid "Source"
+msgstr "Source"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:36
+#, elixir-autogen, elixir-format
+msgid "From Spotify"
+msgstr "Depuis Spotify"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:53
+#, elixir-autogen, elixir-format
+msgid "Playlist"
+msgstr "Playlist"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:54
+#, elixir-autogen, elixir-format
+msgid "Coming soon"
+msgstr "Bientôt disponible"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:130
+#, elixir-autogen, elixir-format
+msgid "Album Info"
+msgstr "Informations de l'Album"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:220
+#, elixir-autogen, elixir-format
+msgid "Tracklist"
+msgstr "Liste des Pistes"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:266
+#, elixir-autogen, elixir-format
+msgid "Preview"
+msgstr "Aperçu"
+
+#: lib/premiere_ecoute_web/live/sessions/discography/album_selection_live.html.heex:298
+#, elixir-autogen, elixir-format
+msgid "Start Over"
+msgstr "Recommencer"

@@ -11,11 +11,15 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     PremiereEcoute.PubSub.subscribe("listening_sessions")
 
     socket
+    # AIDEV-NOTE: Track current source selection (nil, "album", "playlist")
+    |> assign(:source_type, nil)
     |> assign(:search_form, to_form(%{"query" => ""}))
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:selected_album, AsyncResult.ok(nil))
     |> assign(:current_scope, socket.assigns[:current_scope] || %{})
     |> assign(:vote_options_preset, "0-10")
+    # AIDEV-NOTE: Track if user has interacted with vote options
+    |> assign(:vote_options_configured, false)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -28,6 +32,20 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
   end
 
   def handle_event("search_albums", _params, socket), do: {:noreply, socket}
+
+  def handle_event("select_source", %{"source" => source}, socket) do
+    socket
+    |> assign(:source_type, source)
+    # Clear previous searches
+    |> assign(:search_albums, AsyncResult.ok([]))
+    # Clear previous selection
+    |> assign(:selected_album, AsyncResult.ok(nil))
+    # Reset search form
+    |> assign(:search_form, to_form(%{"query" => ""}))
+    # Reset vote options state
+    |> assign(:vote_options_configured, false)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
 
   def handle_event("select_album", %{"album_id" => album_id}, socket) do
     socket
@@ -44,6 +62,8 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
   def handle_event("vote_options_preset_change", %{"preset" => preset}, socket) do
     socket
     |> assign(:vote_options_preset, preset)
+    # AIDEV-NOTE: Mark vote options as configured when user changes them
+    |> assign(:vote_options_configured, true)
     |> then(fn socket -> {:noreply, socket} end)
   end
 

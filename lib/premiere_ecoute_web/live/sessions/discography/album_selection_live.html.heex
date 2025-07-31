@@ -1,277 +1,394 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
   <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
-    <!-- Main Content -->
-    <div class="flex h-screen">
-      <!-- Left Panel - Album Selection -->
-      <div class="w-1/2 border-r p-6" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
-        <h2 class="text-xl font-semibold mb-4" style="color: var(--color-primary-300);">
-          {gettext("Album Selection")}
-        </h2>
-        
-<!-- Search -->
-        <div class="mb-6 relative">
-          <.form for={@search_form} id="album-search-form" phx-change="search_albums" phx-submit="search_albums">
-            <.input
-              field={@search_form[:query]}
-              type="text"
-              placeholder={gettext("Search Spotify albums...")}
-              class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-              style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
-              error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
-            />
-          </.form>
-          
-<!-- Search Results Overlay -->
-          <%= if @search_albums.loading do %>
-            <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4 text-center text-gray-400">
-              <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
-              <p class="mt-2 text-sm">{gettext("Searching albums...")}</p>
-            </div>
-          <% end %>
-
-          <%= if @search_albums.ok? do %>
-            <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
-              <%= for album <- @search_albums.result do %>
-                <div
-                  class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                  style="background-color: var(--color-dark-800);"
-                  phx-click="select_album"
-                  phx-value-album_id={album.spotify_id}
-                >
-                  <div class="flex items-center space-x-3">
-                    <%= if album.cover_url do %>
-                      <img src={album.cover_url} alt={album.name} class="w-12 h-12 rounded object-cover" />
-                    <% else %>
-                      <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                        </svg>
-                      </div>
-                    <% end %>
-                    <div class="flex-1 min-w-0">
-                      <h4 class="font-medium truncate" style="color: var(--color-primary-300);">
-                        {album.name}
-                      </h4>
-                      <p class="text-gray-400 text-sm truncate">{album.artist}</p>
-                      <p class="text-gray-500 text-xs">{album.total_tracks} {gettext("tracks")}</p>
-                    </div>
-                  </div>
-                </div>
+    <div class="max-w-4xl mx-auto py-8 px-6">
+      <!-- AIDEV-NOTE: Inline form design with progressive steps -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">{gettext("New Listening Session")}</h1>
+        <p class="text-gray-400">{gettext("Configure your session step by step")}</p>
+      </div>
+      
+<!-- AIDEV-NOTE: Steps with Ariadne's thread connecting them -->
+      <div class="relative">
+        <!-- Ariadne's thread - base line -->
+        <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result && @vote_options_configured do %>
+          <!-- All 4 steps visible - thread goes from step 1 to step 4 -->
+          <div class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full" style="height: calc(100% - 6rem);"></div>
+        <% else %>
+          <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result do %>
+            <!-- Steps 1-3 visible - thread goes from step 1 to step 3 -->
+            <div class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full" style="height: 50rem;"></div>
+          <% else %>
+            <%= if @source_type == "album" do %>
+              <!-- Steps 1-2 visible - thread goes from step 1 to step 2 -->
+              <div class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full" style="height: 30rem;"></div>
+            <% else %>
+              <%= if @source_type do %>
+                <!-- Only step 1 visible - minimal thread -->
+                <div class="absolute left-6 top-12 w-1 bg-gray-700 rounded-full" style="height: 8rem;"></div>
               <% end %>
-            </div>
+            <% end %>
           <% end %>
+        <% end %>
+        
+<!-- Progressive fill thread - shows progress as steps complete -->
+        <div
+          class={[
+            "absolute left-6 top-12 w-1 rounded-full transition-all duration-700 ease-in-out",
+            "bg-gradient-to-b from-purple-500 via-purple-400 to-purple-300"
+          ]}
+          style={
+            cond do
+              @source_type == "album" && @selected_album.ok? && @selected_album.result && @vote_options_configured ->
+                # All steps completed - full thread
+                "height: calc(100% - 6rem);"
+
+              @source_type == "album" && @selected_album.ok? && @selected_album.result ->
+                # Step 3 reached - covers step 1 to step 3
+                "height: 40rem;"
+
+              @source_type == "album" ->
+                # Step 2 reached - covers step 1 to step 2
+                "height: 20rem;"
+
+              @source_type ->
+                # Step 1 completed
+                "height: 8rem;"
+
+              true ->
+                # No progress
+                "height: 0;"
+            end
+          }
+        >
         </div>
         
-<!-- Selected Album -->
-        <%= if @selected_album.ok? && @selected_album.result do %>
-          <div
-            class="rounded-xl mb-6 overflow-hidden relative h-[calc(100vh-16rem)] shadow-lg"
-            style="background-color: var(--color-dark-900);"
-          >
-            
-<!-- Blurred background layer -->
-            <%= if @selected_album.result.cover_url do %>
-              <div
-                class="absolute inset-0"
-                style={"background-image: url('#{@selected_album.result.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
-              >
+<!-- Step 1: Source Selection -->
+        <div class="mb-8 relative">
+          <div class="flex items-center mb-6">
+            <div class={[
+              "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
+              if @source_type do
+                "bg-purple-600 ring-4 ring-purple-500/30"
+              else
+                "bg-gray-600 ring-4 ring-gray-500/20"
+              end
+            ]}>
+              1
+            </div>
+            <h2 class="text-2xl font-semibold text-white">{gettext("Source")}</h2>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 max-w-md ml-16">
+            <button
+              class={[
+                "p-4 rounded-lg border-2 transition-all text-left",
+                if @source_type == "album" do
+                  "border-purple-500 bg-purple-500/10 text-white"
+                else
+                  "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                end
+              ]}
+              phx-click="select_source"
+              phx-value-source="album"
+            >
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                </svg>
+                <div>
+                  <h3 class="font-semibold">{gettext("Album")}</h3>
+                  <p class="text-sm opacity-70">{gettext("From Spotify")}</p>
+                </div>
               </div>
-            <% else %>
-              <div
-                class="absolute inset-0"
-                style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"
-              >
+            </button>
+
+            <button
+              class={[
+                "p-4 rounded-lg border-2 transition-all text-left opacity-50 cursor-not-allowed",
+                "border-gray-700 bg-gray-800/30 text-gray-500"
+              ]}
+              disabled
+            >
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h3 class="font-semibold">{gettext("Playlist")}</h3>
+                  <p class="text-sm opacity-70">{gettext("Coming soon")}</p>
+                </div>
               </div>
-            <% end %>
+            </button>
+          </div>
+        </div>
+        
+<!-- Step 2: Album Selection & Info (only show if Album is selected) -->
+        <%= if @source_type == "album" do %>
+          <div class="mb-8 relative">
+            <div class="flex items-center mb-6">
+              <div class={[
+                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
+                "bg-purple-600 ring-4 ring-purple-500/30"
+              ]}>
+                2
+              </div>
+              <h2 class="text-2xl font-semibold text-white">{gettext("Album Selection")}</h2>
+            </div>
             
-<!-- Overlay for text readability -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40"></div>
-            
-<!-- Content overlay with album cover and text -->
-            <div class="relative z-10 h-full flex items-center justify-center p-10">
-              <div class="flex items-center space-x-12 max-w-6xl">
-                
-<!-- Non-blurred album cover -->
-                <div class="flex-shrink-0 relative">
-                  <%= if @selected_album.result.cover_url do %>
-                    <img
-                      src={@selected_album.result.cover_url}
-                      alt={@selected_album.result.name}
-                      class="w-64 h-64 rounded-xl shadow-2xl border-2 border-white/10"
-                      style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);"
-                    />
-                    <!-- Reflection effect -->
+<!-- Search -->
+            <div class="mb-6 relative max-w-lg ml-16">
+              <.form for={@search_form} id="album-search-form" phx-change="search_albums" phx-submit="search_albums">
+                <.input
+                  field={@search_form[:query]}
+                  type="text"
+                  placeholder={gettext("Search Spotify albums...")}
+                  class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                  style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                  error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+                />
+              </.form>
+              
+<!-- Search Results Overlay -->
+              <%= if @search_albums.loading do %>
+                <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4 text-center text-gray-400">
+                  <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+                  <p class="mt-2 text-sm">{gettext("Searching albums...")}</p>
+                </div>
+              <% end %>
+
+              <%= if @search_albums.ok? && length(@search_albums.result) > 0 do %>
+                <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
+                  <%= for album <- @search_albums.result do %>
                     <div
-                      class="absolute top-0 left-0 w-64 h-64 rounded-xl"
-                      style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;"
+                      class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                      style="background-color: var(--color-dark-800);"
+                      phx-click="select_album"
+                      phx-value-album_id={album.spotify_id}
                     >
-                    </div>
-                  <% else %>
-                    <div class="w-64 h-64 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-2xl border-2 border-white/10 relative">
-                      <svg class="w-32 h-32 text-white/60" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                      </svg>
-                      <!-- Reflection effect for fallback -->
-                      <div
-                        class="absolute top-0 left-0 w-64 h-64 rounded-xl"
-                        style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 30%, transparent 70%); pointer-events: none;"
-                      >
+                      <div class="flex items-center space-x-3">
+                        <%= if album.cover_url do %>
+                          <img src={album.cover_url} alt={album.name} class="w-12 h-12 rounded object-cover" />
+                        <% else %>
+                          <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                            </svg>
+                          </div>
+                        <% end %>
+                        <div class="flex-1 min-w-0">
+                          <h4 class="font-medium truncate" style="color: var(--color-primary-300);">
+                            {album.name}
+                          </h4>
+                          <p class="text-gray-400 text-sm truncate">{album.artist}</p>
+                          <p class="text-gray-500 text-xs">{album.total_tracks} {gettext("tracks")}</p>
+                        </div>
                       </div>
                     </div>
                   <% end %>
                 </div>
-                
-<!-- Album info -->
-                <div class="text-left space-y-6">
-                  <h3 class="text-5xl font-bold text-white drop-shadow-2xl leading-tight">
-                    {@selected_album.result.name}
-                  </h3>
-                  <p class="text-white text-3xl font-semibold drop-shadow-lg">
-                    {@selected_album.result.artist}
-                  </p>
-                  
-<!-- Enhanced Album Stats -->
-                  <div class="flex items-center space-x-8 text-white/90 text-xl font-semibold">
-                    <div class="flex items-center space-x-3">
-                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                        />
-                      </svg>
-                      <span>{@selected_album.result.total_tracks} {gettext("tracks")}</span>
-                    </div>
-
-                    <div class="flex items-center space-x-3">
-                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>
-                        {total_ms =
-                          @selected_album.result.tracks
-                          |> Enum.map(&(&1.duration_ms || 0))
-                          |> Enum.sum()
-
-                        total_minutes = div(total_ms, 60_000)
-                        "#{total_minutes} #{gettext("min")}"}
-                      </span>
-                    </div>
-
-                    <div class="flex items-center space-x-3">
-                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <span>
-                        {if @selected_album.result.release_date,
-                          do: @selected_album.result.release_date.year,
-                          else: gettext("Unknown")}
-                      </span>
-                    </div>
-                  </div>
-                  
-<!-- Action Button moved here -->
-                  <div class="pt-4">
-                    <button
-                      class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors text-lg shadow-2xl"
-                      phx-click="prepare_session"
+              <% end %>
+            </div>
+            
+<!-- Album Info (shows when album is selected) -->
+            <%= if @selected_album.ok? && @selected_album.result do %>
+              <div class="mt-6">
+                <!-- Album Card with Tracklist -->
+                <div class="rounded-xl overflow-hidden ml-16 relative" style="background-color: var(--color-dark-900);">
+                  <!-- Blurred background layer covering entire card -->
+                  <%= if @selected_album.result.cover_url do %>
+                    <div
+                      class="absolute inset-0"
+                      style={"background-image: url('#{@selected_album.result.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
                     >
-                      🎵 {gettext("Start Listening Session")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% else %>
-          <div class="rounded-lg p-8 mb-6" style="background-color: var(--color-dark-800);">
-            <div class="text-center text-gray-400">
-              <svg class="w-20 h-20 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-              </svg>
-              <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("Ready to Start")}</h3>
-              <p class="text-sm">{gettext("Search for an album above to begin your listening session")}</p>
-            </div>
-          </div>
-        <% end %>
-      </div>
-      
-<!-- Right Panel - Configuration & Track List -->
-      <div class="w-1/2 p-6" style="background-color: var(--color-dark-900);">
-        <!-- Vote Options Configuration -->
-        <div class="mb-6">
-          <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">
-            {gettext("Vote Options")}
-          </h3>
-
-          <div class="space-y-4">
-            <!-- Preset Selection -->
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                {gettext("Choose vote format")}
-              </label>
-              <form phx-change="vote_options_preset_change">
-                <select
-                  name="preset"
-                  value={@vote_options_preset}
-                  class="w-full rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-                  style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
-                >
-                  <option value="0-10">
-                    {gettext("0-10 Rating")}
-                  </option>
-                  <option value="1-5">
-                    {gettext("1-5 Rating")}
-                  </option>
-                  <option value="smash-pass">
-                    {gettext("Smash or Pass")}
-                  </option>
-                </select>
-              </form>
-            </div>
-          </div>
-        </div>
-        
-<!-- Track List -->
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--color-primary-300);">
-          {gettext("Track List")}
-        </h3>
-        <%= if @selected_album.ok? && @selected_album.result do %>
-          <div class="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
-            <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
-              <div class="rounded-lg p-4 hover:bg-gray-600 transition-colors" style="background-color: var(--color-dark-800);">
-                <div class="flex justify-between items-center">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center space-x-3">
-                      <span class="text-sm text-gray-400 w-6">{index + 1}</span>
-                      <div class="flex-1 min-w-0">
-                        <h4 class="font-medium text-white truncate">{track.name}</h4>
-                        <p class="text-sm text-gray-400">{format_duration(track.duration_ms)}</p>
+                    </div>
+                  <% else %>
+                    <div
+                      class="absolute inset-0"
+                      style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"
+                    >
+                    </div>
+                  <% end %>
+                  
+<!-- Overlay for text readability covering entire card -->
+                  <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black/90"></div>
+                  
+<!-- Album Header -->
+                  <div class="relative z-10 p-6 h-48 flex items-center">
+                    <div class="flex items-center space-x-6">
+                      <!-- Album cover -->
+                      <div class="flex-shrink-0">
+                        <%= if @selected_album.result.cover_url do %>
+                          <img
+                            src={@selected_album.result.cover_url}
+                            alt={@selected_album.result.name}
+                            class="w-32 h-32 rounded-lg shadow-2xl border-2 border-white/10"
+                          />
+                        <% else %>
+                          <div class="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-2xl border-2 border-white/10">
+                            <svg class="w-16 h-16 text-white/60" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                            </svg>
+                          </div>
+                        <% end %>
                       </div>
+                      
+<!-- Album details -->
+                      <div>
+                        <h3 class="text-2xl font-bold text-white mb-1">
+                          {@selected_album.result.name}
+                        </h3>
+                        <p class="text-white text-lg font-semibold mb-3">
+                          {@selected_album.result.artist}
+                        </p>
+                        
+<!-- Album Stats -->
+                        <div class="flex items-center space-x-6 text-white/90 text-sm">
+                          <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                              />
+                            </svg>
+                            <span>{@selected_album.result.total_tracks} {gettext("tracks")}</span>
+                          </div>
+
+                          <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            <span>
+                              {total_ms = @selected_album.result.tracks |> Enum.map(&(&1.duration_ms || 0)) |> Enum.sum()
+                              total_minutes = div(total_ms, 60_000)
+                              "#{total_minutes} #{gettext("min")}"}
+                            </span>
+                          </div>
+
+                          <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span>
+                              {if @selected_album.result.release_date,
+                                do: @selected_album.result.release_date.year,
+                                else: gettext("Unknown")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+<!-- Tracklist with subtle separator -->
+                  <div class="relative z-10 p-6 border-t border-white/10">
+                    <div class="space-y-1 max-h-64 overflow-y-auto">
+                      <%= for {track, index} <- Enum.with_index(@selected_album.result.tracks) do %>
+                        <div
+                          class="rounded-lg p-3 hover:bg-white/5 transition-colors"
+                          style="background-color: rgba(0, 0, 0, 0.3);"
+                        >
+                          <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-300 w-6 text-right">{index + 1}</span>
+                            <div class="flex-1 min-w-0">
+                              <h5 class="font-medium text-white truncate text-sm">{track.name}</h5>
+                            </div>
+                            <span class="text-sm text-gray-300">{format_duration(track.duration_ms)}</span>
+                          </div>
+                        </div>
+                      <% end %>
                     </div>
                   </div>
                 </div>
               </div>
             <% end %>
           </div>
-        <% else %>
-          <div class="text-center text-gray-400 h-full flex items-center justify-center">
-            <div>
-              <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-              </svg>
-              <p class="text-sm">{gettext("Select an album to view tracks")}</p>
+        <% end %>
+        
+<!-- Step 3: Vote Options (only show if album is selected) -->
+        <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result do %>
+          <div class="mb-8 relative">
+            <div class="flex items-center mb-6">
+              <div class={[
+                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
+                "bg-purple-600 ring-4 ring-purple-500/30"
+              ]}>
+                3
+              </div>
+              <h2 class="text-2xl font-semibold text-white">{gettext("Vote Options")}</h2>
+            </div>
+
+            <div class="ml-16">
+              <!-- Vote format selector with inline preview -->
+              <div class="flex items-center space-x-4">
+                <form phx-change="vote_options_preset_change">
+                  <select
+                    name="preset"
+                    value={@vote_options_preset}
+                    class="rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:ring-opacity-50 border-0"
+                    style="background-color: var(--color-dark-800);"
+                  >
+                    <option value="0-10">{gettext("0-10 Rating")}</option>
+                    <option value="1-5">{gettext("1-5 Rating")}</option>
+                    <option value="smash-pass">{gettext("Smash or Pass")}</option>
+                  </select>
+                </form>
+                
+<!-- Options preview on the right -->
+                <div class="flex flex-wrap gap-1.5">
+                  <%= for option <- get_vote_options(%{vote_options_preset: @vote_options_preset}) do %>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-600/15 text-purple-300 border border-purple-600/25 hover:bg-purple-600/25 transition-colors">
+                      {option}
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+<!-- Step 4: Action Buttons (only show if everything is configured) -->
+        <%= if @source_type == "album" && @selected_album.ok? && @selected_album.result && @vote_options_configured do %>
+          <div class="border-t pt-6 relative" style="border-color: var(--color-dark-700);">
+            <!-- Final step indicator -->
+            <div class="flex items-center mb-6">
+              <div class={[
+                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
+                "bg-green-600 ring-4 ring-green-500/30"
+              ]}>
+                4
+              </div>
+              <h2 class="text-2xl font-semibold text-white">{gettext("Ready to Start")}</h2>
+            </div>
+            <div class="flex items-center space-x-4 ml-16">
+              <button
+                class="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                phx-click="prepare_session"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
+                </svg>
+                <span>{gettext("Start Listening Session")}</span>
+              </button>
+
+              <button
+                class="border border-gray-600 text-gray-300 hover:bg-gray-800 py-3 px-6 rounded-lg font-medium transition-colors"
+                phx-click="select_source"
+                phx-value-source=""
+              >
+                {gettext("Start Over")}
+              </button>
             </div>
           </div>
         <% end %>

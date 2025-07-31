@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Layouts do
     <div class="min-h-screen bg-gray-900 flex flex-col">
       <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
       
-      <!-- AIDEV-NOTE: Spotify connection notification for streamers -->
+    <!-- AIDEV-NOTE: Spotify connection notification for streamers -->
       <%= if @current_scope && Map.get(@current_scope, :user) && Map.get(@current_scope, :user).role in [:streamer, :admin] && needs_spotify_connection?(Map.get(@current_scope, :user)) do %>
         <div class="bg-green-600 px-6 py-2">
           <div class="flex items-center justify-between">
@@ -59,21 +59,21 @@ defmodule PremiereEcouteWeb.Layouts do
         </div>
       <% end %>
       
-      <!-- AIDEV-NOTE: Layout with left sidebar for authenticated users -->
+    <!-- AIDEV-NOTE: Layout with left sidebar for authenticated users -->
       <div class="flex flex-1">
-        <.left_sidebar 
-          current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} 
+        <.left_sidebar
+          current_user={(@current_scope && Map.get(@current_scope, :user)) || nil}
           current_scope={@current_scope}
           current_page={assigns[:current_page]}
         />
         
-        <!-- Main content area -->
+    <!-- Main content area -->
         <main class="flex-1">
           {render_slot(@inner_block)}
         </main>
       </div>
       
-      <!-- Footer - spans full width under both sidebar and content -->
+    <!-- Footer - spans full width under both sidebar and content -->
       <footer class="py-4 px-6 mt-auto" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">
         <div class="max-w-5xl mx-auto text-center">
           <div class="flex justify-center items-center space-x-3">
@@ -127,6 +127,7 @@ defmodule PremiereEcouteWeb.Layouts do
 
   # AIDEV-NOTE: Helper function to check if user needs Spotify connection
   defp needs_spotify_connection?(nil), do: false
+
   defp needs_spotify_connection?(user) do
     user.spotify_access_token == nil || user.spotify_refresh_token == nil
   end

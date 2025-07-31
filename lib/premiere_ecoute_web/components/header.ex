@@ -236,7 +236,6 @@ defmodule PremiereEcouteWeb.Components.Header do
         </div>
       </div>
     </header>
-
     """
   end
 
