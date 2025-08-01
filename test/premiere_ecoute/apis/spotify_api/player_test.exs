@@ -16,7 +16,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         })
       )
 
-    Cache.put(:tokens, :spotify_access_token, "token")
+    Cache.put(:tokens, :spotify, "token")
 
     {:ok, scope: scope}
   end

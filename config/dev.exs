@@ -1,8 +1,21 @@
 import Config
 
-config :premiere_ecoute,
-  # twitch_api: PremiereEcouteMock.TwitchApi.Mock,
-  twitch_api_base_url: "http://localhost:4001"
+config :premiere_ecoute, PremiereEcoute.Apis,
+  twitch: [
+    api: PremiereEcoute.Apis.TwitchApi,
+    urls: [
+      # api: "http://localhost:4001",
+      api: "https://api.twitch.tv/helix",
+      accounts: "https://id.twitch.tv/oauth2"
+    ]
+  ],
+  spotify: [
+    api: PremiereEcoute.Apis.SpotifyApi,
+    urls: [
+      api: "https://api.spotify.com/v1",
+      accounts: "https://accounts.spotify.com/api"
+    ]
+  ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,
   stacktrace: true,
@@ -37,9 +50,5 @@ config :logger, level: :info
 config :logger, :default_formatter, format: "[$level] $message\n"
 
 config :phoenix, :stacktrace_depth, 20
-
 config :phoenix, :plug_init_mode, :runtime
-
-config :phoenix_live_view,
-  debug_heex_annotations: true,
-  enable_expensive_runtime_checks: true
+config :phoenix_live_view, debug_heex_annotations: true, enable_expensive_runtime_checks: true

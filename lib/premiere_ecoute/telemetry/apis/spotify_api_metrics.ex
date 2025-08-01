@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics do
 
   use PromEx.Plugin
 
-  @api_event [:premiere_ecoute, :apis, :spotify_api, :api_called]
+  @api_event [:premiere_ecoute, :apis, :spotify, :api_called]
 
   def api_called({%Req.Request{} = request, %Req.Response{} = response}) do
     :telemetry.execute(@api_event, %{}, %{
@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics do
   def event_metrics(_opts) do
     [
       Event.build(
-        :premiere_ecoute_apis_spotify_api_api_calls,
+        :premiere_ecoute_apis_spotify_api_calls,
         [
           counter(
             @api_event ++ [:count],

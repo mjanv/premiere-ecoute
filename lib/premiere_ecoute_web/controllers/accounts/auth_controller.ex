@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
       id = user && user.id
 
       if id do
-        redirect(conn, external: SpotifyApi.authorization_url(to_string(id)))
+        redirect(conn, external: SpotifyApi.authorization_url(nil, to_string(id)))
       else
         conn
         |> put_flash(:error, "You must be logged in to connect Spotify")

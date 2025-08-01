@@ -14,20 +14,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
   Reference: https://developer.spotify.com/documentation/web-api/reference/get-an-album
   """
   def get_album(album_id) when is_binary(album_id) do
-    SpotifyApi.api(:web)
-    |> Req.get(url: "/albums/#{album_id}")
-    |> case do
-      {:ok, %{status: 200, body: body}} ->
-        {:ok, parse_album_with_tracks(body)}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Spotify album fetch failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify API error: #{status}"}
-
-      {:error, reason} ->
-        Logger.error("Spotify request failed: #{inspect(reason)}")
-        {:error, "Network error: #{inspect(reason)}"}
-    end
+    SpotifyApi.api(:api)
+    |> SpotifyApi.get(url: "/albums/#{album_id}")
+    |> SpotifyApi.handle(200, &parse_album_with_tracks/1)
   end
 
   def parse_album_with_tracks(data) do

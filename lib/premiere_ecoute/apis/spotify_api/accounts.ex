@@ -8,41 +8,35 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
   require Logger
 
   alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Core.Cache
 
   def client_credentials do
     SpotifyApi.api(:accounts)
-    |> Req.post(url: "/token", body: "grant_type=client_credentials")
-    |> case do
-      {:ok, %{status: 200, body: %{"access_token" => token, "expires_in" => expires_in}}} ->
-        Cache.put(:tokens, :spotify_access_token, token, expire: expires_in * 1_000)
-        {:ok, token}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Spotify auth failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify authentication failed"}
-
-      {:error, reason} ->
-        Logger.error("Spotify auth request failed: #{inspect(reason)}")
-        {:error, "Network error during authentication"}
-    end
+    |> SpotifyApi.post(url: "/token", body: "grant_type=client_credentials")
+    |> SpotifyApi.handle(200, fn %{"access_token" => _} = body -> body end)
   end
 
-  def authorization_url(state \\ nil) do
-    "https://accounts.spotify.com/authorize?" <>
-      URI.encode_query(%{
-        response_type: "code",
-        client_id: Application.get_env(:premiere_ecoute, :spotify_client_id),
-        scope:
-          "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing",
-        redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri),
-        state: state || random(16)
-      })
+  def authorization_url(scope \\ nil, state \\ nil) do
+    SpotifyApi.url(:accounts)
+    |> URI.parse()
+    |> URI.merge(%URI{
+      path: "/authorize",
+      query:
+        URI.encode_query(%{
+          response_type: "code",
+          client_id: Application.get_env(:premiere_ecoute, :spotify_client_id),
+          scope:
+            scope ||
+              "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing",
+          redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri),
+          state: state || random(16)
+        })
+    })
+    |> URI.to_string()
   end
 
   def authorization_code(code, _state) do
     SpotifyApi.api(:accounts)
-    |> Req.post(
+    |> SpotifyApi.post(
       url: "/token",
       form: [
         grant_type: "authorization_code",
@@ -51,23 +45,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
         client_id: Application.get_env(:premiere_ecoute, :spotify_client_id)
       ]
     )
-    |> case do
-      {:ok, %{status: 200, body: %{"token_type" => "Bearer"} = body}} ->
-        {:ok,
-         %{
-           access_token: body["access_token"],
-           refresh_token: body["refresh_token"],
-           expires_in: body["expires_in"]
-         }}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Spotify auth failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify authentication failed: #{status} - #{inspect(body)}"}
-
-      {:error, reason} ->
-        Logger.error("Spotify auth request failed: #{inspect(reason)}")
-        {:error, "Network error during authentication"}
-    end
+    |> SpotifyApi.handle(200, fn %{"token_type" => "Bearer"} = body ->
+      %{access_token: body["access_token"], refresh_token: body["refresh_token"], expires_in: body["expires_in"]}
+    end)
   end
 
   def renew_token(refresh_token) do

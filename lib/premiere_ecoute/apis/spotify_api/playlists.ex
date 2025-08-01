@@ -9,80 +9,36 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
   alias PremiereEcoute.Sessions.Discography.Playlist.Track
 
   def get_playlist(playlist_id) when is_binary(playlist_id) do
-    SpotifyApi.api(:web)
-    |> Req.get(url: "/playlists/#{playlist_id}")
-    |> case do
-      {:ok, %{status: 200, body: body}} ->
-        {:ok, parse_playlist(body)}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Spotify playlist fetch failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify API error: #{status}"}
-
-      {:error, reason} ->
-        Logger.error("Spotify request failed: #{inspect(reason)}")
-        {:error, "Network error: #{inspect(reason)}"}
-    end
+    SpotifyApi.api(:api)
+    |> SpotifyApi.get(url: "/playlists/#{playlist_id}")
+    |> SpotifyApi.handle(200, &parse_playlist/1)
   end
 
   def get_user_playlists(_scope) do
-    SpotifyApi.api(:web)
-    |> Req.get(url: "/me/playlists")
-    |> case do
-      {:ok, %{status: 200, body: %{"items" => items}}} ->
-        {:ok, Enum.map(items, &parse_playlist/1)}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Spotify playlists fetch failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify API error: #{status}"}
-
-      {:error, reason} ->
-        Logger.error("Spotify request failed: #{inspect(reason)}")
-        {:error, "Network error: #{inspect(reason)}"}
-    end
+    SpotifyApi.api(:api)
+    |> SpotifyApi.get(url: "/me/playlists")
+    |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_playlist/1) end)
   end
 
   def add_items_to_playlist(_scope, id, tracks) do
-    SpotifyApi.api(:web)
-    |> Req.post(
+    SpotifyApi.api(:api)
+    |> SpotifyApi.post(
       url: "/playlists/#{id}/tracks",
       json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.spotify_id}" end)}
     )
-    |> case do
-      {:ok, %{status: 201, body: body}} ->
-        {:ok, body}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Spotify add items to playlist failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify API error: #{status}"}
-
-      {:error, reason} ->
-        Logger.error("Spotify request failed: #{inspect(reason)}")
-        {:error, "Network error: #{inspect(reason)}"}
-    end
+    |> SpotifyApi.handle(201, fn body -> body end)
   end
 
   def remove_playlist_items(_scope, id, tracks, snapshot) do
-    SpotifyApi.api(:web)
-    |> Req.delete(
+    SpotifyApi.api(:api)
+    |> SpotifyApi.delete(
       url: "/playlists/#{id}/tracks",
       json: %{
         "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{t.spotify_id}"} end),
         "snapshot_id" => snapshot["snapshot_id"]
       }
     )
-    |> case do
-      {:ok, %{status: 200, body: body}} ->
-        {:ok, body}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Spotify remove items to playlist failed: #{status} - #{inspect(body)}")
-        {:error, "Spotify API error: #{status}"}
-
-      {:error, reason} ->
-        Logger.error("Spotify request failed: #{inspect(reason)}")
-        {:error, "Network error: #{inspect(reason)}"}
-    end
+    |> SpotifyApi.handle(200, fn body -> body end)
   end
 
   def parse_playlist(data) do

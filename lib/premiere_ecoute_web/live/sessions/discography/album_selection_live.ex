@@ -68,7 +68,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
         |> assign(:vote_options_preset, nil)
         |> assign(:vote_options_configured, false)
         |> then(fn socket -> {:noreply, socket} end)
-      
+
       _ ->
         socket
         |> assign(:vote_options_preset, preset)

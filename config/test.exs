@@ -10,9 +10,17 @@ config :premiere_ecoute,
     PremiereEcoute.Core.CommandBusTest.Handler,
     PremiereEcoute.Core.CommandBusTest.EventDispatcher,
     PremiereEcoute.Core.EventBusTest.Handler
+  ]
+
+config :premiere_ecoute, PremiereEcoute.Apis,
+  twitch: [
+    api: PremiereEcoute.Apis.TwitchApi.Mock,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
   ],
-  spotify_req_options: [plug: {Req.Test, PremiereEcoute.Apis.SpotifyApi}],
-  twitch_req_options: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
+  spotify: [
+    api: PremiereEcoute.Apis.SpotifyApi.Mock,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.SpotifyApi}]
+  ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,

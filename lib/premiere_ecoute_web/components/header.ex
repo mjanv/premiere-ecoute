@@ -145,7 +145,7 @@ defmodule PremiereEcouteWeb.Components.Header do
               >
                 <div class="py-1">
                   <!-- AIDEV-NOTE: Session management links moved to left sidebar, keeping only account-related items here -->
-                  
+
     <!-- Admin (if admin user) -->
                   <%= if @current_user.role == :admin do %>
                     <!-- Divider -->
@@ -237,10 +237,5 @@ defmodule PremiereEcouteWeb.Components.Header do
       </div>
     </header>
     """
-  end
-
-  # AIDEV-NOTE: Helper function to check if user has Spotify connected
-  defp has_spotify_connected?(user) do
-    user.spotify_access_token != nil && user.spotify_refresh_token != nil
   end
 end

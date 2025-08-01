@@ -9,14 +9,13 @@ defmodule PremiereEcoute.Accounts.ApiToken do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Apis
 
   def maybe_renew_twitch_token(conn) do
     with %Scope{user: %User{twitch_expires_at: expires_at, twitch_refresh_token: refresh_token} = user} = scope <-
            conn.assigns[:current_scope],
          true <- token_expired?(expires_at),
-         {:ok, tokens} <- TwitchApi.renew_token(refresh_token),
+         {:ok, tokens} <- Apis.twitch().renew_token(refresh_token),
          {:ok, user} <- User.update_twitch_tokens(user, tokens) do
       %{scope | user: user}
     else
@@ -33,7 +32,7 @@ defmodule PremiereEcoute.Accounts.ApiToken do
     with %{user: %{spotify_expires_at: expires_at, spotify_refresh_token: refresh_token} = user} = scope <-
            conn.assigns[:current_scope],
          true <- token_expired?(expires_at),
-         {:ok, tokens} <- SpotifyApi.renew_token(refresh_token),
+         {:ok, tokens} <- Apis.spotify().renew_token(refresh_token),
          {:ok, user} <- User.update_spotify_tokens(user, tokens) do
       %{scope | user: user}
     else

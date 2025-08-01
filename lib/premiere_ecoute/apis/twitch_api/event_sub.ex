@@ -1,42 +1,30 @@
 defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   @moduledoc false
 
-  require Logger
-
   alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcoute.Core.Cache
 
   def get_event_subscriptions(%Scope{user: %{twitch_user_id: user_id}}) do
-    TwitchApi.api(:helix)
-    |> Req.get(
+    TwitchApi.api(:api)
+    |> TwitchApi.get(
       url: "/eventsub/subscriptions",
       params: %{user_id: user_id}
     )
-    |> case do
-      {:ok, %{status: 200, body: %{"data" => subscriptions}}} ->
-        subscriptions
-        |> Enum.map(fn s -> Map.take(s, ["id", "type"]) end)
-        |> Enum.map(fn s ->
-          Cache.put(:polls, {user_id, s["type"]}, s["id"])
-          s
-        end)
-        |> then(fn subscriptions -> {:ok, subscriptions} end)
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Twitch event subscriptions retrieval failed: #{status} - #{inspect(body)}")
-        {:error, "Failed to retrieve event subscriptions"}
-
-      {:error, reason} ->
-        Logger.error("Twitch event subscriptions request failed: #{inspect(reason)}")
-        {:error, "Network error retrieving event subscriptions"}
-    end
+    |> TwitchApi.handle(200, fn %{"data" => subscriptions} ->
+      subscriptions
+      |> Enum.map(fn s -> Map.take(s, ["id", "type"]) end)
+      |> Enum.map(fn s ->
+        Cache.put(:polls, {user_id, s["type"]}, s["id"])
+        s
+      end)
+    end)
   end
 
   def subscribe(%Scope{user: %{twitch_user_id: user_id}} = scope, type) do
-    TwitchApi.api(:helix)
-    |> Req.post(
+    TwitchApi.api(:api)
+    |> TwitchApi.post(
       url: "/eventsub/subscriptions",
       json: %{
         type: type,
@@ -49,41 +37,18 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
         }
       }
     )
-    |> case do
-      {:ok, %{status: 202, body: %{"data" => [%{"id" => id} = poll | _]}}} ->
-        Cache.put(:polls, {user_id, type}, id)
-        {:ok, poll}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Twitch subscription creation failed: #{status} - #{inspect(body)}")
-        {:error, "Failed to subscribe to #{type}"}
-
-      {:error, reason} ->
-        Logger.error("Twitch subscription request failed: #{inspect(reason)}")
-        {:error, "Network error subscribing"}
-    end
+    |> TwitchApi.handle(202, fn %{"data" => [%{"id" => id} = poll | _]} ->
+      Cache.put(:polls, {user_id, type}, id)
+      poll
+    end)
   end
 
   def unsubscribe(%Scope{user: %{twitch_user_id: user_id}}, type) do
     case Cache.get(:polls, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
-        TwitchApi.api(:helix)
-        |> Req.delete(
-          url: "/eventsub/subscriptions",
-          params: %{"id" => id}
-        )
-        |> case do
-          {:ok, %{status: 204}} ->
-            {:ok, id}
-
-          {:ok, %{status: status}} ->
-            Logger.error("Twitch unsubscribe failed: #{status}")
-            {:error, "Failed to unsubscribe from #{type}"}
-
-          {:error, reason} ->
-            Logger.error("Twitch unsubscribe request failed: #{inspect(reason)}")
-            {:error, "Network error unsubscribing"}
-        end
+        TwitchApi.api(:api)
+        |> TwitchApi.delete(url: "/eventsub/subscriptions", params: %{"id" => id})
+        |> TwitchApi.handle(204, fn _ -> id end)
 
       _ ->
         {:error, "Unknown subscription"}

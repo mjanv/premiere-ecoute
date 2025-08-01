@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Accounts.User do
     json: [:id, :email, :role, :twitch_user_id, :twitch_username]
 
   alias PremiereEcoute.Accounts.User.Follow
+  alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.UserToken
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
@@ -47,10 +48,12 @@ defmodule PremiereEcoute.Accounts.User do
     field :spotify_expires_at, :utc_datetime
 
     field :twitch_user_id, :string
+    field :twitch_username, :string
     field :twitch_access_token, :string, redact: true
     field :twitch_refresh_token, :string, redact: true
     field :twitch_expires_at, :utc_datetime
-    field :twitch_username, :string
+
+    embeds_one :profile, Profile, on_replace: :update, defaults_to_struct: true
 
     has_many :follows, Follow, foreign_key: :user_id
     has_many :channels, through: [:follows, :streamer]
@@ -71,6 +74,7 @@ defmodule PremiereEcoute.Accounts.User do
     ])
     |> validate_email(opts)
     |> validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
+    |> cast_embed(:profile, required: false, with: &Profile.changeset/2)
   end
 
   def email_changeset(user, attrs \\ %{}, opts \\ []) do
@@ -484,5 +488,12 @@ defmodule PremiereEcoute.Accounts.User do
            |> Repo.transaction() do
       {:ok, user, expired_tokens}
     end
+  end
+
+  def edit_user_profile(user, attrs) do
+    user
+    |> cast(%{profile: attrs}, [])
+    |> cast_embed(:profile, required: true, with: &Profile.changeset/2)
+    |> Repo.update()
   end
 end

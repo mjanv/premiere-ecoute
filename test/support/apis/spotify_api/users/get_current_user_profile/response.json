@@ -1,0 +1,22 @@
+{
+  "country": "FR",
+  "display_name": "lanfeust313",
+  "email": "maxime.janvier@gmail.com",
+  "explicit_content": {
+    "filter_enabled": false,
+    "filter_locked": false
+  },
+  "external_urls": {
+    "spotify": "https://open.spotify.com/user/lanfeust313"
+  },
+  "followers": {
+    "href": null,
+    "total": 1
+  },
+  "href": "https://api.spotify.com/v1/users/lanfeust313",
+  "id": "lanfeust313",
+  "images": [],
+  "product": "premium",
+  "type": "user",
+  "uri": "spotify:user:lanfeust313"
+}

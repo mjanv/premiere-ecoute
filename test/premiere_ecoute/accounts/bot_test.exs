@@ -2,11 +2,21 @@ defmodule PremiereEcoute.Accounts.BotTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Accounts.Bot
+  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
   alias PremiereEcoute.Core.Cache
 
   setup do
     Cache.clear(:users)
     on_exit(fn -> Cache.clear(:users) end)
+
+    stub(TwitchApi, :renew_token, fn _ ->
+      {:ok,
+       %{
+         access_token: "access_token",
+         refresh_token: "refresh_token",
+         expires_in: 3600
+       }}
+    end)
 
     :ok
   end
@@ -16,7 +26,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
   end
 
   test "Bot is available if premiereecoutebot@twitch.tv user account exists" do
-    %{id: id} = user_fixture(%{email: "premiereecoutebot@twitch.tv"})
+    %{id: id} = user_fixture(%{email: "premiereecoutebot@twitch.tv", twitch_refresh_token: "twitch_refresh_token"})
 
     bot = Bot.get()
 
@@ -24,7 +34,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
   end
 
   test "Bot can be read from cache" do
-    %{id: id} = user_fixture(%{email: "premiereecoutebot@twitch.tv"})
+    %{id: id} = user_fixture(%{email: "premiereecoutebot@twitch.tv", twitch_refresh_token: "twitch_refresh_token"})
 
     bot1 = Bot.get()
     bot2 = Bot.get()

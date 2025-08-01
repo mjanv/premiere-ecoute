@@ -7,177 +7,76 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
 
   require Logger
 
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcoute.Apis.TwitchApi
 
-  def access_token do
-    client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
-    client_secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
-
-    if client_id && client_secret do
-      "https://id.twitch.tv/oauth2/token"
-      |> Req.post(
-        headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
-        body:
-          URI.encode_query(%{
-            client_id: client_id,
-            client_secret: client_secret,
-            grant_type: "client_credentials"
-          })
-      )
-      |> case do
-        {:ok, %{status: 200, body: %{"access_token" => token, "expires_in" => expires_in}}} ->
-          Cache.put(:tokens, :twitch_access_token, token, expire: expires_in * 1_000)
-          {:ok, token}
-
-        {:ok, %{status: status, body: body}} ->
-          Logger.error("Twitch app token failed: #{status} - #{inspect(body)}")
-          {:error, "Twitch app authentication failed"}
-
-        {:error, reason} ->
-          Logger.error("Twitch app token request failed: #{inspect(reason)}")
-          {:error, "Network error during app authentication"}
-      end
-    else
-      {:error, "Twitch credentials not configured"}
-    end
+  def client_credentials do
+    TwitchApi.api(:accounts)
+    |> TwitchApi.post(
+      url: "/token",
+      headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
+      body: %{grant_type: "client_credentials"}
+    )
+    |> TwitchApi.handle(200, fn body -> body end)
   end
 
-  def authorization_url do
-    "https://id.twitch.tv/oauth2/authorize?" <>
-      URI.encode_query(%{
-        response_type: "code",
-        client_id: Application.get_env(:premiere_ecoute, :twitch_client_id),
-        scope:
-          "channel:manage:polls channel:read:polls channel:bot user:read:chat user:write:chat user:bot moderator:manage:announcements",
-        redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri),
-        state: random(16)
-      })
+  def authorization_url(scope \\ nil, state \\ nil) do
+    TwitchApi.url(:accounts)
+    |> URI.parse()
+    |> URI.merge(%URI{
+      path: "/oauth2/authorize",
+      query:
+        URI.encode_query(%{
+          response_type: "code",
+          scope:
+            scope ||
+              "channel:manage:polls channel:read:polls channel:bot user:read:chat user:write:chat user:bot moderator:manage:announcements",
+          client_id: Application.get_env(:premiere_ecoute, :twitch_client_id),
+          redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri),
+          state: state || random(16)
+        })
+    })
+    |> URI.to_string()
   end
 
   def authorization_code(code) when is_binary(code) do
-    client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
-    client_secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
-    redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
-
-    if client_id && client_secret do
-      "https://id.twitch.tv/oauth2/token"
-      |> Req.post(
-        headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
-        body:
-          URI.encode_query(%{
-            client_id: client_id,
-            client_secret: client_secret,
-            code: code,
-            grant_type: "authorization_code",
-            redirect_uri: redirect_uri
-          })
-      )
-      |> case do
-        {:ok,
-         %{
-           status: 200,
-           body: %{
-             "access_token" => token,
-             "refresh_token" => refresh_token,
-             "expires_in" => expires_in
-           }
-         }} ->
-          case get_user_info(token) do
-            {:ok, user_info} ->
-              {:ok,
-               %{
-                 user_id: user_info["id"],
-                 access_token: token,
-                 refresh_token: refresh_token,
-                 expires_in: expires_in,
-                 username: user_info["login"],
-                 display_name: user_info["display_name"],
-                 broadcaster_type: user_info["broadcaster_type"]
-               }}
-
-            {:error, reason} ->
-              {:error, reason}
-          end
-
-        {:ok, %{status: status, body: body}} ->
-          Logger.error("Twitch OAuth failed: #{status} - #{inspect(body)}")
-          {:error, "Twitch authentication failed"}
-
-        {:error, reason} ->
-          Logger.error("Twitch OAuth request failed: #{inspect(reason)}")
-          {:error, "Network error during authentication"}
-      end
-    else
-      {:error, "Twitch credentials not configured"}
-    end
-  end
-
-  defp get_user_info(access_token) do
-    "https://api.twitch.tv/helix/users"
-    |> Req.get(
-      headers: [
-        {"Authorization", "Bearer #{access_token}"},
-        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)}
-      ]
+    TwitchApi.api(:accounts)
+    |> TwitchApi.post(
+      url: "/token",
+      headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
+      body: %{
+        code: code,
+        grant_type: "authorization_code",
+        redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
+      }
     )
-    |> case do
-      {:ok, %{status: 200, body: %{"data" => [user | _]}}} ->
-        {:ok, user}
+    |> TwitchApi.handle(200, fn %{"access_token" => token, "refresh_token" => refresh_token, "expires_in" => expires_in} ->
+      {:ok, user} = TwitchApi.get_user(token)
 
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Twitch user info failed: #{status} - #{inspect(body)}")
-        {:error, "Failed to get user info"}
-
-      {:error, reason} ->
-        Logger.error("Twitch user info request failed: #{inspect(reason)}")
-        {:error, "Network error getting user info"}
-    end
+      %{
+        user_id: user["id"],
+        access_token: token,
+        refresh_token: refresh_token,
+        expires_in: expires_in,
+        username: user["login"],
+        display_name: user["display_name"],
+        broadcaster_type: user["broadcaster_type"]
+      }
+    end)
   end
 
   def renew_token(refresh_token) do
-    client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
-    client_secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
-
-    if client_id && client_secret && refresh_token do
-      "https://id.twitch.tv/oauth2/token"
-      |> Req.post(
-        headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
-        body:
-          URI.encode_query(%{
-            client_id: client_id,
-            client_secret: client_secret,
-            grant_type: "refresh_token",
-            refresh_token: refresh_token
-          })
-      )
-      |> case do
-        {:ok,
-         %{
-           status: 200,
-           body:
-             %{
-               "access_token" => access_token,
-               "refresh_token" => new_refresh_token
-             } = body
-         }} ->
-          {:ok,
-           %{
-             access_token: access_token,
-             refresh_token: new_refresh_token,
-             expires_in: body["expires_in"]
-           }}
-
-        {:ok, %{status: status, body: body}} ->
-          Logger.error("Twitch token refresh failed: #{status} - #{inspect(body)}")
-          {:error, "Twitch token refresh failed: #{status} - #{inspect(body)}"}
-
-        {:error, reason} ->
-          Logger.error("Twitch token refresh request failed: #{inspect(reason)}")
-          {:error, "Network error during token refresh"}
-      end
-    else
-      {:error, "Missing Twitch credentials or refresh token"}
-    end
+    TwitchApi.api(:accounts)
+    |> TwitchApi.post(
+      url: "/token",
+      body: %{grant_type: "refresh_token", refresh_token: refresh_token}
+    )
+    |> TwitchApi.handle(200, fn %{"access_token" => access_token, "refresh_token" => refresh_token} = body ->
+      %{
+        access_token: access_token,
+        refresh_token: refresh_token,
+        expires_in: body["expires_in"]
+      }
+    end)
   end
 
   defp random(length) do

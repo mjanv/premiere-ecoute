@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
   alias PremiereEcoute.Sessions.Discography.Playlist.Track
 
   setup_all do
-    Cache.put(:tokens, :spotify_access_token, "token")
+    Cache.put(:tokens, :spotify, "token")
 
     :ok
   end

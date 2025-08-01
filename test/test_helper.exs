@@ -1,11 +1,5 @@
-mocks = [
-  twitch_api: PremiereEcoute.Apis.TwitchApi,
-  spotify_api: PremiereEcoute.Apis.SpotifyApi
-]
-
-for {key, module} <- mocks do
-  Mox.defmock(Module.concat([module, Mock]), for: Module.concat([module, Behavior]))
-  Application.put_env(:premiere_ecoute, key, Module.concat([module, Mock]))
+for api <- [PremiereEcoute.Apis.TwitchApi, PremiereEcoute.Apis.SpotifyApi] do
+  Mox.defmock(Module.concat([api, Mock]), for: Module.concat([api, Behavior]))
 end
 
 ExUnit.start(capture_log: true, exclude: [:api, :wip])

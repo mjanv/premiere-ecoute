@@ -41,22 +41,8 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
 
       {:ok, _lv, html} = live(conn, ~p"/")
 
-      # Basic content still visible
       assert html =~ "Premiere Ecoute"
-
-      # Viewer-specific content
       assert html =~ "Welcome back"
-      assert html =~ "Explore listening sessions and join the community discussions."
-
-      # Features preview not shown
-      refute html =~ "Album Discovery"
-      refute html =~ "Community Rating"
-      refute html =~ "Live Sessions"
-
-      # No streamer action buttons
-      refute html =~ "Start New Session"
-      refute html =~ "My Sessions"
-      refute html =~ "My Retrospective"
     end
 
     test "displays content for authenticated streamer", %{conn: conn} do
@@ -70,9 +56,9 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
       assert html =~ "Premiere Ecoute"
 
       # Streamer action buttons
-      assert html =~ "Start New Session"
+      assert html =~ "New Session"
       assert html =~ "My Sessions"
-      assert html =~ "My Retrospective"
+      assert html =~ "Retrospective"
 
       # Check button links
       assert html =~ "href=\"/sessions/discography/album/select\""

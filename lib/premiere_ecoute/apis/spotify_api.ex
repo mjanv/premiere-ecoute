@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   Enables searching Spotify's music catalog for albums, tracks, and artists. Returns structured results that can be used for music discovery and selection within listening sessions.
   """
 
-  require Logger
+  use PremiereEcoute.Core.Api, api: :spotify
 
   alias PremiereEcoute.Core.Cache
   alias PremiereEcoute.Telemetry
@@ -60,64 +60,45 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
     # Search
     @callback search_albums(query :: String.t()) :: {:ok, [Album.t()]} | {:error, term()}
+
+    # Users
+    @callback get_user_profile(scope :: Scope.t()) :: {:ok, map()} | {:error, term()}
   end
 
-  @behaviour __MODULE__.Behavior
-  @app :premiere_ecoute
-  @web "https://api.spotify.com/v1"
-  @accounts "https://accounts.spotify.com/api"
-
-  def impl, do: Application.get_env(@app, :spotify_api, __MODULE__)
-
-  @spec api(:web | :accounts, String.t() | nil) :: Req.Request.t()
+  @spec api(:api | :accounts, String.t() | nil) :: Req.Request.t()
   def api(type, token \\ nil)
 
-  def api(:web, token) do
-    token =
-      with {:ok, nil} <- {:ok, token},
-           {:ok, nil} <- Cache.get(:tokens, :spotify_access_token),
-           {:ok, token} <- PremiereEcoute.Apis.SpotifyApi.Accounts.client_credentials() do
-        token
-      else
-        {:ok, token} ->
-          token
-
-        {:error, reason} ->
-          Logger.error("Cannot retrieve Spotify app access token due to #{inspect(reason)}")
-          ""
-      end
-
+  def api(:api, token) do
     [
-      base_url: @web,
-      headers: [{"Authorization", "Bearer #{token}"}]
+      base_url: url(:api),
+      headers: [
+        {"Authorization", "Bearer #{token(token)}"}
+      ]
     ]
-    |> Keyword.merge(Application.get_env(@app, :spotify_req_options, []))
+    |> Keyword.merge(env(:spotify)[:req_options] || [])
     |> Req.new()
     |> Telemetry.ReqPipeline.attach(&SpotifyApiMetrics.api_called/1)
   end
 
   def api(:accounts, _) do
-    with id when not is_nil(id) <- Application.get_env(@app, :spotify_client_id),
-         secret when not is_nil(secret) <- Application.get_env(@app, :spotify_client_secret) do
-      Req.new(
-        [
-          base_url: @accounts,
-          headers: [
-            {"Authorization", "Basic #{Base.encode64("#{id}:#{secret}")}"},
-            {"Content-Type", "application/x-www-form-urlencoded"}
-          ]
-        ]
-        |> Keyword.merge(Application.get_env(@app, :spotify_req_options, []))
-      )
-    else
-      _ -> Req.new(base_url: @accounts)
-    end
+    id = Application.get_env(:premiere_ecoute, :spotify_client_id)
+    secret = Application.get_env(:premiere_ecoute, :spotify_client_secret)
+
+    [
+      base_url: url(:accounts),
+      headers: [
+        {"Authorization", "Basic #{Base.encode64("#{id}:#{secret}")}"},
+        {"Content-Type", "application/x-www-form-urlencoded"}
+      ]
+    ]
+    |> Keyword.merge(env(:spotify)[:req_options] || [])
+    |> Req.new()
+    |> Telemetry.ReqPipeline.attach(&SpotifyApiMetrics.api_called/1)
   end
 
   # Accounts
   defdelegate client_credentials, to: __MODULE__.Accounts
-  defdelegate authorization_url, to: __MODULE__.Accounts
-  defdelegate authorization_url(state), to: __MODULE__.Accounts
+  defdelegate authorization_url(scope \\ nil, state \\ nil), to: __MODULE__.Accounts
   defdelegate authorization_code(code, state), to: __MODULE__.Accounts
   defdelegate renew_token(refresh_token), to: __MODULE__.Accounts
 
@@ -141,4 +122,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   # Search
   defdelegate search_albums(query), to: __MODULE__.Search
+
+  # Users
+  defdelegate get_user_profile(scope), to: __MODULE__.Users
 end

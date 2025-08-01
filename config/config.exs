@@ -28,6 +28,22 @@ config :premiere_ecoute, PremiereEcoute.Accounts,
   admins: ["lanfeust313"],
   bots: ["premiereecoutebot"]
 
+config :premiere_ecoute, PremiereEcoute.Apis,
+  twitch: [
+    api: PremiereEcoute.Apis.TwitchApi,
+    urls: [
+      api: "https://api.twitch.tv/helix",
+      accounts: "https://id.twitch.tv/oauth2"
+    ]
+  ],
+  spotify: [
+    api: PremiereEcoute.Apis.SpotifyApi,
+    urls: [
+      api: "https://api.spotify.com/v1",
+      accounts: "https://accounts.spotify.com/api"
+    ]
+  ]
+
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,

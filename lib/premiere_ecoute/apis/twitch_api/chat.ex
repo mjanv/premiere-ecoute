@@ -1,8 +1,6 @@
 defmodule PremiereEcoute.Apis.TwitchApi.Chat do
   @moduledoc false
 
-  require Logger
-
   alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
@@ -10,8 +8,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
   def send_chat_message(%Scope{user: %{twitch_user_id: user_id}}, message) do
     bot = Bot.get()
 
-    TwitchApi.api(:helix, bot.twitch_access_token)
-    |> Req.post(
+    TwitchApi.api(:api, bot.twitch_access_token)
+    |> TwitchApi.post(
       url: "/chat/messages",
       json: %{
         broadcaster_id: user_id,
@@ -19,18 +17,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
         message: message
       }
     )
-    |> case do
-      {:ok, %{status: 200, body: %{"data" => [message]}}} ->
-        {:ok, message}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Twitch chat message send failed: #{status} - #{inspect(body)}")
-        {:error, "Failed to send chat message"}
-
-      {:error, reason} ->
-        Logger.error("Twitch chat message request failed: #{inspect(reason)}")
-        {:error, "Network error sending chat message"}
-    end
+    |> TwitchApi.handle(200, fn %{"data" => [message]} -> message end)
   end
 
   def send_chat_announcement(
@@ -40,29 +27,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
       ) do
     bot = Bot.get()
 
-    TwitchApi.api(:helix, token)
-    |> Req.post(
+    TwitchApi.api(:api, token)
+    |> TwitchApi.post(
       url: "/chat/announcements",
-      params: %{
-        broadcaster_id: user_id,
-        moderator_id: bot.twitch_user_id
-      },
-      json: %{
-        message: message,
-        color: color
-      }
+      params: %{broadcaster_id: user_id, moderator_id: bot.twitch_user_id},
+      json: %{message: message, color: color}
     )
-    |> case do
-      {:ok, %{status: 204}} ->
-        {:ok, message}
-
-      {:ok, %{status: status, body: body}} ->
-        Logger.error("Twitch chat announcement send failed: #{status} - #{inspect(body)}")
-        {:error, "Failed to send chat announcement"}
-
-      {:error, reason} ->
-        Logger.error("Twitch chat announcement request failed: #{inspect(reason)}")
-        {:error, "Network error sending chat announcement"}
-    end
+    |> TwitchApi.handle(204, fn _ -> message end)
   end
 end

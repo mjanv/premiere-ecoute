@@ -4,7 +4,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
 
   Provides "Mes activités" section with:
   - Nouvelle session
-  - Mes sessions  
+  - Mes sessions
   - Rétrospective
 
   And "Followed channels" section with list of followed streamers.
@@ -176,7 +176,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
   attr :class, :string, default: ""
   slot :inner_block, required: true
 
-  defp sidebar_link(assigns) do
+  def sidebar_link(assigns) do
     ~H"""
     <.link
       href={@href}
@@ -196,9 +196,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
     """
   end
 
-  @doc """
-  Renders a followed channel link with avatar.
-  """
   attr :channel, :map, required: true
 
   defp sidebar_channel_link(assigns) do

@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Accounts.Bot do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Core.Cache
 
   @bot "premiereecoutebot@twitch.tv"
@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Accounts.Bot do
   end
 
   def renew_twitch_token(user) do
-    with {:ok, tokens} <- TwitchApi.renew_token(user.twitch_refresh_token),
+    with {:ok, tokens} <- Apis.twitch().renew_token(user.twitch_refresh_token),
          {:ok, user} <- User.update_twitch_tokens(user, tokens) do
       {:ok, user}
     else

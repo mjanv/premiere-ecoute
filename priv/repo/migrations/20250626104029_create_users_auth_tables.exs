@@ -18,6 +18,8 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersAuthTables do
       add :twitch_expires_at, :utc_datetime
       add :twitch_username, :string
 
+      add :profile, :map, null: false, default: %{}
+
       timestamps(type: :utc_datetime)
     end
 
@@ -26,6 +28,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersAuthTables do
            )
 
     create unique_index(:users, [:email])
+    execute("CREATE INDEX users_profile ON users USING GIN(profile)")
 
     create table(:users_tokens) do
       add :user_id, references(:users, on_delete: :delete_all), null: false

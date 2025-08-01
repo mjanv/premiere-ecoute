@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Core.Cache
 
   setup do
     scope =
@@ -12,6 +13,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
           twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
         })
       )
+
+    Cache.put(:tokens, :twitch, "token")
 
     {:ok, %{scope: scope}}
   end
@@ -95,7 +98,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
       {:error, reason} = TwitchApi.subscribe(scope, "channel.follow")
 
-      assert reason == "Failed to subscribe to channel.follow"
+      assert reason == "Twitch API error: 409"
     end
   end
 

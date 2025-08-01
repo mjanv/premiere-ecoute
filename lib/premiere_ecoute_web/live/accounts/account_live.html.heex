@@ -1,334 +1,353 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
   <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);" phx-hook="FileDownload" id="account-page">
     <!-- Main Content -->
-    <div class="max-w-4xl mx-auto px-6 py-8">
-      <!-- AIDEV-NOTE: Redesigned account page layout matching provided wireframe -->
-      <!-- Account Title -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-white mb-2">{gettext("Account")}</h1>
-        <p class="text-gray-400">
-          {gettext("Manage your account, connections, and preferences")}
-        </p>
-      </div>
-
-      <div class="space-y-8">
-        
-<!-- Details Section -->
-        <div class="rounded-xl p-6" style="background-color: var(--color-dark-900);">
-          <div class="flex items-center space-x-3 mb-6">
-            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-white">{gettext("Details")}</h2>
+    <div class="max-w-6xl mx-auto px-6 py-8">
+      <!-- Enhanced Header with Profile Section -->
+      <div class="mb-10">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <h1 class="text-4xl font-bold text-white mb-3 tracking-tight">{gettext("Account Settings")}</h1>
+            <p class="text-gray-400 text-lg">
+              {gettext("Manage your profile, connections, and privacy settings")}
+            </p>
           </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Account Info -->
-            <div class="space-y-4">
-              <div class="bg-white/5 rounded-lg p-4">
-                <div class="flex items-center space-x-3 mb-3">
-                  <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-medium text-white">{gettext("Account ID")}</p>
-                    <p class="text-sm text-gray-400">
-                      <%= if @current_user do %>
-                        #{@current_user.id}
-                      <% else %>
-                        {gettext("N/A")}
-                      <% end %>
-                    </p>
-                  </div>
-                </div>
+          <!-- Profile Avatar Section -->
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                <%= if @current_user && @current_user.twitch_username do %>
+                  {String.first(@current_user.twitch_username) |> String.upcase()}
+                <% else %>
+                  {String.first(@current_user.email || "U") |> String.upcase()}
+                <% end %>
               </div>
+              <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
+                <div class="w-2 h-2 bg-white rounded-full"></div>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-white font-semibold text-lg">
+                <%= if @current_user && @current_user.twitch_username do %>
+                  {@current_user.twitch_username}
+                <% else %>
+                  {String.replace(@current_user.email || "User", "@twitch.tv", "")}
+                <% end %>
+              </p>
+              <p class="text-gray-400 text-sm">
+                {gettext("Member since")} {Calendar.strftime(@current_user.inserted_at, "%B %Y")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+<!-- Profile Section -->
+      <div class="mt-12">
+        <div class="flex items-center space-x-3 mb-8">
+          <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold text-white">{gettext("Profile")}</h2>
+            <p class="text-gray-400">{gettext("Your account information and preferences")}</p>
+          </div>
+        </div>
 
-              <div class="bg-white/5 rounded-lg p-4">
-                <div class="flex items-center space-x-3 mb-3">
-                  <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-medium text-white">{gettext("Role")}</p>
-                    <div class="mt-1">
-                      <%= if @current_user do %>
-                        <span class={[
-                          "inline-flex px-2 py-1 text-xs font-semibold rounded-full",
-                          case @current_user.role do
-                            :admin -> "bg-purple-100 text-purple-800"
-                            :streamer -> "bg-blue-100 text-blue-800"
-                            :viewer -> "bg-gray-100 text-gray-800"
-                            :bot -> "bg-red-100 text-red-800"
-                          end
-                        ]}>
-                          {String.capitalize(to_string(@current_user.role))}
-                        </span>
-                      <% else %>
-                        <p class="text-sm text-gray-400">{gettext("N/A")}</p>
-                      <% end %>
-                    </div>
-                  </div>
-                </div>
+        <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700/30">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Email")}</label>
+              <div class="px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700">
+                <p class="text-white">{@current_user.email || gettext("Not set")}</p>
               </div>
             </div>
             
-<!-- Statistics -->
-            <div class="space-y-4">
-              <div class="bg-white/5 rounded-lg p-4">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <span class="text-gray-300">{gettext("Sessions Created")}</span>
-                  </div>
-                  <span class="text-2xl font-bold text-white">
-                    0
-                  </span>
-                </div>
+<!-- Member Since -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Member Since")}</label>
+              <div class="px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700">
+                <p class="text-white">{Calendar.strftime(@current_user.inserted_at, "%B %d, %Y")}</p>
               </div>
             </div>
-          </div>
-        </div>
-        
-<!-- Twitch Section -->
-        <div class="rounded-xl p-6" style="background-color: var(--color-dark-900);">
-          <div class="flex items-center space-x-3 mb-6">
-            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-white">{gettext("Twitch")}</h2>
-          </div>
-
-          <%= if @current_user && @current_user.twitch_access_token do %>
-            <!-- AIDEV-NOTE: Twitch connected state -->
-            <div class="bg-purple-600/20 rounded-lg p-4 border border-purple-600/30">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                  </svg>
-                </div>
-                <div>
-                  <p class="font-medium text-white">
-                    <%= if @current_user.twitch_username do %>
-                      {@current_user.twitch_username}
-                    <% else %>
-                      {String.replace(@current_user.email, "@twitch.tv", "")}
-                    <% end %>
-                  </p>
-                  <p class="text-sm text-purple-300">
-                    @<%= if @current_user.twitch_username do %>
-                      {@current_user.twitch_username}
-                    <% else %>
-                      {String.replace(@current_user.email, "@twitch.tv", "")}
-                    <% end %>
-                  </p>
-                </div>
-              </div>
-              <div class="mt-3 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span class="text-sm text-green-400">{gettext("Connected")}</span>
-                  <%= if @current_user.twitch_expires_at do %>
-                    <span class="text-xs text-purple-300">
-                      • Expires: {Calendar.strftime(
-                        @current_user.twitch_expires_at,
-                        "%m/%d %H:%M"
-                      )}
-                    </span>
+            
+<!-- Twitch Username -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Twitch Username")}</label>
+              <div class="px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700">
+                <p class="text-white">
+                  <%= if @current_user && @current_user.twitch_username do %>
+                    {@current_user.twitch_username}
+                  <% else %>
+                    <span class="text-gray-400">{gettext("Not connected")}</span>
                   <% end %>
-                </div>
-                <button
-                  phx-click="disconnect_twitch"
-                  class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
-                >
-                  {gettext("Disconnect")}
-                </button>
-              </div>
-            </div>
-          <% else %>
-            <div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-              <div class="text-center">
-                <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                  </svg>
-                </div>
-                <p class="text-gray-400 text-sm">{gettext("Not connected")}</p>
-                <button phx-click="connect_twitch" class="mt-2 text-purple-400 hover:text-purple-300 text-sm font-medium">
-                  {gettext("Connect Twitch")}
-                </button>
-              </div>
-            </div>
-          <% end %>
-        </div>
-        
-<!-- Spotify Section -->
-        <div class="rounded-xl p-6" style="background-color: var(--color-dark-900);">
-          <div class="flex items-center space-x-3 mb-6">
-            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-white">{gettext("Spotify")}</h2>
-          </div>
-
-          <%= if @current_user && @current_user.spotify_access_token do %>
-            <!-- AIDEV-NOTE: Spotify connected state -->
-            <div class="bg-green-600/20 rounded-lg p-4 border border-green-600/30">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-                  </svg>
-                </div>
-                <div>
-                  <p class="font-medium text-white">{gettext("Spotify Connected")}</p>
-                  <p class="text-sm text-green-300">
-                    {gettext("Ready for music playback control")}
-                  </p>
-                </div>
-              </div>
-              <div class="mt-3 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span class="text-sm text-green-400">{gettext("Connected")}</span>
-                  <%= if @current_user.spotify_expires_at do %>
-                    <span class="text-xs text-green-300">
-                      • Expires: {Calendar.strftime(
-                        @current_user.spotify_expires_at,
-                        "%m/%d %H:%M"
-                      )}
-                    </span>
-                  <% end %>
-                </div>
-                <button
-                  phx-click="disconnect_spotify"
-                  class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
-                >
-                  {gettext("Disconnect")}
-                </button>
-              </div>
-            </div>
-          <% else %>
-            <!-- AIDEV-NOTE: Spotify not connected state -->
-            <div class="min-h-[200px] flex items-center justify-center">
-              <div class="text-center">
-                <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-                  </svg>
-                </div>
-                <button
-                  phx-click="connect_spotify"
-                  class="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg font-medium transition-colors text-lg inline-flex items-center space-x-2"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-                  </svg>
-                  <span>{gettext("Connect with Spotify")}</span>
-                </button>
-                <p class="text-gray-400 text-sm mt-2">
-                  {gettext("Connect your Spotify account to search and play music")}
                 </p>
               </div>
             </div>
-          <% end %>
-        </div>
-        
-<!-- Actions Section -->
-        <div class="rounded-xl p-6" style="background-color: var(--color-dark-900);">
-          <div class="flex items-center space-x-3 mb-6">
-            <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd" />
-                <path
-                  fill-rule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+            
+<!-- Last Activity -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Last Activity")}</label>
+              <div class="px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700">
+                <p class="text-white">
+                  <%= if @current_user && @current_user.updated_at do %>
+                    {Calendar.strftime(@current_user.updated_at, "%B %d, %Y at %I:%M %p")}
+                  <% else %>
+                    <span class="text-gray-400">{gettext("Unknown")}</span>
+                  <% end %>
+                </p>
+              </div>
             </div>
-            <h2 class="text-xl font-bold text-white">{gettext("Actions")}</h2>
           </div>
+        </div>
+      </div>
+      
+<!-- APIs Section -->
+      <div class="mt-12">
+        <div class="flex items-center space-x-3 mb-8">
+          <div class="w-12 h-12 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold text-white">{gettext("Associated accounts")}</h2>
+            <p class="text-gray-400">{gettext("Connect your streaming and music service accounts")}</p>
+          </div>
+        </div>
 
-          <div class="space-y-4">
-            <!-- AIDEV-NOTE: GDPR data download action -->
-            <div class="bg-blue-600/10 border border-blue-600/30 rounded-lg p-4">
-              <div class="flex items-start space-x-4">
-                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                      clip-rule="evenodd"
-                    />
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Twitch API Status -->
+          <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700/30">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
                   </svg>
                 </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-semibold text-blue-400 mb-2">
-                    {gettext("Download Your Data")}
-                  </h3>
-                  <p class="text-gray-300 text-sm mb-4">
-                    {gettext("Download a copy of all your personal data in JSON format for GDPR compliance.")}
-                  </p>
-                  <button
-                    phx-click="show_download_modal"
-                    class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
-                  >
-                    {gettext("Download Data")}
-                  </button>
+                <div>
+                  <h3 class="text-xl font-semibold text-white">{gettext("Twitch")}</h3>
+                  <div class="space-y-1 text-sm">
+                    <%= if @current_user && @current_user.twitch_access_token do %>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span class="text-green-400">{gettext("Token Active")}</span>
+                      </div>
+                      <%= if @current_user.twitch_expires_at do %>
+                        <p class="text-gray-300">
+                          {gettext("Expires")}: {Calendar.strftime(@current_user.twitch_expires_at, "%B %d, %Y at %I:%M:%S %p")}
+                        </p>
+                      <% end %>
+                    <% else %>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <span class="text-gray-400">{gettext("Not connected")}</span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <%= if @current_user && @current_user.twitch_access_token do %>
+                <button
+                  phx-click="disconnect_twitch"
+                  class="px-3 py-2 text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
+                >
+                  {gettext("Disconnect")}
+                </button>
+              <% else %>
+                <button
+                  phx-click="connect_twitch"
+                  class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium transition-colors"
+                >
+                  {gettext("Connect")}
+                </button>
+              <% end %>
+            </div>
+          </div>
+          
+<!-- Spotify API Status -->
+          <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700/30">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-xl font-semibold text-white">{gettext("Spotify")}</h3>
+                  <div class="space-y-1 text-sm">
+                    <%= if @current_user && @current_user.spotify_access_token do %>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span class="text-green-400">{gettext("Token Active")}</span>
+                      </div>
+                      <%= if @current_user.spotify_expires_at do %>
+                        <p class="text-gray-300">
+                          {gettext("Expires")}: {Calendar.strftime(@current_user.spotify_expires_at, "%B %d, %Y at %I:%M:%S %p")}
+                        </p>
+                      <% end %>
+                    <% else %>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <span class="text-gray-400">{gettext("Not connected")}</span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <%= if @current_user && @current_user.spotify_access_token do %>
+                <button
+                  phx-click="disconnect_spotify"
+                  class="px-3 py-2 text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
+                >
+                  {gettext("Disconnect")}
+                </button>
+              <% else %>
+                <button
+                  phx-click="connect_spotify"
+                  class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors"
+                >
+                  {gettext("Connect")}
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+<!-- Privacy & Data Management Section -->
+      <div class="mt-12">
+        <div class="flex items-center space-x-3 mb-8">
+          <div class="w-12 h-12 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold text-white">{gettext("Privacy & Data")}</h2>
+            <p class="text-gray-400">{gettext("Manage your personal information and account")}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Data Download Card -->
+          <div class="rounded-2xl p-8 bg-gradient-to-br from-blue-900/20 to-blue-800/10 backdrop-blur-sm border border-blue-600/20 hover:border-blue-500/30 transition-all duration-300">
+            <div class="flex items-center space-x-4 mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-1">{gettext("Export Your Data")}</h3>
+                <p class="text-blue-200 text-sm">{gettext("GDPR Compliance")}</p>
+              </div>
+            </div>
+
+            <p class="text-gray-300 text-sm mb-6 leading-relaxed">
+              {gettext(
+                "Download a comprehensive archive of all your personal data including profile information, session history, votes, and account activity."
+              )}
+            </p>
+
+            <div class="bg-blue-800/20 rounded-lg p-4 mb-6">
+              <p class="text-blue-300 text-xs font-medium mb-2">{gettext("Export includes:")}</p>
+              <div class="space-y-1 text-xs text-blue-200">
+                <div class="flex items-center space-x-2">
+                  <div class="w-1 h-1 bg-blue-400 rounded-full"></div>
+                  <span>{gettext("Account details and preferences")}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div class="w-1 h-1 bg-blue-400 rounded-full"></div>
+                  <span>{gettext("Listening session history")}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div class="w-1 h-1 bg-blue-400 rounded-full"></div>
+                  <span>{gettext("Voting patterns and follows")}</span>
                 </div>
               </div>
             </div>
 
-            <div class="bg-red-600/10 border border-red-600/30 rounded-lg p-4">
-              <div class="flex items-start space-x-4">
-                <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-semibold text-red-400 mb-2">
-                    {gettext("Delete Account")}
-                  </h3>
-                  <p class="text-gray-300 text-sm mb-4">
-                    {gettext("Permanently delete your account and all associated data. This action cannot be undone.")}
-                  </p>
-                  <button
-                    phx-click="show_delete_modal"
-                    class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
-                  >
-                    {gettext("Delete Account")}
-                  </button>
+            <button
+              phx-click="show_download_modal"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
+            >
+              {gettext("Download My Data")}
+            </button>
+          </div>
+          
+<!-- Account Deletion Card -->
+          <div class="rounded-2xl p-8 bg-gradient-to-br from-red-900/20 to-red-800/10 backdrop-blur-sm border border-red-600/20 hover:border-red-500/30 transition-all duration-300">
+            <div class="flex items-center space-x-4 mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-1">{gettext("Delete Account")}</h3>
+                <p class="text-red-200 text-sm">{gettext("Permanent & Irreversible")}</p>
+              </div>
+            </div>
+
+            <p class="text-gray-300 text-sm mb-6 leading-relaxed">
+              {gettext("Permanently remove your account and all associated data from our servers. This action cannot be undone.")}
+            </p>
+
+            <div class="bg-red-800/20 rounded-lg p-4 mb-6 border border-red-700/30">
+              <div class="flex items-start space-x-3">
+                <svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <div>
+                  <p class="text-red-300 text-xs font-medium mb-1">{gettext("This will permanently delete:")}</p>
+                  <div class="space-y-1 text-xs text-red-200">
+                    <div>• {gettext("Your profile and authentication")}</div>
+                    <div>• {gettext("All listening sessions you created")}</div>
+                    <div>• {gettext("Your votes, follows, and activity")}</div>
+                    <div>• {gettext("Connected service accounts")}</div>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <button
+              phx-click="show_delete_modal"
+              class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-red-500/25 border border-red-500/20 hover:border-red-400/30"
+            >
+              {gettext("Delete My Account")}
+            </button>
           </div>
         </div>
       </div>
     </div>
+    <!-- End Main Content Container -->
     
 <!-- AIDEV-NOTE: GDPR data download modal -->
     <%= if @show_download_modal do %>
@@ -436,4 +455,5 @@
       </div>
     <% end %>
   </div>
+  <!-- End min-h-screen container -->
 </Layouts.app>

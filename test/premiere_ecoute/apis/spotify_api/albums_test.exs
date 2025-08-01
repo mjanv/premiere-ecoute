@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
   alias PremiereEcoute.Sessions.Discography.Album.Track
 
   setup_all do
-    Cache.put(:tokens, :spotify_access_token, "token")
+    Cache.put(:tokens, :spotify, "token")
 
     :ok
   end
@@ -137,7 +137,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
       assert reason == "Spotify API error: 404"
 
       assert logs =~
-               "[error] Spotify album fetch failed: 404 - %{\"error\" => %{\"message\" => \"Resource not found\", \"status\" => 404}}"
+               "[error] Spotify API returned unexpected status: 404 - %{\"error\" => %{\"message\" => \"Resource not found\", \"status\" => 404}}"
     end
   end
 end

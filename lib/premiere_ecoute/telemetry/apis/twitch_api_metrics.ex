@@ -3,8 +3,8 @@ defmodule PremiereEcoute.Telemetry.Apis.TwitchApiMetrics do
 
   use PromEx.Plugin
 
-  @api_event [:premiere_ecoute, :apis, :twitch_api, :api_called]
-  @webhook_event [:premiere_ecoute, :apis, :twitch_api, :webhook_received]
+  @api_event [:premiere_ecoute, :apis, :twitch, :api_called]
+  @webhook_event [:premiere_ecoute, :apis, :twitch, :webhook_received]
 
   def api_called({%Req.Request{} = request, %Req.Response{} = response}) do
     :telemetry.execute(@api_event, %{}, %{
@@ -22,7 +22,7 @@ defmodule PremiereEcoute.Telemetry.Apis.TwitchApiMetrics do
   def event_metrics(_opts) do
     [
       Event.build(
-        :premiere_ecoute_apis_twitch_api_api_calls,
+        :premiere_ecoute_apis_twitch_calls,
         [
           counter(
             @api_event ++ [:count],
@@ -33,7 +33,7 @@ defmodule PremiereEcoute.Telemetry.Apis.TwitchApiMetrics do
         ]
       ),
       Event.build(
-        :premiere_ecoute_apis_twitch_api_webhooks,
+        :premiere_ecoute_apis_twitch_webhooks,
         [
           counter(
             @webhook_event ++ [:count],

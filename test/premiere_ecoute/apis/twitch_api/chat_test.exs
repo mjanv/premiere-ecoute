@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Core.Cache
 
   setup do
     scope =
@@ -13,7 +14,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
         })
       )
 
-    %{id: _} = user_fixture(%{email: "premiereecoutebot@twitch.tv", twitch_user_id: "467189141"})
+    Cache.put(:users, :bot, %{twitch_user_id: "467189141", twitch_access_token: "token"})
 
     {:ok, %{scope: scope}}
   end
