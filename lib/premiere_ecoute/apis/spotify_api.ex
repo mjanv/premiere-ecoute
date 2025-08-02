@@ -27,9 +27,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   alias PremiereEcoute.Telemetry
   alias PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics
 
-  defmodule Behavior do
+  defmodule Behaviour do
     @moduledoc """
-    Spotify API Behavior
+    Spotify API Behaviour
     """
 
     alias PremiereEcoute.Accounts.Scope

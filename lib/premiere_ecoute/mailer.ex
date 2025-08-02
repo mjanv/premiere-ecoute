@@ -5,6 +5,16 @@ defmodule PremiereEcoute.Mailer do
 
   use Swoosh.Mailer, otp_app: :premiere_ecoute
 
+  defmodule Behaviour do
+    @moduledoc false
+
+    @callback dispatch(map()) :: any()
+  end
+
+  @behaviour __MODULE__.Behaviour
+
+  def impl, do: Application.get_env(:premiere_ecoute, :mailer, __MODULE__)
+
   def dispatch(event) do
     deliver(Email.from_event(event))
   end

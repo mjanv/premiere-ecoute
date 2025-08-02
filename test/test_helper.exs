@@ -1,5 +1,7 @@
-for api <- [PremiereEcoute.Apis.TwitchApi, PremiereEcoute.Apis.SpotifyApi] do
-  Mox.defmock(Module.concat([api, Mock]), for: Module.concat([api, Behavior]))
+apis = [PremiereEcoute.Apis.TwitchApi, PremiereEcoute.Apis.SpotifyApi, PremiereEcoute.Mailer]
+
+for api <- apis do
+  Mox.defmock(Module.concat([api, Mock]), for: Module.concat([api, Behaviour]))
 end
 
 ExUnit.start(capture_log: true, exclude: [:api, :wip])

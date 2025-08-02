@@ -27,8 +27,8 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   alias PremiereEcoute.Telemetry
   alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
 
-  defmodule Behavior do
-    @moduledoc "Twitch API Behavior"
+  defmodule Behaviour do
+    @moduledoc "Twitch API Behaviour"
 
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Accounts.User

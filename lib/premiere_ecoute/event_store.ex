@@ -68,4 +68,9 @@ defmodule PremiereEcoute.EventStore do
   end
 
   def error(pattern, _stream, _g), do: pattern
+
+  def any(data, stream, h) do
+    append(h.(data), stream: stream)
+    data
+  end
 end

@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
   alias PremiereEcoute.Events.AccountDeleted
+  alias PremiereEcoute.Events.PersonalDataRequested
   alias PremiereEcoute.EventStore
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
@@ -17,29 +18,32 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
 
   @spec download_associated_data(Scope.t()) :: {:ok, binary()} | {:error, term()}
   def download_associated_data(scope) do
-    user = User.preload(scope.user)
-    votes = Vote.all(where: [viewer_id: user.twitch_user_id])
-    events = EventStore.read("user-#{scope.user.id}", :raw)
+    try do
+      user = User.preload(scope.user)
+      votes = Vote.all(where: [viewer_id: user.twitch_user_id])
+      events = EventStore.read("user-#{scope.user.id}", :raw)
 
-    %{
-      metadata: %{
-        generated_at: DateTime.utc_now(),
-        host: System.get_env("PHX_HOST", "localhost"),
-        version: to_string(Application.spec(:premiere_ecoute)[:vsn])
-      },
-      data: %{profile: scope.user, activity: %{follows: user.channels, votes: votes}},
-      events: events
-    }
-    |> Jason.encode!()
-    |> Jason.decode!()
-    |> anonym(["data", "activity", "follows"], ["twitch_user_id", "twitch_username"])
-    |> anonym(["data", "activity", "votes"], ["session_id", "track_id", "value", "inserted_at"])
-    |> Jason.encode!()
-    |> then(fn data -> {:ok, data} end)
-  rescue
-    error ->
-      Logger.error("#{inspect(error)}")
-      {:error, "Cannot generate associated data"}
+      %{
+        metadata: %{
+          generated_at: DateTime.utc_now(),
+          host: System.get_env("PHX_HOST", "localhost"),
+          version: to_string(Application.spec(:premiere_ecoute)[:vsn])
+        },
+        data: %{profile: scope.user, activity: %{follows: user.channels, votes: votes}},
+        events: events
+      }
+      |> Jason.encode!()
+      |> Jason.decode!()
+      |> anonym(["data", "activity", "follows"], ["twitch_user_id", "twitch_username"])
+      |> anonym(["data", "activity", "votes"], ["session_id", "track_id", "value", "inserted_at"])
+      |> Jason.encode!()
+      |> then(fn data -> {:ok, data} end)
+    rescue
+      error ->
+        Logger.error("#{inspect(error)}")
+        {:error, "Cannot generate associated data"}
+    end
+    |> EventStore.any("user", fn {result, _} -> %PersonalDataRequested{id: scope.user.id, result: result} end)
   end
 
   defp anonym(data, path, keys) do

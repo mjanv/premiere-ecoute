@@ -15,7 +15,10 @@ defmodule PremiereEcoute do
 
   alias PremiereEcoute.Core
   alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Mailer
 
   defdelegate apply(command), to: Core
   defdelegate paginate(stream, opts), to: EventStore
+
+  def mailer, do: Mailer.impl()
 end

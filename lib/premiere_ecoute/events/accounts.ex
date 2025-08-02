@@ -10,6 +10,12 @@ defmodule PremiereEcoute.Events.AccountDeleted do
   use PremiereEcoute.Core.Event
 end
 
+defmodule PremiereEcoute.Events.PersonalDataRequested do
+  @moduledoc false
+
+  use PremiereEcoute.Core.Event, fields: [:result]
+end
+
 defmodule PremiereEcoute.Events.ChannelFollowed do
   @moduledoc false
 

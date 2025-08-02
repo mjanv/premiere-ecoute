@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Core.Api do
 
       alias PremiereEcoute.Core.Cache
 
-      @behaviour __MODULE__.Behavior
+      @behaviour __MODULE__.Behaviour
 
       def env, do: Application.get_env(unquote(app), PremiereEcoute.Apis)
       def env(key), do: Application.get_env(unquote(app), PremiereEcoute.Apis)[key]

@@ -3,8 +3,8 @@ defmodule PremiereEcoute.MailerTest do
 
   import Swoosh.TestAssertions
 
-  alias PremiereEcoute.Mailer
   alias PremiereEcoute.Events.AccountCreated
+  alias PremiereEcoute.Mailer
 
   describe "dispatch/1" do
     test "send an email from an event" do

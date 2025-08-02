@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.UserToken
   alias PremiereEcoute.Events.AccountDeleted
+  alias PremiereEcoute.Events.PersonalDataRequested
   alias PremiereEcoute.EventStore
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album
@@ -108,6 +109,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
                  "timestamp" => _
                }
              ] = events
+    end
+
+    test "register an event", %{viewer: viewer} do
+      {:ok, _} = Accounts.download_associated_data(Scope.for_user(viewer))
+
+      assert [_, _, %PersonalDataRequested{result: "ok"}] = EventStore.read("user-#{viewer.id}")
     end
   end
 
