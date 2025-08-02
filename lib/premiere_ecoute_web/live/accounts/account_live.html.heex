@@ -136,13 +136,25 @@
                   <h3 class="text-xl font-semibold text-white">{gettext("Twitch")}</h3>
                   <div class="space-y-1 text-sm">
                     <%= if @current_user && @current_user.twitch_access_token do %>
-                      <div class="flex items-center space-x-2">
-                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span class="text-green-400">{gettext("Token Active")}</span>
+                      <div class="space-y-0.5">
+                        <div class="flex items-center space-x-2">
+                          <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span class="text-green-400">{gettext("Token Active")}</span>
+                        </div>
+                        <%= if @current_user.twitch_expires_at do %>
+                          <p class="text-gray-300 ml-4 text-xs">
+                            {gettext("Expires")}: {Calendar.strftime(@current_user.twitch_expires_at, "%B %d, %Y at %I:%M:%S %p")}
+                          </p>
+                        <% end %>
                       </div>
-                      <%= if @current_user.twitch_expires_at do %>
+                      <%= if @current_user.twitch_username do %>
                         <p class="text-gray-300">
-                          {gettext("Expires")}: {Calendar.strftime(@current_user.twitch_expires_at, "%B %d, %Y at %I:%M:%S %p")}
+                          {gettext("Username")}: <span class="text-white font-medium">{@current_user.twitch_username}</span>
+                        </p>
+                      <% end %>
+                      <%= if @current_user.twitch_user_id do %>
+                        <p class="text-gray-300">
+                          {gettext("User ID")}: <span class="text-white font-mono text-xs">{@current_user.twitch_user_id}</span>
                         </p>
                       <% end %>
                     <% else %>
@@ -158,7 +170,7 @@
               <%= if @current_user && @current_user.twitch_access_token do %>
                 <button
                   phx-click="disconnect_twitch"
-                  class="px-3 py-2 text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
+                  class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors border border-red-500/20 hover:border-red-400/30"
                 >
                   {gettext("Disconnect")}
                 </button>
@@ -186,13 +198,25 @@
                   <h3 class="text-xl font-semibold text-white">{gettext("Spotify")}</h3>
                   <div class="space-y-1 text-sm">
                     <%= if @current_user && @current_user.spotify_access_token do %>
-                      <div class="flex items-center space-x-2">
-                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span class="text-green-400">{gettext("Token Active")}</span>
+                      <div class="space-y-0.5">
+                        <div class="flex items-center space-x-2">
+                          <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span class="text-green-400">{gettext("Token Active")}</span>
+                        </div>
+                        <%= if @current_user.spotify_expires_at do %>
+                          <p class="text-gray-300 ml-4 text-xs">
+                            {gettext("Expires")}: {Calendar.strftime(@current_user.spotify_expires_at, "%B %d, %Y at %I:%M:%S %p")}
+                          </p>
+                        <% end %>
                       </div>
-                      <%= if @current_user.spotify_expires_at do %>
+                      <%= if @current_user.spotify_username do %>
                         <p class="text-gray-300">
-                          {gettext("Expires")}: {Calendar.strftime(@current_user.spotify_expires_at, "%B %d, %Y at %I:%M:%S %p")}
+                          {gettext("Username")}: <span class="text-white font-medium">{@current_user.spotify_username}</span>
+                        </p>
+                      <% end %>
+                      <%= if @current_user.spotify_user_id do %>
+                        <p class="text-gray-300">
+                          {gettext("User ID")}: <span class="text-white font-mono text-xs">{@current_user.spotify_user_id}</span>
                         </p>
                       <% end %>
                     <% else %>
@@ -208,7 +232,7 @@
               <%= if @current_user && @current_user.spotify_access_token do %>
                 <button
                   phx-click="disconnect_spotify"
-                  class="px-3 py-2 text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
+                  class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors border border-red-500/20 hover:border-red-400/30"
                 >
                   {gettext("Disconnect")}
                 </button>

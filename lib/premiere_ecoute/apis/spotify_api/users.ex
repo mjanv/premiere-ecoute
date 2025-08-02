@@ -3,8 +3,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Users do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
-  def get_user_profile(_scope) do
-    SpotifyApi.api(:api)
+  def get_user_profile(access_token) do
+    SpotifyApi.api(:api, access_token)
     |> SpotifyApi.get(url: "/me")
     |> SpotifyApi.handle(200, &parse_profile/1)
   end

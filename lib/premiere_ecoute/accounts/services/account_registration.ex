@@ -10,15 +10,21 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
 
   @type twitch_data() :: %{
           required(:user_id) => String.t(),
-          required(:access_token) => String.t(),
-          required(:refresh_token) => String.t(),
-          required(:expires_in) => integer(),
+          required(:email) => String.t(),
           required(:username) => String.t(),
           required(:display_name) => String.t(),
-          required(:broadcaster_type) => String.t()
+          required(:broadcaster_type) => String.t(),
+          required(:access_token) => String.t(),
+          required(:refresh_token) => String.t(),
+          required(:expires_in) => integer()
         }
 
   @type spotify_data() :: %{
+          required(:user_id) => String.t(),
+          required(:email) => String.t(),
+          required(:display_name) => String.t(),
+          required(:country) => String.t(),
+          required(:product) => String.t(),
           required(:access_token) => String.t(),
           required(:refresh_token) => String.t(),
           required(:expires_in) => integer()
@@ -28,8 +34,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   @bots Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :bots])
 
   @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
-  def register_twitch_user(%{username: username, user_id: user_id} = payload, password \\ nil) do
-    with email <- "#{username}@twitch.tv",
+  def register_twitch_user(%{email: email, username: username, user_id: user_id} = payload, password \\ nil) do
+    with email <- if(email == "", do: "#{username}@twitch.tv", else: email),
          nil <- User.get_user_by_email(email),
          attrs <- %{
            email: email,

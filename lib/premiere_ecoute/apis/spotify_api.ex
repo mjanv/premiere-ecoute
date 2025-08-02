@@ -62,7 +62,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     @callback search_albums(query :: String.t()) :: {:ok, [Album.t()]} | {:error, term()}
 
     # Users
-    @callback get_user_profile(scope :: Scope.t()) :: {:ok, map()} | {:error, term()}
+    @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
   @spec api(:api | :accounts, String.t() | nil) :: Req.Request.t()
@@ -124,5 +124,5 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   defdelegate search_albums(query), to: __MODULE__.Search
 
   # Users
-  defdelegate get_user_profile(scope), to: __MODULE__.Users
+  defdelegate get_user_profile(access_token), to: __MODULE__.Users
 end

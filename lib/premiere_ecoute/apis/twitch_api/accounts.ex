@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
           response_type: "code",
           scope:
             scope ||
-              "channel:manage:polls channel:read:polls channel:bot user:read:chat user:write:chat user:bot moderator:manage:announcements",
+              "channel:manage:polls channel:read:polls channel:bot user:read:email user:read:chat user:write:chat user:bot moderator:manage:announcements",
           client_id: Application.get_env(:premiere_ecoute, :twitch_client_id),
           redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri),
           state: state || random(16)
@@ -49,17 +49,18 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
         redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
       }
     )
-    |> TwitchApi.handle(200, fn %{"access_token" => token, "refresh_token" => refresh_token, "expires_in" => expires_in} ->
-      {:ok, user} = TwitchApi.get_user(token)
+    |> TwitchApi.handle(200, fn %{"token_type" => "bearer"} = body ->
+      {:ok, user} = TwitchApi.get_user_profile(body["access_token"])
 
       %{
         user_id: user["id"],
-        access_token: token,
-        refresh_token: refresh_token,
-        expires_in: expires_in,
+        email: user["email"],
         username: user["login"],
         display_name: user["display_name"],
-        broadcaster_type: user["broadcaster_type"]
+        broadcaster_type: user["broadcaster_type"],
+        access_token: body["access_token"],
+        refresh_token: body["refresh_token"],
+        expires_in: body["expires_in"]
       }
     end)
   end

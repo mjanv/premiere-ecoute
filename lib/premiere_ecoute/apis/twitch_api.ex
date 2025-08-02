@@ -60,6 +60,9 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     # Channels
     @callback get_followed_channels(scope :: Scope.t()) :: {:ok, [map()]} | {:error, term()}
     @callback get_followed_channel(scope :: Scope.t(), user :: User.t()) :: {:ok, map() | nil} | {:error, term()}
+
+    # Users
+    @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
   @spec api(:api | :accounts, String.t() | nil) :: Req.Request.t()
@@ -124,5 +127,5 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defdelegate get_followed_channel(scope, user), to: __MODULE__.Channels
 
   # Users
-  defdelegate get_user(app_or_access_token), to: __MODULE__.Users
+  defdelegate get_user_profile(access_token), to: __MODULE__.Users
 end

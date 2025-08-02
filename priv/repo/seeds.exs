@@ -14,12 +14,13 @@ for i <- 1..2 do
 
   payload = %{
     user_id: Seeds.user_id(),
-    access_token: Seeds.token(32),
-    refresh_token: Seeds.token(32),
-    expires_in: 3600,
+    email: "streamer#{i}@provider.fr",
     username: "streamer#{i}",
     display_name: "Streamer Name",
-    broadcaster_type: "partner"
+    broadcaster_type: "partner",
+    access_token: Seeds.token(32),
+    refresh_token: Seeds.token(32),
+    expires_in: 3600
   }
 
   {:ok, streamer} = PremiereEcoute.Accounts.Services.AccountRegistration.register_twitch_user(payload, password)
@@ -34,12 +35,13 @@ for i <- 1..2 do
 
   payload = %{
     user_id: Seeds.user_id(),
-    access_token: Seeds.token(32),
-    refresh_token: Seeds.token(32),
-    expires_in: 3600,
+    email: "viewer#{i}@provider.fr",
     username: "viewer#{i}",
     display_name: "Viewer Name",
-    broadcaster_type: ""
+    broadcaster_type: "",
+    access_token: Seeds.token(32),
+    refresh_token: Seeds.token(32),
+    expires_in: 3600
   }
 
   {:ok, viewer} = PremiereEcoute.Accounts.Services.AccountRegistration.register_twitch_user(payload, password)

@@ -46,7 +46,18 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
       ]
     )
     |> SpotifyApi.handle(200, fn %{"token_type" => "Bearer"} = body ->
-      %{access_token: body["access_token"], refresh_token: body["refresh_token"], expires_in: body["expires_in"]}
+      {:ok, user} = SpotifyApi.get_user_profile(body["access_token"])
+
+      %{
+        user_id: user["id"],
+        email: user["email"],
+        display_name: user["display_name"],
+        country: user["country"],
+        product: user["product"],
+        access_token: body["access_token"],
+        refresh_token: body["refresh_token"],
+        expires_in: body["expires_in"]
+      }
     end)
   end
 

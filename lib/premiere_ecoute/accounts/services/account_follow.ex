@@ -45,7 +45,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
   def follow_streamers(scope) do
     User.all(where: [role: :streamer])
     |> Enum.map(fn streamer -> %{streamer_id: streamer.id, user_id: scope.user.id} end)
-    |> __MODULE__.Worker.in_seconds(10)
+
+    # |> __MODULE__.Worker.in_seconds(10)
 
     :ok
   end

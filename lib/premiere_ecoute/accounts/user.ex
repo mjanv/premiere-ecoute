@@ -43,6 +43,8 @@ defmodule PremiereEcoute.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
     field :role, Ecto.Enum, values: [:viewer, :streamer, :admin, :bot], default: :viewer
 
+    field :spotify_user_id, :string
+    field :spotify_username, :string
     field :spotify_access_token, :string, redact: true
     field :spotify_refresh_token, :string, redact: true
     field :spotify_expires_at, :utc_datetime
@@ -67,10 +69,10 @@ defmodule PremiereEcoute.Accounts.User do
       :email,
       :role,
       :twitch_user_id,
+      :twitch_username,
       :twitch_access_token,
       :twitch_refresh_token,
-      :twitch_expires_at,
-      :twitch_username
+      :twitch_expires_at
     ])
     |> validate_email(opts)
     |> validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
@@ -170,7 +172,7 @@ defmodule PremiereEcoute.Accounts.User do
   """
   def spotify_changeset(user, attrs) do
     user
-    |> cast(attrs, [:spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
+    |> cast(attrs, [:spotify_user_id, :spotify_username, :spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
     |> validate_spotify_tokens()
   end
 
@@ -179,7 +181,7 @@ defmodule PremiereEcoute.Accounts.User do
   """
   def spotify_disconnect_changeset(user, attrs) do
     user
-    |> cast(attrs, [:spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
+    |> cast(attrs, [:spotify_user_id, :spotify_username, :spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
   end
 
   defp validate_spotify_tokens(changeset) do
@@ -260,12 +262,16 @@ defmodule PremiereEcoute.Accounts.User do
   end
 
   def update_spotify_tokens(user, %{
+        user_id: user_id,
+        display_name: username,
         access_token: access_token,
         refresh_token: refresh_token,
         expires_in: expires_in
       }) do
     user
     |> spotify_changeset(%{
+      spotify_user_id: user_id,
+      spotify_username: username,
       spotify_access_token: access_token,
       spotify_refresh_token: refresh_token,
       spotify_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)

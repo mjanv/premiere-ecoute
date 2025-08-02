@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
   defp twitch_data do
     %{
       user_id: "441903922",
+      email: "username+twitch@yahoo.fr",
       access_token: :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false),
       refresh_token: :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false),
       expires_in: 3600,
@@ -21,6 +22,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
   defp spotify_data do
     %{
+      user_id: "username007",
+      email: "username+spotify@yahoo.fr",
+      display_name: "Username",
+      country: "FR",
+      product: "premium",
       access_token: :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false),
       refresh_token: :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false),
       expires_in: 3600
@@ -36,6 +42,25 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
   describe "register_twitch_user/1" do
     test "create a new user" do
       data = twitch_data()
+      {:ok, user} = AccountRegistration.register_twitch_user(data)
+
+      assert %User{
+               email: "username+twitch@yahoo.fr",
+               role: :streamer,
+               twitch_user_id: "441903922",
+               twitch_access_token: access_token,
+               twitch_refresh_token: refresh_token
+             } = user
+
+      assert data[:access_token] == access_token
+      assert data[:refresh_token] == refresh_token
+
+      events = EventStore.read("user-#{user.id}")
+      assert events == [%AccountCreated{id: user.id, twitch_user_id: "441903922"}]
+    end
+
+    test "create a new user with a default email address" do
+      data = Map.merge(twitch_data(), %{email: ""})
       {:ok, user} = AccountRegistration.register_twitch_user(data)
 
       assert %User{
@@ -61,7 +86,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       {:ok, user} = AccountRegistration.register_twitch_user(data)
 
       assert %User{
-               email: "user1004@twitch.tv",
+               email: "username+twitch@yahoo.fr",
                role: :streamer,
                twitch_user_id: "441903922",
                twitch_access_token: access_token,
@@ -77,6 +102,25 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
   end
 
   describe "register_spotify_user/2" do
+    test "update an existing user with a default address" do
+      data = Map.merge(twitch_data(), %{email: ""})
+      {:ok, user} = AccountRegistration.register_twitch_user(data)
+
+      data = spotify_data()
+      {:ok, user} = AccountRegistration.register_spotify_user(data, user.id)
+
+      assert %User{
+               email: "user1004@twitch.tv",
+               spotify_user_id: "username007",
+               spotify_username: "Username",
+               spotify_access_token: access_token,
+               spotify_refresh_token: refresh_token
+             } = user
+
+      assert data[:access_token] == access_token
+      assert data[:refresh_token] == refresh_token
+    end
+
     test "update an existing user" do
       data = twitch_data()
       {:ok, user} = AccountRegistration.register_twitch_user(data)
@@ -85,9 +129,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       {:ok, user} = AccountRegistration.register_spotify_user(data, user.id)
 
       assert %User{
-               email: "user1004@twitch.tv",
-               role: :streamer,
-               twitch_user_id: "441903922",
+               email: "username+twitch@yahoo.fr",
+               spotify_user_id: "username007",
+               spotify_username: "Username",
                spotify_access_token: access_token,
                spotify_refresh_token: refresh_token
              } = user

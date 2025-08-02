@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.UsersTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
 
-  describe "get_user/1" do
+  describe "get_user_profile/1" do
     test "can get information about one Twitch user" do
       ApiMock.expect(
         TwitchApi,
@@ -13,7 +13,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.UsersTest do
         status: 200
       )
 
-      {:ok, user} = TwitchApi.get_user("access_token")
+      scope = user_scope_fixture(user_fixture(%{twitch_access_token: "token"}))
+
+      {:ok, user} = TwitchApi.get_user_profile(scope.user.twitch_access_token)
 
       assert user == %{
                "broadcaster_type" => "partner",
