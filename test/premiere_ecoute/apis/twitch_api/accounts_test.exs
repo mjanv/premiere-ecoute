@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
       url = TwitchApi.Accounts.authorization_url(nil, "state")
 
       assert url =~
-               "https://id.twitch.tv/oauth2/authorize?scope=channel%3Amanage%3Apolls+channel%3Aread%3Apolls+channel%3Abot+user%3Aread%3Achat+user%3Awrite%3Achat+user%3Abot+moderator%3Amanage%3Aannouncements"
+               "https://id.twitch.tv/oauth2/authorize?scope=channel%3Amanage%3Apolls+channel%3Aread%3Apolls+channel%3Abot+user%3Aread%3Aemail+user%3Aread%3Achat+user%3Awrite%3Achat+user%3Abot+moderator%3Amanage%3Aannouncements"
 
       assert url =~ "response_type=code"
       assert url =~ "client_id="

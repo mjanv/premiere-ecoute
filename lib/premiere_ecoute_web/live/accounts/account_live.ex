@@ -3,15 +3,26 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Services.AccountCompliance
+  alias PremiereEcoute.Accounts.User.Profile
 
   @impl true
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
 
+    profile_form =
+      if current_user do
+        current_user.profile
+        |> Profile.changeset()
+        |> to_form()
+      else
+        nil
+      end
+
     socket
     |> assign(:current_user, current_user)
     |> assign(:show_download_modal, false)
     |> assign(:show_delete_modal, false)
+    |> assign(:profile_form, profile_form)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -127,6 +138,48 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
   @impl true
   def handle_event("stop_propagation", _params, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("validate_profile", %{"profile" => profile_params}, socket) do
+    profile_form =
+      socket.assigns.current_user.profile
+      |> Profile.changeset(profile_params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, :profile_form, profile_form)}
+  end
+
+  @impl true
+  def handle_event("save_profile", %{"profile" => profile_params}, socket) do
+    case socket.assigns.current_user do
+      nil ->
+        socket
+        |> put_flash(:error, "User not found")
+
+      user ->
+        case Accounts.User.edit_user_profile(user, profile_params) do
+          {:ok, updated_user} ->
+            updated_profile_form =
+              updated_user.profile
+              |> Profile.changeset()
+              |> to_form()
+
+            socket
+            |> assign(:current_user, updated_user)
+            |> assign(:profile_form, updated_profile_form)
+            |> put_flash(:info, "Profile updated successfully")
+
+          {:error, changeset} ->
+            profile_form = changeset |> to_form()
+
+            socket
+            |> assign(:profile_form, profile_form)
+            |> put_flash(:error, "Failed to update profile")
+        end
+    end
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
