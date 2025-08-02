@@ -30,6 +30,8 @@ defmodule PremiereEcouteWeb.ChannelCase do
       import PremiereEcoute.Sessions.Discography.AlbumFixtures
       import PremiereEcoute.Sessions.Discography.PlaylistFixtures
       import PremiereEcoute.Sessions.ScoresFixtures
+
+      import Swoosh.TestAssertions
     end
   end
 

@@ -38,6 +38,8 @@ defmodule PremiereEcoute.DataCase do
       setup :set_mox_from_context
       setup :verify_on_exit!
 
+      import Swoosh.TestAssertions
+
       alias PremiereEcoute.Repo
     end
   end

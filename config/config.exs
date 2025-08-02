@@ -85,6 +85,12 @@ config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   grafana: :disabled,
   metrics_server: :disabled
 
+config :premiere_ecoute, PremiereEcoute.Gettext,
+  locales: ~w(en fr it),
+  default_locale: "en"
+
+config :premiere_ecoute, PremiereEcoute.Mailer, adapter: Resend.Swoosh.Adapter
+
 config :esbuild,
   version: "0.17.11",
   premiere_ecoute: [
@@ -123,10 +129,6 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 config :phoenix, :logger, false
 
-config :premiere_ecoute, PremiereEcoute.Gettext,
-  locales: ~w(en fr it),
-  default_locale: "en"
-
 config :ueberauth, Ueberauth,
   providers: [
     twitch: {Ueberauth.Strategy.Twitch, []},
@@ -137,5 +139,9 @@ config :ueberauth, Ueberauth,
            "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing"
        ]}
   ]
+
+config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+config :tesla, disable_deprecated_builder_warning: true
 
 import_config "#{config_env()}.exs"

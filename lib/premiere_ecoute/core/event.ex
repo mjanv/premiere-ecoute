@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Core.Event do
   @moduledoc false
 
+  def name(event), do: event.__struct__ |> Module.split() |> List.last()
+
   defmacro __using__(opts) do
     fields = Keyword.get(opts, :fields, [])
 
@@ -8,10 +10,16 @@ defmodule PremiereEcoute.Core.Event do
       defstruct [:id] ++ unquote(fields)
 
       defimpl Jason.Encoder, for: __MODULE__ do
-        def encode(value, opts) do
-          value
+        def encode(event, opts) do
+          event
           |> Map.take(unquote(fields))
           |> Jason.Encode.map(opts)
+        end
+      end
+
+      defimpl String.Chars, for: __MODULE__ do
+        def to_string(event) do
+          "#{inspect(event)}"
         end
       end
     end

@@ -37,6 +37,8 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
 
 config :premiere_ecoute, PremiereEcoute.Gettext, default_locale: "en"
 
+config :premiere_ecoute, PremiereEcoute.Mailer, adapter: Swoosh.Adapters.Test
+
 config :bcrypt_elixir, :log_rounds, 1
 
 config :logger, level: :warning

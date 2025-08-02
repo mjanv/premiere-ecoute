@@ -71,8 +71,8 @@ defmodule PremiereEcoute.MixProject do
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.0.9"},
-      {:phoenix_live_dashboard, "~> 0.8.3"},
+      {:phoenix_live_view, "~> 1.1"},
+      {:phoenix_live_dashboard, "~> 0.8"},
       {:phoenix_storybook, "~> 0.9.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
@@ -90,7 +90,7 @@ defmodule PremiereEcoute.MixProject do
       {:jason, "~> 1.2"},
       {:cachex, "~> 4.1"},
       {:bcrypt_elixir, "~> 3.0"},
-      {:postgrex, "~> 0.20.0"},
+      {:postgrex, "~> 0.21"},
       {:ecto_sql, "~> 3.10"},
       {:eventstore, "~> 1.4"},
       {:scrivener_ecto, "~> 3.0"},
@@ -102,6 +102,8 @@ defmodule PremiereEcoute.MixProject do
       {:makeup_erlang, ">= 0.0.0"},
       {:oban, "~> 2.19"},
       {:oban_web, "~> 2.11"},
+      {:swoosh, "~> 1.19"},
+      {:resend, "~> 0.4"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -116,6 +118,7 @@ defmodule PremiereEcoute.MixProject do
       # Tests
       {:hammox, "~> 0.7", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
+      {:lazy_html, "~> 0.1", only: :test},
       # Development
       {:doctor, "~> 0.22.0", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
