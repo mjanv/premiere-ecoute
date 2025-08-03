@@ -12,6 +12,7 @@ defmodule PremiereEcoute.Supervisor do
     children = [
       PremiereEcoute.Telemetry.PromEx,
       PremiereEcoute.Repo,
+      PremiereEcoute.Repo.Vault,
       PremiereEcoute.EventStore,
       {Oban, Application.fetch_env!(:premiere_ecoute, Oban)},
       PremiereEcoute.Core.Supervisor

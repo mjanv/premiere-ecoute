@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Accounts.User do
   """
 
   use PremiereEcoute.Core.Schema,
-    root: [:channels],
+    root: [:channels, :twitch, :spotify],
     json: [:id, :email, :role, :twitch_user_id, :twitch_username]
 
   alias PremiereEcoute.Accounts.User.Follow
@@ -54,6 +54,9 @@ defmodule PremiereEcoute.Accounts.User do
     field :twitch_access_token, :string, redact: true
     field :twitch_refresh_token, :string, redact: true
     field :twitch_expires_at, :utc_datetime
+
+    has_one :twitch, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :twitch], foreign_key: :parent_id
+    has_one :spotify, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :spotify], foreign_key: :parent_id
 
     embeds_one :profile, Profile, on_replace: :update, defaults_to_struct: true
 

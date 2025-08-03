@@ -37,6 +37,14 @@ config :premiere_ecoute, PremiereEcoute.EventStore,
   hostname: env!("POSTGRES_HOSTNAME"),
   socket_options: if(env!("ECTO_IPV6", :string, nil) in ~w(true 1), do: [:inet6], else: [])
 
+config :premiere_ecoute, PremiereEcoute.Repo.Vault,
+  ciphers: [
+    default: {
+      Cloak.Ciphers.AES.GCM,
+      tag: "AES.GCM.V1", key: 32 |> :crypto.strong_rand_bytes(), iv_length: 12
+    }
+  ]
+
 config :premiere_ecoute, PremiereEcoute.Mailer, api_key: env!("RESEND_API_KEY")
 
 config :ueberauth, Ueberauth.Strategy.Twitch.OAuth,

@@ -34,3 +34,13 @@ defmodule PremiereEcoute.Repo do
     end)
   end
 end
+
+defmodule PremiereEcoute.Repo.Vault do
+  use Cloak.Vault, otp_app: :premiere_ecoute
+end
+
+defmodule PremiereEcoute.Repo.Encrypted do
+  @moduledoc false
+
+  use Cloak.Ecto.Binary, vault: PremiereEcoute.Repo.Vault
+end
