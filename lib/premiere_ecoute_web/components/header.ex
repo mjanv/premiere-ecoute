@@ -22,7 +22,7 @@ defmodule PremiereEcouteWeb.Components.Header do
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span class="text-white font-medium">
-              Admin Impersonation: Viewing as {@current_scope.user.twitch_username}
+              Admin Impersonation: Viewing as {@current_scope.user.twitch.username}
             </span>
           </div>
           <.link
@@ -67,7 +67,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
-                {@current_user.twitch_username || @current_user.email}
+                {@current_user.twitch.username || @current_user.email}
                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -114,7 +114,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     <!-- Divider -->
                     <div class="border-t border-gray-600 my-1"></div>
                     <a
-                      href={"http://localhost:4001/#{@current_user.twitch_user_id}/chat"}
+                      href={"http://localhost:4001/#{@current_user.twitch.user_id}/chat"}
                       target="_blank"
                       class="flex items-center px-4 py-2 text-sm text-purple-300 hover:bg-gray-700 hover:text-purple-200 transition-colors"
                     >

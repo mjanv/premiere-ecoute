@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcoute.Core.Cache
 
-  def get_event_subscriptions(%Scope{user: %{twitch_user_id: user_id}}) do
+  def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}}) do
     TwitchApi.api(:api)
     |> TwitchApi.get(
       url: "/eventsub/subscriptions",
@@ -22,7 +22,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end)
   end
 
-  def subscribe(%Scope{user: %{twitch_user_id: user_id}} = scope, type) do
+  def subscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
     TwitchApi.api(:api)
     |> TwitchApi.post(
       url: "/eventsub/subscriptions",
@@ -43,7 +43,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end)
   end
 
-  def unsubscribe(%Scope{user: %{twitch_user_id: user_id}}, type) do
+  def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}}, type) do
     case Cache.get(:polls, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
         TwitchApi.api(:api)
@@ -77,15 +77,15 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   defp version("channel.poll.progress"), do: "1"
   defp version(_), do: "0"
 
-  defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.chat.message") do
+  defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.chat.message") do
     bot = Bot.get()
-    %{broadcaster_user_id: user_id, user_id: bot.twitch_user_id}
+    %{broadcaster_user_id: user_id, user_id: bot.twitch.user_id}
   end
 
-  defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.follow"),
+  defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.follow"),
     do: %{broadcaster_user_id: user_id, moderator_user_id: user_id}
 
-  defp condition(%Scope{user: %{twitch_user_id: user_id}}, "channel.poll.progress"),
+  defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.poll.progress"),
     do: %{broadcaster_user_id: user_id}
 
   defp condition(_, _), do: %{}

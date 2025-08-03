@@ -7,11 +7,12 @@ defmodule PremiereEcoute.Accounts.User do
 
   use PremiereEcoute.Core.Schema,
     root: [:channels, :twitch, :spotify],
-    json: [:id, :email, :role, :twitch_user_id, :twitch_username]
+    json: [:id, :email, :role, :twitch, :spotify]
 
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.Token
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
 
@@ -23,14 +24,8 @@ defmodule PremiereEcoute.Accounts.User do
           confirmed_at: DateTime.t() | nil,
           authenticated_at: DateTime.t() | nil,
           role: :viewer | :streamer | :admin | :bot,
-          spotify_access_token: String.t() | nil,
-          spotify_refresh_token: String.t() | nil,
-          spotify_expires_at: DateTime.t() | nil,
-          twitch_user_id: String.t() | nil,
-          twitch_access_token: String.t() | nil,
-          twitch_refresh_token: String.t() | nil,
-          twitch_expires_at: DateTime.t() | nil,
-          twitch_username: String.t() | nil,
+          spotify: OauthToken.t() | nil,
+          twitch: OauthToken.t() | nil,
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }
@@ -43,17 +38,17 @@ defmodule PremiereEcoute.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
     field :role, Ecto.Enum, values: [:viewer, :streamer, :admin, :bot], default: :viewer
 
-    field :spotify_user_id, :string
-    field :spotify_username, :string
-    field :spotify_access_token, :string, redact: true
-    field :spotify_refresh_token, :string, redact: true
-    field :spotify_expires_at, :utc_datetime
+    # field :spotify_user_id, :string
+    # field :spotify_username, :string
+    # field :spotify_access_token, :string, redact: true
+    # field :spotify_refresh_token, :string, redact: true
+    # field :spotify_expires_at, :utc_datetime
 
-    field :twitch_user_id, :string
-    field :twitch_username, :string
-    field :twitch_access_token, :string, redact: true
-    field :twitch_refresh_token, :string, redact: true
-    field :twitch_expires_at, :utc_datetime
+    # field :twitch_user_id, :string
+    # field :twitch_username, :string
+    # field :twitch_access_token, :string, redact: true
+    # field :twitch_refresh_token, :string, redact: true
+    # field :twitch_expires_at, :utc_datetime
 
     has_one :twitch, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :twitch], foreign_key: :parent_id
     has_one :spotify, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :spotify], foreign_key: :parent_id
@@ -68,15 +63,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   def changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [
-      :email,
-      :role,
-      :twitch_user_id,
-      :twitch_username,
-      :twitch_access_token,
-      :twitch_refresh_token,
-      :twitch_expires_at
-    ])
+    |> cast(attrs, [:email, :role, :profile])
     |> validate_email(opts)
     |> validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
     |> cast_embed(:profile, required: false, with: &Profile.changeset/2)
@@ -171,30 +158,6 @@ defmodule PremiereEcoute.Accounts.User do
   end
 
   @doc """
-  A user changeset for updating Spotify tokens.
-  """
-  def spotify_changeset(user, attrs) do
-    user
-    |> cast(attrs, [:spotify_user_id, :spotify_username, :spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
-    |> validate_spotify_tokens()
-  end
-
-  @doc """
-  A user changeset for disconnecting Spotify (allows nil values).
-  """
-  def spotify_disconnect_changeset(user, attrs) do
-    user
-    |> cast(attrs, [:spotify_user_id, :spotify_username, :spotify_access_token, :spotify_refresh_token, :spotify_expires_at])
-  end
-
-  defp validate_spotify_tokens(changeset) do
-    case get_change(changeset, :spotify_access_token) do
-      nil -> changeset
-      _ -> validate_required(changeset, [:spotify_access_token])
-    end
-  end
-
-  @doc """
   Verifies the password.
 
   If there is no user or the user doesn't have a password, we call `Bcrypt.no_user_verify/0` to avoid timing attacks.
@@ -261,160 +224,18 @@ defmodule PremiereEcoute.Accounts.User do
   def create(attrs) do
     attrs
     |> super()
-    |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id, twitch_user_id: user.twitch_user_id} end)
+    |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id, twitch_user_id: user.twitch.user_id} end)
   end
 
-  def update_spotify_tokens(user, %{
-        user_id: user_id,
-        display_name: username,
-        access_token: access_token,
-        refresh_token: refresh_token,
-        expires_in: expires_in
-      }) do
-    user
-    |> spotify_changeset(%{
-      spotify_user_id: user_id,
-      spotify_username: username,
-      spotify_access_token: access_token,
-      spotify_refresh_token: refresh_token,
-      spotify_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)
-    })
-    |> Repo.update()
-  end
+  # def update_spotify_tokens(user, attrs) do
+  # %{user_id: user_id, display_name: username, access_token: access_token, refresh_token: refresh_token, expires_in: expires_in}
+  # %{access_token: access_token, refresh_token: refresh_token, expires_in: expires_in}
+  # def disconnect_spotify(user) do
 
-  def update_spotify_tokens(user, %{
-        access_token: access_token,
-        refresh_token: refresh_token,
-        expires_in: expires_in
-      }) do
-    user
-    |> spotify_changeset(%{
-      spotify_access_token: access_token,
-      spotify_refresh_token: refresh_token,
-      spotify_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)
-    })
-    |> Repo.update()
-  end
-
-  def disconnect_spotify(user) do
-    user
-    |> spotify_disconnect_changeset(%{
-      spotify_access_token: nil,
-      spotify_refresh_token: nil,
-      spotify_expires_at: nil
-    })
-    |> Repo.update()
-  end
-
-  @doc """
-  A user changeset for updating Twitch tokens and user data.
-  """
-  def twitch_changeset(user, attrs) do
-    user
-    |> cast(attrs, [
-      :twitch_user_id,
-      :twitch_access_token,
-      :twitch_refresh_token,
-      :twitch_expires_at,
-      :twitch_username
-    ])
-    |> validate_twitch_tokens()
-  end
-
-  @doc """
-  A user changeset for updating only Twitch tokens (during refresh).
-  """
-  def twitch_token_refresh_changeset(user, attrs) do
-    user
-    |> cast(attrs, [
-      :twitch_access_token,
-      :twitch_refresh_token,
-      :twitch_expires_at
-    ])
-    |> validate_required([:twitch_access_token])
-  end
-
-  defp validate_twitch_tokens(changeset) do
-    case get_change(changeset, :twitch_access_token) do
-      nil -> changeset
-      _ -> validate_required(changeset, [:twitch_user_id, :twitch_access_token, :twitch_username])
-    end
-  end
-
-  @doc """
-  Updates user with Twitch auth data from login (includes user_id and username).
-  """
-  def update_twitch_auth(user, %{
-        user_id: user_id,
-        access_token: access_token,
-        refresh_token: refresh_token,
-        expires_in: expires_in,
-        username: username
-      }) do
-    user
-    |> twitch_changeset(%{
-      twitch_user_id: user_id,
-      twitch_access_token: access_token,
-      twitch_refresh_token: refresh_token,
-      twitch_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second),
-      twitch_username: username
-    })
-    |> Repo.update()
-  end
-
-  @doc """
-  Updates user with refreshed Twitch tokens (no user_id/username).
-  """
-  def update_twitch_tokens(user, %{
-        access_token: access_token,
-        refresh_token: refresh_token,
-        expires_in: expires_in
-      }) do
-    user
-    |> twitch_token_refresh_changeset(%{
-      twitch_access_token: access_token,
-      twitch_refresh_token: refresh_token,
-      twitch_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)
-    })
-    |> Repo.update()
-  end
-
-  # Handle case where expires_in is not provided
-  def update_twitch_tokens(user, %{
-        access_token: access_token,
-        refresh_token: refresh_token
-      }) do
-    user
-    |> twitch_token_refresh_changeset(%{
-      twitch_access_token: access_token,
-      twitch_refresh_token: refresh_token
-    })
-    |> Repo.update()
-  end
-
-  @doc """
-  Disconnects Twitch by clearing all Twitch tokens and data.
-  """
-  def disconnect_twitch(user) do
-    user
-    |> cast(
-      %{
-        twitch_user_id: nil,
-        twitch_access_token: nil,
-        twitch_refresh_token: nil,
-        twitch_expires_at: nil,
-        twitch_username: nil
-      },
-      [
-        :twitch_user_id,
-        :twitch_access_token,
-        :twitch_refresh_token,
-        :twitch_expires_at,
-        :twitch_username
-      ]
-    )
-    |> Repo.update()
-  end
+  # def update_twitch_auth(user, attrs) do
+  # %{user_id: user_id, access_token: access_token, refresh_token: refresh_token, expires_in: expires_in, username: username}
+  # %{access_token: access_token, refresh_token: refresh_token, expires_in: expires_in}
+  # def disconnect_twitch(user)
 
   @doc """
   Checks whether the user is in sudo mode.

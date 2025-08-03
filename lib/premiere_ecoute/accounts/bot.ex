@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Accounts.Bot do
   end
 
   def renew_twitch_token(user) do
-    with {:ok, tokens} <- Apis.twitch().renew_token(user.twitch_refresh_token),
+    with {:ok, tokens} <- Apis.twitch().renew_token(user.twitch.refresh_token),
          {:ok, user} <- User.update_twitch_tokens(user, tokens) do
       {:ok, user}
     else

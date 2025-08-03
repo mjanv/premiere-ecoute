@@ -110,7 +110,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("vote_track", %{"rating" => rating}, socket) do
-    user_id = socket.assigns.current_scope.user.twitch_user_id
+    user_id = socket.assigns.current_scope.user.twitch.user_id
 
     Core.dispatch(%MessageSent{
       broadcaster_id: user_id,

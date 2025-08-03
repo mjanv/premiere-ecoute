@@ -5,14 +5,14 @@ defmodule PremiereEcoute.Apis.TwitchApi.Channels do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.TwitchApi
 
-  def get_followed_channels(%Scope{user: %{twitch_user_id: user_id, twitch_access_token: token}}) do
+  def get_followed_channels(%Scope{user: %{twitch: %{user_id: user_id, access_token: token}}}) do
     TwitchApi.api(:api, token)
     |> TwitchApi.get(url: "/channels/followed", params: %{user_id: user_id})
     |> TwitchApi.handle(200, fn %{"data" => data} -> data end)
   end
 
-  def get_followed_channel(%Scope{user: %{twitch_user_id: user_id, twitch_access_token: token}}, %User{
-        twitch_user_id: streamer_id
+  def get_followed_channel(%Scope{user: %{twitch: %{user_id: user_id, access_token: token}}}, %User{
+        twitch: %{user_id: streamer_id}
       }) do
     TwitchApi.api(:api, token)
     |> TwitchApi.get(url: "/channels/followed", params: %{user_id: user_id, broadcaster_id: streamer_id})

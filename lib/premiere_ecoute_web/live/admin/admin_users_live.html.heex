@@ -147,9 +147,9 @@
                       <div class="text-sm font-medium text-white">
                         {user.email}
                       </div>
-                      <%= if user.twitch_username do %>
+                      <%= if user.twitch do %>
                         <div class="text-sm text-gray-400">
-                          @{user.twitch_username}
+                          @{user.twitch.username}
                         </div>
                       <% end %>
                     </div>
@@ -170,7 +170,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <div class="flex space-x-2">
-                    <%= if user.spotify_access_token do %>
+                    <%= if user.spotify do %>
                       <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-200">
                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.481.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
@@ -178,7 +178,7 @@
                         Spotify
                       </span>
                     <% end %>
-                    <%= if user.twitch_access_token do %>
+                    <%= if user.twitch do %>
                       <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900 text-purple-200">
                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
@@ -224,8 +224,8 @@
           </div>
           <div>
             <h2 class="text-xl font-semibold text-white">{@selected_user.email}</h2>
-            <%= if @selected_user.twitch_username do %>
-              <p class="text-gray-400">@{@selected_user.twitch_username}</p>
+            <%= if @selected_user.twitch do %>
+              <p class="text-gray-400">@{@selected_user.twitch.username}</p>
             <% end %>
             <span class={[
               "inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-2",
@@ -259,10 +259,10 @@
                 <p class="mt-1 text-sm text-gray-400">{@selected_user.email}</p>
               </div>
 
-              <%= if @selected_user.twitch_username do %>
+              <%= if @selected_user.twitch do %>
                 <div>
                   <label class="block text-sm font-medium text-gray-300">{gettext("Twitch Username")}</label>
-                  <p class="mt-1 text-sm text-gray-400">@{@selected_user.twitch_username}</p>
+                  <p class="mt-1 text-sm text-gray-400">@{@selected_user.twitch.username}</p>
                 </div>
               <% end %>
 
@@ -289,15 +289,17 @@
                   </svg>
                   <span class="text-white font-medium">Spotify</span>
                 </div>
-                <span class={[
-                  "px-2 py-1 text-xs font-medium rounded-full",
-                  if(@selected_user.spotify_access_token,
-                    do: "bg-green-900 text-green-200",
-                    else: "bg-red-900 text-red-200"
-                  )
-                ]}>
-                  {if @selected_user.spotify_access_token, do: gettext("Connected"), else: gettext("Disconnected")}
-                </span>
+                <%= if @selected_user.spotify do %>
+                  <span class={[
+                    "px-2 py-1 text-xs font-medium rounded-full",
+                    if(@selected_user.spotify.access_token,
+                      do: "bg-green-900 text-green-200",
+                      else: "bg-red-900 text-red-200"
+                    )
+                  ]}>
+                    {if @selected_user.spotify.access_token, do: gettext("Connected"), else: gettext("Disconnected")}
+                  </span>
+                <% end %>
               </div>
 
               <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
@@ -307,15 +309,17 @@
                   </svg>
                   <span class="text-white font-medium">Twitch</span>
                 </div>
-                <span class={[
-                  "px-2 py-1 text-xs font-medium rounded-full",
-                  if(@selected_user.twitch_access_token,
-                    do: "bg-green-900 text-green-200",
-                    else: "bg-red-900 text-red-200"
-                  )
-                ]}>
-                  {if @selected_user.twitch_access_token, do: gettext("Connected"), else: gettext("Disconnected")}
-                </span>
+                <%= if @selected_user.twitch do %>
+                  <span class={[
+                    "px-2 py-1 text-xs font-medium rounded-full",
+                    if(@selected_user.twitch.access_token,
+                      do: "bg-green-900 text-green-200",
+                      else: "bg-red-900 text-red-200"
+                    )
+                  ]}>
+                    {if @selected_user.twitch.access_token, do: gettext("Connected"), else: gettext("Disconnected")}
+                  </span>
+                <% end %>
               </div>
             </div>
           </div>
@@ -357,7 +361,7 @@
                 <button
                   type="submit"
                   class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-yellow-600 hover:bg-yellow-700 text-white"
-                  onclick={"return confirm('Are you sure you want to impersonate #{@selected_user.twitch_username || @selected_user.email}?')"}
+                  onclick={"return confirm('Are you sure you want to impersonate #{@selected_user.email}?')"}
                 >
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -382,7 +386,7 @@
               phx-click="confirm_delete_user"
               phx-value-user_id={@selected_user.id}
               class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 text-white"
-              data-confirm={"Are you sure you want to permanently delete the account for #{@selected_user.twitch_username || @selected_user.email}? This action cannot be undone and will delete all associated data."}
+              data-confirm="Are you sure you want to permanently delete your account ? This action cannot be undone and will delete all associated data."
             >
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

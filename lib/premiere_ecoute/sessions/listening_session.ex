@@ -66,8 +66,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       {:ok, session} ->
         session = preload(session)
 
-        if session.user && session.user.twitch_user_id do
-          Cache.put(:sessions, session.user.twitch_user_id, {session.id, session.vote_options, nil})
+        if session.user && session.user.twitch do
+          Cache.put(:sessions, session.user.twitch.user_id, {session.id, session.vote_options, nil})
         end
 
         {:ok, session}
@@ -154,8 +154,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       {:ok, session} ->
         session = preload(session)
 
-        if session.user && session.user.twitch_user_id do
-          Cache.put(:sessions, session.user.twitch_user_id, {session.id, session.vote_options, track_id})
+        if session.user && session.user.twitch do
+          Cache.put(:sessions, session.user.twitch.user_id, {session.id, session.vote_options, track_id})
         end
 
         {:ok, session}

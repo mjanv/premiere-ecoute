@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
   alias PremiereEcoute.Apis
 
   def maybe_renew_twitch_token(conn) do
-    with %Scope{user: %User{twitch_expires_at: expires_at, twitch_refresh_token: refresh_token} = user} = scope <-
+    with %Scope{user: %User{twitch: %{expires_at: expires_at, refresh_token: refresh_token}} = user} = scope <-
            conn.assigns[:current_scope],
          true <- token_expired?(expires_at),
          {:ok, tokens} <- Apis.twitch().renew_token(refresh_token),
@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
   end
 
   def maybe_renew_spotify_token(conn) do
-    with %{user: %{spotify_expires_at: expires_at, spotify_refresh_token: refresh_token} = user} = scope <-
+    with %{user: %{spotify: %{expires_at: expires_at, refresh_token: refresh_token}} = user} = scope <-
            conn.assigns[:current_scope],
          true <- token_expired?(expires_at),
          {:ok, tokens} <- Apis.spotify().renew_token(refresh_token),

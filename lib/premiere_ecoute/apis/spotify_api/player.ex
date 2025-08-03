@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   Start/resume playback on the user's active device.
   Can optionally specify track URIs to play.
   """
-  def start_playback(%Scope{user: %{spotify_access_token: access_token}}) do
+  def start_playback(%Scope{user: %{spotify: %{access_token: access_token}}}) do
     body = %{}
     json_body = Jason.encode!(body)
 
@@ -33,7 +33,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Pause playback on the user's active device.
   """
-  def pause_playback(%Scope{user: %{spotify_access_token: access_token}}) do
+  def pause_playback(%Scope{user: %{spotify: %{access_token: access_token}}}) do
     headers = [
       {"Authorization", "Bearer #{access_token}"},
       {"Content-Length", "0"},
@@ -49,7 +49,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Skip to next track in the user's queue.
   """
-  def next_track(%Scope{user: %{spotify_access_token: access_token}}) do
+  def next_track(%Scope{user: %{spotify: %{access_token: access_token}}}) do
     SpotifyApi.api(:api)
     |> Req.merge(
       headers: [
@@ -65,7 +65,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Skip to previous track in the user's queue.
   """
-  def previous_track(%Scope{user: %{spotify_access_token: access_token}}) do
+  def previous_track(%Scope{user: %{spotify: %{access_token: access_token}}}) do
     SpotifyApi.api(:api)
     |> Req.merge(
       headers: [
@@ -81,7 +81,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Get information about the user's current playback state.
   """
-  def get_playback_state(%Scope{user: %{spotify_access_token: access_token}}) do
+  def get_playback_state(%Scope{user: %{spotify: %{access_token: access_token}}}) do
     SpotifyApi.api(:api)
     |> Req.merge(headers: [{"Authorization", "Bearer #{access_token}"}])
     |> Req.get(url: "/me/player")
@@ -122,7 +122,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
 
   def default, do: %{"is_playing" => false, "item" => nil, "device" => nil}
 
-  def start_resume_playback(%Scope{user: %{spotify_access_token: access_token}}, %Album{
+  def start_resume_playback(%Scope{user: %{spotify: %{access_token: access_token}}}, %Album{
         spotify_id: spotify_id
       }) do
     SpotifyApi.api(:api)
@@ -134,7 +134,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     |> SpotifyApi.handle(204, fn _ -> "spotify:album:#{spotify_id}" end)
   end
 
-  def start_resume_playback(%Scope{user: %{spotify_access_token: access_token}}, %Track{
+  def start_resume_playback(%Scope{user: %{spotify: %{access_token: access_token}}}, %Track{
         spotify_id: spotify_id
       }) do
     SpotifyApi.api(:api)
@@ -146,7 +146,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{spotify_id}" end)
   end
 
-  def add_item_to_playback_queue(%Scope{user: %{spotify_access_token: access_token}}, %Track{
+  def add_item_to_playback_queue(%Scope{user: %{spotify: %{access_token: access_token}}}, %Track{
         spotify_id: spotify_id
       }) do
     SpotifyApi.api(:api)

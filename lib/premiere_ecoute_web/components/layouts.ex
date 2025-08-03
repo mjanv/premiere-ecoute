@@ -127,10 +127,7 @@ defmodule PremiereEcouteWeb.Layouts do
 
   # AIDEV-NOTE: Helper function to check if user needs Spotify connection
   defp needs_spotify_connection?(nil), do: false
-
-  defp needs_spotify_connection?(user) do
-    user.spotify_access_token == nil || user.spotify_refresh_token == nil
-  end
+  defp needs_spotify_connection?(user), do: user.spotify == nil
 
   # AIDEV-NOTE: Helper function to get user's preferred theme from profile
   def get_user_theme(assigns) do

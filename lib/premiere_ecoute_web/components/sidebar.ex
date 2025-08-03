@@ -143,10 +143,10 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
     ~H"""
     <div class="flex items-center px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors cursor-pointer">
       <div class="w-7 h-7 rounded-full bg-purple-600 border border-gray-700 flex items-center justify-center text-white font-semibold text-sm mr-3">
-        {String.upcase(String.first(@channel.twitch_username || @channel.email))}
+        {String.upcase(String.first(@channel.twitch.username || @channel.email))}
       </div>
       <span class="truncate">
-        {@channel.twitch_username || @channel.email}
+        {@channel.twitch.username || @channel.email}
       </span>
     </div>
     """

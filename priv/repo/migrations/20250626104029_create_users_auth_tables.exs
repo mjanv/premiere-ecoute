@@ -8,18 +8,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersAuthTables do
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime
 
-      add :spotify_user_id, :string
-      add :spotify_username, :string
-      add :spotify_access_token, :string
-      add :spotify_refresh_token, :string
-      add :spotify_expires_at, :utc_datetime
-
-      add :twitch_user_id, :string
-      add :twitch_username, :string
-      add :twitch_access_token, :string
-      add :twitch_refresh_token, :string
-      add :twitch_expires_at, :utc_datetime
-
       add :profile, :map, null: false, default: %{}
 
       timestamps(type: :utc_datetime)

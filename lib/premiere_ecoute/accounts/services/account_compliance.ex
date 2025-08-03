@@ -58,7 +58,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     |> Ecto.Multi.delete_all(:tokens, Token.by_user_and_contexts_query(user, :all))
     |> Ecto.Multi.delete_all(:viewer_follows, from(f in Follow, where: f.user_id == ^user.id))
     |> Ecto.Multi.delete_all(:streamer_follows, from(f in Follow, where: f.streamer_id == ^user.id))
-    |> Ecto.Multi.delete_all(:votes, from(v in Vote, where: v.viewer_id == ^user.twitch_user_id))
+    |> Ecto.Multi.delete_all(:votes, from(v in Vote, where: v.viewer_id == ^user.twitch.user_id))
     |> Ecto.Multi.delete_all(:sessions, from(s in ListeningSession, where: s.user_id == ^user.id))
     |> Ecto.Multi.delete(:user, user)
     |> Ecto.Multi.run(:event, fn _, _ ->
