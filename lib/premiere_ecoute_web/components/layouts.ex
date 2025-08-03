@@ -132,6 +132,26 @@ defmodule PremiereEcouteWeb.Layouts do
     user.spotify_access_token == nil || user.spotify_refresh_token == nil
   end
 
+  # AIDEV-NOTE: Helper function to get user's preferred theme from profile
+  def get_user_theme(assigns) do
+    with %{current_scope: scope} when not is_nil(scope) <- assigns,
+         %{user: user} when not is_nil(user) <- scope,
+         %{profile: profile} when not is_nil(profile) <- user,
+         color_scheme when not is_nil(color_scheme) <- profile.color_scheme do
+      case color_scheme do
+        :light -> "light"
+        :dark -> "dark"
+        # Let browser handle system preference
+        :system -> nil
+        # Default fallback
+        _ -> "dark"
+      end
+    else
+      # Default fallback when any part of the chain is missing
+      _ -> "dark"
+    end
+  end
+
   @doc """
   Shows the flash group with standard titles and content.
 

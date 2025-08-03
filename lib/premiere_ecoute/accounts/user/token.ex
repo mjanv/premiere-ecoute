@@ -1,10 +1,9 @@
-defmodule PremiereEcoute.Accounts.UserToken do
+defmodule PremiereEcoute.Accounts.User.Token do
   @moduledoc false
 
   use PremiereEcoute.Core.Schema
 
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Accounts.UserToken
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -52,7 +51,7 @@ defmodule PremiereEcoute.Accounts.UserToken do
   def build_session_token(user) do
     token = :crypto.strong_rand_bytes(@rand_size)
     dt = user.authenticated_at || DateTime.utc_now(:second)
-    {token, %UserToken{token: token, context: "session", user_id: user.id, authenticated_at: dt}}
+    {token, %__MODULE__{token: token, context: "session", user_id: user.id, authenticated_at: dt}}
   end
 
   @doc """
@@ -95,7 +94,7 @@ defmodule PremiereEcoute.Accounts.UserToken do
     hashed_token = :crypto.hash(@hash_algorithm, token)
 
     {Base.url_encode64(token, padding: false),
-     %UserToken{token: hashed_token, context: context, sent_to: sent_to, user_id: user.id}}
+     %__MODULE__{token: hashed_token, context: context, sent_to: sent_to, user_id: user.id}}
   end
 
   @doc """
@@ -157,25 +156,25 @@ defmodule PremiereEcoute.Accounts.UserToken do
   Returns the token struct for the given token value and context.
   """
   def by_token_and_context_query(token, context) do
-    from UserToken, where: [token: ^token, context: ^context]
+    from __MODULE__, where: [token: ^token, context: ^context]
   end
 
   @doc """
   Gets all tokens for the given user for the given contexts.
   """
   def by_user_and_contexts_query(user, :all) do
-    from t in UserToken, where: t.user_id == ^user.id
+    from t in __MODULE__, where: t.user_id == ^user.id
   end
 
   def by_user_and_contexts_query(user, [_ | _] = contexts) do
-    from t in UserToken, where: t.user_id == ^user.id and t.context in ^contexts
+    from t in __MODULE__, where: t.user_id == ^user.id and t.context in ^contexts
   end
 
   @doc """
   Deletes a list of tokens.
   """
   def delete_all_query(tokens) do
-    from t in UserToken, where: t.id in ^Enum.map(tokens, & &1.id)
+    from t in __MODULE__, where: t.id in ^Enum.map(tokens, & &1.id)
   end
 
   @doc """

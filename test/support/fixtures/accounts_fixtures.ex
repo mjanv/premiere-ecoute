@@ -8,6 +8,8 @@ defmodule PremiereEcoute.AccountsFixtures do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User.Token
+  alias PremiereEcoute.Repo
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "hello world!"
@@ -52,26 +54,17 @@ defmodule PremiereEcoute.AccountsFixtures do
   end
 
   def override_token_authenticated_at(token, authenticated_at) when is_binary(token) do
-    PremiereEcoute.Repo.update_all(
-      from(t in Accounts.UserToken,
-        where: t.token == ^token
-      ),
-      set: [authenticated_at: authenticated_at]
-    )
+    Repo.update_all(from(t in Token, where: t.token == ^token), set: [authenticated_at: authenticated_at])
   end
 
   def generate_user_magic_link_token(user) do
-    {encoded_token, user_token} = Accounts.UserToken.build_email_token(user, "login")
-    PremiereEcoute.Repo.insert!(user_token)
+    {encoded_token, user_token} = Token.build_email_token(user, "login")
+    Repo.insert!(user_token)
     {encoded_token, user_token.token}
   end
 
   def offset_user_token(token, amount_to_add, unit) do
     dt = DateTime.add(DateTime.utc_now(:second), amount_to_add, unit)
-
-    PremiereEcoute.Repo.update_all(
-      from(ut in Accounts.UserToken, where: ut.token == ^token),
-      set: [inserted_at: dt, authenticated_at: dt]
-    )
+    Repo.update_all(from(ut in Token, where: ut.token == ^token), set: [inserted_at: dt, authenticated_at: dt])
   end
 end

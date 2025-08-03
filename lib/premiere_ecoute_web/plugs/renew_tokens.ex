@@ -5,13 +5,13 @@ defmodule PremiereEcouteWeb.Plugs.RenewTokens do
 
   import Plug.Conn
 
-  alias PremiereEcoute.Accounts.ApiToken
+  alias PremiereEcoute.Accounts.Services.TokenRenewal
 
   def init(default), do: default
 
   def call(conn, _opts) do
     conn
-    |> assign(:current_scope, ApiToken.maybe_renew_twitch_token(conn))
-    |> assign(:current_scope, ApiToken.maybe_renew_spotify_token(conn))
+    |> assign(:current_scope, TokenRenewal.maybe_renew_twitch_token(conn))
+    |> assign(:current_scope, TokenRenewal.maybe_renew_spotify_token(conn))
   end
 end

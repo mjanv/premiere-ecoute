@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Accounts do
   alias PremiereEcoute.Accounts.Services
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
-  alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Accounts.User.Token
 
   ## User
   defdelegate preload_user(user), to: User, as: :preload
@@ -23,13 +23,13 @@ defmodule PremiereEcoute.Accounts do
   defdelegate delete_account(scope), to: Services.AccountCompliance
 
   ## User Token
-  defdelegate generate_user_session_token(user), to: UserToken
-  defdelegate get_user_by_session_token(token), to: UserToken
-  defdelegate get_user_by_magic_link_token(token), to: UserToken
-  defdelegate login_user_by_magic_link(token), to: UserToken
-  defdelegate deliver_user_update_email_instructions(user, email, fun), to: UserToken
-  defdelegate deliver_login_instructions(user, fun), to: UserToken
-  defdelegate delete_user_session_token(token), to: UserToken
+  defdelegate generate_user_session_token(user), to: Token
+  defdelegate get_user_by_session_token(token), to: Token
+  defdelegate get_user_by_magic_link_token(token), to: Token
+  defdelegate login_user_by_magic_link(token), to: Token
+  defdelegate deliver_user_update_email_instructions(user, email, fun), to: Token
+  defdelegate deliver_login_instructions(user, fun), to: Token
+  defdelegate delete_user_session_token(token), to: Token
 
   ## Follow
   defdelegate follow(user, streamer, opts \\ %{}), to: Follow

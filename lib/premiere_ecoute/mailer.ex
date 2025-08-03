@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Mailer.Email do
   def from_event(event) do
     new()
     |> to({"Maxime Janvier", "maxime.janvier@gmail.com"})
-    |> from({"Premiere Ecoute", "noreply@premiere-ecoute.onresend.com"})
+    |> from({"Premiere Ecoute", "hello@premiere-ecoute.fr"})
     |> subject("#{Event.name(event)}")
     |> text_body("#{inspect(event)}")
   end

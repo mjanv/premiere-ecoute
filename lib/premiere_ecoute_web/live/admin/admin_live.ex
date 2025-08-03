@@ -18,10 +18,10 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
       polls_count: Scores.Poll.count(:id)
     })
     |> assign(:event_store, %{
-      stream: "accounts",
+      stream: "users",
       page: 1,
       size: 10,
-      events: PremiereEcoute.paginate("accounts", page: 1, size: 10)
+      events: PremiereEcoute.paginate("users", page: 1, size: 10)
     })
     |> then(fn socket -> {:ok, socket} end)
   end

@@ -41,6 +41,8 @@ defmodule PremiereEcouteWeb.Endpoint do
   plug PromEx.Plug, prom_ex_module: PremiereEcoute.Telemetry.PromEx
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
+  plug PremiereEcouteWeb.Plugs.TwitchHmacValidator
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],

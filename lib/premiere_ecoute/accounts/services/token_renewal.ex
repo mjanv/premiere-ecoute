@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Accounts.ApiToken do
+defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
   @moduledoc """
   API Token Manager
 

@@ -66,6 +66,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
     end
 
     test "cannnot resubscribe to a Twitch event" do
+      Application.put_env(:premiere_ecoute, :twitch_eventsub_secret, "s3cre77890ab")
+
       scope =
         user_scope_fixture(
           user_fixture(%{

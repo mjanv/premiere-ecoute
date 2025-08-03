@@ -24,7 +24,7 @@ defmodule PremiereEcouteWeb.Accounts.UserLoginLiveTest do
 
       assert html =~ "If your email is in our system"
 
-      assert PremiereEcoute.Repo.get_by!(PremiereEcoute.Accounts.UserToken, user_id: user.id).context ==
+      assert PremiereEcoute.Repo.get_by!(PremiereEcoute.Accounts.User.Token, user_id: user.id).context ==
                "login"
     end
 

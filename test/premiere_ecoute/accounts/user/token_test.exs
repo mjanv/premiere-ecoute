@@ -1,9 +1,9 @@
-defmodule PremiereEcoute.Accounts.UserTokenTest do
+defmodule PremiereEcoute.Accounts.User.TokenTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Accounts.User.Token
 
   describe "generate_user_session_token/1" do
     setup do
@@ -12,13 +12,13 @@ defmodule PremiereEcoute.Accounts.UserTokenTest do
 
     test "generates a token", %{user: user} do
       token = Accounts.generate_user_session_token(user)
-      assert user_token = Repo.get_by(UserToken, token: token)
+      assert user_token = Repo.get_by(Token, token: token)
       assert user_token.context == "session"
       assert user_token.authenticated_at != nil
 
       # Creating the same token for another user should fail
       assert_raise Ecto.ConstraintError, fn ->
-        Repo.insert!(%UserToken{
+        Repo.insert!(%Token{
           token: user_token.token,
           user_id: user_fixture().id,
           context: "session"
@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Accounts.UserTokenTest do
     test "duplicates the authenticated_at of given user in new token", %{user: user} do
       user = %{user | authenticated_at: DateTime.add(DateTime.utc_now(:second), -3600)}
       token = Accounts.generate_user_session_token(user)
-      assert user_token = Repo.get_by(UserToken, token: token)
+      assert user_token = Repo.get_by(Token, token: token)
       assert user_token.authenticated_at == user.authenticated_at
       assert DateTime.compare(user_token.inserted_at, user.authenticated_at) == :gt
     end
@@ -55,7 +55,7 @@ defmodule PremiereEcoute.Accounts.UserTokenTest do
 
     test "does not return user for expired token", %{token: token} do
       dt = ~N[2020-01-01 00:00:00]
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: dt, authenticated_at: dt])
+      {1, nil} = Repo.update_all(Token, set: [inserted_at: dt, authenticated_at: dt])
       refute Accounts.get_user_by_session_token(token)
     end
   end
@@ -77,7 +77,7 @@ defmodule PremiereEcoute.Accounts.UserTokenTest do
     end
 
     test "does not return user for expired token", %{token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} = Repo.update_all(Token, set: [inserted_at: ~N[2020-01-01 00:00:00]])
       refute Accounts.get_user_by_magic_link_token(token)
     end
   end
@@ -135,7 +135,7 @@ defmodule PremiereEcoute.Accounts.UserTokenTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+      assert user_token = Repo.get_by(Token, token: :crypto.hash(:sha256, token))
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "change:current@example.com"
@@ -154,7 +154,7 @@ defmodule PremiereEcoute.Accounts.UserTokenTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+      assert user_token = Repo.get_by(Token, token: :crypto.hash(:sha256, token))
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "login"

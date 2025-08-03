@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
-  alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.PersonalDataRequested
   alias PremiereEcoute.EventStore
@@ -55,7 +55,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     user = scope.user
 
     Ecto.Multi.new()
-    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, :all))
+    |> Ecto.Multi.delete_all(:tokens, Token.by_user_and_contexts_query(user, :all))
     |> Ecto.Multi.delete_all(:viewer_follows, from(f in Follow, where: f.user_id == ^user.id))
     |> Ecto.Multi.delete_all(:streamer_follows, from(f in Follow, where: f.streamer_id == ^user.id))
     |> Ecto.Multi.delete_all(:votes, from(v in Vote, where: v.viewer_id == ^user.twitch_user_id))

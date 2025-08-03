@@ -166,9 +166,23 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
               |> Profile.changeset()
               |> to_form()
 
+            # Push theme update to client when color scheme changes
+            theme =
+              case updated_user.profile.color_scheme do
+                :light -> "light"
+                :dark -> "dark"
+                :system -> "system"
+              end
+
+            # Update locale immediately when language changes
+            locale = Atom.to_string(updated_user.profile.language)
+            Gettext.put_locale(PremiereEcoute.Gettext, locale)
+
             socket
             |> assign(:current_user, updated_user)
             |> assign(:profile_form, updated_profile_form)
+            |> push_event("phx:set-theme", %{theme: theme})
+            |> push_navigate(to: ~p"/users/account")
             |> put_flash(:info, "Profile updated successfully")
 
           {:error, changeset} ->

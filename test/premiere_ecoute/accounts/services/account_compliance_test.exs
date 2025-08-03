@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
-  alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.PersonalDataRequested
   alias PremiereEcoute.EventStore
@@ -125,7 +125,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert deleted_user.id == viewer.id
       assert is_nil(User.get(viewer.id))
 
-      assert Enum.empty?(UserToken.all(where: [user_id: viewer.id], order_by: [:id]))
+      assert Enum.empty?(Token.all(where: [user_id: viewer.id], order_by: [:id]))
       assert Enum.empty?(Follow.all(where: [user_id: viewer.id]))
       assert Enum.empty?(Follow.all(where: [streamer_id: viewer.id]))
       assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch_user_id]))
@@ -140,7 +140,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert deleted_user.id == streamer.id
       assert is_nil(User.get(streamer.id))
 
-      assert Enum.empty?(UserToken.all(where: [user_id: streamer.id], order_by: [:id]))
+      assert Enum.empty?(Token.all(where: [user_id: streamer.id], order_by: [:id]))
       assert Enum.empty?(Follow.all(where: [user_id: streamer.id]))
       assert Enum.empty?(Follow.all(where: [streamer_id: streamer.id]))
       assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch_user_id]))

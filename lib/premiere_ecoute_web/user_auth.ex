@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   alias PremiereEcoute.Accounts.User
 
   # Make the remember me cookie valid for 14 days. This should match
-  # the session validity setting in UserToken.
+  # the session validity setting in User.Token.
   @max_cookie_age_in_days 14
   @remember_me_cookie "_premiere_ecoute_web_user_remember_me"
   @remember_me_options [

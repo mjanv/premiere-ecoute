@@ -6,6 +6,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   alias PremiereEcoute.Sessions.Scores.Events.PollEnded
   alias PremiereEcoute.Sessions.Scores.Events.PollStarted
   alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
+  alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
   alias PremiereEcouteWeb.Webhooks.TwitchController
 
   describe "POST /webhooks/twitch" do
@@ -31,6 +32,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       response =
         conn
+        |> sign_conn(payload)
         |> put_req_header("twitch-eventsub-message-type", "webhook_callback_verification")
         |> put_req_header("content-type", "application/json")
         |> post(~p"/webhooks/twitch", Jason.encode!(payload))
@@ -61,6 +63,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       response =
         conn
+        |> sign_conn(payload)
         |> put_req_header("twitch-eventsub-message-type", "revocation")
         |> put_req_header("content-type", "application/json")
         |> post(~p"/webhooks/twitch", Jason.encode!(payload))
@@ -74,12 +77,40 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       response =
         conn
+        |> sign_conn(payload)
         |> put_req_header("twitch-eventsub-message-type", "notification")
         |> put_req_header("content-type", "application/json")
-        |> post(~p"/webhooks/twitch", payload)
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
 
       assert response.status == 202
       assert response.resp_body == ""
+    end
+
+    test "revokes message with wrong HMAC signature", %{conn: conn} do
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_message.json")
+
+      response =
+        conn
+        |> sign_conn(payload, "wrong")
+        |> put_req_header("twitch-eventsub-message-type", "notification")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
+
+      assert response.status == 401
+      assert response.resp_body == ""
+    end
+
+    defp sign_conn(conn, payload, signature \\ nil) do
+      id = UUID.uuid4()
+      timestamp = DateTime.to_iso8601(DateTime.utc_now(), :extended)
+      secret = :crypto.strong_rand_bytes(32)
+      Application.put_env(:premiere_ecoute, :twitch_eventsub_secret, Base.encode16(secret, case: :lower))
+      hmac = TwitchHmacValidator.signature(secret, id <> timestamp <> Jason.encode!(payload))
+
+      conn
+      |> put_req_header("twitch-eventsub-message-id", id)
+      |> put_req_header("twitch-eventsub-message-timestamp", timestamp)
+      |> put_req_header("twitch-eventsub-message-signature", signature || hmac)
     end
   end
 

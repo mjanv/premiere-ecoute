@@ -14,7 +14,7 @@ defmodule PremiereEcoute.MailerTest do
 
       assert_email_sent(
         to: {"Maxime Janvier", "maxime.janvier@gmail.com"},
-        from: {"Premiere Ecoute", "noreply@premiere-ecoute.onresend.com"},
+        from: {"Premiere Ecoute", "hello@premiere-ecoute.fr"},
         subject: "AccountCreated",
         text_body: to_string(event)
       )

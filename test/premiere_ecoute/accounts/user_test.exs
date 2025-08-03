@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Accounts.UserTest do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Accounts.User.Token
 
   describe "inspect/2 for the User module" do
     test "does not include password" do
@@ -131,26 +131,26 @@ defmodule PremiereEcoute.Accounts.UserTest do
       changed_user = Repo.get!(User, user.id)
       assert changed_user.email != user.email
       assert changed_user.email == email
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(Token, user_id: user.id)
     end
 
     test "does not update email with invalid token", %{user: user} do
       assert Accounts.update_user_email(user, "oops") == :error
       assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get_by(Token, user_id: user.id)
     end
 
     test "does not update email if user email changed", %{user: user, token: token} do
       assert Accounts.update_user_email(%{user | email: "current@example.com"}, token) == :error
       assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get_by(Token, user_id: user.id)
     end
 
     test "does not update email if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} = Repo.update_all(Token, set: [inserted_at: ~N[2020-01-01 00:00:00]])
       assert Accounts.update_user_email(user, token) == :error
       assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get_by(Token, user_id: user.id)
     end
   end
 
@@ -222,7 +222,7 @@ defmodule PremiereEcoute.Accounts.UserTest do
           password: "new valid password"
         })
 
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(Token, user_id: user.id)
     end
   end
 

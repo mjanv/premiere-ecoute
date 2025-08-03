@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.User.Profile
-  alias PremiereEcoute.Accounts.UserToken
+  alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
 
@@ -279,6 +279,20 @@ defmodule PremiereEcoute.Accounts.User do
     |> Repo.update()
   end
 
+  def update_spotify_tokens(user, %{
+        access_token: access_token,
+        refresh_token: refresh_token,
+        expires_in: expires_in
+      }) do
+    user
+    |> spotify_changeset(%{
+      spotify_access_token: access_token,
+      spotify_refresh_token: refresh_token,
+      spotify_expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)
+    })
+    |> Repo.update()
+  end
+
   def disconnect_spotify(user) do
     user
     |> spotify_disconnect_changeset(%{
@@ -421,8 +435,8 @@ defmodule PremiereEcoute.Accounts.User do
   def update_user_email(user, token) do
     context = "change:#{user.email}"
 
-    with {:ok, query} <- UserToken.verify_change_email_token_query(token, context),
-         %UserToken{sent_to: email} <- Repo.one(query),
+    with {:ok, query} <- Token.verify_change_email_token_query(token, context),
+         %Token{sent_to: email} <- Repo.one(query),
          {:ok, _} <- Repo.transaction(user_email_multi(user, email, context)) do
       :ok
     else
@@ -433,7 +447,7 @@ defmodule PremiereEcoute.Accounts.User do
   defp user_email_multi(user, email, context) do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, email_changeset(user, %{email: email}))
-    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, [context]))
+    |> Ecto.Multi.delete_all(:tokens, Token.by_user_and_contexts_query(user, [context]))
   end
 
   @doc """
@@ -487,9 +501,9 @@ defmodule PremiereEcoute.Accounts.User do
     with {:ok, %{user: user, tokens_to_expire: expired_tokens}} <-
            Ecto.Multi.new()
            |> Ecto.Multi.update(:user, changeset)
-           |> Ecto.Multi.all(:tokens_to_expire, UserToken.by_user_and_contexts_query(user, :all))
+           |> Ecto.Multi.all(:tokens_to_expire, Token.by_user_and_contexts_query(user, :all))
            |> Ecto.Multi.delete_all(:tokens, fn %{tokens_to_expire: tokens_to_expire} ->
-             UserToken.delete_all_query(tokens_to_expire)
+             Token.delete_all_query(tokens_to_expire)
            end)
            |> Repo.transaction() do
       {:ok, user, expired_tokens}

@@ -8,28 +8,30 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   alias PremiereEcoute.Sessions.Scores.Events.PollEnded
   alias PremiereEcoute.Sessions.Scores.Events.PollStarted
   alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
-
   alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
+  alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
 
   def handle(conn, _params) do
     conn
     |> put_resp_content_type("text/plain")
     |> then(fn conn ->
-      headers = Enum.into(conn.req_headers, %{})
-      type = headers["twitch-eventsub-message-type"]
+      twitch_hmac = Map.get(conn.assigns, :twitch_hmac, false)
+      type = TwitchHmacValidator.at(conn.req_headers, "type")
       TwitchApiMetrics.webhook_received(type)
-      {type, conn}
+      {twitch_hmac, type, conn}
     end)
     |> case do
-      {"webhook_callback_verification", conn} ->
-        response = conn.body_params["challenge"]
-        send_resp(conn, 200, response)
+      {false, _, conn} ->
+        send_resp(conn, 401, "")
 
-      {"revocation", conn} ->
+      {true, "webhook_callback_verification", conn} ->
+        send_resp(conn, 200, conn.body_params["challenge"])
+
+      {true, "revocation", conn} ->
         Logger.error("revocation: #{inspect(conn.body_params)}")
         send_resp(conn, 204, "")
 
-      {"notification", conn} ->
+      {true, "notification", conn} ->
         Core.dispatch(handle(conn.body_params))
         send_resp(conn, 202, "")
     end
