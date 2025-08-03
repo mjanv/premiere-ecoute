@@ -36,9 +36,11 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> validate_required([:access_token, :refresh_token, :expires_at])
   end
 
-  def create(%User{id: id} = user, %{expires_in: expires_in} = attrs) do
+  def create(%User{id: id} = user, provider, %{expires_in: expires_in} = attrs) do
     %__MODULE__{}
-    |> changeset(Map.merge(attrs, %{parent_id: id, expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)}))
+    |> changeset(
+      Map.merge(attrs, %{parent_id: id, provider: provider, expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)})
+    )
     |> Repo.insert()
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end

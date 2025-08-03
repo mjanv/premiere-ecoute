@@ -10,9 +10,9 @@ defmodule PremiereEcoute.Accounts.User do
     json: [:id, :email, :role, :twitch, :spotify]
 
   alias PremiereEcoute.Accounts.User.Follow
-  alias PremiereEcoute.Accounts.User.Profile
-  alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Accounts.User.OauthToken
+    alias PremiereEcoute.Accounts.User.Profile
+  alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
 
@@ -340,4 +340,8 @@ defmodule PremiereEcoute.Accounts.User do
     |> cast_embed(:profile, required: true, with: &Profile.changeset/2)
     |> Repo.update()
   end
+
+  defdelegate create_token(user, provider, attrs), to: OauthToken, as: :create
+  defdelegate refresh_token(user, provider, attrs), to: OauthToken, as: :refresh
+  defdelegate disconnect_provider(user, provider), to: OauthToken, as: :disconnect
 end

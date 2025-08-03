@@ -16,7 +16,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
            conn.assigns[:current_scope],
          true <- token_expired?(expires_at),
          {:ok, tokens} <- Apis.twitch().renew_token(refresh_token),
-         {:ok, user} <- User.update_twitch_tokens(user, tokens) do
+         {:ok, user} <- User.refresh_token(user, :twitch, tokens) do
       %{scope | user: user}
     else
       {:error, reason} ->
@@ -33,7 +33,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
            conn.assigns[:current_scope],
          true <- token_expired?(expires_at),
          {:ok, tokens} <- Apis.spotify().renew_token(refresh_token),
-         {:ok, user} <- User.update_spotify_tokens(user, tokens) do
+         {:ok, user} <- User.refresh_token(user, :spotify, tokens) do
       %{scope | user: user}
     else
       {:error, reason} ->

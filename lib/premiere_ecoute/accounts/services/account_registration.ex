@@ -34,23 +34,22 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   @bots Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :bots])
 
   @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
-  def register_twitch_user(%{email: email, username: username, user_id: user_id} = payload, password \\ nil) do
+  def register_twitch_user(%{email: email, username: username} = payload, password \\ nil) do
     with email <- if(email == "", do: "#{username}@twitch.tv", else: email),
          nil <- User.get_user_by_email(email),
          attrs <- %{
            email: email,
            role: role(payload),
            confirmed_at: DateTime.utc_now(),
-           password: password || random(32),
-           twitch_user_id: user_id
+           password: password || random(32)
          },
          {:ok, user} <- User.create(attrs),
-         {:ok, user} <- User.update_twitch_auth(user, payload),
+         {:ok, user} <- User.create_token(user, :twitch, payload),
          :ok <- AccountFollow.follow_streamers(Scope.for_user(user)) do
       {:ok, user}
     else
       %User{} = user ->
-        User.update_twitch_auth(user, payload)
+        User.refresh_token(user, :twitch, payload)
 
       {:error, reason} ->
         Logger.error("Failed to create user from Twitch authentification: #{inspect(reason)}")
@@ -61,7 +60,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   @spec register_spotify_user(spotify_data(), String.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_spotify_user(payload, id) do
     with %User{} = user <- Accounts.get_user!(id),
-         {:ok, user} <- User.update_spotify_tokens(user, payload) do
+         {:ok, user} <- User.create_token(user, :spotify, payload) do
       {:ok, user}
     else
       nil ->
