@@ -20,9 +20,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.UsersTest do
         status: 200
       )
 
-      scope = user_scope_fixture(user_fixture(%{spotify_access_token: "token"}))
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "token"}}))
 
-      {:ok, profile} = SpotifyApi.get_user_profile(scope.user.spotify_access_token)
+      {:ok, profile} = SpotifyApi.get_user_profile(scope.user.spotify.access_token)
 
       assert profile == %{
                "display_name" => "lanfeust313",

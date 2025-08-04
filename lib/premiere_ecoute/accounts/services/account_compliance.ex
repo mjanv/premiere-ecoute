@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   def download_associated_data(scope) do
     try do
       user = User.preload(scope.user)
-      votes = Vote.all(where: [viewer_id: user.twitch_user_id])
+      votes = Vote.all(where: [viewer_id: user.twitch.user_id])
       events = EventStore.read("user-#{scope.user.id}", :raw)
 
       %{
@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
       }
       |> Jason.encode!()
       |> Jason.decode!()
-      |> anonym(["data", "activity", "follows"], ["twitch_user_id", "twitch_username"])
+      |> anonym(["data", "activity", "follows"], ["id"])
       |> anonym(["data", "activity", "votes"], ["session_id", "track_id", "value", "inserted_at"])
       |> Jason.encode!()
       |> then(fn data -> {:ok, data} end)

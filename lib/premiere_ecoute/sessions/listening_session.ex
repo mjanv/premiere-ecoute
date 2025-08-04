@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
   use PremiereEcoute.Core.Schema,
-    root: [album: [:tracks], user: [], current_track: []],
+    root: [album: [:tracks], user: [:twitch, :spotify], current_track: []],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
 
   alias PremiereEcoute.Accounts.User

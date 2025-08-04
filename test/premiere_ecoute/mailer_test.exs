@@ -8,7 +8,7 @@ defmodule PremiereEcoute.MailerTest do
 
   describe "dispatch/1" do
     test "send an email from an event" do
-      event = %AccountCreated{id: UUID.uuid4(), twitch_user_id: "user_id"}
+      event = %AccountCreated{id: UUID.uuid4()}
 
       Mailer.dispatch(event)
 

@@ -80,6 +80,7 @@ defmodule PremiereEcoute.MixProject do
       {:heroicons, github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
       {:gettext, "~> 0.26"},
       {:dns_cluster, "~> 0.2"},
+      {:plug_content_security_policy, "~> 0.2.1"},
       # Backend
       {:dotenvy, "~> 1.0"},
       {:boundary, "~> 0.10"},

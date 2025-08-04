@@ -51,6 +51,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
       %{
         user_id: user["id"],
         email: user["email"],
+        username: user["display_name"],
         display_name: user["display_name"],
         country: user["country"],
         product: user["product"],

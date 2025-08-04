@@ -13,9 +13,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.UsersTest do
         status: 200
       )
 
-      scope = user_scope_fixture(user_fixture(%{twitch_access_token: "token"}))
+      scope = user_scope_fixture(user_fixture(%{twitch: %{access_token: "token"}}))
 
-      {:ok, user} = TwitchApi.get_user_profile(scope.user.twitch_access_token)
+      {:ok, user} = TwitchApi.get_user_profile(scope.user.twitch.access_token)
 
       assert user == %{
                "broadcaster_type" => "partner",

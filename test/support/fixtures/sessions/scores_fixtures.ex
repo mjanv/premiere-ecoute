@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Sessions.ScoresFixtures do
 
   alias PremiereEcoute.Sessions.Scores.Vote
 
-  def vote(%{twitch_user_id: viewer_id, role: role}, %{id: session_id, current_track: %{id: track_id}, vote_options: options}) do
+  def vote(%{twitch: %{user_id: viewer_id}, role: role}, %{id: session_id, current_track: %{id: track_id}, vote_options: options}) do
     %Vote{
       viewer_id: viewer_id,
       session_id: session_id,

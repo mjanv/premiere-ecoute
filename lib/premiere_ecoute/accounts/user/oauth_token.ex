@@ -5,10 +5,26 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
 
   import Ecto.Changeset
 
+  alias PremiereEcoute.EventStore
   alias PremiereEcoute.Repo
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Events.AccountAssociated
 
+  @type t :: %__MODULE__{
+          id: integer() | nil,
+          provider: :twitch | :spotify,
+          user_id: String.t(),
+          username: String.t(),
+          access_token: binary() | nil,
+          refresh_token: binary() | nil,
+          expires_at: DateTime.t() | nil,
+          parent_id: integer() | nil,
+          inserted_at: NaiveDateTime.t(),
+          updated_at: NaiveDateTime.t()
+        }
+
+  @derive {Jason.Encoder, except: [:__meta__, :parent]}
   schema "users_oauth_tokens" do
     field :provider, Ecto.Enum, values: [:twitch, :spotify]
     field :user_id, :string
@@ -33,7 +49,7 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
   def refresh_changeset(user, attrs) do
     user
     |> cast(attrs, [:access_token, :refresh_token, :expires_at])
-    |> validate_required([:access_token, :refresh_token, :expires_at])
+    |> validate_required([])
   end
 
   def create(%User{id: id} = user, provider, %{expires_in: expires_in} = attrs) do
@@ -42,6 +58,9 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
       Map.merge(attrs, %{parent_id: id, provider: provider, expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)})
     )
     |> Repo.insert()
+    |> EventStore.ok("user", fn token ->
+      %AccountAssociated{id: token.parent_id, provider: token.provider, user_id: token.user_id}
+    end)
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 
@@ -53,11 +72,7 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 
-  def disconnect(%User{id: id} = user, provider) do
-    case Repo.get_by(__MODULE__, parent_id: id, provider: provider) do
-      nil -> {:error, nil}
-      token -> Repo.delete(token)
-    end
-    |> then(fn {status, _token} -> {status, User.preload(user)} end)
+  def disconnect(%User{} = user, provider) do
+    refresh(user, provider, %{access_token: nil, refresh_token: nil, expires_at: nil})
   end
 end

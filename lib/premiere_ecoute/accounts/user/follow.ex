@@ -89,5 +89,6 @@ defmodule PremiereEcoute.Accounts.User.Follow do
       order_by: [asc: :id]
     )
     |> Repo.all()
+    |> User.preload()
   end
 end

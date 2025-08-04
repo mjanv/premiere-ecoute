@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
     scope =
       user_scope_fixture(
         user_fixture(%{
-          spotify_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+          spotify: %{access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"}
         })
       )
 

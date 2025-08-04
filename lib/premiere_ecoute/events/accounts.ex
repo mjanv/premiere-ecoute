@@ -1,7 +1,13 @@
 defmodule PremiereEcoute.Events.AccountCreated do
   @moduledoc false
 
-  use PremiereEcoute.Core.Event, fields: [:twitch_user_id]
+  use PremiereEcoute.Core.Event
+end
+
+defmodule PremiereEcoute.Events.AccountAssociated do
+  @moduledoc false
+
+  use PremiereEcoute.Core.Event, fields: [:provider, :user_id]
 end
 
 defmodule PremiereEcoute.Events.AccountDeleted do

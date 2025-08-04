@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Accounts.Bot do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Core.Cache
 
-  @bot "premiereecoutebot@twitch.tv"
+  @bot "maxime.janvier+premiereecoute@gmail.com"
 
   def get do
     case Cache.get(:users, :bot) do

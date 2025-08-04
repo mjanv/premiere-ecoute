@@ -9,12 +9,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
     scope =
       user_scope_fixture(
         user_fixture(%{
-          twitch_user_id: "1234",
-          twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+          twitch: %{user_id: "1234", access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"}
         })
       )
 
     Cache.put(:tokens, :twitch, "token")
+    Application.put_env(:premiere_ecoute, :twitch_eventsub_secret, "s3cre77890ab")
 
     {:ok, %{scope: scope}}
   end
@@ -65,17 +65,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
              }
     end
 
-    test "cannnot resubscribe to a Twitch event" do
-      Application.put_env(:premiere_ecoute, :twitch_eventsub_secret, "s3cre77890ab")
-
-      scope =
-        user_scope_fixture(
-          user_fixture(%{
-            twitch_user_id: "1234",
-            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
-          })
-        )
-
+    test "cannnot resubscribe to a Twitch event", %{scope: scope} do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
@@ -132,8 +122,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       scope =
         user_scope_fixture(
           user_fixture(%{
-            twitch_user_id: "5678",
-            twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+            twitch: %{user_id: "5678", access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"}
           })
         )
 

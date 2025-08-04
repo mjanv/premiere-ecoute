@@ -6,12 +6,12 @@ defmodule PremiereEcoute.Accounts.User do
   """
 
   use PremiereEcoute.Core.Schema,
-    root: [:channels, :twitch, :spotify],
+    root: [[channels: [:twitch, :spotify]], :twitch, :spotify],
     json: [:id, :email, :role, :twitch, :spotify]
 
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.User.OauthToken
-    alias PremiereEcoute.Accounts.User.Profile
+  alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
@@ -38,18 +38,6 @@ defmodule PremiereEcoute.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
     field :role, Ecto.Enum, values: [:viewer, :streamer, :admin, :bot], default: :viewer
 
-    # field :spotify_user_id, :string
-    # field :spotify_username, :string
-    # field :spotify_access_token, :string, redact: true
-    # field :spotify_refresh_token, :string, redact: true
-    # field :spotify_expires_at, :utc_datetime
-
-    # field :twitch_user_id, :string
-    # field :twitch_username, :string
-    # field :twitch_access_token, :string, redact: true
-    # field :twitch_refresh_token, :string, redact: true
-    # field :twitch_expires_at, :utc_datetime
-
     has_one :twitch, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :twitch], foreign_key: :parent_id
     has_one :spotify, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :spotify], foreign_key: :parent_id
 
@@ -63,7 +51,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   def changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :role, :profile])
+    |> cast(attrs, [:email, :role])
     |> validate_email(opts)
     |> validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
     |> cast_embed(:profile, required: false, with: &Profile.changeset/2)
@@ -224,7 +212,7 @@ defmodule PremiereEcoute.Accounts.User do
   def create(attrs) do
     attrs
     |> super()
-    |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id, twitch_user_id: user.twitch.user_id} end)
+    |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id} end)
   end
 
   # def update_spotify_tokens(user, attrs) do

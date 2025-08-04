@@ -8,10 +8,13 @@ defmodule PremiereEcoute.AccountsFixtures do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Repo
 
-  def unique_user_email, do: "user#{System.unique_integer()}@example.com"
+  def unique_user_id, do: "#{System.unique_integer([:positive])}"
+  def unique_username, do: "username-#{System.unique_integer([:positive])}"
+  def unique_user_email, do: "user-#{System.unique_integer([:positive])}@example.com"
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
@@ -26,6 +29,47 @@ defmodule PremiereEcoute.AccountsFixtures do
   end
 
   def user_fixture(attrs \\ %{}) do
+    user = unconfirmed_user_fixture(attrs)
+
+    token =
+      extract_user_token(fn url ->
+        Accounts.deliver_login_instructions(user, url)
+      end)
+
+    {:ok, user, _expired_tokens} = Accounts.login_user_by_magic_link(token)
+
+    {:ok, user} =
+      OauthToken.create(
+        user,
+        :twitch,
+        %{
+          username: unique_username(),
+          user_id: unique_user_id(),
+          access_token: "access_token",
+          refresh_token: "refresh_token",
+          expires_in: 3600
+        }
+        |> Map.merge(Map.get(attrs, :twitch, %{}))
+      )
+
+    {:ok, user} =
+      OauthToken.create(
+        user,
+        :spotify,
+        %{
+          username: unique_username(),
+          user_id: unique_user_id(),
+          access_token: "access_token",
+          refresh_token: "refresh_token",
+          expires_in: 3600
+        }
+        |> Map.merge(Map.get(attrs, :spotify, %{}))
+      )
+
+    user
+  end
+
+  def user_fixture2(attrs \\ %{}) do
     user = unconfirmed_user_fixture(attrs)
 
     token =

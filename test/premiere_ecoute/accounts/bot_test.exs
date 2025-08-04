@@ -26,7 +26,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
   end
 
   test "Bot is available if premiereecoutebot@twitch.tv user account exists" do
-    %{id: id} = user_fixture(%{email: "premiereecoutebot@twitch.tv", twitch_refresh_token: "twitch_refresh_token"})
+    %{id: id} = user_fixture(%{email: "maxime.janvier+premiereecoute@gmail.com", twitch_refresh_token: "twitch_refresh_token"})
 
     bot = Bot.get()
 
@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
   end
 
   test "Bot can be read from cache" do
-    %{id: id} = user_fixture(%{email: "premiereecoutebot@twitch.tv", twitch_refresh_token: "twitch_refresh_token"})
+    %{id: id} = user_fixture(%{email: "maxime.janvier+premiereecoute@gmail.com", twitch_refresh_token: "twitch_refresh_token"})
 
     bot1 = Bot.get()
     bot2 = Bot.get()

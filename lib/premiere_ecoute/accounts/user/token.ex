@@ -193,7 +193,11 @@ defmodule PremiereEcoute.Accounts.User.Token do
   """
   def get_user_by_session_token(token) do
     {:ok, query} = verify_session_token_query(token)
-    Repo.one(query)
+
+    case Repo.one(query) do
+      nil -> nil
+      {user, inserted_at} -> {User.preload(user), inserted_at}
+    end
   end
 
   @doc """
@@ -244,10 +248,14 @@ defmodule PremiereEcoute.Accounts.User.Token do
         user
         |> User.confirm_changeset()
         |> User.update_user_and_delete_all_tokens()
+        |> case do
+          {:ok, user, tokens} -> {:ok, User.preload(user), tokens}
+          other -> other
+        end
 
       {user, token} ->
         Repo.delete!(token)
-        {:ok, user, []}
+        {:ok, User.preload(user), []}
 
       nil ->
         {:error, :not_found}

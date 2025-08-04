@@ -9,12 +9,11 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
     scope =
       user_scope_fixture(
         user_fixture(%{
-          twitch_user_id: "141981764",
-          twitch_access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"
+          twitch: %{user_id: "141981764", access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"}
         })
       )
 
-    Cache.put(:users, :bot, %{twitch_user_id: "467189141", twitch_access_token: "token"})
+    Cache.put(:users, :bot, %{twitch: %{user_id: "467189141", access_token: "token"}})
 
     {:ok, %{scope: scope}}
   end

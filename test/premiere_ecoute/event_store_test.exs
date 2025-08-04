@@ -62,7 +62,7 @@ defmodule PremiereEcoute.EventStoreTest do
                stream_uuid: "account-id1",
                stream_version: 1,
                event_type: "Elixir.PremiereEcoute.Events.AccountCreated",
-               data: %AccountCreated{id: "id1", twitch_user_id: nil},
+               data: %AccountCreated{id: "id1"},
                metadata: %{},
                created_at: _
              } = hd(events1)
@@ -73,7 +73,7 @@ defmodule PremiereEcoute.EventStoreTest do
                stream_uuid: "account-id11",
                stream_version: 1,
                event_type: "Elixir.PremiereEcoute.Events.AccountCreated",
-               data: %AccountCreated{id: "id11", twitch_user_id: nil},
+               data: %AccountCreated{id: "id11"},
                metadata: %{},
                created_at: _
              } = hd(events2)
@@ -84,7 +84,7 @@ defmodule PremiereEcoute.EventStoreTest do
                stream_uuid: "account-id21",
                stream_version: 1,
                event_type: "Elixir.PremiereEcoute.Events.AccountCreated",
-               data: %AccountCreated{id: "id21", twitch_user_id: nil},
+               data: %AccountCreated{id: "id21"},
                metadata: %{},
                created_at: _
              } = hd(events3)

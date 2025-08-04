@@ -14,9 +14,18 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, html: {PremiereEcouteWeb.Layouts, :root}
     plug :protect_from_forgery
-    # %{"content-security-policy" => "default-src 'self'"}
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
+
+    plug PlugContentSecurityPolicy,
+      nonces_for: [:script_src, :style_src],
+      directives: %{
+        script_src: ~w('self' 'unsafe-eval' https://unpkg.com),
+        style_src: ~w('self' 'unsafe-hashes' https://fonts.googleapis.com),
+        font_src: ~w('self' https://fonts.gstatic.com),
+        style_src_attr: ~w('self' 'unsafe-hashes' 'unsafe-inline')
+      }
+
     plug Plugs.RenewTokens
     plug Plugs.SetLocale
   end

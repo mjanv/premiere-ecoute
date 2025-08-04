@@ -6,9 +6,9 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersOauthTokens do
       add :provider, :string, null: false
       add :user_id, :string, null: false
       add :username, :string, null: false
-      add :access_token, :binary, null: false
-      add :refresh_token, :binary, null: false
-      add :expires_at, :utc_datetime, null: false
+      add :access_token, :binary
+      add :refresh_token, :binary
+      add :expires_at, :utc_datetime
 
       add :parent_id, references(:users, on_delete: :delete_all)
 

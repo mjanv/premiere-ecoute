@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
   alias PremiereEcoute.Sessions.Scores.Vote
 
   setup do
-    user = user_fixture(%{twitch_user_id: "1234"})
+    user = user_fixture(%{twitch: %{user_id: "1234"}})
     {:ok, album} = Album.create(album_fixture())
 
     {:ok, session} =

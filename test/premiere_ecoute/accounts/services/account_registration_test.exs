@@ -3,7 +3,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
   alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Events.AccountAssociated
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.EventStore
 
@@ -24,7 +26,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
     %{
       user_id: "username007",
       email: "username+spotify@yahoo.fr",
-      display_name: "Username",
+      username: "Username",
       country: "FR",
       product: "premium",
       access_token: :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false),
@@ -47,16 +49,18 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert %User{
                email: "username+twitch@yahoo.fr",
                role: :streamer,
-               twitch_user_id: "441903922",
-               twitch_access_token: access_token,
-               twitch_refresh_token: refresh_token
+               twitch: %OauthToken{
+                 user_id: "441903922",
+                 access_token: access_token,
+                 refresh_token: refresh_token
+               }
              } = user
 
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
 
       events = EventStore.read("user-#{user.id}")
-      assert events == [%AccountCreated{id: user.id, twitch_user_id: "441903922"}]
+      assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
     end
 
     test "create a new user with a default email address" do
@@ -66,16 +70,18 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert %User{
                email: "user1004@twitch.tv",
                role: :streamer,
-               twitch_user_id: "441903922",
-               twitch_access_token: access_token,
-               twitch_refresh_token: refresh_token
+               twitch: %OauthToken{
+                 user_id: "441903922",
+                 access_token: access_token,
+                 refresh_token: refresh_token
+               }
              } = user
 
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
 
       events = EventStore.read("user-#{user.id}")
-      assert events == [%AccountCreated{id: user.id, twitch_user_id: "441903922"}]
+      assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
     end
 
     test "find an existing user" do
@@ -88,16 +94,18 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert %User{
                email: "username+twitch@yahoo.fr",
                role: :streamer,
-               twitch_user_id: "441903922",
-               twitch_access_token: access_token,
-               twitch_refresh_token: refresh_token
+               twitch: %OauthToken{
+                 user_id: "441903922",
+                 access_token: access_token,
+                 refresh_token: refresh_token
+               }
              } = user
 
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
 
       events = EventStore.read("user-#{user.id}")
-      assert events == [%AccountCreated{id: user.id, twitch_user_id: "441903922"}]
+      assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
     end
   end
 
@@ -111,10 +119,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert %User{
                email: "user1004@twitch.tv",
-               spotify_user_id: "username007",
-               spotify_username: "Username",
-               spotify_access_token: access_token,
-               spotify_refresh_token: refresh_token
+               spotify: %OauthToken{
+                 user_id: "username007",
+                 username: "Username",
+                 access_token: access_token,
+                 refresh_token: refresh_token
+               }
              } = user
 
       assert data[:access_token] == access_token
@@ -130,10 +140,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert %User{
                email: "username+twitch@yahoo.fr",
-               spotify_user_id: "username007",
-               spotify_username: "Username",
-               spotify_access_token: access_token,
-               spotify_refresh_token: refresh_token
+               spotify: %OauthToken{
+                 user_id: "username007",
+                 username: "Username",
+                 access_token: access_token,
+                 refresh_token: refresh_token
+               }
              } = user
 
       assert data[:access_token] == access_token

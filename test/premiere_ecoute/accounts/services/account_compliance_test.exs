@@ -15,8 +15,20 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
   alias PremiereEcoute.Sessions.Scores.Vote
 
   setup do
-    streamer = user_fixture(%{role: :streamer, twitch_user_id: "streamer123", twitch_username: "streamer"})
-    viewer = user_fixture(%{role: :viewer, twitch_user_id: "viewer456", twitch_username: "viewer"})
+    streamer =
+      user_fixture(%{
+        role: :streamer,
+        twitch: %{user_id: "streamer123", username: "streamer"},
+        spotify: %{user_id: "streamer123", username: "streamer"}
+      })
+
+    viewer =
+      user_fixture(%{
+        role: :viewer,
+        twitch: %{user_id: "viewer456", username: "viewer"},
+        spotify: %{user_id: "viewer456", username: "viewer"}
+      })
+
     {:ok, _} = Follow.follow(viewer, streamer)
 
     albums =
@@ -69,15 +81,14 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
                "email" => _,
                "id" => _,
                "role" => "viewer",
-               "twitch_user_id" => "viewer456",
-               "twitch_username" => "viewer"
+               "twitch" => %{
+                 "user_id" => "viewer456",
+                 "username" => "viewer"
+               }
              } = profile
 
       assert [
-               %{
-                 "twitch_user_id" => "streamer123",
-                 "twitch_username" => "streamer"
-               }
+               %{"id" => _}
              ] = follows
 
       assert [
@@ -97,9 +108,21 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
 
       assert [
                %{
-                 "details" => %{"twitch_user_id" => "viewer456"},
+                 "details" => %{},
                  "event_id" => _,
                  "event_type" => "AccountCreated",
+                 "timestamp" => _
+               },
+               %{
+                 "details" => %{"provider" => "twitch", "user_id" => "viewer456"},
+                 "event_id" => _,
+                 "event_type" => "AccountAssociated",
+                 "timestamp" => _
+               },
+               %{
+                 "details" => %{"provider" => "spotify", "user_id" => "viewer456"},
+                 "event_id" => _,
+                 "event_type" => "AccountAssociated",
                  "timestamp" => _
                },
                %{
@@ -114,7 +137,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
     test "register an event", %{viewer: viewer} do
       {:ok, _} = Accounts.download_associated_data(Scope.for_user(viewer))
 
-      assert [_, _, %PersonalDataRequested{result: "ok"}] = EventStore.read("user-#{viewer.id}")
+      assert [_, _, _, _, %PersonalDataRequested{result: "ok"}] = EventStore.read("user-#{viewer.id}")
     end
   end
 
@@ -128,10 +151,10 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Token.all(where: [user_id: viewer.id], order_by: [:id]))
       assert Enum.empty?(Follow.all(where: [user_id: viewer.id]))
       assert Enum.empty?(Follow.all(where: [streamer_id: viewer.id]))
-      assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch_user_id]))
+      assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: viewer.id]))
 
-      assert [_, _, %AccountDeleted{}] = EventStore.read("user-#{viewer.id}")
+      assert [_, _, _, _, %AccountDeleted{}] = EventStore.read("user-#{viewer.id}")
     end
 
     test "delete a streamer account", %{streamer: streamer} do
@@ -143,14 +166,14 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Token.all(where: [user_id: streamer.id], order_by: [:id]))
       assert Enum.empty?(Follow.all(where: [user_id: streamer.id]))
       assert Enum.empty?(Follow.all(where: [streamer_id: streamer.id]))
-      assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch_user_id]))
+      assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: streamer.id]))
 
-      assert [_, %AccountDeleted{}] = EventStore.read("user-#{streamer.id}")
+      assert [_, _, _, %AccountDeleted{}] = EventStore.read("user-#{streamer.id}")
     end
 
     test "deleting non-existent user raises appropriate error" do
-      user = user_fixture(%{role: :viewer, twitch_user_id: "test123"})
+      user = user_fixture(%{role: :viewer, twitch: %{user_id: "test123"}})
       Repo.delete!(user)
 
       assert_raise Ecto.StaleEntryError, fn -> Accounts.delete_account(Scope.for_user(user)) end

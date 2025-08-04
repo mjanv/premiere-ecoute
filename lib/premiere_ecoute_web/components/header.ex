@@ -67,7 +67,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
-                {@current_user.twitch.username || @current_user.email}
+                {@current_user.email}
                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -110,7 +110,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                   <% end %>
                   
     <!-- AIDEV-NOTE: Dev mode fake Twitch link for testing -->
-                  <%= if Application.get_env(:premiere_ecoute, :environment) == :dev and @current_user.twitch_user_id do %>
+                  <%= if Application.get_env(:premiere_ecoute, :environment) == :dev do %>
                     <!-- Divider -->
                     <div class="border-t border-gray-600 my-1"></div>
                     <a

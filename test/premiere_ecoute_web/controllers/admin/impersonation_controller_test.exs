@@ -5,7 +5,7 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationControllerTest do
     # Create admin user
     admin = user_fixture(%{role: :admin})
     # Create target user to impersonate
-    target_user = user_fixture(%{role: :viewer, twitch_username: "test_user"})
+    target_user = user_fixture(%{role: :viewer, twitch: %{username: "test_user"}})
 
     {:ok, admin: admin, target_user: target_user}
   end

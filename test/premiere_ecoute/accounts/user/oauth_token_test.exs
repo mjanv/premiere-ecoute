@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
   }
 
   setup do
-    %{user: user_fixture()}
+    %{user: user_fixture2()}
   end
 
   describe "create/1" do
@@ -99,8 +99,23 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
       {:ok, user} = OauthToken.disconnect(user, :twitch)
       {:ok, user} = OauthToken.disconnect(user, :spotify)
 
-      assert user.twitch == nil
-      assert user.spotify == nil
+      assert %OauthToken{
+               provider: :twitch,
+               user_id: "twitch_user_id",
+               username: "twitch_username",
+               access_token: nil,
+               refresh_token: nil,
+               expires_at: nil
+             } = user.twitch
+
+      assert %OauthToken{
+               provider: :spotify,
+               user_id: "spotify_user_id",
+               username: "spotify_username",
+               access_token: nil,
+               refresh_token: nil,
+               expires_at: nil
+             } = user.spotify
     end
 
     test "cannnot delete non-existing oauth tokens for an user", %{user: user} do
@@ -109,7 +124,15 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
       {:ok, user} = OauthToken.disconnect(user, :twitch)
       {:error, %User{}} = OauthToken.disconnect(user, :spotify)
 
-      assert user.twitch == nil
+      assert %OauthToken{
+               provider: :twitch,
+               user_id: "twitch_user_id",
+               username: "twitch_username",
+               access_token: nil,
+               refresh_token: nil,
+               expires_at: nil
+             } = user.twitch
+
       assert user.spotify == nil
     end
   end

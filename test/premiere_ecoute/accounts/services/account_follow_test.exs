@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
 
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
@@ -15,7 +16,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
 
       expect(TwitchApi, :get_followed_channel, fn %Scope{user: ^user}, ^streamer ->
         payload = %{
-          "broadcaster_id" => streamer.twitch_user_id,
+          "broadcaster_id" => streamer.twitch.user_id,
           "broadcaster_login" => "basketweaver101",
           "broadcaster_name" => "BasketWeaver101",
           "followed_at" => "2022-05-24T22:22:08Z"
@@ -46,12 +47,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
     test "automatically follows all followed streamers" do
       %{id: user_id} = user = user_fixture()
       scope = user_scope_fixture(user)
-      streamer1 = user_fixture(%{role: :streamer, twitch_user_id: "1"})
-      streamer2 = user_fixture(%{role: :streamer, twitch_user_id: "2"})
+      %{id: streamer1_id} = streamer1 = user_fixture(%{role: :streamer, twitch: %{user_id: "1"}})
+      %{id: streamer2_id} = user_fixture(%{role: :streamer, twitch: %{user_id: "2"}})
 
-      expect(TwitchApi, :get_followed_channel, fn %Scope{user: %{id: ^user_id}}, %{twitch_user_id: "1"} ->
+      expect(TwitchApi, :get_followed_channel, fn %Scope{user: %{id: ^user_id}}, %{twitch: %{user_id: "1"}} ->
         payload = %{
-          "broadcaster_id" => streamer1.twitch_user_id,
+          "broadcaster_id" => streamer1.twitch.user_id,
           "broadcaster_login" => "basketweaver101",
           "broadcaster_name" => "BasketWeaver101",
           "followed_at" => "2022-05-24T22:22:08Z"
@@ -60,7 +61,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
         {:ok, payload}
       end)
 
-      expect(TwitchApi, :get_followed_channel, fn %Scope{user: %{id: ^user_id}}, %{twitch_user_id: "2"} ->
+      expect(TwitchApi, :get_followed_channel, fn %Scope{user: %{id: ^user_id}}, %{twitch: %{user_id: "2"}} ->
         {:ok, %{"data" => []}}
       end)
 
@@ -68,8 +69,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
 
       user = Accounts.get_user!(user_id)
 
-      assert user.channels == [streamer1]
-      refute streamer2 in user.channels
+      assert [%User{id: ^streamer1_id}] = user.channels
+      refute streamer2_id in Enum.map(user.channels, fn user -> user.id end)
     end
   end
 end

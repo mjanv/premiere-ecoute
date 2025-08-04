@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
 
+  alias PremiereEcoute.Events.AccountAssociated
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.ChannelFollowed
   alias PremiereEcoute.Events.ChannelUnfollowed
@@ -21,7 +22,9 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: nil} = follow
 
         assert EventStore.read("user-#{user_id}") == [
-                 %AccountCreated{id: user.id, twitch_user_id: nil},
+                 %AccountCreated{id: user.id},
+                 %AccountAssociated{id: user.id, provider: "twitch", user_id: user.twitch.user_id},
+                 %AccountAssociated{id: user.id, provider: "spotify", user_id: user.spotify.user_id},
                  %ChannelFollowed{id: user.id, streamer_id: streamer.id}
                ]
       end
@@ -37,7 +40,9 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: ~N[2020-07-18 07:59:47]} = follow
 
         assert EventStore.read("user-#{user_id}") == [
-                 %AccountCreated{id: user.id, twitch_user_id: nil},
+                 %AccountCreated{id: user.id},
+                 %AccountAssociated{id: user.id, provider: "twitch", user_id: user.twitch.user_id},
+                 %AccountAssociated{id: user.id, provider: "spotify", user_id: user.spotify.user_id},
                  %ChannelFollowed{id: user.id, streamer_id: streamer.id}
                ]
       end
@@ -85,7 +90,9 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = unfollow
 
       assert EventStore.read("user-#{user_id}") == [
-               %AccountCreated{id: user.id, twitch_user_id: nil},
+               %AccountCreated{id: user.id},
+               %AccountAssociated{id: user.id, provider: "twitch", user_id: user.twitch.user_id},
+               %AccountAssociated{id: user.id, provider: "spotify", user_id: user.spotify.user_id},
                %ChannelFollowed{id: user.id, streamer_id: streamer.id},
                %ChannelUnfollowed{id: user.id, streamer_id: streamer.id}
              ]

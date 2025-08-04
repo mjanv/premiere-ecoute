@@ -22,10 +22,8 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
   end
 
   def handle_event("show_user_modal", %{"user_id" => user_id}, socket) do
-    user = Accounts.User.get!(user_id)
-
     socket
-    |> assign(:selected_user, user)
+    |> assign(:selected_user, Accounts.User.get(user_id))
     |> assign(:show_user_modal, true)
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -38,7 +36,6 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
   end
 
   def handle_event("modal_content_click", _params, socket) do
-    # Do nothing - this prevents the modal from closing when clicking inside
     {:noreply, socket}
   end
 
