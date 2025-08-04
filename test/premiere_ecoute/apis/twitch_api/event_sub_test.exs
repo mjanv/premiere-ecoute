@@ -24,6 +24,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         response: "twitch_api/eventsub/get_event_subscriptions/response.json",
         params: %{"user_id" => "1234"},
         status: 200
@@ -43,6 +47,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         request: "twitch_api/eventsub/create_event_subscription/request.json",
         response: "twitch_api/eventsub/create_event_subscription/response.json",
         status: 202
@@ -69,6 +77,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         request: "twitch_api/eventsub/create_event_subscription/request.json",
         response: "twitch_api/eventsub/create_event_subscription/response.json",
         status: 202
@@ -99,6 +111,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         request: "twitch_api/eventsub/create_event_subscription/request.json",
         response: "twitch_api/eventsub/create_event_subscription/response.json",
         status: 202
@@ -137,6 +153,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         response: "twitch_api/eventsub/get_event_subscriptions/response.json",
         params: %{"user_id" => "1234"},
         status: 200
@@ -168,6 +188,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         response: "twitch_api/eventsub/get_event_subscriptions/response.json",
         params: %{"user_id" => "1234"},
         status: 200
@@ -176,6 +200,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:delete, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         params: %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a"},
         status: 204
       )
@@ -183,6 +211,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       ApiMock.expect(
         TwitchApi,
         path: {:delete, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         params: %{"id" => "35016908-41ff-33ce-7879-61b8dfc2ee16"},
         response: %{"error" => "The subscription was not found."},
         status: 404

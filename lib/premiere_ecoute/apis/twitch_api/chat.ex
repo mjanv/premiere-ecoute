@@ -8,7 +8,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
   def send_chat_message(%Scope{user: %{twitch: %{user_id: user_id}}}, message) do
     bot = Bot.get()
 
-    TwitchApi.api(:api, bot.twitch.access_token)
+    bot.twitch.access_token
+    |> TwitchApi.api()
     |> TwitchApi.post(
       url: "/chat/messages",
       json: %{
@@ -20,14 +21,11 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
     |> TwitchApi.handle(200, fn %{"data" => [message]} -> message end)
   end
 
-  def send_chat_announcement(
-        %Scope{user: %{twitch: %{user_id: user_id, access_token: token}}},
-        message,
-        color \\ "purple"
-      ) do
+  def send_chat_announcement(%Scope{user: %{twitch: %{user_id: user_id}}}, message, color \\ "purple") do
     bot = Bot.get()
 
-    TwitchApi.api(:api, token)
+    bot.twitch.access_token
+    |> TwitchApi.api()
     |> TwitchApi.post(
       url: "/chat/announcements",
       params: %{broadcaster_id: user_id, moderator_id: bot.twitch.user_id},

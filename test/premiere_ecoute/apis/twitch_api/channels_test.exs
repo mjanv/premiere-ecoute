@@ -22,6 +22,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChannelsTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/channels/followed"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         params: %{"user_id" => scope.user.twitch.user_id},
         response: "twitch_api/channels/followed/response1.json",
         status: 200
@@ -57,6 +61,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChannelsTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/channels/followed"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         params: %{"user_id" => scope.user.twitch.user_id, "broadcaster_id" => streamer.twitch.user_id},
         response: "twitch_api/channels/followed/response2.json",
         status: 200
@@ -76,6 +84,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChannelsTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/channels/followed"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         params: %{"user_id" => scope.user.twitch.user_id, "broadcaster_id" => streamer.twitch.user_id},
         response: "twitch_api/channels/followed/response3.json",
         status: 200

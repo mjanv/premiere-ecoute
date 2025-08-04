@@ -23,9 +23,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   use PremiereEcoute.Core.Api, api: :spotify
 
-  alias PremiereEcoute.Core.Cache
-  alias PremiereEcoute.Telemetry
-  alias PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics
+  alias PremiereEcoute.Accounts.Scope
 
   defmodule Behaviour do
     @moduledoc """
@@ -66,22 +64,43 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
-  @spec api(:api | :accounts, String.t() | nil) :: Req.Request.t()
-  def api(type, token \\ nil)
-
-  def api(:api, token) do
+  @spec api :: Req.Request.t()
+  def api do
     [
       base_url: url(:api),
       headers: [
-        {"Authorization", "Bearer #{token(token)}"}
+        {"Authorization", "Bearer #{token(nil)}"},
+        {"Content-Type", "application/json"}
       ]
     ]
-    |> Keyword.merge(env(:spotify)[:req_options] || [])
-    |> Req.new()
-    |> Telemetry.ReqPipeline.attach(&SpotifyApiMetrics.api_called/1)
+    |> new()
   end
 
-  def api(:accounts, _) do
+  @spec api(Scope.t() | binary()) :: Req.Request.t()
+  def api(%Scope{user: %{spotify: %{access_token: access_token}}}) do
+    [
+      base_url: url(:api),
+      headers: [
+        {"Authorization", "Bearer #{access_token}"},
+        {"Content-Type", "application/json"}
+      ]
+    ]
+    |> new()
+  end
+
+  def api(token) when is_binary(token) do
+    [
+      base_url: url(:api),
+      headers: [
+        {"Authorization", "Bearer #{token(token)}"},
+        {"Content-Type", "application/json"}
+      ]
+    ]
+    |> new()
+  end
+
+  @spec accounts :: Req.Request.t()
+  def accounts do
     id = Application.get_env(:premiere_ecoute, :spotify_client_id)
     secret = Application.get_env(:premiere_ecoute, :spotify_client_secret)
 
@@ -92,9 +111,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
         {"Content-Type", "application/x-www-form-urlencoded"}
       ]
     ]
-    |> Keyword.merge(env(:spotify)[:req_options] || [])
-    |> Req.new()
-    |> Telemetry.ReqPipeline.attach(&SpotifyApiMetrics.api_called/1)
+    |> new()
   end
 
   # Accounts

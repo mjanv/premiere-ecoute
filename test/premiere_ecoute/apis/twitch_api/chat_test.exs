@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
         })
       )
 
-    Cache.put(:users, :bot, %{twitch: %{user_id: "467189141", access_token: "token"}})
+    Cache.put(:users, :bot, %{twitch: %{user_id: "467189141", access_token: "access_token"}})
 
     {:ok, %{scope: scope}}
   end
@@ -23,6 +23,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/messages"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
         request: "twitch_api/chat/send_chat_message/request.json",
         response: "twitch_api/chat/send_chat_message/response.json",
         status: 200
@@ -44,6 +48,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/announcements"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
         request: "twitch_api/chat/send_chat_announcement/request.json",
         params: %{"broadcaster_id" => "141981764", "moderator_id" => "467189141"},
         status: 204

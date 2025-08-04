@@ -26,6 +26,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
         response: "spotify_api/player/get_playback_state/state1.json",
         status: 200
       )
@@ -53,6 +54,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
         response: %{},
         status: 204
       )
@@ -72,6 +74,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:put, "/v1/me/player/play"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "2"}
+        ],
         response: %{},
         status: 204
       )
@@ -85,6 +92,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:put, "/v1/me/player/pause"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
         response: %{},
         status: 204
       )
@@ -98,6 +110,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/me/player/next"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
         response: %{},
         status: 204
       )
@@ -111,6 +128,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/me/player/previous"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
         response: %{},
         status: 204
       )
@@ -130,6 +152,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:put, "/v1/me/player/play"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
         request: "spotify_api/player/start_resume_playback/request_album.json",
         status: 204
       )
@@ -145,6 +168,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:put, "/v1/me/player/play"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}],
         request: "spotify_api/player/start_resume_playback/request_track.json",
         status: 204
       )
@@ -168,6 +192,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/me/player/queue"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
         params: %{"uri" => "spotify:track:#{track.spotify_id}"},
         status: 204
       )
@@ -181,6 +210,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/me/player/queue"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}],
         params: %{"uri" => "spotify:track:track001"},
         status: 204
       )
@@ -188,6 +218,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/me/player/queue"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}],
         params: %{"uri" => "spotify:track:track002"},
         status: 204
       )
@@ -204,6 +235,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/me/player/queue"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}],
         params: %{"uri" => "spotify:track:track001"},
         status: 204
       )
@@ -211,6 +243,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/me/player/queue"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}],
         status: 429,
         body: %{}
       )

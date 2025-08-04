@@ -10,19 +10,21 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
   alias PremiereEcoute.Sessions.Discography.Playlist.Track
 
   def get_playlist(playlist_id) when is_binary(playlist_id) do
-    SpotifyApi.api(:api)
+    SpotifyApi.api()
     |> SpotifyApi.get(url: "/playlists/#{playlist_id}")
     |> SpotifyApi.handle(200, &parse_playlist/1)
   end
 
-  def get_library_playlists(_scope) do
-    SpotifyApi.api(:api)
+  def get_library_playlists(scope) do
+    scope
+    |> SpotifyApi.api()
     |> SpotifyApi.get(url: "/me/playlists")
     |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_library_playlist/1) end)
   end
 
-  def add_items_to_playlist(_scope, id, tracks) do
-    SpotifyApi.api(:api)
+  def add_items_to_playlist(scope, id, tracks) do
+    scope
+    |> SpotifyApi.api()
     |> SpotifyApi.post(
       url: "/playlists/#{id}/tracks",
       json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.spotify_id}" end)}
@@ -30,8 +32,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(201, fn body -> body end)
   end
 
-  def remove_playlist_items(_scope, id, tracks, snapshot) do
-    SpotifyApi.api(:api)
+  def remove_playlist_items(scope, id, tracks, snapshot) do
+    scope
+    |> SpotifyApi.api()
     |> SpotifyApi.delete(
       url: "/playlists/#{id}/tracks",
       json: %{

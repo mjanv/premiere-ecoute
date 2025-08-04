@@ -17,6 +17,12 @@ defmodule PremiereEcoute.ApiMock do
     assert conn.request_path == path
     assert String.to_atom(String.downcase(conn.method)) == method
 
+    if opts[:headers] do
+      for header <- opts[:headers] do
+        assert header in conn.req_headers
+      end
+    end
+
     if opts[:params] do
       assert conn.query_params == payload(opts[:params])
     end

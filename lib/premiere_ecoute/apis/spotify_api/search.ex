@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Search do
   Reference: https://developer.spotify.com/documentation/web-api/reference/search
   """
   def search_albums(query) when is_binary(query) do
-    SpotifyApi.api(:api)
+    SpotifyApi.api()
     |> SpotifyApi.get(url: "/search?q=#{URI.encode(query)}&type=album&limit=20")
     |> SpotifyApi.handle(200, fn %{"albums" => %{"items" => items}} ->
       Enum.map(items, fn item ->

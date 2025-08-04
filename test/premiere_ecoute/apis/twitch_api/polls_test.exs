@@ -20,6 +20,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/polls"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         request: "twitch_api/polls/create_poll/request.json",
         response: "twitch_api/polls/create_poll/response.json",
         status: 200
@@ -66,6 +70,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
       ApiMock.expect(
         TwitchApi,
         path: {:patch, "/helix/polls"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         request: "twitch_api/polls/end_poll/request.json",
         response: "twitch_api/polls/end_poll/response.json",
         status: 200
@@ -111,6 +119,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.PollsTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/polls"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
         params: "twitch_api/polls/get_polls/params.json",
         response: "twitch_api/polls/get_polls/response.json",
         status: 200

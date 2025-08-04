@@ -13,8 +13,7 @@ defmodule PremiereEcoute.Telemetry.PromEx do
       {Plugins.Phoenix, router: PremiereEcouteWeb.Router, endpoint: PremiereEcouteWeb.Endpoint},
       Plugins.Ecto,
       Plugins.PhoenixLiveView,
-      PremiereEcoute.Telemetry.Apis.TwitchApiMetrics,
-      PremiereEcoute.Telemetry.Apis.SpotifyApiMetrics
+      PremiereEcoute.Telemetry.ApiMetrics
     ]
   end
 

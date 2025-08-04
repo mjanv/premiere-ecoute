@@ -10,16 +10,22 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
   alias PremiereEcoute.Sessions.Discography.Playlist.Track
 
   setup_all do
-    Cache.put(:tokens, :spotify, "token")
+    token = UUID.uuid4()
 
-    :ok
+    Cache.put(:tokens, :spotify, token)
+
+    {:ok, %{token: token}}
   end
 
   describe "get_playlist/1" do
-    test "list playlist from an unique identifier" do
+    test "get a playlist from an unique identifier", %{token: token} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7"},
+        headers: [
+          {"authorization", "Bearer #{token}"},
+          {"content-type", "application/json"}
+        ],
         response: "spotify_api/playlists/get_playlist/response.json",
         status: 200
       )
@@ -49,12 +55,16 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
     test "get a list of the playlists owned or followed by the current Spotify user" do
       ApiMock.expect(
         SpotifyApi,
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
         path: {:get, "/v1/me/playlists"},
         response: "spotify_api/playlists/get_current_user_playlist/response.json",
         status: 200
       )
 
-      scope = user_scope_fixture(user_fixture())
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
       {:ok, playlists} = SpotifyApi.get_library_playlists(scope)
 
@@ -99,6 +109,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:post, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
         request: "spotify_api/playlists/add_items_to_playlist/request.json",
         response: "spotify_api/playlists/add_items_to_playlist/response.json",
         status: 201
@@ -106,7 +120,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
 
       id = "2gW4sqiC2OXZLe9m0yDQX7"
 
-      scope = user_scope_fixture(user_fixture())
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
       tracks = [%Track{spotify_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{spotify_id: "6TGd66r0nlPaYm3KIoI7ET"}]
 
@@ -121,6 +135,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       ApiMock.expect(
         SpotifyApi,
         path: {:delete, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
         request: "spotify_api/playlists/remove_playlist_items/request.json",
         response: "spotify_api/playlists/remove_playlist_items/response.json",
         status: 200
@@ -128,7 +146,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
 
       id = "2gW4sqiC2OXZLe9m0yDQX7"
 
-      scope = user_scope_fixture(user_fixture())
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
       tracks = [%Track{spotify_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{spotify_id: "6TGd66r0nlPaYm3KIoI7ET"}]
       snapshot = %{"snapshot_id" => "abc"}

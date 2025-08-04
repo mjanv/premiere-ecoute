@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
   alias PremiereEcoute.Apis.SpotifyApi
 
   def client_credentials do
-    SpotifyApi.api(:accounts)
+    SpotifyApi.accounts()
     |> SpotifyApi.post(url: "/token", body: "grant_type=client_credentials")
     |> SpotifyApi.handle(200, fn %{"access_token" => _} = body -> body end)
   end
@@ -35,7 +35,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
   end
 
   def authorization_code(code, _state) do
-    SpotifyApi.api(:accounts)
+    SpotifyApi.accounts()
     |> SpotifyApi.post(
       url: "/token",
       form: [
@@ -63,7 +63,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
   end
 
   def renew_token(refresh_token) do
-    SpotifyApi.api(:accounts)
+    SpotifyApi.accounts()
     |> Req.post(
       url: "/token",
       form: [

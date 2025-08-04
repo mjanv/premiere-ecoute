@@ -23,9 +23,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
   use PremiereEcoute.Core.Api, api: :twitch
 
-  alias PremiereEcoute.Core.Cache
-  alias PremiereEcoute.Telemetry
-  alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
+  alias PremiereEcoute.Accounts.Scope
 
   defmodule Behaviour do
     @moduledoc "Twitch API Behaviour"
@@ -40,9 +38,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     @callback renew_token(refresh_token :: String.t()) :: {:ok, map()} | {:error, any()}
 
     # Chat
-    @callback send_chat_message(scope :: Scope.t(), message :: String.t()) ::
-                {:ok, map()} | {:error, term()}
-
+    @callback send_chat_message(scope :: Scope.t(), message :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback send_chat_announcement(scope :: Scope.t(), message :: String.t(), color :: String.t()) ::
                 {:ok, String.t()} | {:error, term()}
 
@@ -65,24 +61,44 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
-  @spec api(:api | :accounts, String.t() | nil) :: Req.Request.t()
-  def api(type, token \\ nil)
+  @spec api :: Req.Request.t()
+  def api do
+    [
+      base_url: url(:api),
+      headers: [
+        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
+        {"Authorization", "Bearer #{token(nil)}"},
+        {"Content-Type", "application/json"}
+      ]
+    ]
+    |> new()
+  end
 
-  def api(:api, token) do
+  @spec api(Scope.t() | binary()) :: Req.Request.t()
+  def api(%Scope{user: %{twitch: %{access_token: access_token}}}) do
+    [
+      base_url: url(:api),
+      headers: [
+        {"Authorization", "Bearer #{access_token}"},
+        {"Content-Type", "application/json"}
+      ]
+    ]
+    |> new()
+  end
+
+  def api(token) when is_binary(token) do
     [
       base_url: url(:api),
       headers: [
         {"Authorization", "Bearer #{token(token)}"},
-        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
         {"Content-Type", "application/json"}
       ]
     ]
-    |> Keyword.merge(env(:twitch)[:req_options] || [])
-    |> Req.new()
-    |> Telemetry.ReqPipeline.attach(&TwitchApiMetrics.api_called/1)
+    |> new()
   end
 
-  def api(:accounts, _) do
+  @spec accounts :: Req.Request.t()
+  def accounts do
     id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     secret = Application.get_env(:premiere_ecoute, :twitch_client_secret)
 
@@ -90,15 +106,13 @@ defmodule PremiereEcoute.Apis.TwitchApi do
       base_url: url(:accounts),
       headers: [{"Content-Type", "application/x-www-form-urlencoded"}]
     ]
-    |> Keyword.merge(env(:twitch)[:req_options] || [])
-    |> Req.new()
+    |> new()
     |> Req.Request.append_request_steps(
       body: fn request ->
         body = Map.merge(%{client_id: id, client_secret: secret}, request.body)
         %{request | body: URI.encode_query(body)}
       end
     )
-    |> Telemetry.ReqPipeline.attach(&TwitchApiMetrics.api_called/1)
   end
 
   # Accounts

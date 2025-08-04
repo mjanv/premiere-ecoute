@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
   Reference: https://developer.spotify.com/documentation/web-api/reference/get-an-album
   """
   def get_album(album_id) when is_binary(album_id) do
-    SpotifyApi.api(:api)
+    SpotifyApi.api()
     |> SpotifyApi.get(url: "/albums/#{album_id}")
     |> SpotifyApi.handle(200, &parse_album_with_tracks/1)
   end

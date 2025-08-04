@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Core.Api do
       require Logger
 
       alias PremiereEcoute.Core.Cache
+      alias PremiereEcoute.Telemetry
 
       @behaviour __MODULE__.Behaviour
 
@@ -17,6 +18,13 @@ defmodule PremiereEcoute.Core.Api do
       def env(key), do: Application.get_env(unquote(app), PremiereEcoute.Apis)[key]
       def impl, do: env()[unquote(api)][:api]
       def url(key), do: env()[unquote(api)][:urls][key]
+
+      def new(attrs) do
+        attrs
+        |> Keyword.merge(env(unquote(api))[:req_options] || [])
+        |> Req.new()
+        |> Telemetry.ReqPipeline.attach(unquote(api), &Telemetry.ApiMetrics.api_call/2)
+      end
 
       def get(request, opts), do: Req.get(request, opts)
       def post(request, opts), do: Req.post(request, opts)

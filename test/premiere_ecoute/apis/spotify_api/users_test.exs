@@ -3,24 +3,27 @@ defmodule PremiereEcoute.Apis.SpotifyApi.UsersTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Core.Cache
 
   setup_all do
-    Cache.put(:tokens, :spotify, "token")
+    token = UUID.uuid4()
 
-    :ok
+    {:ok, %{token: token}}
   end
 
   describe "get_user_profile/1" do
-    test "list playlist from an unique identifier" do
+    test "list playlist from an unique identifier", %{token: token} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/me"},
+        headers: [
+          {"authorization", "Bearer #{token}"},
+          {"content-type", "application/json"}
+        ],
         response: "spotify_api/users/get_current_user_profile/response.json",
         status: 200
       )
 
-      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "token"}}))
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: token}}))
 
       {:ok, profile} = SpotifyApi.get_user_profile(scope.user.spotify.access_token)
 

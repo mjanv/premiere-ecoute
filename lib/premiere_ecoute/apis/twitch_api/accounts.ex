@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
   alias PremiereEcoute.Apis.TwitchApi
 
   def client_credentials do
-    TwitchApi.api(:accounts)
+    TwitchApi.accounts()
     |> TwitchApi.post(
       url: "/token",
       headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
   end
 
   def authorization_code(code) when is_binary(code) do
-    TwitchApi.api(:accounts)
+    TwitchApi.accounts()
     |> TwitchApi.post(
       url: "/token",
       headers: [{"Content-Type", "application/x-www-form-urlencoded"}],
@@ -66,7 +66,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
   end
 
   def renew_token(refresh_token) do
-    TwitchApi.api(:accounts)
+    TwitchApi.accounts()
     |> TwitchApi.post(
       url: "/token",
       body: %{grant_type: "refresh_token", refresh_token: refresh_token}

@@ -23,7 +23,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
 
       EventStore.append(event, stream: "user")
 
-      :timer.sleep(50)
+      :timer.sleep(100)
     end
 
     test "dispatch an email event on AccountDeleted" do
@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
 
       EventStore.append(event, stream: "user")
 
-      :timer.sleep(50)
+      :timer.sleep(100)
     end
 
     test "does not dispatch an email event on other events", %{ref: ref, pid: pid} do

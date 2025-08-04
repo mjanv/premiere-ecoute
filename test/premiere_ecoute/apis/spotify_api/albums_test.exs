@@ -11,16 +11,22 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
   alias PremiereEcoute.Sessions.Discography.Album.Track
 
   setup_all do
-    Cache.put(:tokens, :spotify, "token")
+    token = UUID.uuid4()
 
-    :ok
+    Cache.put(:tokens, :spotify, token)
+
+    {:ok, %{token: token}}
   end
 
   describe "get_album/1" do
-    test "list album and track details from an unique identifier" do
+    test "list album and track details from an unique identifier", %{token: token} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/albums/7aJuG4TFXa2hmE4z1yxc3n"},
+        headers: [
+          {"authorization", "Bearer #{token}"},
+          {"content-type", "application/json"}
+        ],
         response: "spotify_api/albums/get_album/response.json",
         status: 200
       )
@@ -122,10 +128,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
              } = album
     end
 
-    test "returns an error from an unknown unique identifier" do
+    test "returns an error from an unknown unique identifier", %{token: token} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/albums/4SLYa6PnWEEC6WyIEaQagI"},
+        headers: [
+          {"authorization", "Bearer #{token}"},
+          {"content-type", "application/json"}
+        ],
         response: "spotify_api/albums/get_album/error.json",
         status: 404
       )

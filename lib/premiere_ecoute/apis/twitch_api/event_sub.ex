@@ -6,12 +6,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcoute.Core.Cache
 
-  def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}}) do
-    TwitchApi.api(:api)
-    |> TwitchApi.get(
-      url: "/eventsub/subscriptions",
-      params: %{user_id: user_id}
-    )
+  def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}} = scope) do
+    scope
+    |> TwitchApi.api()
+    |> TwitchApi.get(url: "/eventsub/subscriptions", params: %{user_id: user_id})
     |> TwitchApi.handle(200, fn %{"data" => subscriptions} ->
       subscriptions
       |> Enum.map(fn s -> Map.take(s, ["id", "type"]) end)
@@ -23,7 +21,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   end
 
   def subscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
-    TwitchApi.api(:api)
+    scope
+    |> TwitchApi.api()
     |> TwitchApi.post(
       url: "/eventsub/subscriptions",
       json: %{
@@ -43,10 +42,11 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end)
   end
 
-  def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}}, type) do
+  def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
     case Cache.get(:polls, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
-        TwitchApi.api(:api)
+        scope
+        |> TwitchApi.api()
         |> TwitchApi.delete(url: "/eventsub/subscriptions", params: %{"id" => id})
         |> TwitchApi.handle(204, fn _ -> id end)
 

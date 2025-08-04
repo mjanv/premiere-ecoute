@@ -9,11 +9,15 @@ defmodule PremiereEcoute.Apis.TwitchApi.UsersTest do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/users"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
         response: "twitch_api/users/get_users/response.json",
         status: 200
       )
 
-      scope = user_scope_fixture(user_fixture(%{twitch: %{access_token: "token"}}))
+      scope = user_scope_fixture(user_fixture(%{twitch: %{access_token: "access_token"}}))
 
       {:ok, user} = TwitchApi.get_user_profile(scope.user.twitch.access_token)
 

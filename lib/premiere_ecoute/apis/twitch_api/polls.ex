@@ -4,12 +4,13 @@ defmodule PremiereEcoute.Apis.TwitchApi.Polls do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
 
-  def create_poll(%Scope{user: %{twitch: %{user_id: broadcaster_id, access_token: token}}}, %{
+  def create_poll(%Scope{user: %{twitch: %{user_id: broadcaster_id}}} = scope, %{
         title: title,
         choices: choices,
         duration: duration
       }) do
-    TwitchApi.api(:api, token)
+    scope
+    |> TwitchApi.api()
     |> TwitchApi.post(
       url: "/polls",
       json: %{
@@ -22,14 +23,16 @@ defmodule PremiereEcoute.Apis.TwitchApi.Polls do
     |> TwitchApi.handle(200, fn %{"data" => [poll | _]} -> poll end)
   end
 
-  def end_poll(%Scope{user: %{twitch: %{user_id: broadcaster_id, access_token: token}}}, poll_id) do
-    TwitchApi.api(:api, token)
+  def end_poll(%Scope{user: %{twitch: %{user_id: broadcaster_id}}} = scope, poll_id) do
+    scope
+    |> TwitchApi.api()
     |> TwitchApi.patch(url: "/polls", json: %{broadcaster_id: broadcaster_id, id: poll_id, status: "TERMINATED"})
     |> TwitchApi.handle(200, fn %{"data" => [poll | _]} -> poll end)
   end
 
-  def get_poll(%Scope{user: %{twitch: %{user_id: broadcaster_id, access_token: token}}}, poll_id) do
-    TwitchApi.api(:api, token)
+  def get_poll(%Scope{user: %{twitch: %{user_id: broadcaster_id}}} = scope, poll_id) do
+    scope
+    |> TwitchApi.api()
     |> TwitchApi.get(url: "/polls", params: %{broadcaster_id: broadcaster_id, id: poll_id})
     |> TwitchApi.handle(200, fn %{"data" => [poll | _]} -> poll end)
   end

@@ -8,7 +8,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   alias PremiereEcoute.Sessions.Scores.Events.PollEnded
   alias PremiereEcoute.Sessions.Scores.Events.PollStarted
   alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
-  alias PremiereEcoute.Telemetry.Apis.TwitchApiMetrics
+  alias PremiereEcoute.Telemetry.ApiMetrics
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
 
   def handle(conn, _params) do
@@ -17,7 +17,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
     |> then(fn conn ->
       twitch_hmac = Map.get(conn.assigns, :twitch_hmac, false)
       type = TwitchHmacValidator.at(conn.req_headers, "type")
-      TwitchApiMetrics.webhook_received(type)
+      ApiMetrics.webhook_event(:twitch, type)
       {twitch_hmac, type, conn}
     end)
     |> case do

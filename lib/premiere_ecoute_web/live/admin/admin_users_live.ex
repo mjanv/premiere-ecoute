@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
   def handle_event("change_role", %{"user_id" => user_id, "role" => role}, socket) do
     user_id
     |> User.get!()
-    |> Accounts.update_user_role(String.to_atom(role))
+    |> Accounts.update_user_role(String.to_existing_atom(role))
     |> case do
       {:ok, user} ->
         users = User.all()
