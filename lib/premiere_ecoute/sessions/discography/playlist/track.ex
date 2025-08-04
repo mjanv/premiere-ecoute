@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.Discography.Playlist.Track do
   @moduledoc false
 
-  use PremiereEcoute.Core.Schema,
+  use PremiereEcoute.Core.Aggregate,
     json: [:spotify_id, :album_spotify_id, :user_spotify_id, :name, :artist, :duration_ms, :added_at]
 
   alias PremiereEcoute.Sessions.Discography.Playlist

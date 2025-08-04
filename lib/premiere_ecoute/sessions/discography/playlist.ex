@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.Discography.Playlist do
   @moduledoc false
 
-  use PremiereEcoute.Core.Schema,
+  use PremiereEcoute.Core.Aggregate,
     root: [:tracks],
     identity: [:spotify_id],
     json: [:id, :name, :cover_url]

@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
   Manages voting polls associated with listening sessions and tracks. This module provides data persistence for poll results, vote tallying, and validation to ensure vote counts are consistent with totals.
   """
 
-  use PremiereEcoute.Core.Schema
+  use PremiereEcoute.Core.Aggregate
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Album.Track

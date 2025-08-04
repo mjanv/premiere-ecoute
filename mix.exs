@@ -8,7 +8,7 @@ defmodule PremiereEcoute.MixProject do
       version: "0.1.0",
       elixir: "~> 1.18",
       source_url: "https://github.com/mjanv/premiere-ecoute",
-      homepage_url: "https://premiere-ecoute.fly.dev/",
+      homepage_url: "https://premiere-ecoute.fr/",
       elixirc_paths: elixirc_paths(Mix.env()),
       elixirc_options: [ignore_module_conflict: true],
       start_permanent: Mix.env() == :prod,

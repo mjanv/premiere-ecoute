@@ -8,6 +8,7 @@ defmodule PremiereEcoute.AccountsFixtures do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Repo
@@ -17,78 +18,55 @@ defmodule PremiereEcoute.AccountsFixtures do
   def unique_user_email, do: "user-#{System.unique_integer([:positive])}@example.com"
   def valid_user_password, do: "hello world!"
 
-  def valid_user_attributes(attrs \\ %{}) do
-    Enum.into(attrs, %{email: unique_user_email()})
-  end
+  def valid_user_attributes(attrs \\ %{}), do: Enum.into(attrs, %{email: unique_user_email()})
 
   def unconfirmed_user_fixture(attrs \\ %{}) do
-    attrs
-    |> valid_user_attributes()
-    |> Accounts.create_user()
-    |> then(fn {:ok, user} -> user end)
+    Repo.insert!(User.changeset(struct(User), valid_user_attributes(attrs)))
   end
 
   def user_fixture(attrs \\ %{}) do
     user = unconfirmed_user_fixture(attrs)
-
-    token =
-      extract_user_token(fn url ->
-        Accounts.deliver_login_instructions(user, url)
-      end)
+    token = extract_user_token(fn url -> Accounts.deliver_login_instructions(user, url) end)
 
     {:ok, user, _expired_tokens} = Accounts.login_user_by_magic_link(token)
 
-    {:ok, user} =
-      OauthToken.create(
-        user,
-        :twitch,
-        %{
-          username: unique_username(),
-          user_id: unique_user_id(),
-          access_token: "access_token",
-          refresh_token: "refresh_token",
-          expires_in: 3600
-        }
-        |> Map.merge(Map.get(attrs, :twitch, %{}))
-      )
+    tokens = oauth_tokens_fixture(user, Map.take(attrs, [:twitch, :spotify]))
 
-    {:ok, user} =
-      OauthToken.create(
-        user,
-        :spotify,
-        %{
-          username: unique_username(),
-          user_id: unique_user_id(),
-          access_token: "access_token",
-          refresh_token: "refresh_token",
-          expires_in: 3600
-        }
-        |> Map.merge(Map.get(attrs, :spotify, %{}))
-      )
-
-    user
+    Map.merge(user, tokens)
   end
 
-  def user_fixture2(attrs \\ %{}) do
-    user = unconfirmed_user_fixture(attrs)
+  def oauth_tokens_fixture(user, provider_attrs) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+    now2 = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
-    token =
-      extract_user_token(fn url ->
-        Accounts.deliver_login_instructions(user, url)
-      end)
+    tokens_data =
+      for {provider, attrs} <- provider_attrs do
+        %{
+          provider: provider,
+          user_id: Map.get(attrs, :user_id, unique_user_id()),
+          username: Map.get(attrs, :username, unique_username()),
+          access_token: Map.get(attrs, :access_token, "access_token"),
+          refresh_token: Map.get(attrs, :refresh_token, "refresh_token"),
+          expires_at: DateTime.add(now, Map.get(attrs, :expires_in, 3600), :second),
+          parent_id: user.id,
+          inserted_at: now2,
+          updated_at: now2
+        }
+      end
 
-    {:ok, user, _expired_tokens} = Accounts.login_user_by_magic_link(token)
+    {_, tokens} = Repo.insert_all(OauthToken, tokens_data, returning: true)
 
-    user
+    for {provider, _} <- provider_attrs do
+      {provider, Enum.find(tokens, &(&1.provider == provider))}
+    end
+    |> Enum.into(%{})
   end
 
   def user_scope_fixture, do: user_scope_fixture(user_fixture())
   def user_scope_fixture(user), do: Scope.for_user(user)
 
   def set_password(user) do
-    {:ok, user, _expired_tokens} =
-      Accounts.update_user_password(user, %{password: valid_user_password()})
-
+    {:ok, user, _} = Accounts.update_user_password(user, %{password: valid_user_password()})
     user
   end
 

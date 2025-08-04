@@ -10,9 +10,13 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
 
   describe "follow_streamer/2" do
     test "add the followed at information to a follow" do
-      %{id: user_id} = user = user_fixture()
+      %{id: user_id} =
+        user = user_fixture(%{role: :viewer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+
       scope = user_scope_fixture(user)
-      %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
+
+      %{id: streamer_id} =
+        streamer = user_fixture(%{role: :streamer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
 
       expect(TwitchApi, :get_followed_channel, fn %Scope{user: ^user}, ^streamer ->
         payload = %{

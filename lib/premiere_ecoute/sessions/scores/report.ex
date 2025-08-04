@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.Scores.Report do
   @moduledoc false
 
-  use PremiereEcoute.Core.Schema,
+  use PremiereEcoute.Core.Aggregate,
     root: [:votes, :polls]
 
   require Logger

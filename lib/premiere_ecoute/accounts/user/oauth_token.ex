@@ -1,12 +1,8 @@
 defmodule PremiereEcoute.Accounts.User.OauthToken do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
-
-  alias PremiereEcoute.EventStore
-  alias PremiereEcoute.Repo
+  use PremiereEcoute.Core.Entity,
+    no_json: [:parent]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Events.AccountAssociated
@@ -24,8 +20,7 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
           updated_at: NaiveDateTime.t()
         }
 
-  @derive {Jason.Encoder, except: [:__meta__, :parent]}
-  schema "users_oauth_tokens" do
+  schema "user_oauth_tokens" do
     field :provider, Ecto.Enum, values: [:twitch, :spotify]
     field :user_id, :string
     field :username, :string
@@ -33,7 +28,7 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     field :refresh_token, PremiereEcoute.Repo.Encrypted, redact: true
     field :expires_at, :utc_datetime
 
-    belongs_to :parent, PremiereEcoute.Accounts.User
+    belongs_to :parent, User
 
     timestamps()
   end

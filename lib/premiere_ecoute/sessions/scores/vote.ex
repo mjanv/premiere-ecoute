@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.Scores.Vote do
   @moduledoc false
 
-  use PremiereEcoute.Core.Schema,
+  use PremiereEcoute.Core.Aggregate,
     json: [:value, :track_id, :session_id, :viewer_id, :inserted_at]
 
   alias PremiereEcoute.Repo

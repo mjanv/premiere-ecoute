@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
-  use PremiereEcoute.Core.Schema,
+  use PremiereEcoute.Core.Aggregate,
     root: [album: [:tracks], user: [:twitch, :spotify], current_track: []],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
 

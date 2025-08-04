@@ -7,6 +7,14 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   The module enforces that only users with the `:streamer` role can be followed, preventing invalid follow relationships and maintaining the application's user hierarchy.
   """
 
+  use PremiereEcoute.Core.Entity,
+    root: [:user],
+    json: [:user, :streamer]
+
+  alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Events.ChannelFollowed
+  alias PremiereEcoute.Events.ChannelUnfollowed
+
   @type t :: %__MODULE__{
           user_id: String.t(),
           streamer_id: String.t(),
@@ -14,15 +22,6 @@ defmodule PremiereEcoute.Accounts.User.Follow do
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }
-
-  use PremiereEcoute.Core.Schema,
-    root: [:user],
-    json: [:user, :streamer]
-
-  alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Events.ChannelFollowed
-  alias PremiereEcoute.Events.ChannelUnfollowed
-  alias PremiereEcoute.EventStore
 
   schema "user_follows" do
     belongs_to :user, User
@@ -89,6 +88,5 @@ defmodule PremiereEcoute.Accounts.User.Follow do
       order_by: [asc: :id]
     )
     |> Repo.all()
-    |> User.preload()
   end
 end

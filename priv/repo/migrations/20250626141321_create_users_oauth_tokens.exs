@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersOauthTokens do
   use Ecto.Migration
 
   def change do
-    create table(:users_oauth_tokens) do
+    create table(:user_oauth_tokens) do
       add :provider, :string, null: false
       add :user_id, :string, null: false
       add :username, :string, null: false
@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateUsersOauthTokens do
       timestamps()
     end
 
-    create unique_index(:users_oauth_tokens, [:user_id, :provider],
+    create unique_index(:user_oauth_tokens, [:user_id, :provider],
              name: :unique_user_provider_tokens
            )
   end

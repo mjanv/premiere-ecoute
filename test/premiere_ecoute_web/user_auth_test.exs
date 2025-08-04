@@ -22,7 +22,7 @@ defmodule PremiereEcouteWeb.UserAuthTest do
     test "stores the user token in the session", %{conn: conn, user: user} do
       conn = UserAuth.log_in_user(conn, user)
       assert token = get_session(conn, :user_token)
-      assert get_session(conn, :live_socket_id) == "users_sessions:#{Base.url_encode64(token)}"
+      assert get_session(conn, :live_socket_id) == "user_sessions:#{Base.url_encode64(token)}"
       assert redirected_to(conn) == ~p"/"
       assert Accounts.get_user_by_session_token(token)
     end
@@ -123,7 +123,7 @@ defmodule PremiereEcouteWeb.UserAuthTest do
     end
 
     test "broadcasts to the given live_socket_id", %{conn: conn} do
-      live_socket_id = "users_sessions:abcdef-token"
+      live_socket_id = "user_sessions:abcdef-token"
       PremiereEcouteWeb.Endpoint.subscribe(live_socket_id)
 
       conn
@@ -171,7 +171,7 @@ defmodule PremiereEcouteWeb.UserAuthTest do
       assert get_session(conn, :user_remember_me)
 
       assert get_session(conn, :live_socket_id) ==
-               "users_sessions:#{Base.url_encode64(user_token)}"
+               "user_sessions:#{Base.url_encode64(user_token)}"
     end
 
     test "does not authenticate if data is missing", %{conn: conn, user: user} do
@@ -363,19 +363,19 @@ defmodule PremiereEcouteWeb.UserAuthTest do
       tokens = [%{token: "token1"}, %{token: "token2"}]
 
       for %{token: token} <- tokens do
-        PremiereEcouteWeb.Endpoint.subscribe("users_sessions:#{Base.url_encode64(token)}")
+        PremiereEcouteWeb.Endpoint.subscribe("user_sessions:#{Base.url_encode64(token)}")
       end
 
       UserAuth.disconnect_sessions(tokens)
 
       assert_receive %Phoenix.Socket.Broadcast{
         event: "disconnect",
-        topic: "users_sessions:dG9rZW4x"
+        topic: "user_sessions:dG9rZW4x"
       }
 
       assert_receive %Phoenix.Socket.Broadcast{
         event: "disconnect",
-        topic: "users_sessions:dG9rZW4y"
+        topic: "user_sessions:dG9rZW4y"
       }
     end
   end

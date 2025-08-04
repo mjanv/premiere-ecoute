@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
   }
 
   setup do
-    %{user: user_fixture2()}
+    %{user: user_fixture()}
   end
 
   describe "create/1" do

@@ -7,7 +7,7 @@ defmodule PremiereEcouteWeb.SessionChannelTest do
   alias PremiereEcoute.Sessions.Scores.Events.MessageSent
 
   setup do
-    user = user_fixture(%{role: :streamer})
+    user = user_fixture(%{role: :streamer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
     {:ok, album} = Album.create(album_fixture())
     {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
     {:ok, session} = ListeningSession.start(session)

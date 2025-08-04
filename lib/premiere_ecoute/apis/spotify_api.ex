@@ -33,6 +33,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     """
 
     alias PremiereEcoute.Accounts.Scope
+    alias PremiereEcoute.Accounts.User.LibraryPlaylist
     alias PremiereEcoute.Sessions.Discography.Album
     alias PremiereEcoute.Sessions.Discography.Album.Track
     alias PremiereEcoute.Sessions.Discography.Playlist
@@ -52,7 +53,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
     # Playlists
     @callback get_playlist(playlist_id :: String.t()) :: {:ok, Playlist.t()} | {:error, term()}
-    @callback get_user_playlists(scope :: Scope.t()) :: {:ok, [Playlist.t()]} | {:error, term()}
+    @callback get_library_playlists(scope :: Scope.t()) :: {:ok, [LibraryPlaylist.t()]} | {:error, term()}
     @callback add_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
                 {:ok, map()} | {:error, term()}
     @callback remove_playlist_items(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()], snapshot :: map()) ::
@@ -116,7 +117,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   # Playlists
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists
-  defdelegate get_user_playlists(scope), to: __MODULE__.Playlists
+  defdelegate get_library_playlists(scope), to: __MODULE__.Playlists
   defdelegate add_items_to_playlist(scope, id, tracks), to: __MODULE__.Playlists
   defdelegate remove_playlist_items(scope, id, tracks, snapshot), to: __MODULE__.Playlists
 

@@ -24,6 +24,20 @@ defmodule PremiereEcoute.EventStore do
     end
   end
 
+  @spec last(String.t(), integer()) :: any()
+  def last(stream_uuid, n \\ 1) do
+    case __MODULE__.read_stream_backward(stream_uuid, -1, n) do
+      {:ok, [%EventStore.RecordedEvent{data: event}]} ->
+        event
+
+      {:ok, [%EventStore.RecordedEvent{} | _] = events} ->
+        Enum.map(events, fn %EventStore.RecordedEvent{data: event} -> event end) |> Enum.reverse()
+
+      {:error, _} ->
+        nil
+    end
+  end
+
   @spec paginate(String.t(), Keyword.t()) :: [EventStore.RecordedEvent.t()]
   def paginate(stream_uuid, opts \\ [page: 1, size: 10]) do
     case __MODULE__.read_stream_forward(stream_uuid, (opts[:page] - 1) * opts[:size] + 1, opts[:size]) do

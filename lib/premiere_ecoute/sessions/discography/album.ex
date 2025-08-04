@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
   metadata such as name, artist, release date, and cover art.
   """
 
-  use PremiereEcoute.Core.Schema,
+  use PremiereEcoute.Core.Aggregate,
     root: [:tracks],
     identity: [:spotify_id],
     json: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]

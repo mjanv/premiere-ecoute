@@ -23,7 +23,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
 
       EventStore.append(event, stream: "user")
 
-      :timer.sleep(500)
+      :timer.sleep(50)
     end
 
     test "dispatch an email event on AccountDeleted" do
@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
 
       EventStore.append(event, stream: "user")
 
-      :timer.sleep(500)
+      :timer.sleep(50)
     end
 
     test "does not dispatch an email event on other events", %{ref: ref, pid: pid} do
@@ -41,7 +41,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
       expect(Mailer, :dispatch, 0, fn _ -> :ok end)
       EventStore.append(event, stream: "user")
 
-      refute_receive {:DOWN, ^ref, :process, ^pid, {%Mox.UnexpectedCallError{}, _}}, 500
+      refute_receive {:DOWN, ^ref, :process, ^pid, {%Mox.UnexpectedCallError{}, _}}, 100
     end
   end
 end

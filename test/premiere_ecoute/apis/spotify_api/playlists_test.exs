@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Core.Cache
 
+  alias PremiereEcoute.Accounts.User.LibraryPlaylist
   alias PremiereEcoute.Sessions.Discography.Playlist
   alias PremiereEcoute.Sessions.Discography.Playlist.Track
 
@@ -44,7 +45,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
     end
   end
 
-  describe "get_user_playlists/1" do
+  describe "get_library_playlists/1" do
     test "get a list of the playlists owned or followed by the current Spotify user" do
       ApiMock.expect(
         SpotifyApi,
@@ -55,33 +56,41 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
 
       scope = user_scope_fixture(user_fixture())
 
-      {:ok, playlists} = SpotifyApi.get_user_playlists(scope)
+      {:ok, playlists} = SpotifyApi.get_library_playlists(scope)
 
-      assert playlists == [
-               %PremiereEcoute.Sessions.Discography.Playlist{
+      assert [
+               %LibraryPlaylist{
                  id: nil,
-                 spotify_id: "5dIzUBcdljrcjJLP3B6ZLk",
-                 name: "La playlist idéale : les propositions",
-                 spotify_owner_id: "ku296zgwbo0e3qff8cylptsjq",
-                 owner_name: "Flonflon",
+                 provider: :spotify,
+                 playlist_id: "5dIzUBcdljrcjJLP3B6ZLk",
+                 url: "https://open.spotify.com/playlist/5dIzUBcdljrcjJLP3B6ZLk",
+                 title: "La playlist idéale : les propositions",
+                 description: "",
                  cover_url:
                    "https://mosaic.scdn.co/300/ab67616d00001e0224eb40775d2ad89181f93630ab67616d00001e0260863211a34118f09d8f6434ab67616d00001e02ae871c52286bf992400f4002ab67616d00001e02b85976e1b1bd2d00ff551a01",
-                 tracks: [],
+                 public: true,
+                 track_count: nil,
+                 metadata: %{},
+                 user_id: nil,
                  inserted_at: nil,
                  updated_at: nil
                },
-               %PremiereEcoute.Sessions.Discography.Playlist{
+               %LibraryPlaylist{
                  id: nil,
-                 spotify_id: "4ulqK1y6myPKOe3bNUEfvr",
-                 name: "Cérémonie d'ouverture JO Paris 2024",
-                 spotify_owner_id: "11124351208",
-                 owner_name: "Ervan Couderc",
+                 provider: :spotify,
+                 playlist_id: "4ulqK1y6myPKOe3bNUEfvr",
+                 url: "https://open.spotify.com/playlist/4ulqK1y6myPKOe3bNUEfvr",
+                 title: "Cérémonie d'ouverture JO Paris 2024",
+                 description: "Tous les titres joués, dans l&#x27;ordre chronologique. #Paris2024",
                  cover_url: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72cc71cd11ee39285e0e565b684",
-                 tracks: [],
+                 public: true,
+                 track_count: nil,
+                 metadata: %{},
+                 user_id: nil,
                  inserted_at: nil,
                  updated_at: nil
                }
-             ]
+             ] = playlists
     end
   end
 

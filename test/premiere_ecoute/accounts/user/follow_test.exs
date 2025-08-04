@@ -5,46 +5,39 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
 
-  alias PremiereEcoute.Events.AccountAssociated
-  alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.ChannelFollowed
   alias PremiereEcoute.Events.ChannelUnfollowed
   alias PremiereEcoute.EventStore
 
   describe "follow/3" do
     test "add a streamer to any role follow list" do
-      for role <- [:viewer, :streamer, :admin, :bot] do
-        %{id: user_id} = user = user_fixture(%{role: role})
+      for role <- [:viewer, :streamer, :admin, :bot] ++ [:viewer, :streamer, :admin, :bot] do
+        %{id: user_id} =
+          user = user_fixture(%{role: role, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+
         %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
 
         {:ok, follow} = Accounts.follow(user, streamer)
 
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: nil} = follow
 
-        assert EventStore.read("user-#{user_id}") == [
-                 %AccountCreated{id: user.id},
-                 %AccountAssociated{id: user.id, provider: "twitch", user_id: user.twitch.user_id},
-                 %AccountAssociated{id: user.id, provider: "spotify", user_id: user.spotify.user_id},
-                 %ChannelFollowed{id: user.id, streamer_id: streamer.id}
-               ]
+        assert EventStore.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
       end
     end
 
     test "add a followed_at date to the follow" do
+      %{id: streamer_id} =
+        streamer = user_fixture(%{role: :streamer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+
       for role <- [:viewer, :streamer, :admin, :bot] do
-        %{id: user_id} = user = user_fixture(%{role: role})
-        %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
+        %{id: user_id} =
+          user = user_fixture(%{role: role, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
 
         {:ok, follow} = Accounts.follow(user, streamer, %{followed_at: ~N[2020-07-18 07:59:47]})
 
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: ~N[2020-07-18 07:59:47]} = follow
 
-        assert EventStore.read("user-#{user_id}") == [
-                 %AccountCreated{id: user.id},
-                 %AccountAssociated{id: user.id, provider: "twitch", user_id: user.twitch.user_id},
-                 %AccountAssociated{id: user.id, provider: "spotify", user_id: user.spotify.user_id},
-                 %ChannelFollowed{id: user.id, streamer_id: streamer.id}
-               ]
+        assert EventStore.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
       end
     end
 
@@ -80,7 +73,9 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
 
   describe "unfollow/2" do
     test "unfollow a streamer from a viewer follow list" do
-      %{id: user_id} = user = user_fixture(%{role: :viewer})
+      %{id: user_id} =
+        user = user_fixture(%{role: :viewer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+
       %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
       {:ok, follow} = Accounts.follow(user, streamer)
 
@@ -89,10 +84,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = follow
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = unfollow
 
-      assert EventStore.read("user-#{user_id}") == [
-               %AccountCreated{id: user.id},
-               %AccountAssociated{id: user.id, provider: "twitch", user_id: user.twitch.user_id},
-               %AccountAssociated{id: user.id, provider: "spotify", user_id: user.spotify.user_id},
+      assert EventStore.last("user-#{user_id}", 2) == [
                %ChannelFollowed{id: user.id, streamer_id: streamer.id},
                %ChannelUnfollowed{id: user.id, streamer_id: streamer.id}
              ]

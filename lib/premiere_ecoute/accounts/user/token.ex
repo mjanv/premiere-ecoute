@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Accounts.User.Token do
   @moduledoc false
 
-  use PremiereEcoute.Core.Schema
+  use PremiereEcoute.Core.Entity
 
   alias PremiereEcoute.Accounts.User
 
@@ -14,11 +14,12 @@ defmodule PremiereEcoute.Accounts.User.Token do
   @change_email_validity_in_days 7
   @session_validity_in_days 14
 
-  schema "users_tokens" do
+  schema "user_tokens" do
     field :token, :binary
     field :context, :string
     field :sent_to, :string
     field :authenticated_at, :utc_datetime
+
     belongs_to :user, PremiereEcoute.Accounts.User
 
     timestamps(type: :utc_datetime, updated_at: false)
@@ -249,13 +250,13 @@ defmodule PremiereEcoute.Accounts.User.Token do
         |> Ecto.Changeset.change(confirmed_at: DateTime.utc_now(:second))
         |> User.update_user_and_delete_all_tokens()
         |> case do
-          {:ok, user, tokens} -> {:ok, User.preload(user), tokens}
+          {:ok, user, tokens} -> {:ok, user, tokens}
           other -> other
         end
 
       {user, token} ->
         Repo.delete!(token)
-        {:ok, User.preload(user), []}
+        {:ok, user, []}
 
       nil ->
         {:error, :not_found}

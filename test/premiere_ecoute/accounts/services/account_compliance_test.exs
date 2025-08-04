@@ -106,25 +106,10 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
                }
              ] = votes
 
+      # AccountCreated, AccountAssociated events are NOT generated during tests.
+      # It is due to the test setup skipping event store writes in order to keep faster tests.
+      # Those events will be generated in a production environment.
       assert [
-               %{
-                 "details" => %{},
-                 "event_id" => _,
-                 "event_type" => "AccountCreated",
-                 "timestamp" => _
-               },
-               %{
-                 "details" => %{"provider" => "twitch", "user_id" => "viewer456"},
-                 "event_id" => _,
-                 "event_type" => "AccountAssociated",
-                 "timestamp" => _
-               },
-               %{
-                 "details" => %{"provider" => "spotify", "user_id" => "viewer456"},
-                 "event_id" => _,
-                 "event_type" => "AccountAssociated",
-                 "timestamp" => _
-               },
                %{
                  "details" => %{"streamer_id" => _},
                  "event_id" => _,
@@ -137,7 +122,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
     test "register an event", %{viewer: viewer} do
       {:ok, _} = Accounts.download_associated_data(Scope.for_user(viewer))
 
-      assert [_, _, _, _, %PersonalDataRequested{result: "ok"}] = EventStore.read("user-#{viewer.id}")
+      assert %PersonalDataRequested{result: "ok"} = EventStore.last("user-#{viewer.id}")
     end
   end
 
@@ -154,7 +139,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: viewer.id]))
 
-      assert [_, _, _, _, %AccountDeleted{}] = EventStore.read("user-#{viewer.id}")
+      assert %AccountDeleted{} = EventStore.last("user-#{viewer.id}")
     end
 
     test "delete a streamer account", %{streamer: streamer} do
@@ -169,7 +154,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: streamer.id]))
 
-      assert [_, _, _, %AccountDeleted{}] = EventStore.read("user-#{streamer.id}")
+      assert %AccountDeleted{} = EventStore.last("user-#{streamer.id}")
     end
 
     test "deleting non-existent user raises appropriate error" do

@@ -1,9 +1,7 @@
 defmodule PremiereEcoute.Accounts.User.Profile do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
+  use PremiereEcoute.Core.Object
 
   @schemes [:light, :dark, :system]
   @languages [:en, :fr, :it]
