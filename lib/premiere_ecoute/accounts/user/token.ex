@@ -246,7 +246,7 @@ defmodule PremiereEcoute.Accounts.User.Token do
 
       {%User{confirmed_at: nil} = user, _token} ->
         user
-        |> User.confirm_changeset()
+        |> Ecto.Changeset.change(confirmed_at: DateTime.utc_now(:second))
         |> User.update_user_and_delete_all_tokens()
         |> case do
           {:ok, user, tokens} -> {:ok, User.preload(user), tokens}

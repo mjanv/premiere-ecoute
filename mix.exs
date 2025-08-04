@@ -145,6 +145,11 @@ defmodule PremiereEcoute.MixProject do
       ],
       gettext: ["gettext.extract", "gettext.merge priv/gettext"],
       # Quality
+      clean: [
+        "format",
+        "credo --strict",
+        "compile --warnings-as-errors"
+      ],
       quality: [
         "compile --warnings-as-errors",
         "format --check-formatted",

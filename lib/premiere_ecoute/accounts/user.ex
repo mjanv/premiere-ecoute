@@ -24,8 +24,8 @@ defmodule PremiereEcoute.Accounts.User do
           confirmed_at: DateTime.t() | nil,
           authenticated_at: DateTime.t() | nil,
           role: :viewer | :streamer | :admin | :bot,
-          spotify: OauthToken.t() | nil,
-          twitch: OauthToken.t() | nil,
+          spotify: entity(OauthToken.t()),
+          twitch: entity(OauthToken.t()),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }
@@ -38,10 +38,10 @@ defmodule PremiereEcoute.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
     field :role, Ecto.Enum, values: [:viewer, :streamer, :admin, :bot], default: :viewer
 
-    has_one :twitch, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :twitch], foreign_key: :parent_id
-    has_one :spotify, PremiereEcoute.Accounts.User.OauthToken, where: [provider: :spotify], foreign_key: :parent_id
-
     embeds_one :profile, Profile, on_replace: :update, defaults_to_struct: true
+
+    has_one :twitch, OauthToken, where: [provider: :twitch], foreign_key: :parent_id
+    has_one :spotify, OauthToken, where: [provider: :spotify], foreign_key: :parent_id
 
     has_many :follows, Follow, foreign_key: :user_id
     has_many :channels, through: [:follows, :streamer]
@@ -107,14 +107,8 @@ defmodule PremiereEcoute.Accounts.User do
     user
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
-    |> validate_password(opts)
-  end
-
-  defp validate_password(changeset, opts) do
-    changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 12, max: 72)
-    # Examples of additional password validation:
     # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
     # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
@@ -129,20 +123,11 @@ defmodule PremiereEcoute.Accounts.User do
       changeset
       # If using Bcrypt, then further validate it is at most 72 bytes long
       |> validate_length(:password, max: 72, count: :bytes)
-      # Hashing could be done with `Ecto.Changeset.prepare_changes/2`, but that
-      # would keep the database transaction open longer and hurt performance.
       |> put_change(:hashed_password, Bcrypt.hash_pwd_salt(password))
       |> delete_change(:password)
     else
       changeset
     end
-  end
-
-  @doc """
-  Confirms the account by setting `confirmed_at`.
-  """
-  def confirm_changeset(user) do
-    change(user, confirmed_at: DateTime.utc_now(:second))
   end
 
   @doc """
@@ -160,22 +145,7 @@ defmodule PremiereEcoute.Accounts.User do
     false
   end
 
-  @doc """
-  Gets a single user.
-
-  Raises `Ecto.NoResultsError` if the User does not exist.
-
-  ## Examples
-
-      iex> get_user!(123)
-      %User{}
-
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
-
-  """
   def get!(id), do: Repo.get!(__MODULE__, id)
-  def get_user!(id), do: Repo.get!(__MODULE__, id)
 
   @doc """
   Gets a user by email and password.
@@ -189,8 +159,7 @@ defmodule PremiereEcoute.Accounts.User do
       nil
 
   """
-  def get_user_by_email_and_password(email, password)
-      when is_binary(email) and is_binary(password) do
+  def get_user_by_email_and_password(email, password) do
     user = Repo.get_by(__MODULE__, email: email)
     if valid_password?(user, password), do: user
   end
@@ -322,9 +291,9 @@ defmodule PremiereEcoute.Accounts.User do
     end
   end
 
-  def edit_user_profile(user, attrs) do
+  def edit_user_profile(user, profile) do
     user
-    |> cast(%{profile: attrs}, [])
+    |> cast(%{profile: profile}, [])
     |> cast_embed(:profile, required: true, with: &Profile.changeset/2)
     |> Repo.update()
   end
