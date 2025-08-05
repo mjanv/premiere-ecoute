@@ -44,12 +44,13 @@ cd premiere_ecoute
 cp .env.example .env
 
 asdf install # Install Erlang and Elixir
-docker compose up -d # Start database
+docker compose up -d # Start database and observability stack
 mix setup # Install dependencies, deploy assets, and run migrations
 mix # Run the server
 ```
 
 Visit [http://localhost:4000](http://localhost:4000) to access the application.
+
 
 ## 🔁 Application lifecycle
 
@@ -85,3 +86,11 @@ mix ecto.reset   # Drop and recreate database
 mix ecto.create  # Create database without running migrations
 mix ecto.migrate # Run database migrations
 ```
+
+### Observability
+
+```bash
+docker compose up -d # Start observability stack (Grafana, Prometheus)
+```
+
+Grafana dashboards are accessible without admin login, for **local development**, at [http://localhost:3000](http://localhost:3000). Dashboards are automatically uploaded at startup from [PromEx dashboards](https://hexdocs.pm/prom_ex/all.html) and application dashboards written in [priv/dashboards/](priv/dashboards/) folder.

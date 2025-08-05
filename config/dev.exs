@@ -22,6 +22,17 @@ config :premiere_ecoute, PremiereEcoute.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
+config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
+  manual_metrics_start_delay: :no_delay,
+  drop_metrics_groups: [],
+  grafana: [
+    host: "http://localhost:3000",
+    auth_token: "",
+    upload_dashboards_on_start: true,
+    folder_name: "Premiere Ecoute",
+    annotate_app_lifecycle: true
+  ]
+
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,

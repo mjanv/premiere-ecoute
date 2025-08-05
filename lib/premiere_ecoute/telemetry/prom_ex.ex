@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Telemetry.PromEx do
   @impl true
   def dashboard_assigns do
     [
-      datasource_id: "YOUR_PROMETHEUS_DATASOURCE_ID",
+      datasource_id: "prometheus",
       default_selected_interval: "30s"
     ]
   end

@@ -7,12 +7,16 @@ defmodule PremiereEcoute.Telemetry.ApiMetrics do
   @webhook_event [:premiere_ecoute, :apis, :webhook_event]
 
   def api_call(provider, {%Req.Request{} = request, %Req.Response{} = response}) do
-    :telemetry.execute(@api_call, %{}, %{
-      provider: provider,
-      method: request.method,
-      url: request.url.path,
-      status: response.status
-    })
+    :telemetry.execute(
+      @api_call,
+      %{},
+      %{
+        provider: provider,
+        method: request.method,
+        url: request.url.path,
+        status: response.status
+      }
+    )
   end
 
   def webhook_event(provider, type) do
