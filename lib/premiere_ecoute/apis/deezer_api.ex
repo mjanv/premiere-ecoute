@@ -4,9 +4,7 @@ defmodule PremiereEcoute.Apis.DeezerApi do
   use PremiereEcoute.Core.Api, api: :deezer
 
   defmodule Behaviour do
-    @moduledoc """
-    Deezer API Behaviour
-    """
+    @moduledoc "Deezer API Behaviour"
 
     alias PremiereEcoute.Sessions.Discography.Playlist
 
@@ -18,10 +16,7 @@ defmodule PremiereEcoute.Apis.DeezerApi do
   def api do
     [
       base_url: url(:api),
-      headers: [
-        # {"Authorization", "Bearer #{token(nil)}"},
-        {"Content-Type", "application/json"}
-      ]
+      headers: [{"Content-Type", "application/json"}]
     ]
     |> new()
   end

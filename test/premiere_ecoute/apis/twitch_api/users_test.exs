@@ -4,12 +4,19 @@ defmodule PremiereEcoute.Apis.TwitchApi.UsersTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
 
+  setup do
+    Application.put_env(:premiere_ecoute, :twitch_client_id, "client_id")
+
+    :ok
+  end
+
   describe "get_user_profile/1" do
     test "can get information about one Twitch user" do
       ApiMock.expect(
         TwitchApi,
         path: {:get, "/helix/users"},
         headers: [
+          {"client-id", "client_id"},
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
         ],

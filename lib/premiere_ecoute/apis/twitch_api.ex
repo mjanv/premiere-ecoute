@@ -90,6 +90,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     [
       base_url: url(:api),
       headers: [
+        {"Client-Id", Application.get_env(:premiere_ecoute, :twitch_client_id)},
         {"Authorization", "Bearer #{token(token)}"},
         {"Content-Type", "application/json"}
       ]

@@ -31,12 +31,13 @@ defmodule PremiereEcoute.Core.Api do
       def patch(request, opts), do: Req.patch(request, opts)
       def delete(request, opts), do: Req.delete(request, opts)
 
-      def handle({:ok, %{status: status, body: body}}, status_or_statuses, f) do
+      def handle({:ok, %Req.Response{status: status, body: body} = r}, status_or_statuses, f) do
         if status in List.wrap(status_or_statuses) do
           try do
             {:ok, f.(body)}
           rescue
             error ->
+              IO.inspect(r)
               Logger.error("#{unquote(name)} API returned unexpected body: #{status} - #{inspect(body)}")
               {:error, "#{unquote(name)} API error: #{status}"}
           end

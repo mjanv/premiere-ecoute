@@ -39,6 +39,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
   end
 
   def authorization_code(code) when is_binary(code) do
+    IO.inspect("---------------------------------")
+
     TwitchApi.accounts()
     |> TwitchApi.post(
       url: "/token",
@@ -50,7 +52,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
       }
     )
     |> TwitchApi.handle(200, fn %{"token_type" => "bearer"} = body ->
+      IO.inspect("---------------------------------???")
       {:ok, user} = TwitchApi.get_user_profile(body["access_token"])
+      IO.inspect("---------------------------------???")
 
       %{
         user_id: user["id"],
