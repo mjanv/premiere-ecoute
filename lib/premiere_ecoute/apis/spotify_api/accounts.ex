@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
+  @scope "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing"
+
   def client_credentials do
     SpotifyApi.accounts()
     |> SpotifyApi.post(url: "/token", body: "grant_type=client_credentials")
@@ -24,10 +26,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
         URI.encode_query(%{
           response_type: "code",
           client_id: Application.get_env(:premiere_ecoute, :spotify_client_id),
-          scope:
-            scope ||
-              "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing",
           redirect_uri: Application.get_env(:premiere_ecoute, :spotify_redirect_uri),
+          scope: scope || @scope,
           state: state || random(16)
         })
     })

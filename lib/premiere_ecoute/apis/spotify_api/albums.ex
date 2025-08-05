@@ -8,11 +8,6 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.Discography.Album.Track
 
-  @doc """
-  Get an album
-
-  Reference: https://developer.spotify.com/documentation/web-api/reference/get-an-album
-  """
   def get_album(album_id) when is_binary(album_id) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/albums/#{album_id}")

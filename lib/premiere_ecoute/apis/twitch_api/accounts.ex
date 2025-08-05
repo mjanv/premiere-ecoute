@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
 
   alias PremiereEcoute.Apis.TwitchApi
 
+  @scope "channel:manage:polls channel:read:polls channel:bot user:read:email user:read:chat user:write:chat user:bot moderator:manage:announcements"
+
   def client_credentials do
     TwitchApi.accounts()
     |> TwitchApi.post(
@@ -27,9 +29,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
       query:
         URI.encode_query(%{
           response_type: "code",
-          scope:
-            scope ||
-              "channel:manage:polls channel:read:polls channel:bot user:read:email user:read:chat user:write:chat user:bot moderator:manage:announcements",
+          scope: scope || @scope,
           client_id: Application.get_env(:premiere_ecoute, :twitch_client_id),
           redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri),
           state: state || random(16)
