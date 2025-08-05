@@ -1,4 +1,4 @@
-# 💿 Premiere Ecoute!
+# 💿 Premiere Ecoute
 
 ![Banner](https://images.unsplash.com/photo-1727797216812-a0478ec92b64?ixlib=rb-4.1.0&q=85&fm=jpg&crop=center&cs=srgb&w=1200&h=300&fit=crop)
 

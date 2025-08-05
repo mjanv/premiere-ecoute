@@ -14,10 +14,7 @@ defmodule PremiereEcoute.Mailer do
   @behaviour __MODULE__.Behaviour
 
   def impl, do: Application.get_env(:premiere_ecoute, :mailer, __MODULE__)
-
-  def dispatch(event) do
-    deliver(Email.from_event(event))
-  end
+  def dispatch(event), do: deliver(Email.from_event(event))
 end
 
 defmodule PremiereEcoute.Mailer.Email do

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*)
+allowed-tools: Bash(git status:*), Bash(git commit:*)
 description: Create a git commit
 ---
 
@@ -12,12 +12,12 @@ description: Create a git commit
 
 ## Your task
 
-Based on the above changes, create a single git commit. Commit message should be under the template:
+Based on the above changes, create a single git commit from files in the staging area. Do NOT add or removed any new files to the staging area. Commit message should be under the template:
 
 ```
 <title>
 
-<description>
+<summary description, do not list every bullet point>
 
 # Features
 
@@ -32,4 +32,4 @@ Based on the above changes, create a single git commit. Commit message should be
 <bullet list>
 ```
 
-Do NOT add a `Co-Authored-By: Claude`
+If a section is empty, do not its title. Do NOT add a `Co-Authored-By: Claude`.
