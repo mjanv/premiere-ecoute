@@ -3,27 +3,40 @@ defmodule PremiereEcoute.Sessions.Discography.Playlist do
 
   use PremiereEcoute.Core.Aggregate,
     root: [:tracks],
-    identity: [:spotify_id],
-    json: [:id, :name, :cover_url]
+    identity: [:playlist_id],
+    json: [:id, :title, :cover_url]
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Discography.Playlist.Track
 
   @type t :: %__MODULE__{
-          id: integer() | nil,
-          spotify_id: String.t() | nil,
-          name: String.t() | nil,
+          id: integer(),
+          provider: :spotify | :deezer,
+          playlist_id: String.t(),
+          owner_id: String.t() | nil,
+          owner_name: String.t() | nil,
+          title: String.t() | nil,
+          description: String.t() | nil,
+          url: String.t() | nil,
           cover_url: String.t() | nil,
-          inserted_at: DateTime.t() | nil,
-          updated_at: DateTime.t() | nil
+          public: boolean(),
+          tracks: [Track.t()] | Ecto.Association.NotLoaded.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
         }
 
   schema "playlists" do
-    field :name, :string
+    field :provider, Ecto.Enum, values: [:spotify, :deezer]
+    field :playlist_id, :string
+
+    field :owner_id, :string
     field :owner_name, :string
-    field :spotify_id, :string
-    field :spotify_owner_id, :string
+
+    field :title, :string
+    field :description, :string
+    field :url, :string
     field :cover_url, :string
+    field :public, :boolean, default: true
 
     has_many :tracks, Track, foreign_key: :playlist_id, on_delete: :delete_all
 
@@ -32,9 +45,10 @@ defmodule PremiereEcoute.Sessions.Discography.Playlist do
 
   def changeset(playlist, attrs) do
     playlist
-    |> cast(attrs, [:spotify_id, :name, :spotify_owner_id, :owner_name, :cover_url])
-    |> validate_required([:spotify_id, :name, :spotify_owner_id, :owner_name, :cover_url])
-    |> unique_constraint(:spotify_id)
+    |> cast(attrs, [:provider, :playlist_id, :owner_id, :owner_name, :title, :description, :url, :cover_url, :public])
+    |> validate_required([:provider, :playlist_id, :owner_id, :owner_name, :title])
+    |> validate_inclusion(:provider, [:spotify, :deezer])
+    |> unique_constraint([:playlist_id, :provider])
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
   end
 

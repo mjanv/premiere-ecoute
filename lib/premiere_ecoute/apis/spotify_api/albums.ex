@@ -16,7 +16,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
 
   def parse_album_with_tracks(data) do
     %Album{
-      spotify_id: data["id"],
+      provider: :spotify,
+      album_id: data["id"],
       name: data["name"],
       artist: Parser.parse_primary_artist(data["artists"]),
       release_date: Parser.parse_release_date(data["release_date"]),
@@ -25,7 +26,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
       tracks:
         Enum.map(data["tracks"]["items"], fn track ->
           %Track{
-            spotify_id: track["id"],
+            provider: :spotify,
+            track_id: track["id"],
             album_id: data["id"],
             name: track["name"],
             track_number: track["track_number"] || 0,

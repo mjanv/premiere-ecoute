@@ -87,7 +87,7 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
 
     %PrepareListeningSession{
       user_id: get_user_id(socket),
-      album_id: album.spotify_id,
+      album_id: album.album_id,
       vote_options: vote_options
     }
     |> PremiereEcoute.apply()

@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Sessions.Discography.Album.Track do
 
   @type t :: %__MODULE__{
           id: integer() | nil,
-          spotify_id: String.t() | nil,
+          track_id: String.t() | nil,
           name: String.t() | nil,
           track_number: integer() | nil,
           duration_ms: integer() | nil,
@@ -23,7 +23,8 @@ defmodule PremiereEcoute.Sessions.Discography.Album.Track do
         }
 
   schema "album_tracks" do
-    field :spotify_id, :string
+    field :provider, Ecto.Enum, values: [:spotify, :deezer]
+    field :track_id, :string
     field :name, :string
     field :track_number, :integer
     field :duration_ms, :integer
@@ -35,10 +36,11 @@ defmodule PremiereEcoute.Sessions.Discography.Album.Track do
 
   def changeset(track, attrs) do
     track
-    |> cast(attrs, [:spotify_id, :name, :track_number, :duration_ms])
-    |> validate_required([:spotify_id, :name, :track_number])
+    |> cast(attrs, [:provider, :track_id, :name, :track_number, :duration_ms])
+    |> validate_required([:provider, :track_id, :name, :track_number])
     |> validate_number(:track_number, greater_than: 0)
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
-    |> unique_constraint([:spotify_id])
+    |> validate_inclusion(:provider, [:twitch, :spotify])
+    |> unique_constraint([:track_id, :provider])
   end
 end

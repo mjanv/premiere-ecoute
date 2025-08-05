@@ -2,29 +2,31 @@ defmodule PremiereEcoute.Sessions.Discography.Playlist.Track do
   @moduledoc false
 
   use PremiereEcoute.Core.Aggregate,
-    json: [:spotify_id, :album_spotify_id, :user_spotify_id, :name, :artist, :duration_ms, :added_at]
+    json: [:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at]
 
   alias PremiereEcoute.Sessions.Discography.Playlist
 
   @type t :: %__MODULE__{
-          id: integer() | nil,
-          spotify_id: String.t() | nil,
-          album_spotify_id: String.t() | nil,
-          user_spotify_id: String.t() | nil,
+          id: integer(),
+          provider: :spotify | :deezer,
+          track_id: String.t(),
+          album_id: String.t() | nil,
+          user_id: String.t() | nil,
           name: String.t() | nil,
           artist: String.t() | nil,
           duration_ms: integer() | nil,
-          playlist_id: integer() | nil,
-          playlist: entity(Playlist.t()),
-          added_at: DateTime.t() | nil,
-          inserted_at: DateTime.t() | nil,
-          updated_at: DateTime.t() | nil
+          added_at: NaiveDateTime.t() | nil,
+          playlist_id: integer(),
+          playlist: Playlist.t() | Ecto.Association.NotLoaded.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
         }
 
   schema "playlist_tracks" do
-    field :spotify_id, :string
-    field :album_spotify_id, :string
-    field :user_spotify_id, :string
+    field :provider, Ecto.Enum, values: [:spotify, :deezer]
+    field :track_id, :string
+    field :album_id, :string
+    field :user_id, :string
     field :name, :string
     field :artist, :string
     field :duration_ms, :integer
@@ -37,8 +39,9 @@ defmodule PremiereEcoute.Sessions.Discography.Playlist.Track do
 
   def changeset(track, attrs) do
     track
-    |> cast(attrs, [:spotify_id, :album_spotify_id, :user_spotify_id, :name, :artist, :duration_ms, :added_at])
-    |> validate_required([:spotify_id, :album_spotify_id, :user_spotify_id, :name, :artist, :duration_ms, :added_at])
+    |> cast(attrs, [:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at])
+    |> validate_required([:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at])
+    |> validate_inclusion(:provider, [:spotify, :deezer])
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
   end
 end

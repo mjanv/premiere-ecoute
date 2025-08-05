@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   The module enforces that only users with the `:streamer` role can be followed, preventing invalid follow relationships and maintaining the application's user hierarchy.
   """
 
-  use  PremiereEcoute.Core.Aggregate.Entity,
+  use PremiereEcoute.Core.Aggregate.Entity,
     root: [:user],
     json: [:user, :streamer]
 

@@ -35,10 +35,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       {:ok, playlist} = SpotifyApi.get_playlist(id)
 
       assert %Playlist{
-               spotify_id: "2gW4sqiC2OXZLe9m0yDQX7",
-               spotify_owner_id: "ku296zgwbo0e3qff8cylptsjq",
+               provider: :spotify,
+               playlist_id: "2gW4sqiC2OXZLe9m0yDQX7",
+               owner_id: "ku296zgwbo0e3qff8cylptsjq",
                owner_name: "Flonflon",
-               name: "FLONFLON MUSIC FRIDAY",
+               title: "FLONFLON MUSIC FRIDAY",
                cover_url: cover_url,
                tracks: tracks
              } = playlist
@@ -122,7 +123,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
 
       scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
-      tracks = [%Track{spotify_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{spotify_id: "6TGd66r0nlPaYm3KIoI7ET"}]
+      tracks = [%Track{track_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{track_id: "6TGd66r0nlPaYm3KIoI7ET"}]
 
       {:ok, snapshot} = SpotifyApi.add_items_to_playlist(scope, id, tracks)
 
@@ -148,7 +149,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
 
       scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
-      tracks = [%Track{spotify_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{spotify_id: "6TGd66r0nlPaYm3KIoI7ET"}]
+      tracks = [%Track{track_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{track_id: "6TGd66r0nlPaYm3KIoI7ET"}]
       snapshot = %{"snapshot_id" => "abc"}
 
       {:ok, snapshot} = SpotifyApi.remove_playlist_items(scope, id, tracks, snapshot)

@@ -156,7 +156,7 @@
                       class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
                       style="background-color: var(--color-dark-800);"
                       phx-click="select_album"
-                      phx-value-album_id={album.spotify_id}
+                      phx-value-album_id={album.album_id}
                     >
                       <div class="flex items-center space-x-3">
                         <%= if album.cover_url do %>
@@ -412,15 +412,15 @@
 
     const baseThread = container.querySelector('.ariane-thread-base');
     const progressThread = container.querySelector('.ariane-thread-progress');
-    
+
     if (!baseThread || !progressThread) return;
 
     const step = baseThread.getAttribute('data-step');
     const progressStep = progressThread.getAttribute('data-progress-step');
-    
+
     // Find the step number element (not the content) for the current step
     let targetElement = null;
-    
+
     if (step === '4') {
       // Find the step 4 number circle
       targetElement = document.querySelector('#step-4 .w-12.h-12');
@@ -431,18 +431,18 @@
       // Find the step 2 number circle
       targetElement = document.querySelector('#step-2 .w-12.h-12');
     }
-    
+
     if (targetElement) {
       const containerTop = container.getBoundingClientRect().top;
       const targetBottom = targetElement.getBoundingClientRect().bottom;
       const threadStart = 48; // top-12 = 3rem = 48px
-      
+
       // Calculate thread height to the step number circle (stop at circle, not beyond)
       const baseHeight = Math.max(0, targetBottom - containerTop - threadStart);
-      
+
       // Update base thread height - always ends at the step number
       baseThread.style.height = baseHeight + 'px';
-      
+
       // Calculate progress thread height - should match current progress step
       let progressHeight = 0;
       if (progressStep === '1') {
@@ -475,7 +475,7 @@
       } else if (progressStep === '4') {
         progressHeight = baseHeight;
       }
-      
+
       progressThread.style.height = progressHeight + 'px';
     }
   }

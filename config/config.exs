@@ -42,6 +42,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
       api: "https://api.spotify.com/v1",
       accounts: "https://accounts.spotify.com/api"
     ]
+  ],
+  deezer: [
+    api: PremiereEcoute.Apis.DeezerApi,
+    urls: [
+      api: "https://api.deezer.com/"
+    ]
   ]
 
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,

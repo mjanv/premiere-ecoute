@@ -20,6 +20,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   spotify: [
     api: PremiereEcoute.Apis.SpotifyApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.SpotifyApi}]
+  ],
+  deezer: [
+    api: PremiereEcoute.Apis.DeezerApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.DeezerApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

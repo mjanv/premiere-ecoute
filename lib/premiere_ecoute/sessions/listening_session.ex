@@ -54,7 +54,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     ])
     |> validate_required([:album_id])
     |> foreign_key_constraint(:user_id)
-    |> foreign_key_constraint(:album_spotify_id)
+    |> foreign_key_constraint(:album_id)
     |> foreign_key_constraint(:current_track_id)
   end
 

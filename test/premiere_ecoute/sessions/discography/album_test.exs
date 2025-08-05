@@ -11,7 +11,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       {:ok, album} = Album.create(album_fixture())
 
       assert %Album{
-               spotify_id: "album123",
+               provider: :spotify,
+               album_id: "album123",
                name: "Sample Album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
@@ -19,13 +20,15 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
                total_tracks: 2,
                tracks: [
                  %Track{
-                   spotify_id: "track001",
+                   provider: :spotify,
+                   track_id: "track001",
                    name: "Track One",
                    track_number: 1,
                    duration_ms: 210_000
                  },
                  %Track{
-                   spotify_id: "track002",
+                   provider: :spotify,
+                   track_id: "track002",
                    name: "Track Two",
                    track_number: 2,
                    duration_ms: 180_000
@@ -38,7 +41,7 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       {:ok, _} = Album.create(album_fixture())
       {:error, changeset} = Album.create(album_fixture())
 
-      assert Repo.traverse_errors(changeset) == %{spotify_id: ["has already been taken"]}
+      assert Repo.traverse_errors(changeset) == %{album_id: ["has already been taken"]}
     end
   end
 
@@ -47,7 +50,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       {:ok, album} = Album.create_if_not_exists(album_fixture())
 
       assert %Album{
-               spotify_id: "album123",
+               provider: :spotify,
+               album_id: "album123",
                name: "Sample Album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
@@ -55,13 +59,15 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
                total_tracks: 2,
                tracks: [
                  %Track{
-                   spotify_id: "track001",
+                   provider: :spotify,
+                   track_id: "track001",
                    name: "Track One",
                    track_number: 1,
                    duration_ms: 210_000
                  },
                  %Track{
-                   spotify_id: "track002",
+                   provider: :spotify,
+                   track_id: "track002",
                    name: "Track Two",
                    track_number: 2,
                    duration_ms: 180_000
@@ -75,7 +81,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       {:ok, album} = Album.create_if_not_exists(album_fixture())
 
       assert %Album{
-               spotify_id: "album123",
+               provider: :spotify,
+               album_id: "album123",
                name: "Sample Album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
@@ -83,13 +90,15 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
                total_tracks: 2,
                tracks: [
                  %Track{
-                   spotify_id: "track001",
+                   provider: :spotify,
+                   track_id: "track001",
                    name: "Track One",
                    track_number: 1,
                    duration_ms: 210_000
                  },
                  %Track{
-                   spotify_id: "track002",
+                   provider: :spotify,
+                   track_id: "track002",
                    name: "Track Two",
                    track_number: 2,
                    duration_ms: 180_000
@@ -106,7 +115,8 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
       album = Album.get(id)
 
       assert %Album{
-               spotify_id: "album123",
+               provider: :spotify,
+               album_id: "album123",
                name: "Sample Album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
@@ -114,13 +124,15 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
                total_tracks: 2,
                tracks: [
                  %Track{
-                   spotify_id: "track001",
+                   provider: :spotify,
+                   track_id: "track001",
                    name: "Track One",
                    track_number: 1,
                    duration_ms: 210_000
                  },
                  %Track{
-                   spotify_id: "track002",
+                   provider: :spotify,
+                   track_id: "track002",
                    name: "Track Two",
                    track_number: 2,
                    duration_ms: 180_000
@@ -137,13 +149,14 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
   describe "get_by/1" do
     test "get an existing album" do
       user = user_fixture()
-      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
+      {:ok, %Album{album_id: album_id} = album} = Album.create(album_fixture())
       {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
-      album = Album.get_by(spotify_id: spotify_id)
+      album = Album.get_by(album_id: album_id)
 
       assert %Album{
-               spotify_id: "album123",
+               provider: :spotify,
+               album_id: "album123",
                name: "Sample Album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
@@ -151,13 +164,15 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
                total_tracks: 2,
                tracks: [
                  %Track{
-                   spotify_id: "track001",
+                   provider: :spotify,
+                   track_id: "track001",
                    name: "Track One",
                    track_number: 1,
                    duration_ms: 210_000
                  },
                  %Track{
-                   spotify_id: "track002",
+                   provider: :spotify,
+                   track_id: "track002",
                    name: "Track Two",
                    track_number: 2,
                    duration_ms: 180_000
@@ -167,38 +182,38 @@ defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
     end
 
     test "get an unexisting album" do
-      assert is_nil(Album.get_by(spotify_id: "unknown"))
+      assert is_nil(Album.get_by(album_id: "unknown"))
     end
   end
 
   describe "delete/1" do
     test "delete an existing album" do
-      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
+      {:ok, %Album{album_id: album_id} = album} = Album.create(album_fixture())
 
       {:ok, _} = Album.delete(album)
 
-      assert is_nil(Album.get_by(spotify_id: spotify_id))
+      assert is_nil(Album.get_by(album_id: album_id))
     end
 
     test "can delete stale album" do
-      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
+      {:ok, %Album{album_id: album_id} = album} = Album.create(album_fixture())
 
       {:ok, _} = Album.delete(album)
       {:ok, _} = Album.delete(album)
 
-      assert is_nil(Album.get_by(spotify_id: spotify_id))
+      assert is_nil(Album.get_by(album_id: album_id))
     end
 
     test "cannot delete an album associated to at least one listening session" do
       user = user_fixture()
-      {:ok, %Album{spotify_id: spotify_id} = album} = Album.create(album_fixture())
+      {:ok, %Album{album_id: album_id} = album} = Album.create(album_fixture())
       {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
       {:error, changeset} = Album.delete(album)
 
       assert Repo.traverse_errors(changeset) == %{listening_sessions: ["are still linked to this album"]}
 
-      assert !is_nil(Album.get_by(spotify_id: spotify_id))
+      assert !is_nil(Album.get_by(album_id: album_id))
     end
   end
 end

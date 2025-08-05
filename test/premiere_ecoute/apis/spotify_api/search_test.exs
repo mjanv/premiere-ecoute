@@ -37,13 +37,14 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
         assert Enum.sort(Map.keys(album)) == [
                  :__meta__,
                  :__struct__,
+                 :album_id,
                  :artist,
                  :cover_url,
                  :id,
                  :inserted_at,
                  :name,
+                 :provider,
                  :release_date,
-                 :spotify_id,
                  :total_tracks,
                  :tracks,
                  :updated_at
@@ -52,7 +53,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
 
       assert %Album{
                id: nil,
-               spotify_id: "7aJuG4TFXa2hmE4z1yxc3n",
+               provider: :spotify,
+               album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                name: "HIT ME HARD AND SOFT",
                artist: "Billie Eilish",
                release_date: ~D[2024-05-17],

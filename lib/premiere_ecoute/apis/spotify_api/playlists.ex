@@ -27,7 +27,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.api()
     |> SpotifyApi.post(
       url: "/playlists/#{id}/tracks",
-      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.spotify_id}" end)}
+      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.track_id}" end)}
     )
     |> SpotifyApi.handle(201, fn body -> body end)
   end
@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.delete(
       url: "/playlists/#{id}/tracks",
       json: %{
-        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{t.spotify_id}"} end),
+        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{t.track_id}"} end),
         "snapshot_id" => snapshot["snapshot_id"]
       }
     )
@@ -47,10 +47,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
 
   def parse_playlist(data) do
     %Playlist{
-      spotify_id: data["id"],
+      provider: :spotify,
+      playlist_id: data["id"],
       owner_name: data["owner"]["display_name"],
-      spotify_owner_id: data["owner"]["id"],
-      name: data["name"],
+      owner_id: data["owner"]["id"],
+      title: data["name"],
       cover_url: Parser.parse_album_cover_url(data["images"]),
       tracks:
         if Map.has_key?(data["tracks"], "items") do
@@ -63,9 +64,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
 
   def parse_track(data) do
     %Track{
-      spotify_id: data["track"]["id"],
-      album_spotify_id: data["track"]["album"]["id"],
-      user_spotify_id: data["added_by"]["id"],
+      provider: :spotify,
+      track_id: data["track"]["id"],
+      album_id: data["track"]["album"]["id"],
+      user_id: data["added_by"]["id"],
       name: data["track"]["name"],
       artist: Parser.parse_primary_artist(data["artists"]),
       duration_ms: data["track"]["duration_ms"] || 0,

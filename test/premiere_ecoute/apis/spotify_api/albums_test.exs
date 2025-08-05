@@ -37,7 +37,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
 
       assert %Album{
                id: nil,
-               spotify_id: "7aJuG4TFXa2hmE4z1yxc3n",
+               provider: :spotify,
+               album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                name: "HIT ME HARD AND SOFT",
                artist: "Billie Eilish",
                release_date: ~D[2024-05-17],
@@ -46,7 +47,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                tracks: [
                  %Track{
                    id: nil,
-                   spotify_id: "1CsMKhwEmNnmvHUuO5nryA",
+                   provider: :spotify,
+                   track_id: "1CsMKhwEmNnmvHUuO5nryA",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "SKINNY",
                    track_number: 1,
@@ -54,7 +56,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "629DixmZGHc7ILtEntuiWE",
+                   provider: :spotify,
+                   track_id: "629DixmZGHc7ILtEntuiWE",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "LUNCH",
                    track_number: 2,
@@ -62,7 +65,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "7BRD7x5pt8Lqa1eGYC4dzj",
+                   provider: :spotify,
+                   track_id: "7BRD7x5pt8Lqa1eGYC4dzj",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "CHIHIRO",
                    track_number: 3,
@@ -70,7 +74,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "6dOtVTDdiauQNBQEDOtlAB",
+                   provider: :spotify,
+                   track_id: "6dOtVTDdiauQNBQEDOtlAB",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "BIRDS OF A FEATHER",
                    track_number: 4,
@@ -78,7 +83,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "3QaPy1KgI7nu9FJEQUgn6h",
+                   provider: :spotify,
+                   track_id: "3QaPy1KgI7nu9FJEQUgn6h",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "WILDFLOWER",
                    track_number: 5,
@@ -86,7 +92,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "6TGd66r0nlPaYm3KIoI7ET",
+                   provider: :spotify,
+                   track_id: "6TGd66r0nlPaYm3KIoI7ET",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "THE GREATEST",
                    track_number: 6,
@@ -94,7 +101,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "6fPan2saHdFaIHuTSatORv",
+                   provider: :spotify,
+                   track_id: "6fPan2saHdFaIHuTSatORv",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "L’AMOUR DE MA VIE",
                    track_number: 7,
@@ -102,7 +110,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "1LLUoftvmTjVNBHZoQyveF",
+                   provider: :spotify,
+                   track_id: "1LLUoftvmTjVNBHZoQyveF",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "THE DINER",
                    track_number: 8,
@@ -110,7 +119,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "7DpUoxGSdlDHfqCYj0otzU",
+                   provider: :spotify,
+                   track_id: "7DpUoxGSdlDHfqCYj0otzU",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "BITTERSUITE",
                    track_number: 9,
@@ -118,7 +128,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
                  },
                  %Track{
                    id: nil,
-                   spotify_id: "2prqm9sPLj10B4Wg0wE5x9",
+                   provider: :spotify,
+                   track_id: "2prqm9sPLj10B4Wg0wE5x9",
                    album_id: "7aJuG4TFXa2hmE4z1yxc3n",
                    name: "BLUE",
                    track_number: 10,

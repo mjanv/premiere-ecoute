@@ -1,6 +1,6 @@
 ---
-allowed-tools: Bash(git status:*), Bash(git commit:*)
-description: Create a git commit
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*)
+description: Write a changelog
 ---
 
 ## Context
@@ -12,10 +12,10 @@ description: Create a git commit
 
 ## Your task
 
-Based on the above changes, create a single git commit from files in the staging area. Do NOT add or removed any new files to the staging area. Be simple and human-oriented in your writing. Commit message should be under the template:
+Based on the last 3 commit message, create a CHANGELOG.md summarizing all commits in a single changelog. Be simple and human-oriented in your writing. Changelog should be under the template:
 
 ```
-<title>
+<release name>
 
 <summary description, do not list every bullet point>
 

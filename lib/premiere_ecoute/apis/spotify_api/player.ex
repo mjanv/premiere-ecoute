@@ -119,27 +119,27 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
 
   def default, do: %{"is_playing" => false, "item" => nil, "device" => nil}
 
-  def start_resume_playback(%Scope{} = scope, %Album{spotify_id: spotify_id}) do
+  def start_resume_playback(%Scope{} = scope, %Album{provider: :spotify, album_id: album_id}) do
     scope
     |> SpotifyApi.api()
     |> Req.put(
       url: "/me/player/play",
-      json: %{context_uri: "spotify:album:#{spotify_id}", offset: %{position: 0}, position_ms: 0}
+      json: %{context_uri: "spotify:album:#{album_id}", offset: %{position: 0}, position_ms: 0}
     )
-    |> SpotifyApi.handle(204, fn _ -> "spotify:album:#{spotify_id}" end)
+    |> SpotifyApi.handle(204, fn _ -> "spotify:album:#{album_id}" end)
   end
 
-  def start_resume_playback(%Scope{} = scope, %Track{spotify_id: spotify_id}) do
+  def start_resume_playback(%Scope{} = scope, %Track{provider: :spotify, track_id: track_id}) do
     scope
     |> SpotifyApi.api()
     |> Req.put(
       url: "/me/player/play",
-      json: %{uris: ["spotify:track:#{spotify_id}"], position_ms: 0}
+      json: %{uris: ["spotify:track:#{track_id}"], position_ms: 0}
     )
-    |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{spotify_id}" end)
+    |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{track_id}" end)
   end
 
-  def add_item_to_playback_queue(%Scope{} = scope, %Track{spotify_id: spotify_id}) do
+  def add_item_to_playback_queue(%Scope{} = scope, %Track{provider: :spotify, track_id: track_id}) do
     scope
     |> SpotifyApi.api()
     |> Req.merge(
@@ -150,9 +150,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     )
     |> SpotifyApi.post(
       url: "/me/player/queue",
-      params: %{uri: "spotify:track:#{spotify_id}"}
+      params: %{uri: "spotify:track:#{track_id}"}
     )
-    |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{spotify_id}" end)
+    |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{track_id}" end)
   end
 
   def add_item_to_playback_queue(%Scope{} = scope, %Album{tracks: tracks}) do

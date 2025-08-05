@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Accounts.User.Profile do
   @moduledoc false
 
-  use  PremiereEcoute.Core.Aggregate.Object
+  use PremiereEcoute.Core.Aggregate.Object
 
   @schemes [:light, :dark, :system]
   @languages [:en, :fr, :it]

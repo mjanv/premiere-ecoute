@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.spotify_id
+        album_id: album.album_id
       }
 
       {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert session.user_id == user.id
       assert session.status == :preparing
 
-      assert session.album.spotify_id == "album123"
+      assert session.album.album_id == "album123"
       assert session.album.name == "Sample Album"
       assert session.album.artist == "Sample Artist"
     end
@@ -64,7 +64,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       album_id = "spotify:album:123"
 
       album = %Album{
-        spotify_id: album_id,
+        provider: :spotify,
+        album_id: album_id,
         # Invalid name to trigger creation failure
         name: nil,
         artist: "Test Artist",
@@ -94,7 +95,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.spotify_id
+        album_id: album.album_id
       }
 
       {:ok, _, [event1]} = CommandBus.apply(command)
@@ -128,7 +129,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.spotify_id
+        album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -194,7 +195,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.spotify_id
+        album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -260,7 +261,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.spotify_id
+        album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -318,7 +319,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %PrepareListeningSession{
         user_id: user.id,
-        album_id: album.spotify_id
+        album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)

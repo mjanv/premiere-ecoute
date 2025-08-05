@@ -2,14 +2,14 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
   @moduledoc """
   Music album in the discography system.
 
-  An album is a collection of tracks from Spotify's catalog that can be used
-  in listening sessions. Albums are identified by their Spotify ID and contain
+  An album is a collection of tracks from a provider catalog that can be used
+  in listening sessions. Albums are identified by their provider ID and contain
   metadata such as name, artist, release date, and cover art.
   """
 
   use PremiereEcoute.Core.Aggregate,
     root: [:tracks],
-    identity: [:spotify_id],
+    identity: [:provider, :album_id],
     json: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
   alias PremiereEcoute.Repo
@@ -17,7 +17,8 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
 
   @type t :: %__MODULE__{
           id: integer() | nil,
-          spotify_id: String.t() | nil,
+          provider: :spotify | :deezer,
+          album_id: String.t() | nil,
           name: String.t() | nil,
           artist: String.t() | nil,
           release_date: Date.t() | nil,
@@ -29,7 +30,8 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
         }
 
   schema "albums" do
-    field :spotify_id, :string
+    field :provider, Ecto.Enum, values: [:spotify, :deezer]
+    field :album_id, :string
     field :name, :string
     field :artist, :string
     field :release_date, :date
@@ -43,10 +45,11 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
 
   def changeset(album, attrs) do
     album
-    |> cast(attrs, [:spotify_id, :name, :artist, :release_date, :cover_url, :total_tracks])
-    |> validate_required([:spotify_id, :name, :artist, :total_tracks])
+    |> cast(attrs, [:provider, :album_id, :name, :artist, :release_date, :cover_url, :total_tracks])
+    |> validate_required([:provider, :album_id, :name, :artist, :total_tracks])
     |> validate_number(:total_tracks, greater_than: 0)
-    |> unique_constraint(:spotify_id)
+    |> validate_inclusion(:provider, [:twitch, :spotify])
+    |> unique_constraint([:album_id, :provider])
     |> foreign_key_constraint(:listening_sessions,
       name: :listening_sessions_album_id_fkey,
       message: "are still linked to this album"

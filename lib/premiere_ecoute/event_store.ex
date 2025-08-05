@@ -66,7 +66,7 @@ defmodule PremiereEcoute.EventStore do
   defp singular(stream), do: stream <> "-"
   defp plural(stream), do: stream <> "s"
 
-  @spec ok({:ok, any()} | any(), String.t() \\ nil, (any() -> any()))
+  @spec ok({:ok, any()} | any(), String.t() | nil, (any() -> any())) :: {:ok, any()} | any()
   def ok(pattern, stream \\ nil, f)
 
   def ok({:ok, data}, stream, f) do
@@ -76,7 +76,7 @@ defmodule PremiereEcoute.EventStore do
 
   def ok(pattern, _stream, _f), do: pattern
 
-  @spec error({:error, any()} | any(), String.t() \\ nil, (any() -> any()))
+  @spec error({:error, any()} | any(), String.t() | nil, (any() -> any())) :: {:error, any()} | any()
   def error(pattern, stream \\ nil, g)
 
   def error({:error, data}, stream, g) do
@@ -86,7 +86,8 @@ defmodule PremiereEcoute.EventStore do
 
   def error(pattern, _stream, _g), do: pattern
 
-  @spec error({:ok, any()} | {:error, any()} | any(), String.t() \\ nil, (any() -> any()))
+  @spec error({:ok, any()} | {:error, any()} | any(), String.t() | nil, (any() -> any())) ::
+          {:ok, any()} | {:error, any()} | any()
   def any(data, stream, h) do
     append(h.(data), stream: stream)
     data

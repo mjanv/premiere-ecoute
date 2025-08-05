@@ -67,7 +67,7 @@ defmodule PremiereEcoute.MixProject do
     [
       # Web
       {:bandit, "~> 1.5"},
-      {:phoenix, "~> 1.8.0-rc.4", override: true},
+      {:phoenix, "~> 1.8", override: true},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},

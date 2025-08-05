@@ -3,21 +3,28 @@ defmodule PremiereEcoute.Repo.Migrations.CreatePlaylists do
 
   def change do
     create table(:playlists) do
-      add :spotify_id, :string, null: false
-      add :name, :string, null: false
-      add :spotify_owner_id, :string, null: false
+      add :provider, :string, null: false
+      add :playlist_id, :string, null: false
+
+      add :owner_id, :string, null: false
       add :owner_name, :string, null: false
-      add :cover_url, :string, null: false
+
+      add :title, :string, null: false
+      add :description, :text
+      add :url, :string, null: false
+      add :cover_url, :string
+      add :public, :boolean, default: true, null: false
 
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:playlists, [:spotify_id])
+    create unique_index(:playlists, [:playlist_id, :provider])
 
     create table(:playlist_tracks) do
-      add :spotify_id, :string, null: false
-      add :album_spotify_id, :string, null: false
-      add :user_spotify_id, :string, null: false
+      add :provider, :string, null: false
+      add :track_id, :string, null: false
+      add :album_id, :string, null: false
+      add :user_id, :string, null: false
       add :name, :string, null: false
       add :artist, :string, null: false
       add :duration_ms, :integer, null: false
@@ -29,6 +36,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreatePlaylists do
     end
 
     create index(:playlist_tracks, [:playlist_id])
-    create unique_index(:playlist_tracks, [:playlist_id, :spotify_id])
+    create unique_index(:playlist_tracks, [:track_id, :provider])
   end
 end

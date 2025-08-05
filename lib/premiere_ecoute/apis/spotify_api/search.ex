@@ -18,7 +18,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Search do
     |> SpotifyApi.handle(200, fn %{"albums" => %{"items" => items}} ->
       Enum.map(items, fn item ->
         %Album{
-          spotify_id: item["id"],
+          provider: :spotify,
+          album_id: item["id"],
           name: item["name"],
           artist: Parser.parse_primary_artist(item["artists"]),
           release_date: Parser.parse_release_date(item["release_date"]),

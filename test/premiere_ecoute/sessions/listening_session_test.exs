@@ -31,7 +31,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
              } = session
 
       assert %Album{
-               spotify_id: "album123",
+               provider: :spotify,
+               album_id: "album123",
                name: "Sample Album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
@@ -39,13 +40,15 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
                total_tracks: 2,
                tracks: [
                  %Track{
-                   spotify_id: "track001",
+                   provider: :spotify,
+                   track_id: "track001",
                    name: "Track One",
                    track_number: 1,
                    duration_ms: 210_000
                  },
                  %Track{
-                   spotify_id: "track002",
+                   provider: :spotify,
+                   track_id: "track002",
                    name: "Track Two",
                    track_number: 2,
                    duration_ms: 180_000
@@ -85,7 +88,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
              } = session
 
       assert %Album{
-               spotify_id: "album123",
+               provider: :spotify,
+               album_id: "album123",
                name: "Sample Album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
@@ -93,13 +97,15 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
                total_tracks: 2,
                tracks: [
                  %Track{
-                   spotify_id: "track001",
+                   provider: :spotify,
+                   track_id: "track001",
                    name: "Track One",
                    track_number: 1,
                    duration_ms: 210_000
                  },
                  %Track{
-                   spotify_id: "track002",
+                   provider: :spotify,
+                   track_id: "track002",
                    name: "Track Two",
                    track_number: 2,
                    duration_ms: 180_000
@@ -125,7 +131,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
                } = session
 
         assert %Album{
-                 spotify_id: "album123",
+                 provider: :spotify,
+                 album_id: "album123",
                  name: "Sample Album",
                  artist: "Sample Artist",
                  release_date: ~D[2023-01-01],
@@ -133,13 +140,15 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
                  total_tracks: 2,
                  tracks: [
                    %Track{
-                     spotify_id: "track001",
+                     provider: :spotify,
+                     track_id: "track001",
                      name: "Track One",
                      track_number: 1,
                      duration_ms: 210_000
                    },
                    %Track{
-                     spotify_id: "track002",
+                     provider: :spotify,
+                     track_id: "track002",
                      name: "Track Two",
                      track_number: 2,
                      duration_ms: 180_000
@@ -172,8 +181,9 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       assert is_nil(session.current_track)
 
       assert %PremiereEcoute.Sessions.Discography.Album.Track{
+               provider: :spotify,
                name: "Track One",
-               spotify_id: "track001",
+               track_id: "track001",
                track_number: 1
              } = after_session.current_track
     end
@@ -186,14 +196,16 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       {:ok, after_session} = ListeningSession.next_track(session)
 
       assert %PremiereEcoute.Sessions.Discography.Album.Track{
+               provider: :spotify,
                name: "Track One",
-               spotify_id: "track001",
+               track_id: "track001",
                track_number: 1
              } = session.current_track
 
       assert %PremiereEcoute.Sessions.Discography.Album.Track{
+               provider: :spotify,
                name: "Track Two",
-               spotify_id: "track002",
+               track_id: "track002",
                track_number: 2
              } = after_session.current_track
     end
@@ -251,14 +263,16 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       {:ok, after_session} = ListeningSession.previous_track(session)
 
       assert %PremiereEcoute.Sessions.Discography.Album.Track{
+               provider: :spotify,
                name: "Track Two",
-               spotify_id: "track002",
+               track_id: "track002",
                track_number: 2
              } = session.current_track
 
       assert %PremiereEcoute.Sessions.Discography.Album.Track{
+               provider: :spotify,
                name: "Track One",
-               spotify_id: "track001",
+               track_id: "track001",
                track_number: 1
              } = after_session.current_track
     end
