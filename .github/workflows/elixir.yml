@@ -29,7 +29,7 @@ jobs:
         run: mix deps.get
 
       - name: Generate ExDoc
-        run: mix docs
+        run: mix ci.docs
 
       - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v3

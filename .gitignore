@@ -46,4 +46,5 @@ npm-debug.log
 
 # Documentation files
 docs/product/
+priv/docs/
 
