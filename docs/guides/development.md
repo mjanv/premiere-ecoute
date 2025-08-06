@@ -93,4 +93,4 @@ mix ecto.migrate # Run database migrations
 docker compose up -d # Start observability stack (Grafana, Prometheus)
 ```
 
-Grafana dashboards are accessible without admin login, for **local development**, at [http://localhost:3000](http://localhost:3000). Dashboards are automatically uploaded at startup from [PromEx dashboards](https://hexdocs.pm/prom_ex/all.html) and application dashboards written in [priv/dashboards/](priv/dashboards/) folder.
+Grafana dashboards are accessible without admin login, for **local development**, at [http://localhost:3000](http://localhost:3000). Dashboards are automatically uploaded at startup from [PromEx dashboards](https://hexdocs.pm/prom_ex/all.html) and application dashboards written in `priv/dashboards/` folder.

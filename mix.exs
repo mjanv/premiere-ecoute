@@ -181,11 +181,11 @@ defmodule PremiereEcoute.MixProject do
         "cmd firefox cover/excoveralls.html"
       ],
       # Deployment
-      docs: ["doctor", "docs --output priv/docs"],
+      dos: ["doctor", "docs --output priv/docs"],
       ready: ["format", "quality", "cmd mix test --color", "docs"],
       deploy: ["cmd fly deploy"],
       # CI/CD
-      "ci.docs": ["doctor", "docs --output priv/docs"],
+      "ci.docs": ["docs --output doc"],
     ]
   end
 end
