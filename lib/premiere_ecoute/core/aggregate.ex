@@ -71,7 +71,7 @@ defmodule PremiereEcoute.Core.Aggregate do
       def min(query \\ __MODULE__, field), do: Repo.aggregate(query, :min, field)
       def sum(query \\ __MODULE__, field), do: Repo.aggregate(query, :sum, field)
 
-      defoverridable create: 1, get: 1, update: 2, upsert: 2, delete: 1
+      defoverridable create: 1, get: 1, update: 2, upsert: 2, delete: 1, delete_all: 1
     end
   end
 end

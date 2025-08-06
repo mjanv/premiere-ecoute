@@ -52,6 +52,10 @@ defmodule PremiereEcouteWeb.UserAuth do
     user_token = get_session(conn, :user_token)
     user_token && Accounts.delete_user_session_token(user_token)
 
+    if Map.has_key?(conn.assigns, :current_scope) && conn.assigns.current_scope do
+      Accounts.delete_all_oauth_tokens(conn.assigns.current_scope.user)
+    end
+
     if live_socket_id = get_session(conn, :live_socket_id) do
       PremiereEcouteWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
     end

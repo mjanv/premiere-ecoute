@@ -49,7 +49,10 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
       {:ok, user}
     else
       %User{} = user ->
-        User.refresh_token(user, :twitch, payload)
+        case User.refresh_token(user, :twitch, payload) do
+          {:error, _} -> User.create_token(user, :twitch, payload)
+          other -> other
+        end
 
       {:error, reason} ->
         Logger.error("Failed to create user from Twitch authentification: #{inspect(reason)}")

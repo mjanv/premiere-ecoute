@@ -136,4 +136,16 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
       assert user.spotify == nil
     end
   end
+
+  describe "delete_all_tokens/1" do
+    test "delete all oauth tokens for an user", %{user: user} do
+      {:ok, user} = OauthToken.create(user, :twitch, @twitch_token)
+      {:ok, user} = OauthToken.create(user, :spotify, @spotify_token)
+
+      {:ok, user} = OauthToken.delete_all_tokens(user)
+
+      assert user.twitch == nil
+      assert user.spotify == nil
+    end
+  end
 end

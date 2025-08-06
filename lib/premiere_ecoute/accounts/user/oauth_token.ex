@@ -70,4 +70,10 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
   def disconnect(%User{} = user, provider) do
     refresh(user, provider, %{access_token: nil, refresh_token: nil, expires_at: nil})
   end
+
+  def delete_all_tokens(%User{id: id} = user) do
+    from(t in __MODULE__, where: t.parent_id == ^id)
+    |> Repo.delete_all()
+    |> then(fn _ -> {:ok, User.preload(user)} end)
+  end
 end

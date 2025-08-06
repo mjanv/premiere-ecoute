@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Accounts do
   alias PremiereEcoute.Accounts.Services
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Accounts.User.Token
 
   ## User
@@ -30,6 +31,9 @@ defmodule PremiereEcoute.Accounts do
   defdelegate deliver_user_update_email_instructions(user, email, fun), to: Token
   defdelegate deliver_login_instructions(user, fun), to: Token
   defdelegate delete_user_session_token(token), to: Token
+
+  ## Oauth Token
+  defdelegate delete_all_oauth_tokens(user), to: OauthToken, as: :delete_all_tokens
 
   ## Follow
   defdelegate follow(user, streamer, opts \\ %{}), to: Follow

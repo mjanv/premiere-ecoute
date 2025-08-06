@@ -37,12 +37,11 @@ defmodule PremiereEcoute.Core.Api do
             {:ok, f.(body)}
           rescue
             error ->
-              IO.inspect(r)
-              Logger.error("#{unquote(name)} API returned unexpected body: #{status} - #{inspect(body)}")
+              Logger.error("#{unquote(name)} API unexpected body: #{status} - #{inspect(body)}")
               {:error, "#{unquote(name)} API error: #{status}"}
           end
         else
-          Logger.error("#{unquote(name)} API returned unexpected status: #{status} - #{inspect(body)}")
+          Logger.error("#{unquote(name)} API unexpected status: #{status} - #{inspect(body)}")
           {:error, "#{unquote(name)} API error: #{status}"}
         end
       end

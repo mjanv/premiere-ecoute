@@ -51,7 +51,9 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
       |> put_flash(:info, "Successfully authenticated with Twitch!")
       |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
     else
-      {:error, _} ->
+      {:error, reason} ->
+        Logger.error("#{inspect(reason)}")
+
         conn
         |> put_flash(:error, "Twitch authentication failed")
         |> redirect(to: ~p"/")

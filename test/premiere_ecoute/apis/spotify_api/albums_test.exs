@@ -158,7 +158,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
       assert reason == "Spotify API error: 404"
 
       assert logs =~
-               "[error] Spotify API returned unexpected status: 404 - %{\"error\" => %{\"message\" => \"Resource not found\", \"status\" => 404}}"
+               "[error] Spotify API unexpected status: 404 - %{\"error\" => %{\"message\" => \"Resource not found\", \"status\" => 404}}"
     end
   end
 end
