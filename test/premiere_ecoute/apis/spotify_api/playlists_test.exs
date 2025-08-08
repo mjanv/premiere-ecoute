@@ -60,6 +60,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
         ],
+        params: %{"limit" => "10", "offset" => "0"},
         path: {:get, "/v1/me/playlists"},
         response: "spotify_api/playlists/get_current_user_playlist/response.json",
         status: 200

@@ -175,4 +175,23 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.all()
     |> preload()
   end
+
+  def current_session(nil), do: nil
+
+  def current_session(user) do
+    from(s in __MODULE__,
+      where: s.user_id == ^user.id and s.status in [:active, :preparing],
+      order_by: [
+        fragment(
+          "CASE WHEN ? = 'active' THEN 0 WHEN ? = 'preparing' THEN 1 END",
+          s.status,
+          s.status
+        ),
+        desc: s.updated_at
+      ],
+      limit: 1
+    )
+    |> Repo.one()
+    |> preload()
+  end
 end

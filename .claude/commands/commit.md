@@ -13,24 +13,34 @@ description: Create a git commit
 
 ## Your task
 
-Based on the above changes, create a single git commit from files in the staging area. Do NOT add or removed any new files to the staging area. Be simple and human-oriented in your writing. Commit message should be under the template:
+Based on the above changes, create a single git commit from files in the staging area. Do NOT add or removed any new files to the staging area. Display the message after committing it. Commit message should be under the template:
 
 ```
-<title>
+# <title>
 
 <summary description, do not list every bullet point>
 
-# Features
+## Features
+
+<bullet list or Level 3 sec>
+
+## Improvements
 
 <bullet list>
 
-# Improvements
-
-<bullet list>
-
-# Bugs
+## Bugs
 
 <bullet list>
 ```
 
-If a section is empty, do not write its title. Do NOT add a `Co-Authored-By: Claude`.
+If a section is empty, do not write its title. Do NOT add a `Co-Authored-By: Claude`. Be simple and human-oriented in your writing, you can left out micro-changes. If a point of the bullet list is considered major and require more explanation, it can be written under its own subsection, above the bullet list like this:
+
+```
+### <feature/improvement title>
+
+<summary>
+
+### Others
+
+<bullet list>
+```

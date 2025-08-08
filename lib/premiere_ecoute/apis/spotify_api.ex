@@ -134,7 +134,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   # Playlists
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists
-  defdelegate get_library_playlists(scope), to: __MODULE__.Playlists
+  defdelegate get_library_playlists(scope, page \\ 1), to: __MODULE__.Playlists
   defdelegate add_items_to_playlist(scope, id, tracks), to: __MODULE__.Playlists
   defdelegate remove_playlist_items(scope, id, tracks, snapshot), to: __MODULE__.Playlists
 

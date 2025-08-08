@@ -1,7 +1,7 @@
 defmodule PremiereEcouteWeb.SessionChannelTest do
   use PremiereEcouteWeb.ChannelCase
 
-  alias PremiereEcoute.Core.EventBus
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Events.MessageSent
@@ -23,11 +23,24 @@ defmodule PremiereEcouteWeb.SessionChannelTest do
 
   describe "push - vote" do
     test "receive current score when a new vote is casted to the active listening session", %{user: user} do
-      EventBus.dispatch(%MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer1", message: "5", is_streamer: false})
-      EventBus.dispatch(%MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer2", message: "10", is_streamer: false})
+      messages = [
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer01", message: "5", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer02", message: "0", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer03", message: "5", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer04", message: "4", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer05", message: "3", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer06", message: "5", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer07", message: "2", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer08", message: "5", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer09", message: "8", is_streamer: false},
+        %MessageSent{broadcaster_id: user.twitch.user_id, user_id: "viewer10", message: "5", is_streamer: false}
+      ]
 
-      assert_push "session_summary", %{"viewer_score" => 5.0}, 1_000
-      assert_push "session_summary", %{"viewer_score" => 7.5}, 1_000
+      for message <- messages do
+        Sessions.publish_message(message)
+      end
+
+      assert_push "session_summary", %{"viewer_score" => 4.2}, 1_000
     end
   end
 end

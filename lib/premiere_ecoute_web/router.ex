@@ -44,6 +44,7 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
+      live "/home", HomeLive, :index
     end
 
     live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)

@@ -40,6 +40,12 @@ defmodule PremiereEcoute.Core.Aggregate do
         end
       end
 
+      def create_all(entities) do
+        Ecto.Multi.new()
+        |> Ecto.Multi.insert_all(:all, __MODULE__, entities)
+        |> Repo.transact()
+      end
+
       # Read operations
       def get(id), do: preload(Repo.get(__MODULE__, id))
       def get_by(query \\ __MODULE__, clauses), do: preload(Repo.get_by(query, clauses))

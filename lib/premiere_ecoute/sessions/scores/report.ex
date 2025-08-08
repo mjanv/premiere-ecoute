@@ -151,7 +151,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           end
         end)
 
-      Enum.sum(numeric_votes) / length(numeric_votes)
+      (Enum.sum(numeric_votes) / length(numeric_votes)) |> Float.round(1)
     end
   end
 
@@ -246,6 +246,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           else
             Enum.sum(viewer_scores_per_track) / length(viewer_scores_per_track)
           end
+          |> Float.round(1)
 
         streamer_score =
           if Enum.empty?(streamer_scores_per_track) do
@@ -253,6 +254,7 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
           else
             Enum.sum(streamer_scores_per_track) / length(streamer_scores_per_track)
           end
+          |> Float.round(1)
 
         {viewer_score, streamer_score}
       else

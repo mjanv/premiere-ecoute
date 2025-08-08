@@ -81,6 +81,8 @@ defmodule PremiereEcoute.MixProject do
       {:gettext, "~> 0.26"},
       {:dns_cluster, "~> 0.2"},
       {:plug_content_security_policy, "~> 0.2.1"},
+      {:fun_with_flags, "~> 1.13"},
+      {:fun_with_flags_ui, "~> 1.1"},
       # Backend
       {:dotenvy, "~> 1.0"},
       {:boundary, "~> 0.10"},
@@ -106,6 +108,7 @@ defmodule PremiereEcoute.MixProject do
       {:oban_web, "~> 2.11"},
       {:swoosh, "~> 1.19"},
       {:resend, "~> 0.4"},
+      {:broadway, "~> 1.2"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -185,7 +188,7 @@ defmodule PremiereEcoute.MixProject do
       ready: ["format", "quality", "cmd mix test --color", "docs"],
       deploy: ["cmd fly deploy"],
       # CI/CD
-      "ci.docs": ["docs --output doc"],
+      "ci.docs": ["docs --output doc"]
     ]
   end
 end

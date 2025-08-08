@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Sessions do
   alias PremiereEcoute.Sessions.Discography
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
+  alias PremiereEcoute.Sessions.Scores.MessagePipeline
 
   # Listening session
   defdelegate create_session(attrs), to: ListeningSession, as: :create
@@ -12,6 +13,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate next_track(session), to: ListeningSession
   defdelegate previous_track(session), to: ListeningSession
   defdelegate active_sessions(user), to: ListeningSession
+  def publish_message(message), do: PremiereEcoute.Core.publish(MessagePipeline, message)
 
   # Discography
   defdelegate create_album(album), to: Discography.Album, as: :create

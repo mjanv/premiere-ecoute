@@ -8,7 +8,8 @@ defmodule PremiereEcoute.Application do
   def start(_type, _args) do
     mandatory = [
       PremiereEcouteWeb.Supervisor,
-      PremiereEcoute.Supervisor
+      PremiereEcoute.Supervisor,
+      {PremiereEcoute.Sessions.Scores.MessagePipeline, []}
     ]
 
     optionals =

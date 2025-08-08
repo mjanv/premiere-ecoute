@@ -150,4 +150,12 @@ config :swoosh, :api_client, Swoosh.ApiClient.Req
 
 config :tesla, disable_deprecated_builder_warning: true
 
+config :fun_with_flags, :cache_bust_notifications, enabled: false
+
+config :fun_with_flags, :persistence,
+  adapter: FunWithFlags.Store.Persistent.Ecto,
+  repo: PremiereEcoute.Repo,
+  ecto_table_name: "feature_flags",
+  ecto_primary_key_type: :id
+
 import_config "#{config_env()}.exs"

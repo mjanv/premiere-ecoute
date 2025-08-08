@@ -9,16 +9,18 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
   alias PremiereEcoute.Sessions.Discography.Playlist
   alias PremiereEcoute.Sessions.Discography.Playlist.Track
 
+  @limit 10
+
   def get_playlist(playlist_id) when is_binary(playlist_id) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/playlists/#{playlist_id}")
     |> SpotifyApi.handle(200, &parse_playlist/1)
   end
 
-  def get_library_playlists(scope) do
+  def get_library_playlists(scope, page \\ 1) do
     scope
     |> SpotifyApi.api()
-    |> SpotifyApi.get(url: "/me/playlists")
+    |> SpotifyApi.get(url: "/me/playlists", params: [limit: @limit, offset: @limit * (page - 1)])
     |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_library_playlist/1) end)
   end
 
