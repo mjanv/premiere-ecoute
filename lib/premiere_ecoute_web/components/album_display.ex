@@ -34,58 +34,62 @@ defmodule PremiereEcouteWeb.Components.AlbumDisplay do
   attr :rest, :global, include: ~w(phx-click phx-value-id href navigate patch)
 
   def album_display(assigns) do
-    icon_classes = [
-      "text-surface-muted",
-      size_icon_classes(assigns.size)
-    ] |> Enum.join(" ")
-    
+    icon_classes =
+      [
+        "text-surface-muted",
+        size_icon_classes(assigns.size)
+      ]
+      |> Enum.join(" ")
+
     assigns = assign(assigns, :icon_classes, icon_classes)
-    
+
     ~H"""
-    <div class={[
-      "flex items-center",
-      size_spacing_classes(@size),
-      @class
-    ]} {@rest}>
+    <div
+      class={[
+        "flex items-center",
+        size_spacing_classes(@size),
+        @class
+      ]}
+      {@rest}
+    >
       <!-- Cover Image or Placeholder -->
       <div class={[
         "flex-shrink-0 rounded-lg overflow-hidden",
         size_image_classes(@size)
       ]}>
         <%= if @cover_url do %>
-          <img 
-            src={@cover_url} 
-            alt={@title}
-            class="w-full h-full object-cover"
-          />
+          <img src={@cover_url} alt={@title} class="w-full h-full object-cover" />
         <% else %>
           <div class={[
             "bg-surface-interactive flex items-center justify-center",
             size_image_classes(@size)
           ]}>
             <%= if @show_placeholder_icon do %>
-              <CoreComponents.icon 
-                name="hero-musical-note" 
-                class={@icon_classes} 
-              />
+              <CoreComponents.icon name="hero-musical-note" class={@icon_classes} />
             <% end %>
           </div>
         <% end %>
       </div>
-
-      <!-- Text Information -->
+      
+    <!-- Text Information -->
       <div class="flex-1 min-w-0">
-        <h4 class={[
-          "font-semibold text-surface-primary truncate",
-          size_title_classes(@size)
-        ]} title={@title}>
+        <h4
+          class={[
+            "font-semibold text-surface-primary truncate",
+            size_title_classes(@size)
+          ]}
+          title={@title}
+        >
           {@title}
         </h4>
         <%= if @subtitle do %>
-          <p class={[
-            "text-surface-muted truncate mt-1",
-            size_subtitle_classes(@size)
-          ]} title={@subtitle}>
+          <p
+            class={[
+              "text-surface-muted truncate mt-1",
+              size_subtitle_classes(@size)
+            ]}
+            title={@subtitle}
+          >
             {@subtitle}
           </p>
         <% end %>

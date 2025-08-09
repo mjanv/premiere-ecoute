@@ -1,10 +1,10 @@
-defmodule PremiereEcoute.Sessions.Scores.Vote.GraphTest do
+defmodule PremiereEcoute.Sessions.Retrospective.VoteTrendsTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Retrospective.VoteTrends
   alias PremiereEcoute.Sessions.Scores.Vote
-  alias PremiereEcoute.Sessions.Scores.Vote.Graph
 
   setup do
     {:ok, album} = Album.create(album_fixture())
@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote.GraphTest do
 
   describe "rolling_average/1" do
     test "compute a rolling average graph where each new vote update the average", %{session: session} do
-      rolling_avg = Graph.rolling_average(session.id)
+      rolling_avg = VoteTrends.rolling_average(session.id)
 
       assert rolling_avg == [
                {~N[2024-01-01 12:00:03], 8.0},
@@ -67,7 +67,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote.GraphTest do
     end
 
     test "compute a rolling average graph where vote are aggregated each minute", %{session: session} do
-      rolling_avg = Graph.rolling_average(session.id, :minute)
+      rolling_avg = VoteTrends.rolling_average(session.id, :minute)
 
       assert rolling_avg == [
                {~N[2024-01-01 12:01:00], 7.7},

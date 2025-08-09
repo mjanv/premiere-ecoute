@@ -3,7 +3,7 @@ defmodule PremiereEcouteWeb.SessionChannel do
 
   use PremiereEcouteWeb, :channel
 
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
 
   @impl true
   def join("session:" <> id, _payload, socket) do

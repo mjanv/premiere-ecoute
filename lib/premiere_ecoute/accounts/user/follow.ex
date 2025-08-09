@@ -85,7 +85,8 @@ defmodule PremiereEcoute.Accounts.User.Follow do
       where: u.role == :streamer,
       where: u.id != ^id,
       where: u.id not in subquery(from f in __MODULE__, where: f.user_id == ^id, select: f.streamer_id),
-      order_by: [asc: :id]
+      order_by: [asc: :id],
+      preload: [:twitch]
     )
     |> Repo.all()
   end

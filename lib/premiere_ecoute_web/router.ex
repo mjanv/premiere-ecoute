@@ -17,14 +17,14 @@ defmodule PremiereEcouteWeb.Router do
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
 
-    plug PlugContentSecurityPolicy,
-      nonces_for: [:script_src, :style_src],
-      directives: %{
-        script_src: ~w('self' 'unsafe-eval' https://unpkg.com),
-        style_src: ~w('self' 'unsafe-hashes' https://fonts.googleapis.com),
-        font_src: ~w('self' https://fonts.gstatic.com),
-        style_src_attr: ~w('self' 'unsafe-hashes' 'unsafe-inline')
-      }
+    # plug PlugContentSecurityPolicy,
+    #   nonces_for: [:script_src, :style_src],
+    #   directives: %{
+    #     script_src: ~w('self' 'unsafe-eval' https://unpkg.com),
+    #     style_src: ~w('self' 'unsafe-hashes' https://fonts.googleapis.com),
+    #     font_src: ~w('self' https://fonts.gstatic.com),
+    #     style_src_attr: ~w('self' 'unsafe-hashes' 'unsafe-inline')
+    #   }
 
     plug Plugs.RenewTokens
     plug Plugs.SetLocale
@@ -83,13 +83,20 @@ defmodule PremiereEcouteWeb.Router do
     post "/update-password", UserSessionController, :update_password
   end
 
+  scope "/discography", PremiereEcouteWeb.Discography do
+    pipe_through [:browser]
+
+    live_session :discography, on_mount: [{UserAuth, :streamer}] do
+      live "/album/select", AlbumSelectionLive, :index
+    end
+  end
+
   scope "/sessions", PremiereEcouteWeb.Sessions do
     pipe_through [:browser]
 
     live_session :sessions, on_mount: [{UserAuth, :streamer}] do
       live "/", SessionsLive, :index
       live "/:id", SessionLive, :show
-      live "/discography/album/select", Discography.AlbumSelectionLive, :index
       live "/wrapped/retrospective", RetrospectiveLive, :index
     end
 

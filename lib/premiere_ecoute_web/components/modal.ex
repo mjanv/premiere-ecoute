@@ -60,13 +60,13 @@ defmodule PremiereEcouteWeb.Components.Modal do
             <CoreComponents.icon name="hero-x-mark" class="w-6 h-6" />
           </button>
         </div>
-
-        <!-- Body -->
+        
+    <!-- Body -->
         <div class="flex-1 overflow-y-auto p-6">
           {render_slot(@inner_block)}
         </div>
-
-        <!-- Footer -->
+        
+    <!-- Footer -->
         <div :if={@footer != []} class="flex justify-end p-6 border-t border-surface">
           {render_slot(@footer)}
         </div>

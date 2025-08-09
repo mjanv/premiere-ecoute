@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
   @moduledoc """
   API Token Manager
 
-  Utility module for managing OAuth2 token renewal for both Spotify and Twitch APIs. Provides automatic token refresh functionality when tokens are approaching expiration, ensuring continuous API access for authenticated users without manual intervention.
+  Utility module for managing OAuth2 token renewal for provider APIs. Provides automatic token refresh functionality when tokens are approaching expiration, ensuring continuous API access for authenticated users without manual intervention.
   """
 
   require Logger
@@ -11,33 +11,16 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis
 
-  def maybe_renew_twitch_token(conn) do
+  def maybe_renew_token(conn, provider) do
     with %Scope{user: %User{twitch: %{expires_at: expires_at, refresh_token: refresh_token}} = user} = scope <-
            conn.assigns[:current_scope],
          true <- token_expired?(expires_at),
-         {:ok, tokens} <- Apis.twitch().renew_token(refresh_token),
-         {:ok, user} <- User.refresh_token(user, :twitch, tokens) do
+         {:ok, tokens} <- Apis.provider(provider).renew_token(refresh_token),
+         {:ok, user} <- User.refresh_token(user, provider, tokens) do
       %{scope | user: user}
     else
       {:error, reason} ->
-        Logger.error("Failed to renew Twitch token: #{inspect(reason)}")
-        conn.assigns[:current_scope]
-
-      _ ->
-        conn.assigns[:current_scope]
-    end
-  end
-
-  def maybe_renew_spotify_token(conn) do
-    with %{user: %{spotify: %{expires_at: expires_at, refresh_token: refresh_token}} = user} = scope <-
-           conn.assigns[:current_scope],
-         true <- token_expired?(expires_at),
-         {:ok, tokens} <- Apis.spotify().renew_token(refresh_token),
-         {:ok, user} <- User.refresh_token(user, :spotify, tokens) do
-      %{scope | user: user}
-    else
-      {:error, reason} ->
-        Logger.error("Failed to renew Spotify token: #{inspect(reason)}")
+        Logger.error("Failed to renew #{provider} token: #{inspect(reason)}")
         conn.assigns[:current_scope]
 
       _ ->

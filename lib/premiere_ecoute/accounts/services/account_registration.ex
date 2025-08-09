@@ -4,8 +4,6 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   require Logger
 
   alias PremiereEcoute.Accounts
-  alias PremiereEcoute.Accounts.Scope
-  alias PremiereEcoute.Accounts.Services.AccountFollow
   alias PremiereEcoute.Accounts.User
 
   @type twitch_data() :: %{
@@ -39,13 +37,13 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
          nil <- User.get_user_by_email(email),
          attrs <- %{
            email: email,
+           username: username,
            role: role(payload),
            confirmed_at: DateTime.utc_now(),
            password: password || random(32)
          },
          {:ok, user} <- User.create(attrs),
-         {:ok, user} <- User.create_token(user, :twitch, payload),
-         :ok <- AccountFollow.follow_streamers(Scope.for_user(user)) do
+         {:ok, user} <- User.create_token(user, :twitch, payload) do
       {:ok, user}
     else
       %User{} = user ->

@@ -3,8 +3,7 @@ defmodule PremiereEcoute.Sessions do
 
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
-  alias PremiereEcoute.Sessions.Scores.MessagePipeline
-  alias PremiereEcoute.Sessions.Scores.Vote
+  alias PremiereEcoute.Sessions.Scores
 
   # Listening session
   defdelegate create_session(attrs), to: ListeningSession, as: :create
@@ -13,13 +12,14 @@ defmodule PremiereEcoute.Sessions do
   defdelegate next_track(session), to: ListeningSession
   defdelegate previous_track(session), to: ListeningSession
   defdelegate active_sessions(user), to: ListeningSession
-  def publish_message(message), do: PremiereEcouteCore.publish(MessagePipeline, message)
+  def publish_message(event), do: PremiereEcouteCore.publish(Scores.MessagePipeline, event)
+  def publish_poll(event), do: PremiereEcouteCore.publish(Scores.PollPipeline, event)
 
   # Votes
-  def viewer_votes(user), do: Vote.all(where: [viewer_id: user.twitch.user_id])
-  defdelegate create_vote(vote), to: Vote, as: :create
+  def viewer_votes(user), do: Scores.Vote.all(where: [viewer_id: user.twitch.user_id])
+  defdelegate create_vote(vote), to: Scores.Vote, as: :create
 
   # Retrospective
-  defdelegate get_albums_by_period(user_id, period, opts \\ %{}), to: Retrospective
-  defdelegate get_album_session_details(session_id), to: Retrospective
+  defdelegate get_albums_by_period(user_id, period, opts \\ %{}), to: Retrospective.History
+  defdelegate get_album_session_details(session_id), to: Retrospective.History
 end

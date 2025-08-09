@@ -32,6 +32,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :username, :string, default: ""
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
@@ -51,7 +52,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   def changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :role])
+    |> cast(attrs, [:email, :username, :role])
     |> validate_email(opts)
     |> validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
     |> cast_embed(:profile, required: false, with: &Profile.changeset/2)

@@ -1,10 +1,9 @@
-defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
+defmodule PremiereEcouteWeb.Discography.AlbumSelectionLive do
   use PremiereEcouteWeb, :live_view
 
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
-  
-  # AIDEV-NOTE: Import LoadingState component for loading overlays
+
   alias PremiereEcouteWeb.Components.LoadingState
 
   require Logger
@@ -14,14 +13,12 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
     PremiereEcoute.PubSub.subscribe("listening_sessions")
 
     socket
-    # AIDEV-NOTE: Track current source selection (nil, "album", "playlist")
     |> assign(:source_type, nil)
     |> assign(:search_form, to_form(%{"query" => ""}))
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:selected_album, AsyncResult.ok(nil))
     |> assign(:current_scope, socket.assigns[:current_scope] || %{})
     |> assign(:vote_options_preset, nil)
-    # AIDEV-NOTE: Track if user has interacted with vote options
     |> assign(:vote_options_configured, false)
     |> then(fn socket -> {:ok, socket} end)
   end

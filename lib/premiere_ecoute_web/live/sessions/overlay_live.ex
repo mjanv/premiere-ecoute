@@ -4,7 +4,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   require Logger
 
   alias Phoenix.LiveView.AsyncResult
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do

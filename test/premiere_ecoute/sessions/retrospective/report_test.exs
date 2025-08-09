@@ -1,9 +1,11 @@
-defmodule PremiereEcoute.Sessions.Scores.ReportTest do
+defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.{Poll, Report, Vote}
+  alias PremiereEcoute.Sessions.Scores.Poll
+  alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   describe "generate/1" do
     test "generates comprehensive report with all vote sources for 1-10 vote options" do

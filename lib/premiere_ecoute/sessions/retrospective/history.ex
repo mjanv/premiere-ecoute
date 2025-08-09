@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Retrospective do
+defmodule PremiereEcoute.Sessions.Retrospective.History do
   @moduledoc """
   Business logic for the streamer dashboard functionality.
   Provides queries and data aggregation for displaying albums listened during time periods.
@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Sessions.Retrospective do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
 
   @type time_period :: :month | :year
 

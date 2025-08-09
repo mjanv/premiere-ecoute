@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
 
   alias PremiereEcoute.Gettext
 

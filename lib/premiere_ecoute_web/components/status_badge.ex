@@ -21,8 +21,15 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
         Completed
       </.status_badge>
   """
-  attr :status, :string, default: "info", values: ~w(active preparing completed stopped success warning error info), doc: "Predefined status type"
-  attr :variant, :string, default: nil, doc: "Custom variant (overrides status) - success, warning, error, info, primary, secondary"
+  attr :status, :string,
+    default: "info",
+    values: ~w(active preparing completed stopped success warning error info),
+    doc: "Predefined status type"
+
+  attr :variant, :string,
+    default: nil,
+    doc: "Custom variant (overrides status) - success, warning, error, info, primary, secondary"
+
   attr :icon, :string, default: nil, doc: "Heroicon name to display"
   attr :size, :string, default: "md", values: ~w(xs sm md lg), doc: "Size variant"
   attr :class, :string, default: nil
@@ -33,27 +40,33 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
   def status_badge(assigns) do
     # Determine the final variant to use (variant overrides status)
     final_variant = assigns.variant || status_to_variant(assigns.status)
-    
-    icon_classes = [
-      "flex-shrink-0",
-      size_icon_classes(assigns.size),
-      (assigns.inner_block != [] && size_icon_spacing_classes(assigns.size))
-    ] |> Enum.filter(&(&1)) |> Enum.join(" ")
-    
+
+    icon_classes =
+      [
+        "flex-shrink-0",
+        size_icon_classes(assigns.size),
+        assigns.inner_block != [] && size_icon_spacing_classes(assigns.size)
+      ]
+      |> Enum.filter(& &1)
+      |> Enum.join(" ")
+
     assigns = assign(assigns, :final_variant, final_variant)
     assigns = assign(assigns, :icon_classes, icon_classes)
-    
+
     ~H"""
-    <span class={[
-      "inline-flex items-center rounded-full font-medium border",
-      size_classes(@size),
-      variant_classes(@final_variant),
-      @class
-    ]} {@rest}>
+    <span
+      class={[
+        "inline-flex items-center rounded-full font-medium border",
+        size_classes(@size),
+        variant_classes(@final_variant),
+        @class
+      ]}
+      {@rest}
+    >
       <%= if @icon do %>
         <CoreComponents.icon name={@icon} class={@icon_classes} />
       <% end %>
-      
+
       <%= if @inner_block != [] do %>
         {render_slot(@inner_block)}
       <% else %>
@@ -65,9 +78,9 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
 
   @doc """
   Renders a status badge specifically for listening session status.
-  
+
   ## Examples
-  
+
       <.session_status_badge status={:preparing} />
       <.session_status_badge status={:active} size="lg" />
   """
@@ -75,12 +88,12 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
   attr :size, :string, default: "md", values: ~w(xs sm md lg), doc: "Size variant"
   attr :class, :string, default: nil
   attr :rest, :global
-  
+
   def session_status_badge(assigns) do
     # Convert atom status to string for the base status_badge component
     status_string = atom_to_status_string(assigns.status)
     assigns = assign(assigns, :status_string, status_string)
-    
+
     ~H"""
     <.status_badge status={@status_string} size={@size} class={@class} {@rest} />
     """

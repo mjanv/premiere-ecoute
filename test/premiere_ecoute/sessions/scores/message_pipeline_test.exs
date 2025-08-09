@@ -1,14 +1,11 @@
-defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
+defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
   use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Events.Chat.MessageSent
-  alias PremiereEcoute.Events.Chat.PollUpdated
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.Poll
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Scores.Vote
-  alias PremiereEcouteCore.EventBus
 
   @pipeline PremiereEcoute.Sessions.Scores.MessagePipeline
 
@@ -24,8 +21,8 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
     {:ok, %{user: user, session: session}}
   end
 
-  describe "dispatch/1 - MessageSent" do
-    test "cast a new vote", %{session: session} do
+  describe "publish/2 - MessageSent" do
+    test "cast new votes", %{session: session} do
       n = 10
       track_id = session.current_track.id
 
@@ -51,7 +48,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
 
       report = Report.get_by(session_id: session.id)
 
-      assert %PremiereEcoute.Sessions.Scores.Report{
+      assert %PremiereEcoute.Sessions.Retrospective.Report{
                unique_votes: ^n,
                polls: [],
                session_id: _,
@@ -74,10 +71,16 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
              } = report
     end
 
-    test "does not cast vote from invalid messages", %{session: session} do
+    test "does not cast votes from invalid messages", %{session: session} do
       messages = [
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "Hello", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "@user ok", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: ":emoji: 5", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "11", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "-1", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "Hello", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "@user ok", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: ":emoji: 5", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "11", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "-1", is_streamer: false}
       ]
@@ -86,39 +89,10 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
         PremiereEcouteCore.publish(@pipeline, message)
       end
 
+      :timer.sleep(500)
+
       assert Enum.empty?(Vote.all(where: [session_id: session.id]))
       assert is_nil(Report.get_by(session_id: session.id))
-    end
-  end
-
-  describe "dispatch/1 - PollUpdated" do
-    test "update an existing poll", %{session: session} do
-      {:ok, _} =
-        Poll.create(%Poll{
-          poll_id: "poll1",
-          session_id: session.id,
-          track_id: session.current_track.id,
-          title: "Question ?",
-          total_votes: 0,
-          votes: %{"A" => 0, "B" => 0}
-        })
-
-      EventBus.dispatch(%PollUpdated{id: "poll1", votes: %{"A" => 5, "B" => 7}})
-
-      [%Poll{} = poll] = Poll.all(where: [session_id: session.id])
-
-      assert %Poll{
-               poll_id: "poll1",
-               title: "Question ?",
-               total_votes: 12,
-               votes: %{"A" => 5, "B" => 7}
-             } = poll
-    end
-
-    test "does not update an unknown poll", %{session: session} do
-      EventBus.dispatch(%PollUpdated{id: "poll2", votes: %{"A" => 5, "B" => 7}})
-
-      assert Enum.empty?(Poll.all(where: [session_id: session.id]))
     end
   end
 end

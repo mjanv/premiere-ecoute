@@ -36,8 +36,7 @@ defmodule PremiereEcouteWeb.Accounts.UserRegistrationLiveTest do
     test "creates account but does not log in", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
-      email = unique_user_email()
-      form = form(lv, "#registration_form", user: valid_user_attributes(email: email))
+      form = form(lv, "#registration_form", user: %{email: unique_user_email()})
 
       {:ok, _lv, html} =
         render_submit(form)

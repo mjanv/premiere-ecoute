@@ -95,6 +95,14 @@ defmodule PremiereEcoute.Accounts.UserTest do
 
       assert user.role == :viewer
     end
+
+    test "registers with a username" do
+      email = unique_user_email()
+
+      {:ok, user} = Accounts.create_user(valid_user_attributes(email: email, username: "username"))
+
+      assert user.username == "username"
+    end
   end
 
   describe "sudo_mode?/2" do

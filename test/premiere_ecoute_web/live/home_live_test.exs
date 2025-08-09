@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.HomeLiveTest do
       assert html =~ "Retrospective"
 
       # Check button links
-      assert html =~ "href=\"/sessions/discography/album/select\""
+      assert html =~ "href=\"/discography/album/select\""
       assert html =~ "href=\"/sessions\""
       assert html =~ "href=\"/sessions/wrapped/retrospective\""
     end

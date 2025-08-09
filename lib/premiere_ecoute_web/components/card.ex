@@ -25,11 +25,14 @@ defmodule PremiereEcouteWeb.Components.Card do
 
   def card(assigns) do
     ~H"""
-    <div class={[
-      "rounded-lg border",
-      variant_classes(@variant),
-      @class
-    ]} {@rest}>
+    <div
+      class={[
+        "rounded-lg border",
+        variant_classes(@variant),
+        @class
+      ]}
+      {@rest}
+    >
       {render_slot(@inner_block)}
     </div>
     """

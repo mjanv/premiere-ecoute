@@ -27,10 +27,13 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
 
   def loading_skeleton(assigns) do
     ~H"""
-    <div class={[
-      "animate-pulse space-y-3",
-      @class
-    ]} {@rest}>
+    <div
+      class={[
+        "animate-pulse space-y-3",
+        @class
+      ]}
+      {@rest}
+    >
       <%= if @inner_block != [] do %>
         {render_slot(@inner_block)}
       <% else %>
@@ -61,11 +64,15 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
 
   def skeleton_element(assigns) do
     ~H"""
-    <div class={[
-      "bg-surface-card rounded",
-      element_classes(@type, @size, @width, @height),
-      @class
-    ]} {@rest}></div>
+    <div
+      class={[
+        "bg-surface-card rounded",
+        element_classes(@type, @size, @width, @height),
+        @class
+      ]}
+      {@rest}
+    >
+    </div>
     """
   end
 
@@ -122,31 +129,37 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
 
   def loading_spinner(assigns) do
     ~H"""
-    <div class={[
-      "animate-spin rounded-full border-2 border-current border-t-transparent",
-      spinner_size_classes(@size),
-      @class
-    ]} {@rest}></div>
+    <div
+      class={[
+        "animate-spin rounded-full border-2 border-current border-t-transparent",
+        spinner_size_classes(@size),
+        @class
+      ]}
+      {@rest}
+    >
+    </div>
     """
   end
 
   # AIDEV-NOTE: Helper functions for skeleton element styling
   defp element_classes(type, size, width, height) do
-    base_classes = case type do
-      "text" -> ["h-4"]
-      "title" -> ["h-6", "font-semibold"]
-      "avatar" -> ["rounded-full"] ++ avatar_size_classes(size)
-      "button" -> ["h-10", "px-4", "rounded-lg"]
-      "card" -> ["p-6", height_class(height) || "h-24"]
-      "image" -> ["rounded-lg", height_class(height) || "h-48"]
-      _ -> ["h-4"]
-    end
+    base_classes =
+      case type do
+        "text" -> ["h-4"]
+        "title" -> ["h-6", "font-semibold"]
+        "avatar" -> ["rounded-full"] ++ avatar_size_classes(size)
+        "button" -> ["h-10", "px-4", "rounded-lg"]
+        "card" -> ["p-6", height_class(height) || "h-24"]
+        "image" -> ["rounded-lg", height_class(height) || "h-48"]
+        _ -> ["h-4"]
+      end
 
-    width_class = case width do
-      "full" -> "w-full"
-      w when is_binary(w) -> "w-#{w}"
-      _ -> "w-full"
-    end
+    width_class =
+      case width do
+        "full" -> "w-full"
+        w when is_binary(w) -> "w-#{w}"
+        _ -> "w-full"
+      end
 
     base_classes ++ [width_class]
   end
@@ -162,6 +175,7 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
   end
 
   defp height_class(nil), do: nil
+
   defp height_class(height) when is_binary(height) do
     if String.contains?(height, ["h-", "min-h-", "max-h-"]) do
       height
@@ -195,10 +209,13 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
 
   def loading_overlay(assigns) do
     ~H"""
-    <div class={[
-      overlay_base_classes(@variant),
-      @class
-    ]} {@rest}>
+    <div
+      class={[
+        overlay_base_classes(@variant),
+        @class
+      ]}
+      {@rest}
+    >
       <div class="flex flex-col items-center justify-center space-y-4">
         <.loading_spinner size="lg" class="text-purple-400" />
         <p class="text-surface-primary text-lg font-medium">{@message}</p>

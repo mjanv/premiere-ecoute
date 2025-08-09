@@ -48,6 +48,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert %User{
                email: "username+twitch@yahoo.fr",
+               username: "user1004",
                role: :streamer,
                twitch: %OauthToken{
                  user_id: "441903922",
@@ -69,6 +70,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert %User{
                email: "user1004@twitch.tv",
+               username: "user1004",
                role: :streamer,
                twitch: %OauthToken{
                  user_id: "441903922",
@@ -93,6 +95,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert %User{
                email: "username+twitch@yahoo.fr",
+               username: "user1004",
                role: :streamer,
                twitch: %OauthToken{
                  user_id: "441903922",
@@ -119,6 +122,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert %User{
                email: "user1004@twitch.tv",
+               username: "user1004",
                spotify: %OauthToken{
                  user_id: "username007",
                  username: "Username",
@@ -140,6 +144,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
 
       assert %User{
                email: "username+twitch@yahoo.fr",
+               username: "user1004",
                spotify: %OauthToken{
                  user_id: "username007",
                  username: "Username",

@@ -13,19 +13,21 @@
     </script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js">
     </script>
-    <script nonce={@script_src_nonce}>
-      (() => {
-        const setTheme = (theme) => {
-          if (theme === "system") {
-            document.documentElement.removeAttribute("data-theme");
-          } else {
-            document.documentElement.setAttribute("data-theme", theme);
-          }
-        };
-        // Theme is now controlled by server-side user profile
-        // Listen for theme updates from LiveView
-        window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
-      })();
+    <script>
+      // nonce={@script_src_nonce}>
+           (() => {
+             const setTheme = (theme) => {
+               if (theme === "system") {
+                 document.documentElement.removeAttribute("data-theme");
+               } else {
+                 document.documentElement.setAttribute("data-theme", theme);
+               }
+             };
+             // Theme is now controlled by server-side user profile
+             // Listen for theme updates from LiveView
+             window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
+           })();
+         
     </script>
   </head>
   <body class="premiere-ecoute-web">

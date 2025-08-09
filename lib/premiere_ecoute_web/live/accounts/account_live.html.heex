@@ -14,7 +14,7 @@
           <!-- Profile Avatar Section -->
           <div class="flex items-center space-x-4">
             <div class="relative">
-              <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
+              <div class="w-16 h-16 bg-gradient-primary-diagonal rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
                 <%= if @current_user && @current_user.twitch do %>
                   {String.first(@current_user.twitch.username) |> String.upcase()}
                 <% else %>

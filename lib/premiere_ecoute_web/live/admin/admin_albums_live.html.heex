@@ -53,11 +53,7 @@
               <tr class="hover:bg-gray-700 cursor-pointer" phx-click="show_album_modal" phx-value-album_id={album.id}>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <!-- AIDEV-NOTE: Using new AlbumDisplay component for consistent album presentation -->
-                  <AlbumDisplay.album_display
-                    cover_url={album.cover_url}
-                    title={album.name}
-                    size="sm"
-                  />
+                  <AlbumDisplay.album_display cover_url={album.cover_url} title={album.name} size="sm" />
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {album.artist}

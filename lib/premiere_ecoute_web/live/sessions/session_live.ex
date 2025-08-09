@@ -7,7 +7,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
 
   @impl true
@@ -177,7 +177,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     do: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
 
   def session_status_class(:active),
-    do: "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md"
+    do: "bg-gradient-primary text-white shadow-md"
 
   def session_status_class(:stopped),
     do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"

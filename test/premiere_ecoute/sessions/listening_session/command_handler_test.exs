@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcouteCore.CommandBus
 
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
@@ -145,7 +145,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       report = Report.get_by(session_id: session.id)
 
-      assert %PremiereEcoute.Sessions.Scores.Report{
+      assert %PremiereEcoute.Sessions.Retrospective.Report{
                unique_votes: 0,
                polls: [],
                session_id: session_id,
@@ -336,7 +336,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       assert session.status == :stopped
 
-      assert %PremiereEcoute.Sessions.Scores.Report{
+      assert %PremiereEcoute.Sessions.Retrospective.Report{
                unique_votes: 0,
                polls: [],
                session_id: session_id,

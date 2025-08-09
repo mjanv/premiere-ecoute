@@ -8,6 +8,9 @@ defmodule PremiereEcoute.Apis do
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi
 
+  def provider(:spotify), do: SpotifyApi.impl()
+  def provider(:twitch), do: TwitchApi.impl()
+
   def spotify, do: SpotifyApi.impl()
   def twitch, do: TwitchApi.impl()
 end

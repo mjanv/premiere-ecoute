@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
       {true, "notification", conn} ->
         case handle(conn.body_params) do
           %MessageSent{} = event -> Sessions.publish_message(event)
-          event -> PremiereEcouteCore.dispatch(event)
+          event -> Sessions.publish_poll(event)
         end
 
         send_resp(conn, 202, "")

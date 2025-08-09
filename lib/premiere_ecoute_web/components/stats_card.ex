@@ -19,18 +19,23 @@ defmodule PremiereEcouteWeb.Components.StatsCard do
   attr :icon, :string, required: true, doc: "Heroicon name for the stats icon"
   attr :value, :string, required: true, doc: "The main statistic value to display"
   attr :label, :string, required: true, doc: "The label describing the statistic"
-  attr :color, :string, default: "blue", values: ~w(blue green yellow purple orange red gray), doc: "Color theme for the icon background"
+
+  attr :color, :string,
+    default: "blue",
+    values: ~w(blue green yellow purple orange red gray),
+    doc: "Color theme for the icon background"
+
   attr :class, :string, default: nil
   attr :rest, :global, include: ~w(href navigate patch method phx-click)
 
   def stats_card(assigns) do
-    assigns = 
+    assigns =
       assign(assigns, :card_classes, [
         "p-8 hover-surface-elevated transition-colors",
         (assigns.rest[:navigate] || assigns.rest[:href] || assigns.rest[:patch] || assigns.rest["phx-click"]) && "cursor-pointer",
         assigns.class
       ])
-    
+
     ~H"""
     <Card.card class={@card_classes} {@rest}>
       <div class="flex items-center">

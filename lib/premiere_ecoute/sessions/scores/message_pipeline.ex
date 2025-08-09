@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
 
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcouteCore.Cache
 

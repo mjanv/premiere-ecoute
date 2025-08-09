@@ -1,11 +1,11 @@
-defmodule PremiereEcoute.Sessions.RetrospectiveTest do
+defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Retrospective
-  alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcoute.Sessions.Retrospective.History
+  alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Scores.Vote
 
   setup do
@@ -61,7 +61,7 @@ defmodule PremiereEcoute.Sessions.RetrospectiveTest do
 
   describe "get_albums_by_period/3" do
     test "returns the list of albums grouped per month", %{user: user} do
-      retrospective = Retrospective.get_albums_by_period(user.id, :month)
+      retrospective = History.get_albums_by_period(user.id, :month)
 
       assert length(retrospective) == 3
 
@@ -73,13 +73,13 @@ defmodule PremiereEcoute.Sessions.RetrospectiveTest do
 
   describe "get_album_session_details/1" do
     test "return no tracks if no votes have been casted", %{sessions: [session | _]} do
-      {:ok, details} = Retrospective.get_album_session_details(session.id)
+      {:ok, details} = History.get_album_session_details(session.id)
 
       assert %{session: %ListeningSession{}, tracks: []} = details
     end
 
     test "returns tracks with casted votes", %{sessions: [_, session | _]} do
-      {:ok, details} = Retrospective.get_album_session_details(session.id)
+      {:ok, details} = History.get_album_session_details(session.id)
 
       assert %{session: %ListeningSession{}, tracks: [track1, track2]} = details
       assert %{track_album: %Track{}, track_summary: summary1} = track1

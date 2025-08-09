@@ -6,9 +6,9 @@ defmodule PremiereEcoute.Events.StoreTest do
   alias PremiereEcoute.Events.Store
 
   setup do
-    Store.delete_stream("users", :any_version, :hard)
-    Store.delete_stream("accounts", :any_version, :hard)
-    Store.delete_stream("players", :any_version, :hard)
+    for stream <- ["users", "accounts", "players"] do
+      Store.delete_stream(stream, :any_version, :hard)
+    end
 
     :ok
   end

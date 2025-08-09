@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Scores.Report do
+defmodule PremiereEcoute.Sessions.Retrospective.Report do
   @moduledoc false
 
   use PremiereEcouteCore.Aggregate,
@@ -10,7 +10,8 @@ defmodule PremiereEcoute.Sessions.Scores.Report do
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.{Poll, Vote}
+  alias PremiereEcoute.Sessions.Scores.Poll
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   @type session_summary :: %{
           viewer_score: float() | String.t(),

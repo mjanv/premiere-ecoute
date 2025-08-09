@@ -36,7 +36,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </h3>
                 <nav class="space-y-1">
                   <.sidebar_link
-                    href={~p"/sessions/discography/album/select"}
+                    href={~p"/discography/album/select"}
                     current_page={@current_page}
                     page_id="new_session"
                     icon="hero-plus"

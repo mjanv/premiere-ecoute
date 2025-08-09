@@ -131,7 +131,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
 
       discovers = Accounts.discover_follows(user)
 
-      assert discovers == nonfollows
+      assert discovers == Enum.map(nonfollows, fn f -> Repo.preload(f, [:twitch]) end)
     end
 
     test "returns an empty list when no streamers are defined" do

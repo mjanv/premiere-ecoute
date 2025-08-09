@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Scores.Vote.Graph do
+defmodule PremiereEcoute.Sessions.Retrospective.VoteTrends do
   @moduledoc """
   # Vote Graph Analytics
 
@@ -37,11 +37,11 @@ defmodule PremiereEcoute.Sessions.Scores.Vote.Graph do
   def rolling_average(session_id, :minute) do
     """
     WITH votes_with_cumulative AS (
-      SELECT 
+      SELECT
         (date_trunc('minute', inserted_at) + INTERVAL '1 minute')::timestamp(0) as minute_boundary,
         CAST(value AS NUMERIC) as vote_value,
         ROW_NUMBER() OVER (ORDER BY inserted_at) as vote_order
-      FROM votes 
+      FROM votes
       WHERE session_id = $1
     ),
     minute_aggregates AS (
@@ -51,11 +51,11 @@ defmodule PremiereEcoute.Sessions.Scores.Vote.Graph do
       FROM votes_with_cumulative
     ),
     minute_rolling_avg AS (
-      SELECT 
+      SELECT
         ma.minute_boundary,
         ROUND(
-          (SELECT AVG(vote_value) 
-           FROM votes_with_cumulative 
+          (SELECT AVG(vote_value)
+           FROM votes_with_cumulative
            WHERE vote_order <= ma.max_vote_in_minute), 1
         )::float as rolling_avg
       FROM minute_aggregates ma

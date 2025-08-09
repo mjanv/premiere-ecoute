@@ -10,7 +10,8 @@ defmodule PremiereEcoute.Sessions.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      {PremiereEcoute.Sessions.Scores.MessagePipeline, []}
+      {PremiereEcoute.Sessions.Scores.MessagePipeline, []},
+      {PremiereEcoute.Sessions.Scores.PollPipeline, []}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
