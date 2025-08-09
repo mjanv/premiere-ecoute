@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
 
   use Broadway
 
+  require Logger
+
   alias Broadway.BatchInfo
   alias Broadway.Message
 
@@ -56,5 +58,8 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
     messages
   end
 
-  def handle_failed(messages, _context), do: messages
+  def handle_failed(messages, _context) do
+    Logger.error("Cannot write a batch of #{length(messages)} messages")
+    messages
+  end
 end

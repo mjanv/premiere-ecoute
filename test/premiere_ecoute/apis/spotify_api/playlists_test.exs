@@ -6,8 +6,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
   alias PremiereEcoute.Core.Cache
 
   alias PremiereEcoute.Accounts.User.LibraryPlaylist
-  alias PremiereEcoute.Sessions.Discography.Playlist
-  alias PremiereEcoute.Sessions.Discography.Playlist.Track
+  alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist.Track
 
   setup_all do
     token = UUID.uuid4()

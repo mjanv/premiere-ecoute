@@ -2,8 +2,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Accounts
-  alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Album.Track
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
   setup do
@@ -180,7 +180,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
 
       assert is_nil(session.current_track)
 
-      assert %PremiereEcoute.Sessions.Discography.Album.Track{
+      assert %PremiereEcoute.Discography.Album.Track{
                provider: :spotify,
                name: "Track One",
                track_id: "track001",
@@ -195,14 +195,14 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       {:ok, session} = ListeningSession.next_track(session)
       {:ok, after_session} = ListeningSession.next_track(session)
 
-      assert %PremiereEcoute.Sessions.Discography.Album.Track{
+      assert %PremiereEcoute.Discography.Album.Track{
                provider: :spotify,
                name: "Track One",
                track_id: "track001",
                track_number: 1
              } = session.current_track
 
-      assert %PremiereEcoute.Sessions.Discography.Album.Track{
+      assert %PremiereEcoute.Discography.Album.Track{
                provider: :spotify,
                name: "Track Two",
                track_id: "track002",
@@ -262,14 +262,14 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       {:ok, session} = ListeningSession.next_track(session)
       {:ok, after_session} = ListeningSession.previous_track(session)
 
-      assert %PremiereEcoute.Sessions.Discography.Album.Track{
+      assert %PremiereEcoute.Discography.Album.Track{
                provider: :spotify,
                name: "Track Two",
                track_id: "track002",
                track_number: 2
              } = session.current_track
 
-      assert %PremiereEcoute.Sessions.Discography.Album.Track{
+      assert %PremiereEcoute.Discography.Album.Track{
                provider: :spotify,
                name: "Track One",
                track_id: "track001",

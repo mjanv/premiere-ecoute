@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Release do
+defmodule PremiereEcoute.Repo.Release do
   @moduledoc """
   Release tools
 
@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Release do
   def migrate do
     load_app()
 
-    config = PremiereEcoute.EventStore.config()
+    config = PremiereEcoute.Events.Store.config()
     :ok = Tasks.Create.exec(config, [])
     :ok = Tasks.Init.exec(config, [])
 

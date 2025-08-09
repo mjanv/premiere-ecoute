@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Scores.EventHandler do
+defmodule PremiereEcoute.Sessions.Scores.PollHandler do
   @moduledoc false
 
   use PremiereEcoute.Core.EventBus.Handler

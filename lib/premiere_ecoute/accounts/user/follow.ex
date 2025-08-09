@@ -58,7 +58,7 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   def follow(user, streamer, opts \\ %{}) do
     %{user_id: user.id, streamer_id: streamer.id, streamer_role: streamer.role, followed_at: opts[:followed_at]}
     |> create()
-    |> EventStore.ok("user", fn follow -> %ChannelFollowed{id: follow.user_id, streamer_id: follow.streamer_id} end)
+    |> Store.ok("user", fn follow -> %ChannelFollowed{id: follow.user_id, streamer_id: follow.streamer_id} end)
   end
 
   @doc """
@@ -77,7 +77,7 @@ defmodule PremiereEcoute.Accounts.User.Follow do
       follow ->
         Repo.delete(follow)
     end
-    |> EventStore.ok("user", fn unfollow -> %ChannelUnfollowed{id: unfollow.user_id, streamer_id: unfollow.streamer_id} end)
+    |> Store.ok("user", fn unfollow -> %ChannelUnfollowed{id: unfollow.user_id, streamer_id: unfollow.streamer_id} end)
   end
 
   def discover_follows(%User{id: id}) do

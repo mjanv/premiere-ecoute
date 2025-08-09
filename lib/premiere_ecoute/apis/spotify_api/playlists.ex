@@ -6,8 +6,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
   alias PremiereEcoute.Accounts.User.LibraryPlaylist
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
-  alias PremiereEcoute.Sessions.Discography.Playlist
-  alias PremiereEcoute.Sessions.Discography.Playlist.Track
+  alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist.Track
 
   @limit 10
 

@@ -1,8 +1,8 @@
-defmodule PremiereEcoute.Sessions.Discography.AlbumFixtures do
+defmodule PremiereEcoute.Discography.AlbumFixtures do
   @moduledoc false
 
-  alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Album.Track
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track
 
   def album_fixture(attrs \\ %{}) do
     %{

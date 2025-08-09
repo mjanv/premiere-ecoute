@@ -29,8 +29,8 @@ defmodule PremiereEcoute.DataCase do
       import PremiereEcoute.DataCase
 
       import PremiereEcoute.AccountsFixtures
-      import PremiereEcoute.Sessions.Discography.AlbumFixtures
-      import PremiereEcoute.Sessions.Discography.PlaylistFixtures
+      import PremiereEcoute.Discography.AlbumFixtures
+      import PremiereEcoute.Discography.PlaylistFixtures
       import PremiereEcoute.Sessions.ScoresFixtures
 
       import Hammox

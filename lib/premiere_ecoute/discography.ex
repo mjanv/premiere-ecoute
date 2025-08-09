@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Discography do
+defmodule PremiereEcoute.Discography do
   @moduledoc """
   Context module for managing music discography data.
 
@@ -11,4 +11,10 @@ defmodule PremiereEcoute.Sessions.Discography do
   - `Album` - Represents a music album with metadata and associated tracks
   - `Track` - Individual songs within an album with track-specific information
   """
+
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Playlist
+
+  defdelegate create_album(album), to: Album, as: :create
+  defdelegate create_playlist(playlist), to: Playlist, as: :create
 end

@@ -1,8 +1,8 @@
-defmodule PremiereEcoute.Sessions.Discography.PlaylistFixtures do
+defmodule PremiereEcoute.Discography.PlaylistFixtures do
   @moduledoc false
 
-  alias PremiereEcoute.Sessions.Discography.Playlist
-  alias PremiereEcoute.Sessions.Discography.Playlist.Track
+  alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist.Track
 
   def playlist_fixture(attrs \\ %{}) do
     %{

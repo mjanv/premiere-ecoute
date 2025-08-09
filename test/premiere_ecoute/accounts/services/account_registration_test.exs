@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
   alias PremiereEcoute.Events.AccountAssociated
   alias PremiereEcoute.Events.AccountCreated
-  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Events.Store
 
   defp twitch_data do
     %{
@@ -59,7 +59,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
 
-      events = EventStore.read("user-#{user.id}")
+      events = Store.read("user-#{user.id}")
       assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
     end
 
@@ -80,7 +80,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
 
-      events = EventStore.read("user-#{user.id}")
+      events = Store.read("user-#{user.id}")
       assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
     end
 
@@ -104,7 +104,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert data[:access_token] == access_token
       assert data[:refresh_token] == refresh_token
 
-      events = EventStore.read("user-#{user.id}")
+      events = Store.read("user-#{user.id}")
       assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
     end
   end

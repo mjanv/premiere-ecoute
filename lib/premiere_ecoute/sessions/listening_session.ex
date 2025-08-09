@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Core.Cache
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.Scores.Report
 
   @type t :: %__MODULE__{

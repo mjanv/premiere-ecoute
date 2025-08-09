@@ -6,7 +6,7 @@ config :premiere_ecoute,
   handlers: [
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
-    PremiereEcoute.Sessions.Scores.EventHandler,
+    PremiereEcoute.Sessions.Scores.PollHandler,
     PremiereEcoute.Core.CommandBusTest.Handler,
     PremiereEcoute.Core.CommandBusTest.EventDispatcher,
     PremiereEcoute.Core.EventBusTest.Handler
@@ -30,7 +30,7 @@ config :premiere_ecoute, PremiereEcoute.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
-config :premiere_ecoute, PremiereEcoute.EventStore,
+config :premiere_ecoute, PremiereEcoute.Events.Store,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 

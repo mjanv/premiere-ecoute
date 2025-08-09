@@ -3,12 +3,12 @@ import Config
 config :premiere_ecoute,
   environment: config_env(),
   ecto_repos: [PremiereEcoute.Repo],
-  event_stores: [PremiereEcoute.EventStore],
+  event_stores: [PremiereEcoute.Events.Store],
   generators: [timestamp_type: :utc_datetime],
   handlers: [
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
-    PremiereEcoute.Sessions.Scores.EventHandler
+    PremiereEcoute.Sessions.Scores.PollHandler
   ]
 
 config :premiere_ecoute, :scopes,
@@ -62,7 +62,7 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
 
 config :premiere_ecoute, PremiereEcoute.Repo, adapter: Ecto.Adapters.Postgres
 
-config :premiere_ecoute, PremiereEcoute.EventStore,
+config :premiere_ecoute, PremiereEcoute.Events.Store,
   column_data_type: "jsonb",
   serializer: EventStore.JsonbSerializer,
   types: EventStore.PostgresTypes
@@ -78,6 +78,9 @@ config :premiere_ecoute, Oban,
     spotify: 1
   ],
   plugins: [
+    {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},
+    {Oban.Plugins.Pruner, max_age: _5_minutes = 300},
+    Oban.Plugins.Reindexer,
     {Oban.Plugins.Cron,
      crontab: [
        {"@reboot", PremiereEcoute.Apis.Workers.RenewSpotifyTokens}

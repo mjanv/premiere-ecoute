@@ -53,9 +53,7 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
       Map.merge(attrs, %{parent_id: id, provider: provider, expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)})
     )
     |> Repo.insert()
-    |> EventStore.ok("user", fn token ->
-      %AccountAssociated{id: token.parent_id, provider: token.provider, user_id: token.user_id}
-    end)
+    |> Store.ok("user", fn token -> %AccountAssociated{id: token.parent_id, provider: token.provider, user_id: token.user_id} end)
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 

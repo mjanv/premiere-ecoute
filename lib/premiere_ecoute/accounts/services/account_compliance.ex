@@ -11,8 +11,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.PersonalDataRequested
-  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
 
@@ -20,8 +21,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   def download_associated_data(scope) do
     try do
       user = User.preload(scope.user)
-      votes = Vote.all(where: [viewer_id: user.twitch.user_id])
-      events = EventStore.read("user-#{scope.user.id}", :raw)
+      votes = Sessions.viewer_votes(user)
+      events = Store.read("user-#{scope.user.id}", :raw)
 
       %{
         metadata: %{
@@ -43,7 +44,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
         Logger.error("#{inspect(error)}")
         {:error, "Cannot generate associated data"}
     end
-    |> EventStore.any("user", fn {result, _} -> %PersonalDataRequested{id: scope.user.id, result: result} end)
+    |> Store.any("user", fn {result, _} -> %PersonalDataRequested{id: scope.user.id, result: result} end)
   end
 
   defp anonym(data, path, keys) do
@@ -62,7 +63,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     |> Ecto.Multi.delete_all(:sessions, from(s in ListeningSession, where: s.user_id == ^user.id))
     |> Ecto.Multi.delete(:user, user)
     |> Ecto.Multi.run(:event, fn _, _ ->
-      :ok = EventStore.append(%AccountDeleted{id: user.id}, stream: "user")
+      :ok = Store.append(%AccountDeleted{id: user.id}, stream: "user")
       {:ok, nil}
     end)
     |> Repo.transaction()

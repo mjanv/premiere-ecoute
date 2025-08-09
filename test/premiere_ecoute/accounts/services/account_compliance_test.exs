@@ -8,9 +8,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.PersonalDataRequested
-  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
 
@@ -122,7 +122,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
     test "register an event", %{viewer: viewer} do
       {:ok, _} = Accounts.download_associated_data(Scope.for_user(viewer))
 
-      assert %PersonalDataRequested{result: "ok"} = EventStore.last("user-#{viewer.id}")
+      assert %PersonalDataRequested{result: "ok"} = Store.last("user-#{viewer.id}")
     end
   end
 
@@ -139,7 +139,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: viewer.id]))
 
-      assert %AccountDeleted{} = EventStore.last("user-#{viewer.id}")
+      assert %AccountDeleted{} = Store.last("user-#{viewer.id}")
     end
 
     test "delete a streamer account", %{streamer: streamer} do
@@ -154,7 +154,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: streamer.id]))
 
-      assert %AccountDeleted{} = EventStore.last("user-#{streamer.id}")
+      assert %AccountDeleted{} = Store.last("user-#{streamer.id}")
     end
 
     test "deleting non-existent user raises appropriate error" do

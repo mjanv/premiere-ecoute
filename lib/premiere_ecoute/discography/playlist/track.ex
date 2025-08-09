@@ -1,10 +1,10 @@
-defmodule PremiereEcoute.Sessions.Discography.Playlist.Track do
+defmodule PremiereEcoute.Discography.Playlist.Track do
   @moduledoc false
 
   use PremiereEcoute.Core.Aggregate,
     json: [:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at]
 
-  alias PremiereEcoute.Sessions.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist
 
   @type t :: %__MODULE__{
           id: integer(),

@@ -7,8 +7,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Album.Track
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track
 
   @doc """
   Start/resume playback on the user's active device.

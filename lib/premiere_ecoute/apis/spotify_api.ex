@@ -32,9 +32,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Accounts.User.LibraryPlaylist
-    alias PremiereEcoute.Sessions.Discography.Album
-    alias PremiereEcoute.Sessions.Discography.Album.Track
-    alias PremiereEcoute.Sessions.Discography.Playlist
+    alias PremiereEcoute.Discography.Album
+    alias PremiereEcoute.Discography.Album.Track
+    alias PremiereEcoute.Discography.Playlist
 
     # Albums
     @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}

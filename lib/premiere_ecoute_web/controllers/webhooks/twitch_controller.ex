@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   require Logger
 
   alias PremiereEcoute.Core
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Events.PollEnded
   alias PremiereEcoute.Sessions.Scores.Events.PollStarted
@@ -32,7 +33,11 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         send_resp(conn, 204, "")
 
       {true, "notification", conn} ->
-        Core.dispatch(handle(conn.body_params))
+        case handle(conn.body_params) do
+          %MessageSent{} = event -> Sessions.publish_message(event)
+          event -> Core.dispatch(event)
+        end
+
         send_resp(conn, 202, "")
     end
   end

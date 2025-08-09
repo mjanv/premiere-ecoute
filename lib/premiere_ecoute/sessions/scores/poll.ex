@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
   use PremiereEcoute.Core.Aggregate
 
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.Discography.Album.Track
+  alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
   @type t :: %__MODULE__{

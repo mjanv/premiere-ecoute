@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Search do
 
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
 
   @doc """
   Search for Album

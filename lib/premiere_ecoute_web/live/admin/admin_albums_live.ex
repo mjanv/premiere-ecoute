@@ -3,7 +3,7 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
 
   def mount(_params, _session, socket) do
     socket

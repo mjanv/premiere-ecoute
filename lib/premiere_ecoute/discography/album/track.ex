@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Discography.Album.Track do
+defmodule PremiereEcoute.Discography.Album.Track do
   @moduledoc """
   Album Track
 
@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Sessions.Discography.Album.Track do
   use PremiereEcoute.Core.Aggregate,
     json: [:id, :name, :track_number]
 
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
 
   @type t :: %__MODULE__{
           id: integer() | nil,

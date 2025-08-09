@@ -4,8 +4,8 @@ defmodule PremiereEcoute.Apis.DeezerApi.PlaylistsTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.DeezerApi
 
-  alias PremiereEcoute.Sessions.Discography.Playlist
-  alias PremiereEcoute.Sessions.Discography.Playlist.Track
+  alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist.Track
 
   describe "get_playlist/1" do
     test "get a playlist from an unique identifier" do

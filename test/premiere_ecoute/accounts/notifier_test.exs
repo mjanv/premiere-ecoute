@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.ChannelFollowed
-  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Mailer.Mock, as: Mailer
 
   setup do
@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
       event = %AccountCreated{id: 1}
       expect(Mailer, :dispatch, fn ^event -> :ok end)
 
-      EventStore.append(event, stream: "user")
+      Store.append(event, stream: "user")
 
       :timer.sleep(100)
     end
@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
       event = %AccountDeleted{id: 1}
       expect(Mailer, :dispatch, fn ^event -> :ok end)
 
-      EventStore.append(event, stream: "user")
+      Store.append(event, stream: "user")
 
       :timer.sleep(100)
     end
@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
       event = %ChannelFollowed{id: 1}
 
       expect(Mailer, :dispatch, 0, fn _ -> :ok end)
-      EventStore.append(event, stream: "user")
+      Store.append(event, stream: "user")
 
       refute_receive {:DOWN, ^ref, :process, ^pid, {%Mox.UnexpectedCallError{}, _}}, 100
     end

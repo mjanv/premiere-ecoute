@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.Scores.Vote.GraphTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcoute.Sessions.Scores.Vote.Graph

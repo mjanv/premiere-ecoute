@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Supervisor do
+defmodule PremiereEcoute.Repo.Supervisor do
   @moduledoc false
 
   use Supervisor
@@ -10,11 +10,9 @@ defmodule PremiereEcoute.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      PremiereEcoute.Telemetry.Supervisor,
-      PremiereEcoute.Repo.Supervisor,
-      PremiereEcoute.Events.Supervisor,
-      PremiereEcoute.Core.Supervisor,
-      PremiereEcoute.Sessions.Supervisor
+      PremiereEcoute.Repo,
+      PremiereEcoute.Repo.Vault,
+      {Oban, Application.fetch_env!(:premiere_ecoute, Oban)},
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

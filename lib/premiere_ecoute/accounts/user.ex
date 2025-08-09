@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Accounts.User do
   alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountCreated
-  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Events.Store
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -181,7 +181,7 @@ defmodule PremiereEcoute.Accounts.User do
   def create(attrs) do
     attrs
     |> super()
-    |> EventStore.ok("user", fn user -> %AccountCreated{id: user.id} end)
+    |> Store.ok("user", fn user -> %AccountCreated{id: user.id} end)
   end
 
   # def update_spotify_tokens(user, attrs) do

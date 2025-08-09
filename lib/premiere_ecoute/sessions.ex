@@ -1,10 +1,10 @@
 defmodule PremiereEcoute.Sessions do
   @moduledoc false
 
-  alias PremiereEcoute.Sessions.Discography
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores.MessagePipeline
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   # Listening session
   defdelegate create_session(attrs), to: ListeningSession, as: :create
@@ -15,9 +15,9 @@ defmodule PremiereEcoute.Sessions do
   defdelegate active_sessions(user), to: ListeningSession
   def publish_message(message), do: PremiereEcoute.Core.publish(MessagePipeline, message)
 
-  # Discography
-  defdelegate create_album(album), to: Discography.Album, as: :create
-  defdelegate create_playlist(playlist), to: Discography.Playlist, as: :create
+  # Votes
+  def viewer_votes(user), do: Vote.all(where: [viewer_id: user.twitch.user_id])
+  defdelegate create_vote(vote), to: Vote, as: :create
 
   # Retrospective
   defdelegate get_albums_by_period(user_id, period, opts \\ %{}), to: Retrospective

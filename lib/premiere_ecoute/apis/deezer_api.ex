@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Apis.DeezerApi do
   defmodule Behaviour do
     @moduledoc "Deezer API Behaviour"
 
-    alias PremiereEcoute.Sessions.Discography.Playlist
+    alias PremiereEcoute.Discography.Playlist
 
     # Playlists
     @callback get_playlist(playlist_id :: String.t()) :: {:ok, Playlist.t()} | {:error, term()}

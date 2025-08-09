@@ -6,6 +6,7 @@ defmodule PremiereEcoute do
     exports: [
       {Core, except: []},
       {Accounts, except: []},
+      {Discography, except: []},
       {Sessions, except: []},
       {Apis, except: []},
       {Telemetry, except: []},
@@ -14,11 +15,11 @@ defmodule PremiereEcoute do
     ]
 
   alias PremiereEcoute.Core
-  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Mailer
 
   defdelegate apply(command), to: Core
-  defdelegate paginate(stream, opts), to: EventStore
+  defdelegate paginate(stream, opts), to: Store
 
   def mailer, do: Mailer.impl()
 end

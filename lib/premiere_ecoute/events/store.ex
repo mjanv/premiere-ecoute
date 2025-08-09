@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.EventStore do
+defmodule PremiereEcoute.Events.Store do
   @moduledoc """
   Event store implementation
 

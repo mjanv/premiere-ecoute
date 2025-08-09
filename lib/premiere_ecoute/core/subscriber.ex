@@ -8,14 +8,14 @@ defmodule PremiereEcoute.Core.Subscriber do
       use GenServer
 
       alias EventStore.RecordedEvent
-      alias PremiereEcoute.EventStore
+      alias PremiereEcoute.Events.Store
 
       def start_link(args) do
         GenServer.start_link(__MODULE__, args)
       end
 
       def init(_args) do
-        :ok = EventStore.subscribe(unquote(stream_uuid))
+        :ok = Store.subscribe(unquote(stream_uuid))
 
         {:ok, %{}}
       end

@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
 
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
-  alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Album.Track
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track
 
   def get_album(album_id) when is_binary(album_id) do
     SpotifyApi.api()

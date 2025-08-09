@@ -1,1 +1,1 @@
-call "%~dp0\premiere_ecoute" eval PremiereEcoute.Release.migrate
+call "%~dp0\premiere_ecoute" eval PremiereEcoute.Repo.Release.migrate

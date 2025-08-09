@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Core.Aggregate do
       import Ecto.Changeset
       import Ecto.Query
 
-      alias PremiereEcoute.EventStore
+      alias PremiereEcoute.Events.Store
       alias PremiereEcoute.Repo
 
       @derive {Jason.Encoder, unquote(encoder_opts)}

@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
 
   alias PremiereEcoute.Events.ChannelFollowed
   alias PremiereEcoute.Events.ChannelUnfollowed
-  alias PremiereEcoute.EventStore
+  alias PremiereEcoute.Events.Store
 
   describe "follow/3" do
     test "add a streamer to any role follow list" do
@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
 
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: nil} = follow
 
-        assert EventStore.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
+        assert Store.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
       end
     end
 
@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
 
         assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: ~N[2020-07-18 07:59:47]} = follow
 
-        assert EventStore.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
+        assert Store.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
       end
     end
 
@@ -84,7 +84,7 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = follow
       assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = unfollow
 
-      assert EventStore.last("user-#{user_id}", 2) == [
+      assert Store.last("user-#{user_id}", 2) == [
                %ChannelFollowed{id: user.id, streamer_id: streamer.id},
                %ChannelUnfollowed{id: user.id, streamer_id: streamer.id}
              ]

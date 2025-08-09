@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
   alias PremiereEcoute.Apis.SpotifyApi.Player
   alias PremiereEcoute.Core.Cache
 
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
 
   setup do
     scope =

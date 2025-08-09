@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
   use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Core.EventBus
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Events.PollUpdated

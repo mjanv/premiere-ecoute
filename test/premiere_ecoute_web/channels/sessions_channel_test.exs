@@ -1,7 +1,7 @@
 defmodule PremiereEcouteWeb.SessionsChannelTest do
   use PremiereEcouteWeb.ChannelCase
 
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
 
   setup do

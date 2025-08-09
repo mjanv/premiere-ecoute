@@ -5,7 +5,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Sessions
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.Scores
 
   def mount(_params, _session, socket) do

@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Core.CommandBus
-  alias PremiereEcoute.Sessions.Discography.Album
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession

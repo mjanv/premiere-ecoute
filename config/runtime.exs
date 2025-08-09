@@ -29,7 +29,7 @@ config :premiere_ecoute, PremiereEcoute.Repo,
   hostname: env!("POSTGRES_HOSTNAME"),
   socket_options: if(env!("ECTO_IPV6", :string, nil) in ~w(true 1), do: [:inet6], else: [])
 
-config :premiere_ecoute, PremiereEcoute.EventStore,
+config :premiere_ecoute, PremiereEcoute.Events.Store,
   schema: "event_store",
   database: env!("POSTGRES_DATABASE", :string, "premiere_ecoute_#{config_env()}"),
   username: env!("POSTGRES_USERNAME"),

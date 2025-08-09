@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Discography.Album do
+defmodule PremiereEcoute.Discography.Album do
   @moduledoc """
   Music album in the discography system.
 
@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Sessions.Discography.Album do
     json: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.Discography.Album.Track
+  alias PremiereEcoute.Discography.Album.Track
 
   @type t :: %__MODULE__{
           id: integer() | nil,

@@ -1,9 +1,9 @@
-defmodule PremiereEcoute.Sessions.Discography.AlbumTest do
+defmodule PremiereEcoute.Discography.AlbumTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Repo
-  alias PremiereEcoute.Sessions.Discography.Album
-  alias PremiereEcoute.Sessions.Discography.Album.Track
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Sessions.ListeningSession
 
   describe "create/1" do

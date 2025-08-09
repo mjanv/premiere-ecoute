@@ -2,4 +2,4 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
-exec ./premiere_ecoute eval PremiereEcoute.Release.migrate
+exec ./premiere_ecoute eval PremiereEcoute.Repo.Release.migrate

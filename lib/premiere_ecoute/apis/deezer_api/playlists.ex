@@ -4,8 +4,8 @@ defmodule PremiereEcoute.Apis.DeezerApi.Playlists do
   require Logger
 
   alias PremiereEcoute.Apis.DeezerApi
-  alias PremiereEcoute.Sessions.Discography.Playlist
-  alias PremiereEcoute.Sessions.Discography.Playlist.Track
+  alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist.Track
 
   def get_playlist(playlist_id) when is_binary(playlist_id) do
     DeezerApi.api()
