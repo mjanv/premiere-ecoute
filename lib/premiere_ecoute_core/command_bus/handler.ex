@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.CommandBus.Handler do
+defmodule PremiereEcouteCore.CommandBus.Handler do
   @moduledoc false
 
   defmacro __using__(_opts) do

@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Event do
+defmodule PremiereEcouteCore.Event do
   @moduledoc false
 
   def name(event), do: event.__struct__ |> Module.split() |> List.last()

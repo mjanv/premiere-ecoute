@@ -8,16 +8,16 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   alias Broadway.BatchInfo
   alias Broadway.Message
 
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Report
   alias PremiereEcoute.Sessions.Scores.Vote
+  alias PremiereEcouteCore.Cache
 
   def start_link(_opts) do
     Broadway.start_link(__MODULE__,
       name: __MODULE__,
-      producer: [module: {PremiereEcoute.Core.BroadwayProducer, []}, concurrency: 1],
+      producer: [module: {PremiereEcouteCore.BroadwayProducer, []}, concurrency: 1],
       processors: [session: [concurrency: 1]],
       batchers: [writer: [concurrency: 1, batch_size: 10, batch_timeout: 5_000]]
     )

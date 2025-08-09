@@ -2,10 +2,10 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   use PremiereEcouteWeb.ConnCase
 
   alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
-  alias PremiereEcoute.Sessions.Scores.Events.PollEnded
-  alias PremiereEcoute.Sessions.Scores.Events.PollStarted
-  alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
+  alias PremiereEcoute.Events.Chat.MessageSent
+  alias PremiereEcoute.Events.Chat.PollEnded
+  alias PremiereEcoute.Events.Chat.PollStarted
+  alias PremiereEcoute.Events.Chat.PollUpdated
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
   alias PremiereEcouteWeb.Webhooks.TwitchController
 

@@ -6,7 +6,6 @@ defmodule PremiereEcoute.Accounts do
   alias PremiereEcoute.Accounts.Services
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
-  alias PremiereEcoute.Accounts.User.LibraryPlaylist
   alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Accounts.User.Token
 
@@ -42,10 +41,4 @@ defmodule PremiereEcoute.Accounts do
   defdelegate discover_follows(user), to: Follow
   defdelegate follow_streamer(scope, streamer), to: Services.AccountFollow
   defdelegate follow_streamers(scope), to: Services.AccountFollow
-
-  ## Library Playlist
-  defdelegate create_library_playlist(user, attrs), to: LibraryPlaylist, as: :create
-  defdelegate get_user_library_playlists(user), to: LibraryPlaylist, as: :get_user_playlists
-  defdelegate delete_library_playlist(user, playlist_id, provider), to: LibraryPlaylist, as: :delete_playlist
-  defdelegate library_playlist_exists?(user, playlist_id, provider), to: LibraryPlaylist, as: :exists?
 end

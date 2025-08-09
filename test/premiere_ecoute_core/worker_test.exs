@@ -1,5 +1,5 @@
 defmodule Worker do
-  use PremiereEcoute.Core.Worker
+  use PremiereEcouteCore.Worker
 
   require Logger
 
@@ -9,7 +9,7 @@ defmodule Worker do
   end
 end
 
-defmodule PremiereEcoute.Core.WorkerTest do
+defmodule PremiereEcouteCore.WorkerTest do
   use PremiereEcoute.DataCase
 
   describe "Worker" do

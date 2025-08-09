@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcouteCore.Cache
 
   setup do
     scope =

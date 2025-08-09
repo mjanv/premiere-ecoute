@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Api do
+defmodule PremiereEcouteCore.Api do
   @moduledoc false
 
   defmacro __using__(opts) do
@@ -9,8 +9,8 @@ defmodule PremiereEcoute.Core.Api do
     quote do
       require Logger
 
-      alias PremiereEcoute.Core.Cache
       alias PremiereEcoute.Telemetry
+      alias PremiereEcouteCore.Cache
 
       @behaviour __MODULE__.Behaviour
 

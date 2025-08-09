@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcouteCore.Cache
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track

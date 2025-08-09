@@ -3,11 +3,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   require Logger
 
-  alias PremiereEcoute.Core
+  alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
-  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
   alias PremiereEcoute.Sessions.Scores.Report
   alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
 
@@ -112,7 +111,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_event("vote_track", %{"rating" => rating}, socket) do
     user_id = socket.assigns.current_scope.user.twitch.user_id
 
-    Core.dispatch(%MessageSent{
+    PremiereEcouteCore.dispatch(%MessageSent{
       broadcaster_id: user_id,
       user_id: user_id,
       message: rating,

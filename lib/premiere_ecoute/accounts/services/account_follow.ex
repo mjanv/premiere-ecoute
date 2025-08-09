@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
   defmodule Worker do
     @moduledoc false
 
-    use PremiereEcoute.Core.Worker, queue: :twitch
+    use PremiereEcouteCore.Worker, queue: :twitch
 
     require Logger
 

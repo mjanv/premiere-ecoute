@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Scores.Events do
+defmodule PremiereEcoute.Events.Chat do
   @moduledoc false
 
   defmodule MessageSent do

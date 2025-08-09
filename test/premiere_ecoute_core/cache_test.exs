@@ -1,7 +1,7 @@
-defmodule PremiereEcoute.Core.CacheTest do
+defmodule PremiereEcouteCore.CacheTest do
   use ExUnit.Case, async: false
 
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcouteCore.Cache
 
   setup do
     start_supervised({Cache, name: :cache})

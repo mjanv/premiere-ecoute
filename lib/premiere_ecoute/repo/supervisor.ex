@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Repo.Supervisor do
     children = [
       PremiereEcoute.Repo,
       PremiereEcoute.Repo.Vault,
-      {Oban, Application.fetch_env!(:premiere_ecoute, Oban)},
+      {Oban, Application.fetch_env!(:premiere_ecoute, Oban)}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

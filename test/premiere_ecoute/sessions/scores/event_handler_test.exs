@@ -1,14 +1,14 @@
 defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
   use PremiereEcoute.DataCase, async: false
 
-  alias PremiereEcoute.Core.EventBus
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Events.Chat.MessageSent
+  alias PremiereEcoute.Events.Chat.PollUpdated
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
-  alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
   alias PremiereEcoute.Sessions.Scores.Poll
   alias PremiereEcoute.Sessions.Scores.Report
   alias PremiereEcoute.Sessions.Scores.Vote
+  alias PremiereEcouteCore.EventBus
 
   @pipeline PremiereEcoute.Sessions.Scores.MessagePipeline
 
@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
       |> Enum.map(fn {m, i} ->
         %MessageSent{broadcaster_id: "1234", user_id: "viewer#{i + 1}", message: m, is_streamer: false}
       end)
-      |> Enum.each(fn m -> PremiereEcoute.Core.publish(@pipeline, m) end)
+      |> Enum.each(fn m -> PremiereEcouteCore.publish(@pipeline, m) end)
 
       :timer.sleep(500)
 
@@ -83,7 +83,7 @@ defmodule PremiereEcoute.Sessions.Scores.EventHandlerTest do
       ]
 
       for message <- messages do
-        PremiereEcoute.Core.publish(@pipeline, message)
+        PremiereEcouteCore.publish(@pipeline, message)
       end
 
       assert Enum.empty?(Vote.all(where: [session_id: session.id]))

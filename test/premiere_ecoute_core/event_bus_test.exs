@@ -1,9 +1,9 @@
-defmodule PremiereEcoute.Core.EventBusTest do
+defmodule PremiereEcouteCore.EventBusTest do
   use PremiereEcoute.DataCase
 
   import ExUnit.CaptureLog
 
-  alias PremiereEcoute.Core.EventBus
+  alias PremiereEcouteCore.EventBus
 
   defmodule EventA do
     defstruct [:a]
@@ -18,10 +18,10 @@ defmodule PremiereEcoute.Core.EventBusTest do
   end
 
   defmodule Handler do
-    use PremiereEcoute.Core.EventBus.Handler
+    use PremiereEcouteCore.EventBus.Handler
 
-    event(PremiereEcoute.Core.EventBusTest.EventA)
-    event(PremiereEcoute.Core.EventBusTest.EventB)
+    event(PremiereEcouteCore.EventBusTest.EventA)
+    event(PremiereEcouteCore.EventBusTest.EventB)
 
     require Logger
 
@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Core.EventBusTest do
     test "1" do
       {:ok, logs} = with_log(fn -> EventBus.dispatch(%EventA{a: 5}) end)
 
-      assert logs =~ "dispatch: %PremiereEcoute.Core.EventBusTest.EventA{a: 5}"
+      assert logs =~ "dispatch: %PremiereEcouteCore.EventBusTest.EventA{a: 5}"
     end
 
     test "2" do
@@ -48,9 +48,9 @@ defmodule PremiereEcoute.Core.EventBusTest do
       {:ok, logs2} = with_log(fn -> EventBus.dispatch(%EventB{b: 5}) end)
       {{:error, :not_registered}, logs3} = with_log(fn -> EventBus.dispatch(%EventC{c: 5}) end)
 
-      assert logs1 =~ "dispatch: %PremiereEcoute.Core.EventBusTest.EventA{a: 5}"
-      assert logs2 =~ "dispatch: %PremiereEcoute.Core.EventBusTest.EventB{b: 5}"
-      refute logs3 =~ "dispatch: %PremiereEcoute.Core.EventBusTest.EventC{c: 5}"
+      assert logs1 =~ "dispatch: %PremiereEcouteCore.EventBusTest.EventA{a: 5}"
+      assert logs2 =~ "dispatch: %PremiereEcouteCore.EventBusTest.EventB{b: 5}"
+      refute logs3 =~ "dispatch: %PremiereEcouteCore.EventBusTest.EventC{c: 5}"
     end
 
     test "3" do
@@ -60,9 +60,9 @@ defmodule PremiereEcoute.Core.EventBusTest do
           EventBus.dispatch(events)
         end)
 
-      assert logs =~ "dispatch: %PremiereEcoute.Core.EventBusTest.EventA{a: 5}"
-      assert logs =~ "dispatch: %PremiereEcoute.Core.EventBusTest.EventB{b: 5}"
-      refute logs =~ "dispatch: %PremiereEcoute.Core.EventBusTest.EventC{c: 5}"
+      assert logs =~ "dispatch: %PremiereEcouteCore.EventBusTest.EventA{a: 5}"
+      assert logs =~ "dispatch: %PremiereEcouteCore.EventBusTest.EventB{b: 5}"
+      refute logs =~ "dispatch: %PremiereEcouteCore.EventBusTest.EventC{c: 5}"
     end
   end
 end

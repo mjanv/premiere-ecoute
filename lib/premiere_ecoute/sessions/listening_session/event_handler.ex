@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   @moduledoc false
 
-  use PremiereEcoute.Core.EventBus.Handler
+  use PremiereEcouteCore.EventBus.Handler
 
   event(PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared)
   event(PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted)

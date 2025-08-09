@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Registry do
+defmodule PremiereEcouteCore.Registry do
   @moduledoc false
 
   require Logger

@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Subscriber do
+defmodule PremiereEcouteCore.Subscriber do
   @moduledoc false
 
   defmacro __using__(opts) do

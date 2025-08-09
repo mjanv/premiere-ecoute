@@ -1,10 +1,10 @@
 defmodule PremiereEcouteWeb.SessionChannelTest do
   use PremiereEcouteWeb.ChannelCase
 
-  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Events.Chat.MessageSent
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
 
   setup do
     user = user_fixture(%{role: :streamer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})

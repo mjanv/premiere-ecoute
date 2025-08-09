@@ -15,6 +15,9 @@ defmodule PremiereEcoute.Discography do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
 
+  # Album
   defdelegate create_album(album), to: Album, as: :create
+
+  # Playlist
   defdelegate create_playlist(playlist), to: Playlist, as: :create
 end

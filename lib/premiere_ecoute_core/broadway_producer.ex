@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.BroadwayProducer do
+defmodule PremiereEcouteCore.BroadwayProducer do
   @moduledoc false
 
   use GenStage

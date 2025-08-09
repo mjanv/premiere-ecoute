@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   Facilitates Twitch poll creation and management, allowing broadcasters to create interactive polls, retrieve poll status, and end active polls. Polls enable audience engagement through voting mechanisms.
   """
 
-  use PremiereEcoute.Core.Api, api: :twitch
+  use PremiereEcouteCore.Api, api: :twitch
 
   alias PremiereEcoute.Accounts.Scope
 

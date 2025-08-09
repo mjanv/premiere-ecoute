@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Cache do
+defmodule PremiereEcouteCore.Cache do
   @moduledoc false
 
   require Logger

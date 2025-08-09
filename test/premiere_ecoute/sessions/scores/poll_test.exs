@@ -1,8 +1,8 @@
 defmodule PremiereEcoute.Sessions.Scores.PollTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Poll
 

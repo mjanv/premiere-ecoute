@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Apis.Workers.RenewSpotifyTokens do
   @moduledoc false
 
-  use PremiereEcoute.Core.Worker, queue: :spotify, max_attempts: 20
+  use PremiereEcouteCore.Worker, queue: :spotify, max_attempts: 20
 
   alias PremiereEcoute.Apis.SpotifyApi.Accounts
 

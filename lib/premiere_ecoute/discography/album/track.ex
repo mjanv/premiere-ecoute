@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
   Schema representing individual music tracks within albums, storing track metadata from Spotify including name, track number, duration, and unique identifiers. Tracks belong to albums and serve as the fundamental unit for music playback and rating within listening sessions.
   """
 
-  use PremiereEcoute.Core.Aggregate,
+  use PremiereEcouteCore.Aggregate,
     json: [:id, :name, :track_number]
 
   alias PremiereEcoute.Discography.Album

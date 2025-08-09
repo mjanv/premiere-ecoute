@@ -7,13 +7,13 @@ defmodule PremiereEcoute.Discography.Album do
   metadata such as name, artist, release date, and cover art.
   """
 
-  use PremiereEcoute.Core.Aggregate,
+  use PremiereEcouteCore.Aggregate,
     root: [:tracks],
     identity: [:provider, :album_id],
     json: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Repo
 
   @type t :: %__MODULE__{
           id: integer() | nil,

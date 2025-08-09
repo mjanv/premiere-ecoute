@@ -1,13 +1,10 @@
 defmodule PremiereEcouteWeb.HomeLive do
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Discography
   alias PremiereEcoute.Sessions.ListeningSession
-
-  # AIDEV-NOTE: Redirect unauthenticated users to the homepage
-  # on_mount {PremiereEcouteWeb.UserAuth, :ensure_authenticated}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -119,13 +116,13 @@ defmodule PremiereEcouteWeb.HomeLive do
 
   # AIDEV-NOTE: Delete playlist from library
   @impl true
-  def handle_event("delete_playlist", _params, %{assigns: %{current_scope: scope}} = socket) do
-    case socket.assigns.selected_library_playlist do
+  def handle_event("delete_playlist", _params, %{assigns: assigns} = socket) do
+    case assigns.selected_library_playlist do
       nil ->
         {:noreply, put_flash(socket, :error, gettext("No playlist selected"))}
 
       playlist ->
-        case Accounts.delete_library_playlist(scope.user, playlist.playlist_id, playlist.provider) do
+        case Discography.LibraryPlaylist.delete(playlist) do
           {:ok, _} ->
             socket
             |> assign(:show_playlist_detail_modal, false)
@@ -143,13 +140,13 @@ defmodule PremiereEcouteWeb.HomeLive do
 
   # AIDEV-NOTE: Register selected playlist to user's library
   @impl true
-  def handle_event("register_playlist", _params, %{assigns: %{current_scope: user}} = socket) do
+  def handle_event("register_playlist", _params, %{assigns: %{current_scope: current_scope}} = socket) do
     case socket.assigns.selected_playlist do
       nil ->
         {:noreply, put_flash(socket, :error, gettext("No playlist selected"))}
 
       playlist ->
-        if Accounts.library_playlist_exists?(user, playlist.playlist_id, playlist.provider) do
+        if Discography.LibraryPlaylist.exists?(current_scope.user, playlist) do
           {:noreply, put_flash(socket, :info, gettext("Playlist is already in your library"))}
         else
           attrs = %{
@@ -164,14 +161,14 @@ defmodule PremiereEcouteWeb.HomeLive do
             metadata: playlist.metadata || %{}
           }
 
-          case Accounts.create_library_playlist(user, attrs) do
-            {:ok, _library_playlist} ->
+          case Discography.LibraryPlaylist.create(current_scope.user, attrs) do
+            {:ok, _} ->
               socket
               |> assign(:selected_playlist, nil)
               |> load_library_playlists()
               |> put_flash(:success, gettext("Playlist added to your library!"))
 
-            {:error, _changeset} ->
+            {:error, _} ->
               socket
               |> put_flash(:error, gettext("Failed to add playlist to your library"))
           end
@@ -224,9 +221,9 @@ defmodule PremiereEcouteWeb.HomeLive do
     end
   end
 
-  defp load_library_playlists(socket) do
-    if socket.assigns.current_scope do
-      library_playlists = Accounts.get_user_library_playlists(socket.assigns.current_scope.user)
+  defp load_library_playlists(%{assigns: assigns} = socket) do
+    if assigns.current_scope do
+      library_playlists = Discography.LibraryPlaylist.all(where: [user_id: assigns.current_scope.user.id])
       assign(socket, :library_playlists, library_playlists)
     else
       assign(socket, :library_playlists, [])

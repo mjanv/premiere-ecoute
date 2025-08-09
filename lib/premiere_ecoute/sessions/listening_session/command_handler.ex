@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   @moduledoc false
 
-  use PremiereEcoute.Core.CommandBus.Handler
+  use PremiereEcouteCore.CommandBus.Handler
   use Gettext, backend: PremiereEcoute.Gettext
 
   require Logger

@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateLibraryPlaylists do
   use Ecto.Migration
 
   def change do
-    create table(:user_library_playlists) do
+    create table(:library_playlists) do
       add :provider, :string, null: false
       add :playlist_id, :string, null: false
 
@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateLibraryPlaylists do
       timestamps()
     end
 
-    create index(:user_library_playlists, [:user_id])
-    create unique_index(:user_library_playlists, [:playlist_id, :provider])
+    create index(:library_playlists, [:user_id])
+    create unique_index(:library_playlists, [:playlist_id, :provider])
   end
 end

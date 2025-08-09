@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   Enables searching Spotify's music catalog for albums, tracks, and artists. Returns structured results that can be used for music discovery and selection within listening sessions.
   """
 
-  use PremiereEcoute.Core.Api, api: :spotify
+  use PremiereEcouteCore.Api, api: :spotify
 
   alias PremiereEcoute.Accounts.Scope
 
@@ -31,9 +31,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     """
 
     alias PremiereEcoute.Accounts.Scope
-    alias PremiereEcoute.Accounts.User.LibraryPlaylist
     alias PremiereEcoute.Discography.Album
     alias PremiereEcoute.Discography.Album.Track
+    alias PremiereEcoute.Discography.LibraryPlaylist
     alias PremiereEcoute.Discography.Playlist
 
     # Albums

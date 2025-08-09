@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Discography.Playlist.Track do
   @moduledoc false
 
-  use PremiereEcoute.Core.Aggregate,
+  use PremiereEcouteCore.Aggregate,
     json: [:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at]
 
   alias PremiereEcoute.Discography.Playlist

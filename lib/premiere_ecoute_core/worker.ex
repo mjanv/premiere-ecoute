@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Worker do
+defmodule PremiereEcouteCore.Worker do
   @moduledoc false
 
   defmacro __using__(opts) do

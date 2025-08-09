@@ -22,7 +22,7 @@ defmodule PremiereEcoute.Mailer.Email do
 
   import Swoosh.Email
 
-  alias PremiereEcoute.Core.Event
+  alias PremiereEcouteCore.Event
 
   def from_event(event) do
     new()

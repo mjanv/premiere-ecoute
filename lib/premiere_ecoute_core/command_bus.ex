@@ -1,10 +1,10 @@
-defmodule PremiereEcoute.Core.CommandBus do
+defmodule PremiereEcouteCore.CommandBus do
   @moduledoc false
 
   require Logger
 
-  alias PremiereEcoute.Core.EventBus
-  alias PremiereEcoute.Core.Registry
+  alias PremiereEcouteCore.EventBus
+  alias PremiereEcouteCore.Registry
 
   def apply(command) do
     command

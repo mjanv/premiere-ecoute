@@ -3,9 +3,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
 
   require Logger
 
-  alias PremiereEcoute.Accounts.User.LibraryPlaylist
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
+  alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
 

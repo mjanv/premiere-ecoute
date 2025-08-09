@@ -1,9 +1,9 @@
-defmodule PremiereEcoute.Core.EventBus do
+defmodule PremiereEcouteCore.EventBus do
   @moduledoc false
 
   require Logger
 
-  alias PremiereEcoute.Core.Registry
+  alias PremiereEcouteCore.Registry
 
   def dispatch([]), do: :ok
 

@@ -1,7 +1,7 @@
-defmodule PremiereEcoute.Core.DurationTest do
+defmodule PremiereEcouteCore.DurationTest do
   use ExUnit.Case, async: true
 
-  alias PremiereEcoute.Core.Duration
+  alias PremiereEcouteCore.Duration
 
   describe "timer/1" do
     test "returns an empty timer for undefined values" do

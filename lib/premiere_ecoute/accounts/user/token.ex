@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Accounts.User.Token do
   @moduledoc false
 
-  use PremiereEcoute.Core.Aggregate.Entity
+  use PremiereEcouteCore.Aggregate.Entity
 
   alias PremiereEcoute.Accounts.User
 

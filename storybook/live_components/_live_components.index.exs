@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.LiveComponents do
   def folder_name, do: "Live Components"
   def folder_icon, do: {:fa, "wave-square"}
   def folder_open?, do: true
+  def folder_index, do: 2
 
   def entry("spotify_player"), do: [name: "Spotify Player", icon: {:fa, "icon"}]
 end

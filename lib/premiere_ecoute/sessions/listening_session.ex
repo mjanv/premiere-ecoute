@@ -1,16 +1,16 @@
 defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
-  use PremiereEcoute.Core.Aggregate,
+  use PremiereEcouteCore.Aggregate,
     root: [album: [:tracks], user: [:twitch, :spotify], current_track: []],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
-  alias PremiereEcoute.Core.Cache
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcouteCore.Cache
 
   @type t :: %__MODULE__{
           id: integer() | nil,

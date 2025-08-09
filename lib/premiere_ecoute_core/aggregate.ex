@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Aggregate do
+defmodule PremiereEcouteCore.Aggregate do
   @moduledoc false
 
   defmacro __using__(opts) do

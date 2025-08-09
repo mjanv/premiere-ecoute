@@ -6,8 +6,8 @@ defmodule PremiereEcoute.Sessions.Retrospective do
 
   import Ecto.Query, warn: false
 
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Report
 

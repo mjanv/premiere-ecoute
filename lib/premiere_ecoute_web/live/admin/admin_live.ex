@@ -4,8 +4,8 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Scores
 
   def mount(_params, _session, socket) do

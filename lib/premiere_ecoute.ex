@@ -2,11 +2,11 @@ defmodule PremiereEcoute do
   @moduledoc false
 
   use Boundary,
-    deps: [],
+    deps: [PremiereEcouteCore],
     exports: [
-      {Core, except: []},
       {Accounts, except: []},
       {Discography, except: []},
+      {Events, except: []},
       {Sessions, except: []},
       {Apis, except: []},
       {Telemetry, except: []},
@@ -14,11 +14,10 @@ defmodule PremiereEcoute do
       DataCase
     ]
 
-  alias PremiereEcoute.Core
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Mailer
 
-  defdelegate apply(command), to: Core
+  defdelegate apply(command), to: PremiereEcouteCore
   defdelegate paginate(stream, opts), to: Store
 
   def mailer, do: Mailer.impl()

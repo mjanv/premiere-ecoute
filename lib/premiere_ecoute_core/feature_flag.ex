@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.FeatureFlag do
+defmodule PremiereEcouteCore.FeatureFlag do
   @moduledoc false
 
   defdelegate enabled?(flag, opts \\ []), to: FunWithFlags

@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Accounts.Bot do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcouteCore.Cache
 
   @bot "maxime.janvier+premiereecoute@gmail.com"
 

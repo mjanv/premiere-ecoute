@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
 
   alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcouteCore.Cache
 
   @email "maxime.janvier+premiereecoute@gmail.com"
 

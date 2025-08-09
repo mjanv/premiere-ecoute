@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcouteCore.Cache
 
   def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}} = scope) do
     scope

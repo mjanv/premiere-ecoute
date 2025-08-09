@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Core.Duration do
+defmodule PremiereEcouteCore.Duration do
   @moduledoc """
   # Utilities for formatting time durations and datetime values.
 
@@ -10,10 +10,10 @@ defmodule PremiereEcoute.Core.Duration do
 
   ## Examples
 
-      iex> PremiereEcoute.Core.Duration.timer(125_000)
+      iex> PremiereEcouteCore.Duration.timer(125_000)
       "02:05"
 
-      iex> PremiereEcoute.Core.Duration.timer("invalid")
+      iex> PremiereEcouteCore.Duration.timer("invalid")
       "--:--"
   """
   @spec timer(any()) :: String.t()
@@ -31,7 +31,7 @@ defmodule PremiereEcoute.Core.Duration do
 
       iex> start = ~U[2024-01-01 10:00:00Z]
       iex> end_time = ~U[2024-01-01 10:03:30Z]
-      iex> PremiereEcoute.Core.Duration.timer(start, end_time)
+      iex> PremiereEcouteCore.Duration.timer(start, end_time)
       "3m 30s"
   """
   @spec timer(DateTime.t(), DateTime.t()) :: String.t()
@@ -46,10 +46,10 @@ defmodule PremiereEcoute.Core.Duration do
   ## Examples
 
       iex> dt = ~U[2024-03-15 14:30:00Z]
-      iex> PremiereEcoute.Core.Duration.clock(dt)
+      iex> PremiereEcouteCore.Duration.clock(dt)
       "Mar 15, 2024 at 02:30 PM"
 
-      iex> PremiereEcoute.Core.Duration.clock("invalid")
+      iex> PremiereEcouteCore.Duration.clock("invalid")
       "--"
   """
   @spec clock(any()) :: String.t()

@@ -1,9 +1,9 @@
 defmodule PremiereEcoute.Discography.PlaylistTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
+  alias PremiereEcoute.Repo
 
   describe "create/1" do
     test "creates an playlist with tracks" do

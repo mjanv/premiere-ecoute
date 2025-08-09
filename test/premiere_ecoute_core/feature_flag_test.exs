@@ -1,7 +1,7 @@
-defmodule PremiereEcoute.Core.FeatureFlagTest do
+defmodule PremiereEcouteCore.FeatureFlagTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Core.FeatureFlag
+  alias PremiereEcouteCore.FeatureFlag
 
   setup do
     viewer = user_fixture(%{role: :viewer, email: "viewer@email.com"})

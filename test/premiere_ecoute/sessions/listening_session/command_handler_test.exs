@@ -2,7 +2,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.Scope
-  alias PremiereEcoute.Core.CommandBus
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
@@ -17,6 +16,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
   alias PremiereEcoute.Sessions.Scores.Report
+  alias PremiereEcouteCore.CommandBus
 
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi

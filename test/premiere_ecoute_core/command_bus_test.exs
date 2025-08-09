@@ -1,9 +1,9 @@
-defmodule PremiereEcoute.Core.CommandBusTest do
+defmodule PremiereEcouteCore.CommandBusTest do
   use PremiereEcoute.DataCase
 
   import ExUnit.CaptureLog
 
-  alias PremiereEcoute.Core.CommandBus
+  alias PremiereEcouteCore.CommandBus
 
   defmodule CommandA do
     defstruct [:a]
@@ -26,10 +26,10 @@ defmodule PremiereEcoute.Core.CommandBusTest do
   end
 
   defmodule Handler do
-    use PremiereEcoute.Core.CommandBus.Handler
+    use PremiereEcouteCore.CommandBus.Handler
 
-    command(PremiereEcoute.Core.CommandBusTest.CommandA)
-    command(PremiereEcoute.Core.CommandBusTest.CommandB)
+    command(PremiereEcouteCore.CommandBusTest.CommandA)
+    command(PremiereEcouteCore.CommandBusTest.CommandB)
 
     require Logger
 
@@ -54,9 +54,9 @@ defmodule PremiereEcoute.Core.CommandBusTest do
   end
 
   defmodule EventDispatcher do
-    use PremiereEcoute.Core.EventBus.Handler
+    use PremiereEcouteCore.EventBus.Handler
 
-    event(PremiereEcoute.Core.CommandBusTest.EventA)
+    event(PremiereEcouteCore.CommandBusTest.EventA)
 
     require Logger
 
@@ -70,11 +70,11 @@ defmodule PremiereEcoute.Core.CommandBusTest do
       {{:ok, events}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 4}) end)
 
       assert events == [
-               %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}
+               %PremiereEcouteCore.CommandBusTest.EventA{a: 5}
              ]
 
-      assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandA{a: 4}"
-      assert logs =~ "dispatch: %PremiereEcoute.Core.CommandBusTest.EventA{a: 5}"
+      assert logs =~ "handle: %PremiereEcouteCore.CommandBusTest.CommandA{a: 4}"
+      assert logs =~ "dispatch: %PremiereEcouteCore.CommandBusTest.EventA{a: 5}"
     end
 
     test "1b" do
@@ -83,11 +83,11 @@ defmodule PremiereEcoute.Core.CommandBusTest do
       assert state == :state
 
       assert events == [
-               %PremiereEcoute.Core.CommandBusTest.EventA{a: 11}
+               %PremiereEcouteCore.CommandBusTest.EventA{a: 11}
              ]
 
-      assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandA{a: 10}"
-      assert logs =~ "dispatch: %PremiereEcoute.Core.CommandBusTest.EventA{a: 11}"
+      assert logs =~ "handle: %PremiereEcouteCore.CommandBusTest.CommandA{a: 10}"
+      assert logs =~ "dispatch: %PremiereEcouteCore.CommandBusTest.EventA{a: 11}"
     end
 
     test "2" do
@@ -100,17 +100,17 @@ defmodule PremiereEcoute.Core.CommandBusTest do
     test "3" do
       {{:error, [event]}, logs} = with_log(fn -> CommandBus.apply(%CommandB{b: 1}) end)
 
-      assert event == %PremiereEcoute.Core.CommandBusTest.EventB{b: 2}
+      assert event == %PremiereEcouteCore.CommandBusTest.EventB{b: 2}
 
-      assert logs =~ "handle: %PremiereEcoute.Core.CommandBusTest.CommandB{b: 1}"
-      assert logs =~ "[error] No registered handler for PremiereEcoute.Core.CommandBusTest.EventB"
+      assert logs =~ "handle: %PremiereEcouteCore.CommandBusTest.CommandB{b: 1}"
+      assert logs =~ "[error] No registered handler for PremiereEcouteCore.CommandBusTest.EventB"
     end
 
     test "4" do
       {{:error, :not_registered}, logs} = with_log(fn -> CommandBus.apply(%CommandC{c: 1}) end)
 
       assert logs =~
-               "[error] No registered handler for PremiereEcoute.Core.CommandBusTest.CommandC"
+               "[error] No registered handler for PremiereEcouteCore.CommandBusTest.CommandC"
     end
   end
 end

@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Apis.DeezerApi do
   @moduledoc false
 
-  use PremiereEcoute.Core.Api, api: :deezer
+  use PremiereEcouteCore.Api, api: :deezer
 
   defmodule Behaviour do
     @moduledoc "Deezer API Behaviour"
@@ -21,7 +21,8 @@ defmodule PremiereEcoute.Apis.DeezerApi do
     |> new()
   end
 
-  def client_credentials, do: %{}
+  @spec client_credentials() :: {:ok, %{String.t() => String.t() | integer()}}
+  def client_credentials, do: {:ok, %{"access_token" => "", "expires_in" => 0}}
 
   # Playlists
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists

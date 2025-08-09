@@ -1,11 +1,11 @@
 defmodule PremiereEcoute.Sessions.Scores.PollHandler do
   @moduledoc false
 
-  use PremiereEcoute.Core.EventBus.Handler
+  use PremiereEcouteCore.EventBus.Handler
 
-  event(PremiereEcoute.Sessions.Scores.Events.PollUpdated)
+  event(PremiereEcoute.Events.Chat.PollUpdated)
 
-  alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
+  alias PremiereEcoute.Events.Chat.PollUpdated
   alias PremiereEcoute.Sessions.Scores.Poll
 
   def dispatch(%PollUpdated{id: id, votes: votes}) do

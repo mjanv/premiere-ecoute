@@ -7,9 +7,9 @@ config :premiere_ecoute,
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
     PremiereEcoute.Sessions.Scores.PollHandler,
-    PremiereEcoute.Core.CommandBusTest.Handler,
-    PremiereEcoute.Core.CommandBusTest.EventDispatcher,
-    PremiereEcoute.Core.EventBusTest.Handler
+    PremiereEcouteCore.CommandBusTest.Handler,
+    PremiereEcouteCore.CommandBusTest.EventDispatcher,
+    PremiereEcouteCore.EventBusTest.Handler
   ]
 
 config :premiere_ecoute, PremiereEcoute.Apis,

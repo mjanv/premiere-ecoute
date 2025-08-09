@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Accounts.Notifier do
   @moduledoc false
 
-  use PremiereEcoute.Core.Subscriber, stream: "users"
+  use PremiereEcouteCore.Subscriber, stream: "users"
 
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.AccountDeleted

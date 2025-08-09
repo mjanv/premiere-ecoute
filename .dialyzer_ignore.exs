@@ -1,6 +1,18 @@
 [
   {"lib/premiere_ecoute/accounts/user.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/accounts/user/follow.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/accounts/user/oauth_token.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/accounts/user/token.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/services/account_compliance.ex", :call_without_opaque},
   {"lib/premiere_ecoute/apis/spotify_api/accounts.ex", :call_without_opaque},
-  {"lib/premiere_ecoute/apis/twitch_api/accounts.ex", :call_without_opaque}
+  {"lib/premiere_ecoute/apis/twitch_api/accounts.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/discography/album.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/discography/album/track.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/discography/library_playlist.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/discography/playlist.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/discography/playlist/track.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/sessions/scores/poll.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/sessions/scores/report.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/sessions/scores/vote.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/sessions/listening_session.ex", :call_without_opaque}
 ]

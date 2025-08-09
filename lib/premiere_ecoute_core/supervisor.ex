@@ -1,9 +1,9 @@
-defmodule PremiereEcoute.Core.Supervisor do
+defmodule PremiereEcouteCore.Supervisor do
   @moduledoc false
 
   use Supervisor
 
-  alias PremiereEcoute.Core.Cache
+  alias PremiereEcouteCore.Cache
 
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)

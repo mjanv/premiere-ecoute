@@ -6,13 +6,14 @@ defmodule PremiereEcoute.Repo.Release do
   """
 
   alias EventStore.Tasks
+  alias PremiereEcoute.Events.Store
 
   @app :premiere_ecoute
 
   def migrate do
     load_app()
 
-    config = PremiereEcoute.Events.Store.config()
+    config = Store.config()
     :ok = Tasks.Create.exec(config, [])
     :ok = Tasks.Init.exec(config, [])
 

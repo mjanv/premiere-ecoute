@@ -1,13 +1,10 @@
-defmodule PremiereEcoute.Accounts.User.LibraryPlaylist do
+defmodule PremiereEcoute.Discography.LibraryPlaylist do
   @moduledoc false
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
-  import Ecto.Query
+  use PremiereEcouteCore.Aggregate,
+    identity: [:provider, :playlist_id]
 
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Repo
 
   @type t :: %__MODULE__{
           id: integer(),
@@ -25,7 +22,7 @@ defmodule PremiereEcoute.Accounts.User.LibraryPlaylist do
           updated_at: NaiveDateTime.t()
         }
 
-  schema "user_library_playlists" do
+  schema "library_playlists" do
     field :provider, Ecto.Enum, values: [:spotify, :deezer]
     field :playlist_id, :string
 
@@ -43,7 +40,6 @@ defmodule PremiereEcoute.Accounts.User.LibraryPlaylist do
     timestamps()
   end
 
-  @doc false
   def changeset(playlist, attrs) do
     playlist
     |> cast(attrs, [:provider, :playlist_id, :title, :description, :url, :cover_url, :public, :track_count, :metadata, :user_id])
@@ -53,46 +49,15 @@ defmodule PremiereEcoute.Accounts.User.LibraryPlaylist do
     |> foreign_key_constraint(:user_id)
   end
 
-  @doc """
-  Creates a new library playlist for a user.
-  """
-  def create(user, attrs) do
+  def create(%User{id: id}, attrs) do
     %__MODULE__{}
-    |> changeset(Map.put(attrs, :user_id, user.id))
+    |> changeset(Map.put(attrs, :user_id, id))
     |> Repo.insert()
   end
 
-  @doc """
-  Gets all library playlists for a user.
-  """
-  def get_user_playlists(user) do
+  def exists?(%User{id: id}, %__MODULE__{playlist_id: playlist_id, provider: provider}) do
     from(p in __MODULE__,
-      where: p.user_id == ^user.id,
-      order_by: [desc: p.inserted_at]
-    )
-    |> Repo.all()
-  end
-
-  @doc """
-  Deletes a library playlist for a user.
-  """
-  def delete_playlist(user, playlist_id, provider) do
-    from(p in __MODULE__,
-      where: p.user_id == ^user.id and p.playlist_id == ^playlist_id and p.provider == ^provider
-    )
-    |> Repo.one()
-    |> case do
-      nil -> {:error, :not_found}
-      playlist -> Repo.delete(playlist)
-    end
-  end
-
-  @doc """
-  Checks if a playlist is already in the user's library.
-  """
-  def exists?(user, playlist_id, provider) do
-    from(p in __MODULE__,
-      where: p.user_id == ^user.id and p.playlist_id == ^playlist_id and p.provider == ^provider
+      where: p.user_id == ^id and p.playlist_id == ^playlist_id and p.provider == ^provider
     )
     |> Repo.exists?()
   end

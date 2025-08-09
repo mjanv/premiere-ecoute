@@ -3,12 +3,11 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
 
   require Logger
 
-  alias PremiereEcoute.Core
+  alias PremiereEcoute.Events.Chat.MessageSent
+  alias PremiereEcoute.Events.Chat.PollEnded
+  alias PremiereEcoute.Events.Chat.PollStarted
+  alias PremiereEcoute.Events.Chat.PollUpdated
   alias PremiereEcoute.Sessions
-  alias PremiereEcoute.Sessions.Scores.Events.MessageSent
-  alias PremiereEcoute.Sessions.Scores.Events.PollEnded
-  alias PremiereEcoute.Sessions.Scores.Events.PollStarted
-  alias PremiereEcoute.Sessions.Scores.Events.PollUpdated
   alias PremiereEcoute.Telemetry.ApiMetrics
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
 
@@ -35,7 +34,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
       {true, "notification", conn} ->
         case handle(conn.body_params) do
           %MessageSent{} = event -> Sessions.publish_message(event)
-          event -> Core.dispatch(event)
+          event -> PremiereEcouteCore.dispatch(event)
         end
 
         send_resp(conn, 202, "")

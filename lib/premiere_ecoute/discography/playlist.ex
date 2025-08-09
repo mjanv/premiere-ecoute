@@ -1,13 +1,13 @@
 defmodule PremiereEcoute.Discography.Playlist do
   @moduledoc false
 
-  use PremiereEcoute.Core.Aggregate,
+  use PremiereEcouteCore.Aggregate,
     root: [:tracks],
     identity: [:playlist_id],
     json: [:id, :title, :cover_url]
 
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Discography.Playlist.Track
+  alias PremiereEcoute.Repo
 
   @type t :: %__MODULE__{
           id: integer(),
