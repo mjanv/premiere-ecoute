@@ -30,6 +30,11 @@ defmodule PremiereEcouteWeb.CoreComponents do
 
   alias Phoenix.HTML
   alias Phoenix.LiveView.JS
+  
+  # AIDEV-NOTE: Import medium priority refactoring components for consistent UI patterns
+  alias PremiereEcouteWeb.Components.AlbumTrackDisplay
+  alias PremiereEcouteWeb.Components.StatusBadge  
+  alias PremiereEcouteWeb.Components.LoadingState
 
   @doc """
   Renders flash notices.
@@ -451,4 +456,70 @@ defmodule PremiereEcouteWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  # AIDEV-NOTE: Medium priority refactoring component delegates for easier access
+  
+  @doc """
+  Renders an album display with cover image, name, and artist.
+  
+  Delegates to AlbumTrackDisplay.album_display/1.
+  See `AlbumTrackDisplay.album_display/1` for full documentation.
+  """
+  defdelegate album_display(assigns), to: AlbumTrackDisplay
+  
+  @doc """
+  Renders a track display with name and optional metadata.
+  
+  Delegates to AlbumTrackDisplay.track_display/1.
+  See `AlbumTrackDisplay.track_display/1` for full documentation.
+  """
+  defdelegate track_display(assigns), to: AlbumTrackDisplay
+  
+  @doc """
+  Renders a status badge with consistent styling.
+  
+  Delegates to StatusBadge.status_badge/1.
+  See `StatusBadge.status_badge/1` for full documentation.
+  """
+  defdelegate status_badge(assigns), to: StatusBadge
+  
+  @doc """
+  Renders a session status badge with predefined styling.
+  
+  Delegates to StatusBadge.session_status_badge/1.
+  See `StatusBadge.session_status_badge/1` for full documentation.
+  """
+  defdelegate session_status_badge(assigns), to: StatusBadge
+  
+  @doc """
+  Renders a spinning loading indicator.
+  
+  Delegates to LoadingState.spinner/1.
+  See `LoadingState.spinner/1` for full documentation.
+  """
+  defdelegate spinner(assigns), to: LoadingState
+  
+  @doc """
+  Renders skeleton loading lines for text content.
+  
+  Delegates to LoadingState.skeleton_text/1.
+  See `LoadingState.skeleton_text/1` for full documentation.
+  """
+  defdelegate skeleton_text(assigns), to: LoadingState
+  
+  @doc """
+  Renders a skeleton loading state for card components.
+  
+  Delegates to LoadingState.skeleton_card/1.
+  See `LoadingState.skeleton_card/1` for full documentation.
+  """
+  defdelegate skeleton_card(assigns), to: LoadingState
+  
+  @doc """
+  Renders a loading overlay with spinner and message.
+  
+  Delegates to LoadingState.loading_overlay/1.
+  See `LoadingState.loading_overlay/1` for full documentation.
+  """
+  defdelegate loading_overlay(assigns), to: LoadingState
 end

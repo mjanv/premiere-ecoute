@@ -143,10 +143,11 @@
               
 <!-- Search Results Overlay -->
               <%= if @search_albums.loading do %>
-                <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4 text-center text-gray-400">
-                  <div class="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
-                  <p class="mt-2 text-sm">{gettext("Searching albums...")}</p>
-                </div>
+                <!-- AIDEV-NOTE: Replaced manual loading state with new LoadingState component -->
+                <LoadingState.loading_overlay 
+                  variant="overlay" 
+                  message={gettext("Searching albums...")}
+                />
               <% end %>
 
               <%= if @search_albums.ok? && length(@search_albums.result) > 0 do %>
@@ -158,24 +159,13 @@
                       phx-click="select_album"
                       phx-value-album_id={album.album_id}
                     >
-                      <div class="flex items-center space-x-3">
-                        <%= if album.cover_url do %>
-                          <img src={album.cover_url} alt={album.name} class="w-12 h-12 rounded object-cover" />
-                        <% else %>
-                          <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                            </svg>
-                          </div>
-                        <% end %>
-                        <div class="flex-1 min-w-0">
-                          <h4 class="font-medium truncate" style="color: var(--color-primary-300);">
-                            {album.name}
-                          </h4>
-                          <p class="text-gray-400 text-sm truncate">{album.artist}</p>
-                          <p class="text-gray-500 text-xs">{album.total_tracks} {gettext("tracks")}</p>
-                        </div>
-                      </div>
+                      <!-- AIDEV-NOTE: Replaced manual album display with new AlbumTrackDisplay component -->
+                      <.album_display 
+                        album={album} 
+                        size="md" 
+                        show_metadata={true}
+                        class="text-primary-300"
+                      />
                     </div>
                   <% end %>
                 </div>

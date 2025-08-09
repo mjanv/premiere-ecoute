@@ -3,6 +3,9 @@ defmodule PremiereEcouteWeb.Sessions.Discography.AlbumSelectionLive do
 
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
+  
+  # AIDEV-NOTE: Import LoadingState component for loading overlays
+  alias PremiereEcouteWeb.Components.LoadingState
 
   require Logger
 

@@ -7,6 +7,9 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Scores
+  
+  # AIDEV-NOTE: Import dedicated component modules for design system components
+  alias PremiereEcouteWeb.Components.{Card, StatsCard}
 
   def mount(_params, _session, socket) do
     socket

@@ -4,6 +4,9 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Discography.Album
+  
+  # AIDEV-NOTE: Import design system components for demonstration
+  alias PremiereEcouteWeb.Components.{AlbumDisplay, StatusBadge, EmptyState, LoadingState}
 
   def mount(_params, _session, socket) do
     socket

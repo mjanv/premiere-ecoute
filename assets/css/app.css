@@ -218,3 +218,25 @@ body {
   color: white;
   border-color: var(--color-dark-600);
 }
+
+/* AIDEV-NOTE: Surface utility classes for consistent design system colors */
+/* Background utilities using CSS variables instead of Tailwind gray classes */
+.bg-surface { background-color: var(--color-dark-900); }
+.bg-surface-elevated { background-color: var(--color-dark-800); }
+.bg-surface-card { background-color: var(--color-dark-850); }
+.bg-surface-interactive { background-color: var(--color-dark-700); }
+
+/* Border utilities */
+.border-surface { border-color: var(--color-dark-700); }
+.border-surface-light { border-color: var(--color-dark-600); }
+.border-surface-interactive { border-color: var(--color-dark-500); }
+
+/* Text utilities */
+.text-surface { color: var(--color-dark-300); }
+.text-surface-muted { color: var(--color-dark-400); }
+.text-surface-bright { color: var(--color-dark-200); }
+.text-surface-primary { color: white; }
+
+/* Hover states for interactive elements */
+.hover-surface:hover { background-color: var(--color-dark-700); }
+.hover-surface-elevated:hover { background-color: var(--color-dark-700); }
