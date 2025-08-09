@@ -44,10 +44,17 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
-      live "/home", HomeLive, :index
     end
 
     live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
+  end
+
+  scope "/", PremiereEcouteWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :home, on_mount: [{UserAuth, :current_scope}] do
+      live "/home", HomeLive, :index
+    end
   end
 
   scope "/users", PremiereEcouteWeb.Accounts do
