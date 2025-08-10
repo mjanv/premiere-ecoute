@@ -1,19 +1,24 @@
 defmodule PremiereEcoute.Accounts.User.ConsentTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Accounts.User.Consent
   alias PremiereEcoute.Accounts.LegalDocument
+  alias PremiereEcoute.Accounts.User.Consent
   alias PremiereEcoute.Events.ConsentGiven
   alias PremiereEcoute.Events.Store
 
+  setup do
+    user = user_fixture()
+
+    privacy = %LegalDocument{id: "privacy", version: "1.0", language: "fr", date: ~D[2000-01-01], title: "Privacy", body: ""}
+    cookies = %LegalDocument{id: "cookies", version: "1.0", language: "fr", date: ~D[2000-01-01], title: "Cookies", body: ""}
+    terms = %LegalDocument{id: "terms", version: "1.0", language: "fr", date: ~D[2000-01-01], title: "Terms", body: ""}
+
+    documents = %{privacy: privacy, cookies: cookies, terms: terms}
+
+    {:ok, user: user, document: privacy, documents: documents}
+  end
+
   describe "accept/2" do
-    setup do
-      user = user_fixture()
-      document = %LegalDocument{id: "privacy", version: "1.0", language: "fr", date: ~D[2000-01-01], title: "Privacy", body: ""}
-
-      {:ok, %{user: user, document: document}}
-    end
-
     test "can create one accepted consent", %{user: user, document: document} do
       {:ok, consent} = Consent.accept(user, document)
 
@@ -21,6 +26,22 @@ defmodule PremiereEcoute.Accounts.User.ConsentTest do
       assert user_id == user.id
 
       assert Store.last("user-#{user.id}") == %ConsentGiven{id: user.id, document: "privacy", version: "1.0", accepted: true}
+    end
+
+    test "can create multiple accepted consents", %{user: user, documents: documents} do
+      {:ok, _multi} = Consent.accept(user, documents)
+
+      assert [
+               %Consent{document: :cookies, version: "1.0", accepted: true, user_id: user_id},
+               %Consent{document: :privacy, version: "1.0", accepted: true, user_id: user_id},
+               %Consent{document: :terms, version: "1.0", accepted: true, user_id: user_id}
+             ] = Consent.all(user_id: user.id)
+
+      assert Store.last("user-#{user.id}", 3) == [
+               %ConsentGiven{id: user.id, document: "cookies", version: "1.0", accepted: true},
+               %ConsentGiven{id: user.id, document: "privacy", version: "1.0", accepted: true},
+               %ConsentGiven{id: user.id, document: "terms", version: "1.0", accepted: true}
+             ]
     end
 
     test "can update one refused consent", %{user: user, document: document} do
@@ -69,18 +90,6 @@ defmodule PremiereEcoute.Accounts.User.ConsentTest do
   end
 
   describe "approval/2" do
-    setup do
-      user = user_fixture()
-
-      privacy = %LegalDocument{id: "privacy", version: "1.0", language: "fr", date: ~D[2000-01-01], title: "Privacy", body: ""}
-      cookies = %LegalDocument{id: "cookies", version: "1.0", language: "fr", date: ~D[2000-01-01], title: "Cookies", body: ""}
-      terms = %LegalDocument{id: "terms", version: "1.0", language: "fr", date: ~D[2000-01-01], title: "Terms", body: ""}
-
-      documents = %{privacy: privacy, cookies: cookies, terms: terms}
-
-      {:ok, user: user, documents: documents}
-    end
-
     test "is granted all legal documents are accepted", %{user: user, documents: documents} do
       {:ok, _} = Consent.accept(user, documents.privacy)
       {:ok, _} = Consent.accept(user, documents.cookies)

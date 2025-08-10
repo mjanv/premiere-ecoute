@@ -4,8 +4,8 @@ defmodule PremiereEcoute.Accounts.User.Consent do
   use PremiereEcouteCore.Aggregate.Entity,
     identity: [:document, :user_id]
 
-  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.LegalDocument
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Events.ConsentGiven
   alias PremiereEcoute.Events.Store
 
@@ -27,7 +27,7 @@ defmodule PremiereEcoute.Accounts.User.Consent do
     |> unique_constraint([:user_id, :document])
   end
 
-  @doc "Accept a legal document for a user. Creates new consent or updates existing one to accepted."
+  @doc "Accept legal document(s) for a user. Creates new consent or updates existing one to accepted."
   def accept(%User{id: id}, %LegalDocument{id: document, version: version}) do
     case get_by(user_id: id, document: document) do
       nil -> create(%{user_id: id, document: String.to_existing_atom(document), version: version, accepted: true})
@@ -36,6 +36,30 @@ defmodule PremiereEcoute.Accounts.User.Consent do
     |> Store.ok("user", fn consent ->
       %ConsentGiven{id: consent.user_id, document: consent.document, version: consent.version, accepted: consent.accepted}
     end)
+  end
+
+  def accept(%User{id: id}, documents) when is_map(documents) do
+    documents
+    |> Map.values()
+    |> Enum.reduce(
+      Ecto.Multi.new(),
+      fn %LegalDocument{id: document, version: version}, multi ->
+        multi
+        |> Ecto.Multi.insert(
+          {:consent, document},
+          changeset(%__MODULE__{}, %{user_id: id, document: String.to_existing_atom(document), version: version, accepted: true})
+        )
+        |> Ecto.Multi.run(
+          {:event, document},
+          fn _repo, _ ->
+            event = %ConsentGiven{id: id, document: String.to_existing_atom(document), version: version, accepted: true}
+            Store.append(event, stream: "user")
+            {:ok, event}
+          end
+        )
+      end
+    )
+    |> Repo.transact()
   end
 
   @doc """

@@ -1,6 +1,10 @@
 {
     "print_summary": false,
     "skip_files": [
-      "lib/premiere_ecoute_mock"
+      "lib/mix",
+      "lib/application.ex",
+      "lib/premiere_ecoute/telemetry/prom_ex.ex",
+      "lib/premiere_ecoute_mock",
+      "storybook"
     ]
 }

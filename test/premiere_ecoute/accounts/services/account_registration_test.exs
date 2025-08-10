@@ -64,28 +64,6 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
     end
 
-    test "create a new user with a default email address" do
-      data = Map.merge(twitch_data(), %{email: ""})
-      {:ok, user} = AccountRegistration.register_twitch_user(data)
-
-      assert %User{
-               email: "user1004@twitch.tv",
-               username: "user1004",
-               role: :streamer,
-               twitch: %OauthToken{
-                 user_id: "441903922",
-                 access_token: access_token,
-                 refresh_token: refresh_token
-               }
-             } = user
-
-      assert data[:access_token] == access_token
-      assert data[:refresh_token] == refresh_token
-
-      events = Store.read("user-#{user.id}")
-      assert events == [%AccountCreated{id: user.id}, %AccountAssociated{id: user.id, provider: "twitch", user_id: "441903922"}]
-    end
-
     test "find an existing user" do
       data = twitch_data()
       {:ok, _} = AccountRegistration.register_twitch_user(data)
@@ -113,28 +91,6 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
   end
 
   describe "register_spotify_user/2" do
-    test "update an existing user with a default address" do
-      data = Map.merge(twitch_data(), %{email: ""})
-      {:ok, user} = AccountRegistration.register_twitch_user(data)
-
-      data = spotify_data()
-      {:ok, user} = AccountRegistration.register_spotify_user(data, user.id)
-
-      assert %User{
-               email: "user1004@twitch.tv",
-               username: "user1004",
-               spotify: %OauthToken{
-                 user_id: "username007",
-                 username: "Username",
-                 access_token: access_token,
-                 refresh_token: refresh_token
-               }
-             } = user
-
-      assert data[:access_token] == access_token
-      assert data[:refresh_token] == refresh_token
-    end
-
     test "update an existing user" do
       data = twitch_data()
       {:ok, user} = AccountRegistration.register_twitch_user(data)

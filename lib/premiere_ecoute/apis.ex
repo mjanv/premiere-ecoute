@@ -11,6 +11,6 @@ defmodule PremiereEcoute.Apis do
   def provider(:spotify), do: SpotifyApi.impl()
   def provider(:twitch), do: TwitchApi.impl()
 
-  def spotify, do: SpotifyApi.impl()
-  def twitch, do: TwitchApi.impl()
+  def spotify, do: provider(:spotify)
+  def twitch, do: provider(:twitch)
 end

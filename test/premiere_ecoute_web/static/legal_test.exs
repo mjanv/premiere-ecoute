@@ -1,8 +1,8 @@
 defmodule PremiereEcouteWeb.Static.LegalTest do
   use PremiereEcouteWeb.ConnCase
 
-  alias PremiereEcouteWeb.Static.Legal
   alias PremiereEcoute.Accounts.LegalDocument
+  alias PremiereEcouteWeb.Static.Legal
 
   describe "document/1" do
     test "retrieves an existing legal document" do

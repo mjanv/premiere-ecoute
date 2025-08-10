@@ -33,8 +33,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
 
   @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_twitch_user(%{email: email, username: username} = payload, password \\ nil) do
-    with email <- if(email == "", do: "#{username}@twitch.tv", else: email),
-         nil <- User.get_user_by_email(email),
+    with nil <- User.get_user_by_email(email),
          attrs <- %{
            email: email,
            username: username,

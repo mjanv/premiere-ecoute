@@ -3,7 +3,6 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Apis.SpotifyApi.Player
   alias PremiereEcouteCore.Cache
 
   alias PremiereEcoute.Discography.Album
@@ -31,7 +30,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 200
       )
 
-      {:ok, state} = Player.get_playback_state(scope)
+      {:ok, state} = SpotifyApi.get_playback_state(scope)
 
       assert state == %{
                "is_playing" => true,
@@ -59,7 +58,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, state} = Player.get_playback_state(scope)
+      {:ok, state} = SpotifyApi.get_playback_state(scope)
 
       assert state == %{
                "is_playing" => false,
@@ -83,7 +82,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, :success} = Player.start_playback(scope)
+      {:ok, :success} = SpotifyApi.start_playback(scope)
     end
   end
 
@@ -101,7 +100,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, :success} = Player.pause_playback(scope)
+      {:ok, :success} = SpotifyApi.pause_playback(scope)
     end
   end
 
@@ -119,7 +118,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, :success} = Player.next_track(scope)
+      {:ok, :success} = SpotifyApi.next_track(scope)
     end
   end
 
@@ -137,7 +136,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, :success} = Player.previous_track(scope)
+      {:ok, :success} = SpotifyApi.previous_track(scope)
     end
   end
 
@@ -157,7 +156,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, context_uri} = Player.start_resume_playback(scope, album)
+      {:ok, context_uri} = SpotifyApi.start_resume_playback(scope, album)
 
       assert context_uri == "spotify:album:5ht7ItJgpBH7W6vJ5BqpPr"
     end
@@ -173,7 +172,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, context_uri} = Player.start_resume_playback(scope, track)
+      {:ok, context_uri} = SpotifyApi.start_resume_playback(scope, track)
 
       assert context_uri == "spotify:track:track001"
     end
@@ -201,7 +200,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, context_uri} = Player.add_item_to_playback_queue(scope, track)
+      {:ok, context_uri} = SpotifyApi.add_item_to_playback_queue(scope, track)
 
       assert context_uri == "spotify:track:#{track.track_id}"
     end
@@ -223,7 +222,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, context_uris} = Player.add_item_to_playback_queue(scope, album)
+      {:ok, context_uris} = SpotifyApi.add_item_to_playback_queue(scope, album)
 
       assert context_uris == ["spotify:track:track001", "spotify:track:track002"]
     end
@@ -248,7 +247,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         body: %{}
       )
 
-      {:error, reason} = Player.add_item_to_playback_queue(scope, album)
+      {:error, reason} = SpotifyApi.add_item_to_playback_queue(scope, album)
 
       assert reason == "Cannot queue all album tracks"
     end

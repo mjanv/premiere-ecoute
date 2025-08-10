@@ -4,8 +4,11 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   require Logger
 
   alias PremiereEcoute.Accounts.Services.AccountRegistration
+  alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Accounts.User.Consent
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcouteWeb.Static.Legal
   alias PremiereEcouteWeb.UserAuth
 
   def request(conn, %{"provider" => "twitch"}) do
@@ -44,40 +47,21 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   end
 
   def callback(conn, %{"provider" => "twitch", "code" => code}) do
-    with {:ok, auth_data} <- TwitchApi.authorization_code(code) do
-      email = auth_data.email || "#{auth_data.username}@twitch.tv"
-
-      # Check if user already exists
-      case PremiereEcoute.Accounts.User.get_user_by_email(email) do
-        nil ->
-          # New user - redirect to terms acceptance
-          conn
-          |> put_session(:pending_twitch_auth, %{
-            auth_data: auth_data,
-            timestamp: System.system_time(:second)
-          })
-          |> redirect(to: ~p"/users/terms-acceptance")
-
-        _user ->
-          # Existing user - update tokens and log in
-          case AccountRegistration.register_twitch_user(auth_data) do
-            {:ok, updated_user} ->
-              conn
-              |> put_session(:user_return_to, ~p"/home")
-              |> put_flash(:info, "Successfully authenticated with Twitch!")
-              |> PremiereEcouteWeb.UserAuth.log_in_user(updated_user, %{})
-
-            {:error, reason} ->
-              Logger.error("Failed to update existing user tokens: #{inspect(reason)}")
-
-              conn
-              |> put_flash(:error, "Authentication failed")
-              |> redirect(to: ~p"/")
-          end
-      end
+    with {:ok, auth_data} <- TwitchApi.authorization_code(code),
+         {user, auth_data} when not is_nil(user) <- {User.get_user_by_email(auth_data.email), auth_data},
+         {:ok, user} <- AccountRegistration.register_twitch_user(auth_data) do
+      conn
+      |> put_session(:user_return_to, ~p"/home")
+      |> put_flash(:info, "Successfully authenticated with Twitch!")
+      |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
     else
+      {nil, auth_data} ->
+        conn
+        |> put_session(:pending_twitch_auth, %{auth_data: auth_data, timestamp: System.system_time(:second)})
+        |> redirect(to: ~p"/users/terms-acceptance")
+
       {:error, reason} ->
-        Logger.error("Twitch OAuth error: #{inspect(reason)}")
+        Logger.error("Twitch callback error: #{inspect(reason)}")
 
         conn
         |> put_flash(:error, "Twitch authentication failed")
@@ -108,33 +92,33 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     |> redirect(to: ~p"/")
   end
 
-  @doc """
-  Complete user registration after terms acceptance.
-  Called after TermsAcceptanceLive redirects here.
-  """
-  def complete(conn, %{"provider" => "twitch", "user_id" => user_id_str}) do
-    case get_session(conn, :pending_twitch_auth) do
-      %{auth_data: _auth_data} ->
-        user_id = String.to_integer(user_id_str)
+  def complete(conn, %{} = params) do
+    with data <- Map.take(params, ["privacy", "cookies", "terms"]),
+         true <- Enum.all?(["privacy", "cookies", "terms"], fn k -> data[k] == "true" end),
+         documents <- %{privacy: Legal.document(:privacy), cookies: Legal.document(:cookies), terms: Legal.document(:terms)},
+         %{auth_data: auth_data} <- get_session(conn, :pending_twitch_auth),
+         {:ok, user} <- AccountRegistration.register_twitch_user(auth_data),
+         {:ok, _} <- Consent.accept(user, documents) do
+      conn
+      |> delete_session(:pending_twitch_auth)
+      |> put_session(:user_return_to, ~p"/home")
+      |> put_flash(:info, "Welcome! Your account has been created successfully.")
+      |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
+    else
+      false ->
+        conn
+        |> put_flash(:error, "All terms must be accepted to complete registration.")
+        |> redirect(to: ~p"/")
 
-        case PremiereEcoute.Accounts.get_user!(user_id) do
-          user when not is_nil(user) ->
-            conn
-            |> delete_session(:pending_twitch_auth)
-            |> put_session(:user_return_to, ~p"/home")
-            |> put_flash(:info, "Welcome! Your account has been created successfully.")
-            |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
-
-          nil ->
-            conn
-            |> put_flash(:error, "User not found")
-            |> redirect(to: ~p"/")
-        end
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Registration failed. Please try again.")
+        |> redirect(to: ~p"/")
 
       _ ->
         conn
         |> put_flash(:error, "Authentication session expired")
-        |> redirect(to: ~p"/users/log-in")
+        |> redirect(to: ~p"/")
     end
   end
 end
