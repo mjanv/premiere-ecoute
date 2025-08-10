@@ -4,6 +4,12 @@ defmodule PremiereEcoute.Events.AccountCreated do
   use PremiereEcouteCore.Event
 end
 
+defmodule PremiereEcoute.Events.ConsentGiven do
+  @moduledoc false
+
+  use PremiereEcouteCore.Event, fields: [:document, :version, :accepted]
+end
+
 defmodule PremiereEcoute.Events.AccountAssociated do
   @moduledoc false
 

@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Static.Changelog.Entry do
+defmodule PremiereEcoute.Changelog.Entry do
   @moduledoc false
 
   @enforce_keys [:id, :title, :date, :body]
@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Static.Changelog do
   @moduledoc false
 
   use NimblePublisher,
-    build: PremiereEcouteWeb.Static.Changelog.Entry,
+    build: PremiereEcoute.Changelog.Entry,
     from: Application.app_dir(:premiere_ecoute, "priv/changelog/*.md"),
     as: :changelog,
     highlighters: [:makeup_elixir, :makeup_erlang]
