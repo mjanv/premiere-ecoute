@@ -33,7 +33,9 @@ defmodule PremiereEcoute.Accounts.User.Consent do
       nil -> create(%{user_id: id, document: String.to_existing_atom(document), version: version, accepted: true})
       consent -> __MODULE__.update(consent, %{version: version, accepted: true})
     end
-    |> Store.ok("user", fn consent -> %ConsentGiven{id: consent.user_id, document: consent.document, version: consent.version, accepted: consent.accepted} end)
+    |> Store.ok("user", fn consent ->
+      %ConsentGiven{id: consent.user_id, document: consent.document, version: consent.version, accepted: consent.accepted}
+    end)
   end
 
   @doc """
@@ -44,7 +46,9 @@ defmodule PremiereEcoute.Accounts.User.Consent do
       nil -> create(%{user_id: id, document: String.to_existing_atom(document), version: version, accepted: false})
       consent -> __MODULE__.update(consent, %{version: version, accepted: false})
     end
-        |> Store.ok("user", fn consent -> %ConsentGiven{id: consent.user_id, document: consent.document, version: consent.version, accepted: consent.accepted} end)
+    |> Store.ok("user", fn consent ->
+      %ConsentGiven{id: consent.user_id, document: consent.document, version: consent.version, accepted: consent.accepted}
+    end)
   end
 
   @doc """

@@ -1,0 +1,108 @@
+<div class="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
+  <div class="max-w-2xl w-full">
+    <div class="bg-gray-800 rounded-xl p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-4">
+          {gettext("Welcome to Premiere Ecoute")}
+        </h1>
+        <p class="text-gray-400">
+          {gettext("Please review and accept our terms to continue")}
+        </p>
+      </div>
+
+      <form phx-submit="accept_terms" class="space-y-6">
+        <!-- Legal Documents with Integrated Checkboxes -->
+        <div class="space-y-4">
+          <label class="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700 cursor-pointer hover:bg-gray-900/70 transition-colors">
+            <div class="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                required
+                name="consent[terms]"
+                value="true"
+                checked={@consent_form["terms"] == "true"}
+                class="text-purple-600 border-gray-600 bg-gray-700 rounded"
+              />
+              <span class="text-white font-medium">
+                {gettext("I have read and agree to the Terms of Use")}
+                <span class="text-red-400">*</span>
+              </span>
+            </div>
+            <a
+              href="/legal/terms"
+              target="_blank"
+              class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
+            >
+              {gettext("Read")} ↗
+            </a>
+          </label>
+
+          <label class="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700 cursor-pointer hover:bg-gray-900/70 transition-colors">
+            <div class="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                required
+                name="consent[privacy]"
+                value="true"
+                checked={@consent_form["privacy"] == "true"}
+                class="text-purple-600 border-gray-600 bg-gray-700 rounded"
+              />
+              <span class="text-white font-medium">
+                {gettext("I have read and agree to the Privacy Policy")}
+                <span class="text-red-400">*</span>
+              </span>
+            </div>
+            <a
+              href="/legal/privacy"
+              target="_blank"
+              class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
+            >
+              {gettext("Read")} ↗
+            </a>
+          </label>
+
+          <label class="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700 cursor-pointer hover:bg-gray-900/70 transition-colors">
+            <div class="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                required
+                name="consent[cookies]"
+                value="true"
+                checked={@consent_form["cookies"] == "true"}
+                class="text-purple-600 border-gray-600 bg-gray-700 rounded"
+              />
+              <span class="text-white font-medium">
+                {gettext("I have read and agree to the Cookies Policy")}
+                <span class="text-red-400">*</span>
+              </span>
+            </div>
+            <a
+              href="/legal/cookies"
+              target="_blank"
+              class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
+            >
+              {gettext("Read")} ↗
+            </a>
+          </label>
+        </div>
+        
+<!-- Action Buttons -->
+        <div class="flex space-x-4 pt-6">
+          <button
+            type="button"
+            phx-click="decline_terms"
+            class="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+          >
+            {gettext("Decline")}
+          </button>
+          <button
+            type="submit"
+            class="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+          >
+            {gettext("Accept & Continue")}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

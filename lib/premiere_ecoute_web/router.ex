@@ -72,6 +72,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/register", UserRegistrationLive, :new
       live "/log-in", UserLoginLive, :new
       live "/log-in/:token", UserConfirmationLive, :new
+      live "/terms-acceptance", TermsAcceptanceLive, :index
     end
 
     post "/log-in", UserSessionController, :create
@@ -139,6 +140,7 @@ defmodule PremiereEcouteWeb.Router do
 
     get "/:provider", AuthController, :request
     get "/:provider/callback", AuthController, :callback
+    get "/:provider/complete", AuthController, :complete
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do
