@@ -47,12 +47,15 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> validate_required([])
   end
 
-  def create(%User{id: id} = user, provider, %{expires_in: expires_in} = attrs) do
-    %__MODULE__{}
+  def create(%User{id: id} = user, provider, %{user_id: user_id, expires_in: expires_in} = attrs) do
+    case get_by(provider: provider, user_id: user_id) do
+      nil -> %__MODULE__{}
+      token -> token
+    end
     |> changeset(
       Map.merge(attrs, %{parent_id: id, provider: provider, expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)})
     )
-    |> Repo.insert()
+    |> Repo.insert_or_update()
     |> Store.ok("user", fn token -> %AccountAssociated{id: token.parent_id, provider: token.provider, user_id: token.user_id} end)
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
@@ -65,8 +68,14 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 
-  def disconnect(%User{} = user, provider) do
-    refresh(user, provider, %{access_token: nil, refresh_token: nil, expires_at: nil})
+  def disconnect(%User{id: id} = user, provider) do
+    case Repo.get_by(__MODULE__, parent_id: id, provider: provider) do
+      nil -> {:ok, nil}
+      token -> Repo.delete(token)
+    end
+    |> then(fn {status, _token} -> {status, User.preload(user)} end)
+
+    # refresh(user, provider, %{access_token: nil, refresh_token: nil, expires_at: nil})
   end
 
   def delete_all_tokens(%User{id: id} = user) do

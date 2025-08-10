@@ -22,7 +22,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
   def left_sidebar(assigns) do
     ~H"""
     <%= if @current_user do %>
-      <!-- AIDEV-NOTE: Left sidebar navigation - only shown to authenticated users -->
       <aside class="w-64 flex flex-col border-r" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
         <!-- Scrollable content area -->
         <div class="flex-1 overflow-y-auto">
@@ -61,44 +60,48 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
             <% end %>
             
     <!-- Followed Channels section -->
-            <%= if @current_user && has_loaded_channels?(@current_user) && !Enum.empty?(@current_user.channels) do %>
-              <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-user-group" class="w-4 h-4 mr-2" />
-                  {gettext("Followed Channels")}
-                </h3>
-                <nav class="space-y-1">
-                  <%= for channel <- @current_user.channels |> Enum.take(10) do %>
-                    <.sidebar_channel_link channel={channel} />
-                  <% end %>
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:follow_channels, for: @current_user) do %>
+              <%= if has_loaded_channels?(@current_user) && !Enum.empty?(@current_user.channels) do %>
+                <div class="mb-6">
+                  <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                    <.icon name="hero-user-group" class="w-4 h-4 mr-2" />
+                    {gettext("Followed Channels")}
+                  </h3>
+                  <nav class="space-y-1">
+                    <%= for channel <- @current_user.channels |> Enum.take(10) do %>
+                      <.sidebar_channel_link channel={channel} />
+                    <% end %>
 
-                  <%= if has_loaded_channels?(@current_user) && length(@current_user.channels) > 10 do %>
-                    <.sidebar_link
-                      href={~p"/users/follows"}
-                      current_page={@current_page}
-                      page_id="all_follows"
-                      icon="hero-ellipsis-horizontal"
-                      class="text-sm"
-                    >
-                      {gettext("View all")} ({if has_loaded_channels?(@current_user), do: length(@current_user.channels), else: "..."})
-                    </.sidebar_link>
-                  <% end %>
-                </nav>
-              </div>
-            <% else %>
-              <!-- Empty state for no followed channels -->
-              <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-user-group" class="w-4 h-4 mr-2" />
-                  {gettext("Followed Channels")}
-                </h3>
-                <div class="text-sm text-gray-500 p-3 border rounded-lg" style="border-color: var(--color-dark-700);">
-                  <p class="mb-2">{gettext("No followed channels yet")}</p>
-                  <.link href={~p"/users/follows"} class="text-purple-400 hover:text-purple-300 underline">
-                    {gettext("Discover streamers")}
-                  </.link>
+                    <%= if has_loaded_channels?(@current_user) && length(@current_user.channels) > 10 do %>
+                      <.sidebar_link
+                        href={~p"/users/follows"}
+                        current_page={@current_page}
+                        page_id="all_follows"
+                        icon="hero-ellipsis-horizontal"
+                        class="text-sm"
+                      >
+                        {gettext("View all")} ({if has_loaded_channels?(@current_user),
+                          do: length(@current_user.channels),
+                          else: "..."})
+                      </.sidebar_link>
+                    <% end %>
+                  </nav>
                 </div>
-              </div>
+              <% else %>
+                <!-- Empty state for no followed channels -->
+                <div class="mb-6">
+                  <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                    <.icon name="hero-user-group" class="w-4 h-4 mr-2" />
+                    {gettext("Followed Channels")}
+                  </h3>
+                  <div class="text-sm text-gray-500 p-3 border rounded-lg" style="border-color: var(--color-dark-700);">
+                    <p class="mb-2">{gettext("No followed channels yet")}</p>
+                    <.link href={~p"/users/follows"} class="text-purple-400 hover:text-purple-300 underline">
+                      {gettext("Discover streamers")}
+                    </.link>
+                  </div>
+                </div>
+              <% end %>
             <% end %>
           </div>
         </div>

@@ -47,6 +47,30 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
                expires_at: _
              } = user.spotify
     end
+
+    test "can recreate oauth tokens for an user", %{user: user} do
+      {:ok, user} = OauthToken.create(user, :twitch, @twitch_token)
+      {:ok, user} = OauthToken.create(user, :twitch, @twitch_token)
+      {:ok, user} = OauthToken.create(user, :spotify, @spotify_token)
+
+      assert %OauthToken{
+               provider: :twitch,
+               user_id: "twitch_user_id",
+               username: "twitch_username",
+               access_token: "twitch_access_token",
+               refresh_token: "twitch_refresh_token",
+               expires_at: _
+             } = user.twitch
+
+      assert %OauthToken{
+               provider: :spotify,
+               user_id: "spotify_user_id",
+               username: "spotify_username",
+               access_token: "spotify_access_token",
+               refresh_token: "spotify_refresh_token",
+               expires_at: _
+             } = user.spotify
+    end
   end
 
   describe "refresh/1" do
@@ -99,40 +123,17 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
       {:ok, user} = OauthToken.disconnect(user, :twitch)
       {:ok, user} = OauthToken.disconnect(user, :spotify)
 
-      assert %OauthToken{
-               provider: :twitch,
-               user_id: "twitch_user_id",
-               username: "twitch_username",
-               access_token: nil,
-               refresh_token: nil,
-               expires_at: nil
-             } = user.twitch
-
-      assert %OauthToken{
-               provider: :spotify,
-               user_id: "spotify_user_id",
-               username: "spotify_username",
-               access_token: nil,
-               refresh_token: nil,
-               expires_at: nil
-             } = user.spotify
+      assert user.twitch == nil
+      assert user.spotify == nil
     end
 
-    test "cannnot delete non-existing oauth tokens for an user", %{user: user} do
+    test "can delete non-existing oauth tokens for an user", %{user: user} do
       {:ok, user} = OauthToken.create(user, :twitch, @twitch_token)
 
       {:ok, user} = OauthToken.disconnect(user, :twitch)
-      {:error, %User{}} = OauthToken.disconnect(user, :spotify)
+      {:ok, user} = OauthToken.disconnect(user, :spotify)
 
-      assert %OauthToken{
-               provider: :twitch,
-               user_id: "twitch_user_id",
-               username: "twitch_username",
-               access_token: nil,
-               refresh_token: nil,
-               expires_at: nil
-             } = user.twitch
-
+      assert user.twitch == nil
       assert user.spotify == nil
     end
   end

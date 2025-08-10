@@ -454,7 +454,7 @@ msgstr "Tentativo di riconnessione"
 msgid "Log Out"
 msgstr "Disconnetti"
 
-#: lib/premiere_ecoute_web/components/sidebar.ex:48
+#: lib/premiere_ecoute_web/components/sidebar.ex:47
 #, elixir-autogen, elixir-format
 msgid "My Sessions"
 msgstr "Le Mie Sessioni"
@@ -910,7 +910,7 @@ msgstr "Mese"
 msgid "No albums listened during this period"
 msgstr "Nessun album ascoltato durante questo periodo"
 
-#: lib/premiere_ecoute_web/components/sidebar.ex:57
+#: lib/premiere_ecoute_web/components/sidebar.ex:56
 #, elixir-autogen, elixir-format
 msgid "Retrospective"
 msgstr "Retrospettiva"
@@ -955,7 +955,7 @@ msgstr "Home"
 msgid "Homepage"
 msgstr "Homepage"
 
-#: lib/premiere_ecoute_web/components/sidebar.ex:35
+#: lib/premiere_ecoute_web/components/sidebar.ex:34
 #, elixir-autogen, elixir-format
 msgid "My Activities"
 msgstr "Le Mie Attività"
@@ -1186,7 +1186,7 @@ msgstr "Account di servizi collegati"
 msgid "Delete My Account"
 msgstr "Elimina Account"
 
-#: lib/premiere_ecoute_web/components/sidebar.ex:98
+#: lib/premiere_ecoute_web/components/sidebar.ex:100
 #, elixir-autogen, elixir-format
 msgid "Discover streamers"
 msgstr "Scopri streamer"
@@ -1218,7 +1218,7 @@ msgid "Export includes:"
 msgstr "L'esportazione include:"
 
 #: lib/premiere_ecoute_web/components/sidebar.ex:68
-#: lib/premiere_ecoute_web/components/sidebar.ex:93
+#: lib/premiere_ecoute_web/components/sidebar.ex:95
 #, elixir-autogen, elixir-format
 msgid "Followed Channels"
 msgstr "Canali seguiti"
@@ -1263,12 +1263,12 @@ msgstr "Membro dal"
 msgid "New Listening Session"
 msgstr "Sessione di Ascolto"
 
-#: lib/premiere_ecoute_web/components/sidebar.ex:44
+#: lib/premiere_ecoute_web/components/sidebar.ex:43
 #, elixir-autogen, elixir-format, fuzzy
 msgid "New Session"
 msgstr "Sessioni dal Vivo"
 
-#: lib/premiere_ecoute_web/components/sidebar.ex:96
+#: lib/premiere_ecoute_web/components/sidebar.ex:98
 #, elixir-autogen, elixir-format
 msgid "No followed channels yet"
 msgstr "Nessun canale seguito ancora"

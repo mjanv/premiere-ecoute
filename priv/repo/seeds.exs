@@ -6,6 +6,9 @@ defmodule Seeds do
   def token(n \\ 32), do: Base.url_encode64(:crypto.strong_rand_bytes(n), padding: false)
 end
 
+# Feature flags
+PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
+
 # Accounts
 Logger.info(IO.ANSI.green() <> IO.ANSI.bright() <> "Accounts:" <> IO.ANSI.reset())
 

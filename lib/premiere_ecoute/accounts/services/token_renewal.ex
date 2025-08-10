@@ -12,8 +12,8 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
   alias PremiereEcoute.Apis
 
   def maybe_renew_token(conn, provider) do
-    with %Scope{user: %User{twitch: %{expires_at: expires_at, refresh_token: refresh_token}} = user} = scope <-
-           conn.assigns[:current_scope],
+    with %Scope{user: %User{} = user} = scope <- conn.assigns[:current_scope],
+         %{expires_at: expires_at, refresh_token: refresh_token} <- Map.get(user, provider),
          true <- token_expired?(expires_at),
          {:ok, tokens} <- Apis.provider(provider).renew_token(refresh_token),
          {:ok, user} <- User.refresh_token(user, provider, tokens) do
