@@ -3,8 +3,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.Scores.Poll
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.Scores.Poll
   alias PremiereEcoute.Sessions.Scores.Vote
 
   describe "generate/1" do
@@ -107,8 +107,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
       {:ok, report} = Report.generate(session)
 
       assert report.session_id == session.id
-      assert report.unique_votes == 19
-      assert report.unique_voters == 14
+      assert report.session_summary.unique_votes == 19
+      assert report.session_summary.unique_voters == 14
 
       session_summary = report.session_summary
       assert session_summary.tracks_rated == 2
@@ -233,8 +233,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
       {:ok, report} = Report.generate(session)
 
       assert report.session_id == session.id
-      assert report.unique_votes == 19
-      assert report.unique_voters == 14
+      assert report.session_summary.unique_votes == 19
+      assert report.session_summary.unique_voters == 14
 
       assert report.session_summary.tracks_rated == 2
       assert report.session_summary.viewer_score == "smash"
@@ -362,8 +362,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
       assert length(Report.all(where: [session_id: session.id])) == 1
 
       assert report.session_id == session.id
-      assert report.unique_votes == 19
-      assert report.unique_voters == 14
+      assert report.session_summary.unique_votes == 19
+      assert report.session_summary.unique_voters == 14
 
       session_summary = report.session_summary
       assert session_summary.tracks_rated == 2

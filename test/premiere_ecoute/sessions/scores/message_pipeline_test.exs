@@ -49,10 +49,11 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
       report = Report.get_by(session_id: session.id)
 
       assert %PremiereEcoute.Sessions.Retrospective.Report{
-               unique_votes: ^n,
                polls: [],
                session_id: _,
                session_summary: %{
+                 "unique_votes" => ^n,
+                 "unique_voters" => ^n,
                  "streamer_score" => +0.0,
                  "tracks_rated" => 1,
                  "viewer_score" => ^average
@@ -66,7 +67,6 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
                    "viewer_score" => ^average
                  }
                ],
-               unique_voters: ^n,
                votes: _
              } = report
     end

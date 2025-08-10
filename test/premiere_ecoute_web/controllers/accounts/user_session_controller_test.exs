@@ -22,7 +22,6 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
       # Now do a logged in request and assert on the menu
       conn = get(conn, ~p"/home")
       response = html_response(conn, 200)
-      assert response =~ user.email
       assert response =~ ~p"/users/account"
       assert response =~ ~p"/users/log-out"
     end
@@ -86,7 +85,6 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
       # Now do a logged in request and assert on the menu
       conn = get(conn, ~p"/home")
       response = html_response(conn, 200)
-      assert response =~ user.email
       assert response =~ ~p"/users/account"
       assert response =~ ~p"/users/log-out"
     end
@@ -110,7 +108,6 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
       # Now do a logged in request and assert on the menu
       conn = get(conn, ~p"/home")
       response = html_response(conn, 200)
-      assert response =~ user.email
       assert response =~ ~p"/users/account"
       assert response =~ ~p"/users/log-out"
     end

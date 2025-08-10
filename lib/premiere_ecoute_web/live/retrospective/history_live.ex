@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
+defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
   @moduledoc """
   LiveView for the streamer dashboard showing albums listened in time periods as a cover wall.
   """
@@ -68,7 +68,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
     # Build new URL with updated parameters
     url_params = build_params(period, year, month)
-    {:noreply, push_patch(socket, to: ~p"/sessions/wrapped/retrospective?#{url_params}")}
+    {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{url_params}")}
   end
 
   @impl true
@@ -102,7 +102,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
       end
 
     params = build_params(socket.assigns.selected_period, new_date.year, new_date.month)
-    {:noreply, push_patch(socket, to: ~p"/sessions/wrapped/retrospective?#{params}")}
+    {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{params}")}
   end
 
   @impl true
@@ -110,7 +110,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     new_period = if socket.assigns.selected_period == :month, do: :year, else: :month
 
     params = build_params(new_period, socket.assigns.selected_year, socket.assigns.selected_month)
-    {:noreply, push_patch(socket, to: ~p"/sessions/wrapped/retrospective?#{params}")}
+    {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{params}")}
   end
 
   # Private helper functions

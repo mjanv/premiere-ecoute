@@ -21,8 +21,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
     create index(:polls, [:track_id])
 
     create table(:reports) do
-      add :unique_votes, :integer, null: false, default: 0
-      add :unique_voters, :integer, null: false, default: 0
       add :session_summary, :map, null: false, default: %{}
       add :track_summaries, {:array, :map}, null: false, default: []
 
@@ -32,5 +30,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateScoreSystemTables do
     end
 
     create unique_index(:reports, [:session_id], name: :reports_session_id_unique_index)
+    execute("CREATE INDEX report_summary ON reports USING GIN(session_summary)")
   end
 end

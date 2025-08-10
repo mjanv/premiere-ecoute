@@ -49,7 +49,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   </.sidebar_link>
 
                   <.sidebar_link
-                    href={~p"/sessions/wrapped/retrospective"}
+                    href={~p"/retrospective/history"}
                     current_page={@current_page}
                     page_id="retrospective"
                     icon="hero-chart-bar"

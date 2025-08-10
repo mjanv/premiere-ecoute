@@ -49,11 +49,10 @@ defmodule PremiereEcouteCore.Aggregate do
       # Read operations
       def get(id), do: preload(Repo.get(__MODULE__, id))
       def get_by(query \\ __MODULE__, clauses), do: preload(Repo.get_by(query, clauses))
+      def exists?(entity), do: !is_nil(get_by(Map.take(entity, unquote(identity))))
       def all(clauses \\ []), do: Repo.all(all_query(clauses))
       def all_by(query \\ __MODULE__, clauses), do: preload(Repo.all_by(query, clauses))
-
-      def page(clauses \\ [], page, page_size \\ 1),
-        do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
+      def page(clauses \\ [], page, page_size \\ 1), do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
 
       defp all_query(clauses \\ []) do
         __MODULE__

@@ -146,16 +146,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       report = Report.get_by(session_id: session.id)
 
       assert %PremiereEcoute.Sessions.Retrospective.Report{
-               unique_votes: 0,
                polls: [],
                session_id: session_id,
                session_summary: %{
+                 "unique_votes" => 0,
+                 "unique_voters" => 0,
                  "streamer_score" => +0.0,
                  "tracks_rated" => 0,
                  "viewer_score" => +0.0
                },
                track_summaries: [],
-               unique_voters: 0,
                votes: []
              } = report
 
@@ -337,16 +337,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert session.status == :stopped
 
       assert %PremiereEcoute.Sessions.Retrospective.Report{
-               unique_votes: 0,
                polls: [],
                session_id: session_id,
                session_summary: %{
+                 "unique_votes" => 0,
+                 "unique_voters" => 0,
                  "streamer_score" => +0.0,
                  "tracks_rated" => 0,
                  "viewer_score" => +0.0
                },
                track_summaries: [],
-               unique_voters: 0,
                votes: []
              } = report
 

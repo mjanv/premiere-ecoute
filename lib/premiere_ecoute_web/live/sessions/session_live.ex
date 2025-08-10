@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   require Logger
 
   alias PremiereEcoute.Events.Chat.MessageSent
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
@@ -38,7 +39,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         |> assign(:show, %{votes: true, scores: true})
         |> assign(:user_current_rating, nil)
         |> assign(:report, nil)
-        # AIDEV-NOTE: Default overlay score type
         |> assign(:overlay_score_type, "streamer")
         |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
         |> then(fn socket -> {:ok, socket} end)
@@ -47,7 +47,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_params(_params, url, socket) do
-    # AIDEV-NOTE: Extract current path for locale switcher
     current_path = URI.parse(url).path || "/"
     {:noreply, assign(socket, :current_path, current_path)}
   end
@@ -84,7 +83,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     {:noreply, assign(socket, :show, Map.update!(assigns.show, String.to_existing_atom(flag), fn v -> !v end))}
   end
 
-  # AIDEV-NOTE: Handle overlay score type selection change
   @impl true
   def handle_event("change_overlay_score_type", params, socket) do
     score_type = params["score_type"] || params[:score_type] || "streamer"
@@ -101,17 +99,17 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_event("copy_overlay_url", _params, socket) do
     overlay_url = build_overlay_url(socket)
 
-    {:noreply,
-     socket
-     |> push_event("copy_to_clipboard", %{text: overlay_url})
-     |> put_flash(:info, "Overlay URL copied to clipboard!")}
+    socket
+    |> push_event("copy_to_clipboard", %{text: overlay_url})
+    |> put_flash(:info, "Overlay URL copied to clipboard!")
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
   def handle_event("vote_track", %{"rating" => rating}, socket) do
     user_id = socket.assigns.current_scope.user.twitch.user_id
 
-    PremiereEcouteCore.dispatch(%MessageSent{
+    Sessions.publish_message(%MessageSent{
       broadcaster_id: user_id,
       user_id: user_id,
       message: rating,
@@ -219,19 +217,13 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   def session_total_votes(nil), do: 0
-  def session_total_votes(report), do: report.unique_votes || 0
+  def session_total_votes(report), do: report.session_summary["unique_votes"]
 
   def session_unique_voters(nil), do: 0
-  def session_unique_voters(report), do: report.unique_voters || 0
+  def session_unique_voters(report), do: report.session_summary["unique_voters"]
 
   def session_tracks_rated(nil), do: 0
-
-  def session_tracks_rated(report) do
-    case report.session_summary do
-      %{"tracks_rated" => count} when is_integer(count) -> count
-      _ -> 0
-    end
-  end
+  def session_tracks_rated(report), do: report.session_summary["tracks_rated"]
 
   def vote_type_display(nil), do: "0-10"
 
@@ -246,18 +238,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   def vote_type_display(_), do: "0-10"
 
-  def session_vote_options(nil), do: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-
-  def session_vote_options(%{vote_options: vote_options}) when is_list(vote_options) do
-    # For the voting interface, we need to filter out "0" if it exists since it's typically not used for voting
-    case vote_options do
-      # Remove "0" for voting interface
-      ["0" | rest] -> rest
-      options -> options
-    end
-  end
-
-  def session_vote_options(_), do: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+  def session_vote_options(nil), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+  def session_vote_options(%{vote_options: vote_options}) when is_list(vote_options), do: vote_options
 
   def session_streamer_score(nil), do: "N/A"
 
@@ -310,7 +292,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         end)
       end)
 
-    # Combine both distributions and ensure all session vote options are present
     for rating <- session_vote_options(session) do
       individual_count = Map.get(individual_distribution, rating, 0)
       poll_count = Map.get(poll_distribution, rating, 0)
@@ -348,47 +329,30 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       total_options <= 5 ->
         # For 1-5 scale, use yellow to green gradient
         case index do
-          # 1st option
           0 -> "bg-red-500"
-          # 2nd option
           1 -> "bg-orange-500"
-          # 3rd option
           2 -> "bg-yellow-500"
-          # 4th option
           3 -> "bg-green-400"
-          # 5th option
           4 -> "bg-green-500"
           _ -> "bg-blue-400"
         end
 
       total_options <= 10 ->
-        # For larger scales like 0-10, use full gradient
         case index do
-          # 1st option
           0 -> "bg-red-600"
-          # 2nd option
           1 -> "bg-red-500"
-          # 3rd option
           2 -> "bg-red-400"
-          # 4th option
           3 -> "bg-orange-500"
-          # 5th option
           4 -> "bg-yellow-500"
-          # 6th option
           5 -> "bg-yellow-400"
-          # 7th option
           6 -> "bg-green-400"
-          # 8th option
           7 -> "bg-blue-400"
-          # 9th option
           8 -> "bg-blue-500"
-          # 10th option
           9 -> "bg-blue-600"
           _ -> "bg-purple-400"
         end
 
       true ->
-        # For custom options with many choices, cycle through colors
         colors = [
           "bg-red-500",
           "bg-orange-500",

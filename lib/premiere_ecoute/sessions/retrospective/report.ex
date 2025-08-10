@@ -14,6 +14,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   alias PremiereEcoute.Sessions.Scores.Vote
 
   @type session_summary :: %{
+          unique_votes: integer(),
+          unique_voters: integer(),
           viewer_score: float() | String.t(),
           streamer_score: float() | String.t(),
           tracks_rated: integer()
@@ -21,17 +23,15 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
 
   @type track_summary :: %{
           track_id: integer(),
+          unique_votes: integer(),
+          unique_voters: integer(),
           viewer_score: float() | String.t(),
           streamer_score: float() | String.t(),
-          unique_votes: integer(),
-          poll_count: integer(),
-          unique_voters: integer()
+          poll_count: integer()
         }
 
   @type t :: %__MODULE__{
           id: integer(),
-          unique_votes: integer(),
-          unique_voters: integer(),
           session_summary: session_summary(),
           track_summaries: [track_summary()],
           session_id: integer(),
@@ -43,8 +43,6 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
         }
 
   schema "reports" do
-    field :unique_votes, :integer
-    field :unique_voters, :integer
     field :session_summary, :map
     field :track_summaries, {:array, :map}
 
@@ -59,15 +57,11 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   def changeset(report, attrs) do
     report
     |> cast(attrs, [
-      :unique_votes,
-      :unique_voters,
       :session_summary,
       :track_summaries,
       :session_id
     ])
     |> validate_required([:session_id])
-    |> validate_number(:unique_votes, greater_than_or_equal_to: 0)
-    |> validate_number(:unique_voters, greater_than_or_equal_to: 0)
     |> foreign_key_constraint(:session_id)
   end
 
@@ -99,11 +93,17 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
 
     session_stats = calculate_session_stats(session_id)
 
+    session_summary =
+      session
+      |> calculate_session_summary(votes, polls)
+      |> Map.merge(%{
+        unique_votes: session_stats.unique_votes,
+        unique_voters: session_stats.unique_voters
+      })
+
     attrs = %{
       session_id: session_id,
-      unique_votes: session_stats.unique_votes,
-      unique_voters: session_stats.unique_voters,
-      session_summary: calculate_session_summary(session, votes, polls),
+      session_summary: session_summary,
       track_summaries: calculate_track_summaries(session, votes, polls)
     }
 

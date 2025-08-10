@@ -82,6 +82,7 @@ config :premiere_ecoute, Oban,
     Oban.Plugins.Reindexer,
     {Oban.Plugins.Cron,
      crontab: [
+       {"@reboot", PremiereEcoute.Apis.Workers.RenewTwitchTokens},
        {"@reboot", PremiereEcoute.Apis.Workers.RenewSpotifyTokens}
      ]}
   ]

@@ -1,11 +1,11 @@
-defmodule PremiereEcoute.Apis.Workers.RenewSpotifyTokens do
+defmodule PremiereEcoute.Apis.Workers.RenewTwitchTokens do
   @moduledoc false
 
-  use PremiereEcouteCore.Worker, queue: :spotify, max_attempts: 20
+  use PremiereEcouteCore.Worker, queue: :twitch, max_attempts: 20
 
   require Logger
 
-  alias PremiereEcoute.Apis.SpotifyApi.Accounts
+  alias PremiereEcoute.Apis.TwitchApi.Accounts
 
   @impl true
   def perform(%Oban.Job{args: args, attempt: attempt}) do
@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Apis.Workers.RenewSpotifyTokens do
         :ok
 
       {:error, _} ->
-        Logger.error("Spotify tokens renewal failed. Attempt #{attempt}/20 Will retry in 10 seconds.")
+        Logger.error("Twitch tokens renewal failed. Attempt #{attempt}/20 Will retry in 10 seconds.")
         {:snooze, 10}
     end
   end

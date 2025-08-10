@@ -35,6 +35,16 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_session
   end
 
+  pipeline :app do
+    plug :accepts, ["html"]
+    plug :put_secure_browser_headers
+    plug :auth
+  end
+
+  defp auth(conn, _opts) do
+    Plug.BasicAuth.basic_auth(conn, Application.get_env(:premiere_ecoute, :feature_flags))
+  end
+
   scope "/" do
     storybook_assets()
   end
@@ -45,8 +55,6 @@ defmodule PremiereEcouteWeb.Router do
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
     end
-
-    live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
   end
 
   scope "/", PremiereEcouteWeb do
@@ -97,10 +105,17 @@ defmodule PremiereEcouteWeb.Router do
     live_session :sessions, on_mount: [{UserAuth, :streamer}] do
       live "/", SessionsLive, :index
       live "/:id", SessionLive, :show
-      live "/wrapped/retrospective", RetrospectiveLive, :index
     end
 
     live "/:id/overlay", OverlayLive, :show
+  end
+
+  scope "/retrospective", PremiereEcouteWeb.Retrospective do
+    pipe_through [:browser]
+
+    live_session :retrospective, on_mount: [{UserAuth, :streamer}] do
+      live "/history", HistoryLive, :index
+    end
   end
 
   scope "/admin", PremiereEcouteWeb.Admin do
@@ -148,6 +163,12 @@ defmodule PremiereEcouteWeb.Router do
     get "/contact", LegalController, :contact
   end
 
+  scope "/feature-flags" do
+    pipe_through [:app]
+
+    forward "/", FunWithFlags.UI.Router, namespace: "feature-flags"
+  end
+
   if Application.compile_env(:premiere_ecoute, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 
@@ -156,6 +177,7 @@ defmodule PremiereEcouteWeb.Router do
 
       live_dashboard "/dashboard", metrics: PremiereEcouteWeb.Telemetry
       oban_dashboard("/oban")
+      live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end

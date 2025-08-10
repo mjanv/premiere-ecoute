@@ -15,11 +15,7 @@
           <div class="flex items-center space-x-4">
             <div class="relative">
               <div class="w-16 h-16 bg-gradient-primary-diagonal rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                <%= if @current_user && @current_user.twitch do %>
-                  {String.first(@current_user.twitch.username) |> String.upcase()}
-                <% else %>
-                  {String.first(@current_user.email || "U") |> String.upcase()}
-                <% end %>
+                {@current_user.username |> String.first() |> String.upcase()}
               </div>
               <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
                 <div class="w-2 h-2 bg-white rounded-full"></div>
@@ -27,11 +23,7 @@
             </div>
             <div class="text-right">
               <p class="text-white font-semibold text-lg">
-                <%= if @current_user && @current_user.twitch do %>
-                  {@current_user.twitch.username}
-                <% else %>
-                  {String.replace(@current_user.email || "User", "@twitch.tv", "")}
-                <% end %>
+                {@current_user.username}
               </p>
               <p class="text-gray-400 text-sm">
                 {gettext("Member since")} {Calendar.strftime(@current_user.inserted_at, "%B %Y")}
@@ -78,11 +70,7 @@
               <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Twitch Username")}</label>
               <div class="px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700">
                 <p class="text-white">
-                  <%= if @current_user && @current_user.twitch do %>
-                    {@current_user.twitch.username}
-                  <% else %>
-                    <span class="text-gray-400">{gettext("Not connected")}</span>
-                  <% end %>
+                  {@current_user.username}
                 </p>
               </div>
             </div>
@@ -222,8 +210,6 @@
                         <p class="text-gray-300">
                           {gettext("Username")}: <span class="text-white font-medium">{@current_user.twitch.username}</span>
                         </p>
-                      <% end %>
-                      <%= if @current_user.twitch do %>
                         <p class="text-gray-300">
                           {gettext("User ID")}: <span class="text-white font-mono text-xs">{@current_user.twitch.user_id}</span>
                         </p>
@@ -300,7 +286,7 @@
                 </div>
               </div>
 
-              <%= if @current_user && @current_user.spotify.access_token do %>
+              <%= if @current_user && @current_user.spotify && @current_user.spotify.access_token do %>
                 <button
                   phx-click="disconnect_spotify"
                   class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors border border-red-500/20 hover:border-red-400/30"

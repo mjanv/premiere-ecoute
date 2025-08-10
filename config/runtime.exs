@@ -21,6 +21,10 @@ config :premiere_ecoute,
   twitch_webhook_callback_url: env!("TWITCH_WEBHOOK_CALLBACK_URL"),
   twitch_eventsub_secret: env!("TWITCH_WEBHOOK_SECRET")
 
+config :premiere_ecoute, :feature_flags,
+  username: env!("AUTH_USERNAME"),
+  password: env!("AUTH_PASSWORD")
+
 config :premiere_ecoute, PremiereEcoute.Repo,
   schema: "public",
   database: env!("POSTGRES_DATABASE", :string, "premiere_ecoute_#{config_env()}"),
