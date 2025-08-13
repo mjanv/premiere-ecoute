@@ -13,7 +13,7 @@ defmodule PremiereEcouteCore.Supervisor do
   def init(_args) do
     children = [
       {Cache, name: :sessions},
-      {Cache, name: :polls},
+      {Cache, name: :subscriptions},
       {Cache, name: :tokens},
       {Cache, name: :users}
     ]

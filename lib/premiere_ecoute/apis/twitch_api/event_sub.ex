@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
       subscriptions
       |> Enum.map(fn s -> Map.take(s, ["id", "type"]) end)
       |> Enum.map(fn s ->
-        Cache.put(:polls, {user_id, s["type"]}, s["id"])
+        Cache.put(:subscriptions, {user_id, s["type"]}, s["id"])
         s
       end)
     end)
@@ -37,13 +37,13 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
       }
     )
     |> TwitchApi.handle(202, fn %{"data" => [%{"id" => id} = poll | _]} ->
-      Cache.put(:polls, {user_id, type}, id)
+      Cache.put(:subscriptions, {user_id, type}, id)
       poll
     end)
   end
 
   def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
-    case Cache.get(:polls, {user_id, type}) do
+    case Cache.get(:subscriptions, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
         scope
         |> TwitchApi.api()

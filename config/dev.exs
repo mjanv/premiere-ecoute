@@ -4,8 +4,8 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [
     api: PremiereEcoute.Apis.TwitchApi,
     urls: [
-      # api: "http://localhost:4001",
-      api: "https://api.twitch.tv/helix",
+      api: "http://localhost:4001",
+      # api: "https://api.twitch.tv/helix",
       accounts: "https://id.twitch.tv/oauth2"
     ]
   ],

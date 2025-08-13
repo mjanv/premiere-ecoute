@@ -71,7 +71,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
       album_id: data["track"]["album"]["id"],
       user_id: data["added_by"]["id"],
       name: data["track"]["name"],
-      artist: Parser.parse_primary_artist(data["artists"]),
+      artist: Parser.parse_primary_artist(data["track"]["artists"]),
       duration_ms: data["track"]["duration_ms"] || 0,
       added_at: NaiveDateTime.from_iso8601!(data["added_at"])
     }

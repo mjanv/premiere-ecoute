@@ -181,6 +181,18 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
     json(conn, 200, data([], %{"total" => 0}))
   end
 
+  get "/users" do
+    case get_req_header(conn, "authorization") do
+      ["Bearer " <> token] ->
+        json(conn, 200, data(user(token), %{}))
+
+      _ ->
+        conn
+        |> put_status(401)
+        |> json(401, %{"error" => "Unauthorized", "status" => 401, "message" => "Invalid access token"})
+    end
+  end
+
   defp no_content(conn) do
     conn
     |> put_resp_content_type("application/json")
@@ -195,6 +207,48 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
 
   defp data(payload, root) when is_list(payload), do: %{"data" => payload} |> Map.merge(root)
   defp data(payload, root), do: %{"data" => [payload]} |> Map.merge(root)
+
+  defp user(_token) do
+    alias PremiereEcoute.Accounts.User
+    alias PremiereEcoute.Repo
+
+    case Repo.get_by(User, username: "lanfeust313") do
+      nil -> lanfeust_313()
+      _user -> bot()
+    end
+  end
+
+  defp lanfeust_313 do
+    %{
+      "id" => "123456",
+      "login" => "lanfeust313",
+      "display_name" => "Lanfeust313",
+      "email" => "lanfeust313@twitch.fr",
+      "type" => "",
+      "broadcaster_type" => "affiliate",
+      "description" => "Streamer and developer passionate about music discovery",
+      "profile_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/lanfeust313-profile_image-300x300.png",
+      "offline_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/lanfeust313-channel_offline_image-1920x1080.png",
+      "view_count" => 42_530,
+      "created_at" => "2016-03-15T10:30:00.000Z"
+    }
+  end
+
+  defp bot do
+    %{
+      "id" => "789012",
+      "login" => "premiereecoutebot",
+      "display_name" => "PremiereEcouteBot",
+      "email" => "maxime.janvier+premiereecoute@gmail.com",
+      "type" => "",
+      "broadcaster_type" => "",
+      "description" => "Bot for Premiere Ecoute music listening sessions",
+      "profile_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/premiereecoutebot-profile_image-300x300.png",
+      "offline_image_url" => "",
+      "view_count" => 0,
+      "created_at" => "2024-01-10T14:20:00.000Z"
+    }
+  end
 
   defp send_webhook_notification(event_type, event_data) do
     # AIDEV-NOTE: Extract broadcaster_user_id from event_data for webhook condition
