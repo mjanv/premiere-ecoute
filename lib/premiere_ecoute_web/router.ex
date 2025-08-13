@@ -51,6 +51,9 @@ defmodule PremiereEcouteWeb.Router do
 
   scope "/", PremiereEcouteWeb do
     pipe_through [:browser]
+    
+    # Health check endpoint for Fly.io
+    get "/health", HealthController, :index
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index

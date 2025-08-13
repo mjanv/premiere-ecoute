@@ -31,7 +31,6 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
     playlist_urls = parse_playlist_urls(playlist_input)
 
     if length(playlist_urls) > 0 do
-      # Start async task with progress callback
       live_view_pid = self()
 
       task =

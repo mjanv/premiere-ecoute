@@ -7,7 +7,8 @@ source!([
   System.get_env()
 ])
 
-config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: env!("PHX_SERVER", :boolean, false)
+config :premiere_ecoute, PremiereEcouteWeb.Endpoint, 
+  server: env!("PHX_SERVER", :boolean, false)
 
 config :premiere_ecoute,
   spotify_client_id: env!("SPOTIFY_CLIENT_ID"),
