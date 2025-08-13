@@ -39,7 +39,7 @@ TWITCH_WEBHOOK_SECRET=your_webhook_secret
 ### First setup
 
 ```bash
-git clone https://github.com/mjanvier/premiere_ecoute.git
+git clone https://github.com/mjanv/premiere-ecoute.git
 cd premiere_ecoute
 cp .env.example .env
 

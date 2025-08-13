@@ -2,29 +2,30 @@
   <div class="max-w-6xl mx-auto">
     <!-- ASCII Art Header -->
     <div class="text-center mb-8">
-      <div class="text-purple-600 text-xs sm:text-sm md:text-base lg:text-lg whitespace-pre mb-2">
-        ██████╗ ██╗██╗     ██╗     ██████╗  ██████╗  █████╗ ██████╗ ██████╗
-        ██╔══██╗██║██║     ██║     ██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗
-        ██████╔╝██║██║     ██║     ██████╔╝██║   ██║███████║██████╔╝██║  ██║
-        ██╔══██╗██║██║     ██║     ██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║
-        ██████╔╝██║███████╗███████╗██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝
-        ╚═════╝ ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝
+      <div class="text-xs sm:text-sm md:text-base lg:text-lg whitespace-pre mb-2 inline-block">
+        <span class="text-red-500">██████╗ ██╗██╗     ██╗     ██████╗  ██████╗  █████╗ ██████╗ ██████╗</span>
+        <span class="text-orange-500">██╔══██╗██║██║     ██║     ██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗</span>
+        <span class="text-yellow-500">██████╔╝██║██║     ██║     ██████╔╝██║   ██║███████║██████╔╝██║  ██║</span>
+        <span class="text-green-500">██╔══██╗██║██║     ██║     ██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║</span>
+        <span class="text-blue-500">██████╔╝██║███████╗███████╗██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝</span>
+        <span class="text-purple-500">╚═════╝ ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝</span>
       </div>
     </div>
     
 <!-- Input Form -->
     <div class="border border-purple-500 p-6 mb-8">
-      <.form for={%{}} phx-submit="generate_billboard" class="space-y-4">
+      <.form for={@playlist_form} phx-submit="generate_billboard" phx-change="update_playlist_input" class="space-y-4">
         <div>
-          <textarea
-            id="playlist_input"
-            name="playlist_input"
-            value={@playlist_input}
-            rows="10"
-            placeholder="https://open.spotify.com/playlist/0GVUztIdLeLsftpMTwkYGf&#10;https://www.deezer.com/us/playlist/14170581581&#10;https://open.spotify.com/playlist/28Anwq5yS87ujCDWdFFr4b"
-            class="w-full px-3 py-2 bg-gray-900 border border-purple-500 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 font-mono text-sm"
-            disabled={@loading}
-          />
+          <div id="playlist_container" phx-update="ignore">
+            <textarea
+              id="playlist_input"
+              name="playlist_input"
+              rows="10"
+              placeholder="https://open.spotify.com/playlist/0GVUztIdLeLsftpMTwkYGf&#10;https://www.deezer.com/us/playlist/14170581581&#10;https://open.spotify.com/playlist/28Anwq5yS87ujCDWdFFr4b"
+              class="w-full px-3 py-2 bg-gray-900 border border-purple-500 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 font-mono text-sm"
+              phx-hook="PlaylistStorage"
+            ></textarea>
+          </div>
         </div>
 
         <div class="flex space-x-4">
@@ -66,10 +67,72 @@
     <%= if @tracks != [] do %>
       <div class="border border-purple-500 p-6 overflow-x-auto">
         
-<!-- Track List -->
-        <div class="font-mono text-sm">
+<!-- Top 3 Podium -->
+        <%= if length(@tracks) >= 3 do %>
+          <div class="mb-12">
+            <div class="flex justify-center items-end space-x-8 mb-12">
+              <!-- 2nd Place -->
+              <div class="text-center">
+                <div class="bg-gray-700 border-4 border-gray-500 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
+                  <div class="text-4xl mb-2">🥈</div>
+                  <div class="text-xl font-bold text-gray-300">#2</div>
+                </div>
+                <div
+                  class="bg-gray-800 p-4 text-center w-64 cursor-pointer hover:bg-gray-700 transition-colors"
+                  phx-click="select_track"
+                  phx-value-rank="2"
+                >
+                  <div class="text-yellow-400 font-bold text-lg">{Enum.at(@tracks, 1).count_text}</div>
+                  <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 1).artist}</div>
+                  <div class="text-gray-300 text-base truncate">{Enum.at(@tracks, 1).name}</div>
+                </div>
+              </div>
+              
+<!-- 1st Place -->
+              <div class="text-center">
+                <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
+                  <div class="text-5xl mb-2">👑</div>
+                  <div class="text-2xl font-bold text-yellow-100">#1</div>
+                </div>
+                <div
+                  class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
+                  phx-click="select_track"
+                  phx-value-rank="1"
+                >
+                  <div class="text-yellow-200 font-bold text-xl">{Enum.at(@tracks, 0).count_text}</div>
+                  <div class="text-white font-semibold text-lg truncate">{Enum.at(@tracks, 0).artist}</div>
+                  <div class="text-yellow-100 text-lg truncate">{Enum.at(@tracks, 0).name}</div>
+                </div>
+              </div>
+              
+<!-- 3rd Place -->
+              <div class="text-center">
+                <div class="bg-orange-700 border-4 border-orange-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
+                  <div class="text-3xl mb-2">🥉</div>
+                  <div class="text-xl font-bold text-orange-200">#3</div>
+                </div>
+                <div
+                  class="bg-orange-800 p-4 text-center w-64 cursor-pointer hover:bg-orange-700 transition-colors"
+                  phx-click="select_track"
+                  phx-value-rank="3"
+                >
+                  <div class="text-orange-400 font-bold text-lg">{Enum.at(@tracks, 2).count_text}</div>
+                  <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 2).artist}</div>
+                  <div class="text-orange-200 text-base truncate">{Enum.at(@tracks, 2).name}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+<!-- Full Track List -->
+        <div class="font-mono text-lg">
           <%= for track <- @tracks do %>
-            <div class="flex items-center space-x-3 hover:bg-gray-800 p-1">
+            <div
+              class="flex items-center space-x-2 hover:bg-gray-800 p-1 cursor-pointer transition-colors"
+              phx-click="select_track"
+              phx-value-rank={track.rank}
+            >
               <span class={"#{track.rank_style_class} font-bold w-16 text-right"}>{track.rank_text}</span>
               <span class={"#{track.count_style_class} w-12"}>{track.count_text}</span>
               <span class="text-white font-semibold flex-1 truncate">{track.artist}</span>
@@ -105,4 +168,63 @@
       </div>
     <% end %>
   </div>
+  
+<!-- Track Details Modal -->
+  <%= if @show_modal and @selected_track do %>
+    <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" phx-click="close_modal">
+      <div
+        class="bg-gray-900 border-2 border-purple-500 rounded-lg p-8 max-w-2xl w-full mx-4 relative"
+        phx-click="stop_propagation"
+      >
+        <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" phx-click="close_modal">×</button>
+
+        <div class="text-center mb-6">
+          <div class="text-3xl mb-4">{@selected_track.rank_text}</div>
+          <div class="flex items-center justify-center space-x-4">
+            <h2 class="text-xl font-bold text-white">
+              {@selected_track.artist} - <span class="text-gray-300">{@selected_track.name}</span>
+            </h2>
+            <div class="flex space-x-2">
+              <%= if @selected_track.spotify_url do %>
+                <a
+                  href={@selected_track.spotify_url}
+                  target="_blank"
+                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                >
+                  Spotify
+                </a>
+              <% end %>
+              <%= if @selected_track.deezer_url do %>
+                <a
+                  href={@selected_track.deezer_url}
+                  target="_blank"
+                  class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                >
+                  Deezer
+                </a>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="border-t border-gray-700 pt-4">
+            <div class="space-y-2 max-h-40 overflow-y-auto">
+              <%= for source <- @selected_track.playlist_sources do %>
+                <div class="bg-gray-800 p-3 rounded-lg">
+                  <a
+                    href={source.playlist_url}
+                    target="_blank"
+                    class="text-purple-400 hover:text-purple-300 text-sm text-center block break-all"
+                  >
+                    {source.playlist_url}
+                  </a>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

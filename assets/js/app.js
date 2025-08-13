@@ -61,6 +61,29 @@ const Hooks = {
         document.body.removeChild(link)
       })
     }
+  },
+
+  // AIDEV-NOTE: Hook for localStorage persistence of playlist input
+  PlaylistStorage: {
+    mounted() {
+      const storageKey = "billboard_playlist_input"
+      
+      // Always try to load from localStorage first
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        this.el.value = saved
+      }
+      
+      // Save value on input change
+      this.el.addEventListener("input", (event) => {
+        localStorage.setItem(storageKey, event.target.value)
+      })
+      
+      // Handle loading state from server
+      this.handleEvent("set_loading", ({loading}) => {
+        this.el.disabled = loading
+      })
+    }
   }
 }
 

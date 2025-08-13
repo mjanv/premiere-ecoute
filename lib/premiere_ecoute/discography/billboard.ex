@@ -43,7 +43,19 @@ defmodule PremiereEcoute.Discography.Billboard do
         |> Enum.flat_map(fn {playlist_id, index} ->
           progress = 20 + div((index + 1) * 60, total_playlists)
           progress_callback.("Fetching playlist #{index + 1}/#{total_playlists}", progress)
-          fetch_playlist_tracks(playlist_id)
+          playlist_tracks = fetch_playlist_tracks(playlist_id)
+          # Add playlist source info to each track
+          Enum.map(playlist_tracks, fn track ->
+            Map.put(track, :playlist_source, %{
+              provider: elem(playlist_id, 0),
+              playlist_id: elem(playlist_id, 1),
+              playlist_url:
+                case playlist_id do
+                  {:spotify, id} -> "https://open.spotify.com/playlist/#{id}"
+                  {:deezer, id} -> "https://www.deezer.com/playlist/#{id}"
+                end
+            })
+          end)
         end)
 
       progress_callback.("Processing tracks", 85)
@@ -76,10 +88,23 @@ defmodule PremiereEcoute.Discography.Billboard do
   @doc """
   Format a track entry for display with rank styling.
   """
-  def format_track_entry(%{track: track, count: count}, rank) do
+  def format_track_entry(%{track: track, count: count, playlist_sources: playlist_sources}, rank) do
     {_color, icon} = rank_style(rank)
     rank_text = String.pad_leading("#{icon} #{rank}", 6)
     count_text = "[#{count}x]"
+
+    # Generate streaming service URLs
+    spotify_url =
+      case track.provider do
+        :spotify -> "https://open.spotify.com/track/#{track.track_id}"
+        _ -> nil
+      end
+
+    deezer_url =
+      case track.provider do
+        :deezer -> "https://www.deezer.com/track/#{track.track_id}"
+        _ -> nil
+      end
 
     %{
       rank: rank,
@@ -90,7 +115,12 @@ defmodule PremiereEcoute.Discography.Billboard do
       artist: track.artist,
       name: track.name,
       count_style_class: count_style_class(count),
-      rank_style_class: rank_style_class(rank)
+      rank_style_class: rank_style_class(rank),
+      track_id: track.track_id,
+      provider: track.provider,
+      spotify_url: spotify_url,
+      deezer_url: deezer_url,
+      playlist_sources: playlist_sources
     }
   end
 
@@ -128,7 +158,17 @@ defmodule PremiereEcoute.Discography.Billboard do
   defp group_by_track(tracks) do
     tracks
     |> Enum.group_by(fn track -> String.downcase(track.artist <> track.name) end)
-    |> Enum.map(fn {_, [track | _] = tracks} -> %{track: track, count: length(tracks)} end)
+    |> Enum.map(fn {_, track_instances} ->
+      [first_track | _] = track_instances
+      playlist_sources = Enum.map(track_instances, & &1.playlist_source)
+
+      %{
+        track: first_track,
+        tracks: track_instances,
+        count: length(track_instances),
+        playlist_sources: playlist_sources
+      }
+    end)
     |> Enum.sort_by(& &1.count, :desc)
   end
 

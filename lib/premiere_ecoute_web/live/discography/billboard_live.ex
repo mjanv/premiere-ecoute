@@ -1,19 +1,22 @@
 defmodule PremiereEcouteWeb.Discography.BillboardLive do
   use PremiereEcouteWeb, :live_view
 
+  alias Phoenix.LiveView.JS
   alias PremiereEcoute.Discography.Billboard
 
   @impl true
   def mount(_params, _session, socket) do
     socket
     |> assign(
-      playlist_input: "",
+      playlist_form: to_form(%{"playlist_input" => nil}),
       tracks: [],
       loading: false,
       error: nil,
       ascii_header: Billboard.generate_ascii_header(),
       progress: 0,
-      progress_text: ""
+      progress_text: "",
+      selected_track: nil,
+      show_modal: false
     )
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -42,6 +45,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
 
       socket =
         assign(socket,
+          playlist_form: to_form(%{"playlist_input" => playlist_input}),
           loading: true,
           error: nil,
           tracks: [],
@@ -49,6 +53,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
           progress: 0,
           progress_text: "Starting..."
         )
+        |> push_event("set_loading", %{loading: true})
 
       {:noreply, socket}
     else
@@ -69,6 +74,34 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
         progress_text: ""
       )
 
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("playlist_loaded", %{"value" => value}, socket) do
+    {:noreply, assign(socket, playlist_form: to_form(%{"playlist_input" => value}))}
+  end
+
+  @impl true
+  def handle_event("update_playlist_input", %{"playlist_input" => playlist_input}, socket) do
+    {:noreply, assign(socket, playlist_form: to_form(%{"playlist_input" => playlist_input}))}
+  end
+
+  @impl true
+  def handle_event("select_track", %{"rank" => rank}, socket) do
+    rank = String.to_integer(rank)
+    selected_track = Enum.find(socket.assigns.tracks, &(&1.rank == rank))
+
+    {:noreply, assign(socket, selected_track: selected_track, show_modal: true)}
+  end
+
+  @impl true
+  def handle_event("close_modal", _params, socket) do
+    {:noreply, assign(socket, selected_track: nil, show_modal: false)}
+  end
+
+  @impl true
+  def handle_event("stop_propagation", _params, socket) do
     {:noreply, socket}
   end
 
@@ -97,6 +130,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
               progress: 0,
               progress_text: ""
             )
+            |> push_event("set_loading", %{loading: false})
 
           {:noreply, socket}
 
@@ -109,6 +143,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
               progress: 0,
               progress_text: ""
             )
+            |> push_event("set_loading", %{loading: false})
 
           {:noreply, socket}
       end
@@ -128,6 +163,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
         progress: 0,
         progress_text: ""
       )
+      |> push_event("set_loading", %{loading: false})
 
     {:noreply, socket}
   end
