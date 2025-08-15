@@ -1,7 +1,6 @@
 defmodule PremiereEcouteWeb.Discography.BillboardLive do
   use PremiereEcouteWeb, :live_view
 
-  alias Phoenix.LiveView.JS
   alias PremiereEcoute.Discography.Billboard
 
   @impl true

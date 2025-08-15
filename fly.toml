@@ -18,11 +18,16 @@ kill_signal = 'SIGTERM'
 
 [http_service]
   internal_port = 4000
-  force_https = true
-  auto_stop_machines = "stop"
-  auto_start_machines = true
+  auto_stop_machines = "off"
   min_machines_running = 1
   processes = ['app']
+  
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
 
   [http_service.concurrency]
     type = 'connections'

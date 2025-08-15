@@ -33,24 +33,29 @@ defmodule PremiereEcoute.Discography.Billboard do
       total_playlists = length(unique_urls)
 
       progress_callback.("Extracting playlist IDs", 10)
-      playlist_ids = unique_urls |> Enum.map(&extract_playlist_id/1) |> Enum.reject(&is_nil/1)
+
+      playlist_ids = 
+        unique_urls 
+        |> Enum.map(&extract_playlist_id/1) 
+        |> Enum.reject(&is_nil/1)
 
       progress_callback.("Fetching playlists", 20)
 
       tracks =
         playlist_ids
         |> Enum.with_index()
-        |> Enum.flat_map(fn {playlist_id, index} ->
+        |> Enum.flat_map(fn {{provider, playlist_id}, index} ->
           progress = 20 + div((index + 1) * 60, total_playlists)
           progress_callback.("Fetching playlist #{index + 1}/#{total_playlists}", progress)
-          playlist_tracks = fetch_playlist_tracks(playlist_id)
-          # Add playlist source info to each track
-          Enum.map(playlist_tracks, fn track ->
+
+          {provider, playlist_id}
+          |> fetch_playlist_tracks()
+          |> Enum.map(fn track ->
             Map.put(track, :playlist_source, %{
-              provider: elem(playlist_id, 0),
-              playlist_id: elem(playlist_id, 1),
+              provider: provider,
+              playlist_id: playlist_id,
               playlist_url:
-                case playlist_id do
+                case {provider, playlist_id} do
                   {:spotify, id} -> "https://open.spotify.com/playlist/#{id}"
                   {:deezer, id} -> "https://www.deezer.com/playlist/#{id}"
                 end
