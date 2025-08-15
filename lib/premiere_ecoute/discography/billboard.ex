@@ -34,9 +34,9 @@ defmodule PremiereEcoute.Discography.Billboard do
 
       progress_callback.("Extracting playlist IDs", 10)
 
-      playlist_ids = 
-        unique_urls 
-        |> Enum.map(&extract_playlist_id/1) 
+      playlist_ids =
+        unique_urls
+        |> Enum.map(&extract_playlist_id/1)
         |> Enum.reject(&is_nil/1)
 
       progress_callback.("Fetching playlists", 20)
@@ -88,6 +88,21 @@ defmodule PremiereEcoute.Discography.Billboard do
       "██████╔╝██║███████╗███████╗██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝",
       "╚═════╝ ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ "
     ]
+  end
+
+  @doc """
+  Generate artist billboard from track data.
+
+  Groups tracks by artist and aggregates their frequency counts and track details.
+  Returns formatted artist entries suitable for display.
+  """
+  def generate_artist_billboard(tracks) do
+    tracks
+    |> group_by_artist()
+    |> Enum.with_index(1)
+    |> Enum.map(fn {artist_data, rank} ->
+      format_artist_entry(artist_data, rank)
+    end)
   end
 
   @doc """
@@ -191,4 +206,64 @@ defmodule PremiereEcoute.Discography.Billboard do
   defp count_style_class(count) when count >= 5, do: "text-yellow-400"
   defp count_style_class(count) when count >= 2, do: "text-green-400"
   defp count_style_class(_), do: "text-white"
+
+  # AIDEV-NOTE: Artist aggregation and formatting functions
+  defp group_by_artist(tracks) do
+    tracks
+    |> Enum.group_by(fn %{track: track} -> String.downcase(track.artist) end)
+    |> Enum.map(fn {_artist_key, track_instances} ->
+      artist_name = track_instances |> List.first() |> Map.get(:track) |> Map.get(:artist)
+      total_count = track_instances |> Enum.map(& &1.count) |> Enum.sum()
+      track_count = length(track_instances)
+
+      # Collect all unique tracks for this artist with their details
+      artist_tracks =
+        Enum.map(track_instances, fn %{track: track, count: count, playlist_sources: sources} ->
+          %{
+            name: track.name,
+            count: count,
+            track_id: track.track_id,
+            provider: track.provider,
+            playlist_sources: sources,
+            spotify_url:
+              case track.provider do
+                :spotify -> "https://open.spotify.com/track/#{track.track_id}"
+                _ -> nil
+              end,
+            deezer_url:
+              case track.provider do
+                :deezer -> "https://www.deezer.com/track/#{track.track_id}"
+                _ -> nil
+              end
+          }
+        end)
+
+      %{
+        artist: artist_name,
+        total_count: total_count,
+        track_count: track_count,
+        tracks: artist_tracks
+      }
+    end)
+    |> Enum.sort_by(& &1.total_count, :desc)
+  end
+
+  defp format_artist_entry(%{artist: artist, total_count: total_count, track_count: track_count, tracks: tracks}, rank) do
+    {_color, icon} = rank_style(rank)
+    rank_text = String.pad_leading("#{icon} #{rank}", 6)
+    count_text = "[#{total_count}x]"
+
+    %{
+      rank: rank,
+      rank_text: rank_text,
+      rank_icon: icon,
+      artist: artist,
+      total_count: total_count,
+      track_count: track_count,
+      count_text: count_text,
+      count_style_class: count_style_class(total_count),
+      rank_style_class: rank_style_class(rank),
+      tracks: tracks
+    }
+  end
 end

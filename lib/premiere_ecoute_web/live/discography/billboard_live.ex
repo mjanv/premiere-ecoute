@@ -9,12 +9,16 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
     |> assign(
       playlist_form: to_form(%{"playlist_input" => nil}),
       tracks: [],
+      artists: [],
+      # AIDEV-NOTE: Track display mode (:track or :artist)
+      display_mode: :track,
       loading: false,
       error: nil,
       ascii_header: Billboard.generate_ascii_header(),
       progress: 0,
       progress_text: "",
       selected_track: nil,
+      selected_artist: nil,
       show_modal: false
     )
     |> then(fn socket -> {:ok, socket} end)
@@ -65,6 +69,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
     socket =
       assign(socket,
         tracks: [],
+        artists: [],
         loading: false,
         error: nil,
         task: nil,
@@ -94,8 +99,22 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   end
 
   @impl true
+  def handle_event("select_artist", %{"rank" => rank}, socket) do
+    rank = String.to_integer(rank)
+    selected_artist = Enum.find(socket.assigns.artists, &(&1.rank == rank))
+
+    {:noreply, assign(socket, selected_artist: selected_artist, show_modal: true)}
+  end
+
+  @impl true
+  def handle_event("switch_mode", %{"mode" => mode}, socket) do
+    display_mode = String.to_existing_atom(mode)
+    {:noreply, assign(socket, display_mode: display_mode)}
+  end
+
+  @impl true
   def handle_event("close_modal", _params, socket) do
-    {:noreply, assign(socket, selected_track: nil, show_modal: false)}
+    {:noreply, assign(socket, selected_track: nil, selected_artist: nil, show_modal: false)}
   end
 
   @impl true
@@ -119,9 +138,13 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
               Billboard.format_track_entry(track, rank)
             end)
 
+          # AIDEV-NOTE: Generate artist aggregation from tracks data
+          formatted_artists = Billboard.generate_artist_billboard(tracks)
+
           socket =
             assign(socket,
               tracks: formatted_tracks,
+              artists: formatted_artists,
               loading: false,
               error: nil,
               task: nil,
