@@ -22,20 +22,13 @@ kill_signal = 'SIGTERM'
   min_machines_running = 1
   processes = ['app']
   
-  [[services.ports]]
-    handlers = ["http"]
-    port = 80
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
-
   [http_service.concurrency]
     type = 'connections'
     hard_limit = 1000
     soft_limit = 1000
 
   [[http_service.checks]]
-    grace_period = "10s"
+    grace_period = "30s"
     interval = "30s"
     method = "GET"
     timeout = "5s"
@@ -43,7 +36,7 @@ kill_signal = 'SIGTERM'
 
 [[vm]]
   size = "shared-cpu-2x"
-  memory = "2gb"
+  memory = "1gb"
 
 [metrics]
   port = 4000

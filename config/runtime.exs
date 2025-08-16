@@ -67,7 +67,7 @@ if config_env() == :prod do
   config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
     url: [host: env!("PHX_HOST"), port: 443, scheme: "https"],
     http: [
-      ip: {0, 0, 0, 0},
+      ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: env!("PORT", :integer, 4000)
     ],
     secret_key_base: env!("SECRET_KEY_BASE")

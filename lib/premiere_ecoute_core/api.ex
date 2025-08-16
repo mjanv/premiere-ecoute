@@ -53,9 +53,9 @@ defmodule PremiereEcouteCore.Api do
 
       def token(token) do
         with {:ok, nil} <- {:ok, token},
-             # {:ok, nil} <- Cache.get(:tokens, unquote(api)),
+             {:ok, nil} <- Cache.get(:tokens, unquote(api)),
              {:ok, %{"access_token" => token, "expires_in" => expires_in}} <- client_credentials() do
-          # Cache.put(:tokens, unquote(api), token, expire: expires_in * 1_000)
+          Cache.put(:tokens, unquote(api), token, expire: expires_in * 1_000)
           token
         else
           {:ok, token} ->

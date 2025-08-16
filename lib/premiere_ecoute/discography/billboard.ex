@@ -177,7 +177,7 @@ defmodule PremiereEcoute.Discography.Billboard do
 
   defp group_by_track(tracks) do
     tracks
-    |> Enum.group_by(fn track -> String.downcase(track.artist <> track.name) end)
+    |> Enum.group_by(fn track -> clean_value(track.artist <> " " <> track.name) end)
     |> Enum.map(fn {_, track_instances} ->
       [first_track | _] = track_instances
       playlist_sources = Enum.map(track_instances, & &1.playlist_source)
@@ -210,7 +210,7 @@ defmodule PremiereEcoute.Discography.Billboard do
   # AIDEV-NOTE: Artist aggregation and formatting functions
   defp group_by_artist(tracks) do
     tracks
-    |> Enum.group_by(fn %{track: track} -> String.downcase(track.artist) end)
+    |> Enum.group_by(fn %{track: track} -> clean_value(track.artist) end)
     |> Enum.map(fn {_artist_key, track_instances} ->
       artist_name = track_instances |> List.first() |> Map.get(:track) |> Map.get(:artist)
       total_count = track_instances |> Enum.map(& &1.count) |> Enum.sum()
@@ -265,5 +265,32 @@ defmodule PremiereEcoute.Discography.Billboard do
       rank_style_class: rank_style_class(rank),
       tracks: tracks
     }
+  end
+
+  def clean_value(value) when is_binary(value) do
+    value
+    |> String.replace(~r/ \(.+\).*| \[.+\].*| -.+/, "")
+    |> String.downcase()
+    |> normalize_unicode()
+    |> remove_diacritics()
+    |> String.replace(~r/[!?]+$/, "")
+    |> String.replace(~r/^[!?]+/, "")
+    |> String.replace(~r/ [!?]+/, " ")
+    |> String.replace(~r/[!?]+ /, " ")
+    |> String.replace(~r/[¿¡*,.'':_\/-]/, "")
+    |> String.replace("œ", "oe")
+    |> String.replace("$", "s")
+    |> String.replace("ø", "o")
+    |> String.trim()
+  end
+
+  # Helper function to normalize Unicode (NFD - Normalization Form Decomposed)
+  defp normalize_unicode(string) do
+    :unicode.characters_to_nfd_binary(string)
+  end
+
+  # Helper function to remove diacritical marks
+  defp remove_diacritics(string) do
+    String.replace(string, ~r/\p{Mn}/u, "")
   end
 end

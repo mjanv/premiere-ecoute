@@ -11,7 +11,6 @@ primary_region = 'cdg'
 
 
 [env]
-  FLY_SCALE_TO_ZERO = '1h'
   PRIMARY_REGION = 'cdg'
 
 [[mounts]]
@@ -21,27 +20,12 @@ primary_region = 'cdg'
 [[services]]
   protocol = 'tcp'
   internal_port = 5432
-  auto_start_machines = true
-  auto_stop_machines = true
+  auto_start_machines = false
+  auto_stop_machines = "off"
   min_machines_running = 1
 
   [[services.ports]]
     port = 5432
-    handlers = ['pg_tls']
-
-  [services.concurrency]
-    type = 'connections'
-    hard_limit = 1000
-    soft_limit = 1000
-
-[[services]]
-  protocol = 'tcp'
-  internal_port = 5433
-  auto_start_machines = true
-  auto_stop_machines = true
-
-  [[services.ports]]
-    port = 5433
     handlers = ['pg_tls']
 
   [services.concurrency]

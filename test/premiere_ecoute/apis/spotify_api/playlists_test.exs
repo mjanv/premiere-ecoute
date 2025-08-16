@@ -47,7 +47,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       assert Regex.match?(~r/^https:\/\/image-cdn-[a-z0-9\-]+\.spotifycdn\.com\/image\/[a-f0-9]{40}$/, cover_url)
 
       for track <- tracks do
-        assert %Track{} = track
+        assert %Track{release_date: _} = track
       end
     end
   end

@@ -73,8 +73,17 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
       name: data["track"]["name"],
       artist: Parser.parse_primary_artist(data["track"]["artists"]),
       duration_ms: data["track"]["duration_ms"] || 0,
-      added_at: NaiveDateTime.from_iso8601!(data["added_at"])
+      added_at: NaiveDateTime.from_iso8601!(data["added_at"]),
+      release_date: parse_release_date(data["track"]["album"]["release_date"])
     }
+  end
+
+  def parse_release_date(date_string) do
+    case String.split(date_string, "-") do
+      [year] -> Date.from_iso8601!("#{year}-01-01")
+      [year, month] -> Date.from_iso8601!("#{year}-#{month}-01")
+      [year, month, day] -> Date.from_iso8601!("#{year}-#{month}-#{day}")
+    end
   end
 
   def parse_library_playlist(data) do

@@ -29,6 +29,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
     field :user_id, :string
     field :name, :string
     field :artist, :string
+    field :release_date, :date
     field :duration_ms, :integer
     field :added_at, :naive_datetime
 
