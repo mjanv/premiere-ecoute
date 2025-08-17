@@ -366,6 +366,8 @@ defmodule PremiereEcoute.Discography.Billboard do
     # Use block characters for better visibility
     bars = String.duplicate("█", bar_count)
     count_text = "[#{bars} #{total_count}x]"
+    # AIDEV-NOTE: Separate count format for podium without bars
+    podium_count_text = "[#{total_count}x]"
 
     %{
       rank: rank,
@@ -377,6 +379,7 @@ defmodule PremiereEcoute.Discography.Billboard do
       total_count: total_count,
       track_count: track_count,
       count_text: count_text,
+      podium_count_text: podium_count_text,
       count_style_class: count_style_class(total_count),
       # Always use cyan for year list entries
       rank_style_class: "text-cyan-400",
