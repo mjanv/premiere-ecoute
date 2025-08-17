@@ -221,6 +221,12 @@
               <% true -> %>
                 <div class="flex justify-center items-end space-x-8 mb-12">
                   <!-- Year Mode Podium -->
+                  <%
+                    # AIDEV-NOTE: Find years with podium ranks for correct display by occurrence count
+                    first_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 1 end)
+                    second_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 2 end)
+                    third_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 3 end)
+                  %>
                   <!-- 2nd Place -->
                   <div class="text-center">
                     <div class="bg-gray-700 border-4 border-gray-500 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
@@ -230,12 +236,12 @@
                     <div
                       class="bg-gray-800 p-4 text-center w-64 cursor-pointer hover:bg-gray-700 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank="2"
+                      phx-value-rank={if second_place, do: second_place.display_rank, else: "2"}
                     >
-                      <%= if length(@years) > 1 do %>
-                        <div class="text-yellow-400 font-bold text-lg">{Enum.at(@years, 1).count_text}</div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@years, 1).year}</div>
-                        <div class="text-gray-300 text-base truncate">{Enum.at(@years, 1).track_count} tracks</div>
+                      <%= if second_place do %>
+                        <div class="text-yellow-400 font-bold text-lg"><%= second_place.count_text %></div>
+                        <div class="text-white font-semibold text-base truncate"><%= second_place.year %></div>
+                        <div class="text-gray-300 text-base truncate"><%= second_place.track_count %> tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -249,12 +255,12 @@
                     <div
                       class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank="1"
+                      phx-value-rank={if first_place, do: first_place.display_rank, else: "1"}
                     >
-                      <%= if length(@years) > 0 do %>
-                        <div class="text-yellow-200 font-bold text-xl">{Enum.at(@years, 0).count_text}</div>
-                        <div class="text-white font-semibold text-lg truncate">{Enum.at(@years, 0).year}</div>
-                        <div class="text-yellow-100 text-lg truncate">{Enum.at(@years, 0).track_count} tracks</div>
+                      <%= if first_place do %>
+                        <div class="text-yellow-200 font-bold text-xl"><%= first_place.count_text %></div>
+                        <div class="text-white font-semibold text-lg truncate"><%= first_place.year %></div>
+                        <div class="text-yellow-100 text-lg truncate"><%= first_place.track_count %> tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -268,12 +274,12 @@
                     <div
                       class="bg-orange-800 p-4 text-center w-64 cursor-pointer hover:bg-orange-700 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank="3"
+                      phx-value-rank={if third_place, do: third_place.display_rank, else: "3"}
                     >
-                      <%= if length(@years) > 2 do %>
-                        <div class="text-orange-400 font-bold text-lg">{Enum.at(@years, 2).count_text}</div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@years, 2).year}</div>
-                        <div class="text-orange-200 text-base truncate">{Enum.at(@years, 2).track_count} tracks</div>
+                      <%= if third_place do %>
+                        <div class="text-orange-400 font-bold text-lg"><%= third_place.count_text %></div>
+                        <div class="text-white font-semibold text-base truncate"><%= third_place.year %></div>
+                        <div class="text-orange-200 text-base truncate"><%= third_place.track_count %> tracks</div>
                       <% end %>
                     </div>
                   </div>

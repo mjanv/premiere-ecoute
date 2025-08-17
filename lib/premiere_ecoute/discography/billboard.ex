@@ -347,23 +347,26 @@ defmodule PremiereEcoute.Discography.Billboard do
          %{year: year, total_count: total_count, track_count: track_count, tracks: tracks, podium_rank: podium_rank},
          rank
        ) do
-    # Use podium rank for display if this year is in top 3, otherwise use chronological rank
+    # AIDEV-NOTE: For year lists, always use bullets (•) instead of medal emojis for cleaner display
     display_rank = podium_rank || rank
-    {_color, icon} = rank_style(display_rank)
-    rank_text = String.pad_leading("#{icon} #{display_rank}", 6)
+    {_color, _icon} = if podium_rank, do: rank_style(podium_rank), else: rank_style(rank)
+    # Always use bullet for year list entries
+    list_icon = "•"
+    rank_text = String.pad_leading("#{list_icon} #{rank}", 6)
     count_text = "[#{total_count}x]"
 
     %{
       rank: rank,
       display_rank: display_rank,
+      podium_rank: podium_rank,
       rank_text: rank_text,
-      rank_icon: icon,
+      rank_icon: list_icon,
       year: year,
       total_count: total_count,
       track_count: track_count,
       count_text: count_text,
       count_style_class: count_style_class(total_count),
-      rank_style_class: rank_style_class(display_rank),
+      rank_style_class: "text-cyan-400", # Always use cyan for year list entries
       tracks: tracks
     }
   end
