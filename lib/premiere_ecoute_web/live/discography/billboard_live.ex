@@ -67,6 +67,13 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   end
 
   @impl true
+  def handle_event("generate_billboard", _params, socket) do
+    # AIDEV-NOTE: Handle case where form is submitted without playlist_input
+    socket = assign(socket, error: "Please enter at least one playlist URL")
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("clear_results", _params, socket) do
     socket =
       assign(socket,

@@ -221,12 +221,10 @@
               <% true -> %>
                 <div class="flex justify-center items-end space-x-8 mb-12">
                   <!-- Year Mode Podium -->
-                  <%
-                    # AIDEV-NOTE: Find years with podium ranks for correct display by occurrence count
-                    first_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 1 end)
-                    second_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 2 end)
-                    third_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 3 end)
-                  %>
+                  <% # AIDEV-NOTE: Find years with podium ranks for correct display by occurrence count
+                  first_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 1 end)
+                  second_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 2 end)
+                  third_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 3 end) %>
                   <!-- 2nd Place -->
                   <div class="text-center">
                     <div class="bg-gray-700 border-4 border-gray-500 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
@@ -239,9 +237,9 @@
                       phx-value-rank={if second_place, do: second_place.display_rank, else: "2"}
                     >
                       <%= if second_place do %>
-                        <div class="text-yellow-400 font-bold text-lg"><%= second_place.count_text %></div>
-                        <div class="text-white font-semibold text-base truncate"><%= second_place.year %></div>
-                        <div class="text-gray-300 text-base truncate"><%= second_place.track_count %> tracks</div>
+                        <div class="text-yellow-400 font-bold text-lg">{second_place.count_text}</div>
+                        <div class="text-white font-semibold text-base truncate">{second_place.year}</div>
+                        <div class="text-gray-300 text-base truncate">{second_place.track_count} tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -258,9 +256,9 @@
                       phx-value-rank={if first_place, do: first_place.display_rank, else: "1"}
                     >
                       <%= if first_place do %>
-                        <div class="text-yellow-200 font-bold text-xl"><%= first_place.count_text %></div>
-                        <div class="text-white font-semibold text-lg truncate"><%= first_place.year %></div>
-                        <div class="text-yellow-100 text-lg truncate"><%= first_place.track_count %> tracks</div>
+                        <div class="text-yellow-200 font-bold text-xl">{first_place.count_text}</div>
+                        <div class="text-white font-semibold text-lg truncate">{first_place.year}</div>
+                        <div class="text-yellow-100 text-lg truncate">{first_place.track_count} tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -277,9 +275,9 @@
                       phx-value-rank={if third_place, do: third_place.display_rank, else: "3"}
                     >
                       <%= if third_place do %>
-                        <div class="text-orange-400 font-bold text-lg"><%= third_place.count_text %></div>
-                        <div class="text-white font-semibold text-base truncate"><%= third_place.year %></div>
-                        <div class="text-orange-200 text-base truncate"><%= third_place.track_count %> tracks</div>
+                        <div class="text-orange-400 font-bold text-lg">{third_place.count_text}</div>
+                        <div class="text-white font-semibold text-base truncate">{third_place.year}</div>
+                        <div class="text-orange-200 text-base truncate">{third_place.track_count} tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -327,7 +325,7 @@
                   phx-value-rank={year.display_rank}
                 >
                   <span class={"#{year.rank_style_class} font-bold w-16 text-right"}>{year.rank_text}</span>
-                  <span class={"#{year.count_style_class} w-12"}>{year.count_text}</span>
+                  <span class={"#{year.count_style_class} w-96"}>{year.count_text}</span>
                   <span class="text-white font-semibold flex-1 truncate">{year.year}</span>
                   <span class="text-gray-300">-</span>
                   <span class="text-gray-100 flex-1 truncate">{year.track_count} tracks</span>

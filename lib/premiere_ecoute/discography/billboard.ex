@@ -112,11 +112,15 @@ defmodule PremiereEcoute.Discography.Billboard do
   Returns formatted year entries suitable for display, sorted in reverse chronological order.
   """
   def generate_year_billboard(tracks) do
-    tracks
-    |> group_by_year()
+    year_data_list = group_by_year(tracks)
+
+    # AIDEV-NOTE: Calculate max occurrence count for proportional bar visualization
+    max_count = year_data_list |> Enum.map(& &1.total_count) |> Enum.max(fn -> 1 end)
+
+    year_data_list
     |> Enum.with_index(1)
     |> Enum.map(fn {year_data, rank} ->
-      format_year_entry(year_data, rank)
+      format_year_entry(year_data, rank, max_count)
     end)
   end
 
@@ -345,7 +349,8 @@ defmodule PremiereEcoute.Discography.Billboard do
 
   defp format_year_entry(
          %{year: year, total_count: total_count, track_count: track_count, tracks: tracks, podium_rank: podium_rank},
-         rank
+         rank,
+         max_count
        ) do
     # AIDEV-NOTE: For year lists, always use bullets (•) instead of medal emojis for cleaner display
     display_rank = podium_rank || rank
@@ -353,7 +358,14 @@ defmodule PremiereEcoute.Discography.Billboard do
     # Always use bullet for year list entries
     list_icon = "•"
     rank_text = String.pad_leading("#{list_icon} #{rank}", 6)
-    count_text = "[#{total_count}x]"
+
+    # AIDEV-NOTE: Generate proportional bar visualization for occurrence count
+    # Balanced bars for visual impact while preventing count wrapping
+    max_bars = 25
+    bar_count = max(1, round(total_count / max_count * max_bars))
+    # Use block characters for better visibility
+    bars = String.duplicate("█", bar_count)
+    count_text = "[#{bars} #{total_count}x]"
 
     %{
       rank: rank,
@@ -366,7 +378,8 @@ defmodule PremiereEcoute.Discography.Billboard do
       track_count: track_count,
       count_text: count_text,
       count_style_class: count_style_class(total_count),
-      rank_style_class: "text-cyan-400", # Always use cyan for year list entries
+      # Always use cyan for year list entries
+      rank_style_class: "text-cyan-400",
       tracks: tracks
     }
   end
