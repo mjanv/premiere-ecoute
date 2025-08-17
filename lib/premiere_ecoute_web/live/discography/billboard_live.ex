@@ -10,7 +10,8 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       playlist_form: to_form(%{"playlist_input" => nil}),
       tracks: [],
       artists: [],
-      # AIDEV-NOTE: Track display mode (:track or :artist)
+      years: [],
+      # AIDEV-NOTE: Track display mode (:track, :artist, or :year)
       display_mode: :track,
       loading: false,
       error: nil,
@@ -19,6 +20,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       progress_text: "",
       selected_track: nil,
       selected_artist: nil,
+      selected_year: nil,
       show_modal: false
     )
     |> then(fn socket -> {:ok, socket} end)
@@ -70,6 +72,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       assign(socket,
         tracks: [],
         artists: [],
+        years: [],
         loading: false,
         error: nil,
         task: nil,
@@ -107,6 +110,14 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   end
 
   @impl true
+  def handle_event("select_year", %{"rank" => rank}, socket) do
+    rank = String.to_integer(rank)
+    selected_year = Enum.find(socket.assigns.years, &(&1.display_rank == rank))
+
+    {:noreply, assign(socket, selected_year: selected_year, show_modal: true)}
+  end
+
+  @impl true
   def handle_event("switch_mode", %{"mode" => mode}, socket) do
     display_mode = String.to_existing_atom(mode)
     {:noreply, assign(socket, display_mode: display_mode)}
@@ -114,7 +125,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
 
   @impl true
   def handle_event("close_modal", _params, socket) do
-    {:noreply, assign(socket, selected_track: nil, selected_artist: nil, show_modal: false)}
+    {:noreply, assign(socket, selected_track: nil, selected_artist: nil, selected_year: nil, show_modal: false)}
   end
 
   @impl true
@@ -138,13 +149,15 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
               Billboard.format_track_entry(track, rank)
             end)
 
-          # AIDEV-NOTE: Generate artist aggregation from tracks data
+          # AIDEV-NOTE: Generate artist and year aggregation from tracks data
           formatted_artists = Billboard.generate_artist_billboard(tracks)
+          formatted_years = Billboard.generate_year_billboard(tracks)
 
           socket =
             assign(socket,
               tracks: formatted_tracks,
               artists: formatted_artists,
+              years: formatted_years,
               loading: false,
               error: nil,
               task: nil,

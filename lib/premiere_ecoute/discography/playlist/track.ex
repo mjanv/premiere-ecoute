@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
   @moduledoc false
 
   use PremiereEcouteCore.Aggregate,
-    json: [:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at]
+    json: [:provider, :track_id, :album_id, :user_id, :name, :artist, :release_date, :duration_ms, :added_at]
 
   alias PremiereEcoute.Discography.Playlist
 
@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
           user_id: String.t() | nil,
           name: String.t() | nil,
           artist: String.t() | nil,
+          release_date: Date.t() | nil,
           duration_ms: integer() | nil,
           added_at: NaiveDateTime.t() | nil,
           playlist_id: integer(),
@@ -40,7 +41,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
 
   def changeset(track, attrs) do
     track
-    |> cast(attrs, [:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at])
+    |> cast(attrs, [:provider, :track_id, :album_id, :user_id, :name, :artist, :release_date, :duration_ms, :added_at])
     |> validate_required([:provider, :track_id, :album_id, :user_id, :name, :artist, :duration_ms, :added_at])
     |> validate_inclusion(:provider, [:spotify, :deezer])
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)

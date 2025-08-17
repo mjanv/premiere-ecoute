@@ -106,6 +106,21 @@ defmodule PremiereEcoute.Discography.Billboard do
   end
 
   @doc """
+  Generate year billboard from track data.
+
+  Groups tracks by release year and aggregates their frequency counts and track details.
+  Returns formatted year entries suitable for display, sorted in reverse chronological order.
+  """
+  def generate_year_billboard(tracks) do
+    tracks
+    |> group_by_year()
+    |> Enum.with_index(1)
+    |> Enum.map(fn {year_data, rank} ->
+      format_year_entry(year_data, rank)
+    end)
+  end
+
+  @doc """
   Format a track entry for display with rank styling.
   """
   def format_track_entry(%{track: track, count: count, playlist_sources: playlist_sources}, rank) do
@@ -263,6 +278,92 @@ defmodule PremiereEcoute.Discography.Billboard do
       count_text: count_text,
       count_style_class: count_style_class(total_count),
       rank_style_class: rank_style_class(rank),
+      tracks: tracks
+    }
+  end
+
+  # AIDEV-NOTE: Year aggregation and formatting functions
+  defp group_by_year(tracks) do
+    year_data =
+      tracks
+      |> Enum.filter(fn %{track: track} -> track.release_date != nil end)
+      |> Enum.group_by(fn %{track: track} -> track.release_date.year end)
+      |> Enum.map(fn {year, track_instances} ->
+        total_count = track_instances |> Enum.map(& &1.count) |> Enum.sum()
+        track_count = length(track_instances)
+
+        # Collect all unique tracks for this year with their details
+        year_tracks =
+          Enum.map(track_instances, fn %{track: track, count: count, playlist_sources: sources} ->
+            %{
+              name: track.name,
+              artist: track.artist,
+              count: count,
+              track_id: track.track_id,
+              provider: track.provider,
+              playlist_sources: sources,
+              spotify_url:
+                case track.provider do
+                  :spotify -> "https://open.spotify.com/track/#{track.track_id}"
+                  _ -> nil
+                end,
+              deezer_url:
+                case track.provider do
+                  :deezer -> "https://www.deezer.com/track/#{track.track_id}"
+                  _ -> nil
+                end
+            }
+          end)
+
+        %{
+          year: year,
+          total_count: total_count,
+          track_count: track_count,
+          tracks: year_tracks
+        }
+      end)
+
+    # Sort by count for podium ranking (assign ranks to top 3)
+    sorted_by_count = Enum.sort_by(year_data, & &1.total_count, :desc)
+
+    # Assign podium ranks to top 3
+    year_data_with_ranks =
+      year_data
+      |> Enum.map(fn year_entry ->
+        podium_rank =
+          case Enum.find_index(sorted_by_count, fn x -> x.year == year_entry.year end) do
+            index when index in [0, 1, 2] -> index + 1
+            _ -> nil
+          end
+
+        Map.put(year_entry, :podium_rank, podium_rank)
+      end)
+
+    # Sort by year in reverse chronological order for display
+    Enum.sort_by(year_data_with_ranks, & &1.year, :desc)
+  end
+
+  defp format_year_entry(
+         %{year: year, total_count: total_count, track_count: track_count, tracks: tracks, podium_rank: podium_rank},
+         rank
+       ) do
+    # Use podium rank for display if this year is in top 3, otherwise use chronological rank
+    display_rank = podium_rank || rank
+    {_color, icon} = rank_style(display_rank)
+    rank_text = String.pad_leading("#{icon} #{display_rank}", 6)
+    count_text = "[#{total_count}x]"
+
+    %{
+      rank: rank,
+      display_rank: display_rank,
+      rank_text: rank_text,
+      rank_icon: icon,
+      year: year,
+      total_count: total_count,
+      track_count: track_count,
+      count_text: count_text,
+      count_style_class: count_style_class(total_count),
+      rank_style_class: rank_style_class(display_rank),
       tracks: tracks
     }
   end
