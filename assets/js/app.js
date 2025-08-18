@@ -97,7 +97,37 @@ const Hooks = {
         { text: "██████╔╝██║███████╗███████╗██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝", color: "text-blue-500" },
         { text: "╚═════╝ ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝", color: "text-purple-500" }
       ]
+      this.initializeAsciiArt()
+    },
+
+    // AIDEV-NOTE: Handle LiveView updates that might clear the ASCII art
+    updated() {
+      // Check if the ASCII art content is missing and re-render if needed
+      if (!this.el.innerHTML.trim() || !this.el.innerHTML.includes('██')) {
+        this.initializeAsciiArt()
+      }
+    },
+
+    initializeAsciiArt() {
+      // Clear any existing timers to prevent conflicts
+      this.clearTimers()
       this.startTerminalRender()
+    },
+
+    // AIDEV-NOTE: Clean up timers to prevent memory leaks and conflicts
+    clearTimers() {
+      if (this.renderTimer) {
+        clearTimeout(this.renderTimer)
+        this.renderTimer = null
+      }
+      if (this.glitchTimer) {
+        clearTimeout(this.glitchTimer)
+        this.glitchTimer = null
+      }
+    },
+
+    destroyed() {
+      this.clearTimers()
     },
 
     startTerminalRender() {
@@ -157,7 +187,7 @@ const Hooks = {
       
       // Continue if not all lines are complete
       if (!allComplete) {
-        setTimeout(() => this.renderAllLines(), Math.random() * 50 + 20) // Faster updates
+        this.renderTimer = setTimeout(() => this.renderAllLines(), Math.random() * 50 + 20) // Faster updates
       } else {
         // Start random glitches after completion
         this.startRandomGlitches()
@@ -188,7 +218,7 @@ const Hooks = {
         // Random delay between glitches (2-8 seconds)
         const delay = Math.random() * 6000 + 2000
         
-        setTimeout(() => {
+        this.glitchTimer = setTimeout(() => {
           // Choose type of glitch: 60% pixel, 25% vertical line, 15% horizontal line
           const glitchType = Math.random()
           if (glitchType < 0.6) {
