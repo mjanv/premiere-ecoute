@@ -115,9 +115,11 @@
                       phx-value-rank="2"
                     >
                       <%= if length(@tracks) > 1 do %>
-                        <div class="text-yellow-400 font-bold text-lg">{Enum.at(@tracks, 1).count_text}</div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 1).artist}</div>
-                        <div class="text-gray-300 text-base truncate">{Enum.at(@tracks, 1).name}</div>
+                        <div class={"#{count_color(Enum.at(@tracks, 1).count)} font-bold text-lg"}>
+                          [{Enum.at(@tracks, 1).count}x]
+                        </div>
+                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 1).track.artist}</div>
+                        <div class="text-gray-300 text-base truncate">{Enum.at(@tracks, 1).track.name}</div>
                       <% end %>
                     </div>
                   </div>
@@ -134,9 +136,11 @@
                       phx-value-rank="1"
                     >
                       <%= if length(@tracks) > 0 do %>
-                        <div class="text-yellow-200 font-bold text-xl">{Enum.at(@tracks, 0).count_text}</div>
-                        <div class="text-white font-semibold text-lg truncate">{Enum.at(@tracks, 0).artist}</div>
-                        <div class="text-yellow-100 text-lg truncate">{Enum.at(@tracks, 0).name}</div>
+                        <div class={"#{count_color(Enum.at(@tracks, 0).count)} font-bold text-xl"}>
+                          [{Enum.at(@tracks, 0).count}x]
+                        </div>
+                        <div class="text-white font-semibold text-lg truncate">{Enum.at(@tracks, 0).track.artist}</div>
+                        <div class="text-yellow-100 text-lg truncate">{Enum.at(@tracks, 0).track.name}</div>
                       <% end %>
                     </div>
                   </div>
@@ -153,9 +157,11 @@
                       phx-value-rank="3"
                     >
                       <%= if length(@tracks) > 2 do %>
-                        <div class="text-orange-400 font-bold text-lg">{Enum.at(@tracks, 2).count_text}</div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 2).artist}</div>
-                        <div class="text-orange-200 text-base truncate">{Enum.at(@tracks, 2).name}</div>
+                        <div class={"#{count_color(Enum.at(@tracks, 2).count)} font-bold text-lg"}>
+                          [{Enum.at(@tracks, 2).count}x]
+                        </div>
+                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 2).track.artist}</div>
+                        <div class="text-orange-200 text-base truncate">{Enum.at(@tracks, 2).track.name}</div>
                       <% end %>
                     </div>
                   </div>
@@ -175,9 +181,11 @@
                       phx-value-rank="2"
                     >
                       <%= if length(@artists) > 1 do %>
-                        <div class="text-yellow-400 font-bold text-lg">{Enum.at(@artists, 1).count_text}</div>
+                        <div class={"#{count_color(Enum.at(@artists, 1).count)} font-bold text-lg"}>
+                          [{Enum.at(@artists, 1).count}x]
+                        </div>
                         <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 1).artist}</div>
-                        <div class="text-gray-300 text-base truncate">{Enum.at(@artists, 1).track_count} tracks</div>
+                        <div class="text-gray-300 text-base truncate">{length(Enum.at(@artists, 1).tracks)} tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -194,9 +202,11 @@
                       phx-value-rank="1"
                     >
                       <%= if length(@artists) > 0 do %>
-                        <div class="text-yellow-200 font-bold text-xl">{Enum.at(@artists, 0).count_text}</div>
+                        <div class={"#{count_color(Enum.at(@artists, 0).count)} font-bold text-xl"}>
+                          [{Enum.at(@artists, 0).count}x]
+                        </div>
                         <div class="text-white font-semibold text-lg truncate">{Enum.at(@artists, 0).artist}</div>
-                        <div class="text-yellow-100 text-lg truncate">{Enum.at(@artists, 0).track_count} tracks</div>
+                        <div class="text-yellow-100 text-lg truncate">{length(Enum.at(@artists, 0).tracks)} tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -213,9 +223,11 @@
                       phx-value-rank="3"
                     >
                       <%= if length(@artists) > 2 do %>
-                        <div class="text-orange-400 font-bold text-lg">{Enum.at(@artists, 2).count_text}</div>
+                        <div class={"#{count_color(Enum.at(@artists, 2).count)} font-bold text-lg"}>
+                          [{Enum.at(@artists, 2).count}x]
+                        </div>
                         <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 2).artist}</div>
-                        <div class="text-orange-200 text-base truncate">{Enum.at(@artists, 2).track_count} tracks</div>
+                        <div class="text-orange-200 text-base truncate">{length(Enum.at(@artists, 2).tracks)} tracks</div>
                       <% end %>
                     </div>
                   </div>
@@ -299,11 +311,11 @@
                   phx-click="select_track"
                   phx-value-rank={track.rank}
                 >
-                  <span class={"#{track.rank_color} font-bold w-16 text-right"}>{track.rank_text}</span>
-                  <span class={"#{track.count_color} w-12"}>{track.count_text}</span>
-                  <span class="text-white font-semibold flex-1 truncate">{track.artist}</span>
+                  <span class={"#{rank_color(track.rank)} font-bold w-16 text-right"}>{rank_icon(track.rank)} {track.rank}</span>
+                  <span class={"#{count_color(track.count)} w-12"}>[{track.count}x]</span>
+                  <span class="text-white font-semibold flex-1 truncate">{track.track.artist}</span>
                   <span class="text-gray-300">-</span>
-                  <span class="text-gray-100 flex-1 truncate">{track.name}</span>
+                  <span class="text-gray-100 flex-1 truncate">{track.track.name}</span>
                 </div>
               <% end %>
             <% @display_mode == :artist -> %>
@@ -313,11 +325,13 @@
                   phx-click="select_artist"
                   phx-value-rank={artist.rank}
                 >
-                  <span class={"#{artist.rank_color} font-bold w-16 text-right"}>{artist.rank_text}</span>
-                  <span class={"#{artist.count_color} w-12"}>{artist.count_text}</span>
+                  <span class={"#{rank_color(artist.rank)} font-bold w-16 text-right"}>
+                    {rank_icon(artist.rank)} {artist.rank}
+                  </span>
+                  <span class={"#{count_color(artist.count)} w-12"}>[{artist.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{artist.artist}</span>
                   <span class="text-gray-300">-</span>
-                  <span class="text-gray-100 flex-1 truncate">{artist.track_count} tracks</span>
+                  <span class="text-gray-100 flex-1 truncate">{length(artist.tracks)} tracks</span>
                 </div>
               <% end %>
             <% @display_mode == :year -> %>
@@ -325,13 +339,13 @@
                 <div
                   class="flex items-center space-x-2 hover:bg-gray-800 p-1 cursor-pointer transition-colors"
                   phx-click="select_year"
-                  phx-value-rank={year.display_rank}
+                  phx-value-rank={year.rank}
                 >
-                  <span class={"#{year.rank_color} font-bold w-16 text-right"}>{year.rank_text}</span>
-                  <span class={"#{year.count_color} w-96"}>{year.count_text}</span>
+                  <span class={"#{rank_color(year.rank)} font-bold w-16 text-right"}>{rank_icon(year.rank)} {year.rank}</span>
+                  <span class={"#{count_color(year.count)} w-96"}>[{String.duplicate("█", year.bar_count)} {year.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{year.year}</span>
                   <span class="text-gray-300">-</span>
-                  <span class="text-gray-100 flex-1 truncate">{year.track_count} tracks</span>
+                  <span class="text-gray-100 flex-1 truncate">{length(year.tracks)} tracks</span>
                 </div>
               <% end %>
           <% end %>
@@ -344,7 +358,7 @@
       <div class="border border-purple-500 p-8 text-center">
         <div class="text-purple-500 mb-4 whitespace-pre-line">
           ┌─────────────────────────────────────────────────────────────────────┐
-          │ {String.pad_trailing(@progress_text, 67)}│
+          │ {String.pad_trailing(@progress_text, 67)} │
           └─────────────────────────────────────────────────────────────────────┘
         </div>
         <div class="text-purple-500 font-mono mb-4">
@@ -376,18 +390,18 @@
         <%= if @selected_track do %>
           <!-- Track Modal -->
           <div class="text-center mb-6">
-            <div class="text-3xl mb-4">{@selected_track.rank_text}</div>
+            <div class="text-3xl mb-4">{rank_icon(@selected_track.rank)} {@selected_track.rank}</div>
             <div class="flex items-center justify-center space-x-4">
               <h2 class="text-xl font-bold text-white">
-                {@selected_track.artist} - <span class="text-gray-300">{@selected_track.name}</span>
+                {@selected_track.track.artist} - <span class="text-gray-300">{@selected_track.track.name}</span>
               </h2>
               <div class="flex space-x-2">
                 <a
-                  href={@selected_track.provider_url}
+                  href={Track.url(@selected_track.track)}
                   target="_blank"
                   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
                 >
-                  {String.capitalize(Atom.to_string(@selected_track.provider))}
+                  {String.capitalize(Atom.to_string(@selected_track.track.provider))}
                 </a>
               </div>
             </div>
@@ -396,15 +410,15 @@
           <div class="space-y-4">
             <div class="border-t border-gray-700 pt-4">
               <h3 class="text-lg font-semibold text-white mb-4">Found in playlists:</h3>
-              <div class="space-y-2 max-h-40 overflow-y-auto">
-                <%= for source <- @selected_track.playlist_sources do %>
+              <div class="space-y-2 max-h-96 overflow-y-auto">
+                <%= for track <- @selected_track.tracks |> Enum.uniq_by(&{&1.provider, &1.playlist_id}) do %>
                   <div class="bg-gray-800 p-3 rounded-lg">
                     <a
-                      href={source.playlist_url}
+                      href={Playlist.url(track)}
                       target="_blank"
                       class="text-purple-400 hover:text-purple-300 text-sm text-center block break-all"
                     >
-                      {source.playlist_url}
+                      {Playlist.url(track)}
                     </a>
                   </div>
                 <% end %>
@@ -416,30 +430,30 @@
         <%= if @selected_artist do %>
           <!-- Artist Modal -->
           <div class="text-center mb-6">
-            <div class="text-3xl mb-4">{@selected_artist.rank_text}</div>
+            <div class="text-3xl mb-4">{rank_icon(@selected_artist.rank)} {@selected_artist.rank}</div>
             <h2 class="text-2xl font-bold text-white mb-2">{@selected_artist.artist}</h2>
             <div class="text-lg text-gray-300">
-              {@selected_artist.total_count} occurrences • {@selected_artist.track_count} tracks
+              {@selected_artist.count} occurrences • {length(@selected_artist.tracks)} tracks
             </div>
           </div>
 
           <div class="space-y-4">
             <div class="border-t border-gray-700 pt-4">
               <h3 class="text-lg font-semibold text-white mb-4">Tracks by this artist:</h3>
-              <div class="space-y-2 max-h-80 overflow-y-auto">
-                <%= for track <- @selected_artist.tracks do %>
+              <div class="space-y-2 max-h-96 overflow-y-auto">
+                <%= for track_group <- @selected_artist.tracks do %>
                   <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                     <div class="flex-1">
-                      <div class="text-white font-semibold">{track.name}</div>
-                      <div class="text-gray-400 text-sm">{track.count} occurrences</div>
+                      <div class="text-white font-semibold">{track_group.track.name}</div>
+                      <div class="text-gray-400 text-sm">{track_group.count} occurrences</div>
                     </div>
                     <div class="flex space-x-2 ml-4">
                       <a
-                        href={track.provider_url}
+                        href={Track.url(track_group.track)}
                         target="_blank"
                         class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                       >
-                        {String.capitalize(Atom.to_string(track.provider))}
+                        {String.capitalize(Atom.to_string(track_group.track.provider))}
                       </a>
                     </div>
                   </div>
@@ -452,26 +466,25 @@
         <%= if @selected_year do %>
           <!-- Year Modal -->
           <div class="text-center mb-6">
-            <div class="text-3xl mb-4">{@selected_year.rank_text}</div>
+            <div class="text-3xl mb-4">{rank_icon(@selected_year.rank)} {@selected_year.rank}</div>
             <h2 class="text-2xl font-bold text-white mb-2">{@selected_year.year}</h2>
             <div class="text-lg text-gray-300">
-              {@selected_year.total_count} occurrences • {@selected_year.track_count} tracks
+              {@selected_year.count} occurrences • {length(@selected_year.tracks)} tracks
             </div>
           </div>
 
           <div class="space-y-4">
             <div class="border-t border-gray-700 pt-4">
               <h3 class="text-lg font-semibold text-white mb-4">Tracks from this year:</h3>
-              <div class="space-y-2 max-h-80 overflow-y-auto">
+              <div class="space-y-2 max-h-96 overflow-y-auto">
                 <%= for track <- @selected_year.tracks do %>
                   <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                     <div class="flex-1">
                       <div class="text-white font-semibold">{track.artist} - {track.name}</div>
-                      <div class="text-gray-400 text-sm">{track.count} occurrences</div>
                     </div>
                     <div class="flex space-x-2 ml-4">
                       <a
-                        href={track.provider_url}
+                        href={Track.url(track)}
                         target="_blank"
                         class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                       >

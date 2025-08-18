@@ -13,30 +13,28 @@ defmodule PremiereEcoute.Discography.Billboard do
 
   def generate_billboard(playlist_urls, opts \\ []) when is_list(playlist_urls) do
     callback = Keyword.get(opts, :callback, fn _, _ -> :ok end)
-    callback = fn t, _ -> IO.inspect(t) end
-    
-    IO.inspect("---------------------------")
 
-    # try do
+    try do
       with _ <- callback.("Starting", 0),
-           playlist_ids <- extract_playlist_ids(playlist_urls) |> IO.inspect(),
+           playlist_ids <- extract_playlist_ids(playlist_urls),
            _ <- callback.("Fetching playlists", 10),
            playlists <- loop(playlist_ids, callback),
            tracks <- Enum.flat_map(playlists, fn %Playlist{tracks: tracks} -> tracks end),
-           _ <- callback.("Stats1", 100),
-           track <- group_by(tracks, :track),
-           _ <- callback.("Stats2", 100),
+           _ <- callback.("Compute billboard by track", 85),
+           track <- group_by(tracks, :track) |> IO.inspect(),
+           _ <- callback.("Compute billboard by artist", 90),
            artist <- group_by(tracks, :artist),
-           _ <- callback.("Stats3", 100),
+           _ <- callback.("Compute billboard by year", 95),
            year <- group_by(tracks, :year),
-           _ <- callback.("Stats4", 100),
-           year_podium <- group_by(tracks, :year_podium) do
-        IO.inspect("???????????????")
-        {:ok, %{track: track, artist: artist, year: year, year_podium: year_podium}}
+           year_podium <- group_by(tracks, :year_podium),
+           _ <- callback.("Done", 100) do
+        {:ok, %{playlists: playlists, track: track, artist: artist, year: year, year_podium: year_podium}}
       end
-    # rescue
-    #   error -> {:error, Exception.message(error)}
-    # end
+    rescue
+      error ->
+        Logger.error("#{inspect(error)}")
+        {:error, Exception.message(error)}
+    end
   end
 
   def extract_playlist_ids(urls) do
@@ -59,14 +57,14 @@ defmodule PremiereEcoute.Discography.Billboard do
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq()
   end
-  
+
   def loop(playlist_ids, callback) do
     total = length(playlist_ids)
 
     playlist_ids
     |> Enum.with_index(1)
     |> Enum.map(fn {{provider, playlist_id}, index} ->
-      callback.("Fetching playlist #{index}/#{total}", 10 + div(index * 90, total))
+      callback.("Fetching playlist #{index}/#{total}", 10 + div(index * 75, total))
       {:ok, %Playlist{} = playlist} = Apis.provider(provider).get_playlist(playlist_id)
       playlist
     end)
@@ -95,7 +93,7 @@ defmodule PremiereEcoute.Discography.Billboard do
         artist: Map.get(first_track, :artist),
         count: Enum.sum(Enum.map(group_by(tracks, :track), & &1.count)),
         track_count: length(tracks),
-        tracks: tracks
+        tracks: group_by(tracks, :track)
       }
     end)
     |> Enum.sort_by(& &1.count, :desc)
@@ -111,18 +109,18 @@ defmodule PremiereEcoute.Discography.Billboard do
         year: year,
         count: Enum.sum(Enum.map(group_by(tracks, :track), & &1.count)),
         track_count: length(tracks),
-        tracks: tracks
+        tracks: group_by(tracks, :track)
       }
     end)
     |> then(fn years ->
       max_count = Enum.max(Enum.map(years, & &1.count))
       Enum.map(years, fn year -> Map.put(year, :max_count, max_count) end)
-      end)
+    end)
     |> Enum.sort_by(& &1.year, :desc)
     |> Enum.with_index(1)
     |> Enum.map(fn {row, rank} -> Map.put(row, :rank, rank) end)
   end
-  
+
   defp group_by(tracks, :year_podium) do
     tracks
     |> Enum.group_by(fn track -> track.release_date.year end)
@@ -137,12 +135,11 @@ defmodule PremiereEcoute.Discography.Billboard do
     |> then(fn years ->
       max_count = Enum.max(Enum.map(years, & &1.count))
       Enum.map(years, fn year -> Map.put(year, :max_count, max_count) end)
-      end)
+    end)
     |> Enum.sort_by(& &1.count, :desc)
     |> Enum.with_index(1)
     |> Enum.map(fn {row, rank} -> Map.put(row, :rank, rank) end)
   end
-
 
   def clean_value(value) when is_binary(value) do
     value
