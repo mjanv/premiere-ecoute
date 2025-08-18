@@ -58,4 +58,7 @@ defmodule PremiereEcoute.Discography.Playlist do
     |> Map.update!(:tracks, fn tracks -> Enum.map(tracks, &Map.from_struct/1) end)
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
+
+  def url(%{provider: :spotify, playlist_id: id}), do: "https://open.spotify.com/playlist/#{id}"
+  def url(%{provider: :deezer, playlist_id: id}), do: "https://www.deezer.com/playlist/#{id}"
 end

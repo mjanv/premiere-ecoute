@@ -46,4 +46,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
     |> validate_inclusion(:provider, [:spotify, :deezer])
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
   end
+
+  def url(%{provider: :spotify, track_id: id}), do: "https://open.spotify.com/track/#{id}"
+  def url(%{provider: :deezer, track_id: id}), do: "https://www.deezer.com/track/#{id}"
 end

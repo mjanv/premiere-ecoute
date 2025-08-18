@@ -57,33 +57,26 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
       cover_url: Parser.parse_album_cover_url(data["images"]),
       tracks:
         if Map.has_key?(data["tracks"], "items") do
-          Enum.map(data["tracks"]["items"], &parse_track/1)
+          Enum.map(data["tracks"]["items"], fn item -> parse_track(item, data["id"]) end)
         else
           []
         end
     }
   end
 
-  def parse_track(data) do
+  def parse_track(data, playlist_id) do
     %Track{
       provider: :spotify,
       track_id: data["track"]["id"],
       album_id: data["track"]["album"]["id"],
       user_id: data["added_by"]["id"],
+      playlist_id: playlist_id,
       name: data["track"]["name"],
       artist: Parser.parse_primary_artist(data["track"]["artists"]),
       duration_ms: data["track"]["duration_ms"] || 0,
       added_at: NaiveDateTime.from_iso8601!(data["added_at"]),
-      release_date: parse_release_date(data["track"]["album"]["release_date"])
+      release_date: Parser.parse_release_date(data["track"]["album"]["release_date"])
     }
-  end
-
-  def parse_release_date(date_string) do
-    case String.split(date_string, "-") do
-      [year] -> Date.from_iso8601!("#{year}-01-01")
-      [year, month] -> Date.from_iso8601!("#{year}-#{month}-01")
-      [year, month, day] -> Date.from_iso8601!("#{year}-#{month}-#{day}")
-    end
   end
 
   def parse_library_playlist(data) do

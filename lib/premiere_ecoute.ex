@@ -11,7 +11,8 @@ defmodule PremiereEcoute do
       {Apis, except: []},
       {Telemetry, except: []},
       PubSub,
-      DataCase
+      DataCase,
+      Repo
     ]
 
   alias PremiereEcoute.Events.Store

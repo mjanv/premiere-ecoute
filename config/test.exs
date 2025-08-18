@@ -18,8 +18,8 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
   ],
   spotify: [
-    api: PremiereEcoute.Apis.SpotifyApi.Mock,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.SpotifyApi}]
+    api: PremiereEcoute.Apis.SpotifyApi
+    # req_options: [plug: {Req.Test, PremiereEcoute.Apis.SpotifyApi}]
   ],
   deezer: [
     api: PremiereEcoute.Apis.DeezerApi,

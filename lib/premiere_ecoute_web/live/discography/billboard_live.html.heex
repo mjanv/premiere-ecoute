@@ -21,7 +21,7 @@
               id="playlist_input"
               name="playlist_input"
               rows="10"
-              placeholder="https://open.spotify.com/playlist/0GVUztIdLeLsftpMTwkYGf&#10;https://www.deezer.com/us/playlist/14170581581&#10;https://open.spotify.com/playlist/28Anwq5yS87ujCDWdFFr4b"
+              placeholder="https://open.spotify.com/playlist/0GVUztdILeLsftpTMwkYGf&#10;https://www.deezer.com/us/playlist/11173584581"
               class="w-full px-3 py-2 bg-gray-900 border border-purple-500 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 font-mono text-sm"
               phx-hook="PlaylistStorage"
             ></textarea>
@@ -56,9 +56,11 @@
 <!-- Error Display -->
       <%= if @error do %>
         <div class="mt-4 p-4 border border-purple-500">
-          <div class="text-purple-500 whitespace-pre-line">┌─────────────────────────────────────────────────────────────────────┐
-            │ ERROR: {String.pad_trailing(@error, 58)}│
-            └─────────────────────────────────────────────────────────────────────┘</div>
+          <div class="text-purple-500 whitespace-pre-line">
+            ┌─────────────────────────────────────────────────────────────────────┐
+            │ ERROR: {String.pad_trailing(@error, 30)} │
+            └─────────────────────────────────────────────────────────────────────┘
+          </div>
         </div>
       <% end %>
     </div>
@@ -95,7 +97,7 @@
         </div>
         
 <!-- Top 3 Podium -->
-        <%= if (@display_mode == :track and @tracks != [] and length(@tracks) >= 3) or (@display_mode == :artist and @artists != [] and length(@artists) >= 3) or (@display_mode == :year and @years != [] and length(@years) >= 3) do %>
+        <%= if true do %>
           <div class="mb-12">
             <%= cond do %>
               <% @display_mode == :track -> %>
@@ -218,14 +220,15 @@
                     </div>
                   </div>
                 </div>
-              <% true -> %>
+              <% @display_mode == :year -> %>
                 <div class="flex justify-center items-end space-x-8 mb-12">
                   <!-- Year Mode Podium -->
                   <% # AIDEV-NOTE: Find years with podium ranks for correct display by occurrence count
                   first_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 1 end)
                   second_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 2 end)
                   third_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 3 end) %>
-                  <!-- 2nd Place -->
+                  
+<!-- 2nd Place -->
                   <div class="text-center">
                     <div class="bg-gray-700 border-4 border-gray-500 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
                       <div class="text-4xl mb-2">🥈</div>
@@ -296,8 +299,8 @@
                   phx-click="select_track"
                   phx-value-rank={track.rank}
                 >
-                  <span class={"#{track.rank_style_class} font-bold w-16 text-right"}>{track.rank_text}</span>
-                  <span class={"#{track.count_style_class} w-12"}>{track.count_text}</span>
+                  <span class={"#{track.rank_color} font-bold w-16 text-right"}>{track.rank_text}</span>
+                  <span class={"#{track.count_color} w-12"}>{track.count_text}</span>
                   <span class="text-white font-semibold flex-1 truncate">{track.artist}</span>
                   <span class="text-gray-300">-</span>
                   <span class="text-gray-100 flex-1 truncate">{track.name}</span>
@@ -310,22 +313,22 @@
                   phx-click="select_artist"
                   phx-value-rank={artist.rank}
                 >
-                  <span class={"#{artist.rank_style_class} font-bold w-16 text-right"}>{artist.rank_text}</span>
-                  <span class={"#{artist.count_style_class} w-12"}>{artist.count_text}</span>
+                  <span class={"#{artist.rank_color} font-bold w-16 text-right"}>{artist.rank_text}</span>
+                  <span class={"#{artist.count_color} w-12"}>{artist.count_text}</span>
                   <span class="text-white font-semibold flex-1 truncate">{artist.artist}</span>
                   <span class="text-gray-300">-</span>
                   <span class="text-gray-100 flex-1 truncate">{artist.track_count} tracks</span>
                 </div>
               <% end %>
-            <% true -> %>
+            <% @display_mode == :year -> %>
               <%= for year <- @years do %>
                 <div
                   class="flex items-center space-x-2 hover:bg-gray-800 p-1 cursor-pointer transition-colors"
                   phx-click="select_year"
                   phx-value-rank={year.display_rank}
                 >
-                  <span class={"#{year.rank_style_class} font-bold w-16 text-right"}>{year.rank_text}</span>
-                  <span class={"#{year.count_style_class} w-96"}>{year.count_text}</span>
+                  <span class={"#{year.rank_color} font-bold w-16 text-right"}>{year.rank_text}</span>
+                  <span class={"#{year.count_color} w-96"}>{year.count_text}</span>
                   <span class="text-white font-semibold flex-1 truncate">{year.year}</span>
                   <span class="text-gray-300">-</span>
                   <span class="text-gray-100 flex-1 truncate">{year.track_count} tracks</span>
@@ -362,7 +365,7 @@
   </div>
   
 <!-- Details Modal -->
-  <%= if @show_modal and (@selected_track != nil or @selected_artist != nil or @selected_year != nil) do %>
+  <%= if @show_modal do %>
     <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" phx-click="close_modal">
       <div
         class="bg-gray-900 border-2 border-purple-500 rounded-lg p-8 max-w-4xl w-full mx-4 relative"
@@ -379,24 +382,13 @@
                 {@selected_track.artist} - <span class="text-gray-300">{@selected_track.name}</span>
               </h2>
               <div class="flex space-x-2">
-                <%= if @selected_track.spotify_url do %>
-                  <a
-                    href={@selected_track.spotify_url}
-                    target="_blank"
-                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
-                  >
-                    Spotify
-                  </a>
-                <% end %>
-                <%= if @selected_track.deezer_url do %>
-                  <a
-                    href={@selected_track.deezer_url}
-                    target="_blank"
-                    class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
-                  >
-                    Deezer
-                  </a>
-                <% end %>
+                <a
+                  href={@selected_track.provider_url}
+                  target="_blank"
+                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                >
+                  {String.capitalize(Atom.to_string(@selected_track.provider))}
+                </a>
               </div>
             </div>
           </div>
@@ -442,24 +434,13 @@
                       <div class="text-gray-400 text-sm">{track.count} occurrences</div>
                     </div>
                     <div class="flex space-x-2 ml-4">
-                      <%= if track.spotify_url do %>
-                        <a
-                          href={track.spotify_url}
-                          target="_blank"
-                          class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                        >
-                          Spotify
-                        </a>
-                      <% end %>
-                      <%= if track.deezer_url do %>
-                        <a
-                          href={track.deezer_url}
-                          target="_blank"
-                          class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                        >
-                          Deezer
-                        </a>
-                      <% end %>
+                      <a
+                        href={track.provider_url}
+                        target="_blank"
+                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                      >
+                        {String.capitalize(Atom.to_string(track.provider))}
+                      </a>
                     </div>
                   </div>
                 <% end %>
@@ -489,24 +470,13 @@
                       <div class="text-gray-400 text-sm">{track.count} occurrences</div>
                     </div>
                     <div class="flex space-x-2 ml-4">
-                      <%= if track.spotify_url do %>
-                        <a
-                          href={track.spotify_url}
-                          target="_blank"
-                          class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                        >
-                          Spotify
-                        </a>
-                      <% end %>
-                      <%= if track.deezer_url do %>
-                        <a
-                          href={track.deezer_url}
-                          target="_blank"
-                          class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                        >
-                          Deezer
-                        </a>
-                      <% end %>
+                      <a
+                        href={track.provider_url}
+                        target="_blank"
+                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                      >
+                        {String.capitalize(Atom.to_string(track.provider))}
+                      </a>
                     </div>
                   </div>
                 <% end %>

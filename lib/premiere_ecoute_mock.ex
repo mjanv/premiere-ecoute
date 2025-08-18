@@ -1,5 +1,5 @@
 defmodule PremiereEcouteMock do
   @moduledoc false
 
-  use Boundary, deps: [], exports: []
+  use Boundary, deps: [PremiereEcoute], exports: []
 end

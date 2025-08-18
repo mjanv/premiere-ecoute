@@ -13,17 +13,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Parser do
   def parse_release_date(nil), do: nil
   def parse_release_date(""), do: nil
 
-  def parse_release_date(date_string) when is_binary(date_string) do
-    case Date.from_iso8601(date_string) do
-      {:ok, date} ->
-        date
-
-      {:error, _} ->
-        # Try parsing year-only format
-        case Integer.parse(date_string) do
-          {year, _} when year > 1900 -> Date.new(year, 1, 1) |> elem(1)
-          _ -> nil
-        end
+  def parse_release_date(date_string) do
+    case String.split(date_string, "-") do
+      [year] -> Date.from_iso8601!("#{year}-01-01")
+      [year, month] -> Date.from_iso8601!("#{year}-#{month}-01")
+      [year, month, day] -> Date.from_iso8601!("#{year}-#{month}-#{day}")
     end
   end
 

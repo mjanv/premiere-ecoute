@@ -29,6 +29,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreatePlaylists do
       add :artist, :string, null: false
       add :duration_ms, :integer, null: false
       add :added_at, :naive_datetime, null: false
+      add :release_date, :date, null: false
 
       add :playlist_id, references(:playlists, on_delete: :delete_all), null: false
 

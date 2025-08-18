@@ -23,7 +23,8 @@ defmodule PremiereEcoute.Discography.PlaylistFixtures do
           user_id: "ku296zgwbo0e3qff8cylptsjq",
           artist: "Unknown Artist",
           duration_ms: 217_901,
-          added_at: ~N[2025-07-18 07:59:47]
+          added_at: ~N[2025-07-18 07:59:47],
+          release_date: ~D[2025-07-17]
         }
       ]
     }

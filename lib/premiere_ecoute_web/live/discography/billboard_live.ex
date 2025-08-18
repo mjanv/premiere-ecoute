@@ -11,11 +11,9 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       tracks: [],
       artists: [],
       years: [],
-      # AIDEV-NOTE: Track display mode (:track, :artist, or :year)
       display_mode: :track,
       loading: false,
       error: nil,
-      ascii_header: Billboard.generate_ascii_header(),
       progress: 0,
       progress_text: "",
       selected_track: nil,
@@ -33,61 +31,55 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
 
   @impl true
   def handle_event("generate_billboard", %{"playlist_input" => playlist_input}, socket) do
-    playlist_urls = parse_playlist_urls(playlist_input)
+    playlist_urls = String.split(playlist_input, ["\n", "\r\n", "\r"], trim: true)
 
     if length(playlist_urls) > 0 do
-      live_view_pid = self()
+      pid = self()
 
       task =
         Task.async(fn ->
-          progress_callback = fn text, progress ->
-            send(live_view_pid, {:progress_update, text, progress})
-          end
-
-          Billboard.generate_billboard(playlist_urls, progress_callback: progress_callback)
+          Billboard.generate_billboard(
+            playlist_urls,
+            callback: fn text, progress -> send(pid, {:progress, text, progress}) end
+          )
         end)
 
-      socket =
-        assign(socket,
-          playlist_form: to_form(%{"playlist_input" => playlist_input}),
-          loading: true,
-          error: nil,
-          tracks: [],
-          task: task,
-          progress: 0,
-          progress_text: "Starting..."
-        )
-        |> push_event("set_loading", %{loading: true})
-
-      {:noreply, socket}
+      socket
+      |> assign(
+        playlist_form: to_form(%{"playlist_input" => playlist_input}),
+        loading: true,
+        error: nil,
+        tracks: [],
+        task: task,
+        progress: 0,
+        progress_text: "Starting..."
+      )
+      |> push_event("set_loading", %{loading: true})
+      |> then(fn socket -> {:noreply, socket} end)
     else
-      socket = assign(socket, error: "Please enter at least one playlist URL")
-      {:noreply, socket}
+      {:noreply, assign(socket, error: "Please enter at least one playlist URL")}
     end
   end
 
   @impl true
   def handle_event("generate_billboard", _params, socket) do
-    # AIDEV-NOTE: Handle case where form is submitted without playlist_input
-    socket = assign(socket, error: "Please enter at least one playlist URL")
-    {:noreply, socket}
+    {:noreply, assign(socket, error: "Please enter at least one playlist URL")}
   end
 
   @impl true
   def handle_event("clear_results", _params, socket) do
-    socket =
-      assign(socket,
-        tracks: [],
-        artists: [],
-        years: [],
-        loading: false,
-        error: nil,
-        task: nil,
-        progress: 0,
-        progress_text: ""
-      )
-
-    {:noreply, socket}
+    socket
+    |> assign(
+      tracks: [],
+      artists: [],
+      years: [],
+      loading: false,
+      error: nil,
+      task: nil,
+      progress: 0,
+      progress_text: ""
+    )
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -126,8 +118,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
 
   @impl true
   def handle_event("switch_mode", %{"mode" => mode}, socket) do
-    display_mode = String.to_existing_atom(mode)
-    {:noreply, assign(socket, display_mode: display_mode)}
+    {:noreply, assign(socket, display_mode: String.to_existing_atom(mode))}
   end
 
   @impl true
@@ -141,78 +132,57 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   end
 
   @impl true
-  def handle_info({ref, result}, socket) do
-    # Only handle if this ref matches our current task
-    if socket.assigns[:task] && socket.assigns.task.ref == ref do
-      # Task completed
-      Process.demonitor(ref, [:flush])
+  def handle_info({ref, {:ok, tracks}}, socket) do
+    Process.demonitor(ref, [:flush])
 
-      case result do
-        {:ok, tracks} ->
-          formatted_tracks =
-            tracks
-            |> Enum.with_index(1)
-            |> Enum.map(fn {track, rank} ->
-              Billboard.format_track_entry(track, rank)
-            end)
+    socket
+    |> assign(
+      tracks: Billboard.generate_list(tracks, :track),
+      artists: Billboard.generate_list(tracks, :artist),
+      years: Billboard.generate_list(tracks, :year),
+      loading: false,
+      error: nil,
+      task: nil,
+      progress: 0,
+      progress_text: ""
+    )
+    |> push_event("set_loading", %{loading: false})
+    |> then(fn socket -> {:noreply, socket} end)
+  end
 
-          # AIDEV-NOTE: Generate artist and year aggregation from tracks data
-          formatted_artists = Billboard.generate_artist_billboard(tracks)
-          formatted_years = Billboard.generate_year_billboard(tracks)
+  @impl true
+  def handle_info({ref, {:error, reason}}, socket) do
+    Process.demonitor(ref, [:flush])
 
-          socket =
-            assign(socket,
-              tracks: formatted_tracks,
-              artists: formatted_artists,
-              years: formatted_years,
-              loading: false,
-              error: nil,
-              task: nil,
-              progress: 0,
-              progress_text: ""
-            )
-            |> push_event("set_loading", %{loading: false})
-
-          {:noreply, socket}
-
-        {:error, reason} ->
-          socket =
-            assign(socket,
-              loading: false,
-              error: "Failed to generate billboard: #{reason}",
-              task: nil,
-              progress: 0,
-              progress_text: ""
-            )
-            |> push_event("set_loading", %{loading: false})
-
-          {:noreply, socket}
-      end
-    else
-      {:noreply, socket}
-    end
+    socket
+    |> assign(
+      loading: false,
+      error: "Failed to generate billboard: #{reason}",
+      task: nil,
+      progress: 0,
+      progress_text: ""
+    )
+    |> push_event("set_loading", %{loading: false})
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
   def handle_info({:DOWN, _ref, :process, _pid, _reason}, socket) do
-    # Task crashed or was killed
-    socket =
-      assign(socket,
-        loading: false,
-        error: "Failed to generate billboard: request was interrupted",
-        task: nil,
-        progress: 0,
-        progress_text: ""
-      )
-      |> push_event("set_loading", %{loading: false})
-
-    {:noreply, socket}
+    socket
+    |> assign(
+      loading: false,
+      error: "Failed to generate billboard: request was interrupted",
+      task: nil,
+      progress: 0,
+      progress_text: ""
+    )
+    |> push_event("set_loading", %{loading: false})
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
-  def handle_info({:progress_update, text, progress}, socket) do
-    socket = assign(socket, progress: progress, progress_text: text)
-    {:noreply, socket}
+  def handle_info({:progress, text, progress}, socket) do
+    {:noreply, assign(socket, progress: progress, progress_text: text)}
   end
 
   @impl true
@@ -220,14 +190,21 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: Parse playlist URLs from textarea input, handling various formats
-  defp parse_playlist_urls(input) do
-    input
-    |> String.split(["\n", "\r\n", "\r"], trim: true)
-    |> Enum.map(&String.trim/1)
-    |> Enum.filter(fn url ->
-      String.starts_with?(url, "http") and
-        (String.contains?(url, "spotify.com/playlist") or String.contains?(url, "deezer.com"))
-    end)
-  end
+  defp rank_icon(1), do: "🥇"
+  defp rank_icon(2), do: "🥈"
+  defp rank_icon(3), do: "🥉"
+  defp rank_icon(_), do: "•"
+
+  defp rank_color(1), do: "text-yellow-400"
+  defp rank_color(2), do: "text-gray-300"
+  defp rank_color(3), do: "text-orange-400"
+  defp rank_color(_), do: "text-cyan-400"
+
+  defp count_color(count) when count >= 10, do: "text-red-400"
+  defp count_color(count) when count >= 5, do: "text-yellow-400"
+  defp count_color(count) when count >= 2, do: "text-green-400"
+  defp count_color(_), do: "text-white"
+
+  # max_bars = 25
+  # bars = max(1, round(count / max_count * max_bars))
 end
