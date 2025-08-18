@@ -356,6 +356,20 @@ body {
   z-index: 1;
 }
 
+/* AIDEV-NOTE: Ensure modals appear above synthwave effects */
+.synthwave-bg .fixed {
+  z-index: 9999 !important;
+}
+
+/* AIDEV-NOTE: Fix modal layering - ensure modals appear above all synthwave effects */
+div[class*="fixed"][class*="inset-0"][class*="bg-black"] {
+  z-index: 10000 !important;
+}
+
+div[class*="fixed"][class*="inset-0"][class*="bg-black"] > div {
+  z-index: 10001 !important;
+}
+
 /* AIDEV-NOTE: CRT screen effect for BILLBOARD title */
 .synthwave-title {
   filter: brightness(0.9) contrast(1.1);
@@ -409,6 +423,7 @@ body {
   background: linear-gradient(45deg, #ff1493, #8b44e7);
   border-radius: inherit;
   z-index: -1;
+  pointer-events: none;
 }
 
 .synthwave-bg button[type="submit"]:hover,
@@ -428,6 +443,95 @@ body {
   box-shadow: 
     0 0 5px rgba(255, 20, 147, 0.2),
     inset 0 0 5px rgba(255, 255, 255, 0.05);
+}
+
+/* AIDEV-NOTE: Synthwave loading state styling - redesigned for fun and readability */
+.synthwave-loading {
+  border: 3px solid transparent;
+  background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)) padding-box,
+              linear-gradient(45deg, #ff1493, #8b44e7) border-box;
+  box-shadow: 
+    0 0 20px rgba(255, 20, 147, 0.4),
+    inset 0 0 15px rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+}
+
+.synthwave-progress-text {
+  color: #ff1493;
+  text-shadow: 
+    0 0 8px #ff1493,
+    0 0 15px #ff1493;
+  animation: synthwave-text-glow 2s ease-in-out infinite alternate;
+  letter-spacing: 0.1em;
+}
+
+.synthwave-status-text {
+  color: #8b44e7;
+  text-shadow: 
+    0 0 5px #8b44e7;
+  opacity: 0.9;
+  font-family: 'Courier New', monospace;
+}
+
+.synthwave-progress-bar {
+  background: #000;
+  border: 2px solid #8b44e7;
+  box-shadow: 
+    0 0 15px rgba(139, 68, 231, 0.4),
+    inset 0 0 8px rgba(0, 0, 0, 0.7);
+  border-radius: 0.25rem;
+}
+
+.synthwave-progress-fill {
+  background: linear-gradient(90deg, #ff1493, #8b44e7, #ff1493);
+  background-size: 200% 100%;
+  animation: synthwave-progress-flow 2s linear infinite;
+  box-shadow: 
+    0 0 15px rgba(255, 20, 147, 0.7),
+    inset 0 0 8px rgba(255, 255, 255, 0.3);
+  border-radius: 0.125rem;
+}
+
+.synthwave-loading-dots {
+  color: #ff1493;
+  text-shadow: 0 0 5px #ff1493;
+  animation: synthwave-dots-pulse 1.5s ease-in-out infinite;
+  letter-spacing: 0.2em;
+  opacity: 0.8;
+}
+
+@keyframes synthwave-text-glow {
+  0% {
+    text-shadow: 
+      0 0 8px #ff1493,
+      0 0 15px #ff1493;
+  }
+  100% {
+    text-shadow: 
+      0 0 12px #ff1493,
+      0 0 20px #ff1493,
+      0 0 25px #ff1493;
+  }
+}
+
+@keyframes synthwave-progress-flow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+@keyframes synthwave-dots-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    text-shadow: 0 0 5px #ff1493;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 10px #ff1493, 0 0 15px #ff1493;
+  }
 }
 
 @keyframes synthwave-grid {
