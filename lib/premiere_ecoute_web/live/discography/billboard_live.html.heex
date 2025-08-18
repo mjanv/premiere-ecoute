@@ -41,8 +41,8 @@
         </.form>
       </div>
     <% end %>
-
-    <!-- Clear Button (when results exist) -->
+    
+<!-- Clear Button (when results exist) -->
     <%= if @tracks != [] do %>
       <div class="border border-purple-500 p-6 mb-8">
         <div class="flex justify-center">
@@ -56,8 +56,8 @@
         </div>
       </div>
     <% end %>
-      
-    <!-- Error Display -->
+    
+<!-- Error Display -->
     <%= if @error do %>
       <div class="mt-4 p-4 border border-purple-500">
         <div class="text-purple-500 whitespace-pre-line">
@@ -366,7 +366,7 @@
                 <div
                   class="flex items-center space-x-2 hover:bg-gray-800 p-1 cursor-pointer transition-colors"
                   phx-click="select_playlist"
-                  phx-value-playlist_id={playlist.playlist_id}
+                  phx-value-rank={playlist.rank}
                 >
                   <span class={"#{rank_color(playlist.rank)} font-bold w-16 text-right"}>
                     {rank_icon(playlist.rank)} {playlist.rank}
@@ -506,18 +506,19 @@
             <div class="border-t border-gray-700 pt-4">
               <h3 class="text-lg font-semibold text-white mb-4">Tracks from this year:</h3>
               <div class="space-y-2 max-h-96 overflow-y-auto">
-                <%= for track <- @selected_year.tracks do %>
+                <%= for track_group <- @selected_year.tracks do %>
                   <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                     <div class="flex-1">
-                      <div class="text-white font-semibold">{track.artist} - {track.name}</div>
+                      <div class="text-white font-semibold">{track_group.track.artist} - {track_group.track.name}</div>
+                      <div class="text-gray-400 text-sm">{track_group.count} occurrences</div>
                     </div>
                     <div class="flex space-x-2 ml-4">
                       <a
-                        href={Track.url(track)}
+                        href={Track.url(track_group.track)}
                         target="_blank"
                         class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                       >
-                        {String.capitalize(Atom.to_string(track.provider))}
+                        {String.capitalize(Atom.to_string(track_group.track.provider))}
                       </a>
                     </div>
                   </div>
@@ -546,30 +547,102 @@
               </a>
             </div>
           </div>
-
-          <div class="space-y-4">
-            <div class="border-t border-gray-700 pt-4">
-              <h3 class="text-lg font-semibold text-white mb-4">Tracks in this playlist:</h3>
-              <div class="space-y-2 max-h-96 overflow-y-auto">
-                <%= for track <- @selected_playlist.tracks do %>
-                  <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
-                    <div class="flex-1">
-                      <div class="text-white font-semibold">{track.artist} - {track.name}</div>
-                      <div class="text-gray-400 text-sm">{track.release_date.year}</div>
-                    </div>
-                    <div class="flex space-x-2 ml-4">
-                      <a
-                        href={Track.url(track)}
-                        target="_blank"
-                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                      >
-                        {String.capitalize(Atom.to_string(track.provider))}
-                      </a>
-                    </div>
-                  </div>
-                <% end %>
-              </div>
+          
+<!-- Tab Navigation -->
+          <div class="mb-6">
+            <div class="flex space-x-2 border-b border-gray-700">
+              <button
+                phx-click="switch_playlist_tab"
+                phx-value-tab="tracks"
+                class={[
+                  "px-4 py-2 font-mono font-bold transition-colors duration-200",
+                  if(@playlist_modal_tab == :tracks,
+                    do: "bg-purple-600 text-white border-b-2 border-purple-300",
+                    else: "text-purple-400 hover:text-purple-300"
+                  )
+                ]}
+              >
+                Tracks ({length(@selected_playlist.tracks)})
+              </button>
+              <button
+                phx-click="switch_playlist_tab"
+                phx-value-tab="similar"
+                class={[
+                  "px-4 py-2 font-mono font-bold transition-colors duration-200",
+                  if(@playlist_modal_tab == :similar,
+                    do: "bg-purple-600 text-white border-b-2 border-purple-300",
+                    else: "text-purple-400 hover:text-purple-300"
+                  )
+                ]}
+              >
+                Similar ({length(@selected_playlist.top_similar)})
+              </button>
             </div>
+          </div>
+          
+<!-- Tab Content -->
+          <div class="space-y-4">
+            <%= if @playlist_modal_tab == :tracks do %>
+              <div>
+                <div class="space-y-2 max-h-96 overflow-y-auto">
+                  <%= for track <- @selected_playlist.tracks do %>
+                    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                      <div class="flex-1">
+                        <div class="text-white font-semibold">{track.artist} - {track.name}</div>
+                        <div class="text-gray-400 text-sm">{track.release_date.year}</div>
+                      </div>
+                      <div class="flex space-x-2 ml-4">
+                        <a
+                          href={Track.url(track)}
+                          target="_blank"
+                          class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                        >
+                          {String.capitalize(Atom.to_string(track.provider))}
+                        </a>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <%= if @playlist_modal_tab == :similar do %>
+              <div>
+                <div class="space-y-2 max-h-96 overflow-y-auto">
+                  <%= for {similar_playlist, index} <- Enum.with_index(@selected_playlist.top_similar, 1) do %>
+                    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                      <div class="flex items-center space-x-3">
+                        <span class="text-lg">
+                          <%= case index do %>
+                            <% 1 -> %>
+                              🥇
+                            <% 2 -> %>
+                              🥈
+                            <% 3 -> %>
+                              🥉
+                          <% end %>
+                        </span>
+                        <div class="flex-1">
+                          <div class="text-white font-semibold">
+                            {similar_playlist.similarity_score}% - {similar_playlist.title}
+                          </div>
+                          <div class="text-gray-400 text-sm">({similar_playlist.mean_year}) by {similar_playlist.owner_name}</div>
+                        </div>
+                      </div>
+                      <div class="flex space-x-2 ml-4">
+                        <a
+                          href={Playlist.url(similar_playlist)}
+                          target="_blank"
+                          class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                        >
+                          Open
+                        </a>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
           </div>
         <% end %>
       </div>

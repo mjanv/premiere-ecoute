@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   alias PremiereEcoute.Discography.Billboard
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
+  alias PremiereEcoute.Discography.Playlist.Similarity
 
   @impl true
   def mount(_params, _session, socket) do
@@ -24,7 +25,8 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       selected_artist: nil,
       selected_year: nil,
       selected_playlist: nil,
-      show_modal: false
+      show_modal: false,
+      playlist_modal_tab: :tracks
     )
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -118,17 +120,18 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   @impl true
   def handle_event("select_year", %{"rank" => rank}, socket) do
     rank = String.to_integer(rank)
-    # First check year_podium for podium ranks, then fallback to years by rank
+    # First check years for chronological ranks, then fallback to year_podium for podium ranks
     selected_year =
-      Enum.find(socket.assigns.year_podium, &(&1.rank == rank)) ||
-        Enum.find(socket.assigns.years, &(&1.rank == rank))
+      Enum.find(socket.assigns.years, &(&1.rank == rank)) ||
+        Enum.find(socket.assigns.year_podium, &(&1.rank == rank))
 
     {:noreply, assign(socket, selected_year: selected_year, show_modal: true)}
   end
 
   @impl true
-  def handle_event("select_playlist", %{"playlist_id" => playlist_id}, socket) do
-    selected_playlist = Enum.find(socket.assigns.playlists, &(&1.playlist_id == playlist_id))
+  def handle_event("select_playlist", %{"rank" => rank}, socket) do
+    rank = String.to_integer(rank)
+    selected_playlist = Enum.find(socket.assigns.playlists, &(&1.rank == rank))
 
     {:noreply, assign(socket, selected_playlist: selected_playlist, show_modal: true)}
   end
@@ -141,7 +144,19 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   @impl true
   def handle_event("close_modal", _params, socket) do
     {:noreply,
-     assign(socket, selected_track: nil, selected_artist: nil, selected_year: nil, selected_playlist: nil, show_modal: false)}
+     assign(socket,
+       selected_track: nil,
+       selected_artist: nil,
+       selected_year: nil,
+       selected_playlist: nil,
+       show_modal: false,
+       playlist_modal_tab: :tracks
+     )}
+  end
+
+  @impl true
+  def handle_event("switch_playlist_tab", %{"tab" => tab}, socket) do
+    {:noreply, assign(socket, playlist_modal_tab: String.to_existing_atom(tab))}
   end
 
   @impl true
@@ -240,21 +255,12 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   defp format_playlists(playlists) when is_list(playlists) do
     playlists
     |> Enum.with_index(1)
-    |> Enum.map(fn {playlist, rank} -> 
-      mean_year = calculate_mean_year(playlist.tracks)
+    |> Enum.map(fn {playlist, rank} ->
       playlist
       |> Map.put(:rank, rank)
-      |> Map.put(:mean_year, mean_year)
+      |> Map.put(:mean_year, Similarity.calculate_mean_year(playlist.tracks))
+      |> Map.put(:top_similar, Similarity.find_most_similar(playlist, playlists))
     end)
-  end
-
-  defp calculate_mean_year(tracks) when is_list(tracks) do
-    if length(tracks) > 0 do
-      total_years = tracks |> Enum.map(&(&1.release_date.year)) |> Enum.sum()
-      round(total_years / length(tracks))
-    else
-      nil
-    end
   end
 
   defp rank_icon(1), do: "🥇"
@@ -267,7 +273,8 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   defp rank_color(3), do: "text-orange-400"
   defp rank_color(_), do: "text-cyan-400"
 
-  defp count_color(count) when count >= 20, do: "text-red-400"
+  defp count_color(count) when count >= 30, do: "text-red-400"
+  defp count_color(count) when count >= 20, do: "text-orange-400"
   defp count_color(count) when count >= 10, do: "text-yellow-400"
   defp count_color(count) when count >= 5, do: "text-green-400"
   defp count_color(_), do: "text-white"
