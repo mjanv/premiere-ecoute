@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
   alias PremiereEcoute.Discography.Billboard
 
   describe "generate_billboard/1" do
-    @tag :wip
+    @tag :skip
     test "?" do
       urls = [
         "https://open.spotify.com/playlist/28Anwq5yS87ujCDWdFFr4b"
@@ -13,20 +13,18 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         # "https://open.spotify.com/playlist/2gJc2T7Tm9TgPqRFrgfCJL"
       ]
 
-      {:ok, %{playlists: playlists, tracks: tracks}} = Billboard.generate_billboard(urls)
-
-      assert Enum.take(tracks, 2) == nil
+      {:ok, _} = Billboard.generate_billboard(urls)
     end
   end
 
-  describe "extract_playlists/1" do
+  describe "extract_playlist_ids/1" do
     test "extracts Spotify playlist IDs from URLs" do
       urls = [
         "https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd",
         "https://open.spotify.com/playlist/1a2b3c4d5e6f7g8h9i0j1k2l"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:spotify, "37i9dQZF1DX0XUsuxWHRQd"},
@@ -40,7 +38,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://www.deezer.com/fr/playlist/9876543210"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:deezer, "1234567890"},
@@ -55,7 +53,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://open.spotify.com/playlist/1a2b3c4d5e6f7g8h9i0j1k2l"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:spotify, "37i9dQZF1DX0XUsuxWHRQd"},
@@ -70,7 +68,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://open.spotify.com/playlist/1a2b3c4d5e6f7g8h9i0j1k2l?utm_source=copy-link"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:spotify, "37i9dQZF1DX0XUsuxWHRQd"},
@@ -84,7 +82,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://www.deezer.com/fr/playlist/9876543210?autoplay=true"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:deezer, "1234567890"},
@@ -98,7 +96,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "\thttps://www.deezer.com/en/playlist/1234567890\n"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:spotify, "37i9dQZF1DX0XUsuxWHRQd"},
@@ -115,7 +113,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://youtube.com/playlist?list=abc123"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:spotify, "37i9dQZF1DX0XUsuxWHRQd"},
@@ -131,7 +129,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://www.deezer.com/fr/playlist/1234567890"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:spotify, "37i9dQZF1DX0XUsuxWHRQd"},
@@ -140,7 +138,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
     end
 
     test "handles empty list" do
-      result = Billboard.extract_playlists([])
+      result = Billboard.extract_playlist_ids([])
       assert result == []
     end
 
@@ -151,7 +149,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://youtube.com/playlist?list=abc123"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
       assert result == []
     end
 
@@ -163,7 +161,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://www.deezer.com/es/playlist/3333333333"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       assert result == [
                {:deezer, "1234567890"},
@@ -185,7 +183,7 @@ defmodule PremiereEcoute.Discography.BillboardTest do
         "https://www.deezer.com/playlist/1234567890"
       ]
 
-      result = Billboard.extract_playlists(urls)
+      result = Billboard.extract_playlist_ids(urls)
 
       # Only the valid Spotify URL should be extracted
       assert result == [

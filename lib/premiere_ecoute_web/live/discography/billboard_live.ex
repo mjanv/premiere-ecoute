@@ -14,6 +14,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       artists: [],
       years: [],
       year_podium: [],
+      playlists: [],
       display_mode: :track,
       loading: false,
       error: nil,
@@ -22,6 +23,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       selected_track: nil,
       selected_artist: nil,
       selected_year: nil,
+      selected_playlist: nil,
       show_modal: false
     )
     |> then(fn socket -> {:ok, socket} end)
@@ -77,6 +79,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       artists: [],
       years: [],
       year_podium: [],
+      playlists: [],
       loading: false,
       error: nil,
       task: nil,
@@ -124,13 +127,21 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   end
 
   @impl true
+  def handle_event("select_playlist", %{"playlist_id" => playlist_id}, socket) do
+    selected_playlist = Enum.find(socket.assigns.playlists, &(&1.playlist_id == playlist_id))
+
+    {:noreply, assign(socket, selected_playlist: selected_playlist, show_modal: true)}
+  end
+
+  @impl true
   def handle_event("switch_mode", %{"mode" => mode}, socket) do
     {:noreply, assign(socket, display_mode: String.to_existing_atom(mode))}
   end
 
   @impl true
   def handle_event("close_modal", _params, socket) do
-    {:noreply, assign(socket, selected_track: nil, selected_artist: nil, selected_year: nil, show_modal: false)}
+    {:noreply,
+     assign(socket, selected_track: nil, selected_artist: nil, selected_year: nil, selected_playlist: nil, show_modal: false)}
   end
 
   @impl true
@@ -139,7 +150,10 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   end
 
   @impl true
-  def handle_info({ref, {:ok, %{track: tracks, artist: artists, year: years, year_podium: year_podium}}}, socket) do
+  def handle_info(
+        {ref, {:ok, %{playlists: playlists, track: tracks, artist: artists, year: years, year_podium: year_podium}}},
+        socket
+      ) do
     Process.demonitor(ref, [:flush])
 
     socket
@@ -148,6 +162,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       artists: format_artists(artists),
       years: format_years(years),
       year_podium: format_year_podium(year_podium),
+      playlists: format_playlists(playlists),
       loading: false,
       error: nil,
       task: nil,
@@ -220,6 +235,12 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
 
   defp format_year_podium(year_podium) when is_list(year_podium) do
     year_podium
+  end
+
+  defp format_playlists(playlists) when is_list(playlists) do
+    playlists
+    |> Enum.with_index(1)
+    |> Enum.map(fn {playlist, rank} -> Map.put(playlist, :rank, rank) end)
   end
 
   defp rank_icon(1), do: "🥇"

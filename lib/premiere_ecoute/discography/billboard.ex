@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Discography.Billboard do
            playlists <- loop(playlist_ids, callback),
            tracks <- Enum.flat_map(playlists, fn %Playlist{tracks: tracks} -> tracks end),
            _ <- callback.("Compute billboard by track", 85),
-           track <- group_by(tracks, :track) |> IO.inspect(),
+           track <- group_by(tracks, :track),
            _ <- callback.("Compute billboard by artist", 90),
            artist <- group_by(tracks, :artist),
            _ <- callback.("Compute billboard by year", 95),
