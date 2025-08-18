@@ -384,6 +384,52 @@ body {
   z-index: 1;
 }
 
+/* AIDEV-NOTE: Synthwave button styles - only for action buttons, not tabs */
+.synthwave-bg button[type="submit"],
+.synthwave-bg button[phx-click="clear_results"] {
+  background: linear-gradient(45deg, #ff1493, #8b44e7);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  box-shadow: 
+    0 0 10px rgba(255, 20, 147, 0.3),
+    inset 0 0 10px rgba(255, 255, 255, 0.1);
+  text-shadow: 0 0 5px currentColor;
+  transition: all 0.3s ease;
+}
+
+.synthwave-bg button[type="submit"]::before,
+.synthwave-bg button[phx-click="clear_results"]::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff1493, #8b44e7);
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.synthwave-bg button[type="submit"]:hover,
+.synthwave-bg button[phx-click="clear_results"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 5px 15px rgba(255, 20, 147, 0.4),
+    0 0 20px rgba(139, 68, 231, 0.3),
+    inset 0 0 15px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 8px currentColor;
+}
+
+.synthwave-bg button[type="submit"]:disabled,
+.synthwave-bg button[phx-click="clear_results"]:disabled {
+  opacity: 0.5;
+  transform: none;
+  box-shadow: 
+    0 0 5px rgba(255, 20, 147, 0.2),
+    inset 0 0 5px rgba(255, 255, 255, 0.05);
+}
+
 @keyframes synthwave-grid {
   0% {
     transform: translateY(0) translateX(0);
