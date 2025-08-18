@@ -223,10 +223,10 @@
               <% @display_mode == :year -> %>
                 <div class="flex justify-center items-end space-x-8 mb-12">
                   <!-- Year Mode Podium -->
-                  <% # AIDEV-NOTE: Find years with podium ranks for correct display by occurrence count
-                  first_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 1 end)
-                  second_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 2 end)
-                  third_place = Enum.find(@years, fn year -> Map.get(year, :podium_rank) == 3 end) %>
+                  <% # AIDEV-NOTE: Use year_podium data for podium display by occurrence count
+                  first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
+                  second_place = Enum.find(@year_podium, fn year -> year.rank == 2 end)
+                  third_place = Enum.find(@year_podium, fn year -> year.rank == 3 end) %>
                   
 <!-- 2nd Place -->
                   <div class="text-center">
@@ -237,10 +237,10 @@
                     <div
                       class="bg-gray-800 p-4 text-center w-64 cursor-pointer hover:bg-gray-700 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank={if second_place, do: second_place.display_rank, else: "2"}
+                      phx-value-rank={if second_place, do: second_place.rank, else: "2"}
                     >
                       <%= if second_place do %>
-                        <div class="text-yellow-400 font-bold text-lg">{second_place.podium_count_text}</div>
+                        <div class="text-yellow-400 font-bold text-lg">[{second_place.count}x]</div>
                         <div class="text-white font-semibold text-base truncate">{second_place.year}</div>
                         <div class="text-gray-300 text-base truncate">{second_place.track_count} tracks</div>
                       <% end %>
@@ -256,10 +256,10 @@
                     <div
                       class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank={if first_place, do: first_place.display_rank, else: "1"}
+                      phx-value-rank={if first_place, do: first_place.rank, else: "1"}
                     >
                       <%= if first_place do %>
-                        <div class="text-yellow-200 font-bold text-xl">{first_place.podium_count_text}</div>
+                        <div class="text-yellow-200 font-bold text-xl">[{first_place.count}x]</div>
                         <div class="text-white font-semibold text-lg truncate">{first_place.year}</div>
                         <div class="text-yellow-100 text-lg truncate">{first_place.track_count} tracks</div>
                       <% end %>
@@ -275,10 +275,10 @@
                     <div
                       class="bg-orange-800 p-4 text-center w-64 cursor-pointer hover:bg-orange-700 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank={if third_place, do: third_place.display_rank, else: "3"}
+                      phx-value-rank={if third_place, do: third_place.rank, else: "3"}
                     >
                       <%= if third_place do %>
-                        <div class="text-orange-400 font-bold text-lg">{third_place.podium_count_text}</div>
+                        <div class="text-orange-400 font-bold text-lg">[{third_place.count}x]</div>
                         <div class="text-white font-semibold text-base truncate">{third_place.year}</div>
                         <div class="text-orange-200 text-base truncate">{third_place.track_count} tracks</div>
                       <% end %>

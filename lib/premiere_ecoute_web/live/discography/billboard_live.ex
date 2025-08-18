@@ -2,6 +2,8 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Discography.Billboard
+  alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist.Track
 
   @impl true
   def mount(_params, _session, socket) do
@@ -11,6 +13,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       tracks: [],
       artists: [],
       years: [],
+      year_podium: [],
       display_mode: :track,
       loading: false,
       error: nil,
@@ -35,6 +38,11 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
 
     if length(playlist_urls) > 0 do
       pid = self()
+      
+        Billboard.generate_billboard(
+            playlist_urls,
+            callback: fn text, progress -> send(pid, {:progress, text, progress}) end
+          ) |> IO.inspect()
 
       task =
         Task.async(fn ->
@@ -73,6 +81,7 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
       tracks: [],
       artists: [],
       years: [],
+      year_podium: [],
       loading: false,
       error: nil,
       task: nil,
@@ -111,7 +120,10 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   @impl true
   def handle_event("select_year", %{"rank" => rank}, socket) do
     rank = String.to_integer(rank)
-    selected_year = Enum.find(socket.assigns.years, &(&1.display_rank == rank))
+    # First check year_podium for podium ranks, then fallback to years by display_rank
+    selected_year = 
+      Enum.find(socket.assigns.year_podium, &(&1.rank == rank)) ||
+      Enum.find(socket.assigns.years, &(&1.display_rank == rank))
 
     {:noreply, assign(socket, selected_year: selected_year, show_modal: true)}
   end
@@ -132,14 +144,17 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   end
 
   @impl true
-  def handle_info({ref, {:ok, tracks}}, socket) do
+  def handle_info({ref, {:ok, %{track: tracks, artist: artists, year: years, year_podium: year_podium}}}, socket) do
     Process.demonitor(ref, [:flush])
+    
+    IO.inspect("OKKKKKKKKKKKKKKKKK!")
 
     socket
     |> assign(
-      tracks: Billboard.generate_list(tracks, :track),
-      artists: Billboard.generate_list(tracks, :artist),
-      years: Billboard.generate_list(tracks, :year),
+      tracks: format_tracks(tracks),
+      artists: format_artists(artists),
+      years: format_years(years),
+      year_podium: format_year_podium(year_podium),
       loading: false,
       error: nil,
       task: nil,
@@ -190,6 +205,157 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
     {:noreply, socket}
   end
 
+  # AIDEV-NOTE: Format functions moved from backend to LiveView for presentation control
+  defp format_tracks(tracks) when is_list(tracks) do
+    tracks
+    |> Enum.map(fn track ->
+      track
+      |> Map.put(:rank_text, String.pad_leading("#{rank_icon(track.rank)} #{track.rank}", 6))
+      |> Map.put(:rank_icon, rank_icon(track.rank))
+      |> Map.put(:count_text, "[#{track.count}x]")
+      |> Map.put(:rank_color, rank_color(track.rank))
+      |> Map.put(:count_color, count_color(track.count))
+      |> Map.put(:artist, track.track.artist)
+      |> Map.put(:name, track.track.name)
+      |> Map.put(:track_id, track.track.track_id)
+      |> Map.put(:provider, track.track.provider)
+      |> Map.put(:provider_url, Track.url(track.track))
+      |> Map.put(:playlist_sources, format_playlist_sources(track.tracks))
+    end)
+  end
+
+  defp format_tracks(tracks) do
+    # Fallback for non-list data - return empty list
+    []
+  end
+
+  defp format_artists(artists) when is_list(artists) do
+    artists
+    |> Enum.map(fn artist ->
+      # Format individual tracks with provider URLs
+      # Note: artist.tracks contains raw Track structs, not grouped data with count
+      track_counts = artist.tracks |> Enum.frequencies_by(& &1.name)
+      
+      formatted_tracks = artist.tracks
+      |> Enum.uniq_by(& &1.name)
+      |> Enum.map(fn track ->
+        %{
+          name: track.name,
+          count: Map.get(track_counts, track.name, 1),
+          track_id: track.track_id,
+          provider: track.provider,
+          provider_url: Track.url(track)
+        }
+      end)
+      
+      artist
+      |> Map.put(:rank_text, String.pad_leading("#{rank_icon(artist.rank)} #{artist.rank}", 6))
+      |> Map.put(:rank_icon, rank_icon(artist.rank))
+      |> Map.put(:count_text, "[#{artist.count}x]")
+      |> Map.put(:rank_color, rank_color(artist.rank))
+      |> Map.put(:count_color, count_color(artist.count))
+      |> Map.put(:total_count, artist.count)
+      |> Map.put(:tracks, formatted_tracks)
+    end)
+  end
+
+  defp format_artists(artists) do
+    # Fallback for non-list data - return empty list
+    []
+  end
+
+  defp format_years(years) when is_list(years) do
+    max_count = years |> Enum.map(& &1.count) |> Enum.max(fn -> 1 end)
+    
+    years
+    |> Enum.map(fn year ->
+      # Always use bullet for year list entries
+      list_icon = "•"
+      rank_text = String.pad_leading("#{list_icon} #{year.rank}", 6)
+      
+      max_bars = 25
+      bars = max(1, round(year.count / max_count * max_bars))
+      
+      # Format individual tracks with provider URLs
+      # Note: year.tracks contains raw Track structs, not grouped data with count
+      track_counts = year.tracks |> Enum.frequencies_by(&("#{&1.artist} - #{&1.name}"))
+      
+      formatted_tracks = year.tracks
+      |> Enum.uniq_by(&("#{&1.artist} - #{&1.name}"))
+      |> Enum.map(fn track ->
+        track_key = "#{track.artist} - #{track.name}"
+        %{
+          name: track.name,
+          artist: track.artist,
+          count: Map.get(track_counts, track_key, 1),
+          track_id: track.track_id,
+          provider: track.provider,
+          provider_url: Track.url(track)
+        }
+      end)
+      
+      year
+      |> Map.put(:display_rank, year.rank)
+      |> Map.put(:rank_text, rank_text)
+      |> Map.put(:rank_icon, list_icon)
+      |> Map.put(:total_count, year.count)
+      |> Map.put(:count_text, "[#{String.duplicate("█", bars)} #{year.count}x]")
+      |> Map.put(:podium_count_text, "[#{year.count}x]")
+      |> Map.put(:rank_color, "text-cyan-400")
+      |> Map.put(:count_color, count_color(year.count))
+      |> Map.put(:tracks, formatted_tracks)
+    end)
+  end
+
+  defp format_years(years) do
+    # Fallback for non-list data - return empty list
+    []
+  end
+
+  defp format_year_podium(year_podium) when is_list(year_podium) do
+    year_podium
+    |> Enum.map(fn year ->
+      # Format individual tracks with provider URLs
+      # Note: year.tracks contains raw Track structs, not grouped data with count
+      track_counts = year.tracks |> Enum.frequencies_by(&("#{&1.artist} - #{&1.name}"))
+      
+      formatted_tracks = year.tracks
+      |> Enum.uniq_by(&("#{&1.artist} - #{&1.name}"))
+      |> Enum.map(fn track ->
+        track_key = "#{track.artist} - #{track.name}"
+        %{
+          name: track.name,
+          artist: track.artist,
+          count: Map.get(track_counts, track_key, 1),
+          track_id: track.track_id,
+          provider: track.provider,
+          provider_url: Track.url(track)
+        }
+      end)
+      
+      year |> Map.put(:tracks, formatted_tracks)
+    end)
+  end
+
+  defp format_year_podium(year_podium) do
+    # Fallback for non-list data - return empty list
+    []
+  end
+
+  defp format_playlist_sources(tracks) do
+    tracks
+    |> Enum.map(fn track ->
+      # Create a minimal playlist struct for URL generation
+      playlist = %Playlist{provider: track.provider, playlist_id: track.playlist_id}
+      %{
+        provider: track.provider,
+        playlist_id: track.playlist_id,
+        playlist_url: Playlist.url(playlist)
+      }
+    end)
+    |> Enum.uniq()
+  end
+
   defp rank_icon(1), do: "🥇"
   defp rank_icon(2), do: "🥈"
   defp rank_icon(3), do: "🥉"
@@ -204,7 +370,4 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   defp count_color(count) when count >= 5, do: "text-yellow-400"
   defp count_color(count) when count >= 2, do: "text-green-400"
   defp count_color(_), do: "text-white"
-
-  # max_bars = 25
-  # bars = max(1, round(count / max_count * max_bars))
 end
