@@ -240,7 +240,21 @@ defmodule PremiereEcouteWeb.Discography.BillboardLive do
   defp format_playlists(playlists) when is_list(playlists) do
     playlists
     |> Enum.with_index(1)
-    |> Enum.map(fn {playlist, rank} -> Map.put(playlist, :rank, rank) end)
+    |> Enum.map(fn {playlist, rank} -> 
+      mean_year = calculate_mean_year(playlist.tracks)
+      playlist
+      |> Map.put(:rank, rank)
+      |> Map.put(:mean_year, mean_year)
+    end)
+  end
+
+  defp calculate_mean_year(tracks) when is_list(tracks) do
+    if length(tracks) > 0 do
+      total_years = tracks |> Enum.map(&(&1.release_date.year)) |> Enum.sum()
+      round(total_years / length(tracks))
+    else
+      nil
+    end
   end
 
   defp rank_icon(1), do: "🥇"
