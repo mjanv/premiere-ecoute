@@ -84,6 +84,240 @@ const Hooks = {
         this.el.disabled = loading
       })
     }
+  },
+
+  // AIDEV-NOTE: Hook for terminal-style rendering of ASCII art with glitch effects
+  TerminalRender: {
+    mounted() {
+      this.asciiLines = [
+        { text: "██████╗ ██╗██╗     ██╗     ██████╗  ██████╗  █████╗ ██████╗ ██████╗", color: "text-red-500" },
+        { text: "██╔══██╗██║██║     ██║     ██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗", color: "text-orange-500" },
+        { text: "██████╔╝██║██║     ██║     ██████╔╝██║   ██║███████║██████╔╝██║  ██║", color: "text-yellow-500" },
+        { text: "██╔══██╗██║██║     ██║     ██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║", color: "text-green-500" },
+        { text: "██████╔╝██║███████╗███████╗██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝", color: "text-blue-500" },
+        { text: "╚═════╝ ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝", color: "text-purple-500" }
+      ]
+      this.startTerminalRender()
+    },
+
+    startTerminalRender() {
+      this.el.innerHTML = ''
+      
+      // Initialize line states - all lines render simultaneously
+      this.lineStates = this.asciiLines.map(line => ({
+        text: line.text,
+        color: line.color,
+        currentIndex: 0,
+        currentContent: '',
+        isComplete: false
+      }))
+      
+      this.renderAllLines()
+    },
+
+    renderAllLines() {
+      const glitchChars = '█▓▒░▄▀▐▌▬▲▼◄►◦●○◉◎⦿⦾⌐¬½¼¡¿▪▫'
+      let allComplete = true
+      
+      // Process each line independently
+      this.lineStates.forEach((lineState, lineIndex) => {
+        if (!lineState.isComplete) {
+          allComplete = false
+          const targetChar = lineState.text[lineState.currentIndex]
+          
+          if (targetChar) {
+            // Sometimes show glitch characters before the real character
+            if (Math.random() < 0.2 && targetChar !== ' ') {
+              // Show glitch character briefly
+              const glitchChar = glitchChars[Math.floor(Math.random() * glitchChars.length)]
+              lineState.currentContent = lineState.text.substring(0, lineState.currentIndex) + glitchChar
+              
+              // Schedule the real character after glitch
+              setTimeout(() => {
+                lineState.currentContent = lineState.text.substring(0, lineState.currentIndex + 1)
+                lineState.currentIndex++
+                if (lineState.currentIndex >= lineState.text.length) {
+                  lineState.isComplete = true
+                }
+              }, 50)
+            } else {
+              // Show character directly
+              lineState.currentContent = lineState.text.substring(0, lineState.currentIndex + 1)
+              lineState.currentIndex++
+              if (lineState.currentIndex >= lineState.text.length) {
+                lineState.isComplete = true
+              }
+            }
+          }
+        }
+      })
+      
+      // Update display with all current line states
+      this.updateDisplay()
+      
+      // Continue if not all lines are complete
+      if (!allComplete) {
+        setTimeout(() => this.renderAllLines(), Math.random() * 50 + 20) // Faster updates
+      } else {
+        // Start random glitches after completion
+        this.startRandomGlitches()
+      }
+    },
+
+    updateDisplay() {
+      let content = ''
+      
+      this.lineStates.forEach((lineState, index) => {
+        const startTag = `<span class="${lineState.color}">`
+        const endTag = '</span>'
+        content += startTag + lineState.currentContent + endTag
+        
+        // Add newline except for last line
+        if (index < this.lineStates.length - 1) {
+          content += '\n'
+        }
+      })
+      
+      this.el.innerHTML = content
+    },
+
+    startRandomGlitches() {
+      const glitchChars = '█▓▒░▄▀▐▌▬▲▼◄►◦●○◉◎⦿⦾⌐¬½¼¡¿▪▫'
+      
+      const scheduleRandomGlitch = () => {
+        // Random delay between glitches (2-8 seconds)
+        const delay = Math.random() * 6000 + 2000
+        
+        setTimeout(() => {
+          // Choose type of glitch: 60% pixel, 25% vertical line, 15% horizontal line
+          const glitchType = Math.random()
+          if (glitchType < 0.6) {
+            this.performPixelGlitch(glitchChars)
+          } else if (glitchType < 0.85) {
+            this.performVerticalLineGlitch(glitchChars)
+          } else {
+            this.performHorizontalLineGlitch(glitchChars)
+          }
+          scheduleRandomGlitch() // Schedule next glitch
+        }, delay)
+      }
+      
+      scheduleRandomGlitch()
+    },
+
+    performPixelGlitch(glitchChars) {
+      // Pick a random line and position
+      const lineIndex = Math.floor(Math.random() * this.asciiLines.length)
+      const line = this.asciiLines[lineIndex]
+      const charIndex = Math.floor(Math.random() * line.text.length)
+      const originalChar = line.text[charIndex]
+      
+      // Skip spaces for glitching
+      if (originalChar === ' ') return
+      
+      // Create glitched version
+      const glitchChar = glitchChars[Math.floor(Math.random() * glitchChars.length)]
+      const glitchedText = line.text.substring(0, charIndex) + glitchChar + line.text.substring(charIndex + 1)
+      
+      // Temporarily modify the line
+      const originalText = line.text
+      line.text = glitchedText
+      
+      // Update display with glitch
+      let content = ''
+      this.asciiLines.forEach((currentLine, index) => {
+        const startTag = `<span class="${currentLine.color}">`
+        const endTag = '</span>'
+        content += startTag + currentLine.text + endTag
+        
+        if (index < this.asciiLines.length - 1) {
+          content += '\n'
+        }
+      })
+      this.el.innerHTML = content
+      
+      // Restore original after brief moment
+      setTimeout(() => {
+        line.text = originalText
+        
+        // Update display back to normal
+        let restoredContent = ''
+        this.asciiLines.forEach((currentLine, index) => {
+          const startTag = `<span class="${currentLine.color}">`
+          const endTag = '</span>'
+          restoredContent += startTag + currentLine.text + endTag
+          
+          if (index < this.asciiLines.length - 1) {
+            restoredContent += '\n'
+          }
+        })
+        this.el.innerHTML = restoredContent
+      }, Math.random() * 150 + 50) // Glitch duration: 50-200ms
+    },
+
+    performVerticalLineGlitch(glitchChars) {
+      // Pick a random character position (vertical column)
+      const charIndex = Math.floor(Math.random() * this.asciiLines[0].text.length)
+      const originalChars = []
+      const glitchedLines = []
+      
+      // Store original characters and create glitched versions
+      this.asciiLines.forEach((line, index) => {
+        originalChars[index] = line.text[charIndex]
+        if (originalChars[index] && originalChars[index] !== ' ') {
+          const glitchChar = glitchChars[Math.floor(Math.random() * glitchChars.length)]
+          glitchedLines[index] = line.text.substring(0, charIndex) + glitchChar + line.text.substring(charIndex + 1)
+        } else {
+          glitchedLines[index] = line.text // Keep original if space or undefined
+        }
+      })
+      
+      // Apply glitch
+      this.asciiLines.forEach((line, index) => {
+        line.text = glitchedLines[index]
+      })
+      this.updateDisplay()
+      
+      // Restore after brief moment
+      setTimeout(() => {
+        this.asciiLines.forEach((line, index) => {
+          line.text = line.text.substring(0, charIndex) + originalChars[index] + line.text.substring(charIndex + 1)
+        })
+        this.updateDisplay()
+      }, Math.random() * 200 + 80) // Slightly longer for line glitches
+    },
+
+    performHorizontalLineGlitch(glitchChars) {
+      // Pick a random line
+      const lineIndex = Math.floor(Math.random() * this.asciiLines.length)
+      const line = this.asciiLines[lineIndex]
+      
+      // Pick a random segment of the line (20-60% of the line)
+      const segmentLength = Math.floor(line.text.length * (0.2 + Math.random() * 0.4))
+      const startPos = Math.floor(Math.random() * (line.text.length - segmentLength))
+      const endPos = startPos + segmentLength
+      
+      const originalText = line.text
+      let glitchedText = line.text
+      
+      // Glitch the segment
+      for (let i = startPos; i < endPos; i++) {
+        if (originalText[i] && originalText[i] !== ' ') {
+          const glitchChar = glitchChars[Math.floor(Math.random() * glitchChars.length)]
+          glitchedText = glitchedText.substring(0, i) + glitchChar + glitchedText.substring(i + 1)
+        }
+      }
+      
+      // Apply glitch
+      line.text = glitchedText
+      this.updateDisplay()
+      
+      // Restore after brief moment
+      setTimeout(() => {
+        line.text = originalText
+        this.updateDisplay()
+      }, Math.random() * 250 + 100) // Longer duration for horizontal line glitches
+    }
   }
 }
 

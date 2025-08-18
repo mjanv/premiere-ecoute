@@ -11,6 +11,19 @@
    The heroicons installation itself is managed by your mix.exs */
 @plugin "../vendor/heroicons";
 
+/* AIDEV-NOTE: Ensure proper Unicode box-drawing character rendering for ASCII art */
+.ascii-art {
+  font-family: 'Courier New', 'DejaVu Sans Mono', 'Liberation Mono', 'Consolas', 'Monaco', 'SF Mono', monospace;
+  letter-spacing: -0.05em;
+  text-rendering: optimizeSpeed;
+  -webkit-font-feature-settings: "liga" off;
+  font-feature-settings: "liga" off;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+}
+
 /* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
    curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
    Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
