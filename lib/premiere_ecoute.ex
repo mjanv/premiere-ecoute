@@ -5,6 +5,7 @@ defmodule PremiereEcoute do
     deps: [PremiereEcouteCore],
     exports: [
       {Accounts, except: []},
+      {Billboard, except: []},
       {Discography, except: []},
       {Events, except: []},
       {Sessions, except: []},

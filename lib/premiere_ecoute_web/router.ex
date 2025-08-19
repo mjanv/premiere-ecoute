@@ -57,7 +57,7 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
-      live "/billboard", Discography.BillboardLive, :index
+      live "/billboard", Billboards.BillboardLive, :index
     end
   end
 

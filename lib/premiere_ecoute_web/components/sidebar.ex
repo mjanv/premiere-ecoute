@@ -2,10 +2,13 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
   @moduledoc """
   Left sidebar component with navigation sections for authenticated users.
 
-  Provides "Mes activités" section with:
-  - Nouvelle session
-  - Mes sessions
-  - Rétrospective
+  Provides "Billboards" section with:
+  - New Billboard
+
+  "Sessions" section with:
+  - New Session
+  - My Sessions
+  - Retrospective
 
   And "Followed channels" section with list of followed streamers.
   """
@@ -26,12 +29,12 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
         <!-- Scrollable content area -->
         <div class="flex-1 overflow-y-auto">
           <div class="p-6">
-            <!-- Mes activités section -->
+            <!-- Sessions section -->
             <%= if @current_user.role in [:streamer, :admin] do %>
               <div class="mb-6">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
                   <.icon name="hero-musical-note" class="w-4 h-4 mr-2" />
-                  {gettext("My Activities")}
+                  {gettext("Sessions")}
                 </h3>
                 <nav class="space-y-1">
                   <.sidebar_link
@@ -54,6 +57,26 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     icon="hero-chart-bar"
                   >
                     {gettext("Retrospective")}
+                  </.sidebar_link>
+                </nav>
+              </div>
+            <% end %>
+            
+    <!-- Billboards section -->
+            <%= if @current_user.role in [:streamer, :admin] do %>
+              <div class="mb-6">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                  <.icon name="hero-chart-bar-square" class="w-4 h-4 mr-2" />
+                  {gettext("Billboards")}
+                </h3>
+                <nav class="space-y-1">
+                  <.sidebar_link
+                    href={~p"/billboard"}
+                    current_page={@current_page}
+                    page_id="new_billboard"
+                    icon="hero-plus"
+                  >
+                    {gettext("New Billboard")}
                   </.sidebar_link>
                 </nav>
               </div>
