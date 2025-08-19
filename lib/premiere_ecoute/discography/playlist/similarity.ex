@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Discography.Playlist.Similarity do
   by comparing their normalized track collections.
   """
 
-  alias PremiereEcoute.Discography.Billboard
+  alias PremiereEcouteCore.Utils
 
   @doc """
   Calculate the Jaccard similarity coefficient between two playlists.
@@ -28,24 +28,27 @@ defmodule PremiereEcoute.Discography.Playlist.Similarity do
     end
   end
 
+  defp normalize_playlist_tracks(tracks) do
+    tracks
+    |> Enum.map(fn track -> Utils.sanitize_track(track.artist <> " " <> track.name) end)
+    |> MapSet.new()
+  end
+
   @doc """
   Find the top N most similar playlists to a target playlist.
 
   Returns a list of playlists with similarity scores, sorted by similarity descending.
   """
-  def find_most_similar(target_playlist, all_playlists, top_n \\ 3) do
+  def find_most_similar(target_playlist, all_playlists, n \\ 3) do
     all_playlists
     |> Enum.reject(&(&1.playlist_id == target_playlist.playlist_id))
     |> Enum.map(fn playlist ->
-      similarity_score = calculate_similarity(target_playlist, playlist)
-      mean_year = calculate_mean_year(playlist.tracks)
-
       playlist
-      |> Map.put(:similarity_score, similarity_score)
-      |> Map.put(:mean_year, mean_year)
+      |> Map.put(:similarity_score, calculate_similarity(target_playlist, playlist))
+      |> Map.put(:mean_year, calculate_mean_year(playlist.tracks))
     end)
     |> Enum.sort_by(& &1.similarity_score, :desc)
-    |> Enum.take(top_n)
+    |> Enum.take(n)
   end
 
   @doc """
@@ -58,15 +61,5 @@ defmodule PremiereEcoute.Discography.Playlist.Similarity do
     else
       nil
     end
-  end
-
-  # Private helper to normalize playlist tracks for comparison
-  defp normalize_playlist_tracks(tracks) do
-    tracks
-    |> Enum.map(fn track ->
-      # Use the same normalization as billboard grouping
-      Billboard.clean_value(track.artist <> " " <> track.name)
-    end)
-    |> MapSet.new()
   end
 end

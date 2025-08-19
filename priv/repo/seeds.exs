@@ -7,7 +7,10 @@ defmodule Seeds do
 end
 
 # Feature flags
+PremiereEcouteCore.FeatureFlag.enable(:billboards)
+PremiereEcouteCore.FeatureFlag.enable(:listening_sessions)
 PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
+PremiereEcouteCore.FeatureFlag.enable(:playlists)
 
 # Accounts
 Logger.info(IO.ANSI.green() <> IO.ANSI.bright() <> "Accounts:" <> IO.ANSI.reset())

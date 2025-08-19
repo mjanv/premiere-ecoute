@@ -1,4 +1,4 @@
-defmodule PremiereEcouteCore.Supervisor do
+defmodule PremiereEcoute.Billboards.Supervisor do
   @moduledoc false
 
   use Supervisor
@@ -12,10 +12,7 @@ defmodule PremiereEcouteCore.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      {Cache, name: :sessions},
-      {Cache, name: :subscriptions},
-      {Cache, name: :tokens},
-      {Cache, name: :users}
+      {Cache, name: :billboards}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

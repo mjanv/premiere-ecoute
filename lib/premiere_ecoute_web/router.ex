@@ -52,20 +52,29 @@ defmodule PremiereEcouteWeb.Router do
   scope "/", PremiereEcouteWeb do
     pipe_through [:browser]
 
-    # Health check endpoint for Fly.io
     get "/health", HealthController, :index
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
       live "/billboard", Billboards.BillboardLive, :index
+      live "/billboards/:id/submission/new", Billboards.SubmissionLive, :new
     end
   end
 
   scope "/", PremiereEcouteWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    live_session :billboards, on_mount: [{UserAuth, :streamer}] do
+      live "/billboards", Billboards.IndexLive, :index
+      live "/billboards/new", Billboards.NewLive, :new
+    end
+
     live_session :home, on_mount: [{UserAuth, :current_scope}] do
       live "/home", HomeLive, :index
+
+      live "/billboards/:id", Billboards.ShowLive, :show
+      live "/billboards/:id/display", Billboards.DisplayLive, :show
+      live "/billboards/:id/dashboard", Billboards.DashboardLive, :show
     end
   end
 
@@ -133,7 +142,6 @@ defmodule PremiereEcouteWeb.Router do
       live "/sessions", AdminSessionsLive, :index
     end
 
-    # AIDEV-NOTE: Impersonation routes for admin users only
     pipe_through [:require_authenticated_user]
     post "/impersonation", ImpersonationController, :create
     delete "/impersonation", ImpersonationController, :delete

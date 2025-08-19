@@ -1,0 +1,45 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
+  <div class="text-white flex flex-col" style="background-color: var(--color-dark-950); min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-12">
+      <div class="max-w-4xl mx-auto px-6">
+        <!-- AIDEV-NOTE: Billboard creation header -->
+        <div class="mb-8">
+          <h1 class="text-4xl font-bold text-white mb-2">Create New Billboard</h1>
+          <p class="text-slate-300/90 text-lg leading-relaxed">
+            Create a music chart by collecting playlist submissions from your community.
+          </p>
+        </div>
+        
+<!-- AIDEV-NOTE: Main creation form card -->
+        <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm p-8">
+          <.form for={@form} id="billboard-form" phx-change="validate" phx-submit="save" class="space-y-6">
+            <div>
+              <label for="title" class="text-white text-sm font-medium mb-2 block">Billboard Title</label>
+              <.input
+                field={@form[:title]}
+                type="text"
+                placeholder="Enter a descriptive title for your billboard"
+                class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-colors"
+              />
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-4">
+              <.link
+                navigate={~p"/home"}
+                class="px-6 py-3 bg-gray-600/50 hover:bg-gray-600/70 text-white rounded-lg transition-colors font-medium border border-white/10"
+              >
+                Cancel
+              </.link>
+              <.button
+                phx-disable-with="Creating..."
+                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg"
+              >
+                Create Billboard
+              </.button>
+            </div>
+          </.form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

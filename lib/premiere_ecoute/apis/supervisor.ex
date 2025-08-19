@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Sessions.Supervisor do
+defmodule PremiereEcoute.Apis.Supervisor do
   @moduledoc false
 
   use Supervisor
@@ -12,9 +12,8 @@ defmodule PremiereEcoute.Sessions.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      {Cache, name: :sessions},
-      {PremiereEcoute.Sessions.Scores.MessagePipeline, []},
-      {PremiereEcoute.Sessions.Scores.PollPipeline, []}
+      {Cache, name: :subscriptions},
+      {Cache, name: :tokens}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

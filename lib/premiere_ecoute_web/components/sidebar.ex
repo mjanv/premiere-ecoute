@@ -30,56 +30,69 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
         <div class="flex-1 overflow-y-auto">
           <div class="p-6">
             <!-- Sessions section -->
-            <%= if @current_user.role in [:streamer, :admin] do %>
-              <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-musical-note" class="w-4 h-4 mr-2" />
-                  {gettext("Sessions")}
-                </h3>
-                <nav class="space-y-1">
-                  <.sidebar_link
-                    href={~p"/discography/album/select"}
-                    current_page={@current_page}
-                    page_id="new_session"
-                    icon="hero-plus"
-                  >
-                    {gettext("New Session")}
-                  </.sidebar_link>
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
+              <%= if @current_user.role in [:streamer, :admin] do %>
+                <div class="mb-6">
+                  <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                    <.icon name="hero-musical-note" class="w-4 h-4 mr-2" />
+                    {gettext("Sessions")}
+                  </h3>
+                  <nav class="space-y-1">
+                    <.sidebar_link
+                      href={~p"/discography/album/select"}
+                      current_page={@current_page}
+                      page_id="new_session"
+                      icon="hero-plus"
+                    >
+                      {gettext("New Session")}
+                    </.sidebar_link>
 
-                  <.sidebar_link href={~p"/sessions"} current_page={@current_page} page_id="my_sessions" icon="hero-rectangle-stack">
-                    {gettext("My Sessions")}
-                  </.sidebar_link>
+                    <.sidebar_link href={~p"/sessions"} current_page={@current_page} page_id="my_sessions" icon="hero-rectangle-stack">
+                      {gettext("My Sessions")}
+                    </.sidebar_link>
 
-                  <.sidebar_link
-                    href={~p"/retrospective/history"}
-                    current_page={@current_page}
-                    page_id="retrospective"
-                    icon="hero-chart-bar"
-                  >
-                    {gettext("Retrospective")}
-                  </.sidebar_link>
-                </nav>
-              </div>
+                    <.sidebar_link
+                      href={~p"/retrospective/history"}
+                      current_page={@current_page}
+                      page_id="retrospective"
+                      icon="hero-chart-bar"
+                    >
+                      {gettext("Retrospective")}
+                    </.sidebar_link>
+                  </nav>
+                </div>
+              <% end %>
             <% end %>
             
     <!-- Billboards section -->
-            <%= if @current_user.role in [:streamer, :admin] do %>
-              <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-chart-bar-square" class="w-4 h-4 mr-2" />
-                  {gettext("Billboards")}
-                </h3>
-                <nav class="space-y-1">
-                  <.sidebar_link
-                    href={~p"/billboard"}
-                    current_page={@current_page}
-                    page_id="new_billboard"
-                    icon="hero-plus"
-                  >
-                    {gettext("New Billboard")}
-                  </.sidebar_link>
-                </nav>
-              </div>
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
+              <%= if @current_user.role in [:streamer, :admin] do %>
+                <div class="mb-6">
+                  <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                    <.icon name="hero-chart-bar-square" class="w-4 h-4 mr-2" />
+                    {gettext("Billboards")}
+                  </h3>
+                  <nav class="space-y-1">
+                    <.sidebar_link
+                      href={~p"/billboards"}
+                      current_page={@current_page}
+                      page_id="billboards"
+                      icon="hero-chart-bar-square"
+                    >
+                      {gettext("My Billboards")}
+                    </.sidebar_link>
+
+                    <.sidebar_link
+                      href={~p"/billboards/new"}
+                      current_page={@current_page}
+                      page_id="new_billboard"
+                      icon="hero-plus"
+                    >
+                      {gettext("New Billboard")}
+                    </.sidebar_link>
+                  </nav>
+                </div>
+              <% end %>
             <% end %>
             
     <!-- Followed Channels section -->

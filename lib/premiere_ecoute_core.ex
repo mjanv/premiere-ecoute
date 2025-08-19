@@ -18,6 +18,7 @@ defmodule PremiereEcouteCore do
       EventBus.Handler,
       FeatureFlag,
       Subscriber,
+      Utils,
       Worker
     ]
 

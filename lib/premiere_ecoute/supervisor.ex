@@ -13,7 +13,9 @@ defmodule PremiereEcoute.Supervisor do
       PremiereEcoute.Telemetry.Supervisor,
       PremiereEcoute.Repo.Supervisor,
       PremiereEcoute.Events.Supervisor,
-      PremiereEcouteCore.Supervisor,
+      PremiereEcoute.Apis.Supervisor,
+      PremiereEcoute.Accounts.Supervisor,
+      PremiereEcoute.Billboards.Supervisor,
       PremiereEcoute.Sessions.Supervisor
     ]
 

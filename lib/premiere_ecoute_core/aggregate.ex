@@ -24,6 +24,9 @@ defmodule PremiereEcouteCore.Aggregate do
       @type entity(type) :: type | nil | Ecto.Association.NotLoaded.t()
       @type nullable(type) :: type | nil
 
+      # Forms
+      def form(entity, attrs \\ %{}), do: changeset(entity, attrs)
+
       # Preload
       def preload({:ok, entity}), do: {:ok, preload(entity)}
       def preload({:error, reason}), do: {:error, reason}

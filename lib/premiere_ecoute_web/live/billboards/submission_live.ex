@@ -1,0 +1,89 @@
+defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
+  @moduledoc """
+  Public LiveView for submitting playlists to active billboards.
+
+  Accessible to non-authenticated users when billboard is active.
+  """
+
+  use PremiereEcouteWeb, :live_view
+
+  alias PremiereEcoute.Billboards
+  alias PremiereEcoute.Billboards.Billboard
+
+  @impl true
+  def mount(%{"id" => billboard_id}, _session, socket) do
+    case Billboards.get_billboard(billboard_id) do
+      nil ->
+        socket
+        |> put_flash(:error, "Billboard not found")
+        |> redirect(to: ~p"/")
+        |> then(fn socket -> {:ok, socket} end)
+
+      %Billboard{status: status} = _billboard when status != :active ->
+        socket
+        |> put_flash(:error, "This billboard is not accepting submissions")
+        |> redirect(to: ~p"/")
+        |> then(fn socket -> {:ok, socket} end)
+
+      %Billboard{} = billboard ->
+        socket
+        |> assign(:page_title, "Submit to #{billboard.title}")
+        |> assign(:billboard, billboard)
+        |> assign(:url, "")
+        |> assign(:pseudo, "")
+        |> assign(:error_message, nil)
+        |> assign(:success_message, nil)
+        |> then(fn socket -> {:ok, socket} end)
+    end
+  end
+
+  @impl true
+  def handle_event("validate", params, socket) do
+    {:noreply, assign(socket, url: Map.get(params, "url", ""), pseudo: Map.get(params, "pseudo", ""), error_message: nil)}
+  end
+
+  @impl true
+  def handle_event("submit", params, socket) do
+    url = Map.get(params, "url", "")
+    pseudo = Map.get(params, "pseudo", "")
+    billboard = socket.assigns.billboard
+
+    case validate_url(url) do
+      {:ok, clean_url} ->
+        case Billboards.add_submission(billboard, clean_url, pseudo) do
+          {:ok, _updated_billboard} ->
+            socket
+            |> assign(:url, "")
+            |> assign(:pseudo, "")
+            |> assign(:success_message, "Playlist submitted successfully!")
+            |> assign(:error_message, nil)
+            |> then(fn socket -> {:noreply, socket} end)
+
+          {:error, :url_already_exists} ->
+            {:noreply, assign(socket, error_message: "This playlist has already been submitted")}
+
+          {:error, :billboard_not_active} ->
+            {:noreply, assign(socket, error_message: "This billboard is no longer accepting submissions")}
+
+          {:error, _} ->
+            {:noreply, assign(socket, error_message: "Failed to submit playlist. Please try again.")}
+        end
+
+      {:error, message} ->
+        {:noreply, assign(socket, error_message: message)}
+    end
+  end
+
+  defp validate_url(url) do
+    cond do
+      String.match?(url, ~r/https:\/\/open\.spotify\.com\/playlist\/[a-zA-Z0-9]+/) ->
+        {:ok, url}
+
+      String.match?(url, ~r/https:\/\/www\.deezer\.com\/[a-z]+\/playlist\/[0-9]+/) ->
+        {:ok, url}
+
+      true ->
+        {:error, "Please use a valid playlist URL from Spotify or Deezer"}
+    end
+  end
+end

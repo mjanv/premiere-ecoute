@@ -1,0 +1,120 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
+  <div class="text-white flex flex-col" style="background-color: var(--color-dark-950); min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-12">
+      <div class="max-w-7xl mx-auto px-6">
+        <!-- AIDEV-NOTE: Billboards index header -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-4xl font-bold text-white mb-2">My Billboards</h1>
+              <p class="text-slate-300/90 text-lg">
+                Manage your music billboard campaigns and collect playlist submissions
+              </p>
+            </div>
+            
+<!-- AIDEV-NOTE: Create new billboard button -->
+            <div>
+              <.link
+                navigate={~p"/billboards/new"}
+                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Create New Billboard
+              </.link>
+            </div>
+          </div>
+        </div>
+        
+<!-- AIDEV-NOTE: Billboards grid or empty state -->
+        <%= if length(@billboards) == 0 do %>
+          <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm p-12 text-center">
+            <div class="w-20 h-20 mx-auto mb-6 bg-purple-600/20 rounded-full flex items-center justify-center">
+              <svg class="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-semibold text-white mb-4">No Billboards Yet</h3>
+            <p class="text-slate-400 text-lg mb-8 max-w-md mx-auto">
+              Create your first billboard to start collecting playlist submissions from your community
+            </p>
+            <.link
+              navigate={~p"/billboards/new"}
+              class="inline-flex items-center px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors font-semibold text-lg shadow-lg"
+            >
+              <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Your First Billboard
+            </.link>
+          </div>
+        <% else %>
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <%= for billboard <- @billboards do %>
+              <!-- AIDEV-NOTE: Clickable billboard card -->
+              <.link navigate={~p"/billboards/#{billboard.billboard_id}"} class="block">
+                <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm hover:bg-gradient-to-br hover:from-slate-50/8 hover:to-slate-100/5 transition-all p-6">
+                  <div class="mb-4">
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-white mb-2 line-clamp-2 hover:text-purple-200 transition-colors">
+                          {billboard.title}
+                        </h3>
+                        <p class="text-sm text-slate-400 font-mono">
+                          ID: {billboard.billboard_id}
+                        </p>
+                      </div>
+                      <.billboard_status_badge status={billboard.status} />
+                    </div>
+                    
+<!-- AIDEV-NOTE: Billboard metadata -->
+                    <div class="flex items-center justify-between text-sm text-slate-400">
+                      <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                          />
+                        </svg>
+                        {length(billboard.submissions || [])} submissions
+                      </div>
+                      <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        {format_date(billboard.inserted_at)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </.link>
+            <% end %>
+          </div>
+        <% end %>
+        
+<!-- AIDEV-NOTE: Back navigation -->
+        <div class="mt-8">
+          <.link navigate={~p"/home"} class="inline-flex items-center text-slate-400 hover:text-white transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Home
+          </.link>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>
