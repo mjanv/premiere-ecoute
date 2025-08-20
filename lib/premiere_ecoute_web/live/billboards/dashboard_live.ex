@@ -18,14 +18,14 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
     case Billboards.get_billboard(billboard_id) do
       nil ->
         socket
-        |> put_flash(:error, "Billboard not found")
+        |> put_flash(:error, gettext("Billboard not found"))
         |> redirect(to: ~p"/billboards")
         |> then(fn socket -> {:ok, socket} end)
 
       %Billboard{} = billboard ->
         socket =
           socket
-          |> assign(:page_title, "#{billboard.title} - Dashboard")
+          |> assign(:page_title, gettext("%{title} - Dashboard", title: billboard.title))
           |> assign(:billboard, billboard)
           |> assign(
             tracks: [],
@@ -59,65 +59,45 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
   end
 
   @impl true
-  def handle_info(:load_dashboard, socket) do
-    billboard = socket.assigns.billboard
-
-    # AIDEV-NOTE: Try loading from cache first
+  def handle_info(:load_dashboard, %{assigns: %{billboard: billboard}} = socket) do
     case Cache.get(:billboards, billboard.billboard_id) do
-      {:ok, cached_results} when not is_nil(cached_results) ->
-        # Direct display from cache
+      {:ok, billboard} when not is_nil(billboard) ->
         socket
-        |> assign(:loading, false)
-        |> assign_results_from_cache(cached_results)
+        |> assign(
+          loading: false,
+          tracks: format_tracks(billboard.track || []),
+          artists: format_artists(billboard.artist || []),
+          years: format_years(billboard.year || []),
+          year_podium: format_year_podium(billboard.year_podium || []),
+          playlists: format_playlists(billboard.playlists || [])
+        )
         |> then(fn socket -> {:noreply, socket} end)
 
       _ ->
-        # Not in cache, start generation with progress bar
-        urls =
-          billboard.submissions
-          |> Enum.map(fn
-            %{url: url} -> url
-            %{"url" => url} -> url
-            url when is_binary(url) -> url
-          end)
-          |> Enum.filter(&is_binary/1)
+        urls = Enum.map(billboard.submissions, fn %{"url" => url} -> url end)
 
         if length(urls) > 0 do
           start_generation(socket, urls)
         else
           socket
           |> assign(:loading, false)
-          |> assign(:error, "No valid submissions found")
+          |> assign(:error, gettext("No valid submissions found"))
           |> then(fn socket -> {:noreply, socket} end)
         end
     end
   end
 
-  # AIDEV-NOTE: Generation completion handlers
-  def handle_info(
-        {ref, {:ok, %{playlists: playlists, track: tracks, artist: artists, year: years, year_podium: year_podium}}},
-        socket
-      ) do
+  def handle_info({ref, {:ok, billboard}}, socket) do
     Process.demonitor(ref, [:flush])
-
-    # Store in cache
-    results = %{
-      playlists: playlists,
-      track: tracks,
-      artist: artists,
-      year: years,
-      year_podium: year_podium
-    }
-
-    Cache.put(:billboards, socket.assigns.billboard.billboard_id, results)
+    Cache.put(:billboards, socket.assigns.billboard.billboard_id, billboard)
 
     socket
     |> assign(
-      tracks: format_tracks(tracks),
-      artists: format_artists(artists),
-      years: format_years(years),
-      year_podium: format_year_podium(year_podium),
-      playlists: format_playlists(playlists),
+      tracks: format_tracks(billboard.track),
+      artists: format_artists(billboard.artist),
+      years: format_years(billboard.year),
+      year_podium: format_year_podium(billboard.year_podium),
+      playlists: format_playlists(billboard.playlists),
       loading: false,
       error: nil,
       task: nil,
@@ -134,7 +114,7 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
     socket
     |> assign(
       loading: false,
-      error: "Failed to generate billboard: #{reason}",
+      error: gettext("Failed to generate billboard: %{reason}", reason: reason),
       task: nil,
       progress: 0,
       progress_text: ""
@@ -147,7 +127,7 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
     socket
     |> assign(
       loading: false,
-      error: "Failed to generate billboard: request was interrupted",
+      error: gettext("Failed to generate billboard: request was interrupted"),
       task: nil,
       progress: 0,
       progress_text: ""
@@ -182,12 +162,13 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
   end
 
   @impl true
-  def handle_event("select_year", %{"rank" => rank}, socket) do
+  def handle_event("select_year", %{"rank" => rank, "location" => location}, socket) do
     rank = String.to_integer(rank)
 
-    selected_year =
-      Enum.find(socket.assigns.years, &(&1.rank == rank)) ||
-        Enum.find(socket.assigns.year_podium, &(&1.rank == rank))
+    selected_year = case location do
+      "list" -> Enum.find(socket.assigns.years, &(&1.rank == rank))
+      "podium" -> Enum.find(socket.assigns.year_podium, &(&1.rank == rank))
+    end
 
     {:noreply, assign(socket, selected_year: selected_year, show_modal: true)}
   end
@@ -247,21 +228,10 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
       tracks: [],
       task: task,
       progress: 0,
-      progress_text: "Starting..."
+      progress_text: gettext("Starting...")
     )
     |> push_event("set_loading", %{loading: true})
     |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  defp assign_results_from_cache(socket, cached_results) do
-    socket
-    |> assign(
-      tracks: format_tracks(cached_results.track || []),
-      artists: format_artists(cached_results.artist || []),
-      years: format_years(cached_results.year || []),
-      year_podium: format_year_podium(cached_results.year_podium || []),
-      playlists: format_playlists(cached_results.playlists || [])
-    )
   end
 
   defp format_tracks(tracks) when is_list(tracks), do: tracks
@@ -293,15 +263,15 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
     end)
   end
 
-  defp rank_icon(1), do: "🥇"
-  defp rank_icon(2), do: "🥈"
-  defp rank_icon(3), do: "🥉"
-  defp rank_icon(_), do: "•"
+  defp rank_icon(1, mode) when mode in [:track, :artist], do: "🥇"
+  defp rank_icon(2, mode) when mode in [:track, :artist], do: "🥈"
+  defp rank_icon(3, mode) when mode in [:track, :artist], do: "🥉"
+  defp rank_icon(_, _), do: "•"
 
-  defp rank_color(1), do: "text-yellow-400"
-  defp rank_color(2), do: "text-gray-300"
-  defp rank_color(3), do: "text-orange-400"
-  defp rank_color(_), do: "text-cyan-400"
+  defp rank_color(1, mode) when mode in [:track, :artist], do: "text-yellow-400"
+  defp rank_color(2, mode) when mode in [:track, :artist], do: "text-gray-300"
+  defp rank_color(3, mode) when mode in [:track, :artist], do: "text-orange-400"
+  defp rank_color(_, _), do: "text-cyan-400"
 
   defp count_color(count) when count >= 30, do: "text-red-400"
   defp count_color(count) when count >= 20, do: "text-orange-400"

@@ -12,8 +12,8 @@ defmodule PremiereEcouteWeb.Billboards.IndexLive do
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket) do
     socket
-    |> assign(:page_title, "My Billboards")
-    |> assign(:billboards, Billboards.all(user_id: user.id))
+    |> assign(:page_title, gettext("My Billboards"))
+    |> assign(:billboards, Billboards.all(where: [user_id: user.id]))
     |> assign(:current_user, user)
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -52,5 +52,5 @@ defmodule PremiereEcouteWeb.Billboards.IndexLive do
     |> format_date()
   end
 
-  defp format_date(_), do: "Unknown"
+  defp format_date(_), do: gettext("Unknown")
 end

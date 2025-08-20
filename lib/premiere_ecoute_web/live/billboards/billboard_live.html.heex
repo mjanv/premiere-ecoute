@@ -39,7 +39,7 @@
               disabled={@loading}
               class="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-bold transition-colors duration-200 text-sm"
             >
-              [GENERATE BILLBOARD]
+              {gettext("[GENERATE BILLBOARD]")}
             </button>
           </div>
         </.form>
@@ -55,7 +55,7 @@
             phx-click="clear_results"
             class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-mono font-bold transition-colors duration-200 text-sm"
           >
-            [CLEAR BILLBOARD]
+            {gettext("[CLEAR BILLBOARD]")}
           </button>
         </div>
       </div>
@@ -89,36 +89,36 @@
               phx-value-mode="track"
               class={"px-2 py-1 font-mono font-bold transition-colors duration-200 text-xs #{if @display_mode == :track, do: "bg-purple-600 text-white", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              TRACK
+              {gettext("TRACK")}
             </button>
             <button
               phx-click="switch_mode"
               phx-value-mode="artist"
               class={"px-2 py-1 font-mono font-bold transition-colors duration-200 text-xs #{if @display_mode == :artist, do: "bg-purple-600 text-white", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              ARTIST
+              {gettext("ARTIST")}
             </button>
             <button
               phx-click="switch_mode"
               phx-value-mode="year"
               class={"px-2 py-1 font-mono font-bold transition-colors duration-200 text-xs #{if @display_mode == :year, do: "bg-purple-600 text-white", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              YEAR
+              {gettext("YEAR")}
             </button>
             <button
               phx-click="switch_mode"
               phx-value-mode="playlist"
               class={"px-2 py-1 font-mono font-bold transition-colors duration-200 text-xs #{if @display_mode == :playlist, do: "bg-purple-600 text-white", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              PLAYLIST
+              {gettext("PLAYLIST")}
             </button>
           </div>
           <button
             phx-click="copy_billboard"
             class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white font-mono font-bold transition-colors duration-200 text-xs"
-            title="Copy billboard to clipboard"
+            title={gettext("Copy billboard to clipboard")}
           >
-            [COPY]
+            {gettext("[COPY]")}
           </button>
         </div>
         
@@ -168,7 +168,7 @@
                   <span class={"#{count_color(artist.count)} w-8 text-xs"}>[{artist.count}]</span>
                   <span class="text-white font-semibold flex-1 truncate text-xs">{artist.artist}</span>
                   <span class="text-gray-300 text-xs">-</span>
-                  <span class="text-gray-100 flex-1 truncate text-xs">{length(artist.tracks)} tracks</span>
+                  <span class="text-gray-100 flex-1 truncate text-xs">{ngettext("%{count} track", "%{count} tracks", length(artist.tracks), count: length(artist.tracks))}</span>
                 </div>
               <% end %>
             <% @display_mode == :year -> %>
@@ -194,7 +194,7 @@
                   </span>
                   <span class="text-white font-semibold flex-1 truncate text-xs">{year.year}</span>
                   <span class="text-gray-300 text-xs">-</span>
-                  <span class="text-gray-100 flex-1 truncate text-xs">{length(year.tracks)} tracks</span>
+                  <span class="text-gray-100 flex-1 truncate text-xs">{ngettext("%{count} track", "%{count} tracks", length(year.tracks), count: length(year.tracks))}</span>
                 </div>
               <% end %>
             <% @display_mode == :playlist -> %>
@@ -230,7 +230,7 @@
     <%= if @loading do %>
       <div class="synthwave-loading p-4 text-center max-w-3xl mx-auto">
         <div class="synthwave-progress-text mb-3 text-lg font-bold">
-          ▲ PROCESSING BILLBOARD DATA ▲
+          {gettext("▲ PROCESSING BILLBOARD DATA ▲")}
         </div>
         <div class="synthwave-status-text mb-3 text-sm">
           {@progress_text}
@@ -284,7 +284,7 @@
 
         <div class="space-y-4">
           <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">Found in playlists:</h3>
+            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Found in playlists:")}</h3>
             <div class="space-y-2 max-h-96 overflow-y-auto">
               <%= for track <- @selected_track.tracks |> Enum.uniq_by(&{&1.provider, &1.playlist_id}) do %>
                 <div class="bg-gray-800 p-3 rounded-lg">
@@ -308,19 +308,19 @@
           <div class="text-3xl mb-4">{rank_icon(@selected_artist.rank)} {@selected_artist.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_artist.artist}</h2>
           <div class="text-lg text-gray-300">
-            {@selected_artist.count} occurrences • {length(@selected_artist.tracks)} tracks
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_artist.count, count: @selected_artist.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_artist.tracks), count: length(@selected_artist.tracks))}
           </div>
         </div>
 
         <div class="space-y-4">
           <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">Tracks by this artist:</h3>
+            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks by this artist:")}</h3>
             <div class="space-y-2 max-h-96 overflow-y-auto">
               <%= for track_group <- @selected_artist.tracks do %>
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{track_group.count} occurrences</div>
+                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -344,19 +344,19 @@
           <div class="text-3xl mb-4">{rank_icon(@selected_year.rank)} {@selected_year.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_year.year}</h2>
           <div class="text-lg text-gray-300">
-            {@selected_year.count} occurrences • {length(@selected_year.tracks)} tracks
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_year.count, count: @selected_year.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_year.tracks), count: length(@selected_year.tracks))}
           </div>
         </div>
 
         <div class="space-y-4">
           <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">Tracks from this year:</h3>
+            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks from this year:")}</h3>
             <div class="space-y-2 max-h-96 overflow-y-auto">
               <%= for track_group <- @selected_year.tracks do %>
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.artist} - {track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{track_group.count} occurrences</div>
+                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -381,7 +381,7 @@
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_playlist.title}</h2>
           <div class="text-lg text-gray-400 mb-2">by {@selected_playlist.owner_name}</div>
           <div class="text-lg text-gray-300">
-            {length(@selected_playlist.tracks)} tracks • Mean year: {@selected_playlist.mean_year}
+            {ngettext("%{count} track", "%{count} tracks", length(@selected_playlist.tracks), count: length(@selected_playlist.tracks))} • {gettext("Mean year: %{year}", year: @selected_playlist.mean_year)}
           </div>
           <div class="mt-4">
             <a
@@ -389,7 +389,7 @@
               target="_blank"
               class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
-              Open {String.capitalize(Atom.to_string(@selected_playlist.provider))} Playlist
+              {gettext("Open %{provider} Playlist", provider: String.capitalize(Atom.to_string(@selected_playlist.provider)))}
             </a>
           </div>
         </div>
@@ -408,7 +408,7 @@
                 )
               ]}
             >
-              Tracks ({length(@selected_playlist.tracks)})
+              {gettext("Tracks (%{count})", count: length(@selected_playlist.tracks))}
             </button>
             <button
               phx-click="switch_playlist_tab"
@@ -421,7 +421,7 @@
                 )
               ]}
             >
-              Similar ({length(@selected_playlist.top_similar)})
+              {gettext("Similar (%{count})", count: length(@selected_playlist.top_similar))}
             </button>
           </div>
         </div>
@@ -481,7 +481,7 @@
                         target="_blank"
                         class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                       >
-                        Open
+                        {gettext("Open")}
                       </a>
                     </div>
                   </div>

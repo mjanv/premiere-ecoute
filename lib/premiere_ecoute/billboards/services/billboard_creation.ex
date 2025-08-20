@@ -130,7 +130,7 @@ defmodule PremiereEcoute.Billboards.Services.BillboardCreation do
         year: year,
         count: Enum.sum(Enum.map(group_by(tracks, :track), & &1.count)),
         track_count: length(tracks),
-        tracks: tracks
+        tracks: group_by(tracks, :track)
       }
     end)
     |> then(fn years ->

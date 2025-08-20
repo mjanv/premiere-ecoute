@@ -22,7 +22,7 @@
                   phx-click="activate"
                   class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
                 >
-                  Activate Billboard
+                  {gettext("Activate Billboard")}
                 </.button>
               <% end %>
 
@@ -31,7 +31,7 @@
                   phx-click="stop"
                   class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium"
                 >
-                  Stop Billboard
+                  {gettext("Stop Billboard")}
                 </.button>
               <% end %>
 
@@ -40,7 +40,7 @@
                   phx-click="activate"
                   class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
                 >
-                  Reactivate Billboard
+                  {gettext("Reactivate Billboard")}
                 </.button>
               <% end %>
 
@@ -48,7 +48,7 @@
                 href={~p"/billboards/#{@billboard.billboard_id}/dashboard"}
                 class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
               >
-                See Billboard
+                {gettext("See Billboard")}
               </.button>
               
 <!-- AIDEV-NOTE: Delete billboard button -->
@@ -64,7 +64,7 @@
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
-                Delete
+                {gettext("Delete")}
               </.button>
             </div>
           </div>
@@ -82,9 +82,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <h3 class="text-xl font-semibold text-white mb-2">Billboard is active</h3>
+                <h3 class="text-xl font-semibold text-white mb-2">{gettext("Billboard is active")}</h3>
                 <p class="text-slate-300/90 mb-4">
-                  Share this link with your audience to submit playlists:
+                  {gettext("Share this link with your audience to submit playlists:")}
                 </p>
                 <div class="bg-white/5 border border-white/20 rounded-lg p-3">
                   <code class="text-green-300 text-sm font-mono break-all">
@@ -107,9 +107,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <h3 class="text-xl font-semibold text-white mb-2">Billboard is stopped</h3>
+                <h3 class="text-xl font-semibold text-white mb-2">{gettext("Billboard is stopped")}</h3>
                 <p class="text-slate-300/90">
-                  This billboard is no longer accepting new submissions. Use the "Reactivate Billboard" button to start collecting playlists again.
+                  {gettext("This billboard is no longer accepting new submissions. Use the \"Reactivate Billboard\" button to start collecting playlists again.")}
                 </p>
               </div>
             </div>
@@ -120,7 +120,7 @@
         <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm">
           <div class="p-6">
             <h3 class="text-2xl font-semibold text-white mb-6">
-              Submissions ({length(@submissions)})
+              {gettext("Submissions (%{count})", count: length(@submissions))}
             </h3>
 
             <%= if length(@submissions) == 0 do %>
@@ -135,8 +135,8 @@
                     />
                   </svg>
                 </div>
-                <p class="text-slate-400 text-lg">No submissions yet.</p>
-                <p class="text-slate-500 mt-2">Activate your billboard to start collecting playlists!</p>
+                <p class="text-slate-400 text-lg">{gettext("No submissions yet.")}</p>
+                <p class="text-slate-500 mt-2">{gettext("Activate your billboard to start collecting playlists!")}</p>
               </div>
             <% else %>
               <div class="space-y-3">
@@ -195,9 +195,9 @@
                     <button
                       phx-click="remove_submission"
                       phx-value-index={index}
-                      data-confirm="Are you sure you want to remove this submission?"
+                      data-confirm={gettext("Are you sure you want to remove this submission?")}
                       class="ml-4 p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
-                      title="Remove submission"
+                      title={gettext("Remove submission")}
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -243,10 +243,10 @@
                   </div>
                 </div>
                 <div class="ml-4 flex-1">
-                  <h3 class="text-xl font-semibold text-white mb-2">Delete Billboard</h3>
+                  <h3 class="text-xl font-semibold text-white mb-2">{gettext("Delete Billboard")}</h3>
                   <p class="text-slate-300 text-base leading-relaxed">
-                    Are you sure you want to delete "<strong class="text-white"><%= @billboard.title %></strong>"?
-                    This action cannot be undone and will permanently remove the billboard and all its submissions.
+                    {gettext("Are you sure you want to delete \"%{title}\"?", title: @billboard.title)}
+                    {gettext("This action cannot be undone and will permanently remove the billboard and all its submissions.")}
                   </p>
                 </div>
               </div>
@@ -257,13 +257,13 @@
                 phx-click="confirm_delete"
                 class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-lg"
               >
-                Delete Billboard
+                {gettext("Delete Billboard")}
               </.button>
               <.button
                 phx-click="hide_delete_modal"
                 class="px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium"
               >
-                Cancel
+                {gettext("Cancel")}
               </.button>
             </div>
           </div>

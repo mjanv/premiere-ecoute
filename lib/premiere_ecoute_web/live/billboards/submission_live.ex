@@ -15,19 +15,19 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
     case Billboards.get_billboard(billboard_id) do
       nil ->
         socket
-        |> put_flash(:error, "Billboard not found")
+        |> put_flash(:error, gettext("Billboard not found"))
         |> redirect(to: ~p"/")
         |> then(fn socket -> {:ok, socket} end)
 
       %Billboard{status: :created} = _billboard ->
         socket
-        |> put_flash(:error, "This billboard is not yet active")
+        |> put_flash(:error, gettext("This billboard is not yet active"))
         |> redirect(to: ~p"/")
         |> then(fn socket -> {:ok, socket} end)
 
       %Billboard{status: :stopped} = billboard ->
         socket
-        |> assign(:page_title, "Billboard Stopped - #{billboard.title}")
+        |> assign(:page_title, gettext("Billboard Stopped - %{title}", title: billboard.title))
         |> assign(:billboard, billboard)
         |> assign(:url, "")
         |> assign(:pseudo, "")
@@ -42,7 +42,7 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
 
       %Billboard{} = billboard ->
         socket
-        |> assign(:page_title, "Submit to #{billboard.title}")
+        |> assign(:page_title, gettext("Submit to %{title}", title: billboard.title))
         |> assign(:billboard, billboard)
         |> assign(:url, "")
         |> assign(:pseudo, "")
@@ -80,19 +80,19 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
             socket
             |> assign(:url, "")
             |> assign(:pseudo, "")
-            |> assign(:success_message, "Playlist submitted successfully!")
+            |> assign(:success_message, gettext("Playlist submitted successfully!"))
             |> assign(:error_message, nil)
             |> assign(:generated_token, deletion_token)
             |> then(fn socket -> {:noreply, socket} end)
 
           {:error, :url_already_exists} ->
-            {:noreply, assign(socket, error_message: "This playlist has already been submitted")}
+            {:noreply, assign(socket, error_message: gettext("This playlist has already been submitted"))}
 
           {:error, :billboard_not_active} ->
-            {:noreply, assign(socket, error_message: "This billboard is no longer accepting submissions")}
+            {:noreply, assign(socket, error_message: gettext("This billboard is no longer accepting submissions"))}
 
           {:error, _} ->
-            {:noreply, assign(socket, error_message: "Failed to submit playlist. Please try again.")}
+            {:noreply, assign(socket, error_message: gettext("Failed to submit playlist. Please try again."))}
         end
 
       {:error, message} ->
@@ -110,15 +110,15 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
         socket
         |> assign(:billboard, updated_billboard)
         |> assign(:deletion_token, "")
-        |> assign(:deletion_success, "Playlist successfully removed!")
+        |> assign(:deletion_success, gettext("Playlist successfully removed!"))
         |> assign(:deletion_error, nil)
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, :token_not_found} ->
-        {:noreply, assign(socket, deletion_error: "Invalid deletion code. Please check your code and try again.")}
+        {:noreply, assign(socket, deletion_error: gettext("Invalid deletion code. Please check your code and try again."))}
 
       {:error, _} ->
-        {:noreply, assign(socket, deletion_error: "Failed to delete playlist. Please try again.")}
+        {:noreply, assign(socket, deletion_error: gettext("Failed to delete playlist. Please try again."))}
     end
   end
 
@@ -131,7 +131,7 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
         {:ok, url}
 
       true ->
-        {:error, "Please use a valid playlist URL from Spotify or Deezer"}
+        {:error, gettext("Please use a valid playlist URL from Spotify or Deezer")}
     end
   end
 end

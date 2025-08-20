@@ -13,7 +13,7 @@ defmodule PremiereEcouteWeb.Billboards.NewLive do
   @impl true
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page_title, "Create Billboard")
+    |> assign(:page_title, gettext("Create Billboard"))
     |> assign_form(Billboards.change_billboard(%Billboard{}))
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -35,7 +35,7 @@ defmodule PremiereEcouteWeb.Billboards.NewLive do
     |> case do
       {:ok, billboard} ->
         socket
-        |> put_flash(:info, "Billboard created successfully!")
+        |> put_flash(:info, gettext("Billboard created successfully!"))
         |> redirect(to: ~p"/billboards/#{billboard.billboard_id}")
         |> then(fn socket -> {:noreply, socket} end)
 

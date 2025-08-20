@@ -9,7 +9,7 @@
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        Back
+        {gettext("Back")}
       </.link>
     </div>
     
@@ -55,34 +55,34 @@
               phx-value-mode="track"
               class={"px-6 py-3 font-mono font-bold transition-colors duration-200 #{if @display_mode == :track, do: "bg-purple-600 text-white border-b-2 border-purple-300", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              [BY TRACK]
+              {gettext("[BY TRACK]")}
             </button>
             <button
               phx-click="switch_mode"
               phx-value-mode="artist"
               class={"px-6 py-3 font-mono font-bold transition-colors duration-200 #{if @display_mode == :artist, do: "bg-purple-600 text-white border-b-2 border-purple-300", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              [BY ARTIST]
+              {gettext("[BY ARTIST]")}
             </button>
             <button
               phx-click="switch_mode"
               phx-value-mode="year"
               class={"px-6 py-3 font-mono font-bold transition-colors duration-200 #{if @display_mode == :year, do: "bg-purple-600 text-white border-b-2 border-purple-300", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              [BY YEAR]
+              {gettext("[BY YEAR]")}
             </button>
             <button
               phx-click="switch_mode"
               phx-value-mode="playlist"
               class={"px-6 py-3 font-mono font-bold transition-colors duration-200 #{if @display_mode == :playlist, do: "bg-purple-600 text-white border-b-2 border-purple-300", else: "text-purple-400 hover:text-purple-300"}"}
             >
-              [BY PLAYLIST]
+              {gettext("[BY PLAYLIST]")}
             </button>
           </div>
         </div>
         
 <!-- Top 3 Podium -->
-        <%= if true do %>
+
           <div class="mb-12">
             <%= cond do %>
               <% @display_mode == :track -> %>
@@ -97,7 +97,7 @@
                     <div
                       class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
                       phx-click="select_track"
-                      phx-value-rank="2"
+                      phx-value-rank={2}
                     >
                       <%= if length(@tracks) > 1 do %>
                         <div class={"#{count_color(Enum.at(@tracks, 1).count)} font-bold text-lg"}>
@@ -118,7 +118,7 @@
                     <div
                       class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
                       phx-click="select_track"
-                      phx-value-rank="1"
+                      phx-value-rank={1}
                     >
                       <%= if length(@tracks) > 0 do %>
                         <div class={"#{count_color(Enum.at(@tracks, 0).count)} font-bold text-xl"}>
@@ -139,7 +139,7 @@
                     <div
                       class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
                       phx-click="select_track"
-                      phx-value-rank="3"
+                      phx-value-rank={3}
                     >
                       <%= if length(@tracks) > 2 do %>
                         <div class={"#{count_color(Enum.at(@tracks, 2).count)} font-bold text-lg"}>
@@ -163,14 +163,14 @@
                     <div
                       class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
                       phx-click="select_artist"
-                      phx-value-rank="2"
+                      phx-value-rank={2}
                     >
                       <%= if length(@artists) > 1 do %>
                         <div class={"#{count_color(Enum.at(@artists, 1).count)} font-bold text-lg"}>
                           [{Enum.at(@artists, 1).count}x]
                         </div>
                         <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 1).artist}</div>
-                        <div class="text-yellow-100 text-base truncate">{length(Enum.at(@artists, 1).tracks)} tracks</div>
+                        <div class="text-yellow-100 text-base truncate">{ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 1).tracks), count: length(Enum.at(@artists, 1).tracks))}</div>
                       <% end %>
                     </div>
                   </div>
@@ -184,14 +184,14 @@
                     <div
                       class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
                       phx-click="select_artist"
-                      phx-value-rank="1"
+                      phx-value-rank={1}
                     >
                       <%= if length(@artists) > 0 do %>
                         <div class={"#{count_color(Enum.at(@artists, 0).count)} font-bold text-xl"}>
                           [{Enum.at(@artists, 0).count}x]
                         </div>
                         <div class="text-white font-semibold text-lg truncate">{Enum.at(@artists, 0).artist}</div>
-                        <div class="text-pink-100 text-lg truncate">{length(Enum.at(@artists, 0).tracks)} tracks</div>
+                        <div class="text-pink-100 text-lg truncate">{ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 0).tracks), count: length(Enum.at(@artists, 0).tracks))}</div>
                       <% end %>
                     </div>
                   </div>
@@ -205,14 +205,14 @@
                     <div
                       class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
                       phx-click="select_artist"
-                      phx-value-rank="3"
+                      phx-value-rank={3}
                     >
                       <%= if length(@artists) > 2 do %>
                         <div class={"#{count_color(Enum.at(@artists, 2).count)} font-bold text-lg"}>
                           [{Enum.at(@artists, 2).count}x]
                         </div>
                         <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 2).artist}</div>
-                        <div class="text-cyan-200 text-base truncate">{length(Enum.at(@artists, 2).tracks)} tracks</div>
+                        <div class="text-cyan-200 text-base truncate">{ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 2).tracks), count: length(Enum.at(@artists, 2).tracks))}</div>
                       <% end %>
                     </div>
                   </div>
@@ -234,12 +234,13 @@
                     <div
                       class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank={if second_place, do: second_place.rank, else: "2"}
+                      phx-value-location="podium"
+                      phx-value-rank={2}
                     >
                       <%= if second_place do %>
                         <div class="text-yellow-200 font-bold text-lg">[{second_place.count}x]</div>
                         <div class="text-white font-semibold text-base truncate">{second_place.year}</div>
-                        <div class="text-yellow-100 text-base truncate">{second_place.track_count} tracks</div>
+                        <div class="text-yellow-100 text-base truncate">{ngettext("%{count} track", "%{count} tracks", second_place.track_count, count: second_place.track_count)}</div>
                       <% end %>
                     </div>
                   </div>
@@ -253,12 +254,13 @@
                     <div
                       class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank={if first_place, do: first_place.rank, else: "1"}
+                      phx-value-location="podium"
+                      phx-value-rank={1}
                     >
                       <%= if first_place do %>
                         <div class="text-pink-200 font-bold text-xl">[{first_place.count}x]</div>
                         <div class="text-white font-semibold text-lg truncate">{first_place.year}</div>
-                        <div class="text-pink-100 text-lg truncate">{first_place.track_count} tracks</div>
+                        <div class="text-pink-100 text-lg truncate">{ngettext("%{count} track", "%{count} tracks", first_place.track_count, count: first_place.track_count)}</div>
                       <% end %>
                     </div>
                   </div>
@@ -272,12 +274,13 @@
                     <div
                       class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
                       phx-click="select_year"
-                      phx-value-rank={if third_place, do: third_place.rank, else: "3"}
+                      phx-value-location="podium"
+                      phx-value-rank={3}
                     >
                       <%= if third_place do %>
                         <div class="text-cyan-300 font-bold text-lg">[{third_place.count}x]</div>
                         <div class="text-white font-semibold text-base truncate">{third_place.year}</div>
-                        <div class="text-cyan-200 text-base truncate">{third_place.track_count} tracks</div>
+                        <div class="text-cyan-200 text-base truncate">{ngettext("%{count} track", "%{count} tracks", third_place.track_count, count: third_place.track_count)}</div>
                       <% end %>
                     </div>
                   </div>
@@ -287,8 +290,7 @@
                 <div></div>
             <% end %>
           </div>
-        <% end %>
-        
+
 <!-- Full List -->
         <div class="font-mono text-lg">
           <%= cond do %>
@@ -299,7 +301,7 @@
                   phx-click="select_track"
                   phx-value-rank={track.rank}
                 >
-                  <span class={"#{rank_color(track.rank)} font-bold w-16 text-right"}>{rank_icon(track.rank)} {track.rank}</span>
+                  <span class={"#{rank_color(track.rank, @display_mode)} font-bold w-16 text-right"}>{rank_icon(track.rank, @display_mode)} {track.rank}</span>
                   <span class={"#{count_color(track.count)} w-12"}>[{track.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{track.track.artist}</span>
                   <span class="text-gray-300">-</span>
@@ -313,13 +315,13 @@
                   phx-click="select_artist"
                   phx-value-rank={artist.rank}
                 >
-                  <span class={"#{rank_color(artist.rank)} font-bold w-16 text-right"}>
-                    {rank_icon(artist.rank)} {artist.rank}
+                  <span class={"#{rank_color(artist.rank, @display_mode)} font-bold w-16 text-right"}>
+                    {rank_icon(artist.rank, @display_mode)} {artist.rank}
                   </span>
                   <span class={"#{count_color(artist.count)} w-12"}>[{artist.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{artist.artist}</span>
                   <span class="text-gray-300">-</span>
-                  <span class="text-gray-100 flex-1 truncate">{length(artist.tracks)} tracks</span>
+                  <span class="text-gray-100 flex-1 truncate">{ngettext("%{count} track", "%{count} tracks", length(artist.tracks), count: length(artist.tracks))}</span>
                 </div>
               <% end %>
             <% @display_mode == :year -> %>
@@ -327,13 +329,14 @@
                 <div
                   class="flex items-center space-x-2 hover:bg-gray-800 p-1 cursor-pointer transition-colors"
                   phx-click="select_year"
+                  phx-value-location="list"
                   phx-value-rank={year.rank}
                 >
-                  <span class={"#{rank_color(year.rank)} font-bold w-16 text-right"}>{rank_icon(year.rank)} {year.rank}</span>
+                  <span class={"#{rank_color(year.rank, @display_mode)} font-bold w-16 text-right"}>{rank_icon(year.rank, @display_mode)} {year.rank}</span>
                   <span class={"#{count_color(year.count)} w-96"}>[{String.duplicate("█", year.bar_count)} {year.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{year.year}</span>
                   <span class="text-gray-300">-</span>
-                  <span class="text-gray-100 flex-1 truncate">{length(year.tracks)} tracks</span>
+                  <span class="text-gray-100 flex-1 truncate">{ngettext("%{count} track", "%{count} tracks", length(year.tracks), count: length(year.tracks))}</span>
                 </div>
               <% end %>
             <% @display_mode == :playlist -> %>
@@ -343,8 +346,8 @@
                   phx-click="select_playlist"
                   phx-value-rank={playlist.rank}
                 >
-                  <span class={"#{rank_color(playlist.rank)} font-bold w-16 text-right"}>
-                    {rank_icon(playlist.rank)} {playlist.rank}
+                  <span class={"#{rank_color(playlist.rank, @display_mode)} font-bold w-16 text-right"}>
+                    {rank_icon(playlist.rank, @display_mode)} {playlist.rank}
                   </span>
                   <span class="text-gray-100 w-12">[{length(playlist.tracks)}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{playlist.title}</span>
@@ -361,7 +364,7 @@
     <%= if @loading do %>
       <div class="synthwave-loading p-8 text-center max-w-4xl mx-auto">
         <div class="synthwave-progress-text mb-6 text-2xl font-bold">
-          ▲ PROCESSING BILLBOARD DATA ▲
+          {gettext("▲ PROCESSING BILLBOARD DATA ▲")}
         </div>
         <div class="synthwave-status-text mb-4 text-lg">
           {@progress_text}
@@ -396,7 +399,7 @@
       <%= if @selected_track do %>
         <!-- Track Modal -->
         <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected_track.rank)} {@selected_track.rank}</div>
+          <div class="text-3xl mb-4">{rank_icon(@selected_track.rank, @display_mode)} {@selected_track.rank}</div>
           <div class="flex items-center justify-center space-x-4">
             <h2 class="text-xl font-bold text-white">
               {@selected_track.track.artist} - <span class="text-gray-300">{@selected_track.track.name}</span>
@@ -415,7 +418,7 @@
 
         <div class="space-y-4">
           <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">Found in playlists:</h3>
+            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Found in playlists:")}</h3>
             <div class="space-y-2 max-h-96 overflow-y-auto">
               <%= for track <- @selected_track.tracks |> Enum.uniq_by(&{&1.provider, &1.playlist_id}) do %>
                 <div class="bg-gray-800 p-3 rounded-lg">
@@ -436,22 +439,22 @@
       <%= if @selected_artist do %>
         <!-- Artist Modal -->
         <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected_artist.rank)} {@selected_artist.rank}</div>
+          <div class="text-3xl mb-4">{rank_icon(@selected_artist.rank, @display_mode)} {@selected_artist.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_artist.artist}</h2>
           <div class="text-lg text-gray-300">
-            {@selected_artist.count} occurrences • {length(@selected_artist.tracks)} tracks
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_artist.count, count: @selected_artist.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_artist.tracks), count: length(@selected_artist.tracks))}
           </div>
         </div>
 
         <div class="space-y-4">
           <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">Tracks by this artist:</h3>
+            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks by this artist:")}</h3>
             <div class="space-y-2 max-h-96 overflow-y-auto">
               <%= for track_group <- @selected_artist.tracks do %>
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{track_group.count} occurrences</div>
+                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -472,22 +475,22 @@
       <%= if @selected_year do %>
         <!-- Year Modal -->
         <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected_year.rank)} {@selected_year.rank}</div>
+          <div class="text-3xl mb-4">{rank_icon(@selected_year.rank, @display_mode)} {@selected_year.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_year.year}</h2>
           <div class="text-lg text-gray-300">
-            {@selected_year.count} occurrences • {length(@selected_year.tracks)} tracks
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_year.count, count: @selected_year.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_year.tracks), count: length(@selected_year.tracks))}
           </div>
         </div>
 
         <div class="space-y-4">
           <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">Tracks from this year:</h3>
+            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks from this year:")}</h3>
             <div class="space-y-2 max-h-96 overflow-y-auto">
               <%= for track_group <- @selected_year.tracks do %>
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.artist} - {track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{track_group.count} occurrences</div>
+                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -508,11 +511,11 @@
       <%= if @selected_playlist do %>
         <!-- Playlist Modal -->
         <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected_playlist.rank)} {@selected_playlist.rank}</div>
+          <div class="text-3xl mb-4">{rank_icon(@selected_playlist.rank, @display_mode)} {@selected_playlist.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_playlist.title}</h2>
           <div class="text-lg text-gray-400 mb-2">by {@selected_playlist.owner_name}</div>
           <div class="text-lg text-gray-300">
-            {length(@selected_playlist.tracks)} tracks • Mean year: {@selected_playlist.mean_year}
+            {ngettext("%{count} track", "%{count} tracks", length(@selected_playlist.tracks), count: length(@selected_playlist.tracks))} • {gettext("Mean year: %{year}", year: @selected_playlist.mean_year)}
           </div>
           <div class="mt-4">
             <a
@@ -520,7 +523,7 @@
               target="_blank"
               class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
-              Open {String.capitalize(Atom.to_string(@selected_playlist.provider))} Playlist
+              {gettext("Open %{provider} Playlist", provider: String.capitalize(Atom.to_string(@selected_playlist.provider)))}
             </a>
           </div>
         </div>
@@ -539,7 +542,7 @@
                 )
               ]}
             >
-              Tracks ({length(@selected_playlist.tracks)})
+              {gettext("Tracks (%{count})", count: length(@selected_playlist.tracks))}
             </button>
             <button
               phx-click="switch_playlist_tab"
@@ -552,7 +555,7 @@
                 )
               ]}
             >
-              Similar ({length(@selected_playlist.top_similar)})
+              {gettext("Similar (%{count})", count: length(@selected_playlist.top_similar))}
             </button>
           </div>
         </div>
@@ -612,7 +615,7 @@
                         target="_blank"
                         class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                       >
-                        Open
+                        {gettext("Open")}
                       </a>
                     </div>
                   </div>

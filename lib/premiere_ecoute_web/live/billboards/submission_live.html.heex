@@ -34,12 +34,12 @@
                 </div>
               </div>
               <div class="flex-1">
-                <h3 class="text-xl font-semibold text-white mb-1">Submission Successful!</h3>
+                <h3 class="text-xl font-semibold text-white mb-1">{gettext("Submission Successful!")}</h3>
                 <p class="text-green-300 mb-4">{@success_message}</p>
                 <%= if @generated_token do %>
                   <div class="bg-white/5 border border-white/20 rounded-lg p-4">
                     <p class="text-sm text-slate-300 mb-2">
-                      <strong>Important:</strong> Save this deletion code to remove your playlist later:
+                      {gettext("Important: Save this deletion code to remove your playlist later:")}
                     </p>
                     <div class="flex items-center space-x-3">
                       <code class="bg-green-600/20 text-green-300 px-3 py-2 rounded-lg font-mono text-lg font-bold border border-green-500/30">
@@ -48,9 +48,9 @@
                       <button
                         onclick={"navigator.clipboard.writeText('#{@generated_token}')"}
                         class="px-3 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm transition-colors"
-                        title="Copy to clipboard"
+                        title={gettext("Copy to clipboard")}
                       >
-                        Copy
+                        {gettext("Copy")}
                       </button>
                     </div>
                   </div>
@@ -72,12 +72,12 @@
                 </div>
               </div>
               <div class="flex-1">
-                <h3 class="text-xl font-semibold text-white mb-2">Billboard Stopped</h3>
+                <h3 class="text-xl font-semibold text-white mb-2">{gettext("Billboard Stopped")}</h3>
                 <p class="text-red-300 mb-4">
-                  This billboard is no longer accepting new submissions. The submission period has ended.
+                  {gettext("This billboard is no longer accepting new submissions. The submission period has ended.")}
                 </p>
                 <p class="text-slate-300 text-sm">
-                  If you previously submitted a playlist, you can still remove it using your deletion code below.
+                  {gettext("If you previously submitted a playlist, you can still remove it using your deletion code below.")}
                 </p>
               </div>
             </div>
@@ -92,20 +92,20 @@
                 <svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Submit your playlist
+                {gettext("Submit your playlist")}
               </h2>
             </div>
             <form phx-change="validate" phx-submit="submit" class="space-y-6">
               <div>
                 <label for="pseudo" class="text-white text-sm font-medium mb-2 block">
-                  Your Name (Optional)
+                  {gettext("Your Name (Optional)")}
                 </label>
                 <input
                   type="text"
                   id="pseudo"
                   name="pseudo"
                   value={@pseudo}
-                  placeholder="Enter your name or pseudonym..."
+                  placeholder={gettext("Enter your name or pseudonym...")}
                   class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-colors"
                   maxlength="50"
                 />
@@ -113,19 +113,19 @@
 
               <div>
                 <label for="url" class="text-white text-sm font-medium mb-2 block">
-                  Playlist URL
+                  {gettext("Playlist URL")}
                 </label>
                 <input
                   type="url"
                   id="url"
                   name="url"
                   value={@url}
-                  placeholder="https://open.spotify.com/playlist/..."
+                  placeholder={gettext("https://open.spotify.com/playlist/...")}
                   class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-colors"
                   required
                 />
                 <p class="mt-2 text-sm text-slate-400">
-                  Supported platforms: Spotify, Deezer
+                  {gettext("Supported platforms: Spotify, Deezer")}
                 </p>
               </div>
 
@@ -153,7 +153,7 @@
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
-                Submit Playlist
+                {gettext("Submit Playlist")}
               </button>
             </form>
           </div>
@@ -171,7 +171,7 @@
                 </div>
               </div>
               <div>
-                <h3 class="text-xl font-semibold text-white mb-1">Deletion Successful!</h3>
+                <h3 class="text-xl font-semibold text-white mb-1">{gettext("Deletion Successful!")}</h3>
                 <p class="text-blue-300">{@deletion_success}</p>
               </div>
             </div>
@@ -190,29 +190,29 @@
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16"
                 />
               </svg>
-              Remove your playlist
+              {gettext("Remove your playlist")}
             </h2>
             <p class="text-slate-300 text-sm">
-              Use the deletion code you received when submitting your playlist to remove it from this billboard.
+              {gettext("Use the deletion code you received when submitting your playlist to remove it from this billboard.")}
             </p>
           </div>
 
           <form phx-change="validate_deletion" phx-submit="delete_submission" class="space-y-6">
             <div>
               <label for="deletion_token" class="text-white text-sm font-medium mb-2 block">
-                Deletion Code
+                {gettext("Deletion Code")}
               </label>
               <input
                 type="text"
                 id="deletion_token"
                 name="deletion_token"
                 value={@deletion_token}
-                placeholder="Enter your deletion code (e.g., banana42)"
+                placeholder={gettext("Enter your deletion code (e.g., banana42)")}
                 class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder-gray-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-colors"
                 required
               />
               <p class="mt-2 text-sm text-slate-400">
-                The deletion code is a goofy word followed by numbers, like "banana42" or "wiggly123"
+                {gettext("The deletion code is a goofy word followed by numbers, like \"banana42\" or \"wiggly123\"")}
               </p>
             </div>
 
@@ -245,7 +245,7 @@
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16"
                 />
               </svg>
-              Remove Playlist
+              {gettext("Remove Playlist")}
             </button>
           </form>
         </div>

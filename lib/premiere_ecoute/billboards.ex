@@ -76,25 +76,4 @@ defmodule PremiereEcoute.Billboards do
 
   def activate_billboard(%Billboard{} = billboard), do: update_billboard(billboard, %{status: :active})
   def stop_billboard(%Billboard{} = billboard), do: update_billboard(billboard, %{status: :stopped})
-
-  @doc """
-  Generates a billboard for display using the existing Billboard service.
-  """
-  def generate_billboard_display(%Billboard{submissions: submissions}) when is_list(submissions) do
-    urls =
-      submissions
-      |> Enum.map(fn
-        %{url: url} -> url
-        %{"url" => url} -> url
-        url when is_binary(url) -> url
-      end)
-      |> Enum.filter(&is_binary/1)
-
-    case urls do
-      [] -> {:error, :no_submissions}
-      urls -> generate_billboard(urls, [])
-    end
-  end
-
-  def generate_billboard_display(_), do: {:error, :no_submissions}
 end

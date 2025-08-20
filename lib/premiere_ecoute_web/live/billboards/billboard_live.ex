@@ -59,12 +59,12 @@ defmodule PremiereEcouteWeb.Billboards.BillboardLive do
         tracks: [],
         task: task,
         progress: 0,
-        progress_text: "Starting..."
+        progress_text: gettext("Starting...")
       )
       |> push_event("set_loading", %{loading: true})
       |> then(fn socket -> {:noreply, socket} end)
     else
-      {:noreply, assign(socket, error: "Please enter at least one playlist URL")}
+      {:noreply, assign(socket, error: gettext("Please enter at least one playlist URL"))}
     end
   end
 
@@ -201,7 +201,7 @@ defmodule PremiereEcouteWeb.Billboards.BillboardLive do
     socket
     |> assign(
       loading: false,
-      error: "Failed to generate billboard: #{reason}",
+      error: gettext("Failed to generate billboard: %{reason}", reason: reason),
       task: nil,
       progress: 0,
       progress_text: ""
@@ -215,7 +215,7 @@ defmodule PremiereEcouteWeb.Billboards.BillboardLive do
     socket
     |> assign(
       loading: false,
-      error: "Failed to generate billboard: request was interrupted",
+      error: gettext("Failed to generate billboard: request was interrupted"),
       task: nil,
       progress: 0,
       progress_text: ""

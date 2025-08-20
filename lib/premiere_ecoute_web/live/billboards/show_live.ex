@@ -20,7 +20,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     case Billboards.get_billboard(billboard_id) do
       nil ->
         socket
-        |> put_flash(:error, "Billboard not found")
+        |> put_flash(:error, gettext("Billboard not found"))
         |> redirect(to: ~p"/home")
         |> then(fn socket -> {:ok, socket} end)
 
@@ -42,7 +42,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
           |> then(fn socket -> {:ok, socket} end)
         else
           socket
-          |> put_flash(:error, "You don't have permission to access this billboard")
+          |> put_flash(:error, gettext("You don't have permission to access this billboard"))
           |> redirect(to: ~p"/home")
           |> then(fn socket -> {:ok, socket} end)
         end
@@ -55,11 +55,11 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
       {:ok, billboard} ->
         socket
         |> assign(:billboard, billboard)
-        |> put_flash(:info, "Billboard activated! Users can now submit playlists.")
+        |> put_flash(:info, gettext("Billboard activated! Users can now submit playlists."))
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to activate billboard")}
+        {:noreply, put_flash(socket, :error, gettext("Failed to activate billboard"))}
     end
   end
 
@@ -69,11 +69,11 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
       {:ok, billboard} ->
         socket
         |> assign(:billboard, billboard)
-        |> put_flash(:info, "Billboard stopped. No more submissions will be accepted.")
+        |> put_flash(:info, gettext("Billboard stopped. No more submissions will be accepted."))
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to stop billboard")}
+        {:noreply, put_flash(socket, :error, gettext("Failed to stop billboard"))}
     end
   end
 
@@ -86,14 +86,14 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
         socket
         |> assign(:billboard, billboard)
         |> assign(:submissions, billboard.submissions || [])
-        |> put_flash(:info, "Submission removed")
+        |> put_flash(:info, gettext("Submission removed"))
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, :invalid_index} ->
-        {:noreply, put_flash(socket, :error, "Invalid submission")}
+        {:noreply, put_flash(socket, :error, gettext("Invalid submission"))}
 
       {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to remove submission")}
+        {:noreply, put_flash(socket, :error, gettext("Failed to remove submission"))}
     end
   end
 
@@ -114,14 +114,14 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     case Billboards.delete_billboard(billboard) do
       {:ok, _} ->
         socket
-        |> put_flash(:info, "Billboard deleted successfully")
+        |> put_flash(:info, gettext("Billboard deleted successfully"))
         |> redirect(to: ~p"/billboards")
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, _changeset} ->
         socket
         |> assign(:show_delete_modal, false)
-        |> put_flash(:error, "Failed to delete billboard")
+        |> put_flash(:error, gettext("Failed to delete billboard"))
         |> then(fn socket -> {:noreply, socket} end)
     end
   end
@@ -150,13 +150,13 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
         |> assign(:page_title, updated_billboard.title)
         |> assign(:show_edit_modal, false)
         |> assign(:title_form, to_form(%{"title" => updated_billboard.title}))
-        |> put_flash(:info, "Billboard title updated successfully")
+        |> put_flash(:info, gettext("Billboard title updated successfully"))
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, changeset} ->
         socket
         |> assign(:title_form, to_form(changeset))
-        |> put_flash(:error, "Failed to update billboard title")
+        |> put_flash(:error, gettext("Failed to update billboard title"))
         |> then(fn socket -> {:noreply, socket} end)
     end
   end
@@ -237,5 +237,5 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     end
   end
 
-  defp simple_date(_), do: "Unknown"
+  defp simple_date(_), do: gettext("Unknown")
 end
