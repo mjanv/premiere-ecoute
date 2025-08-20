@@ -24,7 +24,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:467
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:526
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:117
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:266
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:361
 #: lib/premiere_ecoute_web/live/home_live.html.heex:559
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:36
 #, elixir-autogen, elixir-format
@@ -718,7 +718,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:86
 #: lib/premiere_ecoute_web/live/billboards/index_live.ex:55
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:240
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:400
 #: lib/premiere_ecoute_web/live/discography/album_selection_live.html.heex:266
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:313
 #, elixir-autogen, elixir-format
@@ -1456,8 +1456,8 @@ msgstr ""
 msgid "No playlists found"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:484
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:618
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:504
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:673
 #: lib/premiere_ecoute_web/live/home_live.html.heex:532
 #, elixir-autogen, elixir-format
 msgid "Open"
@@ -1635,14 +1635,14 @@ msgstr ""
 msgid "New Billboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:311
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:323
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:347
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:359
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:445
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:457
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:481
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:493
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:315
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:333
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:358
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:376
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:484
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:502
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:527
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:545
 #, elixir-autogen, elixir-format
 msgid "%{count} occurrence"
 msgid_plural "%{count} occurrences"
@@ -1656,22 +1656,22 @@ msgid_plural "%{count} submissions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:171
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:197
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:311
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:347
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:384
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:173
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:194
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:215
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:243
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:263
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:283
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:324
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:339
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:445
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:481
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:518
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:172
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:200
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:315
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:358
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:402
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:187
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:212
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:237
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:269
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:291
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:313
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:358
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:377
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:484
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:527
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:571
 #, elixir-autogen, elixir-format
 msgid "%{count} track"
 msgid_plural "%{count} tracks"
@@ -1693,17 +1693,17 @@ msgstr ""
 msgid "Activate Billboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:139
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:178
 #, elixir-autogen, elixir-format
 msgid "Activate your billboard to start collecting playlists!"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:248
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:343
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to delete \"%{title}\"?"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:198
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:292
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to remove this submission?"
 msgstr ""
@@ -1718,7 +1718,7 @@ msgstr ""
 msgid "Billboard \"%{title}\""
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:75
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:67
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Billboard Stopped"
 msgstr ""
@@ -1728,7 +1728,7 @@ msgstr ""
 msgid "Billboard Stopped - %{title}"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:58
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:64
 #, elixir-autogen, elixir-format
 msgid "Billboard activated! Users can now submit playlists."
 msgstr ""
@@ -1738,7 +1738,7 @@ msgstr ""
 msgid "Billboard created successfully!"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:117
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:151
 #, elixir-autogen, elixir-format
 msgid "Billboard deleted successfully"
 msgstr ""
@@ -1760,17 +1760,17 @@ msgstr ""
 msgid "Billboard not found"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:72
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:78
 #, elixir-autogen, elixir-format
 msgid "Billboard stopped. No more submissions will be accepted."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:153
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:187
 #, elixir-autogen, elixir-format
 msgid "Billboard title updated successfully"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:53
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:45
 #, elixir-autogen, elixir-format
 msgid "Copy"
 msgstr ""
@@ -1780,7 +1780,7 @@ msgstr ""
 msgid "Copy billboard to clipboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:51
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Copy to clipboard"
 msgstr ""
@@ -1801,18 +1801,18 @@ msgstr ""
 msgid "Creating..."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:246
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:260
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:341
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:355
 #, elixir-autogen, elixir-format
 msgid "Delete Billboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:203
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:195
 #, elixir-autogen, elixir-format
 msgid "Deletion Code"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:174
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:166
 #, elixir-autogen, elixir-format
 msgid "Deletion Successful!"
 msgstr ""
@@ -1822,22 +1822,22 @@ msgstr ""
 msgid "Enter a descriptive title for your billboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:210
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:202
 #, elixir-autogen, elixir-format
 msgid "Enter your deletion code (e.g., banana42)"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:108
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:100
 #, elixir-autogen, elixir-format
 msgid "Enter your name or pseudonym..."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:62
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:68
 #, elixir-autogen, elixir-format
 msgid "Failed to activate billboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:124
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:158
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to delete billboard"
 msgstr ""
@@ -1859,12 +1859,12 @@ msgstr ""
 msgid "Failed to generate billboard: request was interrupted"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:96
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:106
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to remove submission"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:76
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:82
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to stop billboard"
 msgstr ""
@@ -1874,23 +1874,23 @@ msgstr ""
 msgid "Failed to submit playlist. Please try again."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:159
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:193
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to update billboard title"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:287
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:421
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:291
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:460
 #, elixir-autogen, elixir-format
 msgid "Found in playlists:"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:80
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:72
 #, elixir-autogen, elixir-format
 msgid "If you previously submitted a playlist, you can still remove it using your deletion code below."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:42
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:34
 #, elixir-autogen, elixir-format
 msgid "Important: Save this deletion code to remove your playlist later:"
 msgstr ""
@@ -1900,7 +1900,8 @@ msgstr ""
 msgid "Invalid deletion code. Please check your code and try again."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:93
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:103
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:127
 #, elixir-autogen, elixir-format
 msgid "Invalid submission"
 msgstr ""
@@ -1910,8 +1911,8 @@ msgstr ""
 msgid "Manage your music billboard campaigns and collect playlist submissions"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:384
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:518
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:404
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:573
 #, elixir-autogen, elixir-format
 msgid "Mean year: %{year}"
 msgstr ""
@@ -1921,7 +1922,7 @@ msgstr ""
 msgid "No billboards yet"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:138
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:177
 #, elixir-autogen, elixir-format
 msgid "No submissions yet."
 msgstr ""
@@ -1931,8 +1932,8 @@ msgstr ""
 msgid "No valid submissions found"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:392
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:526
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:412
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:581
 #, elixir-autogen, elixir-format
 msgid "Open %{provider} Playlist"
 msgstr ""
@@ -1942,7 +1943,7 @@ msgstr ""
 msgid "PLAYLIST"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:116
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:108
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Playlist URL"
 msgstr ""
@@ -1977,17 +1978,17 @@ msgstr ""
 msgid "Ready to Create"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:248
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:240
 #, elixir-autogen, elixir-format
 msgid "Remove Playlist"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:200
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:294
 #, elixir-autogen, elixir-format
 msgid "Remove submission"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:193
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:185
 #, elixir-autogen, elixir-format
 msgid "Remove your playlist"
 msgstr ""
@@ -2002,14 +2003,14 @@ msgstr ""
 msgid "Share this link with your audience to submit playlists:"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:424
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:558
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:444
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:613
 #, elixir-autogen, elixir-format
 msgid "Similar (%{count})"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/billboards/billboard_live.ex:62
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.ex:231
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.ex:232
 #, elixir-autogen, elixir-format
 msgid "Starting..."
 msgstr ""
@@ -2019,22 +2020,17 @@ msgstr ""
 msgid "Stop Billboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:37
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:29
 #, elixir-autogen, elixir-format
 msgid "Submission Successful!"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:89
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:99
 #, elixir-autogen, elixir-format
 msgid "Submission removed"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:123
-#, elixir-autogen, elixir-format
-msgid "Submissions (%{count})"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:156
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:148
 #, elixir-autogen, elixir-format
 msgid "Submit Playlist"
 msgstr ""
@@ -2044,12 +2040,13 @@ msgstr ""
 msgid "Submit to %{title}"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:95
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:43
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:87
 #, elixir-autogen, elixir-format
 msgid "Submit your playlist"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:128
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:120
 #, elixir-autogen, elixir-format
 msgid "Supported platforms: Spotify, Deezer"
 msgstr ""
@@ -2059,17 +2056,17 @@ msgstr ""
 msgid "TRACK"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:215
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:207
 #, elixir-autogen, elixir-format
 msgid "The deletion code is a goofy word followed by numbers, like \"banana42\" or \"wiggly123\""
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:249
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:344
 #, elixir-autogen, elixir-format
 msgid "This action cannot be undone and will permanently remove the billboard and all its submissions."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:77
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:69
 #, elixir-autogen, elixir-format
 msgid "This billboard is no longer accepting new submissions. The submission period has ended."
 msgstr ""
@@ -2099,25 +2096,25 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:411
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:545
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:431
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:600
 #, elixir-autogen, elixir-format
 msgid "Tracks (%{count})"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:317
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:451
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:326
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:495
 #, elixir-autogen, elixir-format
 msgid "Tracks by this artist:"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:353
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:487
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:369
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:538
 #, elixir-autogen, elixir-format
 msgid "Tracks from this year:"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:196
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:188
 #, elixir-autogen, elixir-format
 msgid "Use the deletion code you received when submitting your playlist to remove it from this billboard."
 msgstr ""
@@ -2127,32 +2124,32 @@ msgstr ""
 msgid "YEAR"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:45
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:51
 #, elixir-autogen, elixir-format
 msgid "You don't have permission to access this billboard"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:101
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:93
 #, elixir-autogen, elixir-format
 msgid "Your Name (Optional)"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:65
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:78
 #, elixir-autogen, elixir-format
 msgid "[BY ARTIST]"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:79
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:92
 #, elixir-autogen, elixir-format
 msgid "[BY PLAYLIST]"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:58
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:71
 #, elixir-autogen, elixir-format
 msgid "[BY TRACK]"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:72
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:85
 #, elixir-autogen, elixir-format
 msgid "[BY YEAR]"
 msgstr ""
@@ -2172,13 +2169,13 @@ msgstr ""
 msgid "[GENERATE BILLBOARD]"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:123
+#: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:115
 #, elixir-autogen, elixir-format
 msgid "https://open.spotify.com/playlist/..."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:233
-#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:367
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:237
+#: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:406
 #, elixir-autogen, elixir-format
 msgid "▲ PROCESSING BILLBOARD DATA ▲"
 msgstr ""
@@ -2191,4 +2188,65 @@ msgstr ""
 #: lib/premiere_ecoute_web/components/layouts.ex:56
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Connect Spotify"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:157
+#, elixir-autogen, elixir-format, fuzzy
+msgid "All submissions"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:271
+#, elixir-autogen, elixir-format
+msgid "Click to mark as reviewed"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:251
+#, elixir-autogen, elixir-format
+msgid "Click to mark as unreviewed"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:130
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Failed to update review status"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:188
+#, elixir-autogen, elixir-format, fuzzy
+msgid "No submissions match your search."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:159
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:281
+#, elixir-autogen, elixir-format
+msgid "Pending review"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:261
+#, elixir-autogen, elixir-format
+msgid "Reviewed"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:158
+#, elixir-autogen, elixir-format
+msgid "Reviewed only"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:143
+#, elixir-autogen, elixir-format
+msgid "Search by URL or submitter name..."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:123
+#, elixir-autogen, elixir-format
+msgid "Submission review status updated"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:126
+#, elixir-autogen, elixir-format
+msgid "Submissions (%{filtered}/%{total})"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:189
+#, elixir-autogen, elixir-format
+msgid "Try adjusting your search query or filters."
 msgstr ""

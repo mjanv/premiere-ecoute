@@ -76,4 +76,40 @@ defmodule PremiereEcoute.Billboards do
 
   def activate_billboard(%Billboard{} = billboard), do: update_billboard(billboard, %{status: :active})
   def stop_billboard(%Billboard{} = billboard), do: update_billboard(billboard, %{status: :stopped})
+
+  @doc """
+  Toggles the review status of a submission at the given index.
+  """
+  def toggle_submission_review(%Billboard{} = billboard, index) when is_integer(index) do
+    if index >= 0 and index < length(billboard.submissions) do
+      updated_submissions =
+        billboard.submissions
+        |> Enum.with_index()
+        |> Enum.map(fn
+          {submission, ^index} ->
+            # AIDEV-NOTE: Toggle reviewed status, default to false if not present
+            current_reviewed = get_submission_reviewed_status(submission)
+            Map.put(submission, "reviewed", !current_reviewed)
+
+          {submission, _} ->
+            submission
+        end)
+
+      case update_billboard(billboard, %{submissions: updated_submissions}) do
+        {:ok, updated_billboard} ->
+          Cache.del(:billboards, updated_billboard.billboard_id)
+          {:ok, updated_billboard}
+
+        error ->
+          error
+      end
+    else
+      {:error, :invalid_index}
+    end
+  end
+
+  # AIDEV-NOTE: Helper function to get review status from submission map
+  defp get_submission_reviewed_status(%{"reviewed" => reviewed}) when is_boolean(reviewed), do: reviewed
+  defp get_submission_reviewed_status(%{reviewed: reviewed}) when is_boolean(reviewed), do: reviewed
+  defp get_submission_reviewed_status(_), do: false
 end
