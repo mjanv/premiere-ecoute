@@ -168,7 +168,9 @@
                   <span class={"#{count_color(artist.count)} w-8 text-xs"}>[{artist.count}]</span>
                   <span class="text-white font-semibold flex-1 truncate text-xs">{artist.artist}</span>
                   <span class="text-gray-300 text-xs">-</span>
-                  <span class="text-gray-100 flex-1 truncate text-xs">{ngettext("%{count} track", "%{count} tracks", length(artist.tracks), count: length(artist.tracks))}</span>
+                  <span class="text-gray-100 flex-1 truncate text-xs">
+                    {ngettext("%{count} track", "%{count} tracks", length(artist.tracks), count: length(artist.tracks))}
+                  </span>
                 </div>
               <% end %>
             <% @display_mode == :year -> %>
@@ -194,7 +196,9 @@
                   </span>
                   <span class="text-white font-semibold flex-1 truncate text-xs">{year.year}</span>
                   <span class="text-gray-300 text-xs">-</span>
-                  <span class="text-gray-100 flex-1 truncate text-xs">{ngettext("%{count} track", "%{count} tracks", length(year.tracks), count: length(year.tracks))}</span>
+                  <span class="text-gray-100 flex-1 truncate text-xs">
+                    {ngettext("%{count} track", "%{count} tracks", length(year.tracks), count: length(year.tracks))}
+                  </span>
                 </div>
               <% end %>
             <% @display_mode == :playlist -> %>
@@ -308,7 +312,12 @@
           <div class="text-3xl mb-4">{rank_icon(@selected_artist.rank)} {@selected_artist.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_artist.artist}</h2>
           <div class="text-lg text-gray-300">
-            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_artist.count, count: @selected_artist.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_artist.tracks), count: length(@selected_artist.tracks))}
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_artist.count, count: @selected_artist.count)} • {ngettext(
+              "%{count} track",
+              "%{count} tracks",
+              length(@selected_artist.tracks),
+              count: length(@selected_artist.tracks)
+            )}
           </div>
         </div>
 
@@ -320,7 +329,9 @@
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
+                    <div class="text-gray-400 text-sm">
+                      {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
+                    </div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -344,7 +355,12 @@
           <div class="text-3xl mb-4">{rank_icon(@selected_year.rank)} {@selected_year.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_year.year}</h2>
           <div class="text-lg text-gray-300">
-            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_year.count, count: @selected_year.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_year.tracks), count: length(@selected_year.tracks))}
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_year.count, count: @selected_year.count)} • {ngettext(
+              "%{count} track",
+              "%{count} tracks",
+              length(@selected_year.tracks),
+              count: length(@selected_year.tracks)
+            )}
           </div>
         </div>
 
@@ -356,7 +372,9 @@
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.artist} - {track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
+                    <div class="text-gray-400 text-sm">
+                      {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
+                    </div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -381,7 +399,9 @@
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_playlist.title}</h2>
           <div class="text-lg text-gray-400 mb-2">by {@selected_playlist.owner_name}</div>
           <div class="text-lg text-gray-300">
-            {ngettext("%{count} track", "%{count} tracks", length(@selected_playlist.tracks), count: length(@selected_playlist.tracks))} • {gettext("Mean year: %{year}", year: @selected_playlist.mean_year)}
+            {ngettext("%{count} track", "%{count} tracks", length(@selected_playlist.tracks),
+              count: length(@selected_playlist.tracks)
+            )} • {gettext("Mean year: %{year}", year: @selected_playlist.mean_year)}
           </div>
           <div class="mt-4">
             <a

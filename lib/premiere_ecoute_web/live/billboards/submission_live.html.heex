@@ -1,21 +1,13 @@
-<div class="min-h-screen bg-slate-950 text-white">
-  <div class="text-white flex flex-col bg-slate-950 min-h-screen">
+<div class="min-h-screen text-white font-mono relative overflow-hidden synthwave-bg">
+  <div class="text-white flex flex-col min-h-screen relative z-10">
     <div class="flex-1 py-12">
       <div class="max-w-4xl mx-auto px-6">
         <!-- AIDEV-NOTE: Submission page header -->
         <div class="mb-12 text-center">
           <div class="mb-4">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-2xl border border-purple-500/30 flex items-center justify-center">
-              <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                />
-              </svg>
-            </div>
-            <h1 class="text-5xl font-bold text-white mb-3">{@billboard.title}</h1>
+            <h1 class="text-4xl md:text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 synthwave-title mb-3">
+              {@billboard.title}
+            </h1>
             <p class="text-slate-300/90 text-xl leading-relaxed max-w-2xl mx-auto">
               by <span class="text-purple-400">{@billboard.streamer.username}</span>
             </p>

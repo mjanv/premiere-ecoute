@@ -27,11 +27,12 @@ defmodule PremiereEcouteWeb.Plugs.SetLocale do
   # Get locale from browser language first, then user profile for authenticated users
   defp get_locale_from_browser_or_profile(conn) do
     browser_locale = get_browser_locale(conn)
-    
+
     case get_user_profile_language(conn) do
       nil ->
         # Non-authenticated user: use browser locale only
         browser_locale
+
       profile_locale ->
         # Authenticated user: browser first, then profile as fallback
         browser_locale || profile_locale

@@ -165,10 +165,11 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
   def handle_event("select_year", %{"rank" => rank, "location" => location}, socket) do
     rank = String.to_integer(rank)
 
-    selected_year = case location do
-      "list" -> Enum.find(socket.assigns.years, &(&1.rank == rank))
-      "podium" -> Enum.find(socket.assigns.year_podium, &(&1.rank == rank))
-    end
+    selected_year =
+      case location do
+        "list" -> Enum.find(socket.assigns.years, &(&1.rank == rank))
+        "podium" -> Enum.find(socket.assigns.year_podium, &(&1.rank == rank))
+      end
 
     {:noreply, assign(socket, selected_year: selected_year, show_modal: true)}
   end

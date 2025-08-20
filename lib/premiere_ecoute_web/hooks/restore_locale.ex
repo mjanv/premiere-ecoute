@@ -17,14 +17,15 @@ defmodule PremiereEcouteWeb.Hooks.RestoreLocale do
   # Get locale from browser language first, then user profile for authenticated users
   defp get_locale_from_browser_or_profile(socket, session) do
     browser_locale = get_browser_locale(session)
-    
+
     case get_user_profile_language(socket) do
       nil ->
         # Non-authenticated user: use browser locale only
         browser_locale
+
       profile_locale ->
         # Authenticated user: browser first, then profile as fallback
-         profile_locale
+        profile_locale
     end
   end
 

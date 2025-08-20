@@ -30,6 +30,19 @@
           {@billboard.title}
         </h2>
       </div>
+      
+<!-- Submission Link -->
+      <div class="text-center mb-6">
+        <.link
+          href={~p"/billboards/#{@billboard.billboard_id}/submission/new"}
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 synthwave-button"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          {gettext("Submit your playlist")}
+        </.link>
+      </div>
     </div>
     
 <!-- Error Display -->
@@ -83,214 +96,232 @@
         
 <!-- Top 3 Podium -->
 
-          <div class="mb-12">
-            <%= cond do %>
-              <% @display_mode == :track -> %>
-                <div class="flex justify-center items-end space-x-8 mb-12">
-                  <!-- Track Mode Podium -->
+        <div class="mb-12">
+          <%= cond do %>
+            <% @display_mode == :track -> %>
+              <div class="flex justify-center items-end space-x-8 mb-12">
+                <!-- Track Mode Podium -->
                   <!-- 2nd Place -->
-                  <div class="text-center">
-                    <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
-                      <div class="text-4xl mb-2">🥈</div>
-                      <div class="text-xl font-bold text-yellow-100">#2</div>
-                    </div>
-                    <div
-                      class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
-                      phx-click="select_track"
-                      phx-value-rank={2}
-                    >
-                      <%= if length(@tracks) > 1 do %>
-                        <div class={"#{count_color(Enum.at(@tracks, 1).count)} font-bold text-lg"}>
-                          [{Enum.at(@tracks, 1).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 1).track.artist}</div>
-                        <div class="text-yellow-100 text-base truncate">{Enum.at(@tracks, 1).track.name}</div>
-                      <% end %>
-                    </div>
+                <div class="text-center">
+                  <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
+                    <div class="text-4xl mb-2">🥈</div>
+                    <div class="text-xl font-bold text-yellow-100">#2</div>
                   </div>
-                  
-<!-- 1st Place -->
-                  <div class="text-center">
-                    <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
-                      <div class="text-5xl mb-2">👑</div>
-                      <div class="text-2xl font-bold text-pink-100">#1</div>
-                    </div>
-                    <div
-                      class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
-                      phx-click="select_track"
-                      phx-value-rank={1}
-                    >
-                      <%= if length(@tracks) > 0 do %>
-                        <div class={"#{count_color(Enum.at(@tracks, 0).count)} font-bold text-xl"}>
-                          [{Enum.at(@tracks, 0).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-lg truncate">{Enum.at(@tracks, 0).track.artist}</div>
-                        <div class="text-pink-100 text-lg truncate">{Enum.at(@tracks, 0).track.name}</div>
-                      <% end %>
-                    </div>
-                  </div>
-                  
-<!-- 3rd Place -->
-                  <div class="text-center">
-                    <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
-                      <div class="text-3xl mb-2">🥉</div>
-                      <div class="text-xl font-bold text-cyan-200">#3</div>
-                    </div>
-                    <div
-                      class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
-                      phx-click="select_track"
-                      phx-value-rank={3}
-                    >
-                      <%= if length(@tracks) > 2 do %>
-                        <div class={"#{count_color(Enum.at(@tracks, 2).count)} font-bold text-lg"}>
-                          [{Enum.at(@tracks, 2).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 2).track.artist}</div>
-                        <div class="text-cyan-200 text-base truncate">{Enum.at(@tracks, 2).track.name}</div>
-                      <% end %>
-                    </div>
+                  <div
+                    class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
+                    phx-click="select_track"
+                    phx-value-rank={2}
+                  >
+                    <%= if length(@tracks) > 1 do %>
+                      <div class={"#{count_color(Enum.at(@tracks, 1).count)} font-bold text-lg"}>
+                        [{Enum.at(@tracks, 1).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 1).track.artist}</div>
+                      <div class="text-yellow-100 text-base truncate">{Enum.at(@tracks, 1).track.name}</div>
+                    <% end %>
                   </div>
                 </div>
-              <% @display_mode == :artist -> %>
-                <div class="flex justify-center items-end space-x-8 mb-12">
-                  <!-- Artist Mode Podium -->
-                  <!-- 2nd Place -->
-                  <div class="text-center">
-                    <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
-                      <div class="text-4xl mb-2">🥈</div>
-                      <div class="text-xl font-bold text-yellow-100">#2</div>
-                    </div>
-                    <div
-                      class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
-                      phx-click="select_artist"
-                      phx-value-rank={2}
-                    >
-                      <%= if length(@artists) > 1 do %>
-                        <div class={"#{count_color(Enum.at(@artists, 1).count)} font-bold text-lg"}>
-                          [{Enum.at(@artists, 1).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 1).artist}</div>
-                        <div class="text-yellow-100 text-base truncate">{ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 1).tracks), count: length(Enum.at(@artists, 1).tracks))}</div>
-                      <% end %>
-                    </div>
-                  </div>
-                  
+                
 <!-- 1st Place -->
-                  <div class="text-center">
-                    <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
-                      <div class="text-5xl mb-2">👑</div>
-                      <div class="text-2xl font-bold text-pink-100">#1</div>
-                    </div>
-                    <div
-                      class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
-                      phx-click="select_artist"
-                      phx-value-rank={1}
-                    >
-                      <%= if length(@artists) > 0 do %>
-                        <div class={"#{count_color(Enum.at(@artists, 0).count)} font-bold text-xl"}>
-                          [{Enum.at(@artists, 0).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-lg truncate">{Enum.at(@artists, 0).artist}</div>
-                        <div class="text-pink-100 text-lg truncate">{ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 0).tracks), count: length(Enum.at(@artists, 0).tracks))}</div>
-                      <% end %>
-                    </div>
+                <div class="text-center">
+                  <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
+                    <div class="text-5xl mb-2">👑</div>
+                    <div class="text-2xl font-bold text-pink-100">#1</div>
                   </div>
-                  
-<!-- 3rd Place -->
-                  <div class="text-center">
-                    <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
-                      <div class="text-3xl mb-2">🥉</div>
-                      <div class="text-xl font-bold text-cyan-200">#3</div>
-                    </div>
-                    <div
-                      class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
-                      phx-click="select_artist"
-                      phx-value-rank={3}
-                    >
-                      <%= if length(@artists) > 2 do %>
-                        <div class={"#{count_color(Enum.at(@artists, 2).count)} font-bold text-lg"}>
-                          [{Enum.at(@artists, 2).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 2).artist}</div>
-                        <div class="text-cyan-200 text-base truncate">{ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 2).tracks), count: length(Enum.at(@artists, 2).tracks))}</div>
-                      <% end %>
-                    </div>
+                  <div
+                    class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
+                    phx-click="select_track"
+                    phx-value-rank={1}
+                  >
+                    <%= if length(@tracks) > 0 do %>
+                      <div class={"#{count_color(Enum.at(@tracks, 0).count)} font-bold text-xl"}>
+                        [{Enum.at(@tracks, 0).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-lg truncate">{Enum.at(@tracks, 0).track.artist}</div>
+                      <div class="text-pink-100 text-lg truncate">{Enum.at(@tracks, 0).track.name}</div>
+                    <% end %>
                   </div>
                 </div>
-              <% @display_mode == :year -> %>
-                <div class="flex justify-center items-end space-x-8 mb-12">
-                  <!-- Year Mode Podium -->
-                  <% # AIDEV-NOTE: Use year_podium data for podium display by occurrence count
-                  first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
-                  second_place = Enum.find(@year_podium, fn year -> year.rank == 2 end)
-                  third_place = Enum.find(@year_podium, fn year -> year.rank == 3 end) %>
-                  
+                
+<!-- 3rd Place -->
+                <div class="text-center">
+                  <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
+                    <div class="text-3xl mb-2">🥉</div>
+                    <div class="text-xl font-bold text-cyan-200">#3</div>
+                  </div>
+                  <div
+                    class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
+                    phx-click="select_track"
+                    phx-value-rank={3}
+                  >
+                    <%= if length(@tracks) > 2 do %>
+                      <div class={"#{count_color(Enum.at(@tracks, 2).count)} font-bold text-lg"}>
+                        [{Enum.at(@tracks, 2).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 2).track.artist}</div>
+                      <div class="text-cyan-200 text-base truncate">{Enum.at(@tracks, 2).track.name}</div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% @display_mode == :artist -> %>
+              <div class="flex justify-center items-end space-x-8 mb-12">
+                <!-- Artist Mode Podium -->
+                  <!-- 2nd Place -->
+                <div class="text-center">
+                  <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
+                    <div class="text-4xl mb-2">🥈</div>
+                    <div class="text-xl font-bold text-yellow-100">#2</div>
+                  </div>
+                  <div
+                    class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
+                    phx-click="select_artist"
+                    phx-value-rank={2}
+                  >
+                    <%= if length(@artists) > 1 do %>
+                      <div class={"#{count_color(Enum.at(@artists, 1).count)} font-bold text-lg"}>
+                        [{Enum.at(@artists, 1).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 1).artist}</div>
+                      <div class="text-yellow-100 text-base truncate">
+                        {ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 1).tracks),
+                          count: length(Enum.at(@artists, 1).tracks)
+                        )}
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- 1st Place -->
+                <div class="text-center">
+                  <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
+                    <div class="text-5xl mb-2">👑</div>
+                    <div class="text-2xl font-bold text-pink-100">#1</div>
+                  </div>
+                  <div
+                    class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
+                    phx-click="select_artist"
+                    phx-value-rank={1}
+                  >
+                    <%= if length(@artists) > 0 do %>
+                      <div class={"#{count_color(Enum.at(@artists, 0).count)} font-bold text-xl"}>
+                        [{Enum.at(@artists, 0).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-lg truncate">{Enum.at(@artists, 0).artist}</div>
+                      <div class="text-pink-100 text-lg truncate">
+                        {ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 0).tracks),
+                          count: length(Enum.at(@artists, 0).tracks)
+                        )}
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- 3rd Place -->
+                <div class="text-center">
+                  <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
+                    <div class="text-3xl mb-2">🥉</div>
+                    <div class="text-xl font-bold text-cyan-200">#3</div>
+                  </div>
+                  <div
+                    class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
+                    phx-click="select_artist"
+                    phx-value-rank={3}
+                  >
+                    <%= if length(@artists) > 2 do %>
+                      <div class={"#{count_color(Enum.at(@artists, 2).count)} font-bold text-lg"}>
+                        [{Enum.at(@artists, 2).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 2).artist}</div>
+                      <div class="text-cyan-200 text-base truncate">
+                        {ngettext("%{count} track", "%{count} tracks", length(Enum.at(@artists, 2).tracks),
+                          count: length(Enum.at(@artists, 2).tracks)
+                        )}
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% @display_mode == :year -> %>
+              <div class="flex justify-center items-end space-x-8 mb-12">
+                <!-- Year Mode Podium -->
+                <% # AIDEV-NOTE: Use year_podium data for podium display by occurrence count
+                first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
+                second_place = Enum.find(@year_podium, fn year -> year.rank == 2 end)
+                third_place = Enum.find(@year_podium, fn year -> year.rank == 3 end) %>
+                
 <!-- 2nd Place -->
-                  <div class="text-center">
-                    <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
-                      <div class="text-4xl mb-2">🥈</div>
-                      <div class="text-xl font-bold text-yellow-100">#2</div>
-                    </div>
-                    <div
-                      class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
-                      phx-click="select_year"
-                      phx-value-location="podium"
-                      phx-value-rank={2}
-                    >
-                      <%= if second_place do %>
-                        <div class="text-yellow-200 font-bold text-lg">[{second_place.count}x]</div>
-                        <div class="text-white font-semibold text-base truncate">{second_place.year}</div>
-                        <div class="text-yellow-100 text-base truncate">{ngettext("%{count} track", "%{count} tracks", second_place.track_count, count: second_place.track_count)}</div>
-                      <% end %>
-                    </div>
+                <div class="text-center">
+                  <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
+                    <div class="text-4xl mb-2">🥈</div>
+                    <div class="text-xl font-bold text-yellow-100">#2</div>
                   </div>
-                  
-<!-- 1st Place -->
-                  <div class="text-center">
-                    <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
-                      <div class="text-5xl mb-2">👑</div>
-                      <div class="text-2xl font-bold text-pink-100">#1</div>
-                    </div>
-                    <div
-                      class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
-                      phx-click="select_year"
-                      phx-value-location="podium"
-                      phx-value-rank={1}
-                    >
-                      <%= if first_place do %>
-                        <div class="text-pink-200 font-bold text-xl">[{first_place.count}x]</div>
-                        <div class="text-white font-semibold text-lg truncate">{first_place.year}</div>
-                        <div class="text-pink-100 text-lg truncate">{ngettext("%{count} track", "%{count} tracks", first_place.track_count, count: first_place.track_count)}</div>
-                      <% end %>
-                    </div>
-                  </div>
-                  
-<!-- 3rd Place -->
-                  <div class="text-center">
-                    <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
-                      <div class="text-3xl mb-2">🥉</div>
-                      <div class="text-xl font-bold text-cyan-200">#3</div>
-                    </div>
-                    <div
-                      class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
-                      phx-click="select_year"
-                      phx-value-location="podium"
-                      phx-value-rank={3}
-                    >
-                      <%= if third_place do %>
-                        <div class="text-cyan-300 font-bold text-lg">[{third_place.count}x]</div>
-                        <div class="text-white font-semibold text-base truncate">{third_place.year}</div>
-                        <div class="text-cyan-200 text-base truncate">{ngettext("%{count} track", "%{count} tracks", third_place.track_count, count: third_place.track_count)}</div>
-                      <% end %>
-                    </div>
+                  <div
+                    class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
+                    phx-click="select_year"
+                    phx-value-location="podium"
+                    phx-value-rank={2}
+                  >
+                    <%= if second_place do %>
+                      <div class="text-yellow-200 font-bold text-lg">[{second_place.count}x]</div>
+                      <div class="text-white font-semibold text-base truncate">{second_place.year}</div>
+                      <div class="text-yellow-100 text-base truncate">
+                        {ngettext("%{count} track", "%{count} tracks", second_place.track_count, count: second_place.track_count)}
+                      </div>
+                    <% end %>
                   </div>
                 </div>
-              <% true -> %>
-                <!-- No podium for playlist mode -->
-                <div></div>
-            <% end %>
-          </div>
-
+                
+<!-- 1st Place -->
+                <div class="text-center">
+                  <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
+                    <div class="text-5xl mb-2">👑</div>
+                    <div class="text-2xl font-bold text-pink-100">#1</div>
+                  </div>
+                  <div
+                    class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
+                    phx-click="select_year"
+                    phx-value-location="podium"
+                    phx-value-rank={1}
+                  >
+                    <%= if first_place do %>
+                      <div class="text-pink-200 font-bold text-xl">[{first_place.count}x]</div>
+                      <div class="text-white font-semibold text-lg truncate">{first_place.year}</div>
+                      <div class="text-pink-100 text-lg truncate">
+                        {ngettext("%{count} track", "%{count} tracks", first_place.track_count, count: first_place.track_count)}
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- 3rd Place -->
+                <div class="text-center">
+                  <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
+                    <div class="text-3xl mb-2">🥉</div>
+                    <div class="text-xl font-bold text-cyan-200">#3</div>
+                  </div>
+                  <div
+                    class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
+                    phx-click="select_year"
+                    phx-value-location="podium"
+                    phx-value-rank={3}
+                  >
+                    <%= if third_place do %>
+                      <div class="text-cyan-300 font-bold text-lg">[{third_place.count}x]</div>
+                      <div class="text-white font-semibold text-base truncate">{third_place.year}</div>
+                      <div class="text-cyan-200 text-base truncate">
+                        {ngettext("%{count} track", "%{count} tracks", third_place.track_count, count: third_place.track_count)}
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% true -> %>
+              <!-- No podium for playlist mode -->
+              <div></div>
+          <% end %>
+        </div>
+        
 <!-- Full List -->
         <div class="font-mono text-lg">
           <%= cond do %>
@@ -301,7 +332,9 @@
                   phx-click="select_track"
                   phx-value-rank={track.rank}
                 >
-                  <span class={"#{rank_color(track.rank, @display_mode)} font-bold w-16 text-right"}>{rank_icon(track.rank, @display_mode)} {track.rank}</span>
+                  <span class={"#{rank_color(track.rank, @display_mode)} font-bold w-16 text-right"}>
+                    {rank_icon(track.rank, @display_mode)} {track.rank}
+                  </span>
                   <span class={"#{count_color(track.count)} w-12"}>[{track.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{track.track.artist}</span>
                   <span class="text-gray-300">-</span>
@@ -321,7 +354,9 @@
                   <span class={"#{count_color(artist.count)} w-12"}>[{artist.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{artist.artist}</span>
                   <span class="text-gray-300">-</span>
-                  <span class="text-gray-100 flex-1 truncate">{ngettext("%{count} track", "%{count} tracks", length(artist.tracks), count: length(artist.tracks))}</span>
+                  <span class="text-gray-100 flex-1 truncate">
+                    {ngettext("%{count} track", "%{count} tracks", length(artist.tracks), count: length(artist.tracks))}
+                  </span>
                 </div>
               <% end %>
             <% @display_mode == :year -> %>
@@ -332,11 +367,15 @@
                   phx-value-location="list"
                   phx-value-rank={year.rank}
                 >
-                  <span class={"#{rank_color(year.rank, @display_mode)} font-bold w-16 text-right"}>{rank_icon(year.rank, @display_mode)} {year.rank}</span>
+                  <span class={"#{rank_color(year.rank, @display_mode)} font-bold w-16 text-right"}>
+                    {rank_icon(year.rank, @display_mode)} {year.rank}
+                  </span>
                   <span class={"#{count_color(year.count)} w-96"}>[{String.duplicate("█", year.bar_count)} {year.count}x]</span>
                   <span class="text-white font-semibold flex-1 truncate">{year.year}</span>
                   <span class="text-gray-300">-</span>
-                  <span class="text-gray-100 flex-1 truncate">{ngettext("%{count} track", "%{count} tracks", length(year.tracks), count: length(year.tracks))}</span>
+                  <span class="text-gray-100 flex-1 truncate">
+                    {ngettext("%{count} track", "%{count} tracks", length(year.tracks), count: length(year.tracks))}
+                  </span>
                 </div>
               <% end %>
             <% @display_mode == :playlist -> %>
@@ -442,7 +481,12 @@
           <div class="text-3xl mb-4">{rank_icon(@selected_artist.rank, @display_mode)} {@selected_artist.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_artist.artist}</h2>
           <div class="text-lg text-gray-300">
-            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_artist.count, count: @selected_artist.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_artist.tracks), count: length(@selected_artist.tracks))}
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_artist.count, count: @selected_artist.count)} • {ngettext(
+              "%{count} track",
+              "%{count} tracks",
+              length(@selected_artist.tracks),
+              count: length(@selected_artist.tracks)
+            )}
           </div>
         </div>
 
@@ -454,7 +498,9 @@
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
+                    <div class="text-gray-400 text-sm">
+                      {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
+                    </div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -478,7 +524,12 @@
           <div class="text-3xl mb-4">{rank_icon(@selected_year.rank, @display_mode)} {@selected_year.rank}</div>
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_year.year}</h2>
           <div class="text-lg text-gray-300">
-            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_year.count, count: @selected_year.count)} • {ngettext("%{count} track", "%{count} tracks", length(@selected_year.tracks), count: length(@selected_year.tracks))}
+            {ngettext("%{count} occurrence", "%{count} occurrences", @selected_year.count, count: @selected_year.count)} • {ngettext(
+              "%{count} track",
+              "%{count} tracks",
+              length(@selected_year.tracks),
+              count: length(@selected_year.tracks)
+            )}
           </div>
         </div>
 
@@ -490,7 +541,9 @@
                 <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                   <div class="flex-1">
                     <div class="text-white font-semibold">{track_group.track.artist} - {track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">{ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}</div>
+                    <div class="text-gray-400 text-sm">
+                      {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
+                    </div>
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
@@ -515,7 +568,9 @@
           <h2 class="text-2xl font-bold text-white mb-2">{@selected_playlist.title}</h2>
           <div class="text-lg text-gray-400 mb-2">by {@selected_playlist.owner_name}</div>
           <div class="text-lg text-gray-300">
-            {ngettext("%{count} track", "%{count} tracks", length(@selected_playlist.tracks), count: length(@selected_playlist.tracks))} • {gettext("Mean year: %{year}", year: @selected_playlist.mean_year)}
+            {ngettext("%{count} track", "%{count} tracks", length(@selected_playlist.tracks),
+              count: length(@selected_playlist.tracks)
+            )} • {gettext("Mean year: %{year}", year: @selected_playlist.mean_year)}
           </div>
           <div class="mt-4">
             <a

@@ -71,7 +71,9 @@
                           {billboard.title}
                         </h4>
                         <p class="text-gray-400">
-                          {ngettext("%{count} submission", "%{count} submissions", length(billboard.submissions || []), count: length(billboard.submissions || []))}
+                          {ngettext("%{count} submission", "%{count} submissions", length(billboard.submissions || []),
+                            count: length(billboard.submissions || [])
+                          )}
                         </p>
                       </div>
                     </div>
