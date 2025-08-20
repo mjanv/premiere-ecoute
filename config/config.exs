@@ -146,7 +146,7 @@ config :ueberauth, Ueberauth,
       {Ueberauth.Strategy.Spotify,
        [
          default_scope:
-           "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing"
+           "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private"
        ]}
   ]
 

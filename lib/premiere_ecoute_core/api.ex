@@ -28,6 +28,7 @@ defmodule PremiereEcouteCore.Api do
 
       def get(request, opts), do: Req.get(request, opts)
       def post(request, opts), do: Req.post(request, opts)
+      def put(request, opts), do: Req.put(request, opts)
       def patch(request, opts), do: Req.patch(request, opts)
       def delete(request, opts), do: Req.delete(request, opts)
 

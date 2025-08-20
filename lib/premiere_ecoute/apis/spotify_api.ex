@@ -54,7 +54,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     @callback get_library_playlists(scope :: Scope.t()) :: {:ok, [LibraryPlaylist.t()]} | {:error, term()}
     @callback add_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
                 {:ok, map()} | {:error, term()}
-    @callback remove_playlist_items(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()], snapshot :: map()) ::
+    @callback replace_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
+                {:ok, map()} | {:error, term()}
+    @callback remove_playlist_items(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
                 {:ok, map()} | {:error, term()}
 
     # Search
@@ -136,7 +138,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists
   defdelegate get_library_playlists(scope, page \\ 1), to: __MODULE__.Playlists
   defdelegate add_items_to_playlist(scope, id, tracks), to: __MODULE__.Playlists
-  defdelegate remove_playlist_items(scope, id, tracks, snapshot), to: __MODULE__.Playlists
+  defdelegate replace_items_to_playlist(scope, id, tracks), to: __MODULE__.Playlists
+  defdelegate remove_playlist_items(scope, id, tracks), to: __MODULE__.Playlists
 
   # Search
   defdelegate search_albums(query), to: __MODULE__.Search

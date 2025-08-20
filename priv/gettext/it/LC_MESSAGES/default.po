@@ -24,7 +24,8 @@ msgstr "Sei sicuro di voler eliminare questa sessione di ascolto? Questa azione 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:467
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:526
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:117
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:361
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:402
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:555
 #: lib/premiere_ecoute_web/live/home_live.html.heex:559
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:36
 #, elixir-autogen, elixir-format
@@ -43,7 +44,7 @@ msgid "Connect with Twitch"
 msgstr "Connetti con Twitch"
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:85
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:67
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:80
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:42
 #, elixir-autogen, elixir-format
 msgid "Delete"
@@ -718,7 +719,7 @@ msgstr "Nome Utente Twitch"
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:86
 #: lib/premiere_ecoute_web/live/billboards/index_live.ex:55
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:400
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:497
 #: lib/premiere_ecoute_web/live/discography/album_selection_live.html.heex:266
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:313
 #, elixir-autogen, elixir-format
@@ -1451,12 +1452,13 @@ msgstr "Le Mie Playlist Spotify"
 msgid "No playlist selected"
 msgstr "Nessuna playlist selezionata"
 
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:519
 #: lib/premiere_ecoute_web/live/home_live.html.heex:421
 #, elixir-autogen, elixir-format
 msgid "No playlists found"
 msgstr "Nessuna playlist trovata"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:504
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:497
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:673
 #: lib/premiere_ecoute_web/live/home_live.html.heex:532
 #, elixir-autogen, elixir-format
@@ -1635,10 +1637,10 @@ msgstr "Le Mie Classifiche"
 msgid "New Billboard"
 msgstr "Nuova Classifica"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:315
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:333
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:358
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:376
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:308
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:326
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:351
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:369
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:484
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:502
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:527
@@ -1656,11 +1658,11 @@ msgid_plural "%{count} submissions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:172
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:200
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:315
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:358
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:402
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:165
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:193
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:308
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:351
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:395
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:187
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:212
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:237
@@ -1693,17 +1695,17 @@ msgstr "ARTISTA"
 msgid "Activate Billboard"
 msgstr "Attiva Classifica"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:178
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:204
 #, elixir-autogen, elixir-format
 msgid "Activate your billboard to start collecting playlists!"
 msgstr "Attiva la tua classifica per iniziare a raccogliere playlist!"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:343
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:384
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to delete \"%{title}\"?"
 msgstr "Sei sicuro di voler eliminare \"%{title}\"?"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:292
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:333
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to remove this submission?"
 msgstr "Sei sicuro di voler rimuovere questa submission?"
@@ -1728,7 +1730,7 @@ msgstr "Classifica Fermata"
 msgid "Billboard Stopped - %{title}"
 msgstr "Classifica Fermata - %{title}"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:64
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:71
 #, elixir-autogen, elixir-format
 msgid "Billboard activated! Users can now submit playlists."
 msgstr "Classifica attivata! Gli utenti possono ora inviare playlist."
@@ -1738,34 +1740,34 @@ msgstr "Classifica attivata! Gli utenti possono ora inviare playlist."
 msgid "Billboard created successfully!"
 msgstr "Album eliminato con successo"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:151
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:158
 #, elixir-autogen, elixir-format
 msgid "Billboard deleted successfully"
 msgstr "Classifica eliminata con successo"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:85
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:98
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Billboard is active"
 msgstr "La classifica è attiva"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:110
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:123
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Billboard is stopped"
 msgstr "La classifica è fermata"
 
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.ex:21
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:23
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:24
 #: lib/premiere_ecoute_web/live/billboards/submission_live.ex:18
 #, elixir-autogen, elixir-format
 msgid "Billboard not found"
 msgstr "Classifica non trovata"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:78
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:85
 #, elixir-autogen, elixir-format
 msgid "Billboard stopped. No more submissions will be accepted."
 msgstr "Classifica fermata. Non verranno più accettate nuove submission."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:187
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:194
 #, elixir-autogen, elixir-format
 msgid "Billboard title updated successfully"
 msgstr "Titolo della classifica aggiornato con successo"
@@ -1774,11 +1776,6 @@ msgstr "Titolo della classifica aggiornato con successo"
 #, elixir-autogen, elixir-format
 msgid "Copy"
 msgstr "Copia"
-
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:119
-#, elixir-autogen, elixir-format
-msgid "Copy billboard to clipboard"
-msgstr "Copia classifica negli appunti"
 
 #: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:43
 #, elixir-autogen, elixir-format
@@ -1801,8 +1798,8 @@ msgstr "Crea una classifica musicale raccogliendo le submission di playlist dall
 msgid "Creating..."
 msgstr "Creazione in corso..."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:341
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:355
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:382
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:396
 #, elixir-autogen, elixir-format
 msgid "Delete Billboard"
 msgstr "Elimina Classifica"
@@ -1832,12 +1829,12 @@ msgstr "Inserisci il tuo codice di eliminazione (es. banana42)"
 msgid "Enter your name or pseudonym..."
 msgstr "Inserisci il tuo nome o pseudonimo..."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:68
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:75
 #, elixir-autogen, elixir-format
 msgid "Failed to activate billboard"
 msgstr "Impossibile attivare la classifica"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:158
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:165
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to delete billboard"
 msgstr "Impossibile eliminare la sessione"
@@ -1847,24 +1844,24 @@ msgstr "Impossibile eliminare la sessione"
 msgid "Failed to delete playlist. Please try again."
 msgstr "Impossibile eliminare la playlist. Riprova."
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.ex:204
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.ex:198
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.ex:117
 #, elixir-autogen, elixir-format
 msgid "Failed to generate billboard: %{reason}"
 msgstr "Impossibile generare la classifica: %{reason}"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.ex:218
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.ex:212
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.ex:130
 #, elixir-autogen, elixir-format
 msgid "Failed to generate billboard: request was interrupted"
 msgstr "Impossibile generare la classifica: la richiesta è stata interrotta"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:106
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:113
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to remove submission"
 msgstr "Impossibile rimuovere la playlist"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:82
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:89
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to stop billboard"
 msgstr "Impossibile caricare gli album"
@@ -1874,12 +1871,12 @@ msgstr "Impossibile caricare gli album"
 msgid "Failed to submit playlist. Please try again."
 msgstr "Impossibile inviare la playlist. Riprova."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:193
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:200
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to update billboard title"
 msgstr "Impossibile aggiornare il ruolo utente"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:291
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:284
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:460
 #, elixir-autogen, elixir-format
 msgid "Found in playlists:"
@@ -1900,8 +1897,8 @@ msgstr "Importante: Salva questo codice di eliminazione per rimuovere la tua pla
 msgid "Invalid deletion code. Please check your code and try again."
 msgstr "Codice di eliminazione non valido. Controlla il tuo codice e riprova."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:103
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:127
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:110
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:134
 #, elixir-autogen, elixir-format
 msgid "Invalid submission"
 msgstr "Submission non valida"
@@ -1911,7 +1908,7 @@ msgstr "Submission non valida"
 msgid "Manage your music billboard campaigns and collect playlist submissions"
 msgstr "Gestisci le tue campagne di classifiche musicali e raccogli le submission di playlist"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:404
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:397
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:573
 #, elixir-autogen, elixir-format
 msgid "Mean year: %{year}"
@@ -1922,7 +1919,7 @@ msgstr "Anno medio: %{year}"
 msgid "No billboards yet"
 msgstr "Ancora nessuna classifica"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:177
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:203
 #, elixir-autogen, elixir-format
 msgid "No submissions yet."
 msgstr "Ancora nessuna submission."
@@ -1932,7 +1929,7 @@ msgstr "Ancora nessuna submission."
 msgid "No valid submissions found"
 msgstr "Nessuna submission valida trovata"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:412
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:405
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:581
 #, elixir-autogen, elixir-format
 msgid "Open %{provider} Playlist"
@@ -1983,7 +1980,7 @@ msgstr "Pronto per Iniziare"
 msgid "Remove Playlist"
 msgstr "Rimuovi Playlist"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:294
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:335
 #, elixir-autogen, elixir-format
 msgid "Remove submission"
 msgstr "Rimuovi submission"
@@ -1998,12 +1995,12 @@ msgstr "Rimuovi la tua playlist"
 msgid "See Billboard"
 msgstr "Vedi Classifica"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:87
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:100
 #, elixir-autogen, elixir-format
 msgid "Share this link with your audience to submit playlists:"
 msgstr "Condividi questo link con il tuo pubblico per inviare playlist:"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:444
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:437
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:613
 #, elixir-autogen, elixir-format
 msgid "Similar (%{count})"
@@ -2025,7 +2022,7 @@ msgstr "Ferma Classifica"
 msgid "Submission Successful!"
 msgstr "Invio Riuscito!"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:99
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:106
 #, elixir-autogen, elixir-format
 msgid "Submission removed"
 msgstr "Submission rimossa"
@@ -2061,7 +2058,7 @@ msgstr "TRACCIA"
 msgid "The deletion code is a goofy word followed by numbers, like \"banana42\" or \"wiggly123\""
 msgstr "Il codice di cancellazione è una parola buffa seguita da numeri, come \"banana42\" o \"wiggly123\""
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:344
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:385
 #, elixir-autogen, elixir-format
 msgid "This action cannot be undone and will permanently remove the billboard and all its submissions."
 msgstr "Questa azione non può essere annullata e rimuoverà permanentemente la classifica e tutte le sue submission."
@@ -2071,7 +2068,7 @@ msgstr "Questa azione non può essere annullata e rimuoverà permanentemente la 
 msgid "This billboard is no longer accepting new submissions. The submission period has ended."
 msgstr "Questa classifica non accetta più nuove submission. Il periodo di invio è terminato."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:112
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:125
 #, elixir-autogen, elixir-format
 msgid "This billboard is no longer accepting new submissions. Use the \"Reactivate Billboard\" button to start collecting playlists again."
 msgstr "Questo tabellone non accetta più nuove proposte. Usa il pulsante \"Riattiva Tabellone\" per ricominciare a raccogliere playlist."
@@ -2096,19 +2093,19 @@ msgstr "Questa playlist è già stata inviata"
 msgid "Title"
 msgstr "Titolo"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:431
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:424
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:600
 #, elixir-autogen, elixir-format
 msgid "Tracks (%{count})"
 msgstr "Tracce (%{count})"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:326
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:319
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:495
 #, elixir-autogen, elixir-format
 msgid "Tracks by this artist:"
 msgstr "Tracce di questo artista:"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:369
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:362
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:538
 #, elixir-autogen, elixir-format
 msgid "Tracks from this year:"
@@ -2124,7 +2121,7 @@ msgstr "Usa il codice di cancellazione che hai ricevuto quando hai inviato la tu
 msgid "YEAR"
 msgstr "ANNO"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:51
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:58
 #, elixir-autogen, elixir-format
 msgid "You don't have permission to access this billboard"
 msgstr "Non hai il permesso di accedere a questa classifica"
@@ -2159,11 +2156,6 @@ msgstr "[PER ANNO]"
 msgid "[CLEAR BILLBOARD]"
 msgstr "[CANCELLA CLASSIFICA]"
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:121
-#, elixir-autogen, elixir-format
-msgid "[COPY]"
-msgstr "[COPIA]"
-
 #: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:42
 #, elixir-autogen, elixir-format
 msgid "[GENERATE BILLBOARD]"
@@ -2174,7 +2166,7 @@ msgstr "[GENERA CLASSIFICA]"
 msgid "https://open.spotify.com/playlist/..."
 msgstr "https://open.spotify.com/playlist/..."
 
-#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:237
+#: lib/premiere_ecoute_web/live/billboards/billboard_live.html.heex:230
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:406
 #, elixir-autogen, elixir-format
 msgid "▲ PROCESSING BILLBOARD DATA ▲"
@@ -2190,63 +2182,148 @@ msgstr "Collega il tuo account Spotify per gestire la riproduzione musicale"
 msgid "Connect Spotify"
 msgstr "Collega Spotify"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:157
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:183
 #, elixir-autogen, elixir-format, fuzzy
 msgid "All submissions"
 msgstr "Ancora nessuna submission."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:271
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:307
 #, elixir-autogen, elixir-format
 msgid "Click to mark as reviewed"
 msgstr "Clicca per contrassegnare come rivisto"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:251
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:282
 #, elixir-autogen, elixir-format
 msgid "Click to mark as unreviewed"
 msgstr "Clicca per contrassegnare come non rivisto"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:130
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:137
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to update review status"
 msgstr "Impossibile aggiornare il ruolo utente"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:188
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:219
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No submissions match your search."
 msgstr "Ancora nessuna submission."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:159
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:281
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:185
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:317
 #, elixir-autogen, elixir-format
 msgid "Pending review"
 msgstr "In attesa di revisione"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:261
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:292
 #, elixir-autogen, elixir-format
 msgid "Reviewed"
 msgstr "Rivisto"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:158
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:184
 #, elixir-autogen, elixir-format
 msgid "Reviewed only"
 msgstr "Solo rivisti"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:143
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:169
 #, elixir-autogen, elixir-format
 msgid "Search by URL or submitter name..."
 msgstr "Cerca per URL o nome del mittente..."
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.ex:123
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:130
 #, elixir-autogen, elixir-format
 msgid "Submission review status updated"
 msgstr "Stato di revisione della proposta aggiornato"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:126
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:139
 #, elixir-autogen, elixir-format
 msgid "Submissions (%{filtered}/%{total})"
 msgstr "Proposte (%{filtered}/%{total})"
 
-#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:189
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:220
 #, elixir-autogen, elixir-format
 msgid "Try adjusting your search query or filters."
 msgstr "Prova ad aggiustare la tua query di ricerca o i filtri."
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:584
+#, elixir-autogen, elixir-format
+msgid "Billboard not generated yet. Please generate the billboard first."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:468
+#, elixir-autogen, elixir-format
+msgid "Choose between 1 and 100 tracks from your billboard's top tracks."
+msgstr "Scegli tra 1 e 100 brani dalla classifica del tuo billboard."
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:431
+#, elixir-autogen, elixir-format
+msgid "Export Top Tracks to Spotify"
+msgstr "Esporta Top Brani su Spotify"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:63
+#, elixir-autogen, elixir-format
+msgid "Export to Spotify"
+msgstr "Esporta su Spotify"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:547
+#, elixir-autogen, elixir-format
+msgid "Export tracks"
+msgstr "Esporta brani"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:433
+#, elixir-autogen, elixir-format
+msgid "Export your billboard's top tracks to a Spotify playlist. This will replace all existing tracks in the selected playlist."
+msgstr "Esporta i migliori brani del tuo billboard in una playlist Spotify. Questo sostituirà tutti i brani esistenti nella playlist selezionata."
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:545
+#, elixir-autogen, elixir-format
+msgid "Exporting..."
+msgstr "Esportazione in corso..."
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:517
+#, elixir-autogen, elixir-format
+msgid "Failed to export tracks to Spotify playlist"
+msgstr "Impossibile esportare i brani nella playlist Spotify"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:587
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Failed to load billboard data"
+msgstr "Impossibile caricare i dettagli dell'album"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:258
+#, elixir-autogen, elixir-format
+msgid "Failed to load your Spotify playlists. Please make sure you're connected to Spotify."
+msgstr "Impossibile caricare le tue playlist Spotify. Assicurati di essere connesso a Spotify."
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:521
+#, elixir-autogen, elixir-format
+msgid "Make sure you're connected to Spotify and have some playlists created."
+msgstr "Assicurati di essere connesso a Spotify e di aver creato alcune playlist."
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:580
+#, elixir-autogen, elixir-format, fuzzy
+msgid "No tracks found in billboard"
+msgstr "Nessun brano trovato per questo album"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:455
+#, elixir-autogen, elixir-format
+msgid "Number of tracks to export"
+msgstr "Numero di brani da esportare"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:261
+#, elixir-autogen, elixir-format
+msgid "Please log in to export playlists"
+msgstr "Effettua il login per esportare le playlist"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:333
+#, elixir-autogen, elixir-format
+msgid "Please select a playlist"
+msgstr "Seleziona una playlist"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:475
+#, elixir-autogen, elixir-format
+msgid "Select Spotify Playlist"
+msgstr "Seleziona Playlist Spotify"
+
+#: lib/premiere_ecoute_web/live/billboards/show_live.ex:508
+#, elixir-autogen, elixir-format
+msgid "Successfully exported top %{count} tracks to your Spotify playlist!"
+msgstr "Top %{count} brani esportati con successo nella tua playlist Spotify!"

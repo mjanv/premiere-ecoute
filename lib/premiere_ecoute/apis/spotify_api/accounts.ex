@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
-  @scope "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing"
+  @scope "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private"
 
   def client_credentials do
     SpotifyApi.accounts()

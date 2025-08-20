@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   use PremiereEcouteWeb, :live_view
 
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcouteCore.Cache
@@ -45,6 +46,12 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
           |> assign(:search_query, "")
           |> assign(:review_filter, "all")
           |> assign(:filtered_submissions, filter_submissions(sorted_submissions, "", "all"))
+          |> assign(:show_export_modal, false)
+          |> assign(:spotify_playlists, [])
+          |> assign(:selected_export_playlist, nil)
+          |> assign(:export_count, 10)
+          |> assign(:export_loading, false)
+          |> assign(:export_error, nil)
           |> then(fn socket -> {:ok, socket} end)
         else
           socket
@@ -203,9 +210,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   @impl true
   def handle_event("search", params, socket) do
-    IO.puts("=== SEARCH EVENT TRIGGERED ===")
-    IO.inspect(params, label: "SEARCH PARAMS")
-
     query =
       case params do
         %{"query" => q} -> q
@@ -213,13 +217,9 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
         _ -> ""
       end
 
-    IO.puts("Search query: #{query}")
-
     submissions = socket.assigns.submissions
     review_filter = socket.assigns.review_filter
     filtered_submissions = filter_submissions(submissions, query, review_filter)
-
-    IO.puts("Filtered from #{length(submissions)} to #{length(filtered_submissions)}")
 
     socket
     |> assign(:search_query, query)
@@ -229,9 +229,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   @impl true
   def handle_event("filter_review", params, socket) do
-    IO.puts("=== FILTER EVENT TRIGGERED ===")
-    IO.inspect(params, label: "FILTER PARAMS")
-
     filter =
       case params do
         %{"filter" => f} -> f
@@ -246,6 +243,88 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     |> assign(:review_filter, filter)
     |> assign(:filtered_submissions, filtered_submissions)
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("show_export_modal", _params, socket) do
+    current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
+    
+    if current_user do
+      # AIDEV-NOTE: Load user's Spotify playlists when opening export modal
+      case Apis.spotify().get_library_playlists(socket.assigns.current_scope) do
+        {:ok, playlists} ->
+          {:noreply, assign(socket, show_export_modal: true, spotify_playlists: playlists, export_error: nil)}
+        {:error, _reason} ->
+          {:noreply, assign(socket, show_export_modal: true, spotify_playlists: [], export_error: gettext("Failed to load your Spotify playlists. Please make sure you're connected to Spotify."))}
+      end
+    else
+      {:noreply, put_flash(socket, :error, gettext("Please log in to export playlists"))}
+    end
+  end
+
+  @impl true  
+  def handle_event("hide_export_modal", _params, socket) do
+    socket
+    |> assign(:show_export_modal, false)
+    |> assign(:selected_export_playlist, nil)
+    |> assign(:export_count, 10)
+    |> assign(:export_error, nil)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("select_export_playlist", %{"playlist_id" => playlist_id}, socket) do
+    {:noreply, assign(socket, :selected_export_playlist, playlist_id)}
+  end
+
+  @impl true
+  def handle_event("update_export_count", params, socket) do
+    count_str = case params do
+      %{"count" => count} -> count
+      %{"value" => count} -> count
+      %{count: count} -> count
+      %{value: count} -> count
+      _ -> nil
+    end
+    
+    case count_str && Integer.parse(count_str) do
+      {count, _} when count > 0 and count <= 100 ->
+        {:noreply, assign(socket, :export_count, count)}
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("export_tracks", _params, socket) do
+    billboard = socket.assigns.billboard
+    current_scope = socket.assigns.current_scope
+    selected_playlist_id = socket.assigns.selected_export_playlist
+    export_count = socket.assigns.export_count
+
+    if selected_playlist_id do
+      socket = assign(socket, :export_loading, true)
+      
+      # AIDEV-NOTE: Perform export in background task to avoid blocking UI
+      pid = self()
+      Task.start(fn ->
+        case get_top_tracks_with_generation(billboard, export_count) do
+          {:ok, tracks} ->
+            case export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
+              {:ok, _} ->
+                send(pid, {:export_success, export_count})
+              {:error, reason} ->
+                send(pid, {:export_error, reason})
+            end
+          {:error, message} ->
+            send(pid, {:export_error, message})
+        end
+      end)
+      
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, :export_error, gettext("Please select a playlist"))}
+    end
   end
 
   # Helper functions
@@ -409,4 +488,113 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   end
 
   defp simple_date(_), do: gettext("Unknown")
+
+  # AIDEV-NOTE: Handle export task completion messages
+  @impl true
+  def handle_info({:export_success, count}, socket) do
+    socket
+    |> assign(:export_loading, false)
+    |> assign(:show_export_modal, false)
+    |> assign(:selected_export_playlist, nil)
+    |> assign(:export_count, 10)
+    |> assign(:export_error, nil)
+    |> put_flash(:info, gettext("Successfully exported top %{count} tracks to your Spotify playlist!", count: count))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:export_error, reason}, socket) do
+    error_message = case reason do
+      %{"error" => %{"message" => msg}} -> msg
+      msg when is_binary(msg) -> msg
+      _ -> gettext("Failed to export tracks to Spotify playlist")
+    end
+    
+    socket
+    |> assign(:export_loading, false)
+    |> assign(:export_error, error_message)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  # AIDEV-NOTE: Export tracks to playlist using 3-step process: get -> remove -> add
+  defp export_tracks_to_playlist(scope, playlist_id, tracks) do
+    with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
+         {:ok, _} <- remove_all_playlist_tracks(scope, playlist_id, playlist),
+         {:ok, result} <- Apis.spotify().add_items_to_playlist(scope, playlist_id, tracks) do
+      {:ok, result}
+    else
+      {:error, reason} -> {:error, reason}
+      error -> {:error, "Failed to export tracks: #{inspect(error)}"}
+    end
+  end
+
+  # AIDEV-NOTE: Remove all existing tracks from playlist
+  defp remove_all_playlist_tracks(_scope, _playlist_id, playlist) when is_nil(playlist.tracks) or playlist.tracks == [] do
+    {:ok, nil}
+  end
+
+  defp remove_all_playlist_tracks(scope, playlist_id, _playlist) do
+    # AIDEV-NOTE: Get current playlist snapshot for removal
+    case Apis.spotify().get_playlist(playlist_id) do
+      {:ok, current_playlist} ->
+        tracks_to_remove = current_playlist.tracks || []
+        
+        if length(tracks_to_remove) > 0 do
+          # AIDEV-NOTE: Use updated API without snapshot parameter
+          Apis.spotify().remove_playlist_items(scope, playlist_id, tracks_to_remove)
+        else
+          {:ok, nil}
+        end
+      
+      {:error, reason} -> 
+        {:error, reason}
+    end
+  end
+
+  # AIDEV-NOTE: Get top N tracks, generating billboard if not in cache
+  defp get_top_tracks_with_generation(billboard, count) do
+    case Cache.get(:billboards, billboard.billboard_id) do
+      {:ok, cached_billboard} when not is_nil(cached_billboard) ->
+        extract_top_tracks(cached_billboard, count)
+      
+      _ ->
+        # AIDEV-NOTE: Billboard not in cache, generate it
+        urls = Enum.map(billboard.submissions, fn %{"url" => url} -> url end)
+        
+        if length(urls) > 0 do
+          case Billboards.generate_billboard(urls, callback: fn _text, _progress -> :ok end) do
+            {:ok, generated_billboard} ->
+              # Cache the generated billboard
+              Cache.put(:billboards, billboard.billboard_id, generated_billboard)
+              extract_top_tracks(generated_billboard, count)
+            
+            {:error, reason} ->
+              {:error, "Failed to generate billboard: #{reason}"}
+          end
+        else
+          {:error, gettext("No valid submissions found")}
+        end
+    end
+  end
+
+  # AIDEV-NOTE: Extract top N tracks from billboard data
+  defp extract_top_tracks(billboard, count) do
+    tracks = billboard.track || []
+    top_tracks = tracks 
+                |> Enum.sort_by(& &1.rank) 
+                |> Enum.take(count)
+    
+    if length(top_tracks) > 0 do
+      # AIDEV-NOTE: Convert billboard track format to Spotify API format
+      spotify_tracks = Enum.map(top_tracks, fn track_group ->
+        # Get the first track from the group (they're all the same track)
+        track = track_group.track
+        %{track_id: track.track_id}
+      end)
+      {:ok, spotify_tracks}
+    else
+      {:error, gettext("No tracks found in billboard")}
+    end
+  end
+
 end

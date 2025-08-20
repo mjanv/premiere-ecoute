@@ -142,12 +142,6 @@ defmodule PremiereEcouteWeb.Billboards.BillboardLive do
   end
 
   @impl true
-  def handle_event("copy_billboard", _params, socket) do
-    # TODO: To remove
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("close_modal", _params, socket) do
     {:noreply,
      assign(socket,

@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.Plugs.RenewTokens do
 
   def call(conn, _opts) do
     conn
-    |> assign(:current_scope, TokenRenewal.maybe_renew_token(conn, :twitch))
+    # |> assign(:current_scope, TokenRenewal.maybe_renew_token(conn, :twitch))
     |> assign(:current_scope, TokenRenewal.maybe_renew_token(conn, :spotify))
   end
 end

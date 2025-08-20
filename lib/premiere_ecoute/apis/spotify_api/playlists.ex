@@ -33,15 +33,24 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     )
     |> SpotifyApi.handle(201, fn body -> body end)
   end
+  
+  def replace_items_to_playlist(scope, id, tracks) do
+    scope
+    |> SpotifyApi.api()
+    |> SpotifyApi.put(
+      url: "/playlists/#{id}/tracks",
+      json: %{"uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.track_id}" end)}
+    )
+    |> SpotifyApi.handle(200, fn body -> body end)
+  end
 
-  def remove_playlist_items(scope, id, tracks, snapshot) do
+  def remove_playlist_items(scope, id, tracks) do
     scope
     |> SpotifyApi.api()
     |> SpotifyApi.delete(
       url: "/playlists/#{id}/tracks",
       json: %{
-        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{t.track_id}"} end),
-        "snapshot_id" => snapshot["snapshot_id"]
+        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{t.track_id}"} end)
       }
     )
     |> SpotifyApi.handle(200, fn body -> body end)

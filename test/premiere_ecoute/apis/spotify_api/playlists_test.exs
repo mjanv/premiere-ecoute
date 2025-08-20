@@ -151,9 +151,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
       tracks = [%Track{track_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{track_id: "6TGd66r0nlPaYm3KIoI7ET"}]
-      snapshot = %{"snapshot_id" => "abc"}
 
-      {:ok, snapshot} = SpotifyApi.remove_playlist_items(scope, id, tracks, snapshot)
+      {:ok, snapshot} = SpotifyApi.remove_playlist_items(scope, id, tracks)
 
       assert snapshot == %{"snapshot_id" => "def"}
     end
