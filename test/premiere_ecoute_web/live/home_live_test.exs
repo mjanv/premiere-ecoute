@@ -3,6 +3,15 @@ defmodule PremiereEcouteWeb.HomeLiveTest do
 
   import Phoenix.LiveViewTest
 
+  setup do
+    PremiereEcouteCore.FeatureFlag.enable(:billboards)
+    PremiereEcouteCore.FeatureFlag.enable(:listening_sessions)
+    PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
+    PremiereEcouteCore.FeatureFlag.enable(:playlists)
+
+    :ok
+  end
+
   describe "home" do
     test "displays content for authenticated viewer", %{conn: conn} do
       user = user_fixture()

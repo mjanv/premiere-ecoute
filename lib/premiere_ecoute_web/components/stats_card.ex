@@ -36,23 +36,54 @@ defmodule PremiereEcouteWeb.Components.StatsCard do
         assigns.class
       ])
 
+    # AIDEV-NOTE: Extract navigation attributes from rest
+    {nav_attrs, rest_attrs} =
+      Map.split(assigns.rest, [:navigate, :href, :patch, :method, :"phx-click"])
+
+    assigns =
+      assigns
+      |> assign(:nav_attrs, nav_attrs)
+      |> assign(:rest_attrs, rest_attrs)
+      |> assign(:has_navigation, nav_attrs != %{})
+
     ~H"""
-    <Card.card class={@card_classes} {@rest}>
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <div class={[
-            "w-12 h-12 rounded-lg flex items-center justify-center",
-            icon_color_classes(@color)
-          ]}>
-            <CoreComponents.icon name={@icon} class="w-7 h-7 text-white" />
+    <%= if @has_navigation do %>
+      <.link {@nav_attrs}>
+        <Card.card class={@card_classes} {@rest_attrs}>
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class={[
+                "w-12 h-12 rounded-lg flex items-center justify-center",
+                icon_color_classes(@color)
+              ]}>
+                <CoreComponents.icon name={@icon} class="w-7 h-7 text-white" />
+              </div>
+            </div>
+            <div class="ml-6">
+              <div class="text-4xl font-bold text-surface-primary">{@value}</div>
+              <div class="text-lg text-surface-muted">{@label}</div>
+            </div>
+          </div>
+        </Card.card>
+      </.link>
+    <% else %>
+      <Card.card class={@card_classes} {@rest_attrs}>
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class={[
+              "w-12 h-12 rounded-lg flex items-center justify-center",
+              icon_color_classes(@color)
+            ]}>
+              <CoreComponents.icon name={@icon} class="w-7 h-7 text-white" />
+            </div>
+          </div>
+          <div class="ml-6">
+            <div class="text-4xl font-bold text-surface-primary">{@value}</div>
+            <div class="text-lg text-surface-muted">{@label}</div>
           </div>
         </div>
-        <div class="ml-6">
-          <div class="text-4xl font-bold text-surface-primary">{@value}</div>
-          <div class="text-lg text-surface-muted">{@label}</div>
-        </div>
-      </div>
-    </Card.card>
+      </Card.card>
+    <% end %>
     """
   end
 

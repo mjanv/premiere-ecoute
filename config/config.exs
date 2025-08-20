@@ -26,7 +26,8 @@ config :premiere_ecoute, :scopes,
 
 config :premiere_ecoute, PremiereEcoute.Accounts,
   admins: ["lanfeust313"],
-  bots: ["premiereecoutebot"]
+  bots: ["premiereecoutebot"],
+  streamers: ["bebealc8"]
 
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [

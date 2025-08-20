@@ -21,7 +21,7 @@
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Create New Billboard
+                New Billboard
               </.link>
             </div>
           </div>
@@ -40,43 +40,23 @@
                 />
               </svg>
             </div>
-            <h3 class="text-2xl font-semibold text-white mb-4">No Billboards Yet</h3>
-            <p class="text-slate-400 text-lg mb-8 max-w-md mx-auto">
-              Create your first billboard to start collecting playlist submissions from your community
-            </p>
-            <.link
-              navigate={~p"/billboards/new"}
-              class="inline-flex items-center px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors font-semibold text-lg shadow-lg"
-            >
-              <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Create Your First Billboard
-            </.link>
+            <h3 class="text-2xl font-semibold text-white mb-4">No billboards yet</h3>
           </div>
         <% else %>
-          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div class="space-y-3">
             <%= for billboard <- @billboards do %>
-              <!-- AIDEV-NOTE: Clickable billboard card -->
-              <.link navigate={~p"/billboards/#{billboard.billboard_id}"} class="block">
-                <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm hover:bg-gradient-to-br hover:from-slate-50/8 hover:to-slate-100/5 transition-all p-6">
-                  <div class="mb-4">
-                    <div class="flex items-start justify-between mb-3">
-                      <div class="flex-1">
-                        <h3 class="text-xl font-semibold text-white mb-2 line-clamp-2 hover:text-purple-200 transition-colors">
-                          {billboard.title}
-                        </h3>
-                        <p class="text-sm text-slate-400 font-mono">
-                          ID: {billboard.billboard_id}
-                        </p>
-                      </div>
-                      <.billboard_status_badge status={billboard.status} />
-                    </div>
-                    
-<!-- AIDEV-NOTE: Billboard metadata -->
-                    <div class="flex items-center justify-between text-sm text-slate-400">
-                      <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- AIDEV-NOTE: Full-width clickable billboard card -->
+              <div
+                class="rounded-lg p-6 cursor-pointer transition-colors border border-gray-700 hover:border-purple-500 hover:bg-gray-700"
+                style="background-color: var(--color-dark-900);"
+                phx-click="navigate"
+                phx-value-billboard_id={billboard.billboard_id}
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-16 h-16 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
@@ -84,36 +64,36 @@
                             d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
                           />
                         </svg>
-                        {length(billboard.submissions || [])} submissions
                       </div>
-                      <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        {format_date(billboard.inserted_at)}
+
+                      <div>
+                        <h4 class="font-semibold text-white text-lg">
+                          {billboard.title}
+                        </h4>
+                        <p class="text-gray-400">
+                          {length(billboard.submissions || [])} submissions
+                        </p>
                       </div>
                     </div>
                   </div>
+
+                  <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                      <.billboard_status_badge status={billboard.status} />
+                      <p class="text-sm text-gray-400 mt-1">
+                        {format_date(billboard.inserted_at)}
+                      </p>
+                    </div>
+
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
-              </.link>
+              </div>
             <% end %>
           </div>
         <% end %>
-        
-<!-- AIDEV-NOTE: Back navigation -->
-        <div class="mt-8">
-          <.link navigate={~p"/home"} class="inline-flex items-center text-slate-400 hover:text-white transition-colors">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Home
-          </.link>
-        </div>
       </div>
     </div>
   </div>

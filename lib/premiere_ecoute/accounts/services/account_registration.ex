@@ -30,6 +30,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
 
   @admins Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :admins])
   @bots Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :bots])
+  @streamers Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :streamers])
 
   @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_twitch_user(%{email: email, username: username} = payload, password \\ nil) do
@@ -77,6 +78,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
     case {auth_data.broadcaster_type, auth_data.username} do
       {_, username} when username in @admins -> :admin
       {_, username} when username in @bots -> :bot
+      {_, username} when username in @streamers -> :streamer
       {"affiliate", _} -> :streamer
       {"partner", _} -> :streamer
       _ -> :viewer

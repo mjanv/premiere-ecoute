@@ -23,42 +23,33 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
         |> then(fn socket -> {:ok, socket} end)
 
       %Billboard{} = billboard ->
-        current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
-
-        if current_user && current_user.id == billboard.user_id do
-          socket =
-            socket
-            |> assign(:page_title, "#{billboard.title} - Dashboard")
-            |> assign(:billboard, billboard)
-            |> assign(
-              tracks: [],
-              artists: [],
-              years: [],
-              year_podium: [],
-              playlists: [],
-              display_mode: :track,
-              loading: false,
-              error: nil,
-              progress: 0,
-              progress_text: "",
-              selected_track: nil,
-              selected_artist: nil,
-              selected_year: nil,
-              selected_playlist: nil,
-              show_modal: false,
-              playlist_modal_tab: :tracks
-            )
-
-          # AIDEV-NOTE: Check cache first, then auto-generate if needed
-          send(self(), :load_dashboard)
-
-          {:ok, socket}
-        else
+        socket =
           socket
-          |> put_flash(:error, "You don't have permission to access this billboard")
-          |> redirect(to: ~p"/billboards")
-          |> then(fn socket -> {:ok, socket} end)
-        end
+          |> assign(:page_title, "#{billboard.title} - Dashboard")
+          |> assign(:billboard, billboard)
+          |> assign(
+            tracks: [],
+            artists: [],
+            years: [],
+            year_podium: [],
+            playlists: [],
+            display_mode: :track,
+            loading: false,
+            error: nil,
+            progress: 0,
+            progress_text: "",
+            selected_track: nil,
+            selected_artist: nil,
+            selected_year: nil,
+            selected_playlist: nil,
+            show_modal: false,
+            playlist_modal_tab: :tracks
+          )
+
+        # AIDEV-NOTE: Check cache first, then auto-generate if needed
+        send(self(), :load_dashboard)
+
+        {:ok, socket}
     end
   end
 
@@ -70,10 +61,9 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
   @impl true
   def handle_info(:load_dashboard, socket) do
     billboard = socket.assigns.billboard
-    cache_key = "billboard_#{billboard.billboard_id}"
 
     # AIDEV-NOTE: Try loading from cache first
-    case Cache.get(:billboards, cache_key) do
+    case Cache.get(:billboards, billboard.billboard_id) do
       {:ok, cached_results} when not is_nil(cached_results) ->
         # Direct display from cache
         socket
@@ -119,8 +109,7 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
       year_podium: year_podium
     }
 
-    cache_key = "billboard_#{socket.assigns.billboard.billboard_id}"
-    Cache.put(:billboards, cache_key, results)
+    Cache.put(:billboards, socket.assigns.billboard.billboard_id, results)
 
     socket
     |> assign(

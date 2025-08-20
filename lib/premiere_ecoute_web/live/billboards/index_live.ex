@@ -18,6 +18,11 @@ defmodule PremiereEcouteWeb.Billboards.IndexLive do
     |> then(fn socket -> {:ok, socket} end)
   end
 
+  @impl true
+  def handle_event("navigate", %{"billboard_id" => billboard_id}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/billboards/#{billboard_id}")}
+  end
+
   # Helper functions
 
   defp billboard_status_badge(assigns) do

@@ -58,6 +58,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/", HomepageLive, :index
       live "/billboard", Billboards.BillboardLive, :index
       live "/billboards/:id/submission/new", Billboards.SubmissionLive, :new
+      live "/billboards/:id/dashboard", Billboards.DashboardLive, :show
     end
   end
 
@@ -73,8 +74,6 @@ defmodule PremiereEcouteWeb.Router do
       live "/home", HomeLive, :index
 
       live "/billboards/:id", Billboards.ShowLive, :show
-      live "/billboards/:id/display", Billboards.DisplayLive, :show
-      live "/billboards/:id/dashboard", Billboards.DashboardLive, :show
     end
   end
 

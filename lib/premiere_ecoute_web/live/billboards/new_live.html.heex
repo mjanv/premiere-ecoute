@@ -1,45 +1,210 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
-  <div class="text-white flex flex-col" style="background-color: var(--color-dark-950); min-height: calc(100vh - 5rem);">
-    <div class="flex-1 py-12">
-      <div class="max-w-4xl mx-auto px-6">
-        <!-- AIDEV-NOTE: Billboard creation header -->
-        <div class="mb-8">
-          <h1 class="text-4xl font-bold text-white mb-2">Create New Billboard</h1>
-          <p class="text-slate-300/90 text-lg leading-relaxed">
-            Create a music chart by collecting playlist submissions from your community.
-          </p>
-        </div>
-        
-<!-- AIDEV-NOTE: Main creation form card -->
-        <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm p-8">
-          <.form for={@form} id="billboard-form" phx-change="validate" phx-submit="save" class="space-y-6">
-            <div>
-              <label for="title" class="text-white text-sm font-medium mb-2 block">Billboard Title</label>
-              <.input
-                field={@form[:title]}
-                type="text"
-                placeholder="Enter a descriptive title for your billboard"
-                class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-colors"
-              />
+  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
+    <div class="max-w-4xl mx-auto py-8 px-6">
+      <!-- AIDEV-NOTE: Billboard creation header with progressive steps design -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">New Billboard</h1>
+        <p class="text-gray-400">Create a music chart by collecting playlist submissions from your community</p>
+      </div>
+      
+<!-- AIDEV-NOTE: Form wrapper for the entire flow -->
+      <.form for={@form} id="billboard-form" phx-change="validate" phx-submit="save" class="space-y-6">
+        <!-- AIDEV-NOTE: Steps with Ariadne's thread connecting them -->
+        <div class="relative" id="steps-container">
+          <!-- Ariadne's thread - base line -->
+          <%= if @form[:title].value && String.trim(@form[:title].value || "") != "" do %>
+            <!-- Steps 1-2 visible - thread goes from step 1 to step 2 -->
+            <div
+              class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full ariane-thread-base"
+              data-step="2"
+              id="thread-to-step-2"
+            >
+            </div>
+          <% else %>
+            <!-- Only step 1 visible - minimal thread -->
+            <div class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full" style="height: 8rem;"></div>
+          <% end %>
+          
+<!-- Progressive fill thread - shows progress as steps complete -->
+          <div
+            class={[
+              "absolute left-6 top-12 w-1 rounded-full transition-all duration-700 ease-in-out",
+              "bg-gradient-primary-vertical",
+              "ariane-thread-progress"
+            ]}
+            style="min-height: 2rem;"
+            data-progress-step={if @form[:title].value && String.trim(@form[:title].value || "") != "", do: "2", else: "1"}
+          >
+          </div>
+          
+<!-- Step 1: Billboard Details -->
+          <div class="mb-8 relative">
+            <div class="flex items-center mb-6">
+              <div class={[
+                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
+                "bg-gradient-primary ring-4 ring-purple-500/30"
+              ]}>
+                1
+              </div>
+              <h2 class="text-2xl font-semibold text-white">Title</h2>
             </div>
 
-            <div class="flex justify-end space-x-4 pt-4">
-              <.link
-                navigate={~p"/home"}
-                class="px-6 py-3 bg-gray-600/50 hover:bg-gray-600/70 text-white rounded-lg transition-colors font-medium border border-white/10"
-              >
-                Cancel
-              </.link>
-              <.button
-                phx-disable-with="Creating..."
-                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg"
-              >
-                Create Billboard
-              </.button>
+            <div class="ml-16 max-w-lg">
+              <div>
+                <.input
+                  field={@form[:title]}
+                  type="text"
+                  placeholder="Enter a descriptive title for your billboard"
+                  class="w-full px-4 py-3 rounded-lg text-white placeholder-gray-400 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-colors"
+                  style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                  error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+                />
+              </div>
             </div>
-          </.form>
+          </div>
+          
+<!-- Step 2: Ready to Create (only show if title is valid) -->
+          <%= if @form[:title].value && String.trim(@form[:title].value || "") != "" do %>
+            <div class="pt-6 relative" id="step-2">
+              <!-- Final step indicator -->
+              <div class="flex items-center mb-6">
+                <div class={[
+                  "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
+                  "bg-gradient-primary ring-4 ring-purple-500/30"
+                ]}>
+                  2
+                </div>
+                <h2 class="text-2xl font-semibold text-white">Ready to Create</h2>
+              </div>
+              
+<!-- Preview card -->
+              <div class="ml-16 mb-6">
+                <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm p-6 max-w-md">
+                  <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-purple-600/20 rounded-full flex items-center justify-center">
+                      <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="text-white font-semibold">Billboard "{@form[:title].value}"</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-4 ml-16">
+                <button
+                  class="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  type="submit"
+                  phx-disable-with="Creating..."
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Create Billboard</span>
+                </button>
+
+                <.link
+                  navigate={~p"/billboards"}
+                  class="border border-gray-600 text-gray-300 hover:bg-gray-800 py-3 px-6 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </.link>
+              </div>
+            </div>
+          <% end %>
         </div>
-      </div>
+      </.form>
     </div>
   </div>
 </Layouts.app>
+
+<script>
+  // AIDEV-NOTE: Dynamic Ariane thread height calculation for Billboard creation
+  function updateArianesThread() {
+    const container = document.getElementById('steps-container');
+    if (!container) return;
+
+    const baseThread = container.querySelector('.ariane-thread-base');
+    const progressThread = container.querySelector('.ariane-thread-progress');
+
+    // Progress thread should always exist, base thread is optional
+    if (!progressThread) return;
+
+    const step = baseThread ? baseThread.getAttribute('data-step') : null;
+    const progressStep = progressThread.getAttribute('data-progress-step');
+
+    // Find the highest step element to determine full thread length
+    let targetElement = null;
+    
+    // Determine the target based on progress step if no base thread
+    const targetStep = step || progressStep;
+
+    if (targetStep === '2') {
+      // Find the step 2 number circle
+      targetElement = document.querySelector('#step-2 .w-12.h-12');
+    } else if (targetStep === '1') {
+      // Find the step 1 number circle
+      targetElement = document.querySelector('#steps-container .w-12.h-12');
+    }
+
+    if (targetElement) {
+      const containerTop = container.getBoundingClientRect().top;
+      const targetBottom = targetElement.getBoundingClientRect().bottom;
+      const threadStart = 48; // top-12 = 3rem = 48px
+
+      // Calculate thread height to the step number circle (stop at circle, not beyond)
+      const baseHeight = Math.max(0, targetBottom - containerTop - threadStart);
+
+      // Update base thread height if it exists
+      if (baseThread) {
+        baseThread.style.height = baseHeight + 'px';
+      }
+
+      // Calculate progress thread height - should match current progress step
+      let progressHeight = 0;
+      
+      if (progressStep === '1') {
+        // Find step 1 circle and stop at its bottom
+        const step1Circle = document.querySelector('#steps-container .w-12.h-12');
+        if (step1Circle) {
+          const step1Bottom = step1Circle.getBoundingClientRect().bottom;
+          progressHeight = Math.max(0, step1Bottom - containerTop - threadStart);
+        } else {
+          progressHeight = 48; // fallback to circle height
+        }
+      } else if (progressStep === '2') {
+        progressHeight = baseHeight;
+      }
+
+      progressThread.style.height = progressHeight + 'px';
+    } else if (progressStep === '0') {
+      // No steps visible yet, hide progress thread
+      progressThread.style.height = '0px';
+    }
+  }
+
+  // Update on page load and when content changes
+  document.addEventListener('DOMContentLoaded', updateArianesThread);
+
+  // Update when LiveView updates
+  document.addEventListener('phx:update', updateArianesThread);
+
+  // Update on window resize
+  window.addEventListener('resize', updateArianesThread);
+
+  // Use ResizeObserver to detect content changes
+  if (window.ResizeObserver) {
+    const observer = new ResizeObserver(updateArianesThread);
+    const container = document.getElementById('steps-container');
+    if (container) {
+      observer.observe(container);
+    }
+  }
+</script>

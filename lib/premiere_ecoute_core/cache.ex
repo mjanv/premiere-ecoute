@@ -11,6 +11,7 @@ defmodule PremiereEcouteCore.Cache do
   end
 
   def clear(cache), do: Cachex.clear(cache)
+  def del(cache, key), do: Cachex.del(cache, key)
 
   def put(cache, key, value, opts \\ []) do
     case Cachex.put(cache, key, value, opts) do

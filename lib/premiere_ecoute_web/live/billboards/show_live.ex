@@ -98,36 +98,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   end
 
   @impl true
-  def handle_event("generate", _params, socket) do
-    billboard = socket.assigns.billboard
-
-    if length(billboard.submissions || []) == 0 do
-      {:noreply, put_flash(socket, :error, "No submissions available to generate billboard")}
-    else
-      # AIDEV-NOTE: Generate billboard and store in cache instead of redirecting
-      case Billboards.generate_billboard_display(billboard) do
-        {:ok, generated_billboard} ->
-          cache_key = "billboard_#{billboard.billboard_id}"
-          Cache.put(:billboards, cache_key, generated_billboard)
-
-          socket
-          |> assign(:cache_status, :ready)
-          |> put_flash(:info, "Billboard generated and cached successfully!")
-          |> then(fn socket -> {:noreply, socket} end)
-
-        {:error, reason} ->
-          error_msg =
-            case reason do
-              :no_submissions -> "No submissions available to generate billboard"
-              _ -> "Failed to generate billboard"
-            end
-
-          {:noreply, put_flash(socket, :error, error_msg)}
-      end
-    end
-  end
-
-  @impl true
   def handle_event("show_delete_modal", _params, socket) do
     {:noreply, assign(socket, :show_delete_modal, true)}
   end
@@ -201,9 +171,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   # AIDEV-NOTE: Check if billboard is available in cache
   defp check_billboard_cache_status(billboard_id) do
-    cache_key = "billboard_#{billboard_id}"
-
-    case Cache.get(:billboards, cache_key) do
+    case Cache.get(:billboards, billboard_id) do
       {:ok, nil} -> :not_ready
       {:ok, _} -> :ready
       {:error, _} -> :not_ready
@@ -213,7 +181,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   defp billboard_status_badge(assigns) do
     class =
       case assigns.status do
-        :created -> "bg-gray-600/20 text-gray-300 border-gray-500/30"
+        :created -> "bg-blue-600/20 text-blue-300 border-blue-500/30"
         :active -> "bg-green-600/20 text-green-300 border-green-500/30"
         :stopped -> "bg-red-600/20 text-red-300 border-red-500/30"
       end
@@ -223,24 +191,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     ~H"""
     <span class={"inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border #{@class}"}>
       {String.capitalize(to_string(@status))}
-    </span>
-    """
-  end
-
-  # AIDEV-NOTE: Display cache status badge for generated billboard versions
-  defp cache_status_badge(assigns) do
-    {class, text} =
-      case assigns.cache_status do
-        :ready -> {"bg-green-600/20 text-green-300 border-green-500/30", "Version Ready"}
-        :not_ready -> {"bg-yellow-600/20 text-yellow-300 border-yellow-500/30", "Not Generated"}
-        _ -> {"bg-gray-600/20 text-gray-300 border-gray-500/30", "Unknown"}
-      end
-
-    assigns = assign(assigns, :class, class) |> assign(:text, text)
-
-    ~H"""
-    <span class={"inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border #{@class}"}>
-      {@text}
     </span>
     """
   end
@@ -269,4 +219,23 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   end
 
   defp format_date(_), do: "Unknown"
+
+  defp simple_date(%DateTime{} = datetime) do
+    Calendar.strftime(datetime, "%b %d, %Y")
+  end
+
+  defp simple_date(%NaiveDateTime{} = naive_datetime) do
+    naive_datetime
+    |> DateTime.from_naive!("Etc/UTC")
+    |> simple_date()
+  end
+
+  defp simple_date(date_string) when is_binary(date_string) do
+    case DateTime.from_iso8601(date_string) do
+      {:ok, datetime, _} -> simple_date(datetime)
+      _ -> date_string
+    end
+  end
+
+  defp simple_date(_), do: "Unknown"
 end

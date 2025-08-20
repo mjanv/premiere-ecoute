@@ -308,7 +308,6 @@ body {
       rgba(255, 0, 255, 0.15) 100%
     );
   background-size: 50px 50px;
-  animation: synthwave-grid 20s linear infinite;
   pointer-events: none;
   z-index: 0;
 }
@@ -542,3 +541,4 @@ div[class*="fixed"][class*="inset-0"][class*="bg-black"] > div {
     transform: translateY(50px) translateX(25px);
   }
 }
+
