@@ -13,6 +13,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard
+  alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteWeb.Layouts
 
@@ -250,13 +251,12 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
     
     if current_user do
-      # AIDEV-NOTE: Load user's Spotify playlists when opening export modal
-      case Apis.spotify().get_library_playlists(socket.assigns.current_scope) do
-        {:ok, playlists} ->
-          {:noreply, assign(socket, show_export_modal: true, spotify_playlists: playlists, export_error: nil)}
-        {:error, _reason} ->
-          {:noreply, assign(socket, show_export_modal: true, spotify_playlists: [], export_error: gettext("Failed to load your Spotify playlists. Please make sure you're connected to Spotify."))}
-      end
+      # AIDEV-NOTE: Load user's library playlists from database when opening export modal
+      library_playlists = LibraryPlaylist.all(
+        where: [user_id: current_user.id, provider: :spotify]
+      )
+      
+      {:noreply, assign(socket, show_export_modal: true, spotify_playlists: library_playlists, export_error: nil)}
     else
       {:noreply, put_flash(socket, :error, gettext("Please log in to export playlists"))}
     end

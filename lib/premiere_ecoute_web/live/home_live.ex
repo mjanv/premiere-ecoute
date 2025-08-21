@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.HomeLive do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Billboards
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Sessions.ListeningSession
 
@@ -24,9 +25,10 @@ defmodule PremiereEcouteWeb.HomeLive do
     # AIDEV-NOTE: Track playlist detail modal
     |> assign(:show_playlist_detail_modal, false)
     |> assign(:selected_library_playlist, nil)
-    # AIDEV-NOTE: Load user's library playlists and session status
+    # AIDEV-NOTE: Load user's library playlists, session status, and recent billboards
     |> load_library_playlists()
     |> assign(:current_session, ListeningSession.current_session(current_user))
+    |> load_recent_billboards()
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -229,4 +231,34 @@ defmodule PremiereEcouteWeb.HomeLive do
       assign(socket, :library_playlists, [])
     end
   end
+
+  # AIDEV-NOTE: Load user's latest billboard for recap
+  defp load_recent_billboards(%{assigns: assigns} = socket) do
+    if assigns.current_scope do
+      latest_billboard = 
+        Billboards.all(
+          where: [user_id: assigns.current_scope.user.id],
+          order_by: [desc: :inserted_at],
+          limit: 1
+        )
+        |> List.first()
+      
+      assign(socket, :latest_billboard, latest_billboard)
+    else
+      assign(socket, :latest_billboard, nil)
+    end
+  end
+
+  # AIDEV-NOTE: Format date for display
+  defp simple_date(%DateTime{} = datetime) do
+    Calendar.strftime(datetime, "%b %d, %Y")
+  end
+
+  defp simple_date(%NaiveDateTime{} = naive_datetime) do
+    naive_datetime
+    |> DateTime.from_naive!("Etc/UTC")
+    |> simple_date()
+  end
+
+  defp simple_date(_), do: gettext("Unknown")
 end

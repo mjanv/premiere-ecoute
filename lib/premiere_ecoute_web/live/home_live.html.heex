@@ -4,153 +4,239 @@
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
         <div class="w-full">
-          <!-- AIDEV-NOTE: Hero Session Card - Priority: active > prepared > create session -->
-          <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
-            <%= if @current_session do %>
-              <%= case @current_session.status do %>
-                <% :active -> %>
-                  <!-- Active Session Hero -->
-                  <.link navigate={~p"/sessions/#{@current_session.id}"} class="block mb-12 group cursor-pointer">
-                    <div class="relative p-8 bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-[1.005]">
-                      <div class="flex items-center space-x-8">
-                        <!-- LARGE Album Cover -->
-                        <div class="flex-shrink-0">
-                          <%= if @current_session.album.cover_url do %>
-                            <img
-                              src={@current_session.album.cover_url}
-                              alt={@current_session.album.name}
-                              class="w-32 h-32 rounded-xl object-cover shadow-xl ring-4 ring-white/15 group-hover:ring-white/25 transition-all duration-300"
-                            />
-                          <% else %>
-                            <div class="w-32 h-32 bg-gradient-to-br from-slate-600/30 to-slate-700/20 rounded-xl flex items-center justify-center shadow-xl ring-4 ring-white/15 group-hover:ring-white/25 transition-all duration-300">
-                              <svg class="w-16 h-16 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="1"
-                                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                                />
-                              </svg>
-                            </div>
-                          <% end %>
-                        </div>
-                        
-<!-- Session Content -->
-                        <div class="flex-1 space-y-3">
-                          <p class="text-slate-300/90 text-lg leading-relaxed">
-                            {gettext("You're currently sharing")}
-                            <strong class="text-white">{@current_session.album.name}</strong> {gettext("by")}
-                            <span class="text-slate-300">{@current_session.album.artist}</span> {gettext(
-                              "with your community. Join the conversation and see what everyone thinks!"
-                            )}
-                          </p>
 
-                          <div class="flex items-center space-x-2 text-slate-400/80 text-sm pt-2">
-                            <span>{gettext("Click to continue your session")}</span>
-                            <svg
-                              class="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          <!-- AIDEV-NOTE: My Activity section -->
+          <h2 class="text-4xl font-bold text-white mb-8 text-left">{gettext("My Activity")}</h2>
+          
+          <div class="mb-12">
+            <div class="flex gap-6">
+              <!-- Latest Session Card -->
+              <div class="w-1/2">
+                <%= if @current_session do %>
+                  <.link navigate={~p"/sessions/#{@current_session.id}"} class="block group h-full">
+                    <div class="p-6 bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-xl hover:shadow-xl transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm h-full flex flex-col">
+                      <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-base font-medium text-slate-400">{gettext("Active Session")}</h2>
+                        <%= case @current_session.status do %>
+                          <% :active -> %>
+                            <span class="inline-flex items-center px-3 py-1 rounded text-sm bg-green-600/20 text-green-400">
+                              {gettext("Live")}
+                            </span>
+                          <% :preparing -> %>
+                            <span class="inline-flex items-center px-3 py-1 rounded text-sm bg-amber-600/20 text-amber-400">
+                              {gettext("Ready")}
+                            </span>
+                        <% end %>
+                      </div>
+                      
+                      <div class="flex items-center gap-4 mb-4 flex-1">
+                        <%= if @current_session.album.cover_url do %>
+                          <img
+                            src={@current_session.album.cover_url}
+                            alt={@current_session.album.name}
+                            class="w-16 h-16 rounded-lg object-cover shadow-md flex-shrink-0"
+                          />
+                        <% else %>
+                          <div class="w-16 h-16 bg-slate-700/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                             </svg>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </.link>
-                <% :preparing -> %>
-                  <!-- Prepared Session Hero -->
-                  <.link navigate={~p"/sessions/#{@current_session.id}"} class="block mb-12 group cursor-pointer">
-                    <div class="relative p-8 bg-gradient-to-br from-amber-50/6 to-amber-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-[1.005]">
-                      <div class="flex items-center space-x-8">
-                        <!-- LARGE Album Cover -->
-                        <div class="flex-shrink-0">
-                          <%= if @current_session.album.cover_url do %>
-                            <img
-                              src={@current_session.album.cover_url}
-                              alt={@current_session.album.name}
-                              class="w-32 h-32 rounded-xl object-cover shadow-xl ring-4 ring-white/15 group-hover:ring-white/25 transition-all duration-300"
-                            />
-                          <% else %>
-                            <div class="w-32 h-32 bg-gradient-to-br from-amber-600/30 to-amber-700/20 rounded-xl flex items-center justify-center shadow-xl ring-4 ring-white/15 group-hover:ring-white/25 transition-all duration-300">
-                              <svg class="w-16 h-16 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="1"
-                                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                                />
-                              </svg>
-                            </div>
-                          <% end %>
-                        </div>
+                        <% end %>
                         
-<!-- Session Content -->
-                        <div class="flex-1 space-y-3">
-                          <p class="text-slate-300/90 text-lg leading-relaxed">
-                            {gettext("Your listening session is ready to go with")}
-                            <strong class="text-white">{@current_session.album.name}</strong> {gettext("by")} <span class="text-slate-300">{@current_session.album.artist}</span>. {gettext(
-                              "Time to share this music with your community!"
-                            )}
+                        <div class="flex-1 min-w-0">
+                          <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors truncate">
+                            {@current_session.album.name}
+                          </h3>
+                          <p class="text-base text-slate-400 truncate">
+                            {gettext("by %{artist}", artist: @current_session.album.artist)}
                           </p>
-
-                          <div class="flex items-center space-x-2 text-slate-400/80 text-sm pt-2">
-                            <span>{gettext("Click to start your session")}</span>
-                            <svg
-                              class="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </div>
                         </div>
                       </div>
-                    </div>
-                  </.link>
-              <% end %>
-            <% else %>
-              <!-- Create Session Hero -->
-              <.link href={~p"/discography/album/select"} class="block mb-12 group cursor-pointer">
-                <div class="relative p-8 bg-gradient-to-br from-indigo-50/6 to-blue-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-[1.005]">
-                  <div class="flex items-center space-x-8">
-                    <!-- LARGE Placeholder -->
-                    <div class="flex-shrink-0">
-                      <div class="w-32 h-32 bg-gradient-to-br from-indigo-600/30 to-blue-700/20 rounded-xl flex items-center justify-center shadow-xl ring-4 ring-white/15 group-hover:ring-white/25 transition-all duration-300">
-                        <svg class="w-16 h-16 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                      </div>
-                    </div>
-                    
-<!-- Welcome Content -->
-                    <div class="flex-1 space-y-3">
-                      <p class="text-slate-300/90 text-lg leading-relaxed">
-                        {gettext(
-                          "Welcome back! Ready to start a listening session and discover amazing albums with your community? Vote together, discuss in real-time, and find your next favorite artist."
-                        )}
-                      </p>
-
-                      <div class="flex items-center space-x-2 text-slate-400/80 text-sm pt-2">
-                        <span>{gettext("Click to create your first session")}</span>
-                        <svg
-                          class="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                      
+                      <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
+                        <span class="text-sm">
+                          <%= case @current_session.status do %>
+                            <% :active -> %>
+                              {gettext("Continue session")}
+                            <% :preparing -> %>
+                              {gettext("Start session")}
+                          <% end %>
+                        </span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </.link>
-            <% end %>
-          <% end %>
+                  </.link>
+                <% else %>
+                  <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
+                    <.link href={~p"/discography/album/select"} class="block group h-full">
+                      <div class="p-6 bg-gradient-to-br from-indigo-50/6 to-blue-100/3 border border-white/10 rounded-xl hover:shadow-xl transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                          <h2 class="text-base font-medium text-slate-400">{gettext("Create Session")}</h2>
+                          <span class="inline-flex items-center px-3 py-1 rounded text-sm bg-indigo-600/20 text-indigo-400">
+                            {gettext("New")}
+                          </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mb-4 flex-1">
+                          <div class="w-16 h-16 bg-gradient-to-br from-indigo-600/30 to-blue-700/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                          </div>
+                          
+                          <div class="flex-1 min-w-0">
+                            <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors">
+                              {gettext("Start Listening Session")}
+                            </h3>
+                            <p class="text-base text-slate-400">
+                              {gettext("Share music with your community")}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
+                          <span class="text-sm">
+                            {gettext("Choose an album to get started")}
+                          </span>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </.link>
+                  <% else %>
+                    <div class="p-6 bg-slate-800/30 border border-slate-700/30 rounded-xl h-full flex items-center justify-center">
+                      <div class="text-center">
+                        <div class="w-12 h-12 bg-slate-700/50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                          </svg>
+                        </div>
+                        <p class="text-sm text-slate-500">{gettext("Sessions not available")}</p>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <!-- Latest Billboard Card -->
+              <div class="w-1/2">
+                <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) && @latest_billboard do %>
+                  <.link navigate={~p"/billboards/#{@latest_billboard.billboard_id}"} class="block group h-full">
+                    <div class="p-6 bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-xl hover:shadow-xl transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm h-full flex flex-col">
+                      <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-base font-medium text-slate-400">{gettext("Latest Billboard")}</h2>
+                        <%= case @latest_billboard.status do %>
+                          <% :active -> %>
+                            <span class="inline-flex items-center px-3 py-1 rounded text-sm bg-green-600/20 text-green-400">
+                              {gettext("Active")}
+                            </span>
+                          <% :stopped -> %>
+                            <span class="inline-flex items-center px-3 py-1 rounded text-sm bg-red-600/20 text-red-400">
+                              {gettext("Stopped")}
+                            </span>
+                          <% :created -> %>
+                            <span class="inline-flex items-center px-3 py-1 rounded text-sm bg-blue-600/20 text-blue-400">
+                              {gettext("Created")}
+                            </span>
+                        <% end %>
+                      </div>
+                      
+                      <div class="flex items-center gap-4 mb-4 flex-1">
+                        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                          </svg>
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                          <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors truncate">
+                            {@latest_billboard.title}
+                          </h3>
+                          <p class="text-base text-slate-400 truncate">
+                            <%= if @latest_billboard.submissions && length(@latest_billboard.submissions) > 0 do %>
+                              {ngettext("1 submission", "%{count} submissions", length(@latest_billboard.submissions))}
+                            <% else %>
+                              {gettext("No submissions yet")}
+                            <% end %>
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
+                        <span class="text-sm">
+                          <%= case @latest_billboard.status do %>
+                            <% :active -> %>
+                              {gettext("Manage billboard")}
+                            <% :stopped -> %>
+                              {gettext("View results")}
+                            <% :created -> %>
+                              {gettext("Activate billboard")}
+                          <% end %>
+                        </span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </.link>
+                <% else %>
+                  <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
+                    <.link navigate={~p"/billboards/new"} class="block group h-full">
+                      <div class="p-6 bg-gradient-to-br from-purple-50/6 to-indigo-100/3 border border-white/10 rounded-xl hover:shadow-xl transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                          <h2 class="text-base font-medium text-slate-400">{gettext("Create Billboard")}</h2>
+                          <span class="inline-flex items-center px-3 py-1 rounded text-sm bg-purple-600/20 text-purple-400">
+                            {gettext("New")}
+                          </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mb-4 flex-1">
+                          <div class="w-16 h-16 bg-gradient-to-br from-purple-600/30 to-indigo-700/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                          </div>
+                          
+                          <div class="flex-1 min-w-0">
+                            <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors">
+                              {gettext("Create Music Billboard")}
+                            </h3>
+                            <p class="text-base text-slate-400">
+                              {gettext("Collect community playlists")}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
+                          <span class="text-sm">
+                            {gettext("Start collecting submissions")}
+                          </span>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </.link>
+                  <% else %>
+                    <div class="p-6 bg-slate-800/30 border border-slate-700/30 rounded-xl h-full flex items-center justify-center">
+                      <div class="text-center">
+                        <div class="w-12 h-12 bg-slate-700/50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                          </svg>
+                        </div>
+                        <p class="text-sm text-slate-500">{gettext("Billboards not available")}</p>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
           
 <!-- AIDEV-NOTE: My Library section header -->
           <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
