@@ -1,7 +1,7 @@
 defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
   @moduledoc """
   LiveView for displaying library playlist details.
-  
+
   Shows playlist information, tracks, and management actions.
   """
 
@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
   @impl true
   def mount(%{"id" => playlist_id}, _session, socket) do
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
-    
+
     if current_user do
       case find_user_playlist(current_user.id, playlist_id) do
         nil ->
@@ -22,7 +22,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
           |> put_flash(:error, gettext("Playlist not found"))
           |> redirect(to: ~p"/home")
           |> then(fn socket -> {:ok, socket} end)
-          
+
         playlist ->
           socket
           |> assign(:page_title, playlist.title)
@@ -33,10 +33,10 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
           |> assign(:tracks, [])
           |> assign(:tracks_loading, true)
           |> assign(:tracks_error, nil)
-          |> then(fn socket -> 
+          |> then(fn socket ->
             # AIDEV-NOTE: Load detailed playlist with tracks asynchronously
             send(self(), {:load_playlist_details, playlist.playlist_id})
-            {:ok, socket} 
+            {:ok, socket}
           end)
       end
     else
@@ -70,7 +70,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
         |> put_flash(:info, gettext("Playlist removed from your library"))
         |> redirect(to: ~p"/home")
         |> then(fn socket -> {:noreply, socket} end)
-        
+
       {:error, _} ->
         socket
         |> assign(:show_delete_modal, false)
@@ -89,7 +89,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
         |> assign(:tracks_loading, false)
         |> assign(:tracks_error, nil)
         |> then(fn socket -> {:noreply, socket} end)
-        
+
       {:error, reason} ->
         socket
         |> assign(:tracks_loading, false)
@@ -125,7 +125,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
     total_seconds = div(duration_ms, 1000)
     minutes = div(total_seconds, 60)
     seconds = rem(total_seconds, 60)
-    
+
     "#{minutes}:#{String.pad_leading(Integer.to_string(seconds), 2, "0")}"
   end
 

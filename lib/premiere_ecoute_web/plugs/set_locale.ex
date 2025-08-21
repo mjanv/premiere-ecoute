@@ -8,10 +8,7 @@ defmodule PremiereEcouteWeb.Plugs.SetLocale do
   def init(_options), do: nil
 
   def call(conn, _options) do
-    # AIDEV-NOTE: Locale priority: browser language first, then user profile (if authenticated)
-    locale = get_locale_from_browser_or_profile(conn)
-
-    case locale do
+    case get_locale_from_browser_or_profile(conn) do
       locale when locale in @supported_locales ->
         Gettext.put_locale(PremiereEcoute.Gettext, locale)
 

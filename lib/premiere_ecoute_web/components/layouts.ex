@@ -30,6 +30,8 @@ defmodule PremiereEcouteWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
+  attr :current_page, :string, default: nil, doc: "current page identifier for highlighting active nav items"
+
   slot :inner_block, required: true
 
   def app(assigns) do
@@ -64,7 +66,7 @@ defmodule PremiereEcouteWeb.Layouts do
         <.left_sidebar
           current_user={(@current_scope && Map.get(@current_scope, :user)) || nil}
           current_scope={@current_scope}
-          current_page={assigns[:current_page]}
+          current_page={@current_page}
         />
         
     <!-- Main content area -->

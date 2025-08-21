@@ -33,7 +33,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     )
     |> SpotifyApi.handle(201, fn body -> body end)
   end
-  
+
   def replace_items_to_playlist(scope, id, tracks) do
     scope
     |> SpotifyApi.api()

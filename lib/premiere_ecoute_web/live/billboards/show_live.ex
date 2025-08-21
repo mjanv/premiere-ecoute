@@ -15,7 +15,9 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcouteCore.Cache
+  alias PremiereEcouteCore.Search
   alias PremiereEcouteWeb.Layouts
+  
 
   @impl true
   def mount(%{"id" => billboard_id}, _session, socket) do
@@ -30,10 +32,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
         current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
 
         if current_user.id == billboard.user_id do
-          # AIDEV-NOTE: Check cache for generated billboard version status
           cache_status = check_billboard_cache_status(billboard.billboard_id)
-
-          # AIDEV-NOTE: Sort submissions by reverse chronological order (newest first)
           sorted_submissions = sort_submissions_by_date(billboard.submissions || [])
 
           socket
@@ -186,12 +185,12 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     billboard = socket.assigns.billboard
 
     case Billboards.update_billboard(billboard, %{title: new_title}) do
-      {:ok, updated_billboard} ->
+      {:ok, billboard} ->
         socket
-        |> assign(:billboard, updated_billboard)
-        |> assign(:page_title, updated_billboard.title)
+        |> assign(:billboard, billboard)
+        |> assign(:page_title, billboard.title)
         |> assign(:show_edit_modal, false)
-        |> assign(:title_form, to_form(%{"title" => updated_billboard.title}))
+        |> assign(:title_form, to_form(%{"title" => billboard.title}))
         |> put_flash(:info, gettext("Billboard title updated successfully"))
         |> then(fn socket -> {:noreply, socket} end)
 
@@ -205,8 +204,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   @impl true
   def handle_event("validate_title", %{"title" => new_title}, socket) do
-    form = to_form(%{"title" => new_title})
-    {:noreply, assign(socket, :title_form, form)}
+    {:noreply, assign(socket, :title_form, to_form(%{"title" => new_title}))}
   end
 
   @impl true
@@ -214,17 +212,14 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     query =
       case params do
         %{"query" => q} -> q
-        %{"_target" => ["query"], "query" => q} -> q
         _ -> ""
       end
 
-    submissions = socket.assigns.submissions
-    review_filter = socket.assigns.review_filter
-    filtered_submissions = filter_submissions(submissions, query, review_filter)
+    submissions = filter_submissions(socket.assigns.submissions, query, socket.assigns.review_filter)
 
     socket
     |> assign(:search_query, query)
-    |> assign(:filtered_submissions, filtered_submissions)
+    |> assign(:filtered_submissions, submissions)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -249,20 +244,18 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   @impl true
   def handle_event("show_export_modal", _params, socket) do
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
-    
+
     if current_user do
       # AIDEV-NOTE: Load user's library playlists from database when opening export modal
-      library_playlists = LibraryPlaylist.all(
-        where: [user_id: current_user.id, provider: :spotify]
-      )
-      
+      library_playlists = LibraryPlaylist.all(where: [user_id: current_user.id, provider: :spotify])
+
       {:noreply, assign(socket, show_export_modal: true, spotify_playlists: library_playlists, export_error: nil)}
     else
       {:noreply, put_flash(socket, :error, gettext("Please log in to export playlists"))}
     end
   end
 
-  @impl true  
+  @impl true
   def handle_event("hide_export_modal", _params, socket) do
     socket
     |> assign(:show_export_modal, false)
@@ -279,17 +272,19 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   @impl true
   def handle_event("update_export_count", params, socket) do
-    count_str = case params do
-      %{"count" => count} -> count
-      %{"value" => count} -> count
-      %{count: count} -> count
-      %{value: count} -> count
-      _ -> nil
-    end
-    
+    count_str =
+      case params do
+        %{"count" => count} -> count
+        %{"value" => count} -> count
+        %{count: count} -> count
+        %{value: count} -> count
+        _ -> nil
+      end
+
     case count_str && Integer.parse(count_str) do
       {count, _} when count > 0 and count <= 100 ->
         {:noreply, assign(socket, :export_count, count)}
+
       _ ->
         {:noreply, socket}
     end
@@ -304,23 +299,23 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
     if selected_playlist_id do
       socket = assign(socket, :export_loading, true)
-      
+
       # AIDEV-NOTE: Perform export in background task to avoid blocking UI
       pid = self()
+
       Task.start(fn ->
         case get_top_tracks_with_generation(billboard, export_count) do
           {:ok, tracks} ->
             case export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
-              {:ok, _} ->
-                send(pid, {:export_success, export_count})
-              {:error, reason} ->
-                send(pid, {:export_error, reason})
+              {:ok, _} -> send(pid, {:export_success, export_count})
+              {:error, reason} -> send(pid, {:export_error, reason})
             end
+
           {:error, message} ->
             send(pid, {:export_error, message})
         end
       end)
-      
+
       {:noreply, socket}
     else
       {:noreply, assign(socket, :export_error, gettext("Please select a playlist"))}
@@ -328,90 +323,22 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   end
 
   # Helper functions
-
-  # AIDEV-NOTE: Sort submissions by date (newest first)
-  defp sort_submissions_by_date(submissions) do
-    Enum.sort(submissions, fn sub1, sub2 ->
-      date1 = get_submission_date(sub1)
-      date2 = get_submission_date(sub2)
-
-      case {date1, date2} do
-        {nil, nil} -> false
-        {nil, _} -> false
-        {_, nil} -> true
-        {d1, d2} -> compare_dates(d1, d2) == :gt
-      end
-    end)
-  end
-
-  # AIDEV-NOTE: Compare dates handling both DateTime and string formats
-  defp compare_dates(%DateTime{} = d1, %DateTime{} = d2), do: DateTime.compare(d1, d2)
-
-  defp compare_dates(d1, d2) when is_binary(d1) and is_binary(d2) do
-    case {DateTime.from_iso8601(d1), DateTime.from_iso8601(d2)} do
-      {{:ok, dt1, _}, {:ok, dt2, _}} -> DateTime.compare(dt1, dt2)
-      _ -> :eq
-    end
-  end
-
-  defp compare_dates(%DateTime{} = d1, d2) when is_binary(d2) do
-    case DateTime.from_iso8601(d2) do
-      {:ok, dt2, _} -> DateTime.compare(d1, dt2)
-      _ -> :gt
-    end
-  end
-
-  defp compare_dates(d1, %DateTime{} = d2) when is_binary(d1) do
-    case DateTime.from_iso8601(d1) do
-      {:ok, dt1, _} -> DateTime.compare(dt1, d2)
-      _ -> :lt
-    end
-  end
-
-  defp compare_dates(_, _), do: :eq
-
-  # AIDEV-NOTE: Filter submissions based on search query and review status
   defp filter_submissions(submissions, query, review_filter) do
+    reviewed =
+      case review_filter do
+        "all" -> nil
+        "reviewed" -> true
+        "unreviewed" -> false
+      end
+
     submissions
-    |> filter_by_search(query)
-    |> filter_by_review_status(review_filter)
+    |> Search.filter(query, ["pseudo", "url"])
+    |> Search.flag([{"reviewed", reviewed}])
+    |> Search.sort(:added_at, :desc)
   end
 
-  defp filter_by_search(submissions, ""), do: submissions
-
-  defp filter_by_search(submissions, query) when is_binary(query) do
-    query_lower = String.downcase(query)
-
-    Enum.filter(submissions, fn submission ->
-      url_match =
-        submission
-        |> get_submission_url()
-        |> String.downcase()
-        |> String.contains?(query_lower)
-
-      pseudo_match =
-        case get_submission_pseudo(submission) do
-          nil ->
-            false
-
-          pseudo ->
-            pseudo
-            |> String.downcase()
-            |> String.contains?(query_lower)
-        end
-
-      url_match or pseudo_match
-    end)
-  end
-
-  defp filter_by_review_status(submissions, "all"), do: submissions
-
-  defp filter_by_review_status(submissions, "reviewed") do
-    Enum.filter(submissions, &get_submission_reviewed/1)
-  end
-
-  defp filter_by_review_status(submissions, "unreviewed") do
-    Enum.filter(submissions, fn submission -> not get_submission_reviewed(submission) end)
+  defp sort_submissions_by_date(submissions) do
+    Search.sort(submissions, :added_at, :desc)
   end
 
   # AIDEV-NOTE: Check if billboard is available in cache
@@ -439,23 +366,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     </span>
     """
   end
-
-  defp get_submission_url(%{url: url}), do: url
-  defp get_submission_url(%{"url" => url}), do: url
-  defp get_submission_url(url) when is_binary(url), do: url
-
-  defp get_submission_pseudo(%{pseudo: pseudo}) when is_binary(pseudo) and pseudo != "", do: pseudo
-  defp get_submission_pseudo(%{"pseudo" => pseudo}) when is_binary(pseudo) and pseudo != "", do: pseudo
-  defp get_submission_pseudo(_), do: nil
-
-  defp get_submission_date(%{submitted_at: date}), do: date
-  defp get_submission_date(%{"submitted_at" => date}), do: date
-  defp get_submission_date(_), do: nil
-
-  # AIDEV-NOTE: Helper function to get review status from submission
-  defp get_submission_reviewed(%{"reviewed" => reviewed}) when is_boolean(reviewed), do: reviewed
-  defp get_submission_reviewed(%{reviewed: reviewed}) when is_boolean(reviewed), do: reviewed
-  defp get_submission_reviewed(_), do: false
 
   defp format_date(%DateTime{} = datetime) do
     Calendar.strftime(datetime, "%d/%m/%Y")
@@ -504,12 +414,13 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   @impl true
   def handle_info({:export_error, reason}, socket) do
-    error_message = case reason do
-      %{"error" => %{"message" => msg}} -> msg
-      msg when is_binary(msg) -> msg
-      _ -> gettext("Failed to export tracks to Spotify playlist")
-    end
-    
+    error_message =
+      case reason do
+        %{"error" => %{"message" => msg}} -> msg
+        msg when is_binary(msg) -> msg
+        _ -> gettext("Failed to export tracks to Spotify playlist")
+      end
+
     socket
     |> assign(:export_loading, false)
     |> assign(:export_error, error_message)
@@ -538,15 +449,15 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     case Apis.spotify().get_playlist(playlist_id) do
       {:ok, current_playlist} ->
         tracks_to_remove = current_playlist.tracks || []
-        
+
         if length(tracks_to_remove) > 0 do
           # AIDEV-NOTE: Use updated API without snapshot parameter
           Apis.spotify().remove_playlist_items(scope, playlist_id, tracks_to_remove)
         else
           {:ok, nil}
         end
-      
-      {:error, reason} -> 
+
+      {:error, reason} ->
         {:error, reason}
     end
   end
@@ -556,18 +467,18 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     case Cache.get(:billboards, billboard.billboard_id) do
       {:ok, cached_billboard} when not is_nil(cached_billboard) ->
         extract_top_tracks(cached_billboard, count)
-      
+
       _ ->
         # AIDEV-NOTE: Billboard not in cache, generate it
         urls = Enum.map(billboard.submissions, fn %{"url" => url} -> url end)
-        
+
         if length(urls) > 0 do
           case Billboards.generate_billboard(urls, callback: fn _text, _progress -> :ok end) do
             {:ok, generated_billboard} ->
               # Cache the generated billboard
               Cache.put(:billboards, billboard.billboard_id, generated_billboard)
               extract_top_tracks(generated_billboard, count)
-            
+
             {:error, reason} ->
               {:error, "Failed to generate billboard: #{reason}"}
           end
@@ -580,21 +491,24 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   # AIDEV-NOTE: Extract top N tracks from billboard data
   defp extract_top_tracks(billboard, count) do
     tracks = billboard.track || []
-    top_tracks = tracks 
-                |> Enum.sort_by(& &1.rank) 
-                |> Enum.take(count)
-    
+
+    top_tracks =
+      tracks
+      |> Enum.sort_by(& &1.rank)
+      |> Enum.take(count)
+
     if length(top_tracks) > 0 do
       # AIDEV-NOTE: Convert billboard track format to Spotify API format
-      spotify_tracks = Enum.map(top_tracks, fn track_group ->
-        # Get the first track from the group (they're all the same track)
-        track = track_group.track
-        %{track_id: track.track_id}
-      end)
+      spotify_tracks =
+        Enum.map(top_tracks, fn track_group ->
+          # Get the first track from the group (they're all the same track)
+          track = track_group.track
+          %{track_id: track.track_id}
+        end)
+
       {:ok, spotify_tracks}
     else
       {:error, gettext("No tracks found in billboard")}
     end
   end
-
 end

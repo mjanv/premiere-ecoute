@@ -29,7 +29,27 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
         <!-- Scrollable content area -->
         <div class="flex-1 overflow-y-auto">
           <div class="p-6">
-            <!-- Sessions section -->
+            <!-- My Library section -->
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
+              <div class="mb-6">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                  <.icon name="hero-rectangle-stack" class="w-4 h-4 mr-2" />
+                  {gettext("Library")}
+                </h3>
+                <nav class="space-y-1">
+                  <.sidebar_link
+                    href={~p"/discography/library"}
+                    current_page={@current_page}
+                    page_id="library"
+                    icon="hero-musical-note"
+                  >
+                    {gettext("My Library")}
+                  </.sidebar_link>
+                </nav>
+              </div>
+            <% end %>
+            
+    <!-- Sessions section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
               <%= if @current_user.role in [:streamer, :admin] do %>
                 <div class="mb-6">

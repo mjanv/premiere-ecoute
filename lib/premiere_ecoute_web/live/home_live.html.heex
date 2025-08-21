@@ -4,10 +4,10 @@
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
         <div class="w-full">
-
-          <!-- AIDEV-NOTE: My Activity section -->
-          <h2 class="text-4xl font-bold text-white mb-8 text-left">{gettext("My Activity")}</h2>
           
+<!-- AIDEV-NOTE: My Activity section -->
+          <h2 class="text-4xl font-bold text-white mb-8 text-left">{gettext("My Activity")}</h2>
+
           <div class="mb-12">
             <div class="flex gap-6">
               <!-- Latest Session Card -->
@@ -28,7 +28,7 @@
                             </span>
                         <% end %>
                       </div>
-                      
+
                       <div class="flex items-center gap-4 mb-4 flex-1">
                         <%= if @current_session.album.cover_url do %>
                           <img
@@ -39,11 +39,16 @@
                         <% else %>
                           <div class="w-16 h-16 bg-slate-700/50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                              />
                             </svg>
                           </div>
                         <% end %>
-                        
+
                         <div class="flex-1 min-w-0">
                           <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors truncate">
                             {@current_session.album.name}
@@ -53,7 +58,7 @@
                           </p>
                         </div>
                       </div>
-                      
+
                       <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
                         <span class="text-sm">
                           <%= case @current_session.status do %>
@@ -79,14 +84,19 @@
                             {gettext("New")}
                           </span>
                         </div>
-                        
+
                         <div class="flex items-center gap-4 mb-4 flex-1">
                           <div class="w-16 h-16 bg-gradient-to-br from-indigo-600/30 to-blue-700/20 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
                             </svg>
                           </div>
-                          
+
                           <div class="flex-1 min-w-0">
                             <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors">
                               {gettext("Start Listening Session")}
@@ -96,7 +106,7 @@
                             </p>
                           </div>
                         </div>
-                        
+
                         <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
                           <span class="text-sm">
                             {gettext("Choose an album to get started")}
@@ -112,7 +122,12 @@
                       <div class="text-center">
                         <div class="w-12 h-12 bg-slate-700/50 rounded-lg flex items-center justify-center mx-auto mb-3">
                           <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                            />
                           </svg>
                         </div>
                         <p class="text-sm text-slate-500">{gettext("Sessions not available")}</p>
@@ -121,8 +136,8 @@
                   <% end %>
                 <% end %>
               </div>
-
-              <!-- Latest Billboard Card -->
+              
+<!-- Latest Billboard Card -->
               <div class="w-1/2">
                 <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) && @latest_billboard do %>
                   <.link navigate={~p"/billboards/#{@latest_billboard.billboard_id}"} class="block group h-full">
@@ -144,14 +159,19 @@
                             </span>
                         <% end %>
                       </div>
-                      
+
                       <div class="flex items-center gap-4 mb-4 flex-1">
                         <div class="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
                           <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                            />
                           </svg>
                         </div>
-                        
+
                         <div class="flex-1 min-w-0">
                           <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors truncate">
                             {@latest_billboard.title}
@@ -165,7 +185,7 @@
                           </p>
                         </div>
                       </div>
-                      
+
                       <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
                         <span class="text-sm">
                           <%= case @latest_billboard.status do %>
@@ -193,14 +213,19 @@
                             {gettext("New")}
                           </span>
                         </div>
-                        
+
                         <div class="flex items-center gap-4 mb-4 flex-1">
                           <div class="w-16 h-16 bg-gradient-to-br from-purple-600/30 to-indigo-700/20 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
                             </svg>
                           </div>
-                          
+
                           <div class="flex-1 min-w-0">
                             <h3 class="text-xl font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors">
                               {gettext("Create Music Billboard")}
@@ -210,7 +235,7 @@
                             </p>
                           </div>
                         </div>
-                        
+
                         <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors mt-auto">
                           <span class="text-sm">
                             {gettext("Start collecting submissions")}
@@ -226,7 +251,12 @@
                       <div class="text-center">
                         <div class="w-12 h-12 bg-slate-700/50 rounded-lg flex items-center justify-center mx-auto mb-3">
                           <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                            />
                           </svg>
                         </div>
                         <p class="text-sm text-slate-500">{gettext("Billboards not available")}</p>
@@ -237,416 +267,8 @@
               </div>
             </div>
           </div>
-          
-<!-- AIDEV-NOTE: My Library section header -->
-          <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
-            <h2 class="text-4xl font-bold text-white mb-8 text-left">{gettext("My Library")}</h2>
-            
-<!-- AIDEV-NOTE: Library playlists grid with add playlist button -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
-              <!-- Existing playlists -->
-              <%= for playlist <- assigns[:library_playlists] || [] do %>
-                <div
-                  class="group relative rounded-lg overflow-hidden border border-gray-700 hover:border-green-500/50 transition-colors aspect-square cursor-pointer"
-                  phx-click="show_playlist_detail"
-                  phx-value-playlist_id={playlist.playlist_id}
-                >
-                  <!-- Background Cover -->
-                  <%= if playlist.cover_url do %>
-                    <img src={playlist.cover_url} alt={playlist.title} class="absolute inset-0 w-full h-full object-cover" />
-                  <% else %>
-                    <div class="absolute inset-0 bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                      <svg class="w-16 h-16 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                        />
-                      </svg>
-                    </div>
-                  <% end %>
-                  
-<!-- Overlay gradient for text readability -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-                  
-<!-- Title at bottom -->
-                  <div class="absolute bottom-0 left-0 right-0 p-4 bg-black/40 backdrop-blur-sm">
-                    <h4 class="font-bold text-white text-base leading-tight drop-shadow-xl shadow-black/80" title={playlist.title}>
-                      {playlist.title}
-                    </h4>
-                  </div>
-                  
-<!-- Tags at top - visible on hover -->
-                  <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div class="flex flex-col space-y-1">
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-black/60 text-white/90 backdrop-blur-sm">
-                        {String.capitalize(to_string(playlist.provider))}
-                      </span>
-                      <%= if playlist.public do %>
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-black/60 text-white/90 backdrop-blur-sm">
-                          {gettext("Public")}
-                        </span>
-                      <% end %>
-                    </div>
-                  </div>
-                </div>
-              <% end %>
-              
-<!-- Add Playlist Button -->
-              <%= if @current_scope && @current_scope.user && @current_scope.user.spotify do %>
-                <button
-                  phx-click="show_playlist_modal"
-                  class="group relative rounded-lg overflow-hidden border-2 border-dashed border-gray-600 hover:border-green-500/70 transition-all aspect-square bg-gray-800/50 hover:bg-gray-700/50"
-                >
-                  <!-- Background gradient -->
-                  <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-green-600/10 group-hover:from-green-500/20 group-hover:to-green-600/20 transition-colors">
-                  </div>
-                  
-<!-- Plus icon and text -->
-                  <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-green-400 transition-colors">
-                    <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <span class="text-sm font-semibold">{gettext("Add Playlist")}</span>
-                  </div>
-                </button>
-              <% end %>
-            </div>
-          <% end %>
         </div>
       </div>
     </div>
   </div>
-  
-<!-- AIDEV-NOTE: Playlist search modal for displaying user's Spotify playlists -->
-  <%= if assigns[:show_playlist_modal] do %>
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_playlist_modal">
-      <div
-        class="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] flex flex-col"
-        phx-click="modal_content_click"
-      >
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-700">
-          <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold text-white">{gettext("My Spotify Playlists")}</h3>
-          </div>
-          <button phx-click="hide_playlist_modal" class="text-gray-400 hover:text-white">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        
-<!-- Modal Content -->
-        <div class="flex-1 overflow-y-auto p-6">
-          <%= if assigns[:playlists_loading] do %>
-            <div class="flex items-center justify-center py-12">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-              <span class="ml-3 text-gray-300">{gettext("Loading your playlists...")}</span>
-            </div>
-          <% else %>
-            <%= if assigns[:playlists] && length(@playlists) > 0 do %>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <%= for playlist <- @playlists do %>
-                  <div
-                    class={[
-                      "bg-gray-700 rounded-lg p-4 transition-colors cursor-pointer border-2",
-                      if @selected_playlist && @selected_playlist.playlist_id == playlist.playlist_id do
-                        "border-green-500 bg-green-600/10"
-                      else
-                        "border-transparent hover:bg-gray-600"
-                      end
-                    ]}
-                    phx-click="select_playlist"
-                    phx-value-playlist_id={playlist.playlist_id}
-                  >
-                    <div class="flex items-start space-x-3">
-                      <%= if playlist.cover_url do %>
-                        <img
-                          src={playlist.cover_url}
-                          alt={playlist.title}
-                          class="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                        />
-                      <% else %>
-                        <div class="w-16 h-16 bg-gray-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                            />
-                          </svg>
-                        </div>
-                      <% end %>
-                      <div class="flex-1 min-w-0">
-                        <h4 class="font-semibold text-white truncate" title={playlist.title}>
-                          {playlist.title}
-                        </h4>
-                        <%= if playlist.description && playlist.description != "" do %>
-                          <p class="text-sm text-gray-300 mt-1 line-clamp-2" title={playlist.description}>
-                            {playlist.description}
-                          </p>
-                        <% end %>
-                        <div class="flex items-center mt-2 space-x-2">
-                          <%= if playlist.public do %>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-600/20 text-green-300">
-                              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                  clip-rule="evenodd"
-                                />
-                              </svg>
-                              {gettext("Public")}
-                            </span>
-                          <% else %>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-600/50 text-gray-300">
-                              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                  clip-rule="evenodd"
-                                />
-                              </svg>
-                              {gettext("Private")}
-                            </span>
-                          <% end %>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                <% end %>
-              </div>
-              
-<!-- AIDEV-NOTE: Load More button for pagination -->
-              <%= if assigns[:has_more_playlists] && @has_more_playlists do %>
-                <div class="text-center mt-6">
-                  <button
-                    phx-click="load_more_playlists"
-                    disabled={assigns[:loading_more] && @loading_more}
-                    class={[
-                      "px-6 py-3 rounded-lg font-medium transition-all",
-                      if assigns[:loading_more] && @loading_more do
-                        "bg-gray-600 text-gray-400 cursor-not-allowed"
-                      else
-                        "bg-green-600 hover:bg-green-700 text-white hover:shadow-lg"
-                      end
-                    ]}
-                  >
-                    <%= if assigns[:loading_more] && @loading_more do %>
-                      <div class="flex items-center space-x-2">
-                        <div class="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-transparent"></div>
-                        <span>{gettext("Loading...")}</span>
-                      </div>
-                    <% else %>
-                      {gettext("Load More Playlists")}
-                    <% end %>
-                  </button>
-                </div>
-              <% end %>
-              
-<!-- AIDEV-NOTE: Selected playlist info and registration button -->
-              <%= if @selected_playlist do %>
-                <div class="mt-6 p-4 bg-green-600/20 border border-green-500/30 rounded-lg">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <%= if @selected_playlist.cover_url do %>
-                        <img
-                          src={@selected_playlist.cover_url}
-                          alt={@selected_playlist.title}
-                          class="w-12 h-12 rounded-lg object-cover"
-                        />
-                      <% else %>
-                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                            />
-                          </svg>
-                        </div>
-                      <% end %>
-                      <div>
-                        <h4 class="font-semibold text-white">{@selected_playlist.title}</h4>
-                        <p class="text-sm text-green-300">{gettext("Selected for registration")}</p>
-                      </div>
-                    </div>
-
-                    <button
-                      phx-click="register_playlist"
-                      class="px-4 py-2 rounded-lg font-medium transition-all flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white hover:shadow-lg"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      <span>{gettext("Add to Library")}</span>
-                    </button>
-                  </div>
-                </div>
-              <% end %>
-            <% else %>
-              <div class="text-center py-12">
-                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                  />
-                </svg>
-                <h4 class="text-lg font-semibold text-white mb-2">{gettext("No playlists found")}</h4>
-                <p class="text-gray-400">{gettext("You don't have any playlists in your Spotify library yet.")}</p>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-        
-<!-- Modal Footer -->
-        <div class="flex justify-end p-6 border-t border-gray-700">
-          <button
-            phx-click="hide_playlist_modal"
-            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-          >
-            {gettext("Close")}
-          </button>
-        </div>
-      </div>
-    </div>
-  <% end %>
-  
-<!-- AIDEV-NOTE: Playlist detail modal for library playlist management -->
-  <%= if assigns[:show_playlist_detail_modal] && @show_playlist_detail_modal && @selected_library_playlist do %>
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_playlist_detail_modal">
-      <div class="bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" phx-click="modal_content_click">
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-700">
-          <div class="flex items-center space-x-3">
-            <%= if @selected_library_playlist.cover_url do %>
-              <img
-                src={@selected_library_playlist.cover_url}
-                alt={@selected_library_playlist.title}
-                class="w-12 h-12 rounded-lg object-cover"
-              />
-            <% else %>
-              <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                  />
-                </svg>
-              </div>
-            <% end %>
-            <div>
-              <h3 class="text-lg font-bold text-white">{@selected_library_playlist.title}</h3>
-              <p class="text-sm text-gray-400">{String.capitalize(to_string(@selected_library_playlist.provider))}</p>
-            </div>
-          </div>
-          <button phx-click="hide_playlist_detail_modal" class="text-gray-400 hover:text-white">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        
-<!-- Modal Content -->
-        <div class="p-6">
-          <div class="mb-6">
-            <%= if @selected_library_playlist.description && @selected_library_playlist.description != "" do %>
-              <p class="text-gray-300 mb-4">{@selected_library_playlist.description}</p>
-            <% end %>
-
-            <div class="flex items-center space-x-4 text-sm text-gray-400">
-              <div class="flex items-center space-x-1">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                </svg>
-                <span>{String.capitalize(to_string(@selected_library_playlist.provider))}</span>
-              </div>
-
-              <%= if @selected_library_playlist.public do %>
-                <div class="flex items-center space-x-1">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path
-                      fill-rule="evenodd"
-                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  <span>{gettext("Public")}</span>
-                </div>
-              <% else %>
-                <div class="flex items-center space-x-1">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  <span>{gettext("Private")}</span>
-                </div>
-              <% end %>
-
-              <%= if @selected_library_playlist.url do %>
-                <a
-                  href={@selected_library_playlist.url}
-                  target="_blank"
-                  class="text-green-400 hover:text-green-300 flex items-center space-x-1"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                  <span>{gettext("Open")}</span>
-                </a>
-              <% end %>
-            </div>
-          </div>
-          
-<!-- Actions -->
-          <div class="flex space-x-3">
-            <button
-              phx-click="delete_playlist"
-              class="flex-1 px-4 py-3 rounded-lg font-semibold transition-all flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white hover:shadow-lg"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              <span>{gettext("Remove from Library")}</span>
-            </button>
-
-            <button
-              phx-click="hide_playlist_detail_modal"
-              class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-all"
-            >
-              {gettext("Cancel")}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  <% end %>
 </Layouts.app>

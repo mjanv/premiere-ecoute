@@ -17,9 +17,7 @@
 // If you have dependencies that try to import CSS, esbuild will generate a separate `app.css` file.
 // To load it, simply add a second `<link>` to your `root.html.heex` file.
 
-// Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html"
-// Establish Phoenix Socket and LiveView configuration.
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
@@ -359,11 +357,10 @@ const liveSocket = new LiveSocket("/live", Socket, {
 })
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
+topbar.config({barColors: {0: "rgba(168, 34, 221, 1)"}, shadowColor: "rgba(24, 72, 228, 0.3)"})
 window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
-// connect if there are any LiveViews on the page
 liveSocket.connect()
 
 // expose liveSocket on window for web console debug logs and latency simulation:
@@ -380,8 +377,7 @@ window.liveSocket = liveSocket
 //
 if (process.env.NODE_ENV === "development") {
   window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
-    // Enable server log streaming to client.
-    // Disable with reloader.disableServerLogs()
+    // Enable server log streaming to client, disable with reloader.disableServerLogs()
     reloader.enableServerLogs()
 
     // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component

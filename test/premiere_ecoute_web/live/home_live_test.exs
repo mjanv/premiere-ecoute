@@ -20,7 +20,7 @@ defmodule PremiereEcouteWeb.HomeLiveTest do
       {:ok, _lv, html} = live(conn, ~p"/home")
 
       assert html =~ "Premiere Ecoute"
-      assert html =~ "Welcome back"
+      assert html =~ "My Activity"
     end
 
     test "displays content for authenticated streamer", %{conn: conn} do
