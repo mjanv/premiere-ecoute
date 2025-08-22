@@ -41,16 +41,4 @@ defmodule PremiereEcouteWeb.Billboards.IndexLive do
     </span>
     """
   end
-
-  defp format_date(%DateTime{} = datetime) do
-    Calendar.strftime(datetime, "%b %d, %Y")
-  end
-
-  defp format_date(%NaiveDateTime{} = naive_datetime) do
-    naive_datetime
-    |> DateTime.from_naive!("Etc/UTC")
-    |> format_date()
-  end
-
-  defp format_date(_), do: gettext("Unknown")
 end

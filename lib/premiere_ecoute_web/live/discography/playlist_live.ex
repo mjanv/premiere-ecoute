@@ -184,7 +184,7 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
       {:error, _} ->
         socket
         |> assign(:loading, false)
-        |> assign(:error,  gettext("Failed to load playlist data"))
+        |> assign(:error, gettext("Failed to load playlist data"))
     end
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -212,58 +212,11 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Format duration from milliseconds to human readable format
-  defp format_duration(nil), do: "--:--"
-
-  defp format_duration(ms) when is_integer(ms) do
-    total_seconds = div(ms, 1000)
-    minutes = div(total_seconds, 60)
-    seconds = rem(total_seconds, 60)
-    "#{minutes}:#{String.pad_leading(Integer.to_string(seconds), 2, "0")}"
-  end
-
-  defp format_duration(_), do: "--:--"
-
-  # AIDEV-NOTE: Format added_at date for display
-  defp format_added_date(%NaiveDateTime{} = datetime) do
-    Calendar.strftime(datetime, "%b %d, %Y")
-  end
-
-  defp format_added_date(%DateTime{} = datetime) do
-    datetime
-    |> DateTime.to_naive()
-    |> format_added_date()
-  end
-
-  defp format_added_date(_), do: "--"
-
-  # AIDEV-NOTE: Format release date for display
-  defp format_release_date(%Date{} = date) do
-    Calendar.strftime(date, "%b %d, %Y")
-  end
-
-  defp format_release_date(_), do: "--"
-
-  # AIDEV-NOTE: Calculate total playlist duration
-  defp total_duration(tracks) when is_list(tracks) do
+  defp total_duration(tracks) do
     tracks
     |> Enum.map(&(&1.duration_ms || 0))
     |> Enum.sum()
-    |> format_total_duration()
-  end
-
-  defp total_duration(_), do: "--"
-
-  defp format_total_duration(total_ms) do
-    total_seconds = div(total_ms, 1000)
-    hours = div(total_seconds, 3600)
-    minutes = div(rem(total_seconds, 3600), 60)
-
-    cond do
-      hours > 0 -> "#{hours}h #{minutes}m"
-      minutes > 0 -> "#{minutes}m"
-      true -> "< 1m"
-    end
+    |> PremiereEcouteCore.Duration.duration()
   end
 
   # AIDEV-NOTE: Apply search and date filters to playlist tracks

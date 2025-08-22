@@ -1,11 +1,11 @@
 defmodule PremiereEcouteCore.Search do
   @moduledoc false
 
-  def filter(data, query, fields \\ [:name])
+  def filter(data, query, fields, threshold \\ 0.8)
 
-  def filter(data, "", _), do: data
+  def filter(data, "", _, _), do: data
 
-  def filter(data, query, fields) do
+  def filter(data, query, fields, threshold) do
     query = String.downcase(query)
 
     data
@@ -18,7 +18,7 @@ defmodule PremiereEcouteCore.Search do
       |> Enum.max()
       |> then(fn score -> {score, struct} end)
     end)
-    |> Enum.filter(fn {score, _} -> score > 0.8 end)
+    |> Enum.filter(fn {score, _} -> score > threshold end)
     |> Enum.sort_by(fn {score, _} -> score end, :desc)
     |> Enum.map(fn {_score, struct} -> struct end)
   end

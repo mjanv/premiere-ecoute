@@ -78,23 +78,4 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   def session_status_icon(:preparing), do: "⏳"
   def session_status_icon(:active), do: "🎵"
   def session_status_icon(:stopped), do: "⏹️"
-
-  def format_datetime(nil), do: "Not started"
-
-  def format_datetime(datetime) do
-    Calendar.strftime(datetime, "%b %d, %Y at %I:%M %p")
-  end
-
-  def time_ago(nil), do: ""
-
-  def time_ago(datetime) do
-    diff = DateTime.diff(DateTime.utc_now(), datetime, :second)
-
-    cond do
-      diff < 60 -> "Just now"
-      diff < 3600 -> "#{div(diff, 60)} min ago"
-      diff < 86_400 -> "#{div(diff, 3600)} hours ago"
-      true -> "#{div(diff, 86400)} days ago"
-    end
-  end
 end

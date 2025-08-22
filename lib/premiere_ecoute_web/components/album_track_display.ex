@@ -171,7 +171,7 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
 
       <%= if @show_duration && @track.duration_ms do %>
         <span class={["text-gray-300", track_duration_size_classes(@size)]}>
-          {format_duration(@track.duration_ms)}
+          {PremiereEcouteCore.Duration.timer(@track.duration_ms)}
         </span>
       <% end %>
     </div>
@@ -234,15 +234,4 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
 
   defp track_duration_size_classes("sm"), do: "text-xs"
   defp track_duration_size_classes("md"), do: "text-sm"
-
-  # AIDEV-NOTE: Duration formatting utility matching existing patterns
-  defp format_duration(nil), do: ""
-
-  defp format_duration(duration_ms) when is_integer(duration_ms) do
-    minutes = div(duration_ms, 60_000)
-    seconds = div(rem(duration_ms, 60_000), 1_000)
-    "#{minutes}:#{String.pad_leading(to_string(seconds), 2, "0")}"
-  end
-
-  defp format_duration(_), do: ""
 end

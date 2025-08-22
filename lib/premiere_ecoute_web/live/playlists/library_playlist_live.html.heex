@@ -99,7 +99,7 @@
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      <span>{gettext("Added %{date}", date: format_date(@playlist.inserted_at))}</span>
+                      <span>{gettext("Added %{date}", date: PremiereEcouteCore.Date.date(@playlist.inserted_at))}</span>
                     </div>
                   </div>
                 </div>
@@ -218,14 +218,14 @@
 <!-- Duration -->
                         <%= if track.duration_ms do %>
                           <div class="text-purple-400 text-sm font-mono">
-                            {format_duration(track.duration_ms)}
+                            {PremiereEcouteCore.Duration.timer(track.duration_ms)}
                           </div>
                         <% end %>
                         
 <!-- Added date -->
                         <%= if track.added_at do %>
                           <div class="text-purple-500 text-xs hidden lg:block">
-                            {format_track_date(track.added_at)}
+                            {PremiereEcouteCore.Date.date(track.added_at)}
                           </div>
                         <% end %>
                       </div>

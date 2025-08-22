@@ -1,9 +1,5 @@
 defmodule PremiereEcouteWeb.Billboards.NewLive do
-  @moduledoc """
-  LiveView for creating new billboards.
-
-  Only accessible to authenticated users with streamer role.
-  """
+  @moduledoc false
 
   use PremiereEcouteWeb, :live_view
 

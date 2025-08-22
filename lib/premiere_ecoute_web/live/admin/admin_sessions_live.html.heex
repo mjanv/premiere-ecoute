@@ -98,7 +98,7 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {format_datetime(session.inserted_at)}
+                  {PremiereEcouteCore.Date.datetime(session.inserted_at)}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
@@ -186,7 +186,7 @@
           <div>
             <h2 class="text-xl font-semibold text-white">{gettext("Session Details")}</h2>
             <p class="text-gray-400">
-              {gettext("Created")}: {format_datetime(@selected_session.inserted_at)}
+              {gettext("Created")}: {PremiereEcouteCore.Date.datetime(@selected_session.inserted_at)}
             </p>
           </div>
         </div>
@@ -206,16 +206,16 @@
             <div class="space-y-3">
               <div>
                 <span class="text-sm text-gray-400">{gettext("Started")}:</span>
-                <div class="text-white">{format_datetime(@selected_session.started_at)}</div>
+                <div class="text-white">{PremiereEcouteCore.Date.datetime(@selected_session.started_at)}</div>
               </div>
               <div>
                 <span class="text-sm text-gray-400">{gettext("Ended")}:</span>
-                <div class="text-white">{format_datetime(@selected_session.ended_at)}</div>
+                <div class="text-white">{PremiereEcouteCore.Date.datetime(@selected_session.ended_at)}</div>
               </div>
               <div>
                 <span class="text-sm text-gray-400">{gettext("Duration")}:</span>
                 <div class="text-white">
-                  {format_duration(@selected_session.started_at, @selected_session.ended_at)}
+                  {PremiereEcouteCore.Duration.timer(@selected_session.started_at, @selected_session.ended_at)}
                 </div>
               </div>
             </div>

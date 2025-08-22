@@ -162,15 +162,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     {:noreply, socket}
   end
 
-  def format_duration(nil), do: "--:--"
-
-  def format_duration(duration_ms) when is_integer(duration_ms) do
-    total_seconds = div(duration_ms, 1000)
-    minutes = div(total_seconds, 60)
-    seconds = rem(total_seconds, 60)
-    "#{minutes}:#{String.pad_leading(Integer.to_string(seconds), 2, "0")}"
-  end
-
   def session_status_class(:preparing),
     do: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
 

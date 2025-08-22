@@ -121,7 +121,9 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           <div class="flex items-center justify-between text-xs text-gray-400">
             <span>{gettext("Progress:")}</span>
             <span>
-              {format_duration(@player_state["item"]["progress_ms"])} / {format_duration(@player_state["item"]["duration_ms"])}
+              {PremiereEcouteCore.Duration.timer(@player_state["item"]["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
+                @player_state["item"]["duration_ms"]
+              )}
             </span>
           </div>
         </div>
@@ -180,14 +182,5 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
       </div>
     </div>
     """
-  end
-
-  def format_duration(nil), do: "--:--"
-
-  def format_duration(duration_ms) when is_integer(duration_ms) do
-    total_seconds = div(duration_ms, 1000)
-    minutes = div(total_seconds, 60)
-    seconds = rem(total_seconds, 60)
-    "#{minutes}:#{String.pad_leading(Integer.to_string(seconds), 2, "0")}"
   end
 end

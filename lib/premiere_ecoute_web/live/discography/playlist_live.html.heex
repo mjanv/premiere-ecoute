@@ -503,12 +503,12 @@
                         
 <!-- Release Date -->
                         <div class="col-span-2 flex items-center text-sm text-gray-400">
-                          {format_release_date(track.release_date)}
+                          {PremiereEcouteCore.Date.date(track.release_date)}
                         </div>
                         
 <!-- Added Date -->
                         <div class="col-span-2 flex items-center text-sm text-gray-400">
-                          {format_added_date(track.added_at)}
+                          {PremiereEcouteCore.Date.date(track.added_at)}
                         </div>
                         
 <!-- Added By -->
@@ -520,7 +520,7 @@
                         
 <!-- Duration -->
                         <div class="col-span-1 flex items-center justify-end text-sm text-gray-400 whitespace-nowrap font-mono">
-                          {format_duration(track.duration_ms)}
+                          {PremiereEcouteCore.Duration.timer(track.duration_ms)}
                         </div>
                       </div>
                     <% end %>

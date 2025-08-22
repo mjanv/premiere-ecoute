@@ -17,7 +17,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.Search
   alias PremiereEcouteWeb.Layouts
-  
 
   @impl true
   def mount(%{"id" => billboard_id}, _session, socket) do
@@ -366,38 +365,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     </span>
     """
   end
-
-  defp format_date(%DateTime{} = datetime) do
-    Calendar.strftime(datetime, "%d/%m/%Y")
-  end
-
-  defp format_date(date_string) when is_binary(date_string) do
-    case DateTime.from_iso8601(date_string) do
-      {:ok, datetime, _} -> format_date(datetime)
-      _ -> date_string
-    end
-  end
-
-  defp format_date(_), do: "Unknown"
-
-  defp simple_date(%DateTime{} = datetime) do
-    Calendar.strftime(datetime, "%b %d, %Y")
-  end
-
-  defp simple_date(%NaiveDateTime{} = naive_datetime) do
-    naive_datetime
-    |> DateTime.from_naive!("Etc/UTC")
-    |> simple_date()
-  end
-
-  defp simple_date(date_string) when is_binary(date_string) do
-    case DateTime.from_iso8601(date_string) do
-      {:ok, datetime, _} -> simple_date(datetime)
-      _ -> date_string
-    end
-  end
-
-  defp simple_date(_), do: gettext("Unknown")
 
   # AIDEV-NOTE: Handle export task completion messages
   @impl true

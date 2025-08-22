@@ -59,9 +59,8 @@ defmodule PremiereEcoute.MixProject do
     ]
   end
 
-  # defp elixirc_paths(:test), do: ["lib", "test/support"]
-  # defp elixirc_paths(_), do: ["lib"]
-  defp elixirc_paths(_), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
     [
@@ -88,6 +87,8 @@ defmodule PremiereEcoute.MixProject do
       {:boundary, "~> 0.10"},
       {:uuid, "~> 1.1"},
       {:timex, "~> 3.7"},
+      {:ex_cldr, "~> 2.0"},
+      {:ex_cldr_dates_times, "~> 2.0"},
       {:req, "~> 0.5"},
       {:hackney, "~> 1.20"},
       {:jason, "~> 1.2"},

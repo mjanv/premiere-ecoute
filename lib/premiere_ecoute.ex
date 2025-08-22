@@ -12,7 +12,6 @@ defmodule PremiereEcoute do
       {Apis, except: []},
       {Telemetry, except: []},
       PubSub,
-      DataCase,
       Repo
     ]
 

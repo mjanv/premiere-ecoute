@@ -394,7 +394,7 @@
                       <div class="flex items-center justify-between">
                         <span class="text-xs text-gray-400">{gettext("Time Left:")}</span>
                         <span class="text-xs text-purple-400 font-medium">
-                          {format_duration(@poll_time_remaining)}
+                          {PremiereEcouteCore.Duration.timer(@poll_time_remaining)}
                         </span>
                       </div>
                     <% end %>
@@ -560,7 +560,7 @@
                                 else: "text-gray-400"
                               )
                             ]}>
-                              {format_duration(track.duration_ms)}
+                              {PremiereEcouteCore.Duration.timer(track.duration_ms)}
                             </p>
                           <% end %>
                         </div>

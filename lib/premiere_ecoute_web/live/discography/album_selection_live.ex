@@ -140,14 +140,6 @@ defmodule PremiereEcouteWeb.Discography.AlbumSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  defp format_duration(duration_ms) when is_integer(duration_ms) do
-    minutes = div(duration_ms, 60_000)
-    seconds = div(rem(duration_ms, 60_000), 1000)
-    "#{minutes}:#{String.pad_leading(to_string(seconds), 2, "0")}"
-  end
-
-  defp format_duration(_), do: "0:00"
-
   def get_vote_options(%{vote_options_preset: "0-10"}), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   def get_vote_options(%{vote_options_preset: "1-5"}), do: ["1", "2", "3", "4", "5"]
   def get_vote_options(%{vote_options_preset: "smash-pass"}), do: ["smash", "pass"]

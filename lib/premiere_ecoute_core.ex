@@ -14,6 +14,8 @@ defmodule PremiereEcouteCore do
       Api,
       Cache,
       CommandBus.Handler,
+      Date,
+      Duration,
       Event,
       EventBus.Handler,
       FeatureFlag,

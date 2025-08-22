@@ -56,21 +56,6 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  defp format_datetime(datetime) when is_struct(datetime, DateTime) do
-    Calendar.strftime(datetime, "%b %d, %Y at %I:%M %p")
-  end
-
-  defp format_datetime(_), do: "--"
-
-  defp format_duration(started_at, ended_at) when is_struct(started_at, DateTime) and is_struct(ended_at, DateTime) do
-    diff = DateTime.diff(ended_at, started_at, :second)
-    minutes = div(diff, 60)
-    seconds = rem(diff, 60)
-    "#{minutes}m #{seconds}s"
-  end
-
-  defp format_duration(_, _), do: "--"
-
   defp status_class(:preparing), do: "bg-yellow-100 text-yellow-800"
   defp status_class(:active), do: "bg-green-100 text-green-800"
   defp status_class(:stopped), do: "bg-gray-100 text-gray-800"

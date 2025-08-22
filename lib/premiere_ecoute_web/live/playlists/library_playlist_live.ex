@@ -111,39 +111,4 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
     )
     |> List.first()
   end
-
-  defp format_date(%NaiveDateTime{} = naive_datetime) do
-    naive_datetime
-    |> DateTime.from_naive!("Etc/UTC")
-    |> Calendar.strftime("%b %d, %Y")
-  end
-
-  defp format_date(_), do: gettext("Unknown")
-
-  # AIDEV-NOTE: Format track duration from milliseconds to MM:SS
-  defp format_duration(duration_ms) when is_integer(duration_ms) do
-    total_seconds = div(duration_ms, 1000)
-    minutes = div(total_seconds, 60)
-    seconds = rem(total_seconds, 60)
-
-    "#{minutes}:#{String.pad_leading(Integer.to_string(seconds), 2, "0")}"
-  end
-
-  defp format_duration(_), do: "-:--"
-
-  # AIDEV-NOTE: Format track added date
-  defp format_track_date(%NaiveDateTime{} = naive_datetime) do
-    naive_datetime
-    |> DateTime.from_naive!("Etc/UTC")
-    |> Calendar.strftime("%b %d")
-  end
-
-  defp format_track_date(date_string) when is_binary(date_string) do
-    case NaiveDateTime.from_iso8601(date_string) do
-      {:ok, naive_datetime} -> format_track_date(naive_datetime)
-      _ -> gettext("Unknown")
-    end
-  end
-
-  defp format_track_date(_), do: gettext("Unknown")
 end

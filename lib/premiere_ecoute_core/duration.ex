@@ -29,9 +29,9 @@ defmodule PremiereEcouteCore.Duration do
 
   ## Examples
 
-      iex> start = ~U[2024-01-01 10:00:00Z]
+      iex> start_time = ~U[2024-01-01 10:00:00Z]
       iex> end_time = ~U[2024-01-01 10:03:30Z]
-      iex> PremiereEcouteCore.Duration.timer(start, end_time)
+      iex> PremiereEcouteCore.Duration.timer(start_time, end_time)
       "3m 30s"
   """
   @spec timer(DateTime.t(), DateTime.t()) :: String.t()
@@ -40,24 +40,30 @@ defmodule PremiereEcouteCore.Duration do
     "#{div(seconds, 60)}m #{pad(rem(seconds, 60))}s"
   end
 
-  @doc """
-  Formats datetime as a human-readable timestamp.
+  def duration(duration_ms) do
+    total_seconds = div(duration_ms, 1000)
+    hours = div(total_seconds, 3600)
+    minutes = div(rem(total_seconds, 3600), 60)
 
-  ## Examples
-
-      iex> dt = ~U[2024-03-15 14:30:00Z]
-      iex> PremiereEcouteCore.Duration.clock(dt)
-      "Mar 15, 2024 at 02:30 PM"
-
-      iex> PremiereEcouteCore.Duration.clock("invalid")
-      "--"
-  """
-  @spec clock(any()) :: String.t()
-  def clock(%DateTime{} = datetime) do
-    Calendar.strftime(datetime, "%b %d, %Y at %I:%M %p")
+    cond do
+      hours > 0 -> "#{hours}h #{minutes}m"
+      minutes > 0 -> "#{minutes}m"
+      true -> "< 1m"
+    end
   end
 
-  def clock(_), do: "--"
+  def ago(%DateTime{} = datetime) do
+    diff = DateTime.diff(DateTime.utc_now(), datetime, :second)
+
+    cond do
+      diff < 60 -> "Just now"
+      diff < 3600 -> "#{div(diff, 60)} min ago"
+      diff < 86_400 -> "#{div(diff, 3600)} hours ago"
+      true -> "#{div(diff, 86400)} days ago"
+    end
+  end
+
+  def ago(_), do: "--"
 
   defp pad(value), do: String.pad_leading(Integer.to_string(value), 2, "0")
 end

@@ -8,6 +8,8 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Billboards.Components
+
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.Playlist.Similarity
@@ -23,33 +25,35 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
         |> then(fn socket -> {:ok, socket} end)
 
       %Billboard{} = billboard ->
-        socket =
-          socket
-          |> assign(:page_title, gettext("%{title} - Dashboard", title: billboard.title))
-          |> assign(:billboard, billboard)
-          |> assign(
-            tracks: [],
-            artists: [],
-            years: [],
-            year_podium: [],
-            playlists: [],
-            display_mode: :track,
-            loading: false,
-            error: nil,
-            progress: 0,
-            progress_text: "",
-            selected_track: nil,
-            selected_artist: nil,
-            selected_year: nil,
-            selected_playlist: nil,
-            show_modal: false,
-            playlist_modal_tab: :tracks
-          )
+        pid = self()
 
-        # AIDEV-NOTE: Check cache first, then auto-generate if needed
-        send(self(), :load_dashboard)
+        socket
+        |> stream_configure(:ranking, dom_id: &"ranking-#{&1.rank}")
+        |> stream(:ranking, [])
+        |> assign(
+          billboard: billboard,
+          rankings: AsyncResult.loading(),
+          podium: [],
+          display_mode: :track,
+          playlist_modal_tab: :tracks,
+          selected: nil,
+          progress: %{percentage: 0, message: ""},
+          search_query: nil
+        )
+        |> start_async(:rankings, fn ->
+          case Cache.get(:billboards, billboard.billboard_id) do
+            {:ok, billboard} when not is_nil(billboard) ->
+              billboard
 
-        {:ok, socket}
+            _ ->
+              urls = Enum.map(billboard.submissions, fn %{"url" => url} -> url end)
+              callback = fn text, progress -> send(pid, {:progress, text, progress}) end
+              results = Billboards.generate_billboard(urls, callback: callback)
+              Cache.put(:billboards, billboard.billboard_id, results)
+              results
+          end
+        end)
+        |> then(fn socket -> {:ok, socket} end)
     end
   end
 
@@ -59,145 +63,63 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
   end
 
   @impl true
-  def handle_info(:load_dashboard, %{assigns: %{billboard: billboard}} = socket) do
-    case Cache.get(:billboards, billboard.billboard_id) do
-      {:ok, billboard} when not is_nil(billboard) ->
-        socket
-        |> assign(
-          loading: false,
-          tracks: format_tracks(billboard.track || []),
-          artists: format_artists(billboard.artist || []),
-          years: format_years(billboard.year || []),
-          year_podium: format_year_podium(billboard.year_podium || []),
-          playlists: format_playlists(billboard.playlists || [])
-        )
-        |> then(fn socket -> {:noreply, socket} end)
-
-      _ ->
-        urls = Enum.map(billboard.submissions, fn %{"url" => url} -> url end)
-
-        if length(urls) > 0 do
-          start_generation(socket, urls)
-        else
-          socket
-          |> assign(:loading, false)
-          |> assign(:error, gettext("No valid submissions found"))
-          |> then(fn socket -> {:noreply, socket} end)
-        end
-    end
-  end
-
-  def handle_info({ref, {:ok, billboard}}, socket) do
-    Process.demonitor(ref, [:flush])
-    Cache.put(:billboards, socket.assigns.billboard.billboard_id, billboard)
+  def handle_async(:rankings, {:ok, {:ok, rankings}}, socket) do
+    ranking = format(rankings.track, :track)
 
     socket
+    |> stream(:ranking, ranking, reset: true)
     |> assign(
-      tracks: format_tracks(billboard.track),
-      artists: format_artists(billboard.artist),
-      years: format_years(billboard.year),
-      year_podium: format_year_podium(billboard.year_podium),
-      playlists: format_playlists(billboard.playlists),
-      loading: false,
-      error: nil,
-      task: nil,
-      progress: 0,
-      progress_text: ""
+      rankings: AsyncResult.ok(%AsyncResult{}, rankings),
+      podium: Enum.take(ranking, 3)
     )
-    |> push_event("set_loading", %{loading: false})
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_info({ref, {:error, reason}}, socket) do
-    Process.demonitor(ref, [:flush])
-
+  def handle_async(:rankings, _, socket) do
     socket
-    |> assign(
-      loading: false,
-      error: gettext("Failed to generate billboard: %{reason}", reason: reason),
-      task: nil,
-      progress: 0,
-      progress_text: ""
-    )
-    |> push_event("set_loading", %{loading: false})
+    |> assign(:rankings, AsyncResult.failed(socket.assigns.rankings, gettext("No valid submissions found")))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_info({:DOWN, _ref, :process, _pid, _reason}, socket) do
-    socket
-    |> assign(
-      loading: false,
-      error: gettext("Failed to generate billboard: request was interrupted"),
-      task: nil,
-      progress: 0,
-      progress_text: ""
-    )
-    |> push_event("set_loading", %{loading: false})
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  def handle_info({:progress, text, progress}, socket) do
-    {:noreply, assign(socket, progress: progress, progress_text: text)}
+  @impl true
+  def handle_info({:progress, message, percentage}, socket) do
+    {:noreply, assign(socket, progress: %{percentage: percentage, message: message})}
   end
 
   def handle_info(_msg, socket) do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: Event handlers from BillboardLive for modal interactions
   @impl true
-  def handle_event("select_track", %{"rank" => rank}, socket) do
-    rank = String.to_integer(rank)
-    selected_track = Enum.find(socket.assigns.tracks, &(&1.rank == rank))
+  def handle_event(
+        "select",
+        %{"rank" => rank, "location" => location},
+        %{assigns: %{display_mode: display_mode, rankings: rankings}} = socket
+      ) do
+    case display_mode do
+      :year ->
+        case location do
+          "list" -> rankings.result.year
+          "podium" -> rankings.result.year_podium
+        end
 
-    {:noreply, assign(socket, selected_track: selected_track, show_modal: true)}
+      key ->
+        Map.get(rankings.result, key)
+    end
+    |> format(display_mode)
+    |> Enum.find(&(&1.rank == String.to_integer(rank)))
+    |> then(fn selected -> {:noreply, assign(socket, selected: selected)} end)
   end
 
   @impl true
-  def handle_event("select_artist", %{"rank" => rank}, socket) do
-    rank = String.to_integer(rank)
-    selected_artist = Enum.find(socket.assigns.artists, &(&1.rank == rank))
+  def handle_event("switch_mode", %{"mode" => mode}, %{assigns: %{rankings: rankings}} = socket) do
+    mode = String.to_existing_atom(mode)
+    ranking = rankings.result |> Map.get(mode) |> format(mode)
 
-    {:noreply, assign(socket, selected_artist: selected_artist, show_modal: true)}
-  end
-
-  @impl true
-  def handle_event("select_year", %{"rank" => rank, "location" => location}, socket) do
-    rank = String.to_integer(rank)
-
-    selected_year =
-      case location do
-        "list" -> Enum.find(socket.assigns.years, &(&1.rank == rank))
-        "podium" -> Enum.find(socket.assigns.year_podium, &(&1.rank == rank))
-      end
-
-    {:noreply, assign(socket, selected_year: selected_year, show_modal: true)}
-  end
-
-  @impl true
-  def handle_event("select_playlist", %{"rank" => rank}, socket) do
-    rank = String.to_integer(rank)
-    selected_playlist = Enum.find(socket.assigns.playlists, &(&1.rank == rank))
-
-    {:noreply, assign(socket, selected_playlist: selected_playlist, show_modal: true)}
-  end
-
-  @impl true
-  def handle_event("switch_mode", %{"mode" => mode}, socket) do
-    {:noreply, assign(socket, display_mode: String.to_existing_atom(mode))}
-  end
-
-  @impl true
-  def handle_event("close_modal", _params, socket) do
-    {:noreply,
-     assign(socket,
-       selected_track: nil,
-       selected_artist: nil,
-       selected_year: nil,
-       selected_playlist: nil,
-       show_modal: false,
-       playlist_modal_tab: :tracks
-     )}
+    socket
+    |> stream(:ranking, ranking, reset: true)
+    |> assign(display_mode: mode, podium: Enum.take(ranking, 3))
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -206,40 +128,43 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
   end
 
   @impl true
-  def handle_event("stop_propagation", _params, socket) do
-    {:noreply, socket}
+  def handle_event("close_modal", _params, socket) do
+    {:noreply, assign(socket, selected: nil, playlist_modal_tab: :tracks)}
   end
 
-  # AIDEV-NOTE: Private helper functions from BillboardLive
-  defp start_generation(socket, urls) do
-    pid = self()
+  @impl true
+  def handle_event("search", %{"query" => query}, socket) do
+    mode = socket.assigns.display_mode
+    rankings = socket.assigns.rankings.result |> Map.get(mode) |> format(mode)
 
-    task =
-      Task.async(fn ->
-        Billboards.generate_billboard(
-          urls,
-          callback: fn text, progress -> send(pid, {:progress, text, progress}) end
-        )
-      end)
+    keys =
+      case mode do
+        :track -> [:name, :artist]
+        :artist -> [:artist]
+      end
+
+    ranking = PremiereEcouteCore.Search.filter(rankings, query, keys, 0.7)
 
     socket
-    |> assign(
-      loading: true,
-      error: nil,
-      tracks: [],
-      task: task,
-      progress: 0,
-      progress_text: gettext("Starting...")
-    )
-    |> push_event("set_loading", %{loading: true})
+    |> stream(:ranking, ranking, reset: true)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  defp format_tracks(tracks) when is_list(tracks), do: tracks
+  @impl true
+  def handle_event(_event, _params, socket) do
+    {:noreply, socket}
+  end
 
-  defp format_artists(artists) when is_list(artists), do: artists
+  defp format(tracks, :track) do
+    tracks
+    |> Enum.map(fn track ->
+      track
+      |> Map.put(:artist, track.track.artist)
+      |> Map.put(:name, track.track.name)
+    end)
+  end
 
-  defp format_years(years) when is_list(years) do
+  defp format(years, :year) do
     max_count = years |> Enum.map(& &1.count) |> Enum.max(fn -> 1 end)
 
     years
@@ -251,9 +176,7 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
     end)
   end
 
-  defp format_year_podium(year_podium) when is_list(year_podium), do: year_podium
-
-  defp format_playlists(playlists) when is_list(playlists) do
+  defp format(playlists, :playlists) do
     playlists
     |> Enum.with_index(1)
     |> Enum.map(fn {playlist, rank} ->
@@ -263,6 +186,8 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
       |> Map.put(:top_similar, Similarity.find_most_similar(playlist, playlists))
     end)
   end
+
+  defp format(list, _), do: list
 
   defp rank_icon(1, mode) when mode in [:track, :artist], do: "🥇"
   defp rank_icon(2, mode) when mode in [:track, :artist], do: "🥈"

@@ -23,15 +23,57 @@ defmodule PremiereEcouteCore.DurationTest do
     end
   end
 
-  describe "clock/1" do
-    test "returns an empty clock for undefined values" do
-      assert Duration.clock(nil) == "--"
+  describe "duration/1" do
+    test "returns hours and minutes when > 1h" do
+      assert Duration.duration((2 * 3600 + 15 * 60) * 1000) == "2h 15m"
     end
 
-    test "returns a valid clock for valid datetimes" do
-      {:ok, datetime} = DateTime.new(~D[2025-07-22], ~T[14:30:45], "Etc/UTC")
+    test "returns only minutes when < 1h" do
+      assert Duration.duration(45 * 60 * 1000) == "45m"
+    end
 
-      assert Duration.clock(datetime) == "Jul 22, 2025 at 02:30 PM"
+    test "returns < 1m when under a minute" do
+      assert Duration.duration(30 * 1000) == "< 1m"
+    end
+
+    test "rounds down to minutes" do
+      assert Duration.duration((1 * 3600 + 59 * 60 + 59) * 1000) == "1h 59m"
+    end
+  end
+
+  describe "ago/1" do
+    setup do
+      now = DateTime.utc_now()
+
+      {:ok, %{now: now}}
+    end
+
+    test "return an empty timer for undefined values" do
+      assert Duration.ago(nil) == "--"
+    end
+
+    test "return a just timer when the datetime is less than one minute away", %{now: now} do
+      datetime = DateTime.add(now, -5, :second)
+
+      assert Duration.ago(datetime) == "Just now"
+    end
+
+    test "return a minute timer when the datetime is less than an hour away", %{now: now} do
+      datetime = DateTime.add(now, -25, :minute)
+
+      assert Duration.ago(datetime) == "25 min ago"
+    end
+
+    test "return a hour timer when the datetime is less than 24 hours away", %{now: now} do
+      datetime = DateTime.add(now, -16, :hour)
+
+      assert Duration.ago(datetime) == "16 hours ago"
+    end
+
+    test "return a day timer when the datetime is more than 24 hours away", %{now: now} do
+      datetime = DateTime.add(now, -36, :hour)
+
+      assert Duration.ago(datetime) == "1 days ago"
     end
   end
 end

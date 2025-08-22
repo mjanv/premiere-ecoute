@@ -10,7 +10,7 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
   Renders an empty state with icon, title, description, and optional action.
 
   ## Examples
-
+  use Phoenix.Component
       <.empty_state
         icon="hero-musical-note"
         title="No Albums Yet"

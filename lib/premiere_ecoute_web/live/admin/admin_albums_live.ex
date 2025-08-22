@@ -54,15 +54,6 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  defp format_duration(duration_ms) when is_integer(duration_ms) do
-    seconds = div(duration_ms, 1000)
-    minutes = div(seconds, 60)
-    remaining_seconds = rem(seconds, 60)
-    "#{minutes}:#{String.pad_leading(Integer.to_string(remaining_seconds), 2, "0")}"
-  end
-
-  defp format_duration(_), do: "--"
-
   # AIDEV-NOTE: Generate pagination range with ellipsis for lean display
   defp pagination_range(current_page, total_pages) do
     cond do
