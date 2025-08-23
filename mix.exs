@@ -110,6 +110,7 @@ defmodule PremiereEcoute.MixProject do
       {:swoosh, "~> 1.19"},
       {:resend, "~> 0.4"},
       {:broadway, "~> 1.2"},
+      {:xml_builder, "~> 2.1"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},

@@ -47,4 +47,6 @@ defmodule PremiereEcouteCore.Search do
       _ -> :eq
     end
   end
+
+  defp compare_dates(_, _), do: :eq
 end

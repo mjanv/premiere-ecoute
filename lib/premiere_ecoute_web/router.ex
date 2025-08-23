@@ -163,6 +163,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:webhook]
 
     post "/twitch", TwitchController, :handle
+    post "/twilio", TwilioController, :handle
   end
 
   scope "/changelog", PremiereEcouteWeb.Static.Changelog do

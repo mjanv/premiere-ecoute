@@ -18,7 +18,7 @@ kill_signal = 'SIGTERM'
 
 [http_service]
   internal_port = 4000
-  auto_stop_machines = "off"
+  auto_stop_machines = "stop"
   min_machines_running = 1
   processes = ['app']
   
