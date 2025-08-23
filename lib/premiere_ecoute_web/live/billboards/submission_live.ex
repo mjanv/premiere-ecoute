@@ -27,7 +27,6 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
 
       %Billboard{status: :stopped} = billboard ->
         socket
-        |> assign(:page_title, gettext("Billboard Stopped - %{title}", title: billboard.title))
         |> assign(:billboard, billboard)
         |> assign(:url, "")
         |> assign(:pseudo, "")
@@ -42,7 +41,6 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
 
       %Billboard{} = billboard ->
         socket
-        |> assign(:page_title, gettext("Submit to %{title}", title: billboard.title))
         |> assign(:billboard, billboard)
         |> assign(:url, "")
         |> assign(:pseudo, "")

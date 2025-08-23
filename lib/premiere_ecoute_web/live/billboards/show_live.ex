@@ -35,7 +35,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
           sorted_submissions = sort_submissions_by_date(billboard.submissions || [])
 
           socket
-          |> assign(:page_title, billboard.title)
           |> assign(:billboard, billboard)
           |> assign(:submissions, sorted_submissions)
           |> assign(:show_delete_modal, false)
@@ -187,7 +186,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
       {:ok, billboard} ->
         socket
         |> assign(:billboard, billboard)
-        |> assign(:page_title, billboard.title)
         |> assign(:show_edit_modal, false)
         |> assign(:title_form, to_form(%{"title" => billboard.title}))
         |> put_flash(:info, gettext("Billboard title updated successfully"))

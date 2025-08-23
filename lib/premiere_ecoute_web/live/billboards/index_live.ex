@@ -12,7 +12,6 @@ defmodule PremiereEcouteWeb.Billboards.IndexLive do
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket) do
     socket
-    |> assign(:page_title, gettext("My Billboards"))
     |> assign(:billboards, Billboards.all(where: [user_id: user.id]))
     |> assign(:current_user, user)
     |> then(fn socket -> {:ok, socket} end)

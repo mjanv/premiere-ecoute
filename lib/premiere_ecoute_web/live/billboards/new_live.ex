@@ -9,7 +9,6 @@ defmodule PremiereEcouteWeb.Billboards.NewLive do
   @impl true
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page_title, gettext("Create Billboard"))
     |> assign_form(Billboards.change_billboard(%Billboard{}))
     |> then(fn socket -> {:ok, socket} end)
   end

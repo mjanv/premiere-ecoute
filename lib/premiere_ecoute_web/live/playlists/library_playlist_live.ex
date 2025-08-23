@@ -25,7 +25,6 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
 
         playlist ->
           socket
-          |> assign(:page_title, playlist.title)
           |> assign(:playlist, playlist)
           |> assign(:show_delete_modal, false)
           |> assign(:deleting_playlist, false)
