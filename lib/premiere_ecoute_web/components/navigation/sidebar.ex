@@ -1,17 +1,8 @@
 defmodule PremiereEcouteWeb.Components.Sidebar do
   @moduledoc """
   Left sidebar component with navigation sections for authenticated users.
-
-  Provides "Billboards" section with:
-  - New Billboard
-
-  "Sessions" section with:
-  - New Session
-  - My Sessions
-  - Retrospective
-
-  And "Followed channels" section with list of followed streamers.
   """
+
   use PremiereEcouteWeb, :html
 
   @doc """

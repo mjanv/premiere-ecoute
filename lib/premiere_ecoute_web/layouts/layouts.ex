@@ -12,7 +12,7 @@ defmodule PremiereEcouteWeb.Layouts do
   import PremiereEcouteWeb.Components.Header
   import PremiereEcouteWeb.Components.Sidebar
 
-  embed_templates "layouts/*"
+  embed_templates "*"
 
   @doc """
   Renders the app layout for our streaming dashboard

@@ -191,7 +191,7 @@ defmodule PremiereEcouteWeb.Router do
   if Application.compile_env(:premiere_ecoute, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 
-    scope "/dev" do
+    scope "/" do
       pipe_through [:browser]
 
       live_dashboard("/dashboard", metrics: PremiereEcouteWeb.Telemetry)

@@ -459,7 +459,6 @@ defmodule PremiereEcouteWeb.CoreComponents do
   defdelegate album_display(assigns), to: AlbumTrackDisplay
   defdelegate track_display(assigns), to: AlbumTrackDisplay
   defdelegate status_badge(assigns), to: StatusBadge
-  defdelegate session_status_badge(assigns), to: StatusBadge
   defdelegate loading_spinner(assigns), to: LoadingState
   defdelegate skeleton_element(assigns), to: LoadingState
   defdelegate loading_overlay(assigns), to: LoadingState

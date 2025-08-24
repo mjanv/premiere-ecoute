@@ -6,7 +6,7 @@
 
 ## What is it ?
 
-Premiere Ecoute turns album listening into an interactive experience where streamers and their [Twitch](https://www.twitch.tv) audiences can discover and note music together. Start your stream, pick an album or a playlist on [Spotify](https://open.spotify.com/), start the playback and users can vote track per track to give their impressions and feelings.
+Premiere Ecoute turns music discovery into an interactive experience where streamers and their [Twitch](https://www.twitch.tv) audiences can listen and note music together. Start your stream, pick an album or a playlist on [Spotify](https://open.spotify.com/), start the playback and users can vote track per track to give their impressions and feelings.
 
 ### Features
 

@@ -9,13 +9,6 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
 
       <.album_display album={@album} size="md" />
       <.track_display track={@track} show_duration={true} />
-      
-  ## Design System Notes
-
-  - Uses consistent sizing variants for different contexts
-  - Graceful fallback for missing cover images with gradient placeholders
-  - Follows the design system color variables for consistent theming
-  - Supports different layout orientations for various use cases
   """
 
   use Phoenix.Component
@@ -123,7 +116,6 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
   ## Attributes
 
     * `track` - Track data structure with name and optional duration_ms
-    * `track_number` - Optional track number to display
     * `show_duration` - Whether to show track duration (default: true)
     * `size` - Size variant: "sm", "md" (default: "md")  
     * `clickable` - Whether the track should be clickable (default: false)
@@ -131,11 +123,9 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
     
   ## Examples
 
-      <.track_display track={%{name: "Track Name", duration_ms: 180000}} />
-      <.track_display track={@track} track_number={1} size="sm" />
+    <.track_display track={@track} size="sm" />
   """
   attr :track, :map, required: true
-  attr :track_number, :integer, default: nil
   attr :show_duration, :boolean, default: true
   attr :size, :string, default: "md", values: ~w(sm md)
   attr :clickable, :boolean, default: false
@@ -152,9 +142,9 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
       ]}
       {@rest}
     >
-      <%= if @track_number do %>
+      <%= if @track.track_number do %>
         <span class={["text-gray-300 w-6 text-right mr-3", track_number_size_classes(@size)]}>
-          {@track_number}
+          {@track.track_number}
         </span>
       <% end %>
 
@@ -162,11 +152,6 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
         <h5 class={["font-medium text-white truncate", track_title_size_classes(@size)]}>
           {@track.name}
         </h5>
-        <%= if @track.artist && @track.artist != Map.get(@track, :album_artist) do %>
-          <p class={["text-gray-400 truncate", track_artist_size_classes(@size)]}>
-            {@track.artist}
-          </p>
-        <% end %>
       </div>
 
       <%= if @show_duration && @track.duration_ms do %>

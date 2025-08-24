@@ -135,68 +135,6 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
     """
   end
 
-  @doc """
-  Renders an empty state specifically for search results.
-
-  ## Examples
-
-      <.empty_search 
-        query="jazz albums"
-        suggestions={["Try different keywords", "Check spelling"]}
-      />
-  """
-  attr :query, :string, required: true, doc: "The search query that returned no results"
-  attr :suggestions, :list, default: [], doc: "List of suggestion strings"
-  attr :class, :string, default: nil
-  attr :rest, :global
-
-  slot :action, doc: "Optional search action"
-
-  def empty_search(assigns) do
-    ~H"""
-    <div
-      class={[
-        "text-center py-16",
-        @class
-      ]}
-      {@rest}
-    >
-      <!-- Search Icon -->
-      <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-surface-card">
-        <CoreComponents.icon name="hero-magnifying-glass" class="w-10 h-10 text-surface-muted" />
-      </div>
-      
-    <!-- Content -->
-      <h3 class="text-xl font-medium text-surface-bright mb-2">
-        No results found
-      </h3>
-
-      <p class="text-surface-muted mb-4">
-        We couldn't find anything matching <span class="font-medium text-surface-primary">"{@query}"</span>
-      </p>
-      
-    <!-- Suggestions -->
-      <%= if @suggestions != [] do %>
-        <div class="text-sm text-surface-muted mb-6">
-          <p class="mb-2">Try:</p>
-          <ul class="space-y-1">
-            <%= for suggestion <- @suggestions do %>
-              <li>• {suggestion}</li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-      
-    <!-- Action -->
-      <%= if @action != [] do %>
-        <div class="flex justify-center">
-          {render_slot(@action)}
-        </div>
-      <% end %>
-    </div>
-    """
-  end
-
   # AIDEV-NOTE: Size helper functions for responsive empty states
   defp size_padding_classes(size) do
     case size do

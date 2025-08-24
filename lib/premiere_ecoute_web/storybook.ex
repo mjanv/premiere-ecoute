@@ -7,5 +7,6 @@ defmodule PremiereEcouteWeb.Storybook do
     css_path: "/assets/css/app.css",
     js_path: "/assets/js/storybook.js",
     sandbox_class: "premiere-ecoute-sandbox",
-    title: "Premiere Ecoute - Storybook"
+    title: "Premiere Ecoute - Storybook",
+    color_mode: true
 end
