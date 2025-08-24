@@ -49,15 +49,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     {gettext("Sessions")}
                   </h3>
                   <nav class="space-y-1">
-                    <.sidebar_link
-                      href={~p"/discography/album/select"}
-                      current_page={@current_page}
-                      page_id="new_session"
-                      icon="hero-plus"
-                    >
-                      {gettext("New Session")}
-                    </.sidebar_link>
-
                     <.sidebar_link href={~p"/sessions"} current_page={@current_page} page_id="my_sessions" icon="hero-rectangle-stack">
                       {gettext("My Sessions")}
                     </.sidebar_link>
@@ -91,15 +82,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                       icon="hero-chart-bar-square"
                     >
                       {gettext("My Billboards")}
-                    </.sidebar_link>
-
-                    <.sidebar_link
-                      href={~p"/billboards/new"}
-                      current_page={@current_page}
-                      page_id="new_billboard"
-                      icon="hero-plus"
-                    >
-                      {gettext("New Billboard")}
                     </.sidebar_link>
                   </nav>
                 </div>

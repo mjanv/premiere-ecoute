@@ -10,7 +10,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     socket
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)
-    |> assign_async(:sessions_data, fn -> {:ok, %{sessions_data: load(scope)}} end)
+    |> assign_async(:sessions, fn -> {:ok, %{sessions: ListeningSession.all(where: [user_id: scope.user.id])}} end)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -41,34 +41,23 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   end
 
   @impl true
-  def handle_event(
-        "confirm_delete",
-        _params,
-        %{assigns: %{session_to_delete: session_id, current_scope: scope}} = socket
-      ) do
+  def handle_event("confirm_delete", _params, %{assigns: %{session_to_delete: session_id}} = socket) do
     session_id
     |> ListeningSession.get()
     |> ListeningSession.delete()
     |> case do
-      {:ok, _} -> put_flash(socket, :info, "Session deleted successfully")
-      {:error, _} -> put_flash(socket, :error, "Failed to delete session")
+      {:ok, session} ->
+        socket
+        |> put_flash(:info, "Session deleted successfully")
+        |> stream_delete(:sessions, session)
+
+      {:error, _} ->
+        socket
+        |> put_flash(:error, "Failed to delete session")
     end
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)
-    |> assign_async(:sessions_data, fn -> {:ok, %{sessions_data: load(scope)}} end)
     |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  defp load(scope) do
-    sessions = ListeningSession.all(where: [user_id: scope.user.id])
-    grouped_sessions = Enum.group_by(sessions, & &1.status)
-
-    %{
-      sessions: sessions,
-      active_sessions: Map.get(grouped_sessions, :active, []),
-      preparing_sessions: Map.get(grouped_sessions, :preparing, []),
-      stopped_sessions: Map.get(grouped_sessions, :stopped, [])
-    }
   end
 
   def session_status_class(:preparing), do: "bg-yellow-900/30 text-yellow-400 border-yellow-700"

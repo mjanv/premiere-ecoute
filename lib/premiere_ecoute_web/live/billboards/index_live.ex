@@ -23,21 +23,4 @@ defmodule PremiereEcouteWeb.Billboards.IndexLive do
   end
 
   # Helper functions
-
-  defp billboard_status_badge(assigns) do
-    class =
-      case assigns.status do
-        :created -> "bg-gray-600/20 text-gray-300 border-gray-500/30"
-        :active -> "bg-green-600/20 text-green-300 border-green-500/30"
-        :stopped -> "bg-red-600/20 text-red-300 border-red-500/30"
-      end
-
-    assigns = assign(assigns, :class, class)
-
-    ~H"""
-    <span class={"inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border #{@class}"}>
-      {String.capitalize(to_string(@status))}
-    </span>
-    """
-  end
 end

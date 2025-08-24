@@ -50,7 +50,7 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
       |> Enum.filter(& &1)
       |> Enum.join(" ")
 
-    assigns = 
+    assigns =
       assigns
       |> assign(:status, to_string(assigns.status))
       |> assign(:variant, variant)
@@ -87,27 +87,27 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
       _ -> "secondary"
     end
   end
-  
+
   defp size("xs"), do: "px-2 py-0.5 text-xs"
   defp size("sm"), do: "px-2.5 py-1 text-xs"
   defp size("md"), do: "px-3 py-1 text-sm"
   defp size("lg"), do: "px-4 py-1.5 text-base"
-  
+
   defp icon_size("xs"), do: "w-3 h-3"
   defp icon_size("sm"), do: "w-3 h-3"
   defp icon_size("md"), do: "w-4 h-4"
   defp icon_size("lg"), do: "w-5 h-5"
-  
+
   defp icon_spacing("xs"), do: "mr-1"
   defp icon_spacing("sm"), do: "mr-1"
   defp icon_spacing("md"), do: "mr-1.5"
   defp icon_spacing("lg"), do: "mr-2"
-  
+
   defp variant("success"), do: "bg-green-600/15 text-green-300 border-green-600/25"
   defp variant("warning"), do: "bg-yellow-600/15 text-yellow-300 border-yellow-600/25"
   defp variant("error"), do: "bg-red-600/15 text-red-300 border-red-600/25"
   defp variant("info"), do: "bg-blue-600/15 text-blue-300 border-blue-600/25"
   defp variant("primary"), do: "bg-purple-600/15 text-purple-300 border-purple-600/25"
   defp variant("secondary"), do: "bg-surface-interactive/50 text-surface-muted border-surface"
-  defp variant(_), do:  "bg-surface-interactive/50 text-surface-muted border-surface"
+  defp variant(_), do: "bg-surface-interactive/50 text-surface-muted border-surface"
 end

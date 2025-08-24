@@ -1,16 +1,18 @@
 defmodule PremiereEcouteWeb.Telemetry do
+  @moduledoc false
+
   use Supervisor
+
   import Telemetry.Metrics
 
-  def start_link(arg) do
-    Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
+  def start_link(args) do
+    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @impl true
-  def init(_arg) do
+  def init(_args) do
     children = [
       {:telemetry_poller, measurements: periodic_measurements(), period: 10_000}
-      # {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

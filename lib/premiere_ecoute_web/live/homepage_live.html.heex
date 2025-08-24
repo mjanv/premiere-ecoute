@@ -1,10 +1,8 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
   <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
-    <!-- AIDEV-NOTE: Hero section with left/right layout: title+description left, mockups right -->
     <!-- Hero Section -->
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
-        <!-- AIDEV-NOTE: Anonymous users - show traditional layout with title, description, and mockups -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
 <!-- Left side: Title and Description -->
@@ -59,7 +57,7 @@
       </div>
     </div>
     
-<!-- AIDEV-NOTE: Features Preview section -->
+<!-- Features Preview section -->
     <div class="py-12">
       <div class="max-w-7xl mx-auto px-6">
         <div class="text-center mb-10">
@@ -141,15 +139,4 @@
       </div>
     </div>
   </div>
-
-  <.album_display
-    size="md"
-    album={
-      %PremiereEcoute.Discography.Album{
-        name: "Random Access Memories",
-        artist: "Daft Punk",
-        cover_url: "https://i.scdn.co/image/ab67616d0000b273e319baafd16e84f0408af2a0"
-      }
-    }
-  />
 </Layouts.app>

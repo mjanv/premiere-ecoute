@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
 
   import PremiereEcouteWeb.Components.Search
   import PremiereEcouteWeb.Billboards.Components
+  import PremiereEcouteWeb.Components.Navigation.Back
 
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard

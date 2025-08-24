@@ -16,7 +16,7 @@
             
 <!-- AIDEV-NOTE: Status and action buttons -->
             <div class="flex items-center gap-3">
-              <.billboard_status_badge status={@billboard.status} />
+              <.status_badge status={@billboard.status} />
               <%= if @billboard.status == :created do %>
                 <.button
                   phx-click="activate"

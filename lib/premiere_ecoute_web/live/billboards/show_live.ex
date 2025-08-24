@@ -347,23 +347,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     end
   end
 
-  defp billboard_status_badge(assigns) do
-    class =
-      case assigns.status do
-        :created -> "bg-blue-600/20 text-blue-300 border-blue-500/30"
-        :active -> "bg-green-600/20 text-green-300 border-green-500/30"
-        :stopped -> "bg-red-600/20 text-red-300 border-red-500/30"
-      end
-
-    assigns = assign(assigns, :class, class)
-
-    ~H"""
-    <span class={"inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border #{@class}"}>
-      {String.capitalize(to_string(@status))}
-    </span>
-    """
-  end
-
   # AIDEV-NOTE: Handle export task completion messages
   @impl true
   def handle_info({:export_success, count}, socket) do
