@@ -1,0 +1,30 @@
+.bg-gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.bg-gradient-primary-vertical {
+  background: var(--gradient-primary-vertical);
+}
+
+.bg-gradient-primary-diagonal {
+  background: var(--gradient-primary-diagonal);
+}
+
+/* Legacy support - now uses cohesive colors */
+.bg-gradient-purple {
+  background: var(--gradient-primary-diagonal);
+}
+
+.bg-gradient-purple-pink {
+  background: var(--gradient-primary-diagonal);
+}
+
+.bg-gradient-purple-blue {
+  background: var(--gradient-primary-diagonal);
+}
+
+/* Background utilities using CSS variables instead of Tailwind gray classes */
+.bg-surface { background-color: var(--color-dark-900); }
+.bg-surface-elevated { background-color: var(--color-dark-800); }
+.bg-surface-card { background-color: var(--color-dark-850); }
+.bg-surface-interactive { background-color: var(--color-dark-700); }

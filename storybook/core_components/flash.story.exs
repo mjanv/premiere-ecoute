@@ -1,4 +1,6 @@
-defmodule Storybook.Components.CoreComponents.Flash do
+defmodule Storybook.CoreComponents.Flash do
+  @moduledoc false
+
   use PhoenixStorybook.Story, :component
 
   def function, do: &PremiereEcouteWeb.CoreComponents.flash/1

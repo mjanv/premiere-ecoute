@@ -5,7 +5,6 @@
 > This principle emphasizes human oversight for critical aspects like architecture, testing, and domain-specific decisions, ensuring AI assists rather than fully dictates development.
 
 @docs/README.md
-@docs/architecture.md
 @docs/coding_standards.md
 @docs/guides/development.md
 
@@ -15,12 +14,12 @@
 
 AI may do:
 
-0. Whenever unsure about something that's related to the project, ask the developer for clarification before making changes.
-1. Generate code only inside relevant source directories or explicitly pointed files.
-2. Add/update AIDEV-NOTE: anchor comments near non-trivial edited code.
-3. Follow lint/style configs. Use the project's formatter, if available, instead of manually re-formatting code.
-4. For changes >300 LOC or >3 files, ask for confirmation.
-5. Stay within the current task context. Inform the dev if it'd be better to start afresh.
+1. Whenever unsure, ask the developer for clarification before making changes.
+2. Generate code only inside relevant source directories or explicitly pointed files.
+3. Add/update AIDEV-NOTE: anchor comments near non-trivial edited code.
+4. Follow lint/style configs. Use the project's formatter, if available, instead of manually re-formatting code.
+5. For changes >300 LOC or >3 files, ask for confirmation.
+6. Stay within the current task context. Inform the dev if it'd be better to start afresh.
 
 AI must NOT do:
 

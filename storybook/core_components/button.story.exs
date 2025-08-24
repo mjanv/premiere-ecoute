@@ -1,4 +1,6 @@
-defmodule Storybook.Components.CoreComponents.Button do
+defmodule Storybook.CoreComponents.Button do
+  @moduledoc false
+
   use PhoenixStorybook.Story, :component
 
   def function, do: &PremiereEcouteWeb.CoreComponents.button/1

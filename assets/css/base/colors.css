@@ -1,0 +1,38 @@
+:root {
+  /* Cohesive purple-pink gradient palette */
+  --color-primary-50: #faf7ff;
+  --color-primary-100: #f0ebff;
+  --color-primary-200: #e4dcff;
+  --color-primary-300: #d1c2ff;
+  --color-primary-400: #b89eff;
+  --color-primary-500: #9f75ff;
+  --color-primary-600: #8b4fff;
+  --color-primary-700: #7a3beb;
+  --color-primary-800: #6532c7;
+  --color-primary-900: #532ba3;
+  --color-primary-950: #36196e;
+
+  /* Secondary pink colors for gradients */
+  --color-secondary-400: #ec4899;
+  --color-secondary-500: #db2777;
+  --color-secondary-600: #be185d;
+
+  /* Simplified dark theme backgrounds */
+  --color-dark-300: #cbd5e1;
+  --color-dark-500: #64748b;
+  --color-dark-800: #1e293b;
+  --color-dark-850: #172033;
+  --color-dark-900: #0f172a;
+  --color-dark-950: #020617;
+
+  /* Standard semantic colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Main gradient definition using OKLCH values */
+  --gradient-primary: linear-gradient(to right, oklch(0.558 0.288 302.321) 0%, oklch(0.592 0.249 0.584) 100%);
+  --gradient-primary-vertical: linear-gradient(to bottom, oklch(0.558 0.288 302.321) 0%, oklch(0.592 0.249 0.584) 100%);
+  --gradient-primary-diagonal: linear-gradient(135deg, oklch(0.558 0.288 302.321) 0%, oklch(0.592 0.249 0.584) 100%);
+}

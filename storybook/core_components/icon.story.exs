@@ -1,4 +1,6 @@
-defmodule Storybook.Components.CoreComponents.Icon do
+defmodule Storybook.CoreComponents.Icon do
+  @moduledoc false
+
   use PhoenixStorybook.Story, :component
 
   def function, do: &PremiereEcouteWeb.CoreComponents.icon/1

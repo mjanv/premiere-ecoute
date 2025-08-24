@@ -1,4 +1,6 @@
-defmodule Storybook.Components.CoreComponents.Table do
+defmodule Storybook.CoreComponents.Table do
+  @moduledoc false
+
   use PhoenixStorybook.Story, :component
 
   def function, do: &PremiereEcouteWeb.CoreComponents.table/1

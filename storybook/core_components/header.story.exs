@@ -1,4 +1,4 @@
-defmodule Storybook.Components.CoreComponents.Header do
+defmodule Storybook.CoreComponents.Header do
   use PhoenixStorybook.Story, :component
 
   def function, do: &PremiereEcouteWeb.CoreComponents.header/1

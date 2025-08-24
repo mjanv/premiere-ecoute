@@ -4,42 +4,12 @@ defmodule PremiereEcouteWeb.Accounts.UserRegistrationLive do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
 
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="mx-auto max-w-sm">
-        <.header class="text-center">
-          Register for an account
-          <:subtitle>
-            Already registered?
-            <.link navigate={~p"/users/log-in"} class="font-semibold text-brand hover:underline">
-              Log in
-            </.link>
-            to your account now.
-          </:subtitle>
-        </.header>
-
-        <.form for={@form} id="registration_form" phx-submit="save" phx-change="validate">
-          <.input field={@form[:email]} type="email" label="Email" autocomplete="username" required phx-mounted={JS.focus()} />
-
-          <.button variant="primary" phx-disable-with="Creating account..." class="w-full">
-            Create an account
-          </.button>
-        </.form>
-      </div>
-    </Layouts.app>
-    """
-  end
-
-  def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
-      when not is_nil(user) do
+  def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket) when not is_nil(user) do
     {:ok, redirect(socket, to: PremiereEcouteWeb.UserAuth.signed_in_path(socket))}
   end
 
   def mount(_params, _session, socket) do
-    changeset = Accounts.User.email_changeset(%User{})
-
-    {:ok, assign_form(socket, changeset), temporary_assigns: [form: nil]}
+    {:ok, assign_form(socket, Accounts.User.email_changeset(%User{})), temporary_assigns: [form: nil]}
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do

@@ -1,4 +1,6 @@
 defmodule Storybook.CoreComponents do
+  @moduledoc false
+
   use PhoenixStorybook.Index
 
   def folder_open?, do: true

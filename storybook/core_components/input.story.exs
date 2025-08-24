@@ -1,4 +1,6 @@
-defmodule Storybook.Components.CoreComponents.Input do
+defmodule Storybook.CoreComponents.Input do
+  @moduledoc false
+
   use PhoenixStorybook.Story, :component
 
   def function, do: &PremiereEcouteWeb.CoreComponents.input/1

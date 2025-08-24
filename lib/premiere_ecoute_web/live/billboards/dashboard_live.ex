@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.Billboards.DashboardLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Components.Search
   import PremiereEcouteWeb.Billboards.Components
 
   alias PremiereEcoute.Billboards

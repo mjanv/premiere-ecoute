@@ -4,8 +4,8 @@ defmodule PremiereEcouteWeb.Storybook do
   use PhoenixStorybook,
     otp_app: :premiere_ecoute,
     content_path: Path.expand("../../storybook", __DIR__),
-    css_path: "/assets/storybook.css",
+    css_path: "/assets/css/app.css",
     js_path: "/assets/js/storybook.js",
-    sandbox_class: "premiere-ecoute-web",
-    title: "Premiere Ecoute - Design System"
+    sandbox_class: "premiere-ecoute-sandbox",
+    title: "Premiere Ecoute - Storybook"
 end

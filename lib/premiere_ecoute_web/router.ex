@@ -194,10 +194,10 @@ defmodule PremiereEcouteWeb.Router do
     scope "/dev" do
       pipe_through [:browser]
 
-      live_dashboard "/dashboard", metrics: PremiereEcouteWeb.Telemetry
+      live_dashboard("/dashboard", metrics: PremiereEcouteWeb.Telemetry)
       oban_dashboard("/oban")
       live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end

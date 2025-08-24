@@ -1,0 +1,29 @@
+/* Enhanced visual effects for better design cohesion */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 79, 255, 0.2);
+  background: rgba(139, 79, 255, 0.1);
+}
+
+.shadow-purple {
+  box-shadow: 0 4px 14px 0 rgba(139, 79, 255, 0.25);
+}
+
+.shadow-purple-lg {
+  box-shadow: 0 10px 40px 0 rgba(139, 79, 255, 0.35);
+}
+
+/* Border utilities */
+.border-surface { border-color: var(--color-dark-700); }
+.border-surface-light { border-color: var(--color-dark-600); }
+.border-surface-interactive { border-color: var(--color-dark-500); }
+
+/* Text utilities */
+.text-surface { color: var(--color-dark-300); }
+.text-surface-muted { color: var(--color-dark-400); }
+.text-surface-bright { color: var(--color-dark-200); }
+.text-surface-primary { color: white; }
+
+/* Hover states for interactive elements */
+.hover-surface:hover { background-color: var(--color-dark-700); }
+.hover-surface-elevated:hover { background-color: var(--color-dark-700); }

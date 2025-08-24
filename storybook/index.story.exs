@@ -1,22 +1,11 @@
-defmodule Storybook.MyPage do
-  # See https://hexdocs.pm/phoenix_storybook/PhoenixStorybook.Story.html for full story
-  # documentation.
+defmodule Storybook.Index do
+  @moduledoc false
+
   use PhoenixStorybook.Story, :page
 
   def doc, do: "Your very first steps into using Phoenix Storybook"
 
-  # Declare an optional tab-based navigation in your page:
-  def navigation do
-    [
-      {:welcome, "Welcome", {:fa, "hand-wave", :thin}},
-      {:components, "Components", {:fa, "toolbox", :thin}},
-      {:sandboxing, "Sandboxing", {:fa, "box-check", :thin}},
-      {:icons, "Icons", {:fa, "icons", :thin}}
-    ]
-  end
-
-  # This is a dummy function that you should replace with your own HEEx content.
-  def render(assigns = %{tab: :welcome}) do
+  def render(assigns) do
     ~H"""
     <div class="psb-welcome-page">
       <p>
@@ -44,25 +33,6 @@ defmodule Storybook.MyPage do
     """
   end
 
-  def render(assigns = %{tab: guide}) when guide in ~w(components sandboxing icons)a do
-    assigns =
-      assign(assigns,
-        guide: guide,
-        guide_content: PhoenixStorybook.Guides.markup("#{guide}.md")
-      )
-
-    ~H"""
-    <p class="psb:md:text-lg psb:leading-relaxed psb:text-slate-400 psb:w-full psb:text-left psb:mb-4 psb:mt-2 psb:italic">
-      <a class="hover:text-indigo-700" href={"https://hexdocs.pm/phoenix_storybook/#{@guide}.html"} target="_blank">
-        This and other guides are also available on HexDocs.
-      </a>
-    </p>
-    <div class="psb:welcome-page psb:border-t psb:border-gray-200 psb:pt-4">
-      {Phoenix.HTML.raw(@guide_content)}
-    </div>
-    """
-  end
-
   defp description_list(assigns) do
     ~H"""
     <div class="psb:w-full psb:md:px-8">
@@ -86,7 +56,5 @@ defmodule Storybook.MyPage do
     """
   end
 
-  defp doc_link(page) do
-    "https://hexdocs.pm/phoenix_storybook/PhoenixStorybook.#{page}.html"
-  end
+  defp doc_link(page), do: "https://hexdocs.pm/phoenix_storybook/PhoenixStorybook.#{page}.html"
 end

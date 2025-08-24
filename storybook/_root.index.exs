@@ -1,6 +1,5 @@
 defmodule Storybook.Root do
-  # See https://hexdocs.pm/phoenix_storybook/PhoenixStorybook.Index.html for full index
-  # documentation.
+  @moduledoc false
 
   use PhoenixStorybook.Index
 
@@ -8,7 +7,7 @@ defmodule Storybook.Root do
   def folder_name, do: "Storybook"
   def folder_index, do: 0
 
-  def entry("welcome") do
+  def entry("index") do
     [
       name: "Welcome Page",
       icon: {:fa, "hand-wave", :thin}
