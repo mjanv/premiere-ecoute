@@ -114,7 +114,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
       
     <!-- Current Track Status -->
       <%= if @player_state["item"] do %>
-        <div class="bg-white/5 rounded-lg p-3 space-y-3">
+        <div class="bg-white/20 rounded-lg p-3 space-y-3">
           <p class="text-sm font-medium text-white truncate">
             {@player_state["item"]["name"]}
           </p>
@@ -128,7 +128,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           </div>
         </div>
       <% else %>
-        <div class="bg-white/5 rounded-lg p-3">
+        <div class="bg-white/20 rounded-lg p-3">
           <p class="text-xs text-gray-400 text-center">{gettext("No track selected")}</p>
         </div>
       <% end %>
@@ -137,7 +137,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         <button
           phx-click="previous_track"
           phx-target={@myself}
-          class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+          class="flex-1 bg-white/20 hover:bg-white/30 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
@@ -172,7 +172,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         <button
           phx-click="next_track"
           phx-target={@myself}
-          class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
+          class="flex-1 bg-white/20 hover:bg-white/30 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
         >
           <span>{gettext("Next")}</span>
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
