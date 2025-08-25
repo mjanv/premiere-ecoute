@@ -31,8 +31,10 @@ defmodule PremiereEcouteWeb.CoreComponents do
   alias Phoenix.HTML
   alias Phoenix.LiveView.JS
 
+  alias PremiereEcouteWeb.Components.ActivityCard
   alias PremiereEcouteWeb.Components.AlbumTrackDisplay
   alias PremiereEcouteWeb.Components.LoadingState
+  alias PremiereEcouteWeb.Components.PageHeader
   alias PremiereEcouteWeb.Components.StatusBadge
 
   @doc """
@@ -456,9 +458,11 @@ defmodule PremiereEcouteWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
+  defdelegate activity_card(assigns), to: ActivityCard
   defdelegate album_display(assigns), to: AlbumTrackDisplay
   defdelegate track_display(assigns), to: AlbumTrackDisplay
   defdelegate playlist_display(assigns), to: AlbumTrackDisplay
+  defdelegate page_header(assigns), to: PageHeader
   defdelegate status_badge(assigns), to: StatusBadge
   defdelegate loading_spinner(assigns), to: LoadingState
   defdelegate skeleton_element(assigns), to: LoadingState

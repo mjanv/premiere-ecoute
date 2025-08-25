@@ -31,6 +31,10 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
         current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
 
         if current_user.id == billboard.user_id do
+          if connected?(socket) do
+            Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "billboard:#{billboard.id}")
+          end
+
           cache_status = check_billboard_cache_status(billboard.billboard_id)
           sorted_submissions = sort_submissions_by_date(billboard.submissions || [])
 
@@ -246,7 +250,11 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
       # AIDEV-NOTE: Load user's library playlists from database when opening export modal
       library_playlists = LibraryPlaylist.all(where: [user_id: current_user.id, provider: :spotify])
 
-      {:noreply, assign(socket, show_export_modal: true, spotify_playlists: library_playlists, export_error: nil)}
+      socket
+      |> assign(:show_export_modal, true)
+      |> assign(:spotify_playlists, library_playlists)
+      |> assign(:export_error, nil)
+      |> then(fn socket -> {:noreply, socket} end)
     else
       {:noreply, put_flash(socket, :error, gettext("Please log in to export playlists"))}
     end
@@ -300,18 +308,19 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
       # AIDEV-NOTE: Perform export in background task to avoid blocking UI
       pid = self()
 
-      Task.start(fn ->
-        case get_top_tracks_with_generation(billboard, export_count) do
-          {:ok, tracks} ->
-            case export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
-              {:ok, _} -> send(pid, {:export_success, export_count})
-              {:error, reason} -> send(pid, {:export_error, reason})
-            end
+      # Task.start(fn ->
+      case get_top_tracks_with_generation(billboard, export_count) do
+        {:ok, tracks} ->
+          case export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
+            {:ok, _} -> send(pid, {:export_success, export_count})
+            {:error, reason} -> send(pid, {:export_error, reason})
+          end
 
-          {:error, message} ->
-            send(pid, {:export_error, message})
-        end
-      end)
+        {:error, message} ->
+          send(pid, {:export_error, message})
+      end
+
+      # end)
 
       {:noreply, socket}
     else
@@ -375,6 +384,17 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  @impl true
+  def handle_info(%Billboard{} = billboard, socket) do
+    sorted_submissions = sort_submissions_by_date(billboard.submissions)
+
+    socket
+    |> assign(:billboard, billboard)
+    |> assign(:submissions, sorted_submissions)
+    |> assign(:filtered_submissions, sorted_submissions)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   # AIDEV-NOTE: Export tracks to playlist using 3-step process: get -> remove -> add
   defp export_tracks_to_playlist(scope, playlist_id, tracks) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
@@ -423,7 +443,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
         if length(urls) > 0 do
           case Billboards.generate_billboard(urls, callback: fn _text, _progress -> :ok end) do
             {:ok, generated_billboard} ->
-              # Cache the generated billboard
               Cache.put(:billboards, billboard.billboard_id, generated_billboard)
               extract_top_tracks(generated_billboard, count)
 

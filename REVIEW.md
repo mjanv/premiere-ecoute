@@ -196,35 +196,9 @@ The application demonstrates a well-established design system with:
 </.action_button>
 ```
 
-##### `BulkActionBar`
-```elixir
-# Found in: playlist_live.html.heex
-<.bulk_action_bar 
-  selected_count={MapSet.size(@selected_tracks)}
-  on_clear={JS.push("clear_selection")}
-  actions={[
-    %{label: "Remove", event: "delete_selected", variant: "danger"}
-  ]}
-/>
-```
-
 ### 3. Layout & Container Components (LOW PRIORITY)
 
 #### Card Variations
-
-##### `ActivityCard`
-```elixir
-# Found in: home_live.html.heex (session/billboard cards)
-<.activity_card 
-  type="session"
-  status={:active}
-  title={@session.album.name}
-  subtitle={@session.album.artist}
-  cover_url={@session.album.cover_url}
-  action_text="Continue session"
-  navigate={~p"/sessions/#{@session.id}"}
-/>
-```
 
 ##### `FeatureCard`
 ```elixir

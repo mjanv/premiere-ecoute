@@ -1,31 +1,24 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
-  <div class="text-white flex flex-col" style="background-color: var(--color-dark-950); min-height: calc(100vh - 5rem);">
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
-        <!-- AIDEV-NOTE: Billboards index header -->
-        <div class="mb-8">
-          <div class="flex items-center justify-between">
-            <div>
-              <h1 class="text-4xl font-bold text-white mb-2">{gettext("My Billboards")}</h1>
-              <p class="text-slate-300/90 text-lg">
-                {gettext("Manage your music billboard campaigns and collect playlist submissions")}
-              </p>
-            </div>
-            
-<!-- AIDEV-NOTE: Create new billboard button -->
-            <div>
-              <.link
-                navigate={~p"/billboards/new"}
-                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
-              >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                {gettext("New Billboard")}
-              </.link>
-            </div>
-          </div>
-        </div>
+        <!-- AIDEV-NOTE: Billboards index header using reusable page_header component -->
+        <.page_header
+          title={gettext("My Billboards")}
+          subtitle={gettext("Manage your music billboard campaigns and collect playlist submissions")}
+        >
+          <:action>
+            <.link
+              navigate={~p"/billboards/new"}
+              class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              {gettext("New Billboard")}
+            </.link>
+          </:action>
+        </.page_header>
         
 <!-- AIDEV-NOTE: Billboards grid or empty state -->
         <%= if length(@billboards) == 0 do %>

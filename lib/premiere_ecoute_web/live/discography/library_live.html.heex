@@ -4,11 +4,25 @@
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
         <div class="w-full">
-          <!-- AIDEV-NOTE: My Library page header -->
-          <div class="mb-8">
-            <h1 class="text-4xl font-bold text-white mb-2">{gettext("My Library")}</h1>
-            <p class="text-slate-400">{gettext("Manage your saved playlists and discover new music")}</p>
-          </div>
+          <!-- AIDEV-NOTE: My Library page header with Add Playlist action button -->
+          <.page_header
+            title={gettext("My Library")}
+            subtitle={gettext("Manage your saved playlists and discover new music")}
+          >
+            <:action>
+              <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) && @current_scope && @current_scope.user && @current_scope.user.spotify do %>
+                <button
+                  phx-click="show_playlist_modal"
+                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  {gettext("Add Playlist")}
+                </button>
+              <% end %>
+            </:action>
+          </.page_header>
           
 <!-- AIDEV-NOTE: Library playlists grid with add playlist button -->
           <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
@@ -60,26 +74,6 @@
                   </div>
                 </.link>
               <% end %>
-              
-<!-- Add Playlist Button -->
-              <%= if @current_scope && @current_scope.user && @current_scope.user.spotify do %>
-                <button
-                  phx-click="show_playlist_modal"
-                  class="group relative rounded-lg overflow-hidden border-2 border-dashed border-gray-600 hover:border-green-500/70 transition-all aspect-square bg-gray-800/50 hover:bg-gray-700/50"
-                >
-                  <!-- Background gradient -->
-                  <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-green-600/10 group-hover:from-green-500/20 group-hover:to-green-600/20 transition-colors">
-                  </div>
-                  
-<!-- Plus icon and text -->
-                  <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-green-400 transition-colors">
-                    <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <span class="text-sm font-semibold">{gettext("Add Playlist")}</span>
-                  </div>
-                </button>
-              <% end %>
             </div>
             
 <!-- Empty state when no playlists -->
@@ -96,30 +90,21 @@
                   </svg>
                 </div>
                 <h3 class="text-xl font-semibold text-white mb-2">{gettext("Your library is empty")}</h3>
-                <p class="text-gray-400 mb-6">
-                  {gettext("Start building your music collection by adding playlists from Spotify")}
+                <p class="text-gray-400">
+                  <%= if @current_scope && @current_scope.user && @current_scope.user.spotify do %>
+                    {gettext("Use the \"Add Playlist\" button above to start building your music collection from Spotify")}
+                  <% else %>
+                    <.link
+                      href={~p"/auth/spotify"}
+                      class="inline-flex items-center text-green-400 hover:text-green-300 transition-colors"
+                    >
+                      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.48.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.32 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                      </svg>
+                      {gettext("Connect Spotify to get started")}
+                    </.link>
+                  <% end %>
                 </p>
-                <%= if @current_scope && @current_scope.user && @current_scope.user.spotify do %>
-                  <button
-                    phx-click="show_playlist_modal"
-                    class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-                  >
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    {gettext("Add Your First Playlist")}
-                  </button>
-                <% else %>
-                  <.link
-                    href={~p"/auth/spotify"}
-                    class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-                  >
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.48.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.32 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-                    </svg>
-                    {gettext("Connect Spotify")}
-                  </.link>
-                <% end %>
               </div>
             <% end %>
           <% else %>

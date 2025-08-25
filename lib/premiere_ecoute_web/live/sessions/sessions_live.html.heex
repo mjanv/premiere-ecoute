@@ -1,5 +1,5 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
-  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
+  <div class="synthwave-bg min-h-screen text-white">
     
 <!-- Delete Confirmation Modal -->
     <%= if @show_delete_modal do %>
@@ -49,30 +49,22 @@
 <!-- Main Content -->
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
-        <!-- AIDEV-NOTE: Sessions index header -->
-        <div class="mb-8">
-          <div class="flex items-center justify-between">
-            <div>
-              <h1 class="text-4xl font-bold text-white mb-2">My Sessions</h1>
-              <p class="text-slate-300/90 text-lg">
-                Manage your listening sessions and track your music discoveries
-              </p>
-            </div>
-            
-<!-- AIDEV-NOTE: Create new session button -->
-            <div>
-              <.link
-                navigate={~p"/discography/album/select"}
-                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
-              >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                New Session
-              </.link>
-            </div>
-          </div>
-        </div>
+        <.page_header
+          title="My Sessions"
+          subtitle="Manage your listening sessions and track your music discoveries"
+        >
+          <:action>
+            <.link
+              navigate={~p"/discography/album/select"}
+              class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              New Session
+            </.link>
+          </:action>
+        </.page_header>
         <.async_result :let={sessions} assign={@sessions}>
           <:loading>
             <div class="space-y-6">

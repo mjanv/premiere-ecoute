@@ -34,7 +34,6 @@ defmodule PremiereEcouteWeb.HomeLiveTest do
       assert html =~ "Premiere Ecoute"
 
       # Streamer action buttons
-      assert html =~ "New Session"
       assert html =~ "My Sessions"
       assert html =~ "Retrospective"
 

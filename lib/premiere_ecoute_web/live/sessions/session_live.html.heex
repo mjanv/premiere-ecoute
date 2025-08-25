@@ -1,5 +1,5 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
-  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
+  <div class="synthwave-bg min-h-screen text-white">
     
 <!-- Main Content -->
     <div class="flex h-screen">
@@ -21,7 +21,7 @@
               <div class="flex items-center w-full">
                 <h2 class="text-xl font-bold text-white">{gettext("Listening Session")}</h2>
                 <div class="flex-1"></div>
-                <.status_badge status={Atom.to_string(@listening_session.status)} size="sm" />???
+                <.status_badge status={Atom.to_string(@listening_session.status)} size="sm" />
               </div>
             </div>
             

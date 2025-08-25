@@ -24,16 +24,17 @@ defmodule PremiereEcoute.Billboards do
       deletion_token = GoofyWords.generate_with_number()
 
       submission = %{
-        url: url,
-        pseudo: pseudo,
-        submitted_at: DateTime.utc_now(),
-        deletion_token: deletion_token
+        "url" => url,
+        "pseudo" => pseudo,
+        "submitted_at" => DateTime.utc_now(),
+        "deletion_token" => deletion_token
       }
 
       case update_billboard(billboard, %{submissions: [submission | billboard.submissions]}) do
-        {:ok, updated_billboard} ->
-          Cache.del(:billboards, updated_billboard.billboard_id)
-          {:ok, updated_billboard, deletion_token}
+        {:ok, billboard} ->
+          Cache.del(:billboards, billboard.billboard_id)
+          PremiereEcoute.PubSub.broadcast("billboard:#{billboard.id}", billboard)
+          {:ok, billboard, deletion_token}
 
         error ->
           error
