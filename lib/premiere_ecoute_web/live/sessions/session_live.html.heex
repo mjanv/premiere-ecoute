@@ -596,7 +596,7 @@
                   <%= if (@listening_session.current_track && @listening_session.current_track.id == track.id) || @listening_session.status == :stopped do %>
                     <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
                       <!-- Horizontal Histogram taking ~80% width -->
-                      <div class="flex items-end justify-center h-20 mx-auto w-4/5">
+                      <div class="flex items-end justify-center h-32 mx-auto w-4/5">
                         <.async_result :let={report} assign={@report}>
                           <:loading>
                             <%= for rating <- session_vote_options(@listening_session) do %>
@@ -640,7 +640,7 @@
                                     )
                                   ]
                                 }
-                                style={"height: #{max(votes * 4, 6)}px"}
+                                style={"height: #{max(votes * 8, 6)}px"}
                               >
                               </div>
                               
