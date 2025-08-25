@@ -102,7 +102,7 @@ msgid "Viewers"
 msgstr "Spectateurs"
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:93
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:157
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:158
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:138
 #, elixir-autogen, elixir-format
 msgid "Album cover"
@@ -829,24 +829,24 @@ msgstr "Politique de confidentialité"
 msgid "Terms"
 msgstr "Conditions générales"
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:221
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:222
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Album details not found"
 msgstr "Détails de l'Album"
 
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:330
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:145
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:227
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:146
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:228
 #, elixir-autogen, elixir-format
 msgid "Close"
 msgstr "Fermer"
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:169
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:170
 #, elixir-autogen, elixir-format
 msgid "Community Score"
 msgstr "Score Communauté"
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:139
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:140
 #, elixir-autogen, elixir-format
 msgid "Failed to load album details"
 msgstr "Échec du chargement des détails de l'album"
@@ -866,7 +866,7 @@ msgstr "Aucun album trouvé"
 msgid "Please try refreshing the page"
 msgstr "Veuillez essayer de rafraîchir la page."
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:174
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:175
 #, elixir-autogen, elixir-format
 msgid "Your Score"
 msgstr "Votre Score"

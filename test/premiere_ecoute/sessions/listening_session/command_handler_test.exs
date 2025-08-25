@@ -189,7 +189,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         {:ok, "spotify:track:track002"}
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Next track: Track Two" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Track Two" ->
         {:ok, %{}}
       end)
 
@@ -247,7 +247,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         {:ok, "spotify:track:track002"}
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Next track: Track Two" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Track Two" ->
         {:ok, %{}}
       end)
 
@@ -255,7 +255,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         {:ok, "spotify:track:track001"}
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Previous track: Track One" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Track One" ->
         {:ok, %{}}
       end)
 

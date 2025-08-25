@@ -17,7 +17,22 @@ defmodule PremiereEcouteWeb do
   those modules here.
   """
 
-  use Boundary, deps: [PremiereEcouteCore, PremiereEcoute], exports: [Endpoint, CoreComponents, Components.Search]
+  use Boundary,
+    deps: [PremiereEcouteCore, PremiereEcoute],
+    exports: [
+      Endpoint,
+      CoreComponents,
+      Components.ActivityCard,
+      Components.AlbumTrackDisplay,
+      Components.Card,
+      Components.EmptyState,
+      Components.LoadingState,
+      Components.Modal,
+      Components.PageHeader,
+      Components.Search,
+      Components.StatsCard,
+      Components.StatusBadge
+    ]
 
   def static_paths, do: ~w(doc assets fonts images favicon.ico robots.txt)
 

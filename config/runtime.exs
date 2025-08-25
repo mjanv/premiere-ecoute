@@ -45,7 +45,8 @@ config :premiere_ecoute, PremiereEcoute.Repo.Vault,
   ciphers: [
     default: {
       Cloak.Ciphers.AES.GCM,
-      tag: "AES.GCM.V1", key: 32 |> :crypto.strong_rand_bytes(), iv_length: 12
+      # generate a key with Base.encode64(:crypto.strong_rand_bytes(32))
+      tag: "AES.GCM.V1", key: Base.decode64!(env!("POSTGRES_ENCRYPTION_KEY", :string)), iv_length: 12
     }
   ]
 

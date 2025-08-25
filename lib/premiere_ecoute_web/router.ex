@@ -123,9 +123,8 @@ defmodule PremiereEcouteWeb.Router do
     live_session :sessions, on_mount: [{UserAuth, :streamer}] do
       live "/", SessionsLive, :index
       live "/:id", SessionLive, :show
+      live "/overlay/:id", OverlayLive, :show
     end
-
-    live "/:id/overlay", OverlayLive, :show
   end
 
   scope "/retrospective", PremiereEcouteWeb.Retrospective do

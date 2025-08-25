@@ -1,14 +1,15 @@
 defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   @moduledoc false
 
+  require Logger
+
   alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcouteCore.Cache
 
-  def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}} = scope) do
-    scope
-    |> TwitchApi.api()
+  def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}}) do
+    TwitchApi.api()
     |> TwitchApi.get(url: "/eventsub/subscriptions", params: %{user_id: user_id})
     |> TwitchApi.handle(200, fn %{"data" => subscriptions} ->
       subscriptions
@@ -21,8 +22,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   end
 
   def subscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
-    scope
-    |> TwitchApi.api()
+    TwitchApi.api()
     |> TwitchApi.post(
       url: "/eventsub/subscriptions",
       json: %{
@@ -42,11 +42,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end)
   end
 
-  def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
+  def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}}, type) do
     case Cache.get(:subscriptions, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
-        scope
-        |> TwitchApi.api()
+        TwitchApi.api()
         |> TwitchApi.delete(url: "/eventsub/subscriptions", params: %{"id" => id})
         |> TwitchApi.handle(204, fn _ -> id end)
 
