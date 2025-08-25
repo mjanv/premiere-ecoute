@@ -40,20 +40,20 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   def handle_event("toggle_playback", _params, socket) do
     case socket.assigns.player_state do
       %{"is_playing" => true} = state ->
-        case SpotifyApi.pause_playback(socket.assigns.current_scope) do
+        case SpotifyApi.Player.pause_playback(socket.assigns.current_scope) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => false})
-            {:noreply, put_flash(socket, :info, gettext("Spotify playback paused"))}
+            {:noreply, socket}
 
           {:error, reason} ->
             {:noreply, put_flash(socket, :error, gettext("Failed to pause: %{reason}", reason: reason))}
         end
 
       %{"is_playing" => false} = state ->
-        case SpotifyApi.start_playback(socket.assigns.current_scope) do
+        case SpotifyApi.Player.start_playback(socket.assigns.current_scope) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => true})
-            {:noreply, put_flash(socket, :info, gettext("Spotify playback resumed"))}
+            {:noreply, socket}
 
           {:error, reason} ->
             {:noreply, put_flash(socket, :error, gettext("Failed to play: %{reason}", reason: reason))}

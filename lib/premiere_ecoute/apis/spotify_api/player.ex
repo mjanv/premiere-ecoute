@@ -10,6 +10,17 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
 
+  def devices(%Scope{} = scope) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.merge(
+      headers: [
+        {"Content-Type", "application/json"}
+      ]
+    )
+    |> Req.get(url: "/me/player/devices")
+  end
+
   @doc """
   Start/resume playback on the user's active device.
   Can optionally specify track URIs to play.
@@ -19,11 +30,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     |> SpotifyApi.api()
     |> Req.merge(
       headers: [
-        {"Content-Type", "application/json"},
-        {"Content-Length", to_string(byte_size(Jason.encode!(%{})))}
+        {"Content-Length", "0"},
+        {"Content-Type", "application/json"}
       ]
     )
-    |> Req.put(url: "/me/player/play", body: %{})
+    |> Req.put(url: "/me/player/play", json: %{})
     |> handle_playback_response()
   end
 
@@ -39,7 +50,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
         {"Content-Type", "application/json"}
       ]
     )
-    |> Req.put(url: "/me/player/pause", body: "")
+    |> Req.put(url: "/me/player/pause", json: %{})
     |> handle_playback_response()
   end
 
@@ -55,7 +66,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
         {"Content-Type", "application/json"}
       ]
     )
-    |> Req.post(url: "/me/player/next", body: "")
+    |> Req.post(url: "/me/player/next", json: %{})
     |> handle_playback_response()
   end
 
@@ -71,7 +82,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
         {"Content-Type", "application/json"}
       ]
     )
-    |> Req.post(url: "/me/player/previous", body: "")
+    |> Req.post(url: "/me/player/previous", json: %{})
     |> handle_playback_response()
   end
 

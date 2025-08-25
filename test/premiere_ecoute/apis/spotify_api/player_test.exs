@@ -76,7 +76,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         headers: [
           {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
           {"content-type", "application/json"},
-          {"content-length", "2"}
+          {"content-length", "0"}
         ],
         response: %{},
         status: 204

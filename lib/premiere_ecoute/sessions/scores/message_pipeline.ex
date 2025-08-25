@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
       name: __MODULE__,
       producer: [module: {PremiereEcouteCore.BroadwayProducer, []}, concurrency: 1],
       processors: [session: [concurrency: 1]],
-      batchers: [writer: [concurrency: 1, batch_size: 10, batch_timeout: 5_000]]
+      batchers: [writer: [concurrency: 1, batch_size: 5, batch_timeout: 2_000]]
     )
   end
 

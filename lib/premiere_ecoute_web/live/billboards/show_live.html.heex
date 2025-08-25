@@ -199,7 +199,6 @@
                   </svg>
                 </div>
                 <p class="text-slate-400 text-lg">{gettext("No submissions yet.")}</p>
-                <p class="text-slate-500 mt-2">{gettext("Activate your billboard to start collecting playlists!")}</p>
               </div>
             <% else %>
               <%= if length(@filtered_submissions) == 0 do %>
@@ -346,60 +345,58 @@
         </div>
       </div>
     </div>
+  </div>
+</Layouts.app>
+
+<!-- AIDEV-NOTE: Delete confirmation modal - Outside layout containers for proper overlay -->
+<%= if @show_delete_modal do %>
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4" id="delete-modal">
+    <!-- Background overlay -->
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" phx-click="hide_delete_modal"></div>
     
-<!-- AIDEV-NOTE: Delete confirmation modal -->
-    <%= if @show_delete_modal do %>
-      <div class="fixed inset-0 z-50 overflow-y-auto" id="delete-modal">
-        <!-- Background overlay -->
-        <div class="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity" phx-click="hide_delete_modal"></div>
-
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-          <!-- Modal panel -->
-          <div class="relative z-10 inline-block align-bottom bg-slate-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-red-500/30">
-            <div class="bg-gradient-to-br from-slate-900 to-slate-950 px-6 pt-6 pb-4">
-              <div class="flex items-start">
-                <div class="flex-shrink-0">
-                  <div class="w-12 h-12 bg-red-600/20 rounded-full flex items-center justify-center border border-red-500/30">
-                    <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div class="ml-4 flex-1">
-                  <h3 class="text-xl font-semibold text-white mb-2">{gettext("Delete Billboard")}</h3>
-                  <p class="text-slate-300 text-base leading-relaxed">
-                    {gettext("Are you sure you want to delete \"%{title}\"?", title: @billboard.title)}
-                    {gettext("This action cannot be undone and will permanently remove the billboard and all its submissions.")}
-                  </p>
-                </div>
-              </div>
+<!-- Modal panel -->
+    <div class="relative bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-red-500/30">
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 px-6 pt-6 pb-4">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 bg-red-600/20 rounded-full flex items-center justify-center border border-red-500/30">
+              <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
             </div>
-
-            <div class="bg-slate-900/50 px-6 py-4 flex flex-row-reverse gap-3">
-              <.button
-                phx-click="confirm_delete"
-                class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-lg"
-              >
-                {gettext("Delete Billboard")}
-              </.button>
-              <.button
-                phx-click="hide_delete_modal"
-                class="px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium"
-              >
-                {gettext("Cancel")}
-              </.button>
-            </div>
+          </div>
+          <div class="ml-4 flex-1">
+            <h3 class="text-xl font-semibold text-white mb-2">{gettext("Delete Billboard")}</h3>
+            <p class="text-slate-300 text-base leading-relaxed">
+              {gettext("Are you sure you want to delete \"%{title}\"?", title: @billboard.title)}
+              {gettext("This action cannot be undone and will permanently remove the billboard and all its submissions.")}
+            </p>
           </div>
         </div>
       </div>
-    <% end %>
+
+      <div class="bg-slate-900/50 px-6 py-4 flex flex-row-reverse gap-3">
+        <.button
+          phx-click="confirm_delete"
+          class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-lg"
+        >
+          {gettext("Delete Billboard")}
+        </.button>
+        <.button
+          phx-click="hide_delete_modal"
+          class="px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium"
+        >
+          {gettext("Cancel")}
+        </.button>
+      </div>
+    </div>
   </div>
-</Layouts.app>
+<% end %>
 
 <!-- AIDEV-NOTE: Export to Spotify Modal - Outside all layout containers -->
 <%= if @show_export_modal do %>
