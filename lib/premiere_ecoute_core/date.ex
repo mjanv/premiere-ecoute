@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Date do
   @moduledoc false
+  
+  def date(%Date{} = date) do
+    Calendar.strftime(date, "%b %d, %Y")
+  end
 
   def date(%DateTime{} = datetime) do
     Calendar.strftime(datetime, "%b %d, %Y")

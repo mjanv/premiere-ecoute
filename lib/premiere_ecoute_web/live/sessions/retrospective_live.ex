@@ -1,0 +1,319 @@
+defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
+  @moduledoc """
+  Public retrospective view for ended listening sessions.
+  No authentication required - designed for sharing with public audience.
+  """
+  use PremiereEcouteWeb, :live_view
+
+  alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Retrospective.Report
+
+  @impl true
+  def mount(%{"id" => id}, _session, socket) do
+    case ListeningSession.get(id) do
+      nil ->
+        socket
+        |> put_flash(:error, "Session not found")
+        |> redirect(to: ~p"/")
+        |> then(fn socket -> {:ok, socket} end)
+
+      listening_session ->
+        # Only allow access to stopped sessions
+        if listening_session.status != :stopped do
+          socket
+          |> put_flash(:error, "Retrospective only available for ended sessions")
+          |> redirect(to: ~p"/")
+          |> then(fn socket -> {:ok, socket} end)
+        else
+          socket
+          |> assign(:listening_session, listening_session)
+          |> assign_async(:report, fn ->
+            case Report.generate(listening_session) do
+              {:ok, report} -> {:ok, %{report: report}}
+              error -> {:error, error}
+            end
+          end)
+          |> assign_async([:most_liked, :least_liked], fn ->
+            consensus =
+              listening_session.id
+              |> PremiereEcoute.Sessions.Retrospective.VoteTrends.track_distribution()
+              |> PremiereEcoute.Sessions.Retrospective.VoteTrends.consensus()
+
+            most_liked = Enum.max(Enum.map(consensus, fn {_, %{score: score}} -> score end))
+            {most_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == most_liked end)
+
+            least_liked = Enum.min(Enum.map(consensus, fn {_, %{score: score}} -> score end))
+            {least_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == least_liked end)
+
+            {:ok, %{most_liked: most_liked, least_liked: least_liked}}
+          end)
+          |> then(fn socket -> {:ok, socket} end)
+        end
+    end
+  end
+
+  @impl true
+  def handle_params(_params, _url, socket) do
+    {:noreply, socket}
+  end
+
+  # AIDEV-NOTE: Helper functions for displaying retrospective data - matching session_live.ex structure
+  defp session_average_score(nil), do: "N/A"
+
+  defp session_average_score(report) do
+    case report.session_summary do
+      %{viewer_score: score} when is_number(score) -> Float.round(score, 1)
+      %{viewer_score: score} when is_binary(score) -> score
+      _ -> "N/A"
+    end
+  end
+
+  defp session_streamer_score(nil), do: "N/A"
+
+  defp session_streamer_score(report) do
+    case report.session_summary do
+      %{streamer_score: score} when is_number(score) -> Float.round(score, 1)
+      %{streamer_score: score} when is_binary(score) -> score
+      _ -> "N/A"
+    end
+  end
+
+  defp track_average_score(_track_id, nil), do: "N/A"
+
+  defp track_average_score(track_id, report) do
+    case Enum.find(report.track_summaries, &(&1.track_id == track_id)) do
+      nil ->
+        "N/A"
+
+      track_summary ->
+        case track_summary.viewer_score do
+          score when is_number(score) -> Float.round(score, 1)
+          score when is_binary(score) -> score
+          _ -> "N/A"
+        end
+    end
+  end
+
+  defp track_streamer_score(_track_id, nil), do: "N/A"
+
+  defp track_streamer_score(track_id, report) do
+    case Enum.find(report.track_summaries, &(&1.track_id == track_id)) do
+      nil ->
+        "N/A"
+
+      track_summary ->
+        case track_summary.streamer_score do
+          score when is_number(score) -> Float.round(score, 1)
+          score when is_binary(score) -> score
+          _ -> "N/A"
+        end
+    end
+  end
+
+  # AIDEV-NOTE: Generate vote distribution for histograms - matching session_live.ex structure
+  defp track_vote_distribution(_track_id, nil, session),
+    do: for(rating <- session_vote_options(session), do: {rating, 0})
+
+  defp track_vote_distribution(track_id, report, session) do
+    # Calculate distribution from individual votes
+    individual_distribution =
+      report.votes
+      |> Enum.filter(&(&1.track_id == track_id))
+      |> Enum.group_by(fn vote ->
+        # Convert string values to integers for numeric scale if vote_options are numeric
+        if vote_options_are_numeric?(session) do
+          String.to_integer(vote.value)
+        else
+          vote.value
+        end
+      end)
+      |> Map.new(fn {value, votes} -> {value, length(votes)} end)
+
+    # Calculate distribution from poll votes (handle if polls exist)
+    poll_distribution =
+      report.polls
+      |> Enum.filter(&(&1.track_id == track_id))
+      |> Enum.reduce(%{}, fn poll, acc ->
+        poll.votes
+        |> Enum.reduce(acc, fn {rating_str, count}, inner_acc ->
+          # Handle both numeric and string ratings
+          rating = if String.match?(rating_str, ~r/^\d+$/), do: String.to_integer(rating_str), else: rating_str
+          Map.update(inner_acc, rating, count, &(&1 + count))
+        end)
+      end)
+
+    for rating <- session_vote_options(session) do
+      individual_count = Map.get(individual_distribution, rating, 0)
+      poll_count = Map.get(poll_distribution, rating, 0)
+      total_count = individual_count + poll_count
+      {rating, total_count}
+    end
+  end
+
+  defp session_vote_distribution(nil, session),
+    do: for(rating <- session_vote_options(session), do: {rating, 0})
+
+  defp session_vote_distribution(report, session) do
+    # Calculate distribution from all individual votes
+    individual_distribution =
+      report.votes
+      |> Enum.group_by(fn vote ->
+        # Convert string values to integers for numeric scale if vote_options are numeric
+        if vote_options_are_numeric?(session) do
+          String.to_integer(vote.value)
+        else
+          vote.value
+        end
+      end)
+      |> Map.new(fn {value, votes} -> {value, length(votes)} end)
+
+    # Calculate distribution from all poll votes
+    poll_distribution =
+      report.polls
+      |> Enum.reduce(%{}, fn poll, acc ->
+        poll.votes
+        |> Enum.reduce(acc, fn {rating_str, count}, inner_acc ->
+          # Handle both numeric and string ratings
+          rating = if String.match?(rating_str, ~r/^\d+$/), do: String.to_integer(rating_str), else: rating_str
+          Map.update(inner_acc, rating, count, &(&1 + count))
+        end)
+      end)
+
+    for rating <- session_vote_options(session) do
+      individual_count = Map.get(individual_distribution, rating, 0)
+      poll_count = Map.get(poll_distribution, rating, 0)
+      total_count = individual_count + poll_count
+      {rating, total_count}
+    end
+  end
+
+  # AIDEV-NOTE: Get voting options based on session configuration
+  defp session_vote_options(session) do
+    case session.vote_options do
+      options when is_list(options) and length(options) > 0 ->
+        if vote_options_are_numeric?(session) do
+          Enum.map(options, &String.to_integer/1)
+        else
+          options
+        end
+
+      _ ->
+        1..10 |> Enum.to_list()
+    end
+  end
+
+  # AIDEV-NOTE: Check if vote options are numeric (all parseable as integers)
+  defp vote_options_are_numeric?(session) do
+    case session.vote_options do
+      options when is_list(options) ->
+        Enum.all?(options, fn option ->
+          case Integer.parse(option) do
+            {_, ""} -> true
+            _ -> false
+          end
+        end)
+
+      # Default to numeric
+      _ ->
+        true
+    end
+  end
+
+  # AIDEV-NOTE: Color coding for vote options with synthwave colors
+  defp vote_option_color(rating, session) do
+    vote_options = session.vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    total_options = length(vote_options)
+
+    # Find the index of this vote option
+    index = Enum.find_index(vote_options, &(to_string(&1) == to_string(rating))) || 0
+
+    cond do
+      # Special handling for common non-numeric options
+      rating in ["smash", "pass"] ->
+        if rating == "smash",
+          do: "bg-gradient-to-t from-pink-500 to-purple-500",
+          else: "bg-gradient-to-t from-red-500 to-pink-500"
+
+      # For numeric options, use synthwave gradient based on position
+      vote_options_are_numeric?(session) and total_options <= 5 ->
+        case index do
+          0 -> "bg-gradient-to-t from-red-500 to-pink-500"
+          1 -> "bg-gradient-to-t from-pink-500 to-purple-500"
+          2 -> "bg-gradient-to-t from-purple-500 to-indigo-500"
+          3 -> "bg-gradient-to-t from-indigo-500 to-cyan-500"
+          4 -> "bg-gradient-to-t from-cyan-500 to-pink-500"
+          _ -> "bg-gradient-to-t from-purple-500 to-pink-500"
+        end
+
+      vote_options_are_numeric?(session) and total_options <= 11 ->
+        synthwave_colors = [
+          "bg-gradient-to-t from-red-500 to-pink-500",
+          "bg-gradient-to-t from-pink-500 to-rose-500",
+          "bg-gradient-to-t from-rose-500 to-purple-500",
+          "bg-gradient-to-t from-purple-500 to-violet-500",
+          "bg-gradient-to-t from-violet-500 to-indigo-500",
+          "bg-gradient-to-t from-indigo-500 to-blue-500",
+          "bg-gradient-to-t from-blue-500 to-cyan-500",
+          "bg-gradient-to-t from-cyan-500 to-teal-500",
+          "bg-gradient-to-t from-teal-500 to-cyan-400",
+          "bg-gradient-to-t from-cyan-400 to-pink-400",
+          "bg-gradient-to-t from-pink-400 to-purple-400"
+        ]
+
+        Enum.at(synthwave_colors, index, "bg-gradient-to-t from-purple-500 to-pink-500")
+
+      true ->
+        synthwave_colors = [
+          "bg-gradient-to-t from-pink-500 to-purple-500",
+          "bg-gradient-to-t from-purple-500 to-indigo-500",
+          "bg-gradient-to-t from-indigo-500 to-cyan-500",
+          "bg-gradient-to-t from-cyan-500 to-pink-500",
+          "bg-gradient-to-t from-red-500 to-pink-500",
+          "bg-gradient-to-t from-violet-500 to-purple-500"
+        ]
+
+        Enum.at(synthwave_colors, rem(index, length(synthwave_colors)), "bg-gradient-to-t from-purple-500 to-pink-500")
+    end
+  end
+
+  defp track_max_votes(_track_id, nil, _session), do: 0
+
+  defp track_max_votes(track_id, report, session) do
+    track_vote_distribution(track_id, report, session)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.max(fn -> 0 end)
+  end
+
+  defp session_max_votes(nil, _session), do: 0
+
+  defp session_max_votes(report, session) do
+    session_vote_distribution(report, session)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.max(fn -> 0 end)
+  end
+
+  # AIDEV-NOTE: Build data attributes for track scores and names to be used by JavaScript
+  defp build_track_data_attributes(listening_session, report) do
+    case listening_session.album do
+      %{tracks: tracks} when is_list(tracks) and length(tracks) > 0 ->
+        tracks
+        |> Enum.with_index()
+        |> Enum.reduce([], fn {track, index}, acc ->
+          viewer_score = track_average_score(track.id, report)
+          streamer_score = track_streamer_score(track.id, report)
+
+          [
+            {"data-track#{index}-name", "#{index + 1}. #{track.name}"},
+            {"data-track#{index}-viewer-score", viewer_score},
+            {"data-track#{index}-streamer-score", streamer_score},
+            {"data-track#{index}-id", track.id}
+            | acc
+          ]
+        end)
+        |> Enum.reverse()
+
+      _ ->
+        []
+    end
+  end
+end

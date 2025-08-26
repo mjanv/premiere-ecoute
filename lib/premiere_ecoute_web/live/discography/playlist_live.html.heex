@@ -255,37 +255,7 @@
                           end
                         ]}
                       >
-                        {gettext("< 1 week")}
-                      </button>
-
-                      <button
-                        phx-click="filter_by_date"
-                        phx-value-date_filter="month"
-                        class={[
-                          "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
-                          if @date_filter == "month" do
-                            "bg-green-600 text-white"
-                          else
-                            "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          end
-                        ]}
-                      >
-                        {gettext("< 1 month")}
-                      </button>
-
-                      <button
-                        phx-click="filter_by_date"
-                        phx-value-date_filter="year"
-                        class={[
-                          "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
-                          if @date_filter == "year" do
-                            "bg-green-600 text-white"
-                          else
-                            "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          end
-                        ]}
-                      >
-                        {gettext("< 1 year")}
+                        {gettext("> 1 week")}
                       </button>
                     </div>
                     

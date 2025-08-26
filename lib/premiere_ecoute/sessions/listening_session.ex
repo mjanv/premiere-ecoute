@@ -90,7 +90,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> change()
     |> put_change(:status, :stopped)
     |> put_change(:ended_at, DateTime.utc_now(:second))
+    |> put_change(:current_track_id, nil)
     |> Repo.update()
+    |> case do
+      {:ok, session} -> {:ok, Repo.preload(session, current_track: [])}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   def stop(%__MODULE__{} = _session) do

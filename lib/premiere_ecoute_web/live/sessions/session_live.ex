@@ -366,7 +366,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   # AIDEV-NOTE: Build overlay URL with score parameter (for template use)
   defp get_current_overlay_url(host_uri, session_id, score_type) do
-    base_url = "#{host_uri}/sessions/overlay/#{session_id}"
+    base_url = "#{host_uri}/sessions/#{session_id}/overlay"
 
     case score_type do
       "streamer" -> "#{base_url}?score=streamer"

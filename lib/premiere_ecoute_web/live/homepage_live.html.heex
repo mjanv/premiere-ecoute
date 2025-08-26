@@ -21,13 +21,31 @@
             <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
               <.link
                 href={~p"/auth/twitch"}
-                class="w-full sm:w-auto inline-flex items-center justify-center px-12 py-6 text-white font-bold rounded-lg transition-all text-xl hover:scale-105 bg-purple-600 hover:bg-purple-700 hover:shadow-lg"
-                style="box-shadow: 0 4px 14px 0 rgba(147, 51, 234, 0.25);"
+                class="w-full sm:w-auto inline-flex items-center justify-center px-12 py-6 
+           font-bold rounded-2xl text-xl relative overflow-hidden
+           transition-all duration-300 group"
               >
-                <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                </svg>
-                {gettext("Connect with Twitch")}
+                <!-- Animated gradient background -->
+                <span class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-cyan-400 
+                 bg-[length:200%_200%] animate-gradient rounded-2xl opacity-90">
+                </span>
+                
+<!-- Neon glow layer -->
+                <span class="absolute inset-0 rounded-2xl 
+                 transition-all duration-500 ease-out
+                 shadow-[0_0_20px_rgba(255,0,255,0.6),0_0_40px_rgba(0,255,255,0.4)]
+                 group-hover:shadow-[0_0_40px_rgba(255,0,255,0.8),0_0_80px_rgba(0,255,255,0.6)]">
+                </span>
+                
+<!-- Content -->
+                <span class="relative flex items-center text-white 
+                 drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
+                 group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]">
+                  <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                  </svg>
+                  {gettext("Connect with Twitch")}
+                </span>
               </.link>
             </div>
           </div>

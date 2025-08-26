@@ -42,13 +42,13 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
             
     <!-- Sessions section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
-              <%= if @current_user.role in [:streamer, :admin] do %>
-                <div class="mb-6">
-                  <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                    <.icon name="hero-musical-note" class="w-4 h-4 mr-2" />
-                    {gettext("Sessions")}
-                  </h3>
-                  <nav class="space-y-1">
+              <div class="mb-6">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                  <.icon name="hero-musical-note" class="w-4 h-4 mr-2" />
+                  {gettext("Sessions")}
+                </h3>
+                <nav class="space-y-1">
+                  <%= if @current_user.role in [:streamer, :admin] do %>
                     <.sidebar_link href={~p"/sessions"} current_page={@current_page} page_id="my_sessions" icon="hero-rectangle-stack">
                       {gettext("My Sessions")}
                     </.sidebar_link>
@@ -61,9 +61,19 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     >
                       {gettext("Retrospective")}
                     </.sidebar_link>
-                  </nav>
-                </div>
-              <% end %>
+                  <% end %>
+                  
+    <!-- AIDEV-NOTE: My votes link - shows viewer votes by period using get_votes_by_period -->
+                  <.sidebar_link
+                    href={~p"/retrospective/votes"}
+                    current_page={@current_page}
+                    page_id="votes"
+                    icon="hero-heart"
+                  >
+                    {gettext("My votes")}
+                  </.sidebar_link>
+                </nav>
+              </div>
             <% end %>
             
     <!-- Billboards section -->

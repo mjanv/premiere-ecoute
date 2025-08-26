@@ -1,4 +1,4 @@
-<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="retrospective">
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="votes">
   <div class="min-h-screen synthwave-bg text-white">
     <!-- Header -->
     <div class="bg-gray-900 border-b border-gray-800">
@@ -50,9 +50,9 @@
       </div>
     </div>
     
-<!-- Album Cover Wall -->
+<!-- Album Cover Wall with Votes -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-      <.async_result :let={albums_data} assign={@albums_data}>
+      <.async_result :let={votes_data} assign={@votes_data}>
         <:loading>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             <%= for _ <- 1..12 do %>
@@ -65,41 +65,42 @@
 
         <:failed>
           <div class="bg-red-900/20 border border-red-800 rounded-lg p-8 text-center">
-            <p class="text-red-400 text-lg">{gettext("Failed to load albums")}</p>
+            <p class="text-red-400 text-lg">{gettext("Failed to load votes")}</p>
             <p class="text-gray-400 mt-2">{gettext("Please try refreshing the page")}</p>
           </div>
         </:failed>
 
-        <%= if Enum.empty?(albums_data) do %>
+        <%= if Enum.empty?(votes_data) do %>
           <div class="p-8 text-center">
             <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.367 4.367 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
             </svg>
-            <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Albums Found")}</h3>
-            <p class="text-gray-400">{gettext("No albums listened during this period")}</p>
+            <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Votes Found")}</h3>
+            <p class="text-gray-400">{gettext("No votes cast during this period")}</p>
           </div>
         <% else %>
+          <!-- AIDEV-NOTE: Display votes with clickable album covers showing voter score -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <%= for album_data <- albums_data do %>
+            <%= for vote_data <- votes_data do %>
               <div
                 class="group cursor-pointer transform transition-all duration-200 hover:scale-105"
                 phx-click="show_album_details"
-                phx-value-session_id={album_data.session.id}
+                phx-value-album_id={vote_data.album.id}
               >
-                <!-- Album Cover with Score Overlay -->
+                <!-- Album Cover with Voter Score Overlay -->
                 <div class="relative">
                   <img
-                    src={album_data.album.cover_url}
+                    src={vote_data.album.cover_url}
                     alt={gettext("Album cover")}
                     class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
                   />
-                  <!-- Centered Large Score -->
+                  <!-- Centered Large Voter Score -->
                   <div class="absolute inset-0 flex items-center justify-center p-2">
                     <div
                       class="text-white group-hover:text-white/80 font-bold transition-all duration-200 text-center leading-none drop-shadow-2xl max-w-full overflow-hidden"
                       style="font-size: clamp(2rem, 15vw, 6rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
                     >
-                      {album_data.report.session_summary["viewer_score"]}
+                      {vote_data.score}
                     </div>
                   </div>
                 </div>
@@ -156,52 +157,27 @@
         </:failed>
 
         <%= if modal_data do %>
-          <!-- Modal Header -->
+          <!-- Modal Header - Album info only, no session data -->
           <div class="flex items-start justify-between p-6 border-b border-gray-700">
             <div class="flex items-start space-x-6">
               <img
-                src={modal_data.session.album.cover_url}
+                src={modal_data.cover_url}
                 alt={gettext("Album cover")}
                 class="w-32 h-32 rounded-lg shadow-lg"
               />
               <div>
                 <h2 class="text-3xl font-bold text-white mb-2" id="modal-title">
-                  {modal_data.session.album.name}
+                  {modal_data.name}
                 </h2>
-                <p class="text-xl text-purple-300 mb-4">{modal_data.session.album.artist}</p>
-                <%= if modal_data.session.report.session_summary do %>
-                  <div class="flex items-center space-x-4 mb-4">
-                    <div class="bg-purple-500/20 px-4 py-2 rounded-lg border border-purple-400/30">
-                      <span class="text-purple-300 font-medium">
-                        {gettext("Community")}:
-                        <span class="text-white font-bold">{modal_data.session.report.session_summary["viewer_score"]}</span>
-                      </span>
-                    </div>
-                    <div class="bg-pink-500/20 px-4 py-2 rounded-lg border border-pink-400/30">
-                      <span class="text-pink-300 font-medium">
-                        {gettext("Your Score")}:
-                        <span class="text-white font-bold">{modal_data.session.report.session_summary["streamer_score"]}</span>
-                      </span>
-                    </div>
-                  </div>
-                  
-<!-- AIDEV-NOTE: Navigation links to session and retrospective -->
-                  <div class="text-sm text-gray-400 mt-2">
-                    <.link
-                      navigate={~p"/sessions/#{modal_data.session.id}"}
-                      class="text-cyan-300 hover:text-cyan-200 underline transition-colors mr-4"
-                    >
-                      {gettext("View Session")}
-                    </.link>
-                    |
-                    <.link
-                      navigate={~p"/sessions/#{modal_data.session.id}/retrospective"}
-                      class="text-orange-300 hover:text-orange-200 underline transition-colors ml-4"
-                    >
-                      {gettext("Session Retrospective")}
-                    </.link>
-                  </div>
+                <p class="text-xl text-purple-300 mb-4">{modal_data.artist}</p>
+                <%= if modal_data.release_date do %>
+                  <p class="text-sm text-gray-400">
+                    {gettext("Released")}: {Calendar.strftime(modal_data.release_date, "%B %d, %Y")}
+                  </p>
                 <% end %>
+                <p class="text-sm text-gray-400 mt-2">
+                  {modal_data.total_tracks} {ngettext("track", "tracks", modal_data.total_tracks)}
+                </p>
               </div>
             </div>
             <button
@@ -219,28 +195,20 @@
             </button>
           </div>
           
-<!-- Track List -->
+<!-- Track List - Album tracks without scores -->
           <div class="p-6 max-h-96 overflow-y-auto">
+            <h3 class="text-lg font-medium text-white mb-4">{gettext("Track List")}</h3>
             <div class="space-y-3">
               <%= for track <- modal_data.tracks do %>
-                <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors">
-                  <div class="flex items-center space-x-4">
-                    <span class="text-purple-300 font-medium w-8 text-center">{track.track_album.track_number}</span>
-                    <div>
-                      <p class="text-white font-medium text-lg">{track.track_album.name}</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center space-x-3">
-                    <div class="bg-purple-500/20 px-3 py-1 rounded border border-purple-400/30">
-                      <span class="text-purple-300 font-medium">
-                        {track.track_summary["viewer_score"]}
-                      </span>
-                    </div>
-                    <div class="bg-pink-500/20 px-3 py-1 rounded border border-pink-400/30">
-                      <span class="text-pink-300 font-medium">
-                        {track.track_summary["streamer_score"]}
-                      </span>
-                    </div>
+                <div class="flex items-center p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors">
+                  <span class="text-purple-300 font-medium w-8 text-center">{track.track_number}</span>
+                  <div class="ml-4">
+                    <p class="text-white font-medium text-lg">{track.name}</p>
+                    <%= if track.duration_ms do %>
+                      <p class="text-gray-400 text-sm">
+                        {timer(track.duration_ms)}
+                      </p>
+                    <% end %>
                   </div>
                 </div>
               <% end %>

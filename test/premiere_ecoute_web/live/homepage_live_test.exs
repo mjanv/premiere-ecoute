@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
 
       # Test main CTA button (homepage Connect with Twitch - the larger button)
       assert lv
-             |> element("a[href='/auth/twitch'].bg-purple-600", "Connect with Twitch")
+             |> element("a[href='/auth/twitch'].text-purple-300", "Connect with Twitch")
              |> render_click()
              |> follow_redirect(conn, ~p"/auth/twitch")
     end

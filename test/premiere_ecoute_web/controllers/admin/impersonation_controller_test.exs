@@ -19,7 +19,7 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationControllerTest do
       # Should redirect to homepage
       assert redirected_to(conn) == ~p"/"
       # Should have flash message
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Now impersonating test_user"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Now impersonating #{target_user.username}"
       # Should have impersonated token in session
       assert get_session(conn, :impersonated_token)
     end

@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.HomeLiveTest do
 
   describe "home" do
     test "displays content for authenticated viewer", %{conn: conn} do
-      user = user_fixture()
+      user = user_fixture(%{role: :streamer})
       conn = log_in_user(conn, user)
 
       {:ok, _lv, html} = live(conn, ~p"/home")

@@ -10,11 +10,29 @@
         />
       </div>
     </div>
-
+    
 <!-- Main Content -->
     <div class="flex h-screen max-w-7xl mx-auto px-6">
       <!-- Left Column - Session & Album Details (1/3) -->
       <div class="w-1/3 p-6 overflow-y-auto">
+        
+<!-- Session Controls - Only show when session is active -->
+
+        <%= if @listening_session.status == :active do %>
+          <div class="rounded-xl p-6 mb-6 bg-gradient-to-br from-purple-900/80 to-pink-900/80">
+            <!-- AIDEV-NOTE: Spotify Player LiveComponent -->
+            <div>
+              <.live_component
+                module={PremiereEcouteWeb.Sessions.Components.SpotifyPlayer}
+                id="spotify-player"
+                listening_session={@listening_session}
+                player_state={@player_state}
+                current_user={@current_user}
+                current_scope={@current_scope}
+              />
+            </div>
+          </div>
+        <% end %>
         <%= if @listening_session.album do %>
           
 <!-- Session Information -->
@@ -22,7 +40,7 @@
             <div class="flex items-center space-x-3 mb-4">
               <div class="flex items-center w-full">
                 <.status_badge status={Atom.to_string(@listening_session.status)} size="sm">
-                   {gettext("Vote Format")}: {vote_type_display(@listening_session)}
+                  {gettext("Vote Format")}: {vote_type_display(@listening_session)}
                 </.status_badge>
                 <div class="flex-1"></div>
                 <.status_badge status={Atom.to_string(@listening_session.status)} size="sm" />
@@ -240,20 +258,24 @@
                   <% end %>
 
                   <%= if @listening_session.status == :stopped do %>
-                    <div class="flex-1 bg-gray-600 text-gray-300 py-2 px-4 rounded-lg font-medium text-sm flex items-center justify-center space-x-2 cursor-not-allowed">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <.link
+                      navigate={~p"/sessions/#{@listening_session.id}/retrospective"}
+                      class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium text-sm flex items-center justify-center space-x-2 shadow-lg transition-all"
+                      target="_blank"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
-                          fill-rule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H7zM14 9a1 1 0 10-2 0v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1h-1z"
-                          clip-rule="evenodd"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2V7a2 2 0 012-2h2a2 2 0 002 2v6a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 00-2 2h-2a2 2 0 00-2 2v6a2 2 0 01-2 2H9z"
                         />
                       </svg>
-                      <span>{gettext("Session Ended")}</span>
-                    </div>
+                      <span>{gettext("View Retrospective")}</span>
+                    </.link>
                   <% end %>
                 </div>
               </div>
-
             </div>
           </div>
           
@@ -318,119 +340,6 @@
       
 <!-- Right Column - Track List (2/3) -->
       <div class="w-2/3 p-6 overflow-y-auto">
-        
-<!-- Session Controls - Only show when session is active -->
-        <%= if @listening_session.status == :active do %>
-          <div class="rounded-xl p-6 mb-6 bg-gradient-to-br from-purple-900/80 to-pink-900/80">
-            <div class="grid grid-cols-2 gap-4">
-              <!-- AIDEV-NOTE: Spotify Player LiveComponent -->
-              <div>
-                <.live_component
-                  module={PremiereEcouteWeb.Sessions.Components.SpotifyPlayer}
-                  id="spotify-player"
-                  listening_session={@listening_session}
-                  player_state={@player_state}
-                  current_user={@current_user}
-                  current_scope={@current_scope}
-                />
-              </div>
-              
-<!-- Poll Controls -->
-              <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                  <h4 class="text-sm font-medium text-purple-300 uppercase tracking-wide">
-                    Twitch
-                  </h4>
-                  <div class="flex items-center space-x-2">
-                    <%= if assigns[:poll_active] do %>
-                      <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                      <span class="text-xs text-purple-400">{gettext("Active Poll")}</span>
-                    <% else %>
-                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                      <span class="text-xs text-gray-500">{gettext("No Poll")}</span>
-                    <% end %>
-                  </div>
-                </div>
-                
-<!-- Poll Status -->
-                <div class="bg-white/5 rounded-lg p-3 space-y-2">
-                  <%= if assigns[:poll_active] do %>
-                    <div class="flex items-center justify-between">
-                      <span class="text-xs text-gray-400">{gettext("Poll Status:")}</span>
-                      <span class="text-xs text-purple-400 font-medium">
-                        {gettext("Running")}
-                      </span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-xs text-gray-400">{gettext("Total Votes:")}</span>
-                      <span class="text-xs text-white font-medium">
-                        {assigns[:poll_votes] || 0}
-                      </span>
-                    </div>
-                    <%= if assigns[:poll_time_remaining] do %>
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-400">{gettext("Time Left:")}</span>
-                        <span class="text-xs text-purple-400 font-medium">
-                          {PremiereEcouteCore.Duration.timer(@poll_time_remaining)}
-                        </span>
-                      </div>
-                    <% end %>
-                  <% else %>
-                    <%= if assigns[:poll_terminated] do %>
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-400">{gettext("Last Poll:")}</span>
-                        <span class="text-xs text-gray-400 font-medium">
-                          {gettext("Completed")}
-                        </span>
-                      </div>
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-400">{gettext("Final Votes:")}</span>
-                        <span class="text-xs text-white font-medium">
-                          {assigns[:last_poll_votes] || 0}
-                        </span>
-                      </div>
-                    <% else %>
-                      <p class="text-xs text-gray-400 text-center">
-                        {gettext("No poll running")}
-                      </p>
-                    <% end %>
-                  <% end %>
-                </div>
-
-                <div class="flex space-x-2">
-                  <button
-                    phx-click="start_poll"
-                    disabled
-                    class="flex-1 bg-gray-600 text-gray-400 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center space-x-2 cursor-not-allowed opacity-50"
-                  >
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                    <span>{gettext("Start Poll")}</span>
-                  </button>
-                  <button
-                    phx-click="stop_poll"
-                    disabled
-                    class="flex-1 bg-gray-600 text-gray-400 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center space-x-2 cursor-not-allowed opacity-50"
-                  >
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 000 2h4a1 1 0 100-2H8z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                    <span>{gettext("Stop Poll")}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% end %>
         
 <!-- AIDEV-NOTE: Compact Streamer Voting Section - Only show when session is active -->
         <%= if @listening_session.status == :active do %>

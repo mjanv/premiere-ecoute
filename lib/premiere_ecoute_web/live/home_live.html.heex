@@ -3,83 +3,85 @@
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
         <div class="w-full">
-          <h2 class="text-4xl font-bold text-white mb-8 text-left">{gettext("My Activity")}</h2>
+          <%= if @current_user.role in [:streamer, :admin] do %>
+            <h2 class="text-4xl font-bold text-white mb-8 text-left">{gettext("My Activity")}</h2>
 
-          <div class="mb-12">
-            <div class="flex gap-6">
-              <%= if @current_session do %>
-                <.activity_card
-                  type="content"
-                  label={gettext("Current Session")}
-                  title={@current_session.album.name}
-                  subtitle={gettext("by %{artist}", artist: @current_session.album.artist)}
-                  status_text={
-                    case @current_session.status do
-                      :active -> gettext("Live")
-                      :preparing -> gettext("Ready")
-                    end
-                  }
-                  action_text={gettext("Go to session")}
-                  navigate={~p"/sessions/#{@current_session.id}"}
-                >
-                  <:icon>
-                    <%= if @current_session.album.cover_url do %>
-                      <img
-                        src={@current_session.album.cover_url}
-                        alt={@current_session.album.name}
-                        class="w-16 h-16 rounded-lg object-cover shadow-md"
-                      />
-                    <% end %>
-                  </:icon>
-                </.activity_card>
-              <% else %>
-                <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
-                  <.activity_card
-                    type="action"
-                    label={gettext("Create Session")}
-                    title={gettext("Start Listening Session")}
-                    subtitle={gettext("Share music with your community")}
-                    status_text={gettext("New")}
-                    status_variant="info"
-                    action_text={gettext("Choose an album to get started")}
-                    navigate={~p"/discography/album/select"}
-                  />
-                <% end %>
-              <% end %>
-              
-<!-- AIDEV-NOTE: Latest Billboard Card using activity_card component -->
-              <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
-                <%= if @latest_billboard do %>
+            <div class="mb-12">
+              <div class="flex gap-6">
+                <%= if @current_session do %>
                   <.activity_card
                     type="content"
-                    label={gettext("Current Billboard")}
-                    title={@latest_billboard.title}
-                    subtitle={ngettext("1 submission", "%{count} submissions", length(@latest_billboard.submissions))}
+                    label={gettext("Current Session")}
+                    title={@current_session.album.name}
+                    subtitle={gettext("by %{artist}", artist: @current_session.album.artist)}
                     status_text={
-                      case @latest_billboard.status do
-                        :active -> gettext("Active")
-                        :stopped -> gettext("Stopped")
-                        :created -> gettext("Created")
+                      case @current_session.status do
+                        :active -> gettext("Live")
+                        :preparing -> gettext("Ready")
                       end
                     }
-                    action_text={gettext("Go to billboard")}
-                    navigate={~p"/billboards/#{@latest_billboard.billboard_id}"}
-                  />
+                    action_text={gettext("Go to session")}
+                    navigate={~p"/sessions/#{@current_session.id}"}
+                  >
+                    <:icon>
+                      <%= if @current_session.album.cover_url do %>
+                        <img
+                          src={@current_session.album.cover_url}
+                          alt={@current_session.album.name}
+                          class="w-16 h-16 rounded-lg object-cover shadow-md"
+                        />
+                      <% end %>
+                    </:icon>
+                  </.activity_card>
                 <% else %>
-                  <.activity_card
-                    type="action"
-                    label={gettext("Create Billboard")}
-                    title={gettext("Create Music Billboard")}
-                    subtitle={gettext("Collect community playlists")}
-                    status_text={gettext("New")}
-                    status_variant="default"
-                    action_text={gettext("Start collecting submissions")}
-                    navigate={~p"/billboards/new"}
-                  />
+                  <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
+                    <.activity_card
+                      type="action"
+                      label={gettext("Create Session")}
+                      title={gettext("Start Listening Session")}
+                      subtitle={gettext("Share music with your community")}
+                      status_text={gettext("New")}
+                      status_variant="info"
+                      action_text={gettext("Choose an album to get started")}
+                      navigate={~p"/discography/album/select"}
+                    />
+                  <% end %>
                 <% end %>
-              <% end %>
+                
+<!-- AIDEV-NOTE: Latest Billboard Card using activity_card component -->
+                <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
+                  <%= if @latest_billboard do %>
+                    <.activity_card
+                      type="content"
+                      label={gettext("Current Billboard")}
+                      title={@latest_billboard.title}
+                      subtitle={ngettext("1 submission", "%{count} submissions", length(@latest_billboard.submissions))}
+                      status_text={
+                        case @latest_billboard.status do
+                          :active -> gettext("Active")
+                          :stopped -> gettext("Stopped")
+                          :created -> gettext("Created")
+                        end
+                      }
+                      action_text={gettext("Go to billboard")}
+                      navigate={~p"/billboards/#{@latest_billboard.billboard_id}"}
+                    />
+                  <% else %>
+                    <.activity_card
+                      type="action"
+                      label={gettext("Create Billboard")}
+                      title={gettext("Create Music Billboard")}
+                      subtitle={gettext("Collect community playlists")}
+                      status_text={gettext("New")}
+                      status_variant="default"
+                      action_text={gettext("Start collecting submissions")}
+                      navigate={~p"/billboards/new"}
+                    />
+                  <% end %>
+                <% end %>
+              </div>
             </div>
-          </div>
+          <% end %>
         </div>
       </div>
     </div>

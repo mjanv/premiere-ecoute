@@ -56,22 +56,31 @@
       rgba(0, 255, 255, 0.06) 20%,
       transparent 40%
     );
-  animation: synthwave-glow 25s ease-in-out infinite alternate;
+  animation: synthwave-glow 15s ease-in-out infinite alternate,
+             synthwave-move 15s linear infinite;
   pointer-events: none;
   z-index: 0;
 }
 
 @keyframes synthwave-glow {
   0% {
-    opacity: 0.6;
+    opacity: 0.0;
   }
   50% {
     opacity: 1;
   }
   100% {
-    opacity: 0.7;
+    opacity: 0.0;
   }
 }
+
+
+@keyframes synthwave-move {
+  0%   { background-position: 85% 15%, 15% 85%; }
+  50%  { background-position: 75% 25%, 25% 75%; }
+  100% { background-position: 85% 15%, 15% 85%; }
+}
+
 
 /* Ensure content appears above the background */
 .synthwave-bg > * {

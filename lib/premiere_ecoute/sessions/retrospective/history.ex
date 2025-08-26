@@ -10,34 +10,12 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   @type time_period :: :month | :year
 
   @doc """
   Get all albums listened by a specific streamer during a time period.
-
-  ## Parameters
-
-    * `user_id` - The ID of the streamer
-    * `period` - Time period to filter by (`:month`, `:year`, `:all_time`)
-    * `opts` - Options map with optional keys:
-      - `:year` - Specific year to filter by (default: current year)
-      - `:month` - Specific month to filter by (1-12, only used when period is `:month`)
-
-  ## Returns
-
-  List of album data with scores and session information, ordered by most recent sessions.
-
-  ## Examples
-
-      # Get albums from current month
-      iex> get_albums_by_period(user_id, :month)
-      [%{album: %Album{}, global_score: 8.5, session_date: ~U[...], ...}]
-
-      # Get albums from specific year
-      iex> get_albums_by_period(user_id, :year, %{year: 2023})
-      [%{album: %Album{}, global_score: 7.2, session_date: ~U[...], ...}]
-      [...]
   """
   @spec get_albums_by_period(integer(), time_period(), map()) :: [map()]
   def get_albums_by_period(user_id, period, opts \\ %{}) do
@@ -70,8 +48,49 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   end
 
   @doc """
+  Get all albums listened by a specific viewer during a time period.
+  """
+  @spec get_votes_by_period(integer(), time_period(), map()) :: [map()]
+  def get_votes_by_period(user_id, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: a in Album,
+        on: s.album_id == a.id,
+        where: v.viewer_id == ^user_id,
+        where: v.value not in ["smash", "pass"],
+        group_by: [a.id, a.name, a.artist, a.cover_url],
+        select: %{
+          album: %Album{
+            id: a.id,
+            name: a.name,
+            artist: a.artist,
+            cover_url: a.cover_url
+          },
+          score: fragment("ROUND(AVG(CAST(? AS DECIMAL)), 1)", v.value)
+        },
+        order_by: [desc: count(v.id)]
+
+    case period do
+      :month ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", s.inserted_at, ^month)
+
+      :year ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year)
+    end
+    |> Repo.all()
+  end
+
+  @doc """
   Get detailed track information for a specific album session.
-  Used for the modal display when clicking on an album.
   """
   @spec get_album_session_details(integer()) :: {:ok, map()} | {:error, :not_found}
   def get_album_session_details(session_id) do

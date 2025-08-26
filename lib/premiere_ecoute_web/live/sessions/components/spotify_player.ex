@@ -118,7 +118,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           <p class="text-sm font-medium text-white truncate">
             {@player_state["item"]["name"]}
           </p>
-          <div class="flex items-center justify-between text-xs text-gray-400">
+          <div class="flex items-center justify-between text-xs text-gray-200">
             <span>{gettext("Progress:")}</span>
             <span>
               {PremiereEcouteCore.Duration.timer(@player_state["item"]["progress_ms"])} / {PremiereEcouteCore.Duration.timer(

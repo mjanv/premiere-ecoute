@@ -35,7 +35,61 @@ defmodule PremiereEcoute.Sessions.Retrospective.VoteTrendsTest do
     create_vote(session.id, track2.id, "iris", "7", DateTime.add(base_time, 203, :second))
     create_vote(session.id, track2.id, "jack", "8", DateTime.add(base_time, 219, :second))
 
-    {:ok, %{session: session}}
+    {:ok, %{session: session, tracks: album.tracks}}
+  end
+
+  describe "distribution/1" do
+    test "compute the distribution of a session", %{session: session} do
+      distribution = VoteTrends.distribution(session.id)
+
+      assert distribution == [{"5", 2}, {"6", 3}, {"7", 5}, {"8", 6}, {"9", 4}]
+    end
+  end
+
+  describe "track_distribution/1" do
+    test "compute the track distribution of a session", %{session: session, tracks: tracks} do
+      [%{id: id1}, %{id: id2}] = tracks
+      distributions = VoteTrends.track_distribution(session.id)
+
+      assert %{
+               ^id1 => [{"5", 1}, {"6", 1}, {"7", 3}, {"8", 3}, {"9", 2}],
+               ^id2 => [{"5", 1}, {"6", 2}, {"7", 2}, {"8", 3}, {"9", 2}]
+             } = distributions
+    end
+  end
+
+  describe "consensus/1" do
+    test "compute rating metrics over session distribution", %{session: session} do
+      distribution = VoteTrends.distribution(session.id)
+
+      consensus = VoteTrends.consensus(distribution)
+
+      assert consensus == %{entropy: 1.5684705556118044, mean: 7.28, mode_share: 0.28, score: 6.558750609756243, variance: 1.6416}
+    end
+
+    test "compute rating metrics over track distributions", %{session: session, tracks: tracks} do
+      [%{id: id1}, %{id: id2}] = tracks
+      distributions = VoteTrends.track_distribution(session.id)
+
+      consensus = VoteTrends.consensus(distributions)
+
+      assert %{
+               ^id1 => %{
+                 mean: 7.266666666666667,
+                 variance: 1.6622222222222223,
+                 mode_share: 0.26666666666666666,
+                 entropy: 1.5641315026219946,
+                 score: 6.510728026279086
+               },
+               ^id2 => %{
+                 mean: 7.2,
+                 variance: 1.76,
+                 mode_share: 0.26666666666666666,
+                 entropy: 1.5867847075280475,
+                 score: 6.406683417191173
+               }
+             } = consensus
+    end
   end
 
   describe "rolling_average/1" do

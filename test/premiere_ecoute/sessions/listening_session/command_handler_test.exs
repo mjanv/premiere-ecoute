@@ -335,6 +335,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       report = Report.get_by(session_id: session.id)
 
       assert session.status == :stopped
+      assert session.current_track == nil
 
       assert %PremiereEcoute.Sessions.Retrospective.Report{
                polls: [],

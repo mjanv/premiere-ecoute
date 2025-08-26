@@ -114,6 +114,7 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
             {:ok, _} ->
               socket
               |> assign(:selected_playlist, nil)
+              |> assign(:show_playlist_modal, false)
               |> load_library_playlists()
               |> put_flash(:success, gettext("Playlist added to your library!"))
 

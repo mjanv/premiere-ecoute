@@ -1,0 +1,330 @@
+<!-- AIDEV-NOTE: Full-page retrospective layout without sidebar/header for sharing -->
+<div class="synthwave-bg min-h-screen text-white">
+  
+<!-- Hero Section: Album Cover Background with Stats Overlay -->
+  <%= if @listening_session.album do %>
+    <div class="relative h-screen flex items-center justify-center overflow-hidden">
+      <!-- Full-width Album Cover Background -->
+      <%= if @listening_session.album.cover_url do %>
+        <div
+          class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={"background-image: url('#{@listening_session.album.cover_url}')"}
+        >
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        </div>
+      <% else %>
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-pink-900">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <svg class="w-64 h-64 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+          </div>
+        </div>
+      <% end %>
+      
+<!-- Back Link -->
+      <.link
+        navigate={~p"/sessions/#{@listening_session.id}"}
+        class="absolute top-4 left-4 z-20 bg-black/60 hover:bg-black/80 text-white px-4 py-2 rounded-lg transition-all text-sm flex items-center space-x-2 backdrop-blur-sm border border-white/20"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span>{gettext("Back to Session")}</span>
+      </.link>
+      
+<!-- Content Overlay -->
+      <div class="relative z-10 w-full h-full flex flex-col justify-center px-8">
+        
+<!-- Main Layout: Stats + Carousel -->
+        <.async_result :let={report} assign={@report}>
+          <:loading>
+            <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-16 items-center max-w-none mx-auto w-full px-16">
+              <!-- Loading Stats (1/3) -->
+              <div class="lg:col-span-1 space-y-8">
+                <%= for _ <- 1..2 do %>
+                  <div class="bg-gradient-to-br from-purple-900/50 to-pink-900/50 backdrop-blur-md rounded-2xl p-8 animate-pulse border border-purple-400/30">
+                    <div class="h-16 bg-white/20 rounded mb-4"></div>
+                    <div class="h-8 bg-white/20 rounded"></div>
+                  </div>
+                <% end %>
+              </div>
+              <!-- Loading Carousel (2/3) -->
+              <div class="lg:col-span-2 bg-black/40 backdrop-blur-md rounded-2xl p-8 animate-pulse">
+                <div class="h-12 bg-white/20 rounded mb-8 w-1/2 mx-auto"></div>
+                <div class="h-80 bg-white/20 rounded mb-4"></div>
+                <div class="h-8 bg-white/20 rounded w-1/3 mx-auto"></div>
+              </div>
+            </div>
+          </:loading>
+
+          <:failed>
+            <div class="text-center text-red-400">
+              <p class="text-2xl">{gettext("Failed to load data")}</p>
+            </div>
+          </:failed>
+
+          <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-16 items-center max-w-none mx-auto w-full px-16">
+            <!-- Left Side: Dynamic Scores (1/3) -->
+            <div class="lg:col-span-1 space-y-8">
+              <!-- Viewer Score -->
+              <div class="bg-gradient-to-br from-purple-900/50 to-pink-900/50 backdrop-blur-md rounded-2xl p-8 text-center border border-purple-400/30">
+                <p id="viewer-score" class="text-6xl md:text-7xl font-bold text-purple-300 mb-4">
+                  <%= case session_average_score(report) do %>
+                    <% score when is_number(score) -> %>
+                      {score}
+                    <% _ -> %>
+                      —
+                  <% end %>
+                </p>
+                <p class="text-2xl font-bold text-purple-100">
+                  {gettext("Viewers")}
+                </p>
+              </div>
+              
+<!-- Streamer Score -->
+              <div class="bg-gradient-to-br from-purple-900/50 to-pink-900/50 backdrop-blur-md rounded-2xl p-8 text-center border border-purple-400/30">
+                <p id="streamer-score" class="text-6xl md:text-7xl font-bold text-pink-300 mb-4">
+                  <%= case session_streamer_score(report) do %>
+                    <% score when is_number(score) -> %>
+                      {score}
+                    <% _ -> %>
+                      —
+                  <% end %>
+                </p>
+                <p class="text-2xl font-bold text-pink-100">
+                  {gettext("Streamer")}
+                </p>
+              </div>
+            </div>
+            
+<!-- Right Side: Carousel with Histograms (2/3) -->
+            <div
+              id="retrospective-carousel"
+              class="lg:col-span-2 relative"
+              phx-hook="Carousel"
+              data-session-viewer-score={session_average_score(report)}
+              data-session-streamer-score={session_streamer_score(report)}
+              data-album-name-only={@listening_session.album.name}
+              data-album-artist={@listening_session.album.artist}
+              data-most-liked-track={if @most_liked.ok?, do: @most_liked.result, else: ""}
+              data-least-liked-track={if @least_liked.ok?, do: @least_liked.result, else: ""}
+              {build_track_data_attributes(@listening_session, report)}
+            >
+              <!-- Dynamic Carousel Title -->
+              <div class="text-center mb-8 relative px-32">
+                <!-- AIDEV-NOTE: Badges positioned outside the padded title area -->
+                <span
+                  id="least-liked-badge"
+                  class="absolute -left-4 top-1/2 -translate-y-1/2 bg-red-500/30 text-red-200 px-4 py-2 rounded-full text-sm font-bold border border-red-400/50 opacity-0 transition-opacity duration-300 whitespace-nowrap"
+                >
+                  💔 {gettext("Least liked")}
+                </span>
+                <span
+                  id="most-liked-badge"
+                  class="absolute -right-4 top-1/2 -translate-y-1/2 bg-pink-500/30 text-pink-200 px-4 py-2 rounded-full text-sm font-bold border border-pink-400/50 opacity-0 transition-opacity duration-300 whitespace-nowrap"
+                >
+                  💖 {gettext("Most liked")}
+                </span>
+
+                <h2 id="carousel-title" class="text-4xl md:text-5xl font-bold text-purple-300 drop-shadow-xl">
+                  {@listening_session.album.name}
+                </h2>
+                <p id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg">
+                  {@listening_session.album.artist}
+                </p>
+              </div>
+
+              <div id="histogram-carousel" class="overflow-hidden">
+                <div class="flex transition-transform duration-300" id="carousel-container">
+                  <!-- Overall Session Histogram -->
+                  <div class="w-full flex-shrink-0">
+                    <div class="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                      <div class="flex items-end justify-center h-80 mx-auto">
+                        <%= for {rating, votes} <- session_vote_distribution(report, @listening_session) do %>
+                          <div class="flex-1 flex flex-col items-center px-1">
+                            <%= if votes > 0 do %>
+                              <span class="text-2xl font-bold text-white mb-2 drop-shadow-lg">
+                                {votes}
+                              </span>
+                            <% end %>
+                            <div
+                              class={[
+                                "w-full rounded-t transition-all duration-300 min-w-0",
+                                vote_option_color(rating, @listening_session),
+                                if(votes > 0 && votes == session_max_votes(report, @listening_session),
+                                  do: "ring-2 ring-white/70",
+                                  else: ""
+                                )
+                              ]}
+                              style={"height: #{min(max(votes * 28, 16), 240)}px"}
+                            >
+                            </div>
+                            <span class="text-xl font-bold text-white mt-2 drop-shadow-lg">
+                              {rating}
+                            </span>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                  
+<!-- Track Histograms -->
+                  <%= if @listening_session.album && length(@listening_session.album.tracks || []) > 0 do %>
+                    <.async_result :let={_most_liked} assign={@most_liked}>
+                      <:loading>
+                        <%= for {track, index} <- Enum.with_index(@listening_session.album.tracks, 1) do %>
+                          <div class="w-full flex-shrink-0">
+                            <div class="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                              <div class="flex items-end justify-center h-80 mx-auto">
+                                <%= for {rating, votes} <- track_vote_distribution(track.id, report, @listening_session) do %>
+                                  <div class="flex-1 flex flex-col items-center px-1">
+                                    <%= if votes > 0 do %>
+                                      <span class="text-sm font-bold text-white mb-2">
+                                        {votes}
+                                      </span>
+                                    <% end %>
+                                    <div
+                                      class={[
+                                        "w-full rounded-t transition-all duration-300 min-w-0",
+                                        vote_option_color(rating, @listening_session),
+                                        if(votes > 0 && votes == track_max_votes(track.id, report, @listening_session),
+                                          do: "ring-2 ring-white/50",
+                                          else: ""
+                                        )
+                                      ]}
+                                      style={"height: #{min(max(votes * 28, 16), 240)}px"}
+                                    >
+                                    </div>
+                                    <span class="text-sm font-bold text-white mt-2">
+                                      {rating}
+                                    </span>
+                                  </div>
+                                <% end %>
+                              </div>
+                            </div>
+                          </div>
+                        <% end %>
+                      </:loading>
+                      <:failed>
+                        <%= for {track, index} <- Enum.with_index(@listening_session.album.tracks, 1) do %>
+                          <div class="w-full flex-shrink-0">
+                            <div class="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                              <div class="flex items-end justify-center h-80 mx-auto">
+                                <%= for {rating, votes} <- track_vote_distribution(track.id, report, @listening_session) do %>
+                                  <div class="flex-1 flex flex-col items-center px-1">
+                                    <%= if votes > 0 do %>
+                                      <span class="text-sm font-bold text-white mb-2">
+                                        {votes}
+                                      </span>
+                                    <% end %>
+                                    <div
+                                      class={[
+                                        "w-full rounded-t transition-all duration-300 min-w-0",
+                                        vote_option_color(rating, @listening_session),
+                                        if(votes > 0 && votes == track_max_votes(track.id, report, @listening_session),
+                                          do: "ring-2 ring-white/50",
+                                          else: ""
+                                        )
+                                      ]}
+                                      style={"height: #{min(max(votes * 28, 16), 240)}px"}
+                                    >
+                                    </div>
+                                    <span class="text-sm font-bold text-white mt-2">
+                                      {rating}
+                                    </span>
+                                  </div>
+                                <% end %>
+                              </div>
+                            </div>
+                          </div>
+                        <% end %>
+                      </:failed>
+
+                      <%= for {track, index} <- Enum.with_index(@listening_session.album.tracks, 1) do %>
+                        <div class="w-full flex-shrink-0">
+                          <!-- AIDEV-NOTE: Highlight most liked track with pink background -->
+                          <div class={[
+                            "backdrop-blur-md rounded-2xl p-6 border",
+                            cond do
+                              @most_liked.ok? && @most_liked.result == track.id ->
+                                "bg-gradient-to-br from-pink-900/20 to-purple-900/20 border-pink-400/50"
+
+                              @least_liked.ok? && @least_liked.result == track.id ->
+                                "bg-gradient-to-br from-red-900/20 to-orange-900/20 border-red-400/50"
+
+                              true ->
+                                "bg-black/40 border-white/20"
+                            end
+                          ]}>
+                            <div class="flex items-end justify-center h-80 mx-auto">
+                              <%= for {rating, votes} <- track_vote_distribution(track.id, report, @listening_session) do %>
+                                <div class="flex-1 flex flex-col items-center px-1">
+                                  <%= if votes > 0 do %>
+                                    <span class="text-sm font-bold text-white mb-2">
+                                      {votes}
+                                    </span>
+                                  <% end %>
+                                  <div
+                                    class={[
+                                      "w-full rounded-t transition-all duration-300 min-w-0",
+                                      vote_option_color(rating, @listening_session),
+                                      if(votes > 0 && votes == track_max_votes(track.id, report, @listening_session),
+                                        do: "ring-2 ring-white/50",
+                                        else: ""
+                                      )
+                                    ]}
+                                    style={"height: #{min(max(votes * 28, 16), 240)}px"}
+                                  >
+                                  </div>
+                                  <span class="text-sm font-bold text-white mt-2">
+                                    {rating}
+                                  </span>
+                                </div>
+                              <% end %>
+                            </div>
+                          </div>
+                        </div>
+                      <% end %>
+                    </.async_result>
+                  <% end %>
+                </div>
+              </div>
+              
+<!-- Carousel Navigation & Indicators -->
+              <div class="flex justify-center items-center space-x-6 mt-6">
+                <!-- Previous Button -->
+                <button
+                  id="carousel-prev"
+                  class="bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all shadow-lg border border-purple-500/30"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                
+<!-- Dot Indicators -->
+                <div class="flex justify-center space-x-2">
+                  <button class="w-3 h-3 bg-white/60 rounded-full carousel-dot active"></button>
+                  <%= for _ <- @listening_session.album.tracks do %>
+                    <button class="w-3 h-3 bg-white/30 rounded-full carousel-dot"></button>
+                  <% end %>
+                </div>
+                
+<!-- Next Button -->
+                <button
+                  id="carousel-next"
+                  class="bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all shadow-lg border border-purple-500/30"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </.async_result>
+      </div>
+    </div>
+  <% end %>
+</div>

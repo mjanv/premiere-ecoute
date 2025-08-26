@@ -16,27 +16,27 @@
       </div>
       
 <!-- Both scores display -->
-      <div :if={summary && @score in [:both]} style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-        <!-- Streamer Score -->
+      <div :if={summary && @score in [:both]} style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+        <!-- Viewer Score -->
         <div style="display: flex; flex-direction: column; align-items: center;">
-          <span style="font-size: 28px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            {score_value(summary, :streamer)}
+          <span style="font-size: 32px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+            {score_value(summary, :viewer)}
           </span>
-          <div style="font-size: 10px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
-            {score_label(:streamer)}
+          <div style="font-size: 11px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
+            {score_label(:viewer)}
           </div>
         </div>
         
-<!-- Separator -->
-        <div style="width: 40px; height: 1px; background: rgba(255, 255, 255, 0.3);"></div>
+<!-- Vertical Separator -->
+        <div style="width: 1px; height: 45px; background: rgba(255, 255, 255, 0.3);"></div>
         
-<!-- Viewer Score -->
+<!-- Streamer Score -->
         <div style="display: flex; flex-direction: column; align-items: center;">
-          <span style="font-size: 28px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            {score_value(summary, :viewer)}
+          <span style="font-size: 32px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+            {score_value(summary, :streamer)}
           </span>
-          <div style="font-size: 10px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
-            {score_label(:viewer)}
+          <div style="font-size: 11px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
+            {score_label(:streamer)}
           </div>
         </div>
       </div>

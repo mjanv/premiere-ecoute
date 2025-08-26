@@ -16,11 +16,9 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
       |> assign(:playlist, nil)
       |> assign(:loading, true)
       |> assign(:error, nil)
-      # AIDEV-NOTE: Search and filter state
       |> assign(:search_query, "")
       |> assign(:date_filter, "all")
       |> assign(:filtered_tracks, [])
-      # AIDEV-NOTE: Batch selection state
       |> assign(:selected_tracks, MapSet.new())
       |> assign(:select_all, false)
       |> assign(:deleting_tracks, false)
@@ -235,22 +233,19 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
     |> assign(:select_all, false)
   end
 
-  # AIDEV-NOTE: Filter tracks by release date
   defp filter_by_date(tracks, "all"), do: tracks
 
   defp filter_by_date(tracks, date_filter) do
     cutoff_date =
       case date_filter do
         "week" -> Date.add(Date.utc_today(), -7)
-        "month" -> Date.add(Date.utc_today(), -30)
-        "year" -> Date.add(Date.utc_today(), -365)
         _ -> nil
       end
 
     if cutoff_date do
       Enum.filter(tracks, fn track ->
         case track.release_date do
-          %Date{} = release_date -> Date.compare(release_date, cutoff_date) != :lt
+          %Date{} = release_date -> Date.compare(release_date, cutoff_date) == :lt
           _ -> false
         end
       end)

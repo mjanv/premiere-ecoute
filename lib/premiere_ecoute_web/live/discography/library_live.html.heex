@@ -247,48 +247,6 @@
                   </button>
                 </div>
               <% end %>
-              
-<!-- AIDEV-NOTE: Selected playlist info and registration button -->
-              <%= if @selected_playlist do %>
-                <div class="mt-6 p-4 bg-green-600/20 border border-green-500/30 rounded-lg">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <%= if @selected_playlist.cover_url do %>
-                        <img
-                          src={@selected_playlist.cover_url}
-                          alt={@selected_playlist.title}
-                          class="w-12 h-12 rounded-lg object-cover"
-                        />
-                      <% else %>
-                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                            />
-                          </svg>
-                        </div>
-                      <% end %>
-                      <div>
-                        <h4 class="font-semibold text-white">{@selected_playlist.title}</h4>
-                        <p class="text-sm text-green-300">{gettext("Selected for registration")}</p>
-                      </div>
-                    </div>
-
-                    <button
-                      phx-click="register_playlist"
-                      class="px-4 py-2 rounded-lg font-medium transition-all flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white hover:shadow-lg"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      <span>{gettext("Add to Library")}</span>
-                    </button>
-                  </div>
-                </div>
-              <% end %>
             <% else %>
               <div class="text-center py-12">
                 <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -307,13 +265,57 @@
         </div>
         
 <!-- Modal Footer -->
-        <div class="flex justify-end p-6 border-t border-gray-700">
-          <button
-            phx-click="hide_playlist_modal"
-            class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-          >
-            {gettext("Close")}
-          </button>
+        <div class="border-t border-gray-700">
+          <!-- AIDEV-NOTE: Selected playlist info section - separate from scrollable content -->
+          <%= if @selected_playlist do %>
+            <div class="px-6 pt-4 pb-2 bg-green-600/10 border-b border-green-500/20">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <%= if @selected_playlist.cover_url do %>
+                    <img
+                      src={@selected_playlist.cover_url}
+                      alt={@selected_playlist.title}
+                      class="w-10 h-10 rounded object-cover"
+                    />
+                  <% else %>
+                    <div class="w-10 h-10 bg-green-600 rounded flex items-center justify-center">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                    </div>
+                  <% end %>
+                  <div>
+                    <h4 class="font-medium text-white text-sm">{@selected_playlist.title}</h4>
+                    <p class="text-xs text-green-300">{gettext("Selected for registration")}</p>
+                  </div>
+                </div>
+
+                <button
+                  phx-click="register_playlist"
+                  class="px-4 py-2 rounded-lg font-medium transition-all flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white hover:shadow-lg"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>{gettext("Add to Library")}</span>
+                </button>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="flex justify-end p-6">
+            <button
+              phx-click="hide_playlist_modal"
+              class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+            >
+              {gettext("Close")}
+            </button>
+          </div>
         </div>
       </div>
     </div>

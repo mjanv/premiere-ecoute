@@ -48,7 +48,7 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
             # AIDEV-NOTE: Admin impersonation start - generates new session token for target user
             conn
             |> UserAuth.start_impersonation(current_scope.user, target_user)
-            |> put_flash(:info, "Now impersonating #{target_user.twitch.username || target_user.email}")
+            |> put_flash(:info, "Now impersonating #{target_user.username}")
             |> redirect(to: ~p"/")
         end
     end
