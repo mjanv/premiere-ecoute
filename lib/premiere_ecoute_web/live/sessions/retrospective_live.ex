@@ -7,6 +7,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.Retrospective.VoteTrends
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -36,8 +37,8 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
           |> assign_async([:most_liked, :least_liked], fn ->
             consensus =
               listening_session.id
-              |> PremiereEcoute.Sessions.Retrospective.VoteTrends.track_distribution()
-              |> PremiereEcoute.Sessions.Retrospective.VoteTrends.consensus()
+              |> VoteTrends.track_distribution()
+              |> VoteTrends.consensus()
 
             most_liked = Enum.max(Enum.map(consensus, fn {_, %{score: score}} -> score end))
             {most_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == most_liked end)

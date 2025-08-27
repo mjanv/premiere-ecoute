@@ -6,9 +6,9 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions
 
   import PremiereEcouteCore.Duration, only: [timer: 1]
 

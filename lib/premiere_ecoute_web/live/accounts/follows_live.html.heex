@@ -1,14 +1,23 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
-  <div class="px-6 py-8">
-    <.header>
-      My Follows
-      <:subtitle>Manage your followed streamers</:subtitle>
-      <:actions>
-        <.button phx-click="show_follow_modal" class="bg-green-600 hover:bg-green-700">
-          Follow +
-        </.button>
-      </:actions>
-    </.header>
+  <div class="synthwave-bg px-6 py-8" style="min-height: calc(100vh - 5rem);">
+        <div class="flex-1 py-12">
+      <div class="max-w-7xl mx-auto px-6">
+    <.page_header
+      title={gettext("My Follows")}
+      subtitle={gettext("Manage your followed streamers")}
+    >
+      <:action>
+        <.link
+          phx-click="show_follow_modal"
+          class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          {gettext("Follow")}
+        </.link>
+      </:action>
+    </.page_header>
 
     <div class="mt-8">
       <%= if Enum.empty?(@current_user.channels) do %>
@@ -197,5 +206,7 @@
         </div>
       </div>
     <% end %>
+  </div>
+  </div>
   </div>
 </Layouts.app>

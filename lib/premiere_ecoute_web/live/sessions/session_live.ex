@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.Retrospective.VoteTrends
   alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
 
   @impl true
@@ -40,7 +41,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         |> assign(:user_current_rating, nil)
         |> assign(:report, nil)
         |> assign(:overlay_score_type, "streamer")
+        |> assign(:vote_trends, nil)
         |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
+        |> assign_async(:vote_trends, fn ->
+          vote_data = VoteTrends.rolling_average(String.to_integer(id), :minute)
+          {:ok, %{vote_trends: vote_data}}
+        end)
         |> then(fn socket -> {:ok, socket} end)
     end
   end
@@ -143,6 +149,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
     socket
     |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
+    |> assign_async(:vote_trends, fn ->
+      vote_data = VoteTrends.rolling_average(String.to_integer(session_id), :minute)
+      {:ok, %{vote_trends: vote_data}}
+    end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -154,6 +164,17 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_async(:report, {:ok, %{report: report}}, socket) do
     {:noreply, assign(socket, :report, report)}
+  end
+
+  @impl true
+  def handle_async(:vote_trends, {:ok, %{vote_trends: vote_trends}}, socket) do
+    {:noreply, assign(socket, :vote_trends, vote_trends)}
+  end
+
+  @impl true
+  def handle_async(:vote_trends, {:exit, reason}, socket) do
+    Logger.error("Failed to load vote trends: #{inspect(reason)}")
+    {:noreply, socket}
   end
 
   @impl true
