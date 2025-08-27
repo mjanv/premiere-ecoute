@@ -93,6 +93,14 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     >
                       {gettext("My Billboards")}
                     </.sidebar_link>
+                    <.sidebar_link
+                      href={~p"/billboards/submissions"}
+                      current_page={@current_page}
+                      page_id="submissions"
+                      icon="hero-bookmark"
+                    >
+                      {gettext("My Submissions")}
+                    </.sidebar_link>
                   </nav>
                 </div>
               <% end %>

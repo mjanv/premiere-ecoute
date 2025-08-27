@@ -13,12 +13,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   def devices(%Scope{} = scope) do
     scope
     |> SpotifyApi.api()
-    |> Req.merge(
-      headers: [
-        {"Content-Type", "application/json"}
-      ]
-    )
+    |> Req.merge(headers: [{"Content-Type", "application/json"}])
     |> Req.get(url: "/me/player/devices")
+    |> case do
+      {:ok, %{status: 200, body: %{"devices" => devices}}} -> {:ok, devices}
+      {:error, _reason} -> {:error, []}
+    end
   end
 
   @doc """

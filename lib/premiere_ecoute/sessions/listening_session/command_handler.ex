@@ -23,8 +23,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
   alias PremiereEcoute.Sessions.Retrospective.Report
 
-  alias PremiereEcoute.Gettext
-
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession)
@@ -56,16 +54,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StartListeningSession{session_id: session_id, scope: scope}) do
-    with {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
+    with {:ok, devices} <- Apis.spotify().devices(scope),
+         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+         {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
          {:ok, _} <- Apis.twitch().subscribe(scope, "channel.chat.message"),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
-         {:ok, _} <- Apis.twitch().send_chat_message(scope, Gettext.gettext(gettext_noop("Welcome !"))),
+         {:ok, session} <- ListeningSession.start(session),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         {:ok, session} <- ListeningSession.start(session) do
+         {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}") do
       {:ok, session, [%SessionStarted{session_id: session.id}]}
     else
+      false ->
+        {:error, "No Spotify active device detected"}
+
       reason ->
         Logger.error("Cannot start listening session due to: #{inspect(reason)}")
         {:error, []}
@@ -97,7 +100,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StopListeningSession{session_id: session_id, scope: scope}) do
-    with session <- ListeningSession.get(session_id),
+    with {:ok, devices} <- Apis.spotify().devices(scope),
+         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+         session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.spotify().pause_playback(scope),
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
@@ -106,6 +111,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
       {:ok, session, [%SessionStopped{session_id: session.id}]}
     else
+      false ->
+        {:error, "No Spotify active device detected"}
+
       reason ->
         Logger.error("Cannot stop listening session due to: #{inspect(reason)}")
         {:error, []}

@@ -56,24 +56,12 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
-      live "/billboard", Billboards.BillboardLive, :index
-      live "/billboards/:id/submission/new", Billboards.SubmissionLive, :new
-      live "/billboards/:id/dashboard", Billboards.DashboardLive, :show
-    end
-  end
-
-  scope "/", PremiereEcouteWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live_session :billboards, on_mount: [{UserAuth, :streamer}] do
-      live "/billboards", Billboards.IndexLive, :index
-      live "/billboards/new", Billboards.NewLive, :new
     end
 
-    live_session :home, on_mount: [{UserAuth, :current_scope}] do
+    pipe_through [:require_authenticated_user]
+
+    live_session :home, on_mount: [{UserAuth, :viewer}] do
       live "/home", HomeLive, :index
-
-      live "/billboards/:id", Billboards.ShowLive, :show
     end
   end
 
@@ -102,6 +90,28 @@ defmodule PremiereEcouteWeb.Router do
     end
 
     post "/update-password", UserSessionController, :update_password
+  end
+
+  scope "/", PremiereEcouteWeb.Billboards do
+    pipe_through [:browser]
+
+    live_session :public_billboard, on_mount: [{UserAuth, :current_scope}] do
+      live "/billboard", BillboardLive, :index
+      live "/billboards/:id/dashboard", DashboardLive, :show
+      live "/billboards/:id/submission/new", SubmissionLive, :new
+    end
+
+    pipe_through [:require_authenticated_user]
+
+    live_session :viewer_billboard, on_mount: [{UserAuth, :viewer}] do
+      live "/billboards/submissions", SubmissionsLive, :index
+    end
+
+    live_session :streamer_billboard, on_mount: [{UserAuth, :streamer}] do
+      live "/billboards", IndexLive, :index
+      live "/billboards/new", NewLive, :new
+      live "/billboards/:id", ShowLive, :show
+    end
   end
 
   scope "/discography", PremiereEcouteWeb.Discography do
@@ -134,8 +144,11 @@ defmodule PremiereEcouteWeb.Router do
   scope "/retrospective", PremiereEcouteWeb.Retrospective do
     pipe_through [:browser]
 
-    live_session :retrospective, on_mount: [{UserAuth, :streamer}] do
+    live_session :streamer_retrospective, on_mount: [{UserAuth, :streamer}] do
       live "/history", HistoryLive, :index
+    end
+
+    live_session :viewer_retrospective, on_mount: [{UserAuth, :viewer}] do
       live "/votes", VotesLive, :index
     end
   end

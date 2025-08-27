@@ -67,6 +67,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> PremiereEcoute.apply()
     |> case do
       {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
       {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
     end
   end
@@ -80,6 +81,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> PremiereEcoute.apply()
     |> case do
       {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
       {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot stop session")}
     end
   end

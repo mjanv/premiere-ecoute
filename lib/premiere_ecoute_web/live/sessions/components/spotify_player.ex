@@ -26,13 +26,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
   def refresh_state(socket) do
     case SpotifyApi.get_playback_state(socket.assigns.current_scope) do
-      {:ok, state} ->
-        assign(socket, :player_state, state)
-
-      {:error, _} ->
-        socket
-        |> put_flash(:error, gettext("Cannot read playback state"))
-        |> assign(:player_state, SpotifyApi.Player.default())
+      {:ok, state} -> assign(socket, :player_state, state)
+      {:error, _} -> assign(socket, :player_state, SpotifyApi.Player.default())
     end
   end
 
@@ -107,7 +102,11 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
             <span class="text-xs text-green-400">{@player_state["device"]["name"]}</span>
           <% else %>
             <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span class="text-xs text-red-500">{gettext("Not playing")}</span>
+            <%= if @player_state["device"] do %>
+              <span class="text-xs text-red-500">{gettext("Not playing")}</span>
+            <% else %>
+              <span class="text-xs text-red-500">{gettext("No device")}</span>
+            <% end %>
           <% end %>
         </div>
       </div>

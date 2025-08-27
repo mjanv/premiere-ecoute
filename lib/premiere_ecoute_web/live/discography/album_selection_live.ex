@@ -72,7 +72,6 @@ defmodule PremiereEcouteWeb.Discography.AlbumSelectionLive do
       _ ->
         socket
         |> assign(:vote_options_preset, preset)
-        # AIDEV-NOTE: Mark vote options as configured when user changes them
         |> assign(:vote_options_configured, true)
         |> then(fn socket -> {:noreply, socket} end)
     end

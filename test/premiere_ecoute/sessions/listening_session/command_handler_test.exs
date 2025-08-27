@@ -118,12 +118,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
+      
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
         {:ok, "spotify:track:track001"}
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome !" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Track One" ->
         {:ok, %{}}
       end)
 
@@ -177,11 +179,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
 
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
         {:ok, "spotify:track:track001"}
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome !" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Track One" ->
         {:ok, %{}}
       end)
 
@@ -234,12 +238,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
+      
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
         {:ok, "spotify:track:track001"}
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome !" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Track One" ->
         {:ok, %{}}
       end)
 
@@ -306,6 +312,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
+
+      expect(SpotifyApi, :devices, 2, fn _ -> {:ok, [%{"is_active" => true}]} end)
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
         {:ok, "spotify:track:track001"}
