@@ -161,22 +161,22 @@
           <div class="flex items-start justify-between p-6 border-b border-gray-700">
             <div class="flex items-start space-x-6">
               <img
-                src={modal_data.cover_url}
+                src={modal_data.album.cover_url}
                 alt={gettext("Album cover")}
                 class="w-32 h-32 rounded-lg shadow-lg"
               />
               <div>
                 <h2 class="text-3xl font-bold text-white mb-2" id="modal-title">
-                  {modal_data.name}
+                  {modal_data.album.name}
                 </h2>
-                <p class="text-xl text-purple-300 mb-4">{modal_data.artist}</p>
-                <%= if modal_data.release_date do %>
+                <p class="text-xl text-purple-300 mb-4">{modal_data.album.artist}</p>
+                <%= if modal_data.album.release_date do %>
                   <p class="text-sm text-gray-400">
-                    {gettext("Released")}: {Calendar.strftime(modal_data.release_date, "%B %d, %Y")}
+                    {gettext("Released")}: {Calendar.strftime(modal_data.album.release_date, "%B %d, %Y")}
                   </p>
                 <% end %>
                 <p class="text-sm text-gray-400 mt-2">
-                  {modal_data.total_tracks} {ngettext("track", "tracks", modal_data.total_tracks)}
+                  {modal_data.album.total_tracks} {ngettext("track", "tracks", modal_data.album.total_tracks)}
                 </p>
               </div>
             </div>
@@ -199,15 +199,33 @@
           <div class="p-6 max-h-96 overflow-y-auto">
             <h3 class="text-lg font-medium text-white mb-4">{gettext("Track List")}</h3>
             <div class="space-y-3">
-              <%= for track <- modal_data.tracks do %>
-                <div class="flex items-center p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors">
-                  <span class="text-purple-300 font-medium w-8 text-center">{track.track_number}</span>
-                  <div class="ml-4">
-                    <p class="text-white font-medium text-lg">{track.name}</p>
-                    <%= if track.duration_ms do %>
-                      <p class="text-gray-400 text-sm">
-                        {timer(track.duration_ms)}
-                      </p>
+              <%= for track <- modal_data.album.tracks do %>
+                <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors">
+                  <div class="flex items-center">
+                    <span class="text-purple-300 font-medium w-8 text-center">{track.track_number}</span>
+                    <div class="ml-4">
+                      <p class="text-white font-medium text-lg">{track.name}</p>
+                      <%= if track.duration_ms do %>
+                        <p class="text-gray-400 text-sm">
+                          {timer(track.duration_ms)}
+                        </p>
+                      <% end %>
+                    </div>
+                  </div>
+                  
+                  <!-- AIDEV-NOTE: Display existing viewer votes for this track -->
+                  <div class="flex items-center space-x-3">
+                    <%= case get_track_votes(@current_user.twitch.user_id, track.id, modal_data.votes_by_track) do %>
+                      <% [_ | _] = votes -> %>
+                        <div class="flex flex-wrap gap-2">
+                          <%= for vote <- votes do %>
+                            <div class="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                              {vote.score}
+                            </div>
+                          <% end %>
+                        </div>
+                      <% [] -> %>
+                        <span class="text-gray-500 text-sm italic">{gettext("No vote")}</span>
                     <% end %>
                   </div>
                 </div>

@@ -110,7 +110,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                   <% end %>
                   
     <!-- AIDEV-NOTE: Dev mode fake Twitch link for testing -->
-                  <%= if Application.get_env(:premiere_ecoute, :environment) == :dev do %>
+                  <%= if Application.get_env(:premiere_ecoute, :environment) == :dev and @current_user.twitch do %>
                     <!-- Divider -->
                     <div class="border-t border-gray-600 my-1"></div>
                     <a

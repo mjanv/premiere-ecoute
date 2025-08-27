@@ -10,34 +10,43 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions
 
+  import Ecto.Query
   import PremiereEcouteCore.Duration, only: [timer: 1]
 
   @impl true
   def mount(_params, _session, socket) do
-    current_date = DateTime.utc_now()
+    case socket.assigns.current_scope.user.twitch do
+      nil ->
+        socket
+        |> put_flash(:error, "Connect to Twitch")
+        |> push_navigate(to: ~p"/home")
+        |> then(fn socket -> {:ok, socket} end)
+      _ ->
+        current_date = DateTime.utc_now()
 
-    socket =
-      socket
-      |> assign(:current_user, socket.assigns.current_scope.user)
-      |> assign(:selected_period, :month)
-      |> assign(:selected_year, current_date.year)
-      |> assign(:selected_month, current_date.month)
-      |> assign(:years_available, get_available_years())
-      |> assign(:show_modal, false)
-      |> assign(:modal_album_id, nil)
+        socket =
+          socket
+          |> assign(:current_user, socket.assigns.current_scope.user)
+          |> assign(:selected_period, :month)
+          |> assign(:selected_year, current_date.year)
+          |> assign(:selected_month, current_date.month)
+          |> assign(:years_available, get_available_years())
+          |> assign(:show_modal, false)
+          |> assign(:modal_album_id, nil)
 
-    # AIDEV-NOTE: Using Twitch user_id for votes lookup as requested
-    user_id = socket.assigns.current_user.twitch.user_id
-    period = :month
-    year = current_date.year
-    month = current_date.month
+        # AIDEV-NOTE: Using Twitch user_id for votes lookup as requested
+        user_id = socket.assigns.current_user.twitch.user_id
+        period = :month
+        year = current_date.year
+        month = current_date.month
 
-    socket
-    |> assign_async(:votes_data, fn ->
-      votes = Sessions.get_votes_by_period(user_id, period, %{year: year, month: month})
-      {:ok, %{votes_data: votes}}
-    end)
-    |> then(fn socket -> {:ok, socket} end)
+        socket
+        |> assign_async(:votes_data, fn ->
+          votes = Sessions.get_votes_by_period(user_id, period, %{year: year, month: month})
+          {:ok, %{votes_data: votes}}
+        end)
+        |> then(fn socket -> {:ok, socket} end)
+      end
   end
 
   @impl true
@@ -104,10 +113,12 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
 
   @impl true
   def handle_event("show_album_details", %{"album_id" => album_id}, socket) do
+    user_id = socket.assigns.current_user.twitch.user_id
+    
     socket
     |> assign(:show_modal, true)
     |> assign(:modal_album_id, album_id)
-    |> assign_async(:modal_data, fn -> load_modal_data(album_id) end)
+    |> assign_async(:modal_data, fn -> load_modal_data(album_id, user_id) end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -120,18 +131,47 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+
   # Private helper functions
 
-  # AIDEV-NOTE: Load album details without session info for votes modal
-  defp load_modal_data(album_id) do
+  # AIDEV-NOTE: Load album details with track votes for votes modal
+  defp load_modal_data(album_id, user_id) do
     case Repo.get(Album, album_id) |> Repo.preload(:tracks) do
       nil ->
         {:ok, %{modal_data: nil}}
 
       album ->
-        {:ok, %{modal_data: album}}
+        # Get all track IDs for this album
+        track_ids = Enum.map(album.tracks, & &1.id)
+        
+        # Get all votes for these tracks by the current user in one query
+        votes = get_all_track_votes_for_user(track_ids, user_id)
+        
+        # Group votes by track_id for easy lookup
+        votes_by_track = Enum.group_by(votes, & &1.track_id)
+        
+        {:ok, %{modal_data: %{album: album, votes_by_track: votes_by_track}}}
     end
   end
+
+  # AIDEV-NOTE: Get all track votes for a user in one query, grouped by track
+  defp get_all_track_votes_for_user(track_ids, user_id) do
+    alias PremiereEcoute.Sessions.Scores.Vote
+    
+    from(v in Vote,
+      where: v.track_id in ^track_ids and v.viewer_id == ^user_id,
+      select: %{track_id: v.track_id, score: v.value, inserted_at: v.inserted_at},
+      order_by: [v.track_id, desc: v.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  # AIDEV-NOTE: Get track votes from pre-loaded data
+  defp get_track_votes(_user_id, track_id, votes_by_track) when is_map(votes_by_track) do
+    Map.get(votes_by_track, track_id, [])
+  end
+  
+  defp get_track_votes(_user_id, _track_id, _votes_data), do: []
 
   defp parse_year(year_str) when is_binary(year_str) do
     case Date.from_iso8601("#{year_str}-01-01") do
