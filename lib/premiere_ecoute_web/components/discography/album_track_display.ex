@@ -14,7 +14,6 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
 
   use Phoenix.Component
 
-  # AIDEV-NOTE: Album display component with consistent cover image and metadata layout
   @doc """
   Renders an album display with cover image, name, and artist.
 
@@ -110,7 +109,6 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
     """
   end
 
-  # AIDEV-NOTE: Track display component for individual tracks with optional duration and controls
   @doc """
   Renders a track display with name, optional duration, and track number.
 
@@ -164,7 +162,6 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
     """
   end
 
-  # AIDEV-NOTE: Playlist display component with cover, name, creator, and metadata
   @doc """
   Renders a playlist display with cover image, name, creator, and optional metadata.
 
@@ -329,8 +326,6 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
     </div>
     """
   end
-
-  # AIDEV-NOTE: Utility functions for consistent sizing and styling
 
   # Cover image size classes
   defp cover_size_classes("sm"), do: "w-8 h-8"

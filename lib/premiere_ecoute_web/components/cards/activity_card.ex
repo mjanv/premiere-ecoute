@@ -2,8 +2,6 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
   @moduledoc """
   Renders activity cards used on the home dashboard for displaying user activities,
   creating new content, or showing unavailable features.
-
-  ## AIDEV-NOTE: Activity cards for home dashboard - sessions, billboards, playlists
   """
   use Phoenix.Component
 
@@ -95,7 +93,6 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
     """
   end
 
-  # AIDEV-NOTE: Private component for card content to avoid duplication between linked and non-linked cards
   defp activity_card_content(assigns) do
     ~H"""
     <div class={[
@@ -167,7 +164,6 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
     """
   end
 
-  # AIDEV-NOTE: Helper functions for consistent styling based on card type and status
   defp card_background_class("content"), do: "bg-gradient-to-br from-slate-50/6 to-slate-100/3"
   defp card_background_class("action"), do: "bg-gradient-to-br from-indigo-50/6 to-blue-100/3"
 

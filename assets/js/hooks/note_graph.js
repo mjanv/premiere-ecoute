@@ -8,7 +8,6 @@ export const NoteGraph = {
   },
 
   initializeChart() {
-    // Load Chart.js if not available
     if (typeof Chart === 'undefined') {
       this.loadChartJS().then(() => {
         this.createChart();
@@ -45,7 +44,6 @@ export const NoteGraph = {
     const minValue = Math.min(...voteOptions.map(Number));
     const maxValue = Math.max(...voteOptions.map(Number));
 
-    // AIDEV-NOTE: Create note graph with Chart.js showing rolling average over time
     try {
       this.chart = new Chart(ctx, {
       type: 'line',
@@ -56,7 +54,7 @@ export const NoteGraph = {
             x: minute,
             y: data.values[index]
           })),
-          borderColor: 'rgb(168, 85, 247)', // Purple-500 to match theme
+          borderColor: 'rgb(168, 85, 247)',
           backgroundColor: 'rgba(168, 85, 247, 0.3)',
           borderWidth: 2,
           fill: true,
@@ -111,11 +109,11 @@ export const NoteGraph = {
               display: false
             },
             grid: {
-              color: 'rgba(156, 163, 175, 0.3)', // lighter gray for dark background
+              color: 'rgba(156, 163, 175, 0.3)',
               lineWidth: 1
             },
             ticks: {
-              color: '#D1D5DB', // gray-300 - lighter for dark background
+              color: '#D1D5DB',
               maxTicksLimit: 10,
               stepSize: 1,
               callback: function(value) {
@@ -249,7 +247,6 @@ export const NoteGraph = {
   },
 
   createSimpleGraph() {
-    // AIDEV-NOTE: Fallback SVG-based graph when Chart.js is not available
     const canvas = this.el.querySelector('#note-graph-canvas');
     if (!canvas) return;
 

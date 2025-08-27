@@ -38,6 +38,7 @@ defmodule PremiereEcoute.Apis.DeezerApi.PlaylistsTest do
                album_id: "42219371",
                name: "Nights In White Satin",
                artist: "The Moody Blues",
+               release_date: ~D[1900-01-01],
                duration_ms: 265_000
              }
 

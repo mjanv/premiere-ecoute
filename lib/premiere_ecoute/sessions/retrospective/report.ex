@@ -87,7 +87,6 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   """
   @spec generate(ListeningSession.t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def generate(%ListeningSession{id: session_id} = session) do
-    # AIDEV-NOTE: Load votes and polls for this session
     votes = Vote.all() |> Enum.filter(&(&1.session_id == session_id))
     polls = Poll.all() |> Enum.filter(&(&1.session_id == session_id))
 
@@ -127,8 +126,6 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
         {:error, reason}
     end
   end
-
-  # AIDEV-NOTE: Helper functions for vote type detection and scoring logic
 
   defp vote_options_are_integers?(vote_options) do
     Enum.all?(vote_options, fn option ->
@@ -215,8 +212,6 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   end
 
   defp calculate_session_summary(%ListeningSession{vote_options: vote_options}, votes, polls) do
-    # AIDEV-NOTE: Session summary calculation adapted for integer vs string voting
-
     # Get all track IDs that have votes or polls
     track_ids_with_votes = votes |> Enum.map(& &1.track_id) |> Enum.uniq()
     track_ids_with_polls = polls |> Enum.map(& &1.track_id) |> Enum.uniq()
@@ -294,16 +289,12 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
     }
   end
 
-  # AIDEV-NOTE: Helper functions for track-level score calculations
-
   defp calculate_track_viewer_score(track_id, vote_options, votes, polls) do
-    # Get individual viewer votes for this track
     individual_votes =
       votes
       |> Enum.filter(fn vote -> vote.track_id == track_id and not vote.is_streamer end)
       |> Enum.map(& &1.value)
 
-    # Get poll votes for this track (extract from polls)
     poll_scores =
       polls
       |> Enum.filter(fn poll -> poll.track_id == track_id end)
@@ -381,7 +372,6 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   end
 
   defp extract_poll_score(poll, vote_options) do
-    # AIDEV-NOTE: Extract average/most frequent score from poll data
     if vote_options_are_integers?(vote_options) do
       # For integer options, calculate weighted average
       total_votes = poll.total_votes || 0
@@ -434,8 +424,6 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   end
 
   defp calculate_track_summaries(%ListeningSession{vote_options: vote_options}, votes, polls) do
-    # AIDEV-NOTE: Track summaries calculation adapted for integer vs string voting
-
     # Get all track IDs that have votes or polls
     track_ids_with_votes = votes |> Enum.map(& &1.track_id) |> Enum.uniq()
     track_ids_with_polls = polls |> Enum.map(& &1.track_id) |> Enum.uniq()

@@ -36,9 +36,7 @@ defmodule PremiereEcouteWeb.Components.StatsCard do
         assigns.class
       ])
 
-    # AIDEV-NOTE: Extract navigation attributes from rest
-    {nav_attrs, rest_attrs} =
-      Map.split(assigns.rest, [:navigate, :href, :patch, :method, :"phx-click"])
+    {nav_attrs, rest_attrs} = Map.split(assigns.rest, [:navigate, :href, :patch, :method, :"phx-click"])
 
     assigns =
       assigns
@@ -87,7 +85,6 @@ defmodule PremiereEcouteWeb.Components.StatsCard do
     """
   end
 
-  # AIDEV-NOTE: Icon color helper function for stats cards
   defp icon_color_classes(color) do
     case color do
       "blue" -> "bg-blue-500"

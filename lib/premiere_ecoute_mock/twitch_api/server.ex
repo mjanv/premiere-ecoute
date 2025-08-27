@@ -17,7 +17,6 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
 
     case File.read(html_file_path) do
       {:ok, chat_html} ->
-        # AIDEV-NOTE: Replace WebSocket URL with broadcaster_id in HTML
         updated_html =
           String.replace(
             chat_html,
@@ -251,7 +250,6 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
   # end
 
   defp send_webhook_notification(event_type, event_data) do
-    # AIDEV-NOTE: Extract broadcaster_user_id from event_data for webhook condition
     broadcaster_user_id = event_data["broadcaster_user_id"] || "123456"
 
     Req.post(

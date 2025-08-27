@@ -285,14 +285,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     |> Enum.max(fn -> 0 end)
   end
 
-  defp session_max_votes(nil, _session), do: 0
-
-  defp session_max_votes(report, session) do
-    session_vote_distribution(report, session)
-    |> Enum.map(&elem(&1, 1))
-    |> Enum.max(fn -> 0 end)
-  end
-
   # AIDEV-NOTE: Build data attributes for track scores and names to be used by JavaScript
   defp build_track_data_attributes(listening_session, report) do
     case listening_session.album do
@@ -315,6 +307,70 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
       _ ->
         []
+    end
+  end
+
+  # AIDEV-NOTE: Dynamic histogram scaling helpers for high vote volumes
+
+  # Calculate dynamic bar height based on vote count and maximum votes in the dataset.
+  # Ensures bars scale proportionally and don't exceed container height.
+  defp calculate_bar_height(votes, max_votes, container_height, min_height) do
+    cond do
+      votes == 0 ->
+        0
+
+      max_votes == 0 ->
+        min_height
+
+      true ->
+        # Use 85% of container height for maximum bar
+        max_bar_height = container_height * 0.85
+        scale_factor = max_bar_height / max_votes
+        calculated_height = votes * scale_factor
+
+        # Ensure minimum height for visibility
+        max(calculated_height, min_height)
+        |> round()
+    end
+  end
+
+  # Format vote count for display, using abbreviated format for large numbers.
+  defp format_vote_count(count) when is_integer(count) do
+    cond do
+      count < 1000 -> Integer.to_string(count)
+      count < 10000 -> "#{Float.round(count / 1000, 1)}k"
+      count < 1_000_000 -> "#{round(count / 1000)}k"
+      true -> "#{Float.round(count / 1_000_000, 1)}M"
+    end
+  end
+
+  defp format_vote_count(_), do: "0"
+
+  # Determine if vote count should be displayed inside or above the bar based on bar height.
+  defp vote_count_position(bar_height, min_height_for_inside \\ 30) do
+    if bar_height >= min_height_for_inside do
+      :inside
+    else
+      :above
+    end
+  end
+
+  # Calculate responsive font size class for vote counts based on maximum vote count.
+  defp vote_count_font_size(max_votes) do
+    cond do
+      max_votes < 100 -> "text-lg"
+      max_votes < 1000 -> "text-base"
+      true -> "text-sm"
+    end
+  end
+
+  # Calculate responsive padding for histogram bars based on number of vote options.
+  defp bar_padding_class(vote_option_count) do
+    cond do
+      vote_option_count <= 5 -> "px-2"
+      vote_option_count <= 10 -> "px-1"
+      vote_option_count <= 15 -> "px-0.5"
+      true -> "px-0"
     end
   end
 end

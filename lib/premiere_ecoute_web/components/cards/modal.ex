@@ -75,7 +75,6 @@ defmodule PremiereEcouteWeb.Components.Modal do
     """
   end
 
-  # AIDEV-NOTE: Modal size helper function for responsive sizing
   defp modal_size_classes(size) do
     case size do
       "sm" -> "max-w-sm w-full max-h-[80vh]"

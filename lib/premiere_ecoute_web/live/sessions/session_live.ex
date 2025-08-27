@@ -192,7 +192,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def session_status_class(:stopped),
     do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"
 
-  # AIDEV-NOTE: Helper functions to extract data from Report struct for template use
   def track_score(_track_id, nil), do: "N/A"
 
   def track_score(track_id, report) do
@@ -279,7 +278,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  # AIDEV-NOTE: Get vote distribution histogram data for a specific track from raw votes and polls
   def track_vote_distribution(_track_id, nil, session),
     do: for(rating <- session_vote_options(session), do: {rating, 0})
 
@@ -312,7 +310,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  # AIDEV-NOTE: Get the maximum vote count for highlighting in histogram
   def track_max_votes(_track_id, nil, _session), do: 0
 
   def track_max_votes(track_id, report, session) do
@@ -321,7 +318,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> Enum.max(fn -> 0 end)
   end
 
-  # AIDEV-NOTE: Get dynamic color for vote option based on its position and type
   def vote_option_color(vote_option, session) do
     vote_options = session_vote_options(session)
     total_options = length(vote_options)
@@ -380,12 +376,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  # AIDEV-NOTE: Build overlay URL with score parameter (for socket use)
   defp build_overlay_url(socket) do
     get_current_overlay_url(socket.host_uri, socket.assigns.listening_session.id, socket.assigns.overlay_score_type)
   end
 
-  # AIDEV-NOTE: Build overlay URL with score parameter (for template use)
   defp get_current_overlay_url(host_uri, session_id, score_type) do
     base_url = "#{host_uri}/sessions/#{session_id}/overlay"
 
@@ -394,6 +388,68 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       "viewer" -> "#{base_url}?score=viewer"
       "both" -> "#{base_url}?score=viewer+streamer"
       _ -> base_url
+    end
+  end
+
+  # Calculate dynamic bar height based on vote count and maximum votes in the dataset.
+  # Ensures bars scale proportionally and don't exceed container height.
+  defp calculate_bar_height(votes, max_votes, container_height, min_height) do
+    cond do
+      votes == 0 ->
+        0
+
+      max_votes == 0 ->
+        min_height
+
+      true ->
+        # Use 85% of container height for maximum bar
+        max_bar_height = container_height * 0.85
+        scale_factor = max_bar_height / max_votes
+        calculated_height = votes * scale_factor
+
+        # Ensure minimum height for visibility
+        max(calculated_height, min_height)
+        |> round()
+    end
+  end
+
+  # Format vote count for display, using abbreviated format for large numbers.
+  defp format_vote_count(count) when is_integer(count) do
+    cond do
+      count < 1000 -> Integer.to_string(count)
+      count < 10000 -> "#{Float.round(count / 1000, 1)}k"
+      count < 1_000_000 -> "#{round(count / 1000)}k"
+      true -> "#{Float.round(count / 1_000_000, 1)}M"
+    end
+  end
+
+  defp format_vote_count(_), do: "0"
+
+  # Determine if vote count should be displayed inside or above the bar based on bar height.
+  defp vote_count_position(bar_height, min_height_for_inside \\ 20) do
+    if bar_height >= min_height_for_inside do
+      :inside
+    else
+      :above
+    end
+  end
+
+  # Calculate responsive font size class for vote counts based on maximum vote count.
+  defp vote_count_font_size(max_votes) do
+    cond do
+      max_votes < 100 -> "text-sm"
+      max_votes < 1000 -> "text-xs"
+      true -> "text-xs"
+    end
+  end
+
+  # Calculate responsive padding for histogram bars based on number of vote options.
+  defp bar_padding_class(vote_option_count) do
+    cond do
+      vote_option_count <= 5 -> "px-1"
+      vote_option_count <= 10 -> "px-0.5"
+      vote_option_count <= 15 -> "px-0"
+      true -> ""
     end
   end
 end

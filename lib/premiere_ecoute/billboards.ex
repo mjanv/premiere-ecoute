@@ -88,7 +88,6 @@ defmodule PremiereEcoute.Billboards do
         |> Enum.with_index()
         |> Enum.map(fn
           {submission, ^index} ->
-            # AIDEV-NOTE: Toggle reviewed status, default to false if not present
             current_reviewed = get_submission_reviewed_status(submission)
             Map.put(submission, "reviewed", !current_reviewed)
 
@@ -109,7 +108,6 @@ defmodule PremiereEcoute.Billboards do
     end
   end
 
-  # AIDEV-NOTE: Helper function to get review status from submission map
   defp get_submission_reviewed_status(%{"reviewed" => reviewed}) when is_boolean(reviewed), do: reviewed
   defp get_submission_reviewed_status(%{reviewed: reviewed}) when is_boolean(reviewed), do: reviewed
   defp get_submission_reviewed_status(_), do: false

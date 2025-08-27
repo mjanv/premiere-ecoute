@@ -60,6 +60,11 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
 
   def handle_failed(messages, _context) do
     Logger.error("Cannot write a batch of #{length(messages)} messages")
+
+    for message <- messages do
+      Logger.error("#{inspect(message)}")
+    end
+
     messages
   end
 end

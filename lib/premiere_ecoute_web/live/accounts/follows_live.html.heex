@@ -1,212 +1,215 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
   <div class="synthwave-bg px-6 py-8" style="min-height: calc(100vh - 5rem);">
-        <div class="flex-1 py-12">
+    <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
-    <.page_header
-      title={gettext("My Follows")}
-      subtitle={gettext("Manage your followed streamers")}
-    >
-      <:action>
-        <.link
-          phx-click="show_follow_modal"
-          class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+        <.page_header
+          title={gettext("My Follows")}
+          subtitle={gettext("Manage your followed streamers")}
         >
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          {gettext("Follow")}
-        </.link>
-      </:action>
-    </.page_header>
+          <:action>
+            <.link
+              phx-click="show_follow_modal"
+              class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              {gettext("Follow")}
+            </.link>
+          </:action>
+        </.page_header>
 
-    <div class="mt-8">
-      <%= if Enum.empty?(@current_user.channels) do %>
-        <div class="text-center py-12">
-          <div class="mx-auto h-12 w-12 text-gray-400">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-              >
-              </path>
-            </svg>
-          </div>
-          <h3 class="mt-2 text-sm font-medium text-white">No follows yet</h3>
-          <p class="mt-1 text-sm text-gray-400">Get started by following some streamers.</p>
-          <div class="mt-6">
-            <.button phx-click="show_follow_modal" class="bg-green-600 hover:bg-green-700">
-              Follow Your First Streamer
-            </.button>
-          </div>
-        </div>
-      <% else %>
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <%= for streamer <- @current_user.channels do %>
-            <div class="bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-700">
-              <div class="p-6">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center flex-1 min-w-0">
-                    <!-- Avatar -->
-                    <div class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold text-lg mr-4">
-                      {String.upcase(String.first(streamer.username))}
+        <div class="mt-8">
+          <%= if Enum.empty?(@current_user.channels) do %>
+            <div class="text-center py-12">
+              <div class="mx-auto h-12 w-12 text-gray-400">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                  >
+                  </path>
+                </svg>
+              </div>
+              <h3 class="mt-2 text-sm font-medium text-white">No follows yet</h3>
+              <p class="mt-1 text-sm text-gray-400">Get started by following some streamers.</p>
+              <div class="mt-6">
+                <.button phx-click="show_follow_modal" class="bg-green-600 hover:bg-green-700">
+                  Follow Your First Streamer
+                </.button>
+              </div>
+            </div>
+          <% else %>
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <%= for streamer <- @current_user.channels do %>
+                <div class="bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-700">
+                  <div class="p-6">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center flex-1 min-w-0">
+                        <!-- Avatar -->
+                        <div class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold text-lg mr-4">
+                          {String.upcase(String.first(streamer.username))}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <h3 class="text-lg font-medium text-white truncate">
+                            {streamer.username}!
+                          </h3>
+                          <%= if streamer.twitch do %>
+                            <p class="text-sm text-gray-400">
+                              <span class="inline-flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                                </svg>
+                                Twitch Streamer
+                              </span>
+                            </p>
+                          <% end %>
+                        </div>
+                      </div>
+                      <div class="flex-shrink-0">
+                        <.button
+                          phx-click="show_unfollow_modal"
+                          phx-value-streamer_id={streamer.id}
+                          class="btn-sm text-red-400 border-red-600 hover:bg-red-900 hover:border-red-500"
+                        >
+                          Unfollow
+                        </.button>
+                      </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                      <h3 class="text-lg font-medium text-white truncate">
-                        {streamer.username}!
-                      </h3>
-                      <%= if streamer.twitch do %>
-                        <p class="text-sm text-gray-400">
-                          <span class="inline-flex items-center">
-                            <svg class="w-4 h-4 mr-1 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                            </svg>
-                            Twitch Streamer
-                          </span>
+                    
+<!-- Follow date info -->
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                      <%= if follow = Enum.find(@current_user.follows, &(&1.streamer_id == streamer.id)) do %>
+                        <p class="text-xs text-gray-500">
+                          Added {Calendar.strftime(follow.inserted_at, "%B %d, %Y")}
                         </p>
+                        <%= if follow.followed_at do %>
+                          <p class="text-xs text-gray-500">
+                            - Followed {Calendar.strftime(follow.followed_at, "%B %d, %Y")}
+                          </p>
+                        <% end %>
                       <% end %>
                     </div>
                   </div>
-                  <div class="flex-shrink-0">
-                    <.button
-                      phx-click="show_unfollow_modal"
-                      phx-value-streamer_id={streamer.id}
-                      class="btn-sm text-red-400 border-red-600 hover:bg-red-900 hover:border-red-500"
-                    >
-                      Unfollow
-                    </.button>
-                  </div>
                 </div>
-                
-<!-- Follow date info -->
-                <div class="mt-4 pt-4 border-t border-gray-700">
-                  <%= if follow = Enum.find(@current_user.follows, &(&1.streamer_id == streamer.id)) do %>
-                    <p class="text-xs text-gray-500">
-                      Added {Calendar.strftime(follow.inserted_at, "%B %d, %Y")}
-                    </p>
-                    <%= if follow.followed_at do %>
-                      <p class="text-xs text-gray-500">
-                        - Followed {Calendar.strftime(follow.followed_at, "%B %d, %Y")}
-                      </p>
-                    <% end %>
-                  <% end %>
-                </div>
-              </div>
+              <% end %>
             </div>
           <% end %>
         </div>
-      <% end %>
-    </div>
-    
+        
 <!-- Unfollow Confirmation Modal -->
-    <%= if @show_unfollow_modal and @to_unfollow do %>
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_unfollow_modal">
-        <div class="bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 border border-gray-700" phx-click="modal_content_click">
-          <!-- Modal Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-700">
-            <h3 class="text-lg font-medium text-white">Unfollow Streamer</h3>
-            <button phx-click="hide_unfollow_modal" class="text-gray-400 hover:text-gray-300">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
+        <%= if @show_unfollow_modal and @to_unfollow do %>
+          <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_unfollow_modal">
+            <div
+              class="bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 border border-gray-700"
+              phx-click="modal_content_click"
+            >
+              <!-- Modal Header -->
+              <div class="flex items-center justify-between p-6 border-b border-gray-700">
+                <h3 class="text-lg font-medium text-white">Unfollow Streamer</h3>
+                <button phx-click="hide_unfollow_modal" class="text-gray-400 hover:text-gray-300">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
 <!-- Modal Content -->
-          <div class="p-6">
-            <p class="text-sm text-gray-300">
-              Are you sure you want to unfollow <strong class="text-white"><%= @to_unfollow.twitch.username || String.split(@to_unfollow.email, "@") |> List.first() %></strong>?
-            </p>
-          </div>
-          
+              <div class="p-6">
+                <p class="text-sm text-gray-300">
+                  Are you sure you want to unfollow <strong class="text-white"><%= @to_unfollow.twitch.username || String.split(@to_unfollow.email, "@") |> List.first() %></strong>?
+                </p>
+              </div>
+              
 <!-- Modal Actions -->
-          <div class="flex justify-end space-x-2 p-6 border-t border-gray-700">
-            <.button phx-click="hide_unfollow_modal" class="btn-outline border-gray-600 text-gray-300 hover:bg-gray-700">
-              Cancel
-            </.button>
-            <.button phx-click="unfollow_streamer" class="bg-red-600 hover:bg-red-700">
-              Unfollow
-            </.button>
+              <div class="flex justify-end space-x-2 p-6 border-t border-gray-700">
+                <.button phx-click="hide_unfollow_modal" class="btn-outline border-gray-600 text-gray-300 hover:bg-gray-700">
+                  Cancel
+                </.button>
+                <.button phx-click="unfollow_streamer" class="bg-red-600 hover:bg-red-700">
+                  Unfollow
+                </.button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    <% end %>
-    
+        <% end %>
+        
 <!-- Follow Modal -->
-    <%= if @show_follow_modal do %>
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_follow_modal">
-        <div
-          class="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col border border-gray-700"
-          phx-click="modal_content_click"
-        >
-          <!-- Modal Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-700">
-            <h3 class="text-lg font-medium text-white">Follow Streamers</h3>
-            <button phx-click="hide_follow_modal" class="text-gray-400 hover:text-gray-300">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
+        <%= if @show_follow_modal do %>
+          <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_follow_modal">
+            <div
+              class="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col border border-gray-700"
+              phx-click="modal_content_click"
+            >
+              <!-- Modal Header -->
+              <div class="flex items-center justify-between p-6 border-b border-gray-700">
+                <h3 class="text-lg font-medium text-white">Follow Streamers</h3>
+                <button phx-click="hide_follow_modal" class="text-gray-400 hover:text-gray-300">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
 <!-- Modal Content -->
-          <div class="p-6 flex-1 overflow-y-auto">
-            <%= if Enum.empty?(@streamers) do %>
-              <p class="text-sm text-gray-300">
-                No new streamers available to follow at the moment.
-              </p>
-            <% else %>
-              <p class="text-sm text-gray-300 mb-4">
-                Choose streamers you'd like to follow:
-              </p>
-              <div class="space-y-3">
-                <%= for streamer <- @streamers do %>
-                  <div class="flex items-center justify-between p-3 border border-gray-600 rounded-lg hover:bg-gray-700">
-                    <div class="flex items-center flex-1 min-w-0">
-                      <!-- Avatar -->
-                      <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold text-sm mr-3">
-                        {String.upcase(String.first(streamer.username))}
+              <div class="p-6 flex-1 overflow-y-auto">
+                <%= if Enum.empty?(@streamers) do %>
+                  <p class="text-sm text-gray-300">
+                    No new streamers available to follow at the moment.
+                  </p>
+                <% else %>
+                  <p class="text-sm text-gray-300 mb-4">
+                    Choose streamers you'd like to follow:
+                  </p>
+                  <div class="space-y-3">
+                    <%= for streamer <- @streamers do %>
+                      <div class="flex items-center justify-between p-3 border border-gray-600 rounded-lg hover:bg-gray-700">
+                        <div class="flex items-center flex-1 min-w-0">
+                          <!-- Avatar -->
+                          <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold text-sm mr-3">
+                            {String.upcase(String.first(streamer.username))}
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-medium text-white truncate">
+                              {streamer.username}
+                            </h4>
+                            <%= if streamer.twitch do %>
+                              <p class="text-xs text-gray-400">
+                                <span class="inline-flex items-center">
+                                  <svg class="w-3 h-3 mr-1 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                                  </svg>
+                                  Twitch Streamer
+                                </span>
+                              </p>
+                            <% end %>
+                          </div>
+                        </div>
+                        <.button
+                          phx-click="follow_streamer"
+                          phx-value-streamer_id={streamer.id}
+                          class="btn-sm bg-green-600 hover:bg-green-700"
+                        >
+                          Follow
+                        </.button>
                       </div>
-                      <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-medium text-white truncate">
-                          {streamer.username}
-                        </h4>
-                        <%= if streamer.twitch do %>
-                          <p class="text-xs text-gray-400">
-                            <span class="inline-flex items-center">
-                              <svg class="w-3 h-3 mr-1 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                              </svg>
-                              Twitch Streamer
-                            </span>
-                          </p>
-                        <% end %>
-                      </div>
-                    </div>
-                    <.button
-                      phx-click="follow_streamer"
-                      phx-value-streamer_id={streamer.id}
-                      class="btn-sm bg-green-600 hover:bg-green-700"
-                    >
-                      Follow
-                    </.button>
+                    <% end %>
                   </div>
                 <% end %>
               </div>
-            <% end %>
-          </div>
-          
+              
 <!-- Modal Actions -->
-          <div class="flex justify-end p-6 border-t border-gray-700">
-            <.button phx-click="hide_follow_modal" class="btn-outline border-gray-600 text-gray-300 hover:bg-gray-700">
-              Close
-            </.button>
+              <div class="flex justify-end p-6 border-t border-gray-700">
+                <.button phx-click="hide_follow_modal" class="btn-outline border-gray-600 text-gray-300 hover:bg-gray-700">
+                  Close
+                </.button>
+              </div>
+            </div>
           </div>
-        </div>
+        <% end %>
       </div>
-    <% end %>
-  </div>
-  </div>
+    </div>
   </div>
 </Layouts.app>

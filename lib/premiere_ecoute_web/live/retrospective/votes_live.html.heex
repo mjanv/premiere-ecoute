@@ -79,7 +79,7 @@
             <p class="text-gray-400">{gettext("No votes cast during this period")}</p>
           </div>
         <% else %>
-          <!-- AIDEV-NOTE: Display votes with clickable album covers showing voter score -->
+          <!-- Display votes with clickable album covers showing voter score -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             <%= for vote_data <- votes_data do %>
               <div
@@ -113,7 +113,7 @@
   </div>
 </Layouts.app>
 
-<!-- AIDEV-NOTE: Album Details Modal - Outside layout containers for proper overlay -->
+<!-- Album Details Modal - Outside layout containers for proper overlay -->
 <%= if @show_modal do %>
   <div
     class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
@@ -213,7 +213,7 @@
                     </div>
                   </div>
                   
-                  <!-- AIDEV-NOTE: Display existing viewer votes for this track -->
+<!-- Display existing viewer votes for this track -->
                   <div class="flex items-center space-x-3">
                     <%= case get_track_votes(@current_user.twitch.user_id, track.id, modal_data.votes_by_track) do %>
                       <% [_ | _] = votes -> %>

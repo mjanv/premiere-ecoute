@@ -43,10 +43,10 @@ git clone https://github.com/mjanv/premiere-ecoute.git
 cd premiere_ecoute
 cp .env.example .env
 
-asdf install # Install Erlang and Elixir
+asdf install         # Install Erlang and Elixir
 docker compose up -d # Start database and observability stack
-mix setup # Install dependencies, deploy assets, and run migrations
-mix # Run the server
+mix setup            # Install dependencies, deploy assets, and run migrations
+mix                  # Run the server
 ```
 
 Visit [http://localhost:4000](http://localhost:4000) to access the application.

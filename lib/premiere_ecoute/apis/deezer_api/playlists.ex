@@ -34,7 +34,8 @@ defmodule PremiereEcoute.Apis.DeezerApi.Playlists do
       name: data["title"],
       artist: data["artist"]["name"],
       duration_ms: (data["duration"] || 0) * 1000,
-      added_at: nil
+      added_at: nil,
+      release_date: ~D[1900-01-01]
     }
   end
 

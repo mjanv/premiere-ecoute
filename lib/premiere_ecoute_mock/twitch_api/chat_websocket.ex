@@ -5,8 +5,6 @@ defmodule PremiereEcouteMock.TwitchApi.ChatWebSocket do
 
   @behaviour WebSock
 
-  # AIDEV-NOTE: WebSocket handler for real-time chat messages and announcements
-
   def init(_opts) do
     Logger.info("Chat WebSocket connected")
 

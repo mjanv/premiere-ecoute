@@ -480,8 +480,7 @@
         const messageForm = document.getElementById('messageForm');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        
-        // AIDEV-NOTE: Generate random user ID and username for chat messages
+
         function generateRandomUserId() {
             return Math.floor(Math.random() * 1000000);
         }
@@ -533,8 +532,7 @@
             const data = JSON.parse(event.data);
             addMessage(data.username || 'User', data.message, data.type === 'announcement', data.color);
         };
-        
-        // AIDEV-NOTE: Handle form submission to send messages via webhook
+
         messageForm.addEventListener('submit', function(e) {
             e.preventDefault();
             

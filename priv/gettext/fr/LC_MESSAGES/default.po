@@ -682,7 +682,7 @@ msgstr "Gérer"
 #: lib/premiere_ecoute_web/live/discography/album_selection_live.html.heex:325
 #, elixir-autogen, elixir-format
 msgid "Smash or Pass"
-msgstr "J'aime ou J'aime pas"
+msgstr "Smash ou Pass"
 
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:110
 #, elixir-autogen, elixir-format

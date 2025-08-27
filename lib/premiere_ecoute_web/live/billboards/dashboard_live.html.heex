@@ -352,7 +352,7 @@
           <%= if @playlist_modal_tab == :similar do %>
             <div>
               <div class="space-y-2 max-h-96 overflow-y-auto">
-                <%= for {similar_playlist, index} <- Enum.with_index(@selected_playlist.top_similar, 1) do %>
+                <%= for {similar_playlist, index} <- Enum.with_index(@selected.top_similar, 1) do %>
                   <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                       <span class="text-lg">

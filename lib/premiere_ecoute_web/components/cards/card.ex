@@ -38,7 +38,6 @@ defmodule PremiereEcouteWeb.Components.Card do
     """
   end
 
-  # AIDEV-NOTE: Card variant helper function for consistent styling using design system colors
   defp variant_classes(variant) do
     case variant do
       "default" -> "bg-surface-elevated border-surface text-surface-primary"

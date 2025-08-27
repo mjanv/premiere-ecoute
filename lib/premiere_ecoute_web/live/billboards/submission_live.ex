@@ -69,7 +69,7 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionLive do
   def handle_event("submit", params, socket) do
     url = Map.get(params, "url", "")
     pseudo = Map.get(params, "pseudo", "")
-    billboard = socket.assigns.billboard
+    billboard = Billboards.get_billboard(socket.assigns.billboard.billboard_id)
 
     case validate_url(url) do
       {:ok, clean_url} ->

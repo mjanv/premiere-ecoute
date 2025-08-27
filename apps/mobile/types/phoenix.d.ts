@@ -1,4 +1,3 @@
-// AIDEV-NOTE: TypeScript declarations for Phoenix Socket
 declare module 'phoenix' {
   export class Socket {
     constructor(endpoint: string, opts?: any);

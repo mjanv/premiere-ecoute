@@ -7,8 +7,8 @@
         <div class="flex items-center">
           <!-- Page Title (2/3 width with right padding) -->
           <div class="w-2/3 pr-6">
-            <.page_header 
-              title={@listening_session.album.name} 
+            <.page_header
+              title={@listening_session.album.name}
               subtitle={
               gettext("by %{artist}", artist: @listening_session.user.username)
               <>
@@ -565,30 +565,35 @@
                               </div>
                             <% end %>
                           </:failed>
-                          <%= for {rating, votes} <- track_vote_distribution(track.id, report, @listening_session) do %>
-                            <div class="flex-1 flex flex-col items-center px-1">
+                          <% track_distribution = track_vote_distribution(track.id, report, @listening_session) %>
+                          <% track_max_votes = track_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end) %>
+                          <% vote_options = session_vote_options(@listening_session) %>
+                          <% padding_class = bar_padding_class(length(vote_options)) %>
+                          <% font_size_class = vote_count_font_size(track_max_votes) %>
+                          <%= for {rating, votes} <- track_distribution do %>
+                            <% bar_height = calculate_bar_height(votes, track_max_votes, 110, 6) %>
+                            <% vote_position = vote_count_position(bar_height) %>
+                            <div class={"flex-1 flex flex-col items-center #{padding_class} min-w-0"}>
                               <!-- Vote count above bar (on the roof) -->
-                              <%= if votes > 0 do %>
-                                <span class="text-xs font-medium text-white mb-1">
-                                  {votes}
+                              <%= if votes > 0 && vote_position == :above do %>
+                                <span class={"#{font_size_class} font-medium text-white mb-1"}>
+                                  {format_vote_count(votes)}
                                 </span>
                               <% end %>
                               
 <!-- Bar (the building) -->
                               <div
-                                class={
-                                  [
-                                    "w-full rounded-t transition-all duration-300 min-w-0",
-                                    vote_option_color(rating, @listening_session),
-                                    # Highlight most voted rating dynamically
-                                    if(votes > 0 && votes == track_max_votes(track.id, report, @listening_session),
-                                      do: "ring-2 ring-white/50",
-                                      else: ""
-                                    )
-                                  ]
-                                }
-                                style={"height: #{max(votes * 8, 6)}px"}
+                                class={[
+                                  "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
+                                  vote_option_color(rating, @listening_session)
+                                ]}
+                                style={"height: #{bar_height}px"}
                               >
+                                <%= if votes > 0 && vote_position == :inside do %>
+                                  <span class={"#{font_size_class} font-medium text-white"}>
+                                    {format_vote_count(votes)}
+                                  </span>
+                                <% end %>
                               </div>
                               
 <!-- Rating number -->
