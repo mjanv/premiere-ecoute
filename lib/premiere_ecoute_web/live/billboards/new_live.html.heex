@@ -1,15 +1,15 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
   <div class="synthwave-gb min-h-screen text-white" style="min-height: calc(100vh - 5rem);">
     <div class="max-w-4xl mx-auto py-8 px-6">
-      <!-- AIDEV-NOTE: Billboard creation header with progressive steps design -->
+      <!-- Billboard creation header with progressive steps design -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-white mb-2">{gettext("New Billboard")}</h1>
         <p class="text-gray-400">{gettext("Create a music chart by collecting playlist submissions from your community")}</p>
       </div>
       
-<!-- AIDEV-NOTE: Form wrapper for the entire flow -->
+<!-- Form wrapper for the entire flow -->
       <.form for={@form} id="billboard-form" phx-change="validate" phx-submit="save" class="space-y-6">
-        <!-- AIDEV-NOTE: Steps with Ariadne's thread connecting them -->
+        <!-- Steps with Ariadne's thread connecting them -->
         <div class="relative" id="steps-container">
           <!-- Ariadne's thread - base line -->
           <%= if @form[:title].value && String.trim(@form[:title].value || "") != "" do %>
@@ -126,7 +126,7 @@
 </Layouts.app>
 
 <script>
-  // AIDEV-NOTE: Dynamic Ariane thread height calculation for Billboard creation
+  // Dynamic Ariane thread height calculation for Billboard creation
   function updateArianesThread() {
     const container = document.getElementById('steps-container');
     if (!container) return;

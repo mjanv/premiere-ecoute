@@ -1,10 +1,10 @@
 <Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="library">
   <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
-    <!-- AIDEV-NOTE: My Library page with playlists grid and management -->
+    <!-- My Library page with playlists grid and management -->
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
         <div class="w-full">
-          <!-- AIDEV-NOTE: My Library page header with Add Playlist action button -->
+          <!-- My Library page header with Add Playlist action button -->
           <.page_header
             title={gettext("My Library")}
             subtitle={gettext("Manage your saved playlists and discover new music")}
@@ -24,7 +24,7 @@
             </:action>
           </.page_header>
           
-<!-- AIDEV-NOTE: Library playlists grid with add playlist button -->
+<!-- Library playlists grid with add playlist button -->
           <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
               <!-- Existing playlists -->
@@ -114,7 +114,7 @@
     </div>
   </div>
   
-<!-- AIDEV-NOTE: Playlist search modal for displaying user's Spotify playlists -->
+<!-- Playlist search modal for displaying user's Spotify playlists -->
   <%= if assigns[:show_playlist_modal] do %>
     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_playlist_modal">
       <div
@@ -221,7 +221,7 @@
                 <% end %>
               </div>
               
-<!-- AIDEV-NOTE: Load More button for pagination -->
+<!-- Load More button for pagination -->
               <%= if assigns[:has_more_playlists] && @has_more_playlists do %>
                 <div class="text-center mt-6">
                   <button
@@ -266,7 +266,7 @@
         
 <!-- Modal Footer -->
         <div class="border-t border-gray-700">
-          <!-- AIDEV-NOTE: Selected playlist info section - separate from scrollable content -->
+          <!-- Selected playlist info section - separate from scrollable content -->
           <%= if @selected_playlist do %>
             <div class="px-6 pt-4 pb-2 bg-green-600/10 border-b border-green-500/20">
               <div class="flex items-center justify-between">

@@ -1,9 +1,8 @@
 defmodule PremiereEcouteWeb.Components.PageHeader do
   @moduledoc """
   Renders a consistent page header with title, subtitle, and optional action buttons.
-
-  ## AIDEV-NOTE: Reusable header component for My Sessions, My Billboards, My Library pages
   """
+
   use Phoenix.Component
 
   @doc """

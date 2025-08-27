@@ -2,7 +2,7 @@
   <div class="text-white flex flex-col min-h-screen relative z-10">
     <div class="flex-1 py-12">
       <div class="max-w-4xl mx-auto px-6">
-        <!-- AIDEV-NOTE: Submission page header -->
+        <!-- Submission page header -->
         <div class="mb-12 text-center">
           <div class="mb-4">
             <h1 class="text-4xl md:text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 synthwave-title mb-3">
@@ -14,7 +14,7 @@
           </div>
         </div>
         
-<!-- AIDEV-NOTE: Success message with token -->
+<!-- Success message with token -->
         <%= if @success_message do %>
           <div class="mb-8 bg-gradient-to-br from-green-50/6 to-green-100/3 border border-green-500/30 rounded-2xl shadow-xl backdrop-blur-sm p-6">
             <div class="flex items-center space-x-4">
@@ -52,7 +52,7 @@
           </div>
         <% end %>
         
-<!-- AIDEV-NOTE: Billboard stopped notification -->
+<!-- Billboard stopped notification -->
         <%= if @billboard_stopped do %>
           <div class="mb-8 bg-gradient-to-br from-red-50/6 to-red-100/3 border border-red-500/30 rounded-2xl shadow-xl backdrop-blur-sm p-6">
             <div class="flex items-start space-x-4">
@@ -76,7 +76,7 @@
           </div>
         <% end %>
         
-<!-- AIDEV-NOTE: Main submission form -->
+<!-- Main submission form -->
         <%= if not @billboard_stopped do %>
           <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm p-8 mb-8">
             <div class="mb-6">
@@ -151,7 +151,7 @@
           </div>
         <% end %>
         
-<!-- AIDEV-NOTE: Deletion success message -->
+<!-- Deletion success message -->
         <%= if @deletion_success do %>
           <div class="mb-8 bg-gradient-to-br from-blue-50/6 to-blue-100/3 border border-blue-500/30 rounded-2xl shadow-xl backdrop-blur-sm p-6">
             <div class="flex items-center space-x-4">
@@ -170,7 +170,7 @@
           </div>
         <% end %>
         
-<!-- AIDEV-NOTE: Playlist deletion section -->
+<!-- Playlist deletion section -->
         <div class="bg-gradient-to-br from-red-50/6 to-red-100/3 border border-red-500/30 rounded-2xl shadow-xl backdrop-blur-sm p-8">
           <div class="mb-6">
             <h2 class="text-2xl font-semibold text-white mb-2 flex items-center">

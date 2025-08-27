@@ -112,7 +112,7 @@
   </div>
 </Layouts.app>
 
-<!-- AIDEV-NOTE: Album Details Modal - Outside layout containers for proper overlay -->
+<!-- Album Details Modal - Outside layout containers for proper overlay -->
 <%= if @show_modal do %>
   <div
     class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
@@ -185,7 +185,7 @@
                     </div>
                   </div>
                   
-<!-- AIDEV-NOTE: Navigation links to session and retrospective -->
+<!-- Navigation links to session and retrospective -->
                   <div class="text-sm text-gray-400 mt-2">
                     <.link
                       navigate={~p"/sessions/#{modal_data.session.id}"}

@@ -141,7 +141,6 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
     """
   end
 
-  # AIDEV-NOTE: Helper functions for skeleton element styling
   defp element_classes(type, size, width, height) do
     base_classes =
       case type do
@@ -224,7 +223,6 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
     """
   end
 
-  # AIDEV-NOTE: Overlay variant styles
   defp overlay_base_classes(variant) do
     case variant do
       "modal" -> "fixed inset-0 bg-black/50 flex items-center justify-center z-50"

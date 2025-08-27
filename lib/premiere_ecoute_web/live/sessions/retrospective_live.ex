@@ -58,7 +58,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: Helper functions for displaying retrospective data - matching session_live.ex structure
   defp session_average_score(nil), do: "N/A"
 
   defp session_average_score(report) do
@@ -111,7 +110,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
-  # AIDEV-NOTE: Generate vote distribution for histograms - matching session_live.ex structure
   defp track_vote_distribution(_track_id, nil, session),
     do: for(rating <- session_vote_options(session), do: {rating, 0})
 
@@ -188,7 +186,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
-  # AIDEV-NOTE: Get voting options based on session configuration
   defp session_vote_options(session) do
     case session.vote_options do
       options when is_list(options) and length(options) > 0 ->
@@ -203,7 +200,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
-  # AIDEV-NOTE: Check if vote options are numeric (all parseable as integers)
   defp vote_options_are_numeric?(session) do
     case session.vote_options do
       options when is_list(options) ->
@@ -220,7 +216,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
-  # AIDEV-NOTE: Color coding for vote options with synthwave colors
   defp vote_option_color(rating, session) do
     vote_options = session.vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     total_options = length(vote_options)
@@ -285,7 +280,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     |> Enum.max(fn -> 0 end)
   end
 
-  # AIDEV-NOTE: Build data attributes for track scores and names to be used by JavaScript
   defp build_track_data_attributes(listening_session, report) do
     case listening_session.album do
       %{tracks: tracks} when is_list(tracks) and length(tracks) > 0 ->
@@ -309,8 +303,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
         []
     end
   end
-
-  # AIDEV-NOTE: Dynamic histogram scaling helpers for high vote volumes
 
   # Calculate dynamic bar height based on vote count and maximum votes in the dataset.
   # Ensures bars scale proportionally and don't exceed container height.
@@ -337,8 +329,8 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   # Format vote count for display, using abbreviated format for large numbers.
   defp format_vote_count(count) when is_integer(count) do
     cond do
-      count < 1000 -> Integer.to_string(count)
-      count < 10000 -> "#{Float.round(count / 1000, 1)}k"
+      count < 1_000 -> Integer.to_string(count)
+      count < 10_000 -> "#{Float.round(count / 1000, 1)}k"
       count < 1_000_000 -> "#{round(count / 1000)}k"
       true -> "#{Float.round(count / 1_000_000, 1)}M"
     end

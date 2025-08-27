@@ -35,7 +35,6 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
           |> assign(:show_modal, false)
           |> assign(:modal_album_id, nil)
 
-        # AIDEV-NOTE: Using Twitch user_id for votes lookup as requested
         user_id = socket.assigns.current_user.twitch.user_id
         period = :month
         year = current_date.year
@@ -66,7 +65,6 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
     socket = assign(socket, :selected_year, year)
     socket = assign(socket, :selected_month, month)
 
-    # AIDEV-NOTE: Using Twitch user_id for votes lookup as requested
     user_id = socket.assigns.current_user.twitch.user_id
 
     socket
@@ -133,8 +131,6 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
   end
 
   # Private helper functions
-
-  # AIDEV-NOTE: Load album details with track votes for votes modal
   defp load_modal_data(album_id, user_id) do
     case Repo.get(Album, album_id) |> Repo.preload(:tracks) do
       nil ->
@@ -154,7 +150,6 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
     end
   end
 
-  # AIDEV-NOTE: Get all track votes for a user in one query, grouped by track
   defp get_all_track_votes_for_user(track_ids, user_id) do
     alias PremiereEcoute.Sessions.Scores.Vote
 
@@ -166,7 +161,6 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
     |> Repo.all()
   end
 
-  # AIDEV-NOTE: Get track votes from pre-loaded data
   defp get_track_votes(_user_id, track_id, votes_by_track) when is_map(votes_by_track) do
     Map.get(votes_by_track, track_id, [])
   end

@@ -43,7 +43,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
   @impl true
   def handle_event("disconnect_spotify", _params, socket) do
-    # AIDEV-NOTE: Disconnect Spotify by clearing tokens
     case socket.assigns.current_user do
       nil ->
         socket
@@ -66,7 +65,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
   @impl true
   def handle_event("disconnect_twitch", _params, socket) do
-    # AIDEV-NOTE: Disconnect Twitch by clearing tokens (but keep user logged in)
     case socket.assigns.current_user do
       nil ->
         socket
@@ -99,7 +97,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
   @impl true
   def handle_event("confirm_delete_account", _params, socket) do
-    # AIDEV-NOTE: Account deletion with automatic logout
     case socket.assigns.current_scope do
       nil ->
         socket
@@ -109,7 +106,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
       scope ->
         case Accounts.delete_account(scope) do
           {:ok, _deleted_user} ->
-            # AIDEV-NOTE: User tokens are already deleted by delete_account function
             # Redirect to homepage where authentication will be handled naturally
             socket
             |> put_flash(:info, "Your account has been permanently deleted. You have been logged out.")
@@ -198,7 +194,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
 
   @impl true
   def handle_event("download_data", _params, socket) do
-    # AIDEV-NOTE: GDPR data download implementation
     case socket.assigns.current_scope do
       nil ->
         socket

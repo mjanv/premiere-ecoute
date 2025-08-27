@@ -245,8 +245,7 @@
               <% @display_mode == :year -> %>
                 <div class="flex justify-center items-end space-x-8 mb-12">
                   <!-- Year Mode Podium -->
-                  <% # AIDEV-NOTE: Use year_podium data for podium display by occurrence count
-                  first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
+                  <% first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
                   second_place = Enum.find(@year_podium, fn year -> year.rank == 2 end)
                   third_place = Enum.find(@year_podium, fn year -> year.rank == 3 end) %>
                   

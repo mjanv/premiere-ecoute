@@ -11,7 +11,6 @@ defmodule PremiereEcouteWeb.HomeLive do
 
     socket
     |> assign(:current_user, User.preload(current_user))
-    # AIDEV-NOTE: Load session status and recent billboards
     |> assign(:current_session, ListeningSession.current_session(current_user))
     |> load_recent_billboards()
     |> then(fn socket -> {:ok, socket} end)
@@ -22,7 +21,6 @@ defmodule PremiereEcouteWeb.HomeLive do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: Load user's latest billboard for recap
   defp load_recent_billboards(%{assigns: assigns} = socket) do
     if assigns.current_scope do
       latest_billboard =

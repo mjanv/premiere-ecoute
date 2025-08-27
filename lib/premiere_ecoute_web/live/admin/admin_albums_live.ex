@@ -53,7 +53,6 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Generate pagination range with ellipsis for lean display
   defp pagination_range(current_page, total_pages) do
     cond do
       total_pages <= 7 ->

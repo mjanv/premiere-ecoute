@@ -33,7 +33,6 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
           |> assign(:tracks_loading, true)
           |> assign(:tracks_error, nil)
           |> then(fn socket ->
-            # AIDEV-NOTE: Load detailed playlist with tracks asynchronously
             send(self(), {:load_playlist_details, playlist.playlist_id})
             {:ok, socket}
           end)
@@ -102,7 +101,6 @@ defmodule PremiereEcouteWeb.Playlists.LibraryPlaylistLive do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: Find playlist belonging to current user
   defp find_user_playlist(user_id, playlist_id) do
     Discography.LibraryPlaylist.all(
       where: [user_id: user_id, playlist_id: playlist_id],

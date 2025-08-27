@@ -352,7 +352,7 @@
             </div>
           </form>
           
-<!-- AIDEV-NOTE: Impersonation action - only show if not current user and not already impersonating -->
+<!-- Impersonation action - only show if not current user and not already impersonating -->
           <%= if @selected_user.id != @current_scope.user.id && !Map.get(@current_scope, :impersonating?, false) do %>
             <div class="mt-4 pt-4 border-t border-gray-700">
               <form action="/admin/impersonation" method="post">
@@ -380,7 +380,7 @@
             </div>
           <% end %>
           
-<!-- AIDEV-NOTE: Delete account action - admin can delete any user account -->
+<!-- Delete account action - admin can delete any user account -->
           <div class="mt-4 pt-4 border-t border-gray-700">
             <button
               phx-click="confirm_delete_user"

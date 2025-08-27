@@ -13,7 +13,7 @@ defmodule PremiereEcouteWeb.Components.Header do
 
   def app_header(assigns) do
     ~H"""
-    <!-- AIDEV-NOTE: Impersonation banner - shown when admin is impersonating another user -->
+    <!-- Impersonation banner - shown when admin is impersonating another user -->
     <%= if @current_scope && Map.get(@current_scope, :impersonating?, false) do %>
       <div class="bg-yellow-600 px-6 py-2">
         <div class="flex items-center justify-between">
@@ -51,7 +51,7 @@ defmodule PremiereEcouteWeb.Components.Header do
 
         <div class="flex items-center space-x-4">
           <%= if @current_user do %>
-            <!-- AIDEV-NOTE: Authenticated user navigation -->
+            <!-- Authenticated user navigation -->
             <!-- User Menu Dropdown -->
             <div class="relative" x-data="{ open: false }">
               <button
@@ -87,7 +87,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                 style="display: none;"
               >
                 <div class="py-1">
-                  <!-- AIDEV-NOTE: Session management links moved to left sidebar, keeping only account-related items here -->
+                  <!-- Session management links moved to left sidebar, keeping only account-related items here -->
 
     <!-- Admin (if admin user) -->
                   <%= if @current_user.role == :admin do %>
@@ -109,7 +109,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     </.link>
                   <% end %>
                   
-    <!-- AIDEV-NOTE: Dev mode fake Twitch link for testing -->
+    <!-- Dev mode fake Twitch link for testing -->
                   <%= if Application.get_env(:premiere_ecoute, :environment) == :dev and @current_user.twitch do %>
                     <!-- Divider -->
                     <div class="border-t border-gray-600 my-1"></div>
@@ -164,7 +164,7 @@ defmodule PremiereEcouteWeb.Components.Header do
               </div>
             </div>
           <% else %>
-            <!-- AIDEV-NOTE: Anonymous user navigation -->
+            <!-- Anonymous user navigation -->
             <.link
               href={~p"/auth/twitch"}
               class="inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium text-purple-300 hover:text-purple-200 transition-colors"

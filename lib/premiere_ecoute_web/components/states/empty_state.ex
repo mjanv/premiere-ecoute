@@ -135,7 +135,6 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
     """
   end
 
-  # AIDEV-NOTE: Size helper functions for responsive empty states
   defp size_padding_classes(size) do
     case size do
       "sm" -> "py-8"

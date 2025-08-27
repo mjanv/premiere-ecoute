@@ -2,7 +2,7 @@
   <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
     <div class="flex-1 py-12">
       <div class="max-w-6xl mx-auto px-6">
-        <!-- AIDEV-NOTE: Billboard management header -->
+        <!-- Billboard management header -->
         <div class="mb-8">
           <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div class="flex-1 min-w-0">
@@ -14,7 +14,7 @@
               </div>
             </div>
             
-<!-- AIDEV-NOTE: Status and action buttons -->
+<!-- Status and action buttons -->
             <div class="flex flex-wrap items-center gap-3 flex-shrink-0">
               <.status_badge status={@billboard.status} />
               <%= if @billboard.status == :created do %>
@@ -51,7 +51,7 @@
                 {gettext("See Billboard")}
               </.button>
               
-<!-- AIDEV-NOTE: Export to Spotify playlist button (always visible, generates billboard if needed) -->
+<!-- Export to Spotify playlist button (always visible, generates billboard if needed) -->
               <.button
                 phx-click="show_export_modal"
                 class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
@@ -62,7 +62,7 @@
                 {gettext("Export to Spotify")}
               </.button>
               
-<!-- AIDEV-NOTE: Delete billboard button -->
+<!-- Delete billboard button -->
               <.button
                 phx-click="show_delete_modal"
                 class="px-4 py-2 bg-red-600/80 hover:bg-red-600 text-white rounded-lg transition-colors font-medium border border-red-500/50"
@@ -81,7 +81,7 @@
           </div>
         </div>
         
-<!-- AIDEV-NOTE: Billboard status notifications -->
+<!-- Billboard status notifications -->
         <%= if @billboard.status == :active do %>
           <div class="mb-8 bg-gradient-to-br from-green-50/6 to-green-100/3 border border-green-500/30 rounded-2xl shadow-xl backdrop-blur-sm p-6">
             <div class="flex items-start space-x-4">
@@ -129,7 +129,7 @@
           </div>
         <% end %>
         
-<!-- AIDEV-NOTE: Submissions list -->
+<!-- Submissions list -->
         <div class="bg-gradient-to-br from-slate-50/6 to-slate-100/3 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm">
           <div class="p-6">
             <div class="flex items-center justify-between mb-6">
@@ -141,7 +141,7 @@
               </h3>
             </div>
             
-<!-- AIDEV-NOTE: Search and filter controls -->
+<!-- Search and filter controls -->
             <div class="flex flex-col sm:flex-row gap-4 mb-6">
               <div class="flex-1">
                 <form phx-change="search">
@@ -266,7 +266,7 @@
                           {PremiereEcouteCore.Date.date(submission["submitted_at"])}
                         </div>
                         
-<!-- AIDEV-NOTE: Clickable review status badge with CTA -->
+<!-- Clickable review status badge with CTA -->
                         <%= if submission["reviewed"] do %>
                           <button
                             phx-click="toggle_review"
@@ -348,7 +348,7 @@
   </div>
 </Layouts.app>
 
-<!-- AIDEV-NOTE: Delete confirmation modal - Outside layout containers for proper overlay -->
+<!-- Delete confirmation modal - Outside layout containers for proper overlay -->
 <%= if @show_delete_modal do %>
   <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4" id="delete-modal">
     <!-- Background overlay -->
@@ -398,7 +398,7 @@
   </div>
 <% end %>
 
-<!-- AIDEV-NOTE: Export to Spotify Modal - Outside all layout containers -->
+<!-- Export to Spotify Modal - Outside all layout containers -->
 <%= if @show_export_modal do %>
   <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4" id="export-modal">
     <!-- Background overlay -->

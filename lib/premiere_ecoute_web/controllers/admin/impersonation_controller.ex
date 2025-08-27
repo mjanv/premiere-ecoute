@@ -45,7 +45,6 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
             |> redirect(to: ~p"/admin/users")
 
           target_user ->
-            # AIDEV-NOTE: Admin impersonation start - generates new session token for target user
             conn
             |> UserAuth.start_impersonation(current_scope.user, target_user)
             |> put_flash(:info, "Now impersonating #{target_user.username}")
@@ -61,7 +60,6 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
     current_scope = conn.assigns.current_scope
 
     if current_scope && current_scope.impersonating? do
-      # AIDEV-NOTE: Admin impersonation end - clears impersonated token from session
       conn
       |> UserAuth.end_impersonation()
       |> put_flash(:info, "Impersonation ended. You are now back to your admin account")

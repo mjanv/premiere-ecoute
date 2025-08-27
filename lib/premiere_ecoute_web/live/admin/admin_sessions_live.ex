@@ -14,7 +14,6 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   end
 
   def handle_params(params, _url, socket) do
-    # AIDEV-NOTE: Handle pagination parameters from URL
     page_number = String.to_integer(params["page"] || "1")
     page_size = String.to_integer(params["per_page"] || "10")
 
@@ -66,7 +65,6 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   defp status_text(:stopped), do: "Stopped"
   defp status_text(_), do: "Unknown"
 
-  # AIDEV-NOTE: Generate pagination range with ellipsis for lean display
   defp pagination_range(current_page, total_pages) do
     cond do
       total_pages <= 7 ->

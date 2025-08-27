@@ -4,7 +4,6 @@ defmodule PremiereEcouteWeb.Hooks.RestoreLocale do
   @supported_locales Gettext.known_locales(PremiereEcoute.Gettext)
 
   def on_mount(_, _params, session, socket) do
-    # AIDEV-NOTE: Locale priority: browser language first, then user profile (if authenticated)
     locale = get_locale_from_browser_or_profile(socket, session)
 
     if locale in @supported_locales do

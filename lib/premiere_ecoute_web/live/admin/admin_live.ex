@@ -28,7 +28,6 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
     |> then(fn socket -> {:ok, socket} end)
   end
 
-  # AIDEV-NOTE: handle event store form changes and pagination
   def handle_event("change_stream", %{"stream" => stream}, socket) do
     events = PremiereEcoute.paginate(stream, page: 1, size: socket.assigns.event_store.size)
     event_store = %{socket.assigns.event_store | stream: stream, page: 1, events: events}

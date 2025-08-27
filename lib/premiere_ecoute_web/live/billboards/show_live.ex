@@ -247,7 +247,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
 
     if current_user do
-      # AIDEV-NOTE: Load user's library playlists from database when opening export modal
       library_playlists = LibraryPlaylist.all(where: [user_id: current_user.id, provider: :spotify])
 
       socket
@@ -305,22 +304,20 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     if selected_playlist_id do
       socket = assign(socket, :export_loading, true)
 
-      # AIDEV-NOTE: Perform export in background task to avoid blocking UI
       pid = self()
 
-      # Task.start(fn ->
-      case get_top_tracks_with_generation(billboard, export_count) do
-        {:ok, tracks} ->
-          case export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
-            {:ok, _} -> send(pid, {:export_success, export_count})
-            {:error, reason} -> send(pid, {:export_error, reason})
-          end
+      Task.start(fn ->
+        case get_top_tracks_with_generation(billboard, export_count) do
+          {:ok, tracks} ->
+            case export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
+              {:ok, _} -> send(pid, {:export_success, export_count})
+              {:error, reason} -> send(pid, {:export_error, reason})
+            end
 
-        {:error, message} ->
-          send(pid, {:export_error, message})
-      end
-
-      # end)
+          {:error, message} ->
+            send(pid, {:export_error, message})
+        end
+      end)
 
       {:noreply, socket}
     else
@@ -347,7 +344,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     Search.sort(submissions, :added_at, :desc)
   end
 
-  # AIDEV-NOTE: Check if billboard is available in cache
   defp check_billboard_cache_status(billboard_id) do
     case Cache.get(:billboards, billboard_id) do
       {:ok, nil} -> :not_ready
@@ -356,7 +352,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     end
   end
 
-  # AIDEV-NOTE: Handle export task completion messages
   @impl true
   def handle_info({:export_success, count}, socket) do
     socket
@@ -395,7 +390,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Export tracks to playlist using 3-step process: get -> remove -> add
   defp export_tracks_to_playlist(scope, playlist_id, tracks) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
          {:ok, _} <- remove_all_playlist_tracks(scope, playlist_id, playlist),
@@ -407,19 +401,16 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     end
   end
 
-  # AIDEV-NOTE: Remove all existing tracks from playlist
   defp remove_all_playlist_tracks(_scope, _playlist_id, playlist) when is_nil(playlist.tracks) or playlist.tracks == [] do
     {:ok, nil}
   end
 
   defp remove_all_playlist_tracks(scope, playlist_id, _playlist) do
-    # AIDEV-NOTE: Get current playlist snapshot for removal
     case Apis.spotify().get_playlist(playlist_id) do
       {:ok, current_playlist} ->
         tracks_to_remove = current_playlist.tracks || []
 
         if length(tracks_to_remove) > 0 do
-          # AIDEV-NOTE: Use updated API without snapshot parameter
           Apis.spotify().remove_playlist_items(scope, playlist_id, tracks_to_remove)
         else
           {:ok, nil}
@@ -430,14 +421,12 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     end
   end
 
-  # AIDEV-NOTE: Get top N tracks, generating billboard if not in cache
   defp get_top_tracks_with_generation(billboard, count) do
     case Cache.get(:billboards, billboard.billboard_id) do
       {:ok, cached_billboard} when not is_nil(cached_billboard) ->
         extract_top_tracks(cached_billboard, count)
 
       _ ->
-        # AIDEV-NOTE: Billboard not in cache, generate it
         urls = Enum.map(billboard.submissions, fn %{"url" => url} -> url end)
 
         if length(urls) > 0 do
@@ -455,7 +444,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     end
   end
 
-  # AIDEV-NOTE: Extract top N tracks from billboard data
   defp extract_top_tracks(billboard, count) do
     tracks = billboard.track || []
 
@@ -465,7 +453,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
       |> Enum.take(count)
 
     if length(top_tracks) > 0 do
-      # AIDEV-NOTE: Convert billboard track format to Spotify API format
       spotify_tracks =
         Enum.map(top_tracks, fn track_group ->
           # Get the first track from the group (they're all the same track)

@@ -14,13 +14,10 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     |> assign(:show_playlist_modal, false)
     |> assign(:playlists_loading, false)
     |> assign(:playlists, [])
-    # AIDEV-NOTE: Track pagination state for playlists
     |> assign(:current_page, 1)
     |> assign(:loading_more, false)
     |> assign(:has_more_playlists, true)
-    # AIDEV-NOTE: Track selected playlist for registration
     |> assign(:selected_playlist, nil)
-    # AIDEV-NOTE: Load user's library playlists
     |> load_library_playlists()
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -30,18 +27,15 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: Show playlist modal and fetch playlists from Spotify API
   @impl true
   def handle_event("show_playlist_modal", _params, socket) do
     socket
     |> assign(:show_playlist_modal, true)
     |> assign(:playlists_loading, true)
     |> assign(:playlists, [])
-    # Reset pagination state
     |> assign(:current_page, 1)
     |> assign(:loading_more, false)
     |> assign(:has_more_playlists, true)
-    # Reset selection state
     |> assign(:selected_playlist, nil)
     |> tap(fn _ -> send(self(), :fetch_playlists) end)
     |> then(fn socket -> {:noreply, socket} end)
@@ -53,22 +47,18 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     |> assign(:show_playlist_modal, false)
     |> assign(:playlists_loading, false)
     |> assign(:playlists, [])
-    # Reset pagination state
     |> assign(:current_page, 1)
     |> assign(:loading_more, false)
     |> assign(:has_more_playlists, true)
-    # Reset selection state
     |> assign(:selected_playlist, nil)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Prevent modal from closing when clicking inside content
   @impl true
   def handle_event("modal_content_click", _params, socket) do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: Load more playlists for pagination
   @impl true
   def handle_event("load_more_playlists", _params, socket) do
     if socket.assigns.has_more_playlists and not socket.assigns.loading_more do
@@ -79,7 +69,6 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     end
   end
 
-  # AIDEV-NOTE: Select a playlist for potential registration
   @impl true
   def handle_event("select_playlist", %{"playlist_id" => playlist_id}, socket) do
     socket
@@ -87,7 +76,6 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Register selected playlist to user's library
   @impl true
   def handle_event("register_playlist", _params, %{assigns: %{current_scope: current_scope}} = socket) do
     case socket.assigns.selected_playlist do
@@ -127,15 +115,12 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     end
   end
 
-  # AIDEV-NOTE: Fetch playlists asynchronously to avoid blocking the UI
-  @impl true
   def handle_info(:fetch_playlists, %{assigns: %{current_scope: scope}} = socket) do
     case SpotifyApi.get_library_playlists(scope, 1) do
       {:ok, playlists} ->
         socket
         |> assign(:playlists_loading, false)
         |> assign(:playlists, playlists)
-        # AIDEV-NOTE: If we got less than 1 playlist, there are no more pages
         |> assign(:has_more_playlists, length(playlists) >= 1)
         |> assign(:current_page, 1)
         |> then(fn socket -> {:noreply, socket} end)
@@ -149,7 +134,6 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     end
   end
 
-  # AIDEV-NOTE: Fetch more playlists for pagination
   @impl true
   def handle_info(:fetch_more_playlists, %{assigns: %{current_scope: scope, current_page: page}} = socket) do
     next_page = page + 1

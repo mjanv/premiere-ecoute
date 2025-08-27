@@ -48,7 +48,7 @@
                   <% end %>
                 <% end %>
                 
-<!-- AIDEV-NOTE: Latest Billboard Card using activity_card component -->
+<!-- Latest Billboard Card using activity_card component -->
                 <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
                   <%= if @latest_billboard do %>
                     <.activity_card

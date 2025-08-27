@@ -417,7 +417,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   defp format_vote_count(count) when is_integer(count) do
     cond do
       count < 1000 -> Integer.to_string(count)
-      count < 10000 -> "#{Float.round(count / 1000, 1)}k"
+      count < 10_000 -> "#{Float.round(count / 1000, 1)}k"
       count < 1_000_000 -> "#{round(count / 1000)}k"
       true -> "#{Float.round(count / 1_000_000, 1)}M"
     end

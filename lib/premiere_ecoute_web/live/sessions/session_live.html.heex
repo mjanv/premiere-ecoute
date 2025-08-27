@@ -87,7 +87,7 @@
 
         <%= if @listening_session.status == :active do %>
           <div class="rounded-xl p-6 mb-6 bg-gradient-to-br from-purple-900/80 to-pink-900/80">
-            <!-- AIDEV-NOTE: Spotify Player LiveComponent -->
+            <!-- Spotify Player LiveComponent -->
             <div>
               <.live_component
                 module={PremiereEcouteWeb.Sessions.Components.SpotifyPlayer}
@@ -186,7 +186,7 @@
               </div>
             <% end %>
             
-<!-- AIDEV-NOTE: Display toggles section - Blended styling -->
+<!-- Display toggles section - Blended styling -->
             <div class="mt-4 pt-4">
               <div class="flex justify-center space-x-6">
                 <div class="flex items-center">
@@ -228,7 +228,7 @@
               </div>
             </div>
             
-<!-- AIDEV-NOTE: Overlay link section with dropdown selector -->
+<!-- Overlay link section with dropdown selector -->
             <div class="mt-4 pt-4 border-t border-white/20" id="overlay-hooks" phx-hook="CopyToClipboard">
               <div class="relative">
                 <div class="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 z-10">
@@ -288,7 +288,7 @@
               </div>
             </div>
             
-<!-- AIDEV-NOTE: Session control buttons for start/end listening session -->
+<!-- Session control buttons for start/end listening session -->
             <div class="mt-4 pt-4 border-t border-white/20">
               <div class="flex space-x-2">
                 <%= if @listening_session.status == :preparing do %>
@@ -349,7 +349,7 @@
 <!-- Right Column - Track List (2/3) -->
       <div class="w-2/3 p-6 overflow-y-auto">
         
-<!-- AIDEV-NOTE: Compact Streamer Voting Section - Only show when session is active -->
+<!-- Compact Streamer Voting Section - Only show when session is active -->
         <%= if @listening_session.status == :active do %>
           <div class="rounded-xl p-3 mb-6 bg-purple-900/20">
             <div class="flex items-center justify-center space-x-3">
@@ -384,7 +384,7 @@
           </div>
         <% end %>
         
-<!-- AIDEV-NOTE: Note Graph - Show when session started, update on report changes -->
+<!-- Note Graph - Show when session started, update on report changes -->
         <%= if @show[:scores] && @listening_session.status in [:active, :stopped] do %>
           <div class="mb-6">
             <div
@@ -539,7 +539,7 @@
                     </div>
                   </div>
                   
-<!-- AIDEV-NOTE: Histogram Section - show for current track when active, or all tracks when session ended -->
+<!-- Histogram Section - show for current track when active, or all tracks when session ended -->
                   <%= if (@listening_session.current_track && @listening_session.current_track.id == track.id) || @listening_session.status == :stopped do %>
                     <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
                       <!-- Horizontal Histogram taking ~80% width -->

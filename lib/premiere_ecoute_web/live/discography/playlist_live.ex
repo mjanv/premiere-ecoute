@@ -217,7 +217,6 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
     |> PremiereEcouteCore.Duration.duration()
   end
 
-  # AIDEV-NOTE: Apply search and date filters to playlist tracks
   defp apply_filters(%{assigns: assigns} = socket) do
     tracks = (assigns.playlist && assigns.playlist.tracks) || []
 
@@ -254,7 +253,6 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
     end
   end
 
-  # AIDEV-NOTE: Get track IDs for current displayed tracks (filtered or all)
   defp get_current_track_ids(socket) do
     tracks =
       if socket.assigns.search_query != "" || socket.assigns.date_filter != "all" do

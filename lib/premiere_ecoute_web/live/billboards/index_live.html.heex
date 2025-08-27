@@ -2,7 +2,7 @@
   <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
     <div class="flex-1 py-12">
       <div class="max-w-7xl mx-auto px-6">
-        <!-- AIDEV-NOTE: Billboards index header using reusable page_header component -->
+        <!-- Billboards index header using reusable page_header component -->
         <.page_header
           title={gettext("My Billboards")}
           subtitle={gettext("Manage your music billboard campaigns and collect playlist submissions")}
@@ -20,7 +20,7 @@
           </:action>
         </.page_header>
         
-<!-- AIDEV-NOTE: Billboards grid or empty state -->
+<!-- Billboards grid or empty state -->
         <%= if length(@billboards) == 0 do %>
           <div class="text-center py-16">
             <div class="w-24 h-24 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -38,7 +38,7 @@
         <% else %>
           <div class="space-y-3">
             <%= for billboard <- @billboards do %>
-              <!-- AIDEV-NOTE: Full-width clickable billboard card -->
+              <!-- Full-width clickable billboard card -->
               <div
                 class="rounded-lg p-6 cursor-pointer transition-colors border border-gray-700 hover:border-purple-500 hover:bg-gray-700"
                 style="background-color: var(--color-dark-900);"

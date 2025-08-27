@@ -92,7 +92,7 @@
         </div>
       </div>
       
-<!-- AIDEV-NOTE: Profile Preferences section with editable form -->
+<!-- Profile Preferences section with editable form -->
       <div class="mt-12">
         <div class="flex items-center space-x-3 mb-8">
           <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
@@ -430,7 +430,7 @@
     </div>
     <!-- End Main Content Container -->
 
-<!-- AIDEV-NOTE: GDPR data download modal -->
+<!-- GDPR data download modal -->
     <%= if @show_download_modal do %>
       <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_download_modal">
         <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4" phx-click="stop_propagation">
@@ -477,7 +477,7 @@
       </div>
     <% end %>
     
-<!-- AIDEV-NOTE: Account deletion warning modal -->
+<!-- Account deletion warning modal -->
     <%= if @show_delete_modal do %>
       <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_delete_modal">
         <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4" phx-click="stop_propagation">

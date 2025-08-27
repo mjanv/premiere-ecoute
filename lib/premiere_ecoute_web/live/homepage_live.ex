@@ -1,7 +1,8 @@
 defmodule PremiereEcouteWeb.HomepageLive do
+  @moduledoc false
+
   use PremiereEcouteWeb, :live_view
 
-  # AIDEV-NOTE: Redirect authenticated users to /home
   @impl true
   def mount(_params, _session, socket) do
     # If user is authenticated, redirect to /home

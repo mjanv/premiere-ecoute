@@ -39,7 +39,7 @@ defmodule PremiereEcouteWeb.Layouts do
     <div class="min-h-screen bg-gray-900 flex flex-col">
       <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
       
-    <!-- AIDEV-NOTE: Spotify connection notification for streamers -->
+    <!-- Spotify connection notification for streamers -->
       <%= if @current_scope && Map.get(@current_scope, :user) && Map.get(@current_scope, :user).role in [:streamer, :admin] && needs_spotify_connection?(Map.get(@current_scope, :user)) do %>
         <div class="bg-green-600 px-6 py-2">
           <div class="flex items-center justify-between">
@@ -61,7 +61,7 @@ defmodule PremiereEcouteWeb.Layouts do
         </div>
       <% end %>
       
-    <!-- AIDEV-NOTE: Layout with left sidebar for authenticated users -->
+    <!-- Layout with left sidebar for authenticated users -->
       <div class="flex flex-1">
         <.left_sidebar
           current_user={(@current_scope && Map.get(@current_scope, :user)) || nil}
@@ -127,11 +127,9 @@ defmodule PremiereEcouteWeb.Layouts do
     """
   end
 
-  # AIDEV-NOTE: Helper function to check if user needs Spotify connection
   defp needs_spotify_connection?(nil), do: false
   defp needs_spotify_connection?(user), do: user.spotify == nil
 
-  # AIDEV-NOTE: Helper function to get user's preferred theme from profile
   def get_user_theme(assigns) do
     with %{current_scope: scope} when not is_nil(scope) <- assigns,
          %{user: user} when not is_nil(user) <- scope,

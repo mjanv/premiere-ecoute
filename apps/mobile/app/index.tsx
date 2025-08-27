@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Simplified Premiere Ecoute Mobile App
+// Simplified Premiere Ecoute Mobile App
 // - Main page lists all active listening sessions from backend
 // - Session detail page shows real-time viewer scores via websockets
 // - TypeScript types exactly match backend channel responses
@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Socket } from "phoenix";
 import Constants from 'expo-constants';
 
-// AIDEV-NOTE: TypeScript types matching backend channel test responses exactly
+// TypeScript types matching backend channel test responses exactly
 interface ListeningSession {
   id: string;
   album: {
@@ -58,17 +58,17 @@ export default function Index() {
   const [selectedSessionData, setSelectedSessionData] = useState<ListeningSession | null>(null);
   const [currentTrack, setCurrentTrack] = useState<any | null>(null);
 
-  // AIDEV-NOTE: Animation for live dot pulsing effect
+  // Animation for live dot pulsing effect
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // AIDEV-NOTE: Auto-refresh timer for sessions list
+  // Auto-refresh timer for sessions list
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // AIDEV-NOTE: Manual IP override for troubleshooting
+  // Manual IP override for troubleshooting
   // Set this to your computer's IP address if auto-detection fails
   const MANUAL_IP_OVERRIDE: string | null = null; // Update this to your computer's actual IP
 
-  // AIDEV-NOTE: Start pulsing animation for live dot
+  // Start pulsing animation for live dot
   useEffect(() => {
     const startPulse = () => {
       Animated.loop(
@@ -92,7 +92,7 @@ export default function Index() {
     }
   }, [connectionStatus, pulseAnim]);
 
-  // AIDEV-NOTE: Auto-refresh sessions list every 5 seconds
+  // Auto-refresh sessions list every 5 seconds
   useEffect(() => {
     const startAutoRefresh = () => {
       if (refreshIntervalRef.current) {
@@ -125,12 +125,12 @@ export default function Index() {
   }, [connectionStatus, currentScreen, channel]);
 
   useEffect(() => {
-    // AIDEV-NOTE: Connect to Phoenix websocket - use correct IP for mobile/emulator
+    // Connect to Phoenix websocket - use correct IP for mobile/emulator
     // For Android emulator: 10.0.2.2:4000
     // For iOS simulator: localhost:4000 works
     // For physical device: use your computer's IP address (e.g., 192.168.1.X:4000)
     const getWebSocketUrl = () => {
-      // AIDEV-NOTE: Connect to Phoenix UserSocket at /socket endpoint
+      // Connect to Phoenix UserSocket at /socket endpoint
 
         // If running on Expo web
         if (Platform.OS === 'web') {
@@ -243,7 +243,7 @@ export default function Index() {
     };
   }, []);
 
-  // AIDEV-NOTE: Function to request sessions from server
+  // Function to request sessions from server
   const requestSessions = (channel: any) => {
     if (channel && connectionStatus === 'connected') {
       console.log('Requesting sessions list...');
@@ -271,7 +271,7 @@ export default function Index() {
 
   useEffect(() => {
     if (socket && connectionStatus === 'connected') {
-      // AIDEV-NOTE: Join sessions:lobby channel to get list of active sessions
+      // Join sessions:lobby channel to get list of active sessions
       const lobbyChannel = socket.channel("sessions:lobby", {});
 
       lobbyChannel.join()
@@ -324,7 +324,7 @@ export default function Index() {
     setCurrentScreen('session-detail');
     setViewerScore(null); // Reset viewer score
 
-    // AIDEV-NOTE: Join specific session channel as per backend test
+    // Join specific session channel as per backend test
     if (socket) {
       const sessionChannel = socket.channel(`session:${sessionId}`, {});
 
@@ -336,13 +336,13 @@ export default function Index() {
           console.error(`Unable to join session:${sessionId} channel`, resp);
         });
 
-      // AIDEV-NOTE: Listen for session_summary events with viewer_score as per backend test
+      // Listen for session_summary events with viewer_score as per backend test
       sessionChannel.on("session_summary", (payload: SessionSummary) => {
         console.log("Session summary received:", payload);
         setViewerScore(payload.viewer_score);
       });
 
-      // AIDEV-NOTE: Listen for track change events (next_track/previous_track)
+      // Listen for track change events (next_track/previous_track)
       sessionChannel.on("track", (payload: any) => {
         console.log("Track change received:", payload);
 
@@ -406,7 +406,7 @@ export default function Index() {
     }
   };
 
-  // AIDEV-NOTE: Voting functionality removed as per requirements - app only displays viewer scores
+  // Voting functionality removed as per requirements - app only displays viewer scores
 
   const getConnectionStatusColor = () => {
     switch (connectionStatus) {
@@ -416,7 +416,7 @@ export default function Index() {
     }
   };
 
-  // AIDEV-NOTE: Mock data removed - using real backend data from channels
+  // Mock data removed - using real backend data from channels
 
   const renderSessionsList = () => (
     <>
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  // AIDEV-NOTE: Logo removed as requested
+  // Logo removed as requested
   appName: {
     fontSize: 28,
     fontWeight: '700',
@@ -771,7 +771,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     fontWeight: '300',
   },
-  // AIDEV-NOTE: Removed old session list styles, replaced with new horizontal layout
+  // Removed old session list styles, replaced with new horizontal layout
   liveDot: {
     width: 8,
     height: 8,
@@ -879,7 +879,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 12,
     lineHeight: 200,
   },
-  // AIDEV-NOTE: Old styles removed and replaced with new gradient design
+  // Old styles removed and replaced with new gradient design
   // Track Progress - Simplified
   trackProgress: {
     paddingHorizontal: 40,
@@ -915,5 +915,5 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 1,
   },
-  // AIDEV-NOTE: SessionInfo styles moved to new layout
+  // SessionInfo styles moved to new layout
 });

@@ -63,7 +63,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     </.sidebar_link>
                   <% end %>
                   
-    <!-- AIDEV-NOTE: My votes link - shows viewer votes by period using get_votes_by_period -->
+    <!-- My votes link - shows viewer votes by period using get_votes_by_period -->
                   <.sidebar_link
                     href={~p"/retrospective/votes"}
                     current_page={@current_page}
@@ -194,7 +194,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
     """
   end
 
-  # AIDEV-NOTE: Helper function to safely check if channels association is loaded
   defp has_loaded_channels?(nil), do: false
   defp has_loaded_channels?(%{channels: %Ecto.Association.NotLoaded{}}), do: false
   defp has_loaded_channels?(%{channels: _}), do: true
