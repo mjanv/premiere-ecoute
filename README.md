@@ -24,14 +24,6 @@ Premiere Ecoute turns music discovery into an interactive experience where strea
 - 🐦 [Phoenix Framework](https://www.phoenixframework.org/)
 - 📱 [_React Native_](https://reactnative.dev/)
 
-## Demo
-
-<p align="center">
-  <a href="https://youtu.be/nTQUwghvy5Q">
-    <img src="https://img.youtube.com/vi/RecB_ZMGjFE/hqdefault.jpg" alt="Watch the video">
-  </a>
-</p>
-
 ## Documentation
 
 - ⚙️ Set up your local environment with the [development setup guide](docs/guides/development.md)
