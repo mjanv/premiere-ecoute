@@ -275,56 +275,51 @@ msgstr "Voti"
 msgid "Your rating"
 msgstr "La tua valutazione"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:34
-#, elixir-autogen, elixir-format
-msgid "Cannot read playback state"
-msgstr "Impossibile leggere lo stato di riproduzione"
-
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:49
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:44
 #, elixir-autogen, elixir-format
 msgid "Failed to pause: %{reason}"
 msgstr "Impossibile mettere in pausa: %{reason}"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:59
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:54
 #, elixir-autogen, elixir-format
 msgid "Failed to play: %{reason}"
 msgstr "Impossibile riprodurre: %{reason}"
 
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:246
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:253
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:177
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:176
 #, elixir-autogen, elixir-format
 msgid "Next"
 msgstr "Successivo"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:132
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:131
 #, elixir-autogen, elixir-format
 msgid "No track selected"
 msgstr "Nessun brano selezionato"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:110
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:106
 #, elixir-autogen, elixir-format
 msgid "Not playing"
 msgstr "Non in riproduzione"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:160
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:159
 #, elixir-autogen, elixir-format
 msgid "Pause"
 msgstr "Pausa"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:169
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:168
 #, elixir-autogen, elixir-format
 msgid "Play"
 msgstr "Riproduci"
 
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:210
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:217
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:145
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:144
 #, elixir-autogen, elixir-format
 msgid "Previous"
 msgstr "Precedente"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:122
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:121
 #, elixir-autogen, elixir-format
 msgid "Progress:"
 msgstr "Progresso:"
@@ -714,11 +709,6 @@ msgstr "Formato Voto"
 #, elixir-autogen, elixir-format
 msgid "Vote Options"
 msgstr "Opzioni di Voto"
-
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:63
-#, elixir-autogen, elixir-format
-msgid "Welcome !"
-msgstr "Benvenuto !"
 
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:343
 #, elixir-autogen, elixir-format
@@ -2574,3 +2564,8 @@ msgstr "In attesa di revisione"
 #, elixir-autogen, elixir-format, fuzzy
 msgid "New Session"
 msgstr "Nuova Sessione"
+
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:108
+#, elixir-autogen, elixir-format
+msgid "No device"
+msgstr "Nessun dispositivo"
