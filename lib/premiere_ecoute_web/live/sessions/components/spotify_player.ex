@@ -29,6 +29,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         if state["item"] do
           album = %{
             "cover_url" => session.album.cover_url,
+            "album_name" => session.album.name,
             "artist" => session.album.artist,
             "total_tracks" => session.album.total_tracks
           }
@@ -130,7 +131,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           <% end %>
         </div>
       </div>
-      
+
     <!-- Current Track Status -->
       <%= if @player_state["item"] do %>
         <div class="bg-white/20 rounded-lg p-3 space-y-3">

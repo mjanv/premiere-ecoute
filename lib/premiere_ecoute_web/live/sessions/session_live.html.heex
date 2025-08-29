@@ -236,11 +236,14 @@
                     <select
                       name="score_type"
                       value={@overlay_score_type}
+                      phx-update="ignore"
+                      id="selectçtype"
                       class="text-xs text-purple-200 font-medium bg-transparent border-none focus:outline-none cursor-pointer w-20"
                     >
                       <option value="streamer" class="bg-gray-800 text-white">Streamer</option>
                       <option value="viewer" class="bg-gray-800 text-white">Viewer</option>
                       <option value="both" class="bg-gray-800 text-white">Both</option>
+                      <option value="player" class="bg-gray-800 text-white">Player</option>
                     </select>
                   </form>
                   <div class="w-px h-4 bg-white/20"></div>

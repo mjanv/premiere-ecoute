@@ -50,7 +50,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp parse_score("viewer streamer"), do: :both
   defp parse_score(_), do: :player
 
-  defp overlay_width(:player), do: 480 * 2
+  defp overlay_width(:player), do: 480 * 2.5
   defp overlay_width(:both), do: 480
   defp overlay_width(_), do: 240
 
@@ -58,6 +58,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   defp score_value(summary, :viewer), do: summary["viewer_score"] || summary.viewer_score
   defp score_value(summary, :streamer), do: summary["streamer_score"] || summary.streamer_score
-  defp score_label(:viewer), do: "CHAT"
-  defp score_label(:streamer), do: "STREAMER"
+  defp score_label(:viewer), do: "Chat"
+  defp score_label(:streamer), do: "Streamer"
 end

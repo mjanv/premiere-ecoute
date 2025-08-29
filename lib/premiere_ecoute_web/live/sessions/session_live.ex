@@ -104,16 +104,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_event("copy_overlay_url", _params, socket) do
-    overlay_url = build_overlay_url(socket)
-
-    socket
-    |> push_event("copy_to_clipboard", %{text: overlay_url})
-    |> put_flash(:info, "Overlay URL copied to clipboard!")
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
   def handle_event("vote_track", %{"rating" => rating}, socket) do
     user_id = socket.assigns.current_scope.user.twitch.user_id
 
@@ -398,6 +388,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       "streamer" -> "#{base_url}?score=streamer"
       "viewer" -> "#{base_url}?score=viewer"
       "both" -> "#{base_url}?score=viewer+streamer"
+      "player" -> "#{base_url}?score=player"
       _ -> base_url
     end
   end
