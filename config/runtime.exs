@@ -14,6 +14,10 @@ config :premiere_ecoute,
   spotify_client_secret: env!("SPOTIFY_CLIENT_SECRET"),
   spotify_redirect_uri: env!("SPOTIFY_REDIRECT_URI")
 
+# config :premiere_ecoute,
+#   tidal_client_id: env!("TIDAL_CLIENT_ID"),
+#   tidal_client_secret: env!("TIDAL_CLIENT_SECRET")
+
 config :premiere_ecoute,
   twitch_client_id: env!("TWITCH_CLIENT_ID"),
   twitch_client_secret: env!("TWITCH_CLIENT_SECRET"),

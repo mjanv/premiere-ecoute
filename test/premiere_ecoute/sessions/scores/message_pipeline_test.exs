@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
       end)
       |> Enum.each(fn m -> PremiereEcouteCore.publish(@pipeline, m) end)
 
-      :timer.sleep(500)
+      :timer.sleep(100)
 
       votes = Vote.all(where: [session_id: session.id])
 
@@ -90,6 +90,27 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
 
       assert Enum.empty?(Vote.all(where: [session_id: session.id]))
       assert is_nil(Report.get_by(session_id: session.id))
+    end
+
+    test "does not cast votes twice", %{session: session} do
+      messages = [
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "0", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "1", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "2", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "3", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "4", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "5", is_streamer: false},
+      ]
+
+      for message <- messages do
+        PremiereEcouteCore.publish(@pipeline, message)
+      end
+
+      :timer.sleep(100)
+
+      [vote] = Vote.all(where: [session_id: session.id, viewer_id: "viewer1"])
+
+      assert %Vote{value: "0"} = vote
     end
   end
 end

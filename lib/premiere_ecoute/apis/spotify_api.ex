@@ -41,7 +41,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
     # Player
     @callback devices(scope :: Scope.t()) :: any()
-    @callback get_playback_state(scope :: Scope.t()) :: {:ok, map()} | {:error, term()}
+    @callback get_playback_state(scope :: Scope.t(), state :: map()) :: {:ok, map()} | {:error, term()}
     @callback start_playback(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
     @callback pause_playback(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
     @callback next_track(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
@@ -128,7 +128,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   # Player
   defdelegate devices(scope), to: __MODULE__.Player
-  defdelegate get_playback_state(scope), to: __MODULE__.Player
+  defdelegate get_playback_state(scope, state), to: __MODULE__.Player
   defdelegate start_playback(scope), to: __MODULE__.Player
   defdelegate pause_playback(scope), to: __MODULE__.Player
   defdelegate next_track(scope), to: __MODULE__.Player

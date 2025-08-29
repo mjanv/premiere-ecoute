@@ -101,14 +101,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%StopListeningSession{session_id: session_id, scope: scope}) do
     with {:ok, devices} <- Apis.spotify().devices(scope),
-         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+         is_active <- Enum.any?(devices, fn device -> device["is_active"] end),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
-         {:ok, _} <- Apis.spotify().pause_playback(scope),
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "Good bye !"),
          {:ok, session} <- ListeningSession.stop(session),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
+      if is_active, do: Apis.spotify().pause_playback(scope)
       {:ok, session, [%SessionStopped{session_id: session.id}]}
     else
       false ->

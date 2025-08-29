@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   require Logger
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
@@ -15,7 +16,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     if connected?(socket) do
-      Process.send_after(self(), :refresh, 0)
+      Process.send_after(self(), :refresh, 100)
     end
 
     case ListeningSession.get(id) do
@@ -141,8 +142,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_info(:refresh, socket) do
-    Process.send_after(self(), :refresh, 2_500)
-    {:noreply, SpotifyPlayer.refresh_state(socket)}
+    Process.send_after(self(), :refresh, 1_500)
+
+    socket
+    |> assign(:current_scope, Accounts.maybe_renew_token(socket, :spotify))
+    |> SpotifyPlayer.refresh_state()
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -156,6 +161,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       {:ok, %{vote_trends: vote_data}}
     end)
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:flash, level, message}, socket) do
+    {:noreply, put_flash(socket, level, message)}
   end
 
   @impl true

@@ -1,45 +1,43 @@
-<div style={"background: linear-gradient(to right, oklch(0.558 0.288 302.321) 0%, oklch(0.592 0.249 0.584) 100%); border-radius: 12px; width: #{overlay_width(@score)}px; height: 120px; display: flex; align-items: center; justify-content: center; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); text-align: center;"}>
-  <div style="line-height: 1;">
-    <.async_result :let={summary} assign={@summary}>
-      <:loading>
-        <div style="font-size: 15px; color: rgba(255, 255, 255, 0.8);">{gettext("Loading...")}</div>
-      </:loading>
-      
+<div style={"background: linear-gradient(to right, oklch(0.558 0.288 302.321) 0%, oklch(0.592 0.249 0.584) 100%); border-radius: 2px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; line-height: 1;"}>
+  <.async_result :let={summary} assign={@summary}>
+    <:loading>
+      <div style="font-size: 64px; color: rgba(255, 255, 255, 0.8);">...</div>
+    </:loading>
+    
 <!-- Single score display (viewer or streamer) -->
-      <div :if={summary && @score in [:viewer, :streamer]} style="display: flex; flex-direction: column; align-items: center;">
-        <span style="font-size: 40px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-          {score_value(summary, @score)}
+    <div :if={summary && @score in [:viewer, :streamer]} style="display: flex; flex-direction: column; align-items: center;">
+      <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+        {score_value(summary, @score)}
+      </span>
+      <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+        {score_label(@score)}
+      </div>
+    </div>
+    
+<!-- Both scores display -->
+    <div :if={summary && @score in [:both]} style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+      <!-- Viewer Score -->
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+          {score_value(summary, :viewer)}
         </span>
-        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
-          {score_label(@score)}
+        <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
+          {score_label(:viewer)}
         </div>
       </div>
       
-<!-- Both scores display -->
-      <div :if={summary && @score in [:both]} style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
-        <!-- Viewer Score -->
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <span style="font-size: 32px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            {score_value(summary, :viewer)}
-          </span>
-          <div style="font-size: 11px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
-            {score_label(:viewer)}
-          </div>
-        </div>
-        
 <!-- Vertical Separator -->
-        <div style="width: 1px; height: 45px; background: rgba(255, 255, 255, 0.3);"></div>
-        
+      <div style="width: 1px; height: 200px; background: rgba(255, 255, 255, 0.6);"></div>
+      
 <!-- Streamer Score -->
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <span style="font-size: 32px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            {score_value(summary, :streamer)}
-          </span>
-          <div style="font-size: 11px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
-            {score_label(:streamer)}
-          </div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+          {score_value(summary, :streamer)}
+        </span>
+        <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
+          {score_label(:streamer)}
         </div>
       </div>
-    </.async_result>
-  </div>
+    </div>
+  </.async_result>
 </div>

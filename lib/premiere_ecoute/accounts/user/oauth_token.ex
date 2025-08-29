@@ -60,10 +60,15 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 
-  def refresh(%User{id: id} = user, provider, attrs) do
+  def refresh(%User{id: id} = user, provider, %{expires_in: expires_in} = attrs) do
     case Repo.get_by(__MODULE__, parent_id: id, provider: provider) do
-      nil -> {:error, nil}
-      token -> Repo.update(refresh_changeset(token, attrs))
+      nil ->
+        {:error, nil}
+
+      token ->
+        Repo.update(
+          refresh_changeset(token, Map.merge(attrs, %{expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)}))
+        )
     end
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
@@ -74,8 +79,6 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
       token -> Repo.delete(token)
     end
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
-
-    # refresh(user, provider, %{access_token: nil, refresh_token: nil, expires_at: nil})
   end
 
   def delete_all_tokens(%User{id: id} = user) do

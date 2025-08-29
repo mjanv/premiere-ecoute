@@ -89,10 +89,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   @doc """
   Get information about the user's current playback state.
   """
-  def get_playback_state(%Scope{} = scope) do
+  def get_playback_state(%Scope{} = scope, state) do
     scope
     |> SpotifyApi.api()
-    |> Req.get(url: "/me/player")
+    |> Req.merge(url: "/me/player")
+    |> Req.get()
     |> case do
       {:ok,
        %{
@@ -113,6 +114,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
           "device" => Map.take(device, ["id", "name", "is_active"])
         }
 
+        {:ok, state}
+
+      {:ok, %{status: 400}} ->
         {:ok, state}
 
       {:ok, %{status: 204}} ->

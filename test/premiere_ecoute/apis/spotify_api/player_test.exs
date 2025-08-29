@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 200
       )
 
-      {:ok, state} = SpotifyApi.get_playback_state(scope)
+      {:ok, state} = SpotifyApi.get_playback_state(scope, %{})
 
       assert state == %{
                "is_playing" => true,
@@ -58,7 +58,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, state} = SpotifyApi.get_playback_state(scope)
+      {:ok, state} = SpotifyApi.get_playback_state(scope, %{})
 
       assert state == %{
                "is_playing" => false,

@@ -544,20 +544,6 @@
                     <!-- Empty Playlist State -->
                     <h3 class="text-xl font-semibold text-white mb-2">{gettext("This playlist is empty")}</h3>
                     <p class="text-gray-400 mb-6">{gettext("No tracks have been added to this playlist yet")}</p>
-                    <button
-                      phx-click="open_in_provider"
-                      class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-                    >
-                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                      {gettext("Open in %{provider}", provider: String.capitalize(to_string(@playlist.provider)))}
-                    </button>
                   <% end %>
                 </div>
               <% end %>

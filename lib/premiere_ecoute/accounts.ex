@@ -41,4 +41,5 @@ defmodule PremiereEcoute.Accounts do
   defdelegate discover_follows(user), to: Follow
   defdelegate follow_streamer(scope, streamer), to: Services.AccountFollow
   defdelegate follow_streamers(scope), to: Services.AccountFollow
+  defdelegate maybe_renew_token(scope, provider), to: Services.TokenRenewal
 end

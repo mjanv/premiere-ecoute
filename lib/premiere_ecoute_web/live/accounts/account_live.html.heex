@@ -286,20 +286,22 @@
                 </div>
               </div>
 
-              <%= if @current_user && @current_user.spotify && @current_user.spotify.access_token do %>
-                <button
-                  phx-click="disconnect_spotify"
-                  class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors border border-red-500/20 hover:border-red-400/30"
-                >
-                  {gettext("Disconnect")}
-                </button>
-              <% else %>
-                <button
-                  phx-click="connect_spotify"
-                  class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors"
-                >
-                  {gettext("Connect")}
-                </button>
+              <%= if @current_user.role in [:streamer, :admin] do %>
+                <%= if @current_user && @current_user.spotify && @current_user.spotify.access_token do %>
+                  <button
+                    phx-click="disconnect_spotify"
+                    class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors border border-red-500/20 hover:border-red-400/30"
+                  >
+                    {gettext("Disconnect")}
+                  </button>
+                <% else %>
+                  <button
+                    phx-click="connect_spotify"
+                    class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors"
+                  >
+                    {gettext("Connect")}
+                  </button>
+                <% end %>
               <% end %>
             </div>
           </div>

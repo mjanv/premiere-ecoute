@@ -78,13 +78,13 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
             
     <!-- Billboards section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
-              <%= if @current_user.role in [:streamer, :admin] do %>
-                <div class="mb-6">
-                  <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                    <.icon name="hero-chart-bar-square" class="w-4 h-4 mr-2" />
-                    {gettext("Billboards")}
-                  </h3>
-                  <nav class="space-y-1">
+              <div class="mb-6">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                  <.icon name="hero-chart-bar-square" class="w-4 h-4 mr-2" />
+                  {gettext("Billboards")}
+                </h3>
+                <nav class="space-y-1">
+                  <%= if @current_user.role in [:streamer, :admin] do %>
                     <.sidebar_link
                       href={~p"/billboards"}
                       current_page={@current_page}
@@ -93,17 +93,17 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     >
                       {gettext("My Billboards")}
                     </.sidebar_link>
-                    <.sidebar_link
-                      href={~p"/billboards/submissions"}
-                      current_page={@current_page}
-                      page_id="submissions"
-                      icon="hero-bookmark"
-                    >
-                      {gettext("My Submissions")}
-                    </.sidebar_link>
-                  </nav>
-                </div>
-              <% end %>
+                  <% end %>
+                  <.sidebar_link
+                    href={~p"/billboards/submissions"}
+                    current_page={@current_page}
+                    page_id="submissions"
+                    icon="hero-bookmark"
+                  >
+                    {gettext("My Submissions")}
+                  </.sidebar_link>
+                </nav>
+              </div>
             <% end %>
             
     <!-- Followed Channels section -->

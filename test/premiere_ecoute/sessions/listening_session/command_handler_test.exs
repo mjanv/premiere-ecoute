@@ -118,7 +118,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
-      
+
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
@@ -238,7 +238,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
-      
+
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->

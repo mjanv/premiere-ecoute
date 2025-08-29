@@ -1,0 +1,1742 @@
+{
+    "data": {
+        "attributes": {
+            "accessType": "PUBLIC",
+            "bounded": true,
+            "createdAt": "2022-11-02T15:10:21.113Z",
+            "description": "",
+            "duration": "PT5H45M31S",
+            "externalLinks": [
+                {
+                    "href": "https://listen.tidal.com/playlist/eaaa8f2b-b891-466d-828b-879891adf264",
+                    "meta": {"type": "TIDAL_SHARING"},
+                },
+                {
+                    "href": "https://tidal.com/playlist/eaaa8f2b-b891-466d-828b-879891adf264?play=true",
+                    "meta": {"type": "TIDAL_AUTOPLAY_ANDROID"},
+                },
+                {
+                    "href": "https://tidal.com/playlist/eaaa8f2b-b891-466d-828b-879891adf264?play=true",
+                    "meta": {"type": "TIDAL_AUTOPLAY_IOS"},
+                },
+                {
+                    "href": "https://listen.tidal.com/playlist/eaaa8f2b-b891-466d-828b-879891adf264?play=true",
+                    "meta": {"type": "TIDAL_AUTOPLAY_WEB"},
+                },
+            ],
+            "lastModifiedAt": "2022-11-02T15:24:24.429Z",
+            "name": "Je suis en Juillet",
+            "numberOfItems": 85,
+            "playlistType": "USER",
+        },
+        "id": "eaaa8f2b-b891-466d-828b-879891adf264",
+        "relationships": {
+            "coverArt": {
+                "data": [
+                    {
+                        "id": "2b7Vtuqr1AeM15QGoPKmC4YhybEGvEaZTL88LPfypSSsyggkGdULHDepo",
+                        "type": "artworks",
+                    }
+                ],
+                "links": {
+                    "self": "/playlists/eaaa8f2b-b891-466d-828b-879891adf264/relationships/coverArt?countryCode=FR"
+                },
+            },
+            "items": {
+                "data": [
+                    {
+                        "id": "77690190",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "76f0bc8c-c53c-4632-83f3-a3aa18da3929",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "87332850",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "2c541e46-4200-47cc-9350-68d963781b35",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "85905133",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "0597c99c-a8ee-4f8e-8157-ab88a96597cf",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "34919698",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "77875e02-2957-440d-acab-3982c9afae39",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "67656933",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "2833aed7-da14-40d2-8c08-da4c73b34921",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "88968070",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "65b61f57-492b-4f60-911a-016e39dd10f0",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "3620317",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "b608568b-2133-4793-b789-01b83f143330",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "95266397",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "954b4170-ed11-4877-b4b9-4ffcbf7a3768",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "51073943",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "41de5a99-28c3-49ad-a8fd-037a92585972",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "76324178",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "2b80ca80-0813-42fb-85d2-c6d6227922c4",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "1462463",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "48248f89-0fb3-41fa-8784-cb72e8747ffc",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "50962010",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "18132ec1-9a92-4948-a9d8-9b8035b82508",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "67659527",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "9847958c-998b-453a-a3ce-5577bcb3567f",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "88717809",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "83f5986b-5eec-45e9-8b7f-36b33217e1b0",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "73599356",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "73020a02-3cc1-4a5b-93e7-31c4003c7a48",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "219775133",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "46bbbe01-2f4f-4dbe-8d08-80f19b31a50e",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "69474403",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "963583d6-d64f-4e3c-a675-e48a0d41dbc4",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "88607405",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "9e68603f-be39-4906-aa9c-3ec0f3249eab",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "88720943",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "152799d8-1b14-4c25-b3f1-87275fea9ace",
+                        },
+                        "type": "tracks",
+                    },
+                    {
+                        "id": "99350679",
+                        "meta": {
+                            "addedAt": "2022-11-02T15:10:21.236398Z",
+                            "itemId": "d534b04e-f15c-4b0a-b7cf-503feb00bd64",
+                        },
+                        "type": "tracks",
+                    },
+                ],
+                "links": {
+                    "meta": {
+                        "nextCursor": "eyJyb3dJZCI6NzI3NDUyMzk3OCwiaW5kZXgiOjIwMDAwMDAsInRpdGxlIjoiR2l2ZSBZb3Vyc2VsZiBBIFRyeSIsImFydGlzdE5hbWUiOiJUaGUgMTk3NSIsImFsYnVtVGl0bGUiOiJBIEJyaWVmIElucXVpcnkgSW50byBPbmxpbmUgUmVsYXRpb25zaGlwcyIsImRhdGVBZGRlZCI6IjIwMjItMTEtMDJUMTU6MTA6MjEuMjM2Mzk4IiwiZHVyYXRpb24iOjE5Ny4wfQ%3D%3D"
+                    },
+                    "next": "/playlists/eaaa8f2b-b891-466d-828b-879891adf264/relationships/items?countryCode=FR&page%5Bcursor%5D=eyJyb3dJZCI6NzI3NDUyMzk3OCwiaW5kZXgiOjIwMDAwMDAsInRpdGxlIjoiR2l2ZSBZb3Vyc2VsZiBBIFRyeSIsImFydGlzdE5hbWUiOiJUaGUgMTk3NSIsImFsYnVtVGl0bGUiOiJBIEJyaWVmIElucXVpcnkgSW50byBPbmxpbmUgUmVsYXRpb25zaGlwcyIsImRhdGVBZGRlZCI6IjIwMjItMTEtMDJUMTU6MTA6MjEuMjM2Mzk4IiwiZHVyYXRpb24iOjE5Ny4wfQ%3D%3D",
+                    "self": "/playlists/eaaa8f2b-b891-466d-828b-879891adf264/relationships/items?countryCode=FR",
+                },
+            },
+            "owners": {
+                "links": {
+                    "self": "/playlists/eaaa8f2b-b891-466d-828b-879891adf264/relationships/owners?countryCode=FR"
+                }
+            },
+        },
+        "type": "playlists",
+    },
+    "included": [
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "(P) 2018 RECORDS, LLC / Columbia",
+                "duration": "PT3M23S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/88720943",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "USQX91800835",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.5402278429394405,
+                "spotlighted": false,
+                "title": "Audio (feat. Sia, Diplo & Labrinth)",
+            },
+            "id": "88720943",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/88720943/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "copyright": "2018 Because Music",
+                "duration": "PT3M19S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/95266397",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "FR6P11801500",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.4465051562178626,
+                "spotlighted": false,
+                "title": "Damn, dis-moi (feat. Dâm-Funk)",
+            },
+            "id": "95266397",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/95266397/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 2018 Dirty Hit, under exclusive licence to Polydor Records and Interscope Records",
+                "duration": "PT3M17S",
+                "explicit": true,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/99350679",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "GBK3W1800737",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.30033192965835337,
+                "spotlighted": false,
+                "title": "Give Yourself A Try",
+            },
+            "id": "99350679",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/99350679/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "(P) 2001 Columbia Records, a division of Sony Music Entertainment",
+                "duration": "PT4M36S",
+                "explicit": true,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/34919698",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "USSM11406824",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.5316117730339825,
+                "spotlighted": false,
+                "title": "Lowrider",
+            },
+            "id": "34919698",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/34919698/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "Crucast",
+                "duration": "PT4M11S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/69474403",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "FR10S1728295",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.4274353060853848,
+                "spotlighted": false,
+                "title": "Goes Like",
+            },
+            "id": "69474403",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/69474403/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "Tommy Boy Music, LLC",
+                "duration": "PT5M34S",
+                "explicit": true,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/219775133",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "USTB10250055",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.4907434238122798,
+                "spotlighted": false,
+                "title": "Fantastic Voyage",
+            },
+            "id": "219775133",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/219775133/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "(P) 2017 Arcade Fire Music under exclusive licence to Sony Music Entertainment UK Limited",
+                "duration": "PT5M53S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/76324178",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "GBARL1700821",
+                "mediaTags": ["HIRES_LOSSLESS", "LOSSLESS"],
+                "popularity": 0.46393145951150944,
+                "spotlighted": false,
+                "title": "Put Your Money on Me",
+            },
+            "id": "76324178",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/76324178/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "Pinéale",
+                "duration": "PT3M28S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/88717809",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "FR9W11809174",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.4622649533937213,
+                "spotlighted": false,
+                "title": "Tout lâcher",
+                "version": "Colors Session",
+            },
+            "id": "88717809",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/88717809/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "files": [
+                    {
+                        "href": "https://resources.tidal.com/images/a9419df7/af70/4b05/bdb3/6e4ded3fd4c6/160x160.jpg",
+                        "meta": {"height": 160, "width": 160},
+                    },
+                    {
+                        "href": "https://resources.tidal.com/images/a9419df7/af70/4b05/bdb3/6e4ded3fd4c6/320x320.jpg",
+                        "meta": {"height": 320, "width": 320},
+                    },
+                    {
+                        "href": "https://resources.tidal.com/images/a9419df7/af70/4b05/bdb3/6e4ded3fd4c6/480x480.jpg",
+                        "meta": {"height": 480, "width": 480},
+                    },
+                    {
+                        "href": "https://resources.tidal.com/images/a9419df7/af70/4b05/bdb3/6e4ded3fd4c6/1080x1080.jpg",
+                        "meta": {"height": 1080, "width": 1080},
+                    },
+                ],
+                "mediaType": "IMAGE",
+            },
+            "id": "2b7Vtuqr1AeM15QGoPKmC4YhybEGvEaZTL88LPfypSSsyggkGdULHDepo",
+            "relationships": {
+                "owners": {
+                    "links": {
+                        "self": "/artworks/2b7Vtuqr1AeM15QGoPKmC4YhybEGvEaZTL88LPfypSSsyggkGdULHDepo/relationships/owners?countryCode=FR"
+                    }
+                }
+            },
+            "type": "artworks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "2016 Sweat It Out",
+                "duration": "PT4M9S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/67656933",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "AUDCB1600950",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.21631101908607134,
+                "spotlighted": false,
+                "title": "Be About You",
+            },
+            "id": "67656933",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/67656933/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "Label Parlophone, ℗ 2001 Warner Music France",
+                "duration": "PT4M18S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/1462463",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "FRZ180100211",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.32935138078750975,
+                "spotlighted": false,
+                "title": "Los Angeles",
+            },
+            "id": "1462463",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/1462463/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 1981 Mercury Music Group",
+                "duration": "PT5M9S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/3620317",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "FRZ038101800",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.3625186979022185,
+                "spotlighted": false,
+                "title": "C'est pas facile",
+            },
+            "id": "3620317",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/3620317/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 2017 En Douceur, Distributed By Universal Music Belgium",
+                "duration": "PT4M15S",
+                "explicit": true,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/73599356",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "BEEO71700001",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.5706254144585909,
+                "spotlighted": false,
+                "title": "Sur Mon Nom",
+            },
+            "id": "73599356",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/73599356/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 2015 Avicii Music AB",
+                "createdAt": "2015-09-11T01:52:04Z",
+                "duration": "PT3M26S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/51073943",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "CHB701400189",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.5848261141009646,
+                "spotlighted": false,
+                "title": "For A Better Day",
+            },
+            "id": "51073943",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/51073943/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "Domino Recording Co Ltd",
+                "duration": "PT4M15S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/67659527",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "GBCEL1600014",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.3846044421940844,
+                "spotlighted": false,
+                "title": "Pattern",
+            },
+            "id": "67659527",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/67659527/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 2018 Whispering Pines Studios Inc., under exclusive license to Republic Records, a division of UMG Recordings, Inc.",
+                "duration": "PT5M11S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/87332850",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "USUG11800082",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.38157908949387404,
+                "spotlighted": false,
+                "title": "When the Night is Over",
+            },
+            "id": "87332850",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/87332850/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 2014 Barclay",
+                "duration": "PT6M50S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/77690190",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "FRUM71401397",
+                "mediaTags": ["HIRES_LOSSLESS", "LOSSLESS"],
+                "popularity": 0.5026716442761869,
+                "spotlighted": false,
+                "title": "Garde Le Pour Toi",
+            },
+            "id": "77690190",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/77690190/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "(P) 2018 Sony Music Entertainment UK Limited",
+                "duration": "PT3M21S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/85905133",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "GBARL1701372",
+                "mediaTags": ["HIRES_LOSSLESS", "LOSSLESS"],
+                "popularity": 0.6407168626366229,
+                "spotlighted": false,
+                "title": "Shotgun",
+            },
+            "id": "85905133",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/85905133/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 2018 Warner Music France, A Warner Music France",
+                "duration": "PT3M17S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/88968070",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "FRZ041800444",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.0,
+                "spotlighted": false,
+                "title": "Ta plus belle insomnie",
+            },
+            "id": "88968070",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/88968070/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "Domino Recording Company Ltd",
+                "duration": "PT5M12S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/88607405",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "GBCEL1800169",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.5253185356775543,
+                "spotlighted": false,
+                "title": "Four Out Of Five",
+            },
+            "id": "88607405",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/88607405/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+        {
+            "attributes": {
+                "accessType": "PUBLIC",
+                "availability": ["STREAM", "DJ"],
+                "copyright": "℗ 2003 Parlophone Records Ltd, a Warner Music Group Company",
+                "duration": "PT3M54S",
+                "explicit": false,
+                "externalLinks": [
+                    {
+                        "href": "https://tidal.com/browse/track/50962010",
+                        "meta": {"type": "TIDAL_SHARING"},
+                    }
+                ],
+                "isrc": "GBAYE0301040",
+                "mediaTags": ["LOSSLESS"],
+                "popularity": 0.5330377651682444,
+                "spotlighted": false,
+                "title": "Four to the Floor",
+            },
+            "id": "50962010",
+            "relationships": {
+                "albums": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/albums?countryCode=FR"
+                    }
+                },
+                "artists": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/artists?countryCode=FR"
+                    }
+                },
+                "genres": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/genres?countryCode=FR"
+                    }
+                },
+                "lyrics": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/lyrics?countryCode=FR"
+                    }
+                },
+                "owners": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/owners?countryCode=FR"
+                    }
+                },
+                "providers": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/providers?countryCode=FR"
+                    }
+                },
+                "radio": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/radio?countryCode=FR"
+                    }
+                },
+                "similarTracks": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/similarTracks?countryCode=FR"
+                    }
+                },
+                "sourceFile": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/sourceFile?countryCode=FR"
+                    }
+                },
+                "trackStatistics": {
+                    "links": {
+                        "self": "/tracks/50962010/relationships/trackStatistics?countryCode=FR"
+                    }
+                },
+            },
+            "type": "tracks",
+        },
+    ],
+    "links": {
+        "self": "/playlists/eaaa8f2b-b891-466d-828b-879891adf264?include=coverArt%2Citems&countryCode=FR"
+    },
+}
