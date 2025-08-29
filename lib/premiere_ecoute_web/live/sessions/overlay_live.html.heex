@@ -1,8 +1,16 @@
-<div style={"background: linear-gradient(to right, oklch(0.558 0.288 302.321) 0%, oklch(0.592 0.249 0.584) 100%); border-radius: 2px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; line-height: 1;"}>
+<div style={"background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{@percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{@percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%); border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1;"}>
   <.async_result :let={summary} assign={@summary}>
     <:loading>
       <div style="font-size: 64px; color: rgba(255, 255, 255, 0.8);">...</div>
     </:loading>
+    
+<!-- Player score display -->
+    <div :if={summary && @score in [:player]} style="display: flex; flex-direction: column; align-items: center;">
+      <img
+        src={@progress["cover_url"]}
+        class="w-32 h-32 rounded-lg shadow-lg"
+      /> ???
+    </div>
     
 <!-- Single score display (viewer or streamer) -->
     <div :if={summary && @score in [:viewer, :streamer]} style="display: flex; flex-direction: column; align-items: center;">
@@ -12,6 +20,7 @@
       <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
         {score_label(@score)}
       </div>
+      {inspect(@progress)}
     </div>
     
 <!-- Both scores display -->

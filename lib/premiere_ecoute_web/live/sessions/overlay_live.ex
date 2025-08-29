@@ -13,6 +13,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     end
 
     socket = assign(socket, :score, :streamer)
+    socket = assign(socket, :percent, 0)
+    socket = assign(socket, :progress, %{})
 
     case Report.get_by(session_id: id) do
       nil -> {:ok, assign(socket, :summary, AsyncResult.loading())}
@@ -31,6 +33,14 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def handle_info({:progress, %{"duration_ms" => duration, "progress_ms" => progress} = p}, socket) do
+    socket
+    |> assign(:percent, round(100 * progress / duration))
+    |> assign(:progress, p)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
   def handle_info(_event, socket) do
     {:noreply, socket}
   end
@@ -38,8 +48,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp parse_score("viewer"), do: :viewer
   defp parse_score("streamer"), do: :streamer
   defp parse_score("viewer streamer"), do: :both
-  defp parse_score(_), do: :streamer
+  defp parse_score(_), do: :player
 
+  defp overlay_width(:player), do: 480 * 2
   defp overlay_width(:both), do: 480
   defp overlay_width(_), do: 240
 

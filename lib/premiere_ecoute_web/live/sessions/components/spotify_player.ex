@@ -23,10 +23,23 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
     |> then(fn socket -> {:ok, socket} end)
   end
 
-  def refresh_state(socket) do
-    case SpotifyApi.get_playback_state(socket.assigns.current_scope, socket.assigns.player_state) do
-      {:ok, state} -> assign(socket, :player_state, state)
-      {:error, _} -> assign(socket, :player_state, SpotifyApi.Player.default())
+  def refresh_state(%{assigns: %{listening_session: session} = assigns} = socket) do
+    case SpotifyApi.get_playback_state(assigns.current_scope, assigns.player_state) do
+      {:ok, state} ->
+        if state["item"] do
+          album = %{
+            "cover_url" => session.album.cover_url,
+            "artist" => session.album.artist,
+            "total_tracks" => session.album.total_tracks
+          }
+
+          PremiereEcoute.PubSub.broadcast("session:#{session.id}", {:progress, Map.merge(state["item"], album)})
+        end
+
+        assign(socket, :player_state, state)
+
+      {:error, _} ->
+        assign(socket, :player_state, SpotifyApi.Player.default())
     end
   end
 
@@ -117,7 +130,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           <% end %>
         </div>
       </div>
-
+      
     <!-- Current Track Status -->
       <%= if @player_state["item"] do %>
         <div class="bg-white/20 rounded-lg p-3 space-y-3">

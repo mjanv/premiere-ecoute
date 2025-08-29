@@ -272,14 +272,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
-  defp track_max_votes(_track_id, nil, _session), do: 0
-
-  defp track_max_votes(track_id, report, session) do
-    track_vote_distribution(track_id, report, session)
-    |> Enum.map(&elem(&1, 1))
-    |> Enum.max(fn -> 0 end)
-  end
-
   defp build_track_data_attributes(listening_session, report) do
     case listening_session.album do
       %{tracks: tracks} when is_list(tracks) and length(tracks) > 0 ->

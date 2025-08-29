@@ -54,8 +54,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_params(_params, url, socket) do
-    current_path = URI.parse(url).path || "/"
-    {:noreply, assign(socket, :current_path, current_path)}
+    {:noreply, assign(socket, :current_path, URI.parse(url).path || "/")}
   end
 
   @impl true

@@ -99,7 +99,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "2", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "3", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "4", is_streamer: false},
-        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "5", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "5", is_streamer: false}
       ]
 
       for message <- messages do

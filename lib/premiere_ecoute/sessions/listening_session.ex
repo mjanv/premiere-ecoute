@@ -63,17 +63,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> changeset(attrs)
     |> Repo.insert()
     |> case do
-      {:ok, session} ->
-        session = preload(session)
-
-        if session.user && session.user.twitch do
-          Cache.put(:sessions, session.user.twitch.user_id, {session.id, session.vote_options, nil})
-        end
-
-        {:ok, session}
-
-      {:error, reason} ->
-        {:error, reason}
+      {:ok, session} -> {:ok, cache(preload(session))}
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -156,17 +147,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> put_change(:current_track_id, track_id)
     |> Repo.update()
     |> case do
-      {:ok, session} ->
-        session = preload(session)
-
-        if session.user && session.user.twitch do
-          Cache.put(:sessions, session.user.twitch.user_id, {session.id, session.vote_options, track_id})
-        end
-
-        {:ok, session}
-
-      {:error, reason} ->
-        {:error, reason}
+      {:ok, session} -> {:ok, cache(preload(session))}
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -199,4 +181,18 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.one()
     |> preload()
   end
+
+  def cache(
+        %__MODULE__{
+          id: id,
+          user: %{twitch: %{user_id: user_id}},
+          vote_options: vote_options,
+          current_track_id: current_track_id
+        } = session
+      ) do
+    Cache.put(:sessions, user_id, {id, vote_options, current_track_id})
+    session
+  end
+
+  def cache(session), do: session
 end
