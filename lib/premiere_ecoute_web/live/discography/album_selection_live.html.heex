@@ -146,10 +146,14 @@
                 />
               </.form>
               
-<!-- Search Results Overlay -->
+<!-- Search Loading Indicator -->
               <%= if @search_albums.loading do %>
-                <!-- Replaced manual loading state with new LoadingState component -->
-                <LoadingState.loading_overlay variant="overlay" message={gettext("Searching albums...")} />
+                <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4">
+                  <div class="flex items-center justify-center space-x-3">
+                    <div class="animate-spin rounded-full h-5 w-5 border-2 border-purple-400 border-t-transparent"></div>
+                    <span class="text-gray-300 text-sm">{gettext("Searching albums...")}</span>
+                  </div>
+                </div>
               <% end %>
 
               <%= if @search_albums.ok? && length(@search_albums.result) > 0 do %>

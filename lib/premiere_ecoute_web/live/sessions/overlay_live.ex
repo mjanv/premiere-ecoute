@@ -4,6 +4,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   require Logger
 
   alias Phoenix.LiveView.AsyncResult
+  # alias PremiereEcoute.Sessions.ListeningSession
+
   alias PremiereEcoute.Sessions.Retrospective.Report
 
   @impl true
@@ -15,6 +17,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     socket = assign(socket, :score, :streamer)
     socket = assign(socket, :percent, 0)
     socket = assign(socket, :progress, %{})
+
+    # _session = ListeningSession.get(id)
 
     case Report.get_by(session_id: id) do
       nil -> {:ok, assign(socket, :summary, AsyncResult.loading())}

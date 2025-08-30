@@ -4,8 +4,6 @@ defmodule PremiereEcouteWeb.Discography.AlbumSelectionLive do
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
 
-  alias PremiereEcouteWeb.Components.LoadingState
-
   require Logger
 
   @impl true

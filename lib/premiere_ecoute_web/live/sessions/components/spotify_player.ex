@@ -31,7 +31,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
             "cover_url" => session.album.cover_url,
             "album_name" => session.album.name,
             "artist" => session.album.artist,
-            "total_tracks" => session.album.total_tracks
+            "total_tracks" => session.album.total_tracks,
+            "track_id" => session.current_track_id
           }
 
           PremiereEcoute.PubSub.broadcast("session:#{session.id}", {:progress, Map.merge(state["item"], album)})
