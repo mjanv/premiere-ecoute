@@ -4,6 +4,7 @@ import { OpenUrl } from "./open_url";
 import { PlaylistStorage } from "./playlist_storage";
 import { Carousel } from "./carousel";
 import { NoteGraph } from "./note_graph";
+import { ClickOutside } from "./click_outside";
  
 export const Hooks = {
   CopyToClipboard: CopyToClipboard,
@@ -11,5 +12,6 @@ export const Hooks = {
   FileDownload: FileDownload,
   PlaylistStorage: PlaylistStorage,
   Carousel: Carousel,
-  NoteGraph: NoteGraph
+  NoteGraph: NoteGraph,
+  ClickOutside: ClickOutside
 };

@@ -134,7 +134,12 @@
             </div>
             
 <!-- Search -->
-            <div class="mb-6 relative max-w-lg ml-16">
+            <div
+              class="mb-6 relative max-w-lg ml-16"
+              phx-hook="ClickOutside"
+              id="search-container"
+              data-event="clear_search_results"
+            >
               <.form for={@search_form} id="album-search-form" phx-change="search_albums" phx-submit="search_albums">
                 <.input
                   field={@search_form[:query]}

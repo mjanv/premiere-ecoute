@@ -29,7 +29,18 @@ defmodule PremiereEcouteWeb.Discography.AlbumSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("search_albums", _params, socket), do: {:noreply, socket}
+  def handle_event("search_albums", _params, socket) do
+    # Clear search results when query is empty or too short
+    socket
+    |> assign(:search_albums, AsyncResult.ok([]))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("clear_search_results", _params, socket) do
+    socket
+    |> assign(:search_albums, AsyncResult.ok([]))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
 
   def handle_event("select_source", %{"source" => source}, socket) do
     socket

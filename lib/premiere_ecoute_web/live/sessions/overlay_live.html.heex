@@ -3,9 +3,12 @@
     <:loading>
       <div style="font-size: 64px; color: rgba(255, 255, 255, 0.8);">...</div>
     </:loading>
-
+    
 <!-- Player score display -->
-    <div :if={summary && @score in [:player]} style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 12px; width: 1200px; height: 240px; box-sizing: border-box;">
+    <div
+      :if={summary && @score in [:player]}
+      style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 12px; width: 1200px; height: 240px; box-sizing: border-box;"
+    >
       <!-- Album Cover -->
       <div style="flex-shrink: 0;">
         <img
@@ -14,37 +17,39 @@
         />
       </div>
       
-      <!-- Track Information -->
+<!-- Track Information -->
       <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
         <!-- Album Name -->
         <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           {@progress["track_number"]} / {@progress["total_tracks"]} - {@progress["album_name"]}
         </div>
         
-        <!-- Track Name -->
+<!-- Track Name -->
         <div style="font-size: 36px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           {@progress["name"]}
         </div>
         
-        <!-- Album Name -->
+<!-- Album Name -->
         <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           {@progress["artist"]}
         </div>
-
-        <!-- Track and Timer Row -->
+        
+<!-- Track and Timer Row -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <!-- Track -->
           <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
-            {PremiereEcouteCore.Duration.timer(@progress["progress_ms"])} / {PremiereEcouteCore.Duration.timer(@progress["duration_ms"])}
+            {PremiereEcouteCore.Duration.timer(@progress["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
+              @progress["duration_ms"]
+            )}
           </div>
-
-          <!-- Timer -->
+          
+<!-- Timer -->
           <div style="font-size: 28px; font-weight: 500; color: rgba(255, 255, 255, 0.6); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
           </div>
         </div>
       </div>
       
-      <!-- Notes Row -->
+<!-- Notes Row -->
       <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
         <!-- Chat Note -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -52,17 +57,17 @@
             {score_value(summary, :viewer)}
           </span>
           <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
-             {score_label(:viewer)}
+            {score_label(:viewer)}
           </div>
         </div>
         
-        <!-- Streamer Note -->
+<!-- Streamer Note -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
             {score_value(summary, :streamer)}
           </span>
           <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
-             {score_label(:streamer)}
+            {score_label(:streamer)}
           </div>
         </div>
       </div>
