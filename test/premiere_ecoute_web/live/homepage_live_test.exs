@@ -9,20 +9,18 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
 
       # Titles
       assert html =~ "Premiere Ecoute"
-      assert html =~ "Share your music taste with the world"
-      assert html =~ "Create listening sessions"
+      assert html =~ "Share and discover music"
 
       # Navigation links
       assert html =~ "Connect with Twitch"
-      assert html =~ "href=\"/auth/twitch\""
 
       # Feature previews
-      assert html =~ "Album Discovery"
-      assert html =~ "Community Rating"
-      assert html =~ "Live Sessions"
-      assert html =~ "Search and explore albums from Spotify"
-      assert html =~ "Rate tracks together and see what the community thinks"
-      assert html =~ "Host real-time listening parties with live voting"
+      assert html =~ "Listening Sessions"
+      assert html =~ "Retrospective"
+      assert html =~ "Billboards"
+      assert html =~ "Host album release listening sessions"
+      assert html =~ "Global retros for streamers"
+      assert html =~ "Create your billboard playlist "
     end
 
     test "navigation links work correctly", %{conn: conn} do
@@ -30,9 +28,9 @@ defmodule PremiereEcouteWeb.HomepageLiveTest do
 
       # Test main CTA button (homepage Connect with Twitch - the larger button)
       assert lv
-             |> element("a[href='/auth/twitch'].text-purple-300", "Connect with Twitch")
+             |> element("a[href='/'].text-purple-300", "Connect with Twitch")
              |> render_click()
-             |> follow_redirect(conn, ~p"/auth/twitch")
+             |> follow_redirect(conn, ~p"/")
     end
   end
 end

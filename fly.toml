@@ -1,8 +1,3 @@
-# fly.toml app configuration file generated for premiere-ecoute on 2025-07-05T20:36:57+02:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'premiere-ecoute'
 primary_region = 'cdg'
 kill_signal = 'SIGTERM'
@@ -19,7 +14,7 @@ kill_signal = 'SIGTERM'
 [http_service]
   internal_port = 4000
   auto_stop_machines = "stop"
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ['app']
   
   [http_service.concurrency]
@@ -27,16 +22,9 @@ kill_signal = 'SIGTERM'
     hard_limit = 1000
     soft_limit = 1000
 
-  [[http_service.checks]]
-    grace_period = "30s"
-    interval = "30s"
-    method = "GET"
-    timeout = "5s"
-    path = "/health"
-
 [[vm]]
-  size = "shared-cpu-2x"
-  memory = "1gb"
+  size = "shared-cpu-1x"
+  memory = "512mb"
 
 [metrics]
   port = 4000

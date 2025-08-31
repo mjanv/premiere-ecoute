@@ -14,40 +14,34 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    if connected?(socket) do
-      Process.send_after(self(), :refresh, 100)
-    end
+  def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
+    with spotify when not is_nil(spotify) <- current_scope && current_scope.user && current_scope.user.spotify,
+         listening_session when not is_nil(listening_session) <- ListeningSession.get(id) do
+      if connected?(socket) do
+        Process.send_after(self(), :refresh, 100)
+        Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
+      end
 
-    case ListeningSession.get(id) do
-      nil ->
+      socket
+      |> assign(:listening_session, listening_session)
+      |> assign(:player_state, nil)
+      |> assign(:session_id, id)
+      |> assign(:show, %{votes: true, scores: true})
+      |> assign(:user_current_rating, nil)
+      |> assign(:report, nil)
+      |> assign(:overlay_score_type, "streamer")
+      |> assign(:vote_trends, nil)
+      |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
+      |> assign_async(:vote_trends, fn ->
+        vote_data = VoteTrends.rolling_average(String.to_integer(id), :minute)
+        {:ok, %{vote_trends: vote_data}}
+      end)
+      |> then(fn socket -> {:ok, socket} end)
+    else
+      _ ->
         socket
-        |> put_flash(:error, "Session not found")
-        |> redirect(to: ~p"/")
-        |> then(fn socket -> {:ok, socket} end)
-
-      listening_session ->
-        if connected?(socket) do
-          Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
-        end
-
-        current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
-
-        socket
-        |> assign(:listening_session, listening_session)
-        |> assign(:player_state, nil)
-        |> assign(:session_id, id)
-        |> assign(:current_user, current_user)
-        |> assign(:show, %{votes: true, scores: true})
-        |> assign(:user_current_rating, nil)
-        |> assign(:report, nil)
-        |> assign(:overlay_score_type, "streamer")
-        |> assign(:vote_trends, nil)
-        |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
-        |> assign_async(:vote_trends, fn ->
-          vote_data = VoteTrends.rolling_average(String.to_integer(id), :minute)
-          {:ok, %{vote_trends: vote_data}}
-        end)
+        |> put_flash(:error, "Session not found or connect to Spotify")
+        |> redirect(to: ~p"/sessions")
         |> then(fn socket -> {:ok, socket} end)
     end
   end

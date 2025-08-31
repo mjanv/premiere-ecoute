@@ -72,12 +72,12 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
       messages = [
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "Hello", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "@user ok", is_streamer: false},
-        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: ":emoji: 5", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "5 :emoji:", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "11", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer1", message: "-1", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "Hello", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "@user ok", is_streamer: false},
-        %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: ":emoji: 5", is_streamer: false},
+        %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "5 :emoji:", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "11", is_streamer: false},
         %MessageSent{broadcaster_id: "1234", user_id: "viewer2", message: "-1", is_streamer: false}
       ]

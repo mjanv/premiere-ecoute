@@ -79,8 +79,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
       {_, username} when username in @admins -> :admin
       {_, username} when username in @bots -> :bot
       {_, username} when username in @streamers -> :streamer
-      {"affiliate", _} -> :streamer
       {"partner", _} -> :streamer
+      {"affiliate", _} -> :viewer
       _ -> :viewer
     end
   end

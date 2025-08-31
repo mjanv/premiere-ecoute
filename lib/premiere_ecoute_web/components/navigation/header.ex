@@ -166,7 +166,7 @@ defmodule PremiereEcouteWeb.Components.Header do
           <% else %>
             <!-- Anonymous user navigation -->
             <.link
-              href={~p"/auth/twitch"}
+              href={~p"/"}
               class="inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium text-purple-300 hover:text-purple-200 transition-colors"
               style="border-color: var(--color-purple-600); background-color: var(--color-dark-900);"
             >

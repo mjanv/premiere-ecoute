@@ -10,12 +10,18 @@ defmodule PremiereEcouteWeb.HomepageLive do
       socket = redirect(socket, to: "/home")
       {:ok, socket}
     else
-      {:ok, socket}
+      {:ok, assign(socket, show_modal: false)}
     end
   end
 
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  # AIDEV-NOTE: Handle modal toggle for role selection
+  @impl true
+  def handle_event("toggle_modal", _params, socket) do
+    {:noreply, assign(socket, show_modal: !socket.assigns.show_modal)}
   end
 end

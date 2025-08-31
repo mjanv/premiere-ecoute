@@ -164,15 +164,15 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
 
   describe "from_message/2" do
     test "can accept messages from a list" do
-      {:ok, value} = Vote.from_message("5", ["5"])
-
-      assert value == "5"
+      assert {:ok, "5"} = Vote.from_message("5", ["5"])
+      assert {:ok, "5"} = Vote.from_message("lala 5", ["5"])
     end
 
     test "can refuse messages from a list" do
-      {:error, value} = Vote.from_message("6", ["5"])
-
-      assert value == "6"
+      assert {:error, "5"} = Vote.from_message("5", ["6"])
+      assert {:error, "lala 5"} = Vote.from_message("lala 5", ["6"])
+      assert {:error, "5 lala"} = Vote.from_message("5 lala", ["5", "6"])
+      assert {:error, "5 6"} = Vote.from_message("5 6", ["5", "6"])
     end
   end
 end

@@ -9,7 +9,11 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
 
   alias PremiereEcoute.Apis.TwitchApi
 
-  @scope "channel:manage:polls channel:read:polls channel:bot user:read:email user:read:chat user:write:chat user:bot moderator:manage:announcements"
+  @scopes [
+    streamer:
+      "user:read:email user:read:follows user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcements",
+    viewer: "user:read:email user:read:follows"
+  ]
 
   def client_credentials do
     TwitchApi.accounts()
@@ -21,7 +25,14 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
     |> TwitchApi.handle(200, fn body -> body end)
   end
 
-  def authorization_url(scope \\ nil, state \\ nil) do
+  def authorization_url(role_or_scope, state \\ nil) do
+    scope =
+      case role_or_scope do
+        nil -> @scopes[:viewer]
+        role when is_atom(role) -> @scopes[role]
+        scope when is_binary(scope) -> scope
+      end
+
     TwitchApi.url(:accounts)
     |> URI.parse()
     |> URI.merge(%URI{
@@ -29,7 +40,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
       query:
         URI.encode_query(%{
           response_type: "code",
-          scope: scope || @scope,
+          scope: scope,
           client_id: Application.get_env(:premiere_ecoute, :twitch_client_id),
           redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri),
           state: state || random(16)
@@ -60,7 +71,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
         broadcaster_type: user["broadcaster_type"],
         access_token: body["access_token"],
         refresh_token: body["refresh_token"],
-        expires_in: body["expires_in"]
+        expires_in: body["expires_in"],
+        scope: body["scope"] || []
       }
     end)
   end

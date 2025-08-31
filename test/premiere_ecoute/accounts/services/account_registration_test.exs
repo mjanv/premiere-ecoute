@@ -18,7 +18,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
       expires_in: 3600,
       username: "user1004",
       display_name: "User1004",
-      broadcaster_type: "affiliate"
+      broadcaster_type: "partner"
     }
   end
 

@@ -150,7 +150,12 @@ config :phoenix, :logger, false
 
 config :ueberauth, Ueberauth,
   providers: [
-    twitch: {Ueberauth.Strategy.Twitch, []},
+    twitch:
+      {Ueberauth.Strategy.Twitch,
+       [
+         default_scope:
+           "user:read:email user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcement"
+       ]},
     spotify:
       {Ueberauth.Strategy.Spotify,
        [

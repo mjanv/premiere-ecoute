@@ -11,12 +11,12 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   alias PremiereEcouteWeb.Static.Legal
   alias PremiereEcouteWeb.UserAuth
 
-  def request(conn, %{"provider" => "twitch"}) do
+  def request(conn, %{"provider" => "twitch", "role" => role}) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
 
     if client_id && redirect_uri do
-      redirect(conn, external: TwitchApi.authorization_url())
+      redirect(conn, external: TwitchApi.authorization_url(String.to_existing_atom(role)))
     else
       conn
       |> put_flash(:error, "Twitch login not configured")

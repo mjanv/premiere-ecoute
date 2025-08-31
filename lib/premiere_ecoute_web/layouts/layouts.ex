@@ -32,11 +32,13 @@ defmodule PremiereEcouteWeb.Layouts do
 
   attr :current_page, :string, default: nil, doc: "current page identifier for highlighting active nav items"
 
+  attr :show_modal, :boolean, default: false, doc: "whether a modal is currently open"
+
   slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
-    <div class="min-h-screen bg-gray-900 flex flex-col">
+    <div class={"min-h-screen bg-gray-900 flex flex-col #{if @show_modal, do: "blur-sm", else: ""}"}>
       <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
       
     <!-- Spotify connection notification for streamers -->

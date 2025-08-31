@@ -38,10 +38,9 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   end
 
   def from_message(message, vote_options) do
-    if message in vote_options do
-      {:ok, message}
-    else
-      {:error, message}
+    case Enum.find(vote_options, fn option -> String.ends_with?(message, option) end) do
+      nil -> {:error, message}
+      _ -> {:ok, message}
     end
   end
 
