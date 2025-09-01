@@ -138,7 +138,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         join: a in Album,
         on: s.album_id == a.id,
         join: t in Album.Track,
-        on: t.album_id == a.id,
+        on: t.album_id == a.id and t.id == v.track_id,
         where: v.viewer_id == ^user_id,
         where: fragment("? ~ '^[0-9]+$'", v.value),
         group_by: [t.id, t.name, t.album_id, a.name, a.artist],
