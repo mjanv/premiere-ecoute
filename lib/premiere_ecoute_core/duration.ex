@@ -40,6 +40,8 @@ defmodule PremiereEcouteCore.Duration do
     "#{div(seconds, 60)}m #{pad(rem(seconds, 60))}s"
   end
 
+  def timer(_, _), do: "-"
+
   def duration(duration_ms) do
     total_seconds = div(duration_ms, 1000)
     hours = div(total_seconds, 3600)

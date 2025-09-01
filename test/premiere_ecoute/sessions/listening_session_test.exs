@@ -179,6 +179,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       {:ok, after_session} = ListeningSession.next_track(session)
 
       assert is_nil(session.current_track)
+      #  assert Cache.get(:sessions, user.twitch.user_id) == nil
 
       assert %PremiereEcoute.Discography.Album.Track{
                provider: :spotify,

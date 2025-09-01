@@ -81,6 +81,7 @@ config :premiere_ecoute, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
   queues: [
+    sessions: 1
     # twitch: 1,
     # spotify: 1
   ],

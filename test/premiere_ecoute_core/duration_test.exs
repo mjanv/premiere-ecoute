@@ -14,6 +14,12 @@ defmodule PremiereEcouteCore.DurationTest do
       assert Duration.timer((10 * 60 + 37) * 1_000) == "10:37"
       assert Duration.timer((999 * 60 + 17) * 1_000) == "999:17"
     end
+  end
+
+  describe "timer/2" do
+    test "returns an empty timer for undefined values" do
+      assert Duration.timer(nil, nil) == "-"
+    end
 
     test "returns a valid timer for datetime range" do
       {:ok, start_datetime} = DateTime.new(~D[2025-07-22], ~T[14:30:00], "Etc/UTC")

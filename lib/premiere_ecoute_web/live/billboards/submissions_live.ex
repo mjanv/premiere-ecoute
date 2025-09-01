@@ -3,13 +3,19 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionsLive do
 
   use PremiereEcouteWeb, :live_view
 
-  import Ecto.Query
+  alias PremiereEcoute.Billboards.Billboard
 
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket) do
-    socket
-    |> assign(:billboards, query(user.twitch.username))
-    |> assign(:current_user, user)
+    if user.twitch do
+      socket
+      |> assign(:billboards, Billboard.submissions(user.twitch.username))
+      |> assign(:current_user, user)
+    else
+      socket
+      |> put_flash(:error, "Connect to Twitch")
+      |> redirect(to: ~p"/home")
+    end
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -25,36 +31,13 @@ defmodule PremiereEcouteWeb.Billboards.SubmissionsLive do
     |> case do
       {:ok, _} ->
         socket
-        |> assign(:billboards, query(user.twitch.username))
+        |> assign(:billboards, Billboard.submissions(user.twitch.username))
         |> put_flash(:info, "Submission deleted successfully")
-        |> then(fn socket -> {:noreply, socket} end)
 
       {:error, _} ->
         socket
         |> put_flash(:error, "Failed to delete submission")
-        |> then(fn socket -> {:noreply, socket} end)
     end
-  end
-
-  defp query(pseudo) do
-    query =
-      from b in PremiereEcoute.Billboards.Billboard,
-        where:
-          fragment(
-            "EXISTS (SELECT 1 FROM jsonb_array_elements(?) elem WHERE elem->>'pseudo' = ?)",
-            b.submissions,
-            ^pseudo
-          )
-
-    query
-    |> PremiereEcoute.Repo.all()
-    |> PremiereEcoute.Repo.preload([:streamer])
-    |> Enum.map(fn billboard ->
-      billboard.submissions
-      |> Enum.with_index()
-      |> Enum.map(fn {submission, i} -> Map.put(submission, "index", i) end)
-      |> Enum.filter(fn submission -> submission["pseudo"] == pseudo end)
-      |> then(fn submissions -> Map.put(billboard, :submissions, submissions) end)
-    end)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 end

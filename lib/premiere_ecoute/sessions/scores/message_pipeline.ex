@@ -31,12 +31,14 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   end
 
   def process(%MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: message, is_streamer: is_streamer}) do
-    with {:ok, {session_id, vote_options, track_id}} when not is_nil(track_id) <- Cache.get(:sessions, broadcaster_id),
-         {:ok, value} <- Vote.from_message(message, vote_options),
+    with {:ok, %{current_track_id: track_id} = session} when not is_nil(track_id) <-
+           Cache.get(:sessions, broadcaster_id),
+         {:ok, value} <-
+           Vote.from_message(message, session.vote_options),
          now <- DateTime.truncate(DateTime.utc_now(), :second),
          vote <- %{
            viewer_id: user_id,
-           session_id: session_id,
+           session_id: session.id,
            track_id: track_id,
            value: value,
            is_streamer: is_streamer,
@@ -50,10 +52,17 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   end
 
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
-    Vote.create_all(Enum.map(messages, fn message -> message.data end))
+    Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
 
     {:ok, report} = Report.generate(%ListeningSession{id: session_id})
-    PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, report.session_summary})
+    # PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, report.session_summary})
+
+    track_id = hd(messages).data.track_id
+    summary = Enum.find(report.track_summaries, fn s -> s.track_id == track_id end)
+
+    if summary do
+      PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, summary})
+    end
 
     messages
   end

@@ -43,9 +43,9 @@ defmodule PremiereEcouteCore.Aggregate do
         end
       end
 
-      def create_all(entities) do
+      def create_all(entities, opts) do
         Ecto.Multi.new()
-        |> Ecto.Multi.insert_all(:all, __MODULE__, entities, on_conflict: :nothing)
+        |> Ecto.Multi.insert_all(:all, __MODULE__, entities, opts)
         |> Repo.transact()
       end
 

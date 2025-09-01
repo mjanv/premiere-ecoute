@@ -10,6 +10,8 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
     |> assign(:page, ListeningSession.page([], 1, 10))
     |> assign(:selected_session, nil)
     |> assign(:show_modal, false)
+    |> assign(:show_delete_modal, false)
+    |> assign(:session_to_delete, nil)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -37,19 +39,40 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   end
 
   def handle_event("delete_session", %{"session_id" => session_id}, socket) do
-    current_page = socket.assigns.page
+    # AIDEV-NOTE: Show confirmation modal instead of deleting directly
+    session = ListeningSession.get(session_id)
 
-    session_id
-    |> ListeningSession.get()
+    socket
+    |> assign(:session_to_delete, session)
+    |> assign(:show_delete_modal, true)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("close_delete_modal", _params, socket) do
+    socket
+    |> assign(:session_to_delete, nil)
+    |> assign(:show_delete_modal, false)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("confirm_delete_session", _params, socket) do
+    current_page = socket.assigns.page
+    session = socket.assigns.session_to_delete
+
+    session
     |> ListeningSession.delete()
     |> case do
-      :ok ->
+      {:ok, _deleted_session} ->
         socket
         |> assign(:page, ListeningSession.page([], current_page.page_number, current_page.page_size))
+        |> assign(:session_to_delete, nil)
+        |> assign(:show_delete_modal, false)
         |> put_flash(:info, gettext("Session deleted successfully"))
 
-      :error ->
+      {:error, _changeset} ->
         socket
+        |> assign(:session_to_delete, nil)
+        |> assign(:show_delete_modal, false)
         |> put_flash(:error, gettext("Failed to delete session"))
     end
     |> then(fn socket -> {:noreply, socket} end)

@@ -41,22 +41,17 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   end
 
   @impl true
-  def handle_event("confirm_delete", _params, %{assigns: %{session_to_delete: session_id}} = socket) do
+  def handle_event("confirm_delete", _params, %{assigns: %{current_scope: scope, session_to_delete: session_id}} = socket) do
     session_id
     |> ListeningSession.get()
     |> ListeningSession.delete()
     |> case do
-      {:ok, session} ->
-        socket
-        |> put_flash(:info, "Session deleted successfully")
-        |> stream_delete(:sessions, session)
-
-      {:error, _} ->
-        socket
-        |> put_flash(:error, "Failed to delete session")
+      {:ok, _} -> put_flash(socket, :info, "Session deleted successfully")
+      {:error, _} -> put_flash(socket, :error, "Failed to delete session")
     end
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)
+    |> assign_async(:sessions, fn -> {:ok, %{sessions: ListeningSession.all(where: [user_id: scope.user.id])}} end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 

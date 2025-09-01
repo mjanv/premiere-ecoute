@@ -23,7 +23,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   describe "handle/1 - PrepareListeningSession" do
     test "successfully creates session and returns SessionPrepared event" do
-      user = user_fixture()
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
       album = album_fixture()
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
@@ -107,7 +107,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   describe "handle/1 - StartListeningSession" do
     test "successfully start a prepare session and returns SessionStarted event" do
-      user = user_fixture()
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
       album = album_fixture()
 
@@ -167,7 +167,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   describe "handle/1 - GoNextTrackListeningSession" do
     test "successfully skip to the next track until none are left and returns NextTrackStarted event" do
-      user = user_fixture()
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
       album = album_fixture()
 
@@ -227,7 +227,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   describe "handle/1 - GoPreviousTrackListeningSession" do
     test "successfully skip to the previous track until none are left and returns PreviousTrackStarted event" do
-      user = user_fixture()
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
       album = album_fixture()
 
@@ -301,7 +301,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   describe "handle/1 - StopListeningSession" do
     test "successfully creates session and generate a report" do
-      user = user_fixture()
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
       album = album_fixture()
 

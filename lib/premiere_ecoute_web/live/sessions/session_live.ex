@@ -11,19 +11,24 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Retrospective.VoteTrends
+  alias PremiereEcouteCore.Cache
   alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
 
   @impl true
   def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
     with spotify when not is_nil(spotify) <- current_scope && current_scope.user && current_scope.user.spotify,
+         twitch when not is_nil(twitch) <- current_scope && current_scope.user && current_scope.user.twitch,
          listening_session when not is_nil(listening_session) <- ListeningSession.get(id) do
       if connected?(socket) do
         Process.send_after(self(), :refresh, 100)
         Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
       end
 
+      {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
+
       socket
       |> assign(:listening_session, listening_session)
+      |> assign(:open_vote, !is_nil(cached_session))
       |> assign(:player_state, nil)
       |> assign(:session_id, id)
       |> assign(:show, %{votes: true, scores: true})
@@ -124,10 +129,27 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_info(:refresh, socket) do
-    Process.send_after(self(), :refresh, 1_500)
+  def handle_info(:vote_open, socket) do
+    socket
+    |> assign(:open_vote, true)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info(:vote_close, socket) do
+    socket
+    |> assign(:open_vote, false)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info(:refresh, %{assigns: %{current_scope: current_scope}} = socket) do
+    Process.send_after(self(), :refresh, 1_000)
+
+    {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
 
     socket
+    |> assign(:open_vote, !is_nil(cached_session))
     |> assign(:current_scope, Accounts.maybe_renew_token(socket, :spotify))
     |> SpotifyPlayer.refresh_state()
     |> then(fn socket -> {:noreply, socket} end)

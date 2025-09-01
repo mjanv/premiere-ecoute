@@ -23,6 +23,7 @@ defmodule PremiereEcoute.Accounts.Scope do
 
   @doc "Creates a scope for the given user."
   def for_user(%User{} = user), do: %__MODULE__{user: user}
+  def for_user({:ok, %User{} = user}), do: %__MODULE__{user: user}
   def for_user(nil), do: nil
 
   @doc "Creates an impersonation scope where an admin is impersonating another user."

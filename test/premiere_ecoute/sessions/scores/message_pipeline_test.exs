@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Scores.Vote
+  alias PremiereEcouteCore.Cache
 
   @pipeline PremiereEcoute.Sessions.Scores.MessagePipeline
 
@@ -14,6 +15,8 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
     {:ok, album} = Album.create(album_fixture())
     {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, status: :active})
     {:ok, session} = ListeningSession.next_track(session)
+
+    Cache.put(:sessions, "1234", Map.take(session, [:id, :vote_options, :current_track_id]))
 
     {:ok, %{user: user, session: session}}
   end

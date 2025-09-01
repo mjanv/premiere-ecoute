@@ -1,18 +1,47 @@
 <div style={"background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{@percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{@percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%); border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1;"}>
-  <.async_result :let={summary} assign={@summary}>
-    <:loading>
-      <div style="font-size: 64px; color: rgba(255, 255, 255, 0.8);">...</div>
-    </:loading>
-    
+  
 <!-- Player score display -->
-    <div
-      :if={summary && @score in [:player]}
-      style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 12px; width: 1200px; height: 240px; box-sizing: border-box;"
-    >
+  <div
+    :if={@score in [:player]}
+    style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 12px; width: 1200px; height: 240px; box-sizing: border-box;"
+  >
+    <.async_result :let={progress} assign={@progress}>
+      <:loading>
+        <!-- Album Cover Skeleton -->
+        <div style="flex-shrink: 0;">
+          <div style="width: 200px; height: 200px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
+          </div>
+        </div>
+        
+<!-- Track Information Skeleton -->
+        <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
+          <!-- Album Name Skeleton -->
+          <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px;">
+            - / - - -
+          </div>
+          
+<!-- Track Name Skeleton -->
+          <div style="font-size: 36px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px;">
+            -
+          </div>
+          
+<!-- Artist Skeleton -->
+          <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px;">
+            -
+          </div>
+          
+<!-- Track and Timer Row Skeleton -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+              --:-- / --:--
+            </div>
+          </div>
+        </div>
+      </:loading>
       <!-- Album Cover -->
       <div style="flex-shrink: 0;">
         <img
-          src={@progress["cover_url"]}
+          src={progress["cover_url"]}
           style="width: 200px; height: 200px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);"
         />
       </div>
@@ -21,25 +50,25 @@
       <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
         <!-- Album Name -->
         <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-          {@progress["track_number"]} / {@progress["total_tracks"]} - {@progress["album_name"]}
+          {progress["track_number"]} / {progress["total_tracks"]} - {progress["album_name"]}
         </div>
         
 <!-- Track Name -->
         <div style="font-size: 36px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-          {@progress["name"]}
+          {progress["name"]}
         </div>
         
 <!-- Album Name -->
         <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-          {@progress["artist"]}
+          {progress["artist"]}
         </div>
         
 <!-- Track and Timer Row -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <!-- Track -->
           <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
-            {PremiereEcouteCore.Duration.timer(@progress["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
-              @progress["duration_ms"]
+            {PremiereEcouteCore.Duration.timer(progress["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
+              progress["duration_ms"]
             )}
           </div>
           
@@ -48,13 +77,43 @@
           </div>
         </div>
       </div>
-      
+    </.async_result>
+    
 <!-- Notes Row -->
+    <.async_result :let={summary} assign={@summary}>
+      <:loading>
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
+          <!-- Chat Note Skeleton -->
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+              -
+            </span>
+            <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+              Viewer
+            </div>
+          </div>
+          
+<!-- Streamer Note Skeleton -->
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+              -
+            </span>
+            <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+              Streamer
+            </div>
+          </div>
+        </div>
+      </:loading>
+
       <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
         <!-- Chat Note -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            {score_value(summary, :viewer)}
+            <%= if @open_vote do %>
+              {score_value(summary, :viewer)}
+            <% else %>
+              -
+            <% end %>
           </span>
           <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
             {score_label(:viewer)}
@@ -64,19 +123,43 @@
 <!-- Streamer Note -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            {score_value(summary, :streamer)}
+            <%= if @open_vote do %>
+              {score_value(summary, :streamer)}
+            <% else %>
+              -
+            <% end %>
           </span>
           <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
             {score_label(:streamer)}
           </div>
         </div>
       </div>
-    </div>
-    
-<!-- Single score display (viewer or streamer) -->
-    <div :if={summary && @score in [:viewer, :streamer]} style="display: flex; flex-direction: column; align-items: center;">
+    </.async_result>
+  </div>
+
+  <.async_result :let={summary} assign={@summary}>
+    <:loading>
+      <!-- Single score loading skeleton -->
+      <div :if={@score in [:viewer, :streamer, :both]} style="display: flex; flex-direction: column; align-items: center;">
+        <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+          --
+        </span>
+        <div
+          :if={@score in [:viewer, :streamer, :both]}
+          style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;"
+        >
+          {@score}
+        </div>
+      </div>
+    </:loading>
+    <!-- Single score display (viewer or streamer) -->
+    <div :if={@score in [:viewer, :streamer]} style="display: flex; flex-direction: column; align-items: center;">
       <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-        {score_value(summary, @score)}
+        <%= if @open_vote do %>
+          {score_value(summary, @score)}
+        <% else %>
+          -
+        <% end %>
       </span>
       <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
         {score_label(@score)}
@@ -84,11 +167,18 @@
     </div>
     
 <!-- Both scores display -->
-    <div :if={summary && @score in [:both]} style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+    <div
+      :if={@score in [:both]}
+      style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 500px; margin: 0 auto;"
+    >
       <!-- Viewer Score -->
-      <div style="display: flex; flex-direction: column; align-items: center;">
+      <div style="display: flex; flex-direction: column; align-items: center; flex: 1; padding: 0 8px;">
         <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-          {score_value(summary, :viewer)}
+          <%= if @open_vote do %>
+            {score_value(summary, :viewer)}
+          <% else %>
+            -
+          <% end %>
         </span>
         <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
           {score_label(:viewer)}
@@ -96,12 +186,16 @@
       </div>
       
 <!-- Vertical Separator -->
-      <div style="width: 1px; height: 200px; background: rgba(255, 255, 255, 0.6);"></div>
+      <div style="width: 2px; height: 160px; background: rgba(255, 255, 255, 0.8); margin: 0 16px; flex-shrink: 0;"></div>
       
 <!-- Streamer Score -->
-      <div style="display: flex; flex-direction: column; align-items: center;">
+      <div style="display: flex; flex-direction: column; align-items: center; flex: 1; padding: 0 8px;">
         <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-          {score_value(summary, :streamer)}
+          <%= if @open_vote do %>
+            {score_value(summary, :streamer)}
+          <% else %>
+            -
+          <% end %>
         </span>
         <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
           {score_label(:streamer)}

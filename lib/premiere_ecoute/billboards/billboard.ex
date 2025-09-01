@@ -52,4 +52,26 @@ defmodule PremiereEcoute.Billboards.Billboard do
     |> Map.put(:billboard_id, String.downcase(Base.encode16(:crypto.strong_rand_bytes(4))))
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
+
+  def submissions(pseudo) do
+    query =
+      from b in __MODULE__,
+        where:
+          fragment(
+            "EXISTS (SELECT 1 FROM jsonb_array_elements(?) elem WHERE elem->>'pseudo' = ?)",
+            b.submissions,
+            ^pseudo
+          )
+
+    query
+    |> PremiereEcoute.Repo.all()
+    |> PremiereEcoute.Repo.preload([:streamer])
+    |> Enum.map(fn billboard ->
+      billboard.submissions
+      |> Enum.with_index()
+      |> Enum.map(fn {submission, i} -> Map.put(submission, "index", i) end)
+      |> Enum.filter(fn submission -> submission["pseudo"] == pseudo end)
+      |> then(fn submissions -> Map.put(billboard, :submissions, submissions) end)
+    end)
+  end
 end

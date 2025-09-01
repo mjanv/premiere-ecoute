@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.Scores
@@ -17,7 +18,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
       sessions_count: Sessions.ListeningSession.count(:id),
       albums_count: Album.count(:id),
       votes_count: Scores.Vote.count(:id),
-      polls_count: Scores.Poll.count(:id)
+      billboards_count: Billboard.count(:id)
     })
     |> assign(:event_store, %{
       stream: "users",

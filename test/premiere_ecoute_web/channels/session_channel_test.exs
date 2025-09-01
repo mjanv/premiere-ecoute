@@ -5,6 +5,7 @@ defmodule PremiereEcouteWeb.SessionChannelTest do
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcouteCore.Cache
 
   setup do
     user = user_fixture(%{role: :streamer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
@@ -12,6 +13,8 @@ defmodule PremiereEcouteWeb.SessionChannelTest do
     {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
     {:ok, session} = ListeningSession.start(session)
     {:ok, session} = ListeningSession.next_track(session)
+
+    Cache.put(:sessions, user.twitch.user_id, Map.take(session, [:id, :vote_options, :current_track_id]))
 
     {:ok, _, socket} =
       PremiereEcouteWeb.UserSocket

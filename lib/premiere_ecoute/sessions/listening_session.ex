@@ -10,7 +10,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Retrospective.Report
-  alias PremiereEcouteCore.Cache
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -56,16 +55,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:album_id)
     |> foreign_key_constraint(:current_track_id)
-  end
-
-  def create(attrs) do
-    %__MODULE__{}
-    |> changeset(attrs)
-    |> Repo.insert()
-    |> case do
-      {:ok, session} -> {:ok, cache(preload(session))}
-      {:error, reason} -> {:error, reason}
-    end
   end
 
   def start(%__MODULE__{} = session) do
@@ -147,7 +136,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> put_change(:current_track_id, track_id)
     |> Repo.update()
     |> case do
-      {:ok, session} -> {:ok, cache(preload(session))}
+      {:ok, session} -> {:ok, preload(session)}
       {:error, reason} -> {:error, reason}
     end
   end
@@ -181,18 +170,4 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.one()
     |> preload()
   end
-
-  def cache(
-        %__MODULE__{
-          id: id,
-          user: %{twitch: %{user_id: user_id}},
-          vote_options: vote_options,
-          current_track_id: current_track_id
-        } = session
-      ) do
-    Cache.put(:sessions, user_id, {id, vote_options, current_track_id})
-    session
-  end
-
-  def cache(session), do: session
 end
