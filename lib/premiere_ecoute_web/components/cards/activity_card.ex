@@ -56,8 +56,8 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
     doc: "Status badge color variant"
 
   attr :action_text, :string, default: nil, doc: "Action/CTA text"
-  attr :navigate, :string, default: nil, doc: "Navigation path"
   attr :class, :string, default: "", doc: "Additional CSS classes"
+  attr :rest, :global
 
   slot :icon, doc: "Custom icon content (image, svg, etc.)"
 
@@ -81,13 +81,9 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
           </div>
         </div>
       <% else %>
-        <%= if @navigate do %>
-          <.link navigate={@navigate} class="block group h-full">
-            <.activity_card_content {assigns} />
-          </.link>
-        <% else %>
+        <.link class="block group h-full" {@rest}>
           <.activity_card_content {assigns} />
-        <% end %>
+        </.link>
       <% end %>
     </div>
     """

@@ -21,7 +21,7 @@
                       end
                     }
                     action_text={gettext("Go to session")}
-                    navigate={~p"/sessions/#{@current_session.id}"}
+                    href={~p"/sessions/#{@current_session.id}"}
                   >
                     <:icon>
                       <%= if @current_session.album.cover_url do %>
@@ -43,7 +43,7 @@
                       status_text={gettext("New")}
                       status_variant="info"
                       action_text={gettext("Choose an album to get started")}
-                      navigate={~p"/discography/album/select"}
+                      href={~p"/discography/album/select"}
                     />
                   <% end %>
                 <% end %>
@@ -64,7 +64,7 @@
                         end
                       }
                       action_text={gettext("Go to billboard")}
-                      navigate={~p"/billboards/#{@latest_billboard.billboard_id}"}
+                      href={~p"/billboards/#{@latest_billboard.billboard_id}"}
                     />
                   <% else %>
                     <.activity_card
@@ -75,7 +75,7 @@
                       status_text={gettext("New")}
                       status_variant="default"
                       action_text={gettext("Start collecting submissions")}
-                      navigate={~p"/billboards/new"}
+                      href={~p"/billboards/new"}
                     />
                   <% end %>
                 <% end %>
