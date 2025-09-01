@@ -36,6 +36,16 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   >
                     {gettext("My Library")}
                   </.sidebar_link>
+                  <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_workflows, for: @current_user) do %>
+                    <.sidebar_link
+                      href={~p"/playlists/workflows"}
+                      current_page={@current_page}
+                      page_id="playlists_workflows"
+                      icon="hero-cog-6-tooth"
+                    >
+                      {gettext("Workflows")}
+                    </.sidebar_link>
+                  <% end %>
                 </nav>
               </div>
             <% end %>

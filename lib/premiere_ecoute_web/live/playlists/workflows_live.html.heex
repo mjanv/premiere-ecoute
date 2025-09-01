@@ -1,0 +1,302 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="playlists_workflows">
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-12">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="w-full">
+          <.page_header
+            title={gettext("Workflows")}
+            subtitle={gettext("Automate and manage your playlist workflows")}
+          />
+          
+<!-- Workflow Form -->
+          <div class="mt-8">
+            <form phx-submit="create_workflow" class="space-y-8">
+              <!-- Three Column Layout -->
+              <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 bg-gray-800/50 p-6 rounded-lg border border-gray-700">
+                
+<!-- SOURCE Column -->
+                <div class="space-y-6">
+                  <div class="pb-2 border-b border-gray-600">
+                    <h3 class="text-lg font-semibold text-white uppercase tracking-wider flex items-center">
+                      <svg class="w-5 h-5 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                        />
+                      </svg>
+                      {gettext("Source")}
+                    </h3>
+                  </div>
+                  
+<!-- AIDEV-NOTE: Source configuration section with improved visual hierarchy -->
+                  <div class="space-y-5">
+                    <!-- Source Type Selection -->
+                    <div class="space-y-2">
+                      <label for="source_type" class="block text-sm font-medium text-gray-300">
+                        {gettext("Data source")}
+                      </label>
+                      <div class="relative">
+                        <select
+                          id="source_type"
+                          name="source_type"
+                          phx-change="update_source"
+                          class="select select-bordered w-full bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-purple-500/20 h-10"
+                        >
+                          <option value="my_votes" selected>{gettext("My votes")}</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+<!-- Track Count Controls -->
+                    <div class="space-y-3">
+                      <label for="track_count" class="block text-sm font-medium text-gray-300">
+                        {gettext("Number of tracks")}
+                        <span class="text-xs text-gray-400 ml-1">(1-100)</span>
+                      </label>
+                      <div class="flex items-center">
+                        <div class="join w-full">
+                          <button
+                            type="button"
+                            phx-click="decrease_track_count"
+                            aria-label={gettext("Decrease track count")}
+                            class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
+                          >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            id="track_count"
+                            type="number"
+                            name="track_count"
+                            value={@track_count}
+                            min="1"
+                            max="100"
+                            phx-change="update_track_count"
+                            class="input input-bordered join-item flex-1 text-center bg-gray-700 border-gray-600 text-white font-medium text-lg focus:border-purple-500 focus:ring-purple-500/20 h-10"
+                            aria-describedby="track-count-help"
+                          />
+                          <button
+                            type="button"
+                            phx-click="increase_track_count"
+                            aria-label={gettext("Increase track count")}
+                            class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
+                          >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+<!-- Time Period Controls -->
+                    <div class="space-y-3">
+                      <label class="block text-sm font-medium text-gray-300">
+                        {gettext("Time period")}
+                      </label>
+                      <div class="flex items-center">
+                        <div class="join w-full">
+                          <button
+                            type="button"
+                            phx-click="previous_month"
+                            aria-label={gettext("Previous month")}
+                            class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
+                          >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <div class="btn join-item flex-1 bg-gray-700 border-gray-600 text-white font-medium cursor-default hover:bg-gray-700 h-10 shadow-none">
+                            {@selected_month} {@selected_year}
+                          </div>
+                          <button
+                            type="button"
+                            phx-click="next_month"
+                            aria-label={gettext("Next month")}
+                            class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
+                          >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+<!-- Preview Action -->
+                    <div class="pt-2 border-t border-gray-700">
+                      <button
+                        type="button"
+                        phx-click="preview_tracks"
+                        class="btn btn-primary w-full bg-purple-600 border-purple-600 hover:bg-purple-700 hover:border-purple-700 text-white font-medium"
+                      >
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                        {gettext("Preview Tracks")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+<!-- TRACKS Column -->
+                <div class="space-y-4 lg:col-span-2">
+                  <h3 class="text-lg font-semibold text-white uppercase tracking-wider">
+                    {gettext("Tracks")}
+                  </h3>
+
+                  <div class="bg-gray-900/50 border border-gray-600 rounded-lg p-4 min-h-[400px]">
+                    <%= if @loading_tracks do %>
+                      <div class="flex items-center justify-center h-32">
+                        <svg class="animate-spin h-8 w-8 text-purple-500" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          >
+                          </path>
+                        </svg>
+                      </div>
+                    <% else %>
+                      <%= if Enum.empty?(@tracks) do %>
+                        <div class="text-center text-gray-500 py-8">
+                          <svg class="w-12 h-10 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                            />
+                          </svg>
+                          <p>{gettext("Click 'Preview Tracks' to see your data")}</p>
+                        </div>
+                      <% else %>
+                        <div class="space-y-2">
+                          <%= for {track, index} <- Enum.with_index(@tracks, 1) do %>
+                            <div class="p-3 bg-gray-800 rounded-lg border border-gray-700 flex items-center space-x-3">
+                              <span class="text-sm font-medium text-gray-400 w-8">#{index}</span>
+                              <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium truncate">{track.name}</p>
+                                <p class="text-gray-400 text-sm truncate">{track.artist}</p>
+                              </div>
+                            </div>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- TARGET Column -->
+                <div class="space-y-6">
+                  <!-- Section Header -->
+                  <div class="border-b border-gray-600 pb-3">
+                    <div class="flex items-center space-x-2">
+                      <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                        />
+                      </svg>
+                      <h3 class="text-lg font-semibold text-white uppercase tracking-wider">
+                        {gettext("Target")}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div class="space-y-5">
+                    <!-- Target Playlist Selection -->
+                    <div class="space-y-3">
+                      <label for="target_playlist" class="block text-sm font-medium text-gray-300">
+                        {gettext("Destination playlist")}
+                      </label>
+                      <div class="relative">
+                        <%= if Enum.empty?(@playlists) do %>
+                          <div class="w-full bg-gray-800 border border-gray-600 rounded-lg text-gray-400 text-center h-10 flex items-center justify-center">
+                            {gettext("No playlists found. Add playlists to your library first.")}
+                          </div>
+                        <% else %>
+                          <select
+                            id="target_playlist"
+                            name="target_playlist"
+                            phx-change="update_target"
+                            class="select select-bordered w-full bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-purple-500/20 h-10"
+                          >
+                            <option value="">{gettext("Select playlist...")}</option>
+                            <%= for playlist <- @playlists do %>
+                              <option value={playlist.id}>{playlist.name}</option>
+                            <% end %>
+                          </select>
+                        <% end %>
+                      </div>
+                    </div>
+                    
+<!-- Workflow Info -->
+                    <div class="space-y-3">
+                      <div class="p-4 bg-blue-900/30 border border-blue-700/50 rounded-lg">
+                        <div class="flex items-start space-x-2">
+                          <svg
+                            class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <p class="text-sm text-blue-200 leading-relaxed">
+                            {gettext("Workflow will replace all tracks in the selected playlist.")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+<!-- Action Section -->
+                    <div class="border-t border-gray-600 pt-6">
+                      <button
+                        type="submit"
+                        disabled={Enum.empty?(@tracks) || @selected_playlist == nil || Enum.empty?(@playlists)}
+                        class="btn btn-primary w-full h-12 bg-purple-600 hover:bg-purple-700 border-purple-600 hover:border-purple-700 disabled:bg-gray-600 disabled:border-gray-600 disabled:cursor-not-allowed text-white font-medium shadow-none"
+                      >
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        {gettext("Create Workflow")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

@@ -11,6 +11,7 @@ PremiereEcouteCore.FeatureFlag.enable(:billboards)
 PremiereEcouteCore.FeatureFlag.enable(:listening_sessions)
 PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
 PremiereEcouteCore.FeatureFlag.enable(:playlists)
+PremiereEcouteCore.FeatureFlag.enable(:playlist_workflows)
 
 # Accounts
 Logger.info(IO.ANSI.green() <> IO.ANSI.bright() <> "Accounts:" <> IO.ANSI.reset())

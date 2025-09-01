@@ -127,6 +127,14 @@ defmodule PremiereEcouteWeb.Router do
     end
   end
 
+  scope "/playlists", PremiereEcouteWeb.Playlists do
+    pipe_through [:browser]
+
+    live_session :playlists, on_mount: [{UserAuth, :streamer}] do
+      live "/workflows", WorkflowsLive, :index
+    end
+  end
+
   scope "/sessions", PremiereEcouteWeb.Sessions do
     pipe_through [:browser]
 

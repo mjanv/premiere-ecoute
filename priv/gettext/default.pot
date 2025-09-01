@@ -21,7 +21,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:117
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:394
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:565
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:310
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:36
 #, elixir-autogen, elixir-format
 msgid "Cancel"
@@ -152,7 +151,6 @@ msgid "Not connected"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:255
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:39
 #, elixir-autogen, elixir-format
 msgid "Spotify"
 msgstr ""
@@ -224,7 +222,6 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:41
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:180
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:159
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:41
 #, elixir-autogen, elixir-format
 msgid "Tracks"
@@ -306,7 +303,7 @@ msgstr ""
 msgid "Log Out"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:53
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:61
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:53
 #, elixir-autogen, elixir-format
 msgid "My Sessions"
@@ -527,7 +524,7 @@ msgstr ""
 msgid "Session deleted successfully"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:48
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:56
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:93
 #, elixir-autogen, elixir-format
 msgid "Sessions"
@@ -750,7 +747,7 @@ msgstr ""
 msgid "No albums listened during this period"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:62
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:70
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:125
 #, elixir-autogen, elixir-format
 msgid "Retrospective"
@@ -1000,7 +997,7 @@ msgstr ""
 msgid "Delete My Account"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:147
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:155
 #, elixir-autogen, elixir-format
 msgid "Discover streamers"
 msgstr ""
@@ -1031,8 +1028,8 @@ msgstr ""
 msgid "Export includes:"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:115
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:142
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:123
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:150
 #, elixir-autogen, elixir-format
 msgid "Followed Channels"
 msgstr ""
@@ -1077,7 +1074,7 @@ msgstr ""
 msgid "New Listening Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:145
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:153
 #, elixir-autogen, elixir-format
 msgid "No followed channels yet"
 msgstr ""
@@ -1139,7 +1136,7 @@ msgstr ""
 msgid "Token Active"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:130
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:138
 #, elixir-autogen, elixir-format
 msgid "View all"
 msgstr ""
@@ -1200,7 +1197,6 @@ msgid "Failed to add playlist to your library"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/playlist_live.ex:149
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.ex:75
 #, elixir-autogen, elixir-format
 msgid "Failed to remove playlist"
 msgstr ""
@@ -1273,7 +1269,6 @@ msgid "Playlist is already in your library"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/playlist_live.ex:144
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.ex:68
 #, elixir-autogen, elixir-format
 msgid "Playlist removed from your library"
 msgstr ""
@@ -1285,7 +1280,6 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:214
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:140
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:63
 #, elixir-autogen, elixir-format
 msgid "Private"
 msgstr ""
@@ -1298,16 +1292,8 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:70
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:203
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:137
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:51
 #, elixir-autogen, elixir-format
 msgid "Public"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:140
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:287
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:304
-#, elixir-autogen, elixir-format
-msgid "Remove from Library"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:154
@@ -1384,7 +1370,7 @@ msgstr ""
 msgid "Welcome to Premiere Ecoute"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:84
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:92
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:110
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:145
 #, elixir-autogen, elixir-format
@@ -1396,7 +1382,7 @@ msgstr ""
 msgid "Feature Flags"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:94
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:102
 #: lib/premiere_ecoute_web/live/billboards/index_live.html.heex:7
 #, elixir-autogen, elixir-format
 msgid "My Billboards"
@@ -2032,20 +2018,6 @@ msgid_plural "%{count} submissions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:89
-#, elixir-autogen, elixir-format
-msgid "1 track"
-msgid_plural "%{count} tracks"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:240
-#, elixir-autogen, elixir-format
-msgid "1 track total"
-msgid_plural "%{count} tracks total"
-msgstr[0] ""
-msgstr[1] ""
-
 #: lib/premiere_ecoute_web/live/home_live.html.heex:61
 #, elixir-autogen, elixir-format
 msgid "Active"
@@ -2054,11 +2026,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:406
 #, elixir-autogen, elixir-format
 msgid "Added"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:102
-#, elixir-autogen, elixir-format
-msgid "Added %{date}"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:407
@@ -2071,11 +2038,6 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:289
-#, elixir-autogen, elixir-format
-msgid "Are you sure you want to remove \"%{title}\" from your library?"
-msgstr ""
-
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:323
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to remove %{count} tracks from this playlist?"
@@ -2084,11 +2046,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:179
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to remove this playlist from your library?"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:153
-#, elixir-autogen, elixir-format
-msgid "Back to Home"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:27
@@ -2143,11 +2100,6 @@ msgstr ""
 msgid "Failed to load playlist data"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.ex:94
-#, elixir-autogen, elixir-format
-msgid "Failed to load playlist tracks: %{reason}"
-msgstr ""
-
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:53
 #, elixir-autogen, elixir-format
 msgid "Fetching the latest data from your music library"
@@ -2173,11 +2125,6 @@ msgstr ""
 msgid "Loading Playlist..."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:173
-#, elixir-autogen, elixir-format
-msgid "Loading tracks..."
-msgstr ""
-
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:10
 #, elixir-autogen, elixir-format
 msgid "Manage your saved playlists and discover new music"
@@ -2192,11 +2139,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/home_live.html.heex:75
 #, elixir-autogen, elixir-format
 msgid "New"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:254
-#, elixir-autogen, elixir-format
-msgid "No tracks found in this playlist."
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:546
@@ -2219,13 +2161,7 @@ msgstr ""
 msgid "Open in %{provider}"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:124
-#, elixir-autogen, elixir-format
-msgid "Open in Spotify"
-msgstr ""
-
 #: lib/premiere_ecoute_web/live/discography/playlist_live.ex:138
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.ex:22
 #, elixir-autogen, elixir-format
 msgid "Playlist not found"
 msgstr ""
@@ -2233,11 +2169,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/discography/playlist_live.ex:30
 #, elixir-autogen, elixir-format
 msgid "Playlist not found in your library"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.ex:42
-#, elixir-autogen, elixir-format
-msgid "Please log in to view your playlists"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/home_live.html.heex:20
@@ -2308,14 +2239,8 @@ msgid "The library feature is not currently enabled for your account"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:545
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:253
 #, elixir-autogen, elixir-format
 msgid "This playlist is empty"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/playlists/library_playlist_live.html.heex:292
-#, elixir-autogen, elixir-format
-msgid "This will only remove it from your library. The original playlist will remain on Spotify."
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/playlist_live.html.heex:530
@@ -2417,7 +2342,7 @@ msgstr ""
 msgid "Failed to load votes"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:73
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:81
 #, elixir-autogen, elixir-format
 msgid "My votes"
 msgstr ""
@@ -2482,7 +2407,7 @@ msgstr ""
 msgid "Manage your listening sessions and track your music discoveries"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:103
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:111
 #: lib/premiere_ecoute_web/live/billboards/submissions_live.html.heex:6
 #, elixir-autogen, elixir-format
 msgid "My Submissions"
@@ -2571,4 +2496,25 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:505
 #, elixir-autogen, elixir-format
 msgid "Open votes"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:8
+#, elixir-autogen, elixir-format
+msgid "Automate and manage your playlist workflows"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:24
+#, elixir-autogen, elixir-format
+msgid "Coming Soon"
+msgstr ""
+
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:45
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:7
+#, elixir-autogen, elixir-format
+msgid "Workflows"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:27
+#, elixir-autogen, elixir-format
+msgid "Playlist workflow management features will be available here."
 msgstr ""

@@ -121,4 +121,51 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         {:ok, %{session: session, tracks: tracks}}
     end
   end
+
+  @doc """
+  Get all albums listened by a specific viewer during a time period.
+  """
+  @spec get_tracks_by_period(integer(), integer(), time_period(), map()) :: [map()]
+  def get_tracks_by_period(user_id, n, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: a in Album,
+        on: s.album_id == a.id,
+        join: t in Album.Track,
+        on: t.album_id == a.id,
+        where: v.viewer_id == ^user_id,
+        where: fragment("? ~ '^[0-9]+$'", v.value),
+        group_by: [t.id, t.name, t.album_id, a.name, a.artist],
+        # on calcule le score moyen pour le ORDER BY uniquement
+        select: %Album.Track{
+          id: t.id,
+          name: t.name,
+          album_id: t.album_id,
+          track_id: t.track_id,
+          album: %Album{
+            name: a.name,
+            artist: a.artist
+          }
+        },
+        order_by: [desc: fragment("AVG(CAST(? AS DECIMAL))", v.value)],
+        limit: ^n
+
+    case period do
+      :month ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", s.inserted_at, ^month)
+
+      :year ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year)
+    end
+    |> Repo.all()
+  end
 end
