@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     |> Req.get(url: "/me/player/devices")
     |> case do
       {:ok, %{status: 200, body: %{"devices" => devices}}} -> {:ok, devices}
-      {:error, _reason} -> {:error, []}
+      _ -> {:error, []}
     end
   end
 
