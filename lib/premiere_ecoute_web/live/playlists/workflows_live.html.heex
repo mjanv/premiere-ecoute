@@ -44,7 +44,7 @@
                           phx-change="update_source"
                           class="select select-bordered w-full bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-purple-500/20 h-10"
                         >
-                          <option value="my_votes" selected>{gettext("My votes")}</option>
+                          <option value="my_votes" selected={@source == "my_votes"}>{gettext("My votes")}</option>
                         </select>
                       </div>
                     </div>
@@ -59,7 +59,8 @@
                         <div class="join w-full">
                           <button
                             type="button"
-                            phx-click="decrease_track_count"
+                            phx-click="update_track_count"
+                            phx-value-direction="decrease"
                             aria-label={gettext("Decrease track count")}
                             class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
                           >
@@ -71,16 +72,17 @@
                             id="track_count"
                             type="number"
                             name="track_count"
-                            value={@track_count}
+                            value={@source_options.number_tracks}
                             min="1"
                             max="100"
                             phx-change="update_track_count"
-                            class="input input-bordered join-item flex-1 text-center bg-gray-700 border-gray-600 text-white font-medium text-lg focus:border-purple-500 focus:ring-purple-500/20 h-10"
+                            class="input input-bordered join-item flex-1 text-center bg-gray-700 border-gray-600 text-white font-medium text-lg focus:border-purple-500 focus:ring-purple-500/20 h-10 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             aria-describedby="track-count-help"
                           />
                           <button
                             type="button"
-                            phx-click="increase_track_count"
+                            phx-click="update_track_count"
+                            phx-value-direction="increase"
                             aria-label={gettext("Increase track count")}
                             class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
                           >
@@ -106,7 +108,8 @@
                         <div class="join w-full">
                           <button
                             type="button"
-                            phx-click="previous_month"
+                            phx-click="navigate_month"
+                            phx-value-direction="previous"
                             aria-label={gettext("Previous month")}
                             class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
                           >
@@ -115,11 +118,12 @@
                             </svg>
                           </button>
                           <div class="btn join-item flex-1 bg-gray-700 border-gray-600 text-white font-medium cursor-default hover:bg-gray-700 h-10 shadow-none">
-                            {@selected_month} {@selected_year}
+                            {format_time_period(@source_options.time_range)}
                           </div>
                           <button
                             type="button"
-                            phx-click="next_month"
+                            phx-click="navigate_month"
+                            phx-value-direction="next"
                             aria-label={gettext("Next month")}
                             class="btn btn-outline join-item bg-gray-700 border-gray-600 text-white hover:bg-gray-600 hover:border-gray-500 focus:ring-purple-500/20 h-10 shadow-none"
                           >
@@ -165,20 +169,44 @@
                   </h3>
 
                   <div class="bg-gray-900/50 border border-gray-600 rounded-lg p-4 min-h-[400px]">
-                    <%= if @loading_tracks do %>
-                      <div class="flex items-center justify-center h-32">
-                        <svg class="animate-spin h-8 w-8 text-purple-500" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path
-                            class="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          >
-                          </path>
-                        </svg>
-                      </div>
-                    <% else %>
-                      <%= if Enum.empty?(@tracks) do %>
+                    <%= case @tracks do %>
+                      <% %AsyncResult{result: nil} -> %>
+                        <div class="flex items-center justify-center h-32">
+                          <svg class="animate-spin h-8 w-8 text-purple-500" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path
+                              class="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            >
+                            </path>
+                          </svg>
+                        </div>
+                      <% %AsyncResult{result: tracks} when tracks == [] -> %>
+                        <div class="text-center text-gray-500 py-8">
+                          <svg class="w-12 h-10 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                            />
+                          </svg>
+                          <p>{gettext("No tracks found for the selected criteria")}</p>
+                        </div>
+                      <% %AsyncResult{result: tracks} when is_list(tracks) -> %>
+                        <div class="space-y-2">
+                          <%= for {track, index} <- Enum.with_index(tracks, 1) do %>
+                            <div class="p-3 bg-gray-800 rounded-lg border border-gray-700 flex items-center space-x-3">
+                              <span class="text-sm font-medium text-gray-400 w-8">#{index}</span>
+                              <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium truncate">{track.name}</p>
+                                <p class="text-gray-400 text-sm truncate">{track.album.artist}</p>
+                              </div>
+                            </div>
+                          <% end %>
+                        </div>
+                      <% _ -> %>
                         <div class="text-center text-gray-500 py-8">
                           <svg class="w-12 h-10 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -190,19 +218,6 @@
                           </svg>
                           <p>{gettext("Click 'Preview Tracks' to see your data")}</p>
                         </div>
-                      <% else %>
-                        <div class="space-y-2">
-                          <%= for {track, index} <- Enum.with_index(@tracks, 1) do %>
-                            <div class="p-3 bg-gray-800 rounded-lg border border-gray-700 flex items-center space-x-3">
-                              <span class="text-sm font-medium text-gray-400 w-8">#{index}</span>
-                              <div class="flex-1 min-w-0">
-                                <p class="text-white font-medium truncate">{track.name}</p>
-                                <p class="text-gray-400 text-sm truncate">{track.artist}</p>
-                              </div>
-                            </div>
-                          <% end %>
-                        </div>
-                      <% end %>
                     <% end %>
                   </div>
                 </div>
@@ -227,13 +242,30 @@
                   </div>
 
                   <div class="space-y-5">
-                    <!-- Target Playlist Selection -->
+                    <!-- Target Type Selection -->
+                    <div class="space-y-3">
+                      <label for="target_type" class="block text-sm font-medium text-gray-300">
+                        {gettext("Data target")}
+                      </label>
+                      <div class="relative">
+                        <select
+                          id="target_type"
+                          name="target_type"
+                          phx-change="update_target_type"
+                          class="select select-bordered w-full bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-purple-500/20 h-10"
+                        >
+                          <option value="playlist" selected={@target == "playlist"}>{gettext("Playlist")}</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+<!-- Target Playlist Selection -->
                     <div class="space-y-3">
                       <label for="target_playlist" class="block text-sm font-medium text-gray-300">
                         {gettext("Destination playlist")}
                       </label>
                       <div class="relative">
-                        <%= if Enum.empty?(@playlists) do %>
+                        <%= if Enum.empty?(@target_options.playlists) do %>
                           <div class="w-full bg-gray-800 border border-gray-600 rounded-lg text-gray-400 text-center h-10 flex items-center justify-center">
                             {gettext("No playlists found. Add playlists to your library first.")}
                           </div>
@@ -245,8 +277,10 @@
                             class="select select-bordered w-full bg-gray-700 border-gray-600 text-white focus:border-purple-500 focus:ring-purple-500/20 h-10"
                           >
                             <option value="">{gettext("Select playlist...")}</option>
-                            <%= for playlist <- @playlists do %>
-                              <option value={playlist.id}>{playlist.name}</option>
+                            <%= for playlist <- @target_options.playlists do %>
+                              <option value={playlist.playlist_id} selected={playlist.id == @target_options.playlist}>
+                                {playlist.title}
+                              </option>
                             <% end %>
                           </select>
                         <% end %>
@@ -281,7 +315,10 @@
                     <div class="border-t border-gray-600 pt-6">
                       <button
                         type="submit"
-                        disabled={Enum.empty?(@tracks) || @selected_playlist == nil || Enum.empty?(@playlists)}
+                        disabled={
+                          !match?(%AsyncResult{result: tracks} when is_list(tracks) and tracks != [], @tracks) ||
+                            @target_options.playlist == nil || Enum.empty?(@target_options.playlists)
+                        }
                         class="btn btn-primary w-full h-12 bg-purple-600 hover:bg-purple-700 border-purple-600 hover:border-purple-700 disabled:bg-gray-600 disabled:border-gray-600 disabled:cursor-not-allowed text-white font-medium shadow-none"
                       >
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

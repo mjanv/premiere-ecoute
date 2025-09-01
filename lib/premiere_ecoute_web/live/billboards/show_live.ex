@@ -10,13 +10,13 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Apis
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.Search
   alias PremiereEcouteWeb.Layouts
+  alias PremiereEcoute.Playlists
 
   @impl true
   def mount(%{"id" => billboard_id}, _session, socket) do
@@ -309,7 +309,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
       Task.start(fn ->
         case get_top_tracks_with_generation(billboard, export_count) do
           {:ok, tracks} ->
-            case export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
+            case Playlists.export_tracks_to_playlist(current_scope, selected_playlist_id, tracks) do
               {:ok, _} -> send(pid, {:export_success, export_count})
               {:error, reason} -> send(pid, {:export_error, reason})
             end
@@ -388,37 +388,6 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     |> assign(:submissions, sorted_submissions)
     |> assign(:filtered_submissions, sorted_submissions)
     |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  defp export_tracks_to_playlist(scope, playlist_id, tracks) do
-    with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
-         {:ok, _} <- remove_all_playlist_tracks(scope, playlist_id, playlist),
-         {:ok, result} <- Apis.spotify().add_items_to_playlist(scope, playlist_id, tracks) do
-      {:ok, result}
-    else
-      {:error, reason} -> {:error, reason}
-      error -> {:error, "Failed to export tracks: #{inspect(error)}"}
-    end
-  end
-
-  defp remove_all_playlist_tracks(_scope, _playlist_id, playlist) when is_nil(playlist.tracks) or playlist.tracks == [] do
-    {:ok, nil}
-  end
-
-  defp remove_all_playlist_tracks(scope, playlist_id, _playlist) do
-    case Apis.spotify().get_playlist(playlist_id) do
-      {:ok, current_playlist} ->
-        tracks_to_remove = current_playlist.tracks || []
-
-        if length(tracks_to_remove) > 0 do
-          Apis.spotify().remove_playlist_items(scope, playlist_id, tracks_to_remove)
-        else
-          {:ok, nil}
-        end
-
-      {:error, reason} ->
-        {:error, reason}
-    end
   end
 
   defp get_top_tracks_with_generation(billboard, count) do
