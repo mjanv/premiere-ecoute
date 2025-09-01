@@ -58,6 +58,8 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     ]
   ]
 
+config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30
+
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,

@@ -29,7 +29,12 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
       report ->
         summary = Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
-        {:ok, assign(socket, :summary, AsyncResult.ok(summary))}
+
+        if is_nil(summary) do
+          {:ok, assign(socket, :summary, AsyncResult.loading())}
+        else
+          {:ok, assign(socket, :summary, AsyncResult.ok(summary))}
+        end
     end
   end
 
@@ -60,9 +65,16 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   @impl true
   def handle_info(:vote_close, %{assigns: %{summary: summary}} = socket) do
+    summary =
+      if summary.ok? do
+        AsyncResult.ok(summary, Map.merge(summary.result, %{"viewer_score" => 0.0, "streamer_score" => 0.0}))
+      else
+        summary
+      end
+
     socket
     |> assign(:open_vote, false)
-    |> assign(:summary, AsyncResult.ok(summary, Map.merge(summary.result, %{"viewer_score" => 0.0, "streamer_score" => 0.0})))
+    |> assign(:summary, summary)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -82,6 +94,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   defp overlay_height(_), do: 240
 
+  defp score_value(nil, _), do: "-"
   defp score_value(summary, :viewer), do: summary["viewer_score"] || summary.viewer_score
   defp score_value(summary, :streamer), do: summary["streamer_score"] || summary.streamer_score
   defp score_label(:viewer), do: "Chat"

@@ -30,6 +30,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession)
 
+  @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
+
   def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id, vote_options: vote_options}) do
     with {:ok, album} <- Apis.spotify().get_album(album_id),
          {:ok, album} <- Album.create_if_not_exists(album),
@@ -66,7 +68,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}") do
       VoteWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, 5)
+      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%SessionStarted{session_id: session.id}]}
     else
       false ->
@@ -85,7 +87,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
       VoteWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, 5)
+      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
@@ -99,7 +101,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
       VoteWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, 5)
+      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
