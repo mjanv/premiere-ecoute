@@ -95,26 +95,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     |> Req.merge(url: "/me/player")
     |> Req.get()
     |> case do
-      {:ok,
-       %{
-         status: 200,
-         body: %{
-           "device" => device,
-           "is_playing" => is_playing,
-           "item" => item,
-           "progress_ms" => progress_ms
-         }
-       }} ->
-        state = %{
-          "is_playing" => is_playing,
-          "item" =>
-            item
-            |> Map.take(["id", "name", "track_number", "duration_ms"])
-            |> Map.merge(%{"progress_ms" => progress_ms}),
-          "device" => Map.take(device, ["id", "name", "is_active"])
-        }
-
-        {:ok, state}
+      {:ok, %{status: 200, body: body}} ->
+        {:ok, body}
 
       {:ok, %{status: 400}} ->
         {:ok, state}

@@ -10,26 +10,26 @@
             subtitle={gettext("Manage your saved playlists and discover new music")}
           >
             <:action>
-                <button
-                  phx-click="show_create_playlist_modal"
-                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
-                >
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {gettext("Create Playlist")}
-                </button>
+              <button
+                phx-click="show_create_playlist_modal"
+                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                {gettext("Create Playlist")}
+              </button>
             </:action>
             <:action>
-                <button
-                  phx-click="show_playlist_modal"
-                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
-                >
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {gettext("Load Playlist")}
-                </button>
+              <button
+                phx-click="show_playlist_modal"
+                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                {gettext("Load Playlist")}
+              </button>
             </:action>
           </.page_header>
           
@@ -329,10 +329,13 @@
       </div>
     </div>
   <% end %>
-
-  <!-- Create Playlist Modal -->
+  
+<!-- Create Playlist Modal -->
   <%= if assigns[:show_create_playlist_modal] do %>
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" phx-click="hide_create_playlist_modal">
+    <div
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+      phx-click="hide_create_playlist_modal"
+    >
       <div
         class="bg-gray-900/95 backdrop-blur-md border border-gray-700 rounded-xl shadow-2xl max-w-md w-full mx-4"
         phx-click="modal_content_click"
@@ -354,7 +357,7 @@
           </button>
         </div>
         
-        <!-- Modal Content -->
+<!-- Modal Content -->
         <form
           phx-submit="create_playlist"
           class="p-6 space-y-4"
@@ -387,16 +390,17 @@
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input
-                type="checkbox" 
+                type="checkbox"
                 name="playlist[public]"
                 value="true"
                 class="sr-only peer"
               />
-              <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600">
+              </div>
             </label>
           </div>
-
-          <!-- Modal Footer -->
+          
+<!-- Modal Footer -->
           <div class="flex justify-end space-x-3 pt-6 border-t border-gray-700/50">
             <button
               type="button"

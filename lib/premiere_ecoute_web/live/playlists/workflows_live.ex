@@ -6,8 +6,8 @@ defmodule PremiereEcouteWeb.Playlists.WorkflowsLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Discography
-  alias PremiereEcoute.Sessions.Retrospective.History
   alias PremiereEcoute.Playlists
+  alias PremiereEcoute.Sessions.Retrospective.History
 
   @impl true
   def mount(_params, _session, socket) do

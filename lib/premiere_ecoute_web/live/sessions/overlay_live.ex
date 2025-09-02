@@ -4,14 +4,23 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   require Logger
 
   alias Phoenix.LiveView.AsyncResult
+  alias PremiereEcoute.Apis.PlayerSupervisor
+  alias PremiereEcoute.Presence
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    session = ListeningSession.get(id)
+
     if connected?(socket) do
-      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
+      {:ok, _} = Presence.join(session.user.id)
+
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{session.id}")
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{session.user.id}")
     end
+
+    {:ok, _} = PlayerSupervisor.start(session.user.id)
 
     socket =
       socket
@@ -20,8 +29,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       |> assign(:percent, 0)
       |> assign(:progress, AsyncResult.loading())
       |> assign(:open_vote, true)
-
-    session = ListeningSession.get(id)
+      |> assign(:listening_session, session)
 
     case Report.get_by(session_id: id) do
       nil ->
@@ -39,6 +47,12 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def terminate(_reason, %{assigns: assigns}) do
+    Presence.unjoin(assigns.listening_session.user.id)
+    :ok
+  end
+
+  @impl true
   def handle_params(%{"score" => score}, _url, socket) do
     {:noreply, assign(socket, :score, parse_score(score))}
   end
@@ -49,10 +63,17 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_info({:progress, %{"duration_ms" => duration, "progress_ms" => progress} = p}, %{assigns: assigns} = socket) do
+  def handle_info({:player, :no_device, _state}, socket) do
     socket
-    |> assign(:percent, round(100 * progress / duration))
-    |> assign(:progress, AsyncResult.ok(assigns.progress, p))
+    |> assign(:progress, AsyncResult.loading())
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:player, _event, state}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:percent, round(100 * state["progress_ms"] / state["item"]["duration_ms"]))
+    |> assign(:progress, AsyncResult.ok(assigns.progress, state))
     |> then(fn socket -> {:noreply, socket} end)
   end
 

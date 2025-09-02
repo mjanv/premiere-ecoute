@@ -259,8 +259,8 @@
                         </button>
                       </div>
                     </div>
-
-                    <!-- Duplicates Filter -->
+                    
+<!-- Duplicates Filter -->
                     <div class="flex flex-col space-y-2">
                       <span class="text-sm text-gray-400 font-medium">{gettext("Duplicates")}:</span>
                       <div class="flex gap-2">
@@ -295,8 +295,8 @@
                         </button>
                       </div>
                     </div>
-
-                    <!-- Multiple Submissions Filter -->
+                    
+<!-- Multiple Submissions Filter -->
                     <div class="flex flex-col space-y-2">
                       <span class="text-sm text-gray-400 font-medium">{gettext("User submissions")}:</span>
                       <div class="flex gap-2">
@@ -332,7 +332,7 @@
                       </div>
                     </div>
                     
-                    <!-- Clear Filters Button -->
+<!-- Clear Filters Button -->
                     <%= if @search_query != "" || @date_filter != "all" || @duplicate_filter != "all" || @submission_filter != "all" do %>
                       <div class="flex flex-col justify-end">
                         <button
@@ -486,7 +486,10 @@
 <!-- Track List -->
                   <div class="divide-y divide-gray-700/30">
                     <% tracks_to_display =
-                      if @search_query != "" || @date_filter != "all" || @duplicate_filter != "all" || @submission_filter != "all", do: @filtered_tracks || [], else: @playlist.tracks || [] %>
+                      if @search_query != "" || @date_filter != "all" || @duplicate_filter != "all" ||
+                           @submission_filter != "all",
+                         do: @filtered_tracks || [],
+                         else: @playlist.tracks || [] %>
                     <%= for {track, index} <- Enum.with_index(tracks_to_display, 1) do %>
                       <div class={[
                         "grid grid-cols-12 gap-4 px-6 py-4 transition-all duration-200 group relative",

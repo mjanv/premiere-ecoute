@@ -92,7 +92,6 @@ defmodule PremiereEcouteWeb.Discography.LibraryLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-
   @impl true
   def handle_event("create_playlist", %{"playlist" => playlist_params}, %{assigns: %{current_scope: current_scope}} = socket) do
     playlist = %Discography.LibraryPlaylist{

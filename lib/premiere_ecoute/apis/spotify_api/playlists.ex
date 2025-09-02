@@ -29,20 +29,20 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.api()
     |> SpotifyApi.post(
       url: "/users/#{scope.user.spotify.user_id}/playlists",
-      json: %{"name" => playlist.title, "description" => playlist.description, "public" => playlist.public} |> IO.inspect(label: ">")
+      json: %{"name" => playlist.title, "description" => playlist.description, "public" => playlist.public}
     )
-    |> SpotifyApi.handle(201, fn body -> 
-        %LibraryPlaylist{
-      provider: :spotify,
-      playlist_id: body["id"],
-      title: body["name"],
-      description: body["description"],
-      url: body["external_urls"]["spotify"],
-      cover_url: Parser.parse_album_cover_url(body["images"]),
-      public: body["public"],
-      track_count: 0,
-      metadata: %{}
-    }
+    |> SpotifyApi.handle(201, fn body ->
+      %LibraryPlaylist{
+        provider: :spotify,
+        playlist_id: body["id"],
+        title: body["name"],
+        description: body["description"],
+        url: body["external_urls"]["spotify"],
+        cover_url: Parser.parse_album_cover_url(body["images"]),
+        public: body["public"],
+        track_count: 0,
+        metadata: %{}
+      }
     end)
   end
 

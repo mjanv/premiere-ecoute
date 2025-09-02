@@ -23,28 +23,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
     |> then(fn socket -> {:ok, socket} end)
   end
 
-  def refresh_state(%{assigns: %{listening_session: session} = assigns} = socket) do
-    case SpotifyApi.get_playback_state(assigns.current_scope, assigns.player_state) do
-      {:ok, state} ->
-        if state["item"] do
-          album = %{
-            "cover_url" => session.album.cover_url,
-            "album_name" => session.album.name,
-            "artist" => session.album.artist,
-            "total_tracks" => session.album.total_tracks,
-            "track_id" => session.current_track_id
-          }
-
-          PremiereEcoute.PubSub.broadcast("session:#{session.id}", {:progress, Map.merge(state["item"], album)})
-        end
-
-        assign(socket, :player_state, state)
-
-      {:error, _} ->
-        assign(socket, :player_state, SpotifyApi.Player.default())
-    end
-  end
-
   @impl true
   def handle_event("toggle_playback", _params, socket) do
     case socket.assigns.player_state do
@@ -142,7 +120,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           <div class="flex items-center justify-between text-xs text-gray-200">
             <span>{gettext("Progress:")}</span>
             <span>
-              {PremiereEcouteCore.Duration.timer(@player_state["item"]["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
+              {PremiereEcouteCore.Duration.timer(@player_state["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
                 @player_state["item"]["duration_ms"]
               )}
             </span>

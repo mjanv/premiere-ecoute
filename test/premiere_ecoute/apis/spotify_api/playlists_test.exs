@@ -124,19 +124,19 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
 
       playlist = %LibraryPlaylist{title: "New Playlist", description: "New playlist description", public: false}
 
-      {:ok,  playlist} = SpotifyApi.create_playlist(scope, playlist)
+      {:ok, playlist} = SpotifyApi.create_playlist(scope, playlist)
 
       assert playlist == %LibraryPlaylist{
-        provider: :spotify,
-        playlist_id: "49TgLmDb4WA8FN1nKUIe9G",
-        title: "New Playlist",
-        description: "New playlist description",
-        url: "https://open.spotify.com/playlist/49TgLmDb4WA8FN1nKUIe9G",
-        cover_url: nil,
-        public: false,
-        track_count: 0,
-        metadata: %{}
-      }
+               provider: :spotify,
+               playlist_id: "49TgLmDb4WA8FN1nKUIe9G",
+               title: "New Playlist",
+               description: "New playlist description",
+               url: "https://open.spotify.com/playlist/49TgLmDb4WA8FN1nKUIe9G",
+               cover_url: nil,
+               public: false,
+               track_count: 0,
+               metadata: %{}
+             }
     end
   end
 

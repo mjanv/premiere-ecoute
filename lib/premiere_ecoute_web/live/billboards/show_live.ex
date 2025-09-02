@@ -13,10 +13,10 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.LibraryPlaylist
+  alias PremiereEcoute.Playlists
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.Search
   alias PremiereEcouteWeb.Layouts
-  alias PremiereEcoute.Playlists
 
   @impl true
   def mount(%{"id" => billboard_id}, _session, socket) do

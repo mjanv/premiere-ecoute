@@ -13,6 +13,7 @@ defmodule PremiereEcoute do
       {Sessions, except: []},
       {Telemetry, except: []},
       PubSub,
+      Presence,
       Repo,
       DataCase
     ]

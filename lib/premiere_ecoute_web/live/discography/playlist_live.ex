@@ -294,8 +294,8 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
 
   defp get_current_track_ids(socket) do
     tracks =
-      if socket.assigns.search_query != "" || socket.assigns.date_filter != "all" || 
-         socket.assigns.duplicate_filter != "all" || socket.assigns.submission_filter != "all" do
+      if socket.assigns.search_query != "" || socket.assigns.date_filter != "all" ||
+           socket.assigns.duplicate_filter != "all" || socket.assigns.submission_filter != "all" do
         socket.assigns.filtered_tracks || []
       else
         (socket.assigns.playlist && socket.assigns.playlist.tracks) || []

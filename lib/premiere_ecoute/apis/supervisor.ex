@@ -13,7 +13,9 @@ defmodule PremiereEcoute.Apis.Supervisor do
   def init(_args) do
     children = [
       {Cache, name: :subscriptions},
-      {Cache, name: :tokens}
+      {Cache, name: :tokens},
+      PremiereEcoute.Apis.PlayerSupervisor,
+      {Registry, keys: :unique, name: PremiereEcoute.Apis.PlayerRegistry}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

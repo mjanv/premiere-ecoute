@@ -4,7 +4,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   require Logger
 
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Events.Chat.MessageSent
+  alias PremiereEcoute.Presence
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
@@ -12,7 +14,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Retrospective.VoteTrends
   alias PremiereEcouteCore.Cache
-  alias PremiereEcouteWeb.Sessions.Components.SpotifyPlayer
+
 
   @impl true
   def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
@@ -21,9 +23,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
          listening_session when not is_nil(listening_session) <- ListeningSession.get(id) do
       if connected?(socket) do
         Process.send_after(self(), :refresh, 100)
+        {:ok, _} = Presence.join(current_scope.user.id)
+        Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{current_scope.user.id}")
         Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
       end
 
+      {:ok, _} = PlayerSupervisor.start(current_scope.user.id)
       {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
 
       socket
@@ -49,6 +54,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         |> redirect(to: ~p"/sessions")
         |> then(fn socket -> {:ok, socket} end)
     end
+  end
+
+  @impl true
+  def terminate(_reason, %{assigns: assigns}) do
+    Presence.unjoin(assigns.current_scope.user.id)
+    :ok
   end
 
   @impl true
@@ -151,7 +162,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     socket
     |> assign(:open_vote, !is_nil(cached_session))
     |> assign(:current_scope, Accounts.maybe_renew_token(socket, :spotify))
-    |> SpotifyPlayer.refresh_state()
+    # |> SpotifyPlayer.refresh_state()
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -171,6 +182,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_info({:flash, level, message}, socket) do
     {:noreply, put_flash(socket, level, message)}
+  end
+
+  @impl true
+  def handle_info({:player, _event, state}, socket) do
+    {:noreply, assign(socket, :player_state, state)}
   end
 
   @impl true

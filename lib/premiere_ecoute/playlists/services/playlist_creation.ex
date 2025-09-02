@@ -5,7 +5,6 @@ defmodule PremiereEcoute.Playlists.Services.PlaylistCreation do
   alias PremiereEcoute.Discography.LibraryPlaylist
 
   def create_library_playlist(scope, %LibraryPlaylist{} = playlist) do
-    IO.inspect(playlist, label: "?")
     with {:ok, playlist} <- Apis.spotify().create_playlist(scope, playlist),
          playlist <- Map.take(playlist, [:provider, :playlist_id, :title, :description, :public, :track_count, :url, :metadata]),
          {:ok, playlist} <- LibraryPlaylist.create(scope.user, playlist) do
