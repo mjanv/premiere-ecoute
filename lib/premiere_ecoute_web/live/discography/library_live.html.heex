@@ -10,7 +10,17 @@
             subtitle={gettext("Manage your saved playlists and discover new music")}
           >
             <:action>
-              <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) && @current_scope && @current_scope.user && @current_scope.user.spotify do %>
+                <button
+                  phx-click="show_create_playlist_modal"
+                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  {gettext("Create Playlist")}
+                </button>
+            </:action>
+            <:action>
                 <button
                   phx-click="show_playlist_modal"
                   class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
@@ -18,9 +28,8 @@
                   <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  {gettext("Add Playlist")}
+                  {gettext("Load Playlist")}
                 </button>
-              <% end %>
             </:action>
           </.page_header>
           
@@ -116,9 +125,9 @@
   
 <!-- Playlist search modal for displaying user's Spotify playlists -->
   <%= if assigns[:show_playlist_modal] do %>
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" phx-click="hide_playlist_modal">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" phx-click="hide_playlist_modal">
       <div
-        class="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] flex flex-col"
+        class="bg-gray-900/95 backdrop-blur-md border border-gray-700 rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[80vh] flex flex-col"
         phx-click="modal_content_click"
       >
         <!-- Modal Header -->
@@ -317,6 +326,96 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Create Playlist Modal -->
+  <%= if assigns[:show_create_playlist_modal] do %>
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" phx-click="hide_create_playlist_modal">
+      <div
+        class="bg-gray-900/95 backdrop-blur-md border border-gray-700 rounded-xl shadow-2xl max-w-md w-full mx-4"
+        phx-click="modal_content_click"
+      >
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white">{gettext("Create New Playlist")}</h3>
+          </div>
+          <button phx-click="hide_create_playlist_modal" class="text-gray-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <form
+          phx-submit="create_playlist"
+          class="p-6 space-y-4"
+        >
+          <div class="space-y-2">
+            <label for="playlist_title" class="block text-sm font-medium text-gray-200">{gettext("Title")}</label>
+            <input
+              type="text"
+              name="playlist[title]"
+              placeholder={gettext("Enter playlist title")}
+              class="block w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:bg-gray-800 transition-all duration-200"
+              required
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label for="playlist_description" class="block text-sm font-medium text-gray-200">{gettext("Description")}</label>
+            <textarea
+              name="playlist[description]"
+              rows="3"
+              placeholder={gettext("Enter playlist description (optional)")}
+              class="block w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:bg-gray-800 transition-all duration-200 resize-none"
+            ></textarea>
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+            <div class="flex flex-col">
+              <span class="text-sm font-medium text-gray-200">{gettext("Make playlist public")}</span>
+              <span class="text-xs text-gray-400 mt-1">{gettext("Anyone can search for and view this playlist")}</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox" 
+                name="playlist[public]"
+                value="true"
+                class="sr-only peer"
+              />
+              <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+            </label>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="flex justify-end space-x-3 pt-6 border-t border-gray-700/50">
+            <button
+              type="button"
+              phx-click="hide_create_playlist_modal"
+              class="px-6 py-2.5 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600/50 text-gray-200 rounded-lg transition-all duration-200 font-medium"
+            >
+              {gettext("Cancel")}
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-200 font-medium flex items-center space-x-2 shadow-lg hover:shadow-purple-500/25"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>{gettext("Create Playlist")}</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   <% end %>

@@ -1,0 +1,39 @@
+{
+  "collaborative": false,
+  "description": "New playlist description",
+  "external_urls": {
+    "spotify": "https://open.spotify.com/playlist/49TgLmDb4WA8FN1nKUIe9G"
+  },
+  "followers": {
+    "href": null,
+    "total": 0
+  },
+  "href": "https://api.spotify.com/v1/playlists/49TgLmDb4WA8FN1nKUIe9G",
+  "id": "49TgLmDb4WA8FN1nKUIe9G",
+  "images": [],
+  "primary_color": null,
+  "name": "New Playlist",
+  "type": "playlist",
+  "uri": "spotify:playlist:49TgLmDb4WA8FN1nKUIe9G",
+  "owner": {
+    "href": "https://api.spotify.com/v1/users/lanfeust313",
+    "id": "lanfeust313",
+    "type": "user",
+    "uri": "spotify:user:lanfeust313",
+    "display_name": null,
+    "external_urls": {
+      "spotify": "https://open.spotify.com/user/lanfeust313"
+    }
+  },
+  "public": false,
+  "snapshot_id": "AAAAT3ZAdA08/+EPZh60gKfMq3ypZJBr",
+  "tracks": {
+    "limit": 100,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "href": "https://api.spotify.com/v1/playlists/49TgLmDb4WA8FN1nKUIe9G/tracks",
+    "total": 0,
+    "items": []
+  }
+}

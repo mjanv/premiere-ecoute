@@ -223,54 +223,129 @@
                   </div>
                   
 <!-- Filters -->
-                  <div class="flex flex-wrap gap-3 items-center">
-                    <span class="text-sm text-gray-400 font-medium">{gettext("Release date")}:</span>
-                    
-<!-- Filter Buttons -->
-                    <div class="flex gap-2">
-                      <button
-                        phx-click="filter_by_date"
-                        phx-value-date_filter="all"
-                        class={[
-                          "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
-                          if @date_filter == "all" do
-                            "bg-green-600 text-white"
-                          else
-                            "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          end
-                        ]}
-                      >
-                        {gettext("All")}
-                      </button>
+                  <div class="flex flex-wrap gap-6 items-start">
+                    <!-- Date Filter -->
+                    <div class="flex flex-col space-y-2">
+                      <span class="text-sm text-gray-400 font-medium">{gettext("Release date")}:</span>
+                      <div class="flex gap-2">
+                        <button
+                          phx-click="filter_by_date"
+                          phx-value-date_filter="all"
+                          class={[
+                            "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
+                            if @date_filter == "all" do
+                              "bg-green-600 text-white"
+                            else
+                              "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            end
+                          ]}
+                        >
+                          {gettext("All")}
+                        </button>
 
-                      <button
-                        phx-click="filter_by_date"
-                        phx-value-date_filter="week"
-                        class={[
-                          "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
-                          if @date_filter == "week" do
-                            "bg-green-600 text-white"
-                          else
-                            "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          end
-                        ]}
-                      >
-                        {gettext("> 1 week")}
-                      </button>
+                        <button
+                          phx-click="filter_by_date"
+                          phx-value-date_filter="week"
+                          class={[
+                            "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
+                            if @date_filter == "week" do
+                              "bg-green-600 text-white"
+                            else
+                              "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            end
+                          ]}
+                        >
+                          {gettext("> 1 week")}
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Duplicates Filter -->
+                    <div class="flex flex-col space-y-2">
+                      <span class="text-sm text-gray-400 font-medium">{gettext("Duplicates")}:</span>
+                      <div class="flex gap-2">
+                        <button
+                          phx-click="filter_duplicates"
+                          phx-value-duplicate_filter="all"
+                          class={[
+                            "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
+                            if @duplicate_filter == "all" do
+                              "bg-blue-600 text-white"
+                            else
+                              "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            end
+                          ]}
+                        >
+                          {gettext("All")}
+                        </button>
+
+                        <button
+                          phx-click="filter_duplicates"
+                          phx-value-duplicate_filter="only"
+                          class={[
+                            "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
+                            if @duplicate_filter == "only" do
+                              "bg-blue-600 text-white"
+                            else
+                              "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            end
+                          ]}
+                        >
+                          {gettext("Duplicates only")}
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Multiple Submissions Filter -->
+                    <div class="flex flex-col space-y-2">
+                      <span class="text-sm text-gray-400 font-medium">{gettext("User submissions")}:</span>
+                      <div class="flex gap-2">
+                        <button
+                          phx-click="filter_submissions"
+                          phx-value-submission_filter="all"
+                          class={[
+                            "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
+                            if @submission_filter == "all" do
+                              "bg-purple-600 text-white"
+                            else
+                              "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            end
+                          ]}
+                        >
+                          {gettext("All")}
+                        </button>
+
+                        <button
+                          phx-click="filter_submissions"
+                          phx-value-submission_filter="multiple"
+                          class={[
+                            "px-3 py-1.5 text-sm rounded-lg font-medium transition-all",
+                            if @submission_filter == "multiple" do
+                              "bg-purple-600 text-white"
+                            else
+                              "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            end
+                          ]}
+                        >
+                          {gettext("Multiple (>3)")}
+                        </button>
+                      </div>
                     </div>
                     
-<!-- Clear Filters Button -->
-                    <%= if @search_query != "" || @date_filter != "all" do %>
-                      <button
-                        phx-click="clear_filters"
-                        class="inline-flex items-center px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
-                        title={gettext("Clear all filters")}
-                      >
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        {gettext("Clear")}
-                      </button>
+                    <!-- Clear Filters Button -->
+                    <%= if @search_query != "" || @date_filter != "all" || @duplicate_filter != "all" || @submission_filter != "all" do %>
+                      <div class="flex flex-col justify-end">
+                        <button
+                          phx-click="clear_filters"
+                          class="inline-flex items-center px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                          title={gettext("Clear all filters")}
+                        >
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          {gettext("Clear")}
+                        </button>
+                      </div>
                     <% end %>
                   </div>
                 </div>
@@ -365,7 +440,7 @@
             
 <!-- Tracklist section -->
             <div class="max-w-7xl mx-auto px-6 pb-8">
-              <%= if (@filtered_tracks && length(@filtered_tracks) > 0) || (@playlist.tracks && length(@playlist.tracks) > 0 && @search_query == "" && @date_filter == "all") do %>
+              <%= if (@filtered_tracks && length(@filtered_tracks) > 0) || (@playlist.tracks && length(@playlist.tracks) > 0 && @search_query == "" && @date_filter == "all" && @duplicate_filter == "all" && @submission_filter == "all") do %>
                 <div class="bg-black/20 rounded-xl overflow-hidden">
                   <!-- Table Header -->
                   <div class="grid grid-cols-12 gap-4 px-6 py-3 text-sm font-medium text-gray-400 uppercase tracking-wide border-b border-gray-700/50">
@@ -411,7 +486,7 @@
 <!-- Track List -->
                   <div class="divide-y divide-gray-700/30">
                     <% tracks_to_display =
-                      if @search_query != "" || @date_filter != "all", do: @filtered_tracks || [], else: @playlist.tracks || [] %>
+                      if @search_query != "" || @date_filter != "all" || @duplicate_filter != "all" || @submission_filter != "all", do: @filtered_tracks || [], else: @playlist.tracks || [] %>
                     <%= for {track, index} <- Enum.with_index(tracks_to_display, 1) do %>
                       <div class={[
                         "grid grid-cols-12 gap-4 px-6 py-4 transition-all duration-200 group relative",
@@ -500,7 +575,7 @@
                 <!-- Empty State -->
                 <div class="text-center py-16">
                   <div class="w-24 h-24 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <%= if @search_query != "" || @date_filter != "all" do %>
+                    <%= if @search_query != "" || @date_filter != "all" || @duplicate_filter != "all" || @submission_filter != "all" do %>
                       <!-- No Search Results Icon -->
                       <svg class="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -523,11 +598,11 @@
                     <% end %>
                   </div>
 
-                  <%= if @search_query != "" || @date_filter != "all" do %>
+                  <%= if @search_query != "" || @date_filter != "all" || @duplicate_filter != "all" || @submission_filter != "all" do %>
                     <!-- No Results State -->
                     <h3 class="text-xl font-semibold text-white mb-2">{gettext("No tracks match your filters")}</h3>
                     <p class="text-gray-400 mb-6">
-                      {gettext("Try adjusting your search query or date filters to find more tracks")}
+                      {gettext("Try adjusting your search query or filters to find more tracks")}
                     </p>
                     <div class="flex flex-col sm:flex-row gap-3 justify-center">
                       <button

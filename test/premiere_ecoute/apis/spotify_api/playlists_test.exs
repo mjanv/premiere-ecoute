@@ -106,6 +106,40 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
     end
   end
 
+  describe "create_playlist/1" do
+    test "create a playlist" do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:post, "/v1/users/lanfeust313/playlists"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        request: "spotify_api/playlists/create_playlist/request.json",
+        response: "spotify_api/playlists/create_playlist/response.json",
+        status: 201
+      )
+
+      scope = user_scope_fixture(user_fixture(%{spotify: %{user_id: "lanfeust313", access_token: "access_token"}}))
+
+      playlist = %LibraryPlaylist{title: "New Playlist", description: "New playlist description", public: false}
+
+      {:ok,  playlist} = SpotifyApi.create_playlist(scope, playlist)
+
+      assert playlist == %LibraryPlaylist{
+        provider: :spotify,
+        playlist_id: "49TgLmDb4WA8FN1nKUIe9G",
+        title: "New Playlist",
+        description: "New playlist description",
+        url: "https://open.spotify.com/playlist/49TgLmDb4WA8FN1nKUIe9G",
+        cover_url: nil,
+        public: false,
+        track_count: 0,
+        metadata: %{}
+      }
+    end
+  end
+
   describe "add_items_to_playlist/1" do
     test "add one or more items to a user's playlist" do
       ApiMock.expect(

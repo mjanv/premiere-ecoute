@@ -18,6 +18,8 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
       |> assign(:error, nil)
       |> assign(:search_query, "")
       |> assign(:date_filter, "all")
+      |> assign(:duplicate_filter, "all")
+      |> assign(:submission_filter, "all")
       |> assign(:filtered_tracks, [])
       |> assign(:selected_tracks, MapSet.new())
       |> assign(:select_all, false)
@@ -59,10 +61,28 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
   end
 
   @impl true
+  def handle_event("filter_duplicates", %{"duplicate_filter" => duplicate_filter}, socket) do
+    socket
+    |> assign(:duplicate_filter, duplicate_filter)
+    |> apply_filters()
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("filter_submissions", %{"submission_filter" => submission_filter}, socket) do
+    socket
+    |> assign(:submission_filter, submission_filter)
+    |> apply_filters()
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
   def handle_event("clear_filters", _params, socket) do
     socket
     |> assign(:search_query, "")
     |> assign(:date_filter, "all")
+    |> assign(:duplicate_filter, "all")
+    |> assign(:submission_filter, "all")
     |> apply_filters()
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -224,6 +244,8 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
       tracks
       |> PremiereEcouteCore.Search.filter(assigns.search_query, [:name, :artist, :user_id])
       |> filter_by_date(assigns.date_filter)
+      |> filter_duplicates(assigns.duplicate_filter)
+      |> filter_submissions(assigns.submission_filter)
 
     # Clear selection when filters change to avoid confusion
     socket
@@ -253,9 +275,27 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
     end
   end
 
+  defp filter_duplicates(tracks, "all"), do: tracks
+
+  defp filter_duplicates(tracks, "only") do
+    frequencies = Enum.frequencies_by(tracks, & &1.user_id)
+    Enum.filter(tracks, fn track -> Map.get(frequencies, track.track_id, 0) > 1 end)
+  end
+
+  defp filter_submissions(tracks, "all"), do: tracks
+
+  defp filter_submissions(tracks, "multiple") do
+    frequencies = Enum.frequencies_by(tracks, & &1.user_id)
+
+    tracks
+    |> Enum.filter(fn track -> Map.get(frequencies, track.user_id, 0) > 3 end)
+    |> Enum.sort_by(& &1.user_id)
+  end
+
   defp get_current_track_ids(socket) do
     tracks =
-      if socket.assigns.search_query != "" || socket.assigns.date_filter != "all" do
+      if socket.assigns.search_query != "" || socket.assigns.date_filter != "all" || 
+         socket.assigns.duplicate_filter != "all" || socket.assigns.submission_filter != "all" do
         socket.assigns.filtered_tracks || []
       else
         (socket.assigns.playlist && socket.assigns.playlist.tracks) || []

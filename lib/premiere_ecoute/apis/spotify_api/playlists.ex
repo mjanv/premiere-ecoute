@@ -24,6 +24,28 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_library_playlist/1) end)
   end
 
+  def create_playlist(scope, %LibraryPlaylist{} = playlist) do
+    scope
+    |> SpotifyApi.api()
+    |> SpotifyApi.post(
+      url: "/users/#{scope.user.spotify.user_id}/playlists",
+      json: %{"name" => playlist.title, "description" => playlist.description, "public" => playlist.public} |> IO.inspect(label: ">")
+    )
+    |> SpotifyApi.handle(201, fn body -> 
+        %LibraryPlaylist{
+      provider: :spotify,
+      playlist_id: body["id"],
+      title: body["name"],
+      description: body["description"],
+      url: body["external_urls"]["spotify"],
+      cover_url: Parser.parse_album_cover_url(body["images"]),
+      public: body["public"],
+      track_count: 0,
+      metadata: %{}
+    }
+    end)
+  end
+
   def add_items_to_playlist(scope, id, tracks) do
     scope
     |> SpotifyApi.api()
