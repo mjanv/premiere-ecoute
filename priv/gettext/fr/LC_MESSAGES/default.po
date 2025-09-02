@@ -1222,9 +1222,10 @@ msgid "Light"
 msgstr "Clair"
 
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:254
-#, elixir-autogen, elixir-format
-msgid "Load More Playlists"
-msgstr "Charger Plus de Playlists"
+#: lib/premiere_ecoute_web/live/discography/library_live.html.heex:31
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Load Playlist"
+msgstr "Charger une playlist"
 
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:155
 #, elixir-autogen, elixir-format
@@ -1249,6 +1250,7 @@ msgstr "Aucune playlist sélectionnée"
 
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:524
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:269
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:270
 #, elixir-autogen, elixir-format
 msgid "No playlists found"
 msgstr "Aucune playlist trouvée"
@@ -2599,11 +2601,6 @@ msgstr "Échec de la pause : %{reason}"
 msgid "Increase track count"
 msgstr "Augmenter le nombre de pistes"
 
-#: lib/premiere_ecoute_web/live/discography/library_live.html.heex:31
-#, elixir-autogen, elixir-format, fuzzy
-msgid "Load Playlist"
-msgstr "Charger Plus de Playlists"
-
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:388
 #, elixir-autogen, elixir-format
 msgid "Make playlist public"
@@ -2623,11 +2620,6 @@ msgstr "Mois prochain"
 #, elixir-autogen, elixir-format
 msgid "Next track in"
 msgstr "Prochaine dans"
-
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:270
-#, elixir-autogen, elixir-format
-msgid "No playlists found. Add playlists to your library first."
-msgstr "Aucune playlist trouvée. Ajoutez d'abord des playlists à votre bibliothèque."
 
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:195
 #, elixir-autogen, elixir-format, fuzzy

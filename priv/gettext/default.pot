@@ -1222,7 +1222,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:254
 #, elixir-autogen, elixir-format
-msgid "Load More Playlists"
+msgid "Load Playlist"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/library_live.html.heex:155
@@ -2625,7 +2625,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:270
 #, elixir-autogen, elixir-format
-msgid "No playlists found. Add playlists to your library first."
+msgid "No playlists found"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:195
