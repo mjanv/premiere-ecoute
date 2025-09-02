@@ -6,6 +6,7 @@ import { Carousel } from "./carousel";
 import { NoteGraph } from "./note_graph";
 import { ClickOutside } from "./click_outside";
 import { AutoDismissFlash } from "./auto_dismiss_flash";
+import { NextTrackTimer } from "./next_track_timer";
 
 
  
@@ -17,5 +18,6 @@ export const Hooks = {
   PlaylistStorage: PlaylistStorage,
   Carousel: Carousel,
   NoteGraph: NoteGraph,
-  ClickOutside: ClickOutside
+  ClickOutside: ClickOutside,
+  NextTrackTimer: NextTrackTimer
 };

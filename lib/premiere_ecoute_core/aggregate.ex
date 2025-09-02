@@ -5,9 +5,6 @@ defmodule PremiereEcouteCore.Aggregate do
     root = Keyword.get(opts, :root, [])
     identity = Keyword.get(opts, :identity, [])
     json = Keyword.get(opts, :json, [])
-    no_json = Keyword.get(opts, :no_json, [])
-
-    encoder_opts = if Enum.empty?(json), do: [except: [:__meta__, :__struct__] ++ no_json], else: [only: json]
 
     quote do
       use Ecto.Schema
@@ -17,9 +14,6 @@ defmodule PremiereEcouteCore.Aggregate do
 
       alias PremiereEcoute.Events.Store
       alias PremiereEcoute.Repo
-
-      @derive {Jason.Encoder, unquote(encoder_opts)}
-      # @derive {Inspect, expect: []}
 
       @type entity(type) :: type | nil | Ecto.Association.NotLoaded.t()
       @type nullable(type) :: type | nil
@@ -80,6 +74,12 @@ defmodule PremiereEcouteCore.Aggregate do
       def sum(query \\ __MODULE__, field), do: Repo.aggregate(query, :sum, field)
 
       defoverridable create: 1, get: 1, update: 2, upsert: 2, delete: 1, delete_all: 1
+
+      defimpl Jason.Encoder, for: __MODULE__ do
+        def encode(entity, opts) do
+          Jason.Encode.map(Map.take(entity, unquote(json)), opts)
+        end
+      end
     end
   end
 end

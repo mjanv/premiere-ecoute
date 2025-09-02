@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
   @moduledoc false
 
   use PremiereEcouteCore.Aggregate.Entity,
-    no_json: [:parent]
+    json: [:user_id, :username]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Events.AccountAssociated

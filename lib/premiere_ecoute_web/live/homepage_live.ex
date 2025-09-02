@@ -6,8 +6,7 @@ defmodule PremiereEcouteWeb.HomepageLive do
   @impl true
   def mount(_params, _session, socket) do
     if socket.assigns[:current_scope] && socket.assigns.current_scope.user do
-      socket =
-        {:ok, redirect(socket, to: "/home")}
+      {:ok, redirect(socket, to: "/home")}
     else
       {:ok, assign(socket, show_modal: false)}
     end

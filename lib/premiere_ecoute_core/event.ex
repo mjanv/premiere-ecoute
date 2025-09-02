@@ -11,9 +11,7 @@ defmodule PremiereEcouteCore.Event do
 
       defimpl Jason.Encoder, for: __MODULE__ do
         def encode(event, opts) do
-          event
-          |> Map.take(unquote(fields))
-          |> Jason.Encode.map(opts)
+          Jason.Encode.map(Map.take(event, unquote(fields)), opts)
         end
       end
 

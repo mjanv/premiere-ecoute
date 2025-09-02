@@ -41,6 +41,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:report, nil)
       |> assign(:overlay_score_type, "streamer")
       |> assign(:vote_trends, nil)
+      |> assign(:next_track_at, nil)
       |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
       |> assign_async(:vote_trends, fn ->
         vote_data = VoteTrends.rolling_average(String.to_integer(id), :minute)
@@ -197,12 +198,16 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         %{assigns: %{show: show, listening_session: session, current_scope: scope}} = socket
       ) do
     if show[:next_track] > 0 do
-      ListeningSessionWorker.in_seconds(
-        %{action: "next_track", session_id: session.id, user_id: scope.user.id},
-        show[:next_track]
-      )
+      {:ok, job} =
+        ListeningSessionWorker.in_seconds(
+          %{action: "next_track", session_id: session.id, user_id: scope.user.id},
+          show[:next_track]
+        )
+        |> IO.inspect()
 
-      put_flash(socket, :info, "Next track in #{show[:next_track]} seconds")
+      socket
+      |> assign(:next_track_at, job.scheduled_at)
+      |> put_flash(:info, "Next track in #{show[:next_track]} seconds")
     else
       socket
     end
@@ -211,7 +216,15 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_info({:player, event, state}, socket) do
+  def handle_info({:player, :start_track, state}, socket) do
+    socket
+    |> assign(:next_track_at, nil)
+    |> assign(:player_state, state)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:player, _event, state}, socket) do
     {:noreply, assign(socket, :player_state, state)}
   end
 
