@@ -282,7 +282,7 @@ defmodule PremiereEcouteWeb.UserAuth do
     else
       socket
       |> Phoenix.LiveView.put_flash(:error, "You must log in to access this page.")
-      |> Phoenix.LiveView.redirect(to: ~p"/")
+      |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
       |> then(fn socket -> {:halt, socket} end)
     end
   end
@@ -305,8 +305,8 @@ defmodule PremiereEcouteWeb.UserAuth do
 
     accepted_roles =
       case role do
-        :viewer -> [:viewer, :streamer, :admin]
-        :streamer -> [:streamer, :admin]
+        :viewer -> [:viewer, :streamer, :bot, :admin]
+        :streamer -> [:streamer, :bot, :admin]
         :bot -> [:bot, :admin]
         :admin -> [:admin]
       end

@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   @moduledoc false
 
-  use PremiereEcouteCore.Worker, queue: :sessions
+  use PremiereEcouteCore.Worker, queue: :sessions, max_attempts: 1
 
   require Logger
 

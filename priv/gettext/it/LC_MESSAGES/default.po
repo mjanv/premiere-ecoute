@@ -2547,7 +2547,7 @@ msgstr "Destinazione dati"
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:280
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Deactivated"
-msgstr "Riattiva Classifica"
+msgstr "Off"
 
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:64
 #, elixir-autogen, elixir-format

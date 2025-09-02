@@ -2545,7 +2545,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:280
 #, elixir-autogen, elixir-format
-msgid "Deactivated"
+msgid "Off"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:64

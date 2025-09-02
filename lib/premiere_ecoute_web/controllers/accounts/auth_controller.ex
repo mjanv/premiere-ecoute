@@ -51,7 +51,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
          {user, auth_data} when not is_nil(user) <- {User.get_user_by_email(auth_data.email), auth_data},
          {:ok, user} <- AccountRegistration.register_twitch_user(auth_data) do
       conn
-      |> put_session(:user_return_to, ~p"/home")
+      |> put_session(:user_return_to, ~p"/")
       |> put_flash(:info, "Successfully authenticated with Twitch!")
       |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
     else
@@ -73,7 +73,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     with {:ok, auth_data} <- SpotifyApi.authorization_code(code, state),
          {:ok, user} <- AccountRegistration.register_spotify_user(auth_data, state) do
       conn
-      |> put_session(:user_return_to, ~p"/home")
+      |> put_session(:user_return_to, ~p"/")
       |> put_flash(:info, "Successfully authenticated with Spotify!")
       |> UserAuth.log_in_user(user, %{})
     else

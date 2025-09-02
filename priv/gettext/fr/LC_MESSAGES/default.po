@@ -2546,7 +2546,7 @@ msgstr "Cible de données"
 
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:280
 #, elixir-autogen, elixir-format, fuzzy
-msgid "Deactivated"
+msgid "Off"
 msgstr "Off"
 
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:64

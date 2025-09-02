@@ -277,7 +277,7 @@
                   if(@show[:next_track] == 0, do: "text-gray-400", else: "text-white")
                 ]}>
                   <%= if @show[:next_track] == 0 do %>
-                    {gettext("Deactivated")}
+                    {gettext("Off")}
                   <% else %>
                     {@show[:next_track]}s
                   <% end %>

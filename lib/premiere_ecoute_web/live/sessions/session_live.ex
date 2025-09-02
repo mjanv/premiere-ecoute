@@ -103,13 +103,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("update_next_track", %{"next_track" => value}, %{assigns: assigns} = socket) do
-    # AIDEV-NOTE: Handle next_track slider from form submission
     case Integer.parse(value) do
-      {next_track_value, _} when next_track_value >= 0 and next_track_value <= 60 ->
-        {:noreply, assign(socket, :show, Map.put(assigns.show, :next_track, next_track_value))}
-
-      _ ->
-        {:noreply, socket}
+      {value, _} when value >= 0 and value <= 60 -> {:noreply, assign(socket, :show, Map.put(assigns.show, :next_track, value))}
+      _ -> {:noreply, socket}
     end
   end
 

@@ -86,7 +86,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}),
-      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0) do
+         ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0) do
       ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
