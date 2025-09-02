@@ -9,6 +9,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Apis
 
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
@@ -32,12 +33,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
-  def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id, vote_options: vote_options}) do
+  def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id, playlist_id: nil, vote_options: vote_options}) do
     with {:ok, album} <- Apis.spotify().get_album(album_id),
          {:ok, album} <- Album.create_if_not_exists(album),
          {:ok, session} <-
            ListeningSession.create(%{
              user_id: user_id,
+             source: :album,
              album_id: album.id,
              vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
            }) do
@@ -46,7 +48,34 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          %SessionPrepared{
            session_id: session.id,
            user_id: session.user_id,
-           album_id: session.album_id
+           album_id: session.album_id,
+           playlist_id: nil
+         }
+       ]}
+    else
+      {:error, reason} ->
+        Logger.error("Cannot prepare listening session due to: #{inspect(reason)}")
+        {:error, [%SessionNotPrepared{user_id: user_id}]}
+    end
+  end
+
+  def handle(%PrepareListeningSession{user_id: user_id, album_id: nil, playlist_id: playlist_id, vote_options: vote_options}) do
+    with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
+         {:ok, playlist} <- Playlist.create(%{playlist | tracks: []}),
+         {:ok, session} <-
+           ListeningSession.create(%{
+             user_id: user_id,
+             source: :playlist,
+             playlist_id: playlist.id,
+             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+           }) do
+      {:ok, session,
+       [
+         %SessionPrepared{
+           session_id: session.id,
+           user_id: session.user_id,
+           album_id: nil,
+           playlist_id: session.playlist_id
          }
        ]}
     else

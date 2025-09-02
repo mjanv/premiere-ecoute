@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     belongs_to :album, Album, foreign_key: :album_id
     belongs_to :current_track, Album.Track, foreign_key: :current_track_id
-    
+
     belongs_to :playlist, Playlist, foreign_key: :playlist_id
     belongs_to :current_playlist_track, Playlist.Track, foreign_key: :current_playlist_track_id
 
@@ -59,7 +59,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       :album_id,
       :current_track_id,
       :playlist_id,
-      :current_playlist_track_id,
+      :current_playlist_track_id
     ])
     |> validate_required([])
     |> foreign_key_constraint(:user_id)
@@ -93,7 +93,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     {:error, :invalid_status}
   end
 
-  def next_track(%__MODULE__{} = session) do
+  def next_track(%__MODULE__{source: :album} = session) do
     session = Repo.preload(session, album: [:tracks], current_track: [])
     tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
 
@@ -117,7 +117,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     end
   end
 
-  def previous_track(%__MODULE__{} = session) do
+  def previous_track(%__MODULE__{source: :album} = session) do
     session = Repo.preload(session, album: [:tracks], current_track: [])
     tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
 
@@ -141,7 +141,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     end
   end
 
-  def current_track(%__MODULE__{} = session, track_id) do
+  def current_track(%__MODULE__{source: :album} = session, track_id) do
     session
     |> change()
     |> put_change(:current_track_id, track_id)

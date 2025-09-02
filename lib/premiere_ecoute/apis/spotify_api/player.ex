@@ -9,6 +9,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Playlist
 
   def devices(%Scope{} = scope) do
     scope
@@ -25,7 +26,45 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   Start/resume playback on the user's active device.
   Can optionally specify track URIs to play.
   """
-  def start_playback(%Scope{} = scope) do
+  def start_playback(%Scope{} = scope, %Album{album_id: id}) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.merge(
+      headers: [
+        {"Content-Type", "application/json"}
+      ]
+    )
+    |> Req.put(
+      url: "/me/player/play",
+      json: %{
+        "context_uri" => "spotify:album:#{id}",
+        "offset" => %{"position" => 0},
+        "position_ms" => 0
+      }
+    )
+    |> handle_playback_response()
+  end
+
+  def start_playback(%Scope{} = scope, %Playlist{playlist_id: id}) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.merge(
+      headers: [
+        {"Content-Type", "application/json"}
+      ]
+    )
+    |> Req.put(
+      url: "/me/player/play",
+      json: %{
+        "context_uri" => "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7",
+        "offset" => %{"position" => 0},
+        "position_ms" => 0
+      }
+    )
+    |> handle_playback_response()
+  end
+
+  def start_playback(%Scope{} = scope, nil) do
     scope
     |> SpotifyApi.api()
     |> Req.merge(

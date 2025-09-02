@@ -8,7 +8,7 @@
           <!-- Page Title (2/3 width with right padding) -->
           <div class="w-2/3 pr-6">
             <.page_header
-              title={@listening_session.album.name}
+              title={if @listening_session.album, do: @listening_session.album.name, else: @listening_session.playlist.title}
               subtitle={
               gettext("by %{artist}", artist: @listening_session.user.username)
               <>

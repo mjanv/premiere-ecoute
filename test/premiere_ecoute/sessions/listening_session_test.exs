@@ -76,7 +76,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
                album: _
              } = session
     end
-    
+
     test "can create a new listening session for an existing playlist", %{
       user: user,
       playlist: playlist

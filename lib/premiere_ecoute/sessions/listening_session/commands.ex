@@ -4,9 +4,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   defmodule PrepareListeningSession do
     @moduledoc false
 
-    @type t :: %__MODULE__{user_id: integer(), album_id: String.t(), vote_options: [String.t()]}
+    @type t :: %__MODULE__{
+            user_id: integer(),
+            album_id: String.t() | nil,
+            playlist_id: String.t() | nil,
+            vote_options: [String.t()]
+          }
 
-    defstruct [:user_id, :album_id, :vote_options]
+    defstruct [:user_id, :album_id, :playlist_id, :vote_options]
   end
 
   defmodule StartListeningSession do

@@ -130,7 +130,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   # Player
   defdelegate devices(scope), to: __MODULE__.Player
   defdelegate get_playback_state(scope, state), to: __MODULE__.Player
-  defdelegate start_playback(scope), to: __MODULE__.Player
+  defdelegate start_playback(scope, context \\ nil), to: __MODULE__.Player
   defdelegate pause_playback(scope), to: __MODULE__.Player
   defdelegate next_track(scope), to: __MODULE__.Player
   defdelegate previous_track(scope), to: __MODULE__.Player

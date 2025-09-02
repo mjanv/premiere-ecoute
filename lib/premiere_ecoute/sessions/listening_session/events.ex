@@ -4,12 +4,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   defmodule SessionPrepared do
     @moduledoc false
 
-    defstruct [:session_id, :user_id, :album_id]
+    defstruct [:session_id, :user_id, :album_id, :playlist_id]
 
     @type t :: %__MODULE__{
             session_id: String.t(),
             user_id: integer(),
-            album_id: String.t()
+            album_id: String.t() | nil,
+            playlist_id: String.t() | nil
           }
   end
 

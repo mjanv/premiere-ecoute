@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
   alias PremiereEcouteCore.Cache
 
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Playlist
 
   setup do
     scope =
@@ -219,6 +220,13 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
   end
 
   describe "start_playback/1" do
+    setup do
+      {:ok, album} = Album.create(album_fixture(%{album_id: "5ht7ItJgpBH7W6vJ5BqpPr"}))
+      {:ok, playlist} = Playlist.create(playlist_fixture())
+
+      {:ok, %{album: album, playlist: playlist}}
+    end
+
     test "start the current player", %{scope: scope} do
       ApiMock.expect(
         SpotifyApi,
@@ -233,6 +241,46 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       )
 
       {:ok, :success} = SpotifyApi.start_playback(scope)
+    end
+
+    test "start the current player with an album context", %{scope: scope, album: album} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/play"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
+        request: %{
+          "context_uri" => "spotify:album:5ht7ItJgpBH7W6vJ5BqpPr",
+          "offset" => %{"position" => 0},
+          "position_ms" => 0
+        },
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = SpotifyApi.start_playback(scope, album)
+    end
+
+    test "start the current player with a playlist context", %{scope: scope, playlist: playlist} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/play"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
+        request: %{
+          "context_uri" => "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7",
+          "offset" => %{"position" => 0},
+          "position_ms" => 0
+        },
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = SpotifyApi.start_playback(scope, playlist)
     end
   end
 
