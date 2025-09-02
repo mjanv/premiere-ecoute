@@ -4,14 +4,16 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Sessions.ListeningSession
 
   setup do
     user = user_fixture(%{role: :streamer})
     viewer = user_fixture(%{role: :viewer})
     {:ok, album} = Album.create(album_fixture())
+    {:ok, playlist} = Playlist.create(playlist_fixture(%{title: "Playlist", tracks: []}))
 
-    {:ok, %{user: user, viewer: viewer, album: album}}
+    {:ok, %{user: user, viewer: viewer, album: album, playlist: playlist}}
   end
 
   describe "create/1" do
@@ -23,6 +25,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
 
       assert %PremiereEcoute.Sessions.ListeningSession{
                status: :preparing,
+               source: :album,
                vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
                started_at: nil,
                ended_at: nil,
@@ -65,12 +68,32 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
 
       assert %PremiereEcoute.Sessions.ListeningSession{
                status: :preparing,
+               source: :album,
                vote_options: ["smash", "pass"],
                started_at: nil,
                ended_at: nil,
                current_track: nil,
                album: _
              } = session
+    end
+    
+    test "can create a new listening session for an existing playlist", %{
+      user: user,
+      playlist: playlist
+    } do
+      {:ok, session} = ListeningSession.create(%{source: :playlist, user_id: user.id, playlist_id: playlist.id})
+
+      assert %PremiereEcoute.Sessions.ListeningSession{
+               status: :preparing,
+               source: :playlist,
+               vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+               started_at: nil,
+               ended_at: nil,
+               current_track: nil,
+               playlist: playlist
+             } = session
+
+      assert %Playlist{title: "Playlist", tracks: []} = playlist
     end
   end
 
@@ -125,6 +148,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       for session <- sessions do
         assert %PremiereEcoute.Sessions.ListeningSession{
                  status: :preparing,
+                 source: :album,
                  started_at: nil,
                  album: album,
                  ended_at: nil
@@ -179,7 +203,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       {:ok, after_session} = ListeningSession.next_track(session)
 
       assert is_nil(session.current_track)
-      #  assert Cache.get(:sessions, user.twitch.user_id) == nil
 
       assert %PremiereEcoute.Discography.Album.Track{
                provider: :spotify,

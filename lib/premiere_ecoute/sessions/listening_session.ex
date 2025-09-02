@@ -2,12 +2,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
   use PremiereEcouteCore.Aggregate,
-    root: [album: [:tracks], user: [:twitch, :spotify], current_track: []],
-    json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track]
+    root: [user: [:twitch, :spotify], album: [:tracks], current_track: [], playlist: [:tracks]],
+    json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Retrospective.Report
 
@@ -26,6 +27,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
+    field :source, Ecto.Enum, values: [:album, :playlist], default: :album
+    field :options, :map, default: %{}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     field :started_at, :utc_datetime
     field :ended_at, :utc_datetime
@@ -34,6 +37,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     belongs_to :album, Album, foreign_key: :album_id
     belongs_to :current_track, Album.Track, foreign_key: :current_track_id
+    
+    belongs_to :playlist, Playlist, foreign_key: :playlist_id
+    belongs_to :current_playlist_track, Playlist.Track, foreign_key: :current_playlist_track_id
 
     has_one :report, Report, foreign_key: :session_id
 
@@ -43,18 +49,23 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def changeset(listening_session, attrs) do
     listening_session
     |> cast(attrs, [
-      :album_id,
       :status,
+      :source,
+      :options,
       :vote_options,
       :started_at,
       :ended_at,
       :user_id,
-      :current_track_id
+      :album_id,
+      :current_track_id,
+      :playlist_id,
+      :current_playlist_track_id,
     ])
-    |> validate_required([:album_id])
+    |> validate_required([])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:album_id)
     |> foreign_key_constraint(:current_track_id)
+    |> foreign_key_constraint(:current_playlist_track_id)
   end
 
   def start(%__MODULE__{} = session) do

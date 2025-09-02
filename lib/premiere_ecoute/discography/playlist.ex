@@ -49,7 +49,7 @@ defmodule PremiereEcoute.Discography.Playlist do
     |> validate_required([:provider, :playlist_id, :owner_id, :owner_name, :title])
     |> validate_inclusion(:provider, [:spotify, :deezer])
     |> unique_constraint([:playlist_id, :provider])
-    |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
+    |> cast_assoc(:tracks, with: &Track.changeset/2, required: false)
   end
 
   def create(%__MODULE__{} = playlist) do
