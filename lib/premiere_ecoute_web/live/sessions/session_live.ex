@@ -11,10 +11,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
+  alias PremiereEcoute.Sessions.ListeningSessionWorker
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Retrospective.VoteTrends
   alias PremiereEcouteCore.Cache
-
 
   @impl true
   def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
@@ -36,7 +36,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:open_vote, !is_nil(cached_session))
       |> assign(:player_state, nil)
       |> assign(:session_id, id)
-      |> assign(:show, %{votes: true, scores: true})
+      |> assign(:show, %{votes: true, scores: true, next_track: 0})
       |> assign(:user_current_rating, nil)
       |> assign(:report, nil)
       |> assign(:overlay_score_type, "streamer")
@@ -102,6 +102,18 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_event("update_next_track", %{"next_track" => value}, %{assigns: assigns} = socket) do
+    # AIDEV-NOTE: Handle next_track slider from form submission
+    case Integer.parse(value) do
+      {next_track_value, _} when next_track_value >= 0 and next_track_value <= 60 ->
+        {:noreply, assign(socket, :show, Map.put(assigns.show, :next_track, next_track_value))}
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
   def handle_event("change_overlay_score_type", params, socket) do
     score_type = params["score_type"] || params[:score_type] || "streamer"
     {:noreply, assign(socket, :overlay_score_type, score_type)}
@@ -109,8 +121,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("open_overlay", _params, socket) do
-    overlay_url = build_overlay_url(socket)
-    {:noreply, push_event(socket, "open_url", %{url: overlay_url})}
+    {:noreply, push_event(socket, "open_url", %{url: build_overlay_url(socket)})}
   end
 
   @impl true
@@ -134,9 +145,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_info({:session_updated, session}, socket) do
-    socket = assign(socket, :listening_session, session)
-    socket = assign(socket, :user_current_rating, nil)
-    {:noreply, socket}
+    socket
+    |> assign(:listening_session, session)
+    |> assign(:user_current_rating, nil)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -162,7 +174,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     socket
     |> assign(:open_vote, !is_nil(cached_session))
     |> assign(:current_scope, Accounts.maybe_renew_token(socket, :spotify))
-    # |> SpotifyPlayer.refresh_state()
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -185,7 +196,26 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_info({:player, _event, state}, socket) do
+  def handle_info(
+        {:player, :end_track, state},
+        %{assigns: %{show: show, listening_session: session, current_scope: scope}} = socket
+      ) do
+    if show[:next_track] > 0 do
+      ListeningSessionWorker.in_seconds(
+        %{action: "next_track", session_id: session.id, user_id: scope.user.id},
+        show[:next_track]
+      )
+
+      put_flash(socket, :info, "Next track in #{show[:next_track]} seconds")
+    else
+      socket
+    end
+    |> assign(:player_state, state)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:player, event, state}, socket) do
     {:noreply, assign(socket, :player_state, state)}
   end
 

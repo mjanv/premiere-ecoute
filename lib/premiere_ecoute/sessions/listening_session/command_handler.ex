@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
-  alias PremiereEcoute.Sessions.ListeningSession.VoteWorker
+  alias PremiereEcoute.Sessions.ListeningSessionWorker
   alias PremiereEcoute.Sessions.Retrospective.Report
 
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
@@ -67,8 +67,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}") do
-      VoteWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
+      ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%SessionStarted{session_id: session.id}]}
     else
       false ->
@@ -85,9 +85,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
-         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
-      VoteWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
+         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}),
+      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0) do
+      ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
@@ -100,8 +100,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
-      VoteWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      VoteWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
+      ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}

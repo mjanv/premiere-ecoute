@@ -227,6 +227,64 @@
               </div>
             </div>
             
+<!-- Next Track Timer Slider -->
+            <div class="mt-4 pt-4 border-t border-white/20">
+              <div class="flex items-center space-x-4">
+                <span class="text-purple-200 text-sm font-medium whitespace-nowrap">
+                  {gettext("Next track in")}
+                </span>
+                <div class="flex-1 px-1 relative">
+                  <form phx-change="update_next_track">
+                    <input
+                      type="range"
+                      name="next_track"
+                      min="0"
+                      max="60"
+                      value={@show[:next_track]}
+                      id="next-track-slider"
+                      class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-white/20 slider-purple"
+                    />
+                  </form>
+                  <style>
+                    .slider-purple::-webkit-slider-thumb {
+                      appearance: none;
+                      width: 16px;
+                      height: 16px;
+                      border-radius: 50%;
+                      background: #8b5cf6;
+                      cursor: pointer;
+                      border: 2px solid white;
+                      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                    }
+                    .slider-purple::-moz-range-thumb {
+                      width: 16px;
+                      height: 16px;
+                      border-radius: 50%;
+                      background: #8b5cf6;
+                      cursor: pointer;
+                      border: 2px solid white;
+                      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                    }
+                    .slider-purple::-webkit-slider-track {
+                      height: 8px;
+                      border-radius: 4px;
+                      background: linear-gradient(to right, #8b5cf6 0%, #8b5cf6 {(@show[:next_track] / 60) * 100}%, rgba(255,255,255,0.2) {(@show[:next_track] / 60) * 100}%, rgba(255,255,255,0.2) 100%);
+                    }
+                  </style>
+                </div>
+                <span class={[
+                  "text-sm font-medium min-w-[60px] text-center",
+                  if(@show[:next_track] == 0, do: "text-gray-400", else: "text-white")
+                ]}>
+                  <%= if @show[:next_track] == 0 do %>
+                    {gettext("Deactivated")}
+                  <% else %>
+                    {@show[:next_track]}s
+                  <% end %>
+                </span>
+              </div>
+            </div>
+            
 <!-- Overlay link section with dropdown selector -->
             <div class="mt-4 pt-4 border-t border-white/20" id="overlay-hooks">
               <div class="relative">
