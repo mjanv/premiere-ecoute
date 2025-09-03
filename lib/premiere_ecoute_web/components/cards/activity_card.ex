@@ -35,7 +35,7 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
         status_text="New"
         status_variant="info"
         action_text="Choose an album to get started"
-        navigate={~p"/discography/album/select"}
+        navigate={~p"/sessions/new"}
       />
 
       <!-- Disabled card -->

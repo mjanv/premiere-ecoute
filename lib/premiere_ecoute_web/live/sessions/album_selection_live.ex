@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Discography.AlbumSelectionLive do
+defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
   use PremiereEcouteWeb, :live_view
 
   alias Phoenix.LiveView.AsyncResult

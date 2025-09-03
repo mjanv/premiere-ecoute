@@ -25,11 +25,11 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
               <div class="mb-6">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
                   <.icon name="hero-rectangle-stack" class="w-4 h-4 mr-2" />
-                  {gettext("Library")}
+                  {gettext("Playlists")}
                 </h3>
                 <nav class="space-y-1">
                   <.sidebar_link
-                    href={~p"/discography/library"}
+                    href={~p"/playlists"}
                     current_page={@current_page}
                     page_id="library"
                     icon="hero-musical-note"

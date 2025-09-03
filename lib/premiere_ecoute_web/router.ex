@@ -115,24 +115,13 @@ defmodule PremiereEcouteWeb.Router do
     end
   end
 
-  scope "/discography", PremiereEcouteWeb.Discography do
-    pipe_through [:browser]
-
-    live_session :discography, on_mount: [{UserAuth, :streamer}] do
-      live "/album/select", AlbumSelectionLive, :index
-    end
-
-    live_session :library, on_mount: [{UserAuth, :current_scope}] do
-      live "/library", LibraryLive, :index
-      live "/library/playlist/:id", PlaylistLive, :show
-    end
-  end
-
   scope "/playlists", PremiereEcouteWeb.Playlists do
     pipe_through [:browser]
 
-    live_session :playlists, on_mount: [{UserAuth, :streamer}] do
+    live_session :playlists, on_mount: [{UserAuth, :viewer}] do
+      live "/", LibraryLive, :index
       live "/workflows", WorkflowsLive, :index
+      live "/:id", PlaylistLive, :show
     end
   end
 
@@ -141,6 +130,7 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :sessions, on_mount: [{UserAuth, :streamer}] do
       live "/", SessionsLive, :index
+      live "/new", AlbumSelectionLive, :index
       live "/:id", SessionLive, :show
       live "/:id/retrospective", RetrospectiveLive, :show
     end

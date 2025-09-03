@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Discography.PlaylistLive do
+defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Apis
@@ -162,7 +162,7 @@ defmodule PremiereEcouteWeb.Discography.PlaylistLive do
           {:ok, _} ->
             socket
             |> put_flash(:success, gettext("Playlist removed from your library"))
-            |> push_navigate(to: ~p"/discography/library")
+            |> push_navigate(to: ~p"/playlists")
 
           {:error, _} ->
             socket

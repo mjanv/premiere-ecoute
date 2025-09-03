@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Utils.GoofyWords do
+defmodule PremiereEcouteCore.GoofyWords do
   @moduledoc """
   Generates random short, goofy words for use as submission deletion tokens.
 

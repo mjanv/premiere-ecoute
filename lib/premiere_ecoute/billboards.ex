@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Billboards do
 
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Billboards.Services.BillboardCreation
-  alias PremiereEcoute.Utils.GoofyWords
+  alias PremiereEcouteCore.GoofyWords
   alias PremiereEcouteCore.Cache
 
   defdelegate generate_billboard(playlist_urls, opts), to: BillboardCreation
@@ -20,21 +20,18 @@ defmodule PremiereEcoute.Billboards do
     if Enum.any?(billboard.submissions, fn s -> s["url"] == url end) do
       {:error, :url_already_exists}
     else
-      # Generate a unique token for this submission
-      deletion_token = GoofyWords.generate_with_number()
-
       submission = %{
         "url" => url,
         "pseudo" => pseudo,
         "submitted_at" => DateTime.utc_now(),
-        "deletion_token" => deletion_token
+        "deletion_token" => GoofyWords.generate_with_number()
       }
 
       case update_billboard(billboard, %{submissions: [submission | billboard.submissions]}) do
         {:ok, billboard} ->
           Cache.del(:billboards, billboard.billboard_id)
           PremiereEcoute.PubSub.broadcast("billboard:#{billboard.id}", billboard)
-          {:ok, billboard, deletion_token}
+          {:ok, billboard, submission["deletion_token"]}
 
         error ->
           error

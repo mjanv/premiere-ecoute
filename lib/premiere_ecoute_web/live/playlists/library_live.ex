@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Discography.LibraryLive do
+defmodule PremiereEcouteWeb.Playlists.LibraryLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts.User

@@ -39,7 +39,7 @@
               <!-- Existing playlists -->
               <%= for playlist <- assigns[:library_playlists] || [] do %>
                 <.link
-                  navigate={~p"/discography/library/playlist/#{playlist.playlist_id}"}
+                  navigate={~p"/playlists/#{playlist.playlist_id}"}
                   class="group relative rounded-lg overflow-hidden border border-gray-700 hover:border-green-500/50 transition-colors aspect-square cursor-pointer block"
                 >
                   <!-- Background Cover -->

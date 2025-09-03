@@ -2412,7 +2412,7 @@ msgstr "Gérez vos sessions d'écoute et suivez vos découvertes musicales"
 #: lib/premiere_ecoute_web/live/billboards/submissions_live.html.heex:6
 #, elixir-autogen, elixir-format, fuzzy
 msgid "My Submissions"
-msgstr "Mes Sessions"
+msgstr "Mes Soumissions"
 
 #: lib/premiere_ecoute_web/live/billboards/submissions_live.html.heex:23
 #, elixir-autogen, elixir-format, fuzzy

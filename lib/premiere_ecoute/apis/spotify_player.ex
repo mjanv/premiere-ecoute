@@ -19,8 +19,6 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
 
   @impl true
   def init(args) do
-    Logger.info("Start Spotify player with args: #{inspect(args)}")
-
     Process.send_after(self(), :poll, @poll_interval)
     scope = Scope.for_user(User.get(args))
     {:ok, phx_ref} = Presence.join(scope.user.id)

@@ -107,7 +107,7 @@ defmodule Storybook.Components.Cards.ActivityCard do
               status_text: "New",
               status_variant: "info",
               action_text: "Choose an album to get started",
-              navigate: "/discography/album/select"
+              navigate: "/sessions/new"
             }
           },
           %Variation{
