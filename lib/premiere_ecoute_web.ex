@@ -97,6 +97,7 @@ defmodule PremiereEcouteWeb do
 
       import Phoenix.HTML
       import PremiereEcouteWeb.CoreComponents
+      import PremiereEcouteWeb.Components.Modal
 
       alias Phoenix.LiveView.AsyncResult
       alias Phoenix.LiveView.JS

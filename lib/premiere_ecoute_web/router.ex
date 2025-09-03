@@ -56,6 +56,7 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
+      live "/playground", PlaygroundLive, :index
     end
 
     pipe_through [:require_authenticated_user]

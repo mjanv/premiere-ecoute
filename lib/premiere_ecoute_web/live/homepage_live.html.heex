@@ -1,4 +1,4 @@
-<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} show_modal={@show_modal}>
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope]}>
   <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
     <!-- Hero Section -->
     <div class="flex-1 py-12">
@@ -20,7 +20,7 @@
 <!-- Action Buttons -->
             <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
               <button
-                phx-click="toggle_modal"
+                phx-click={show_modal("role-selection-modal")}
                 class="w-full sm:w-auto inline-flex items-center justify-center px-12 py-6 
            font-bold rounded-2xl text-xl relative overflow-hidden
            transition-all duration-300 group"
@@ -154,86 +154,80 @@
 </Layouts.app>
 
 <!-- AIDEV-NOTE: Role selection modal for Twitch authentication -->
-<%= if @show_modal do %>
-  <div class="modal modal-open fixed inset-0 z-50">
-    <div class="modal-box max-w-md p-8 bg-base-300 rounded-3xl">
-      <div class="flex flex-col space-y-4">
-        <.link
-          href={~p"/auth/twitch?role=streamer"}
-          class="w-full inline-flex items-center justify-between px-12 py-6 
-           font-bold rounded-2xl text-xl relative overflow-hidden
-           transition-all duration-300 group"
-        >
-          <!-- Animated gradient background -->
-          <span class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-cyan-400 
-           bg-[length:200%_200%] animate-gradient rounded-2xl opacity-90">
-          </span>
-          
+<.modal id="role-selection-modal" size="sm">
+  <div class="flex flex-col space-y-4 pr-8">
+    <.link
+      href={~p"/auth/twitch?role=streamer"}
+      class="w-full inline-flex items-center justify-between px-12 py-6 
+       font-bold rounded-2xl text-xl relative overflow-hidden
+       transition-all duration-300 group"
+    >
+      <!-- Animated gradient background -->
+      <span class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-cyan-400 
+       bg-[length:200%_200%] animate-gradient rounded-2xl opacity-90">
+      </span>
+      
 <!-- Neon glow layer -->
-          <span class="absolute inset-0 rounded-2xl 
-           transition-all duration-500 ease-out
-           shadow-[0_0_20px_rgba(255,0,255,0.6),0_0_40px_rgba(0,255,255,0.4)]
-           group-hover:shadow-[0_0_40px_rgba(255,0,255,0.8),0_0_80px_rgba(0,255,255,0.6)]">
-          </span>
-          
+      <span class="absolute inset-0 rounded-2xl 
+       transition-all duration-500 ease-out
+       shadow-[0_0_20px_rgba(255,0,255,0.6),0_0_40px_rgba(0,255,255,0.4)]
+       group-hover:shadow-[0_0_40px_rgba(255,0,255,0.8),0_0_80px_rgba(0,255,255,0.6)]">
+      </span>
+      
 <!-- Content -->
-          <span class="relative text-white 
-           drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
-           group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]">
-            {gettext("Login as streamer")}
-          </span>
+      <span class="relative text-white 
+       drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
+       group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]">
+        {gettext("Login as streamer")}
+      </span>
 
-          <svg
-            class="w-6 h-6 relative text-white 
-           drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
-           group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </.link>
+      <svg
+        class="w-6 h-6 relative text-white 
+       drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
+       group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </.link>
 
-        <.link
-          href={~p"/auth/twitch?role=viewer"}
-          class="w-full inline-flex items-center justify-between px-12 py-6 
-           font-bold rounded-2xl text-xl relative overflow-hidden
-           transition-all duration-300 group"
-        >
-          <!-- Animated gradient background -->
-          <span class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-cyan-400 
-           bg-[length:200%_200%] animate-gradient rounded-2xl opacity-90">
-          </span>
-          
+    <.link
+      href={~p"/auth/twitch?role=viewer"}
+      class="w-full inline-flex items-center justify-between px-12 py-6 
+       font-bold rounded-2xl text-xl relative overflow-hidden
+       transition-all duration-300 group"
+    >
+      <!-- Animated gradient background -->
+      <span class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-cyan-400 
+       bg-[length:200%_200%] animate-gradient rounded-2xl opacity-90">
+      </span>
+      
 <!-- Neon glow layer -->
-          <span class="absolute inset-0 rounded-2xl 
-           transition-all duration-500 ease-out
-           shadow-[0_0_20px_rgba(255,0,255,0.6),0_0_40px_rgba(0,255,255,0.4)]
-           group-hover:shadow-[0_0_40px_rgba(255,0,255,0.8),0_0_80px_rgba(0,255,255,0.6)]">
-          </span>
-          
+      <span class="absolute inset-0 rounded-2xl 
+       transition-all duration-500 ease-out
+       shadow-[0_0_20px_rgba(255,0,255,0.6),0_0_40px_rgba(0,255,255,0.4)]
+       group-hover:shadow-[0_0_40px_rgba(255,0,255,0.8),0_0_80px_rgba(0,255,255,0.6)]">
+      </span>
+      
 <!-- Content -->
-          <span class="relative text-white 
-           drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
-           group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]">
-            {gettext("Login as viewer")}
-          </span>
+      <span class="relative text-white 
+       drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
+       group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]">
+        {gettext("Login as viewer")}
+      </span>
 
-          <svg
-            class="w-6 h-6 relative text-white 
-           drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
-           group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </.link>
-      </div>
-    </div>
-
-    <div class="modal-backdrop bg-transparent" phx-click="toggle_modal"></div>
+      <svg
+        class="w-6 h-6 relative text-white 
+       drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] 
+       group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)]"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </.link>
   </div>
-<% end %>
+</.modal>

@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.HomepageLive do
+defmodule PremiereEcouteWeb.PlaygroundLive do
   @moduledoc false
 
   use PremiereEcouteWeb, :live_view
@@ -7,11 +7,7 @@ defmodule PremiereEcouteWeb.HomepageLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    if socket.assigns[:current_scope] && socket.assigns.current_scope.user do
-      {:ok, redirect(socket, to: "/home")}
-    else
-      {:ok, socket}
-    end
+    {:ok, socket}
   end
 
   @impl true

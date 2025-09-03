@@ -1,0 +1,18 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}}>
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-12">
+      <div class="max-w-7xl mx-auto px-6">
+        <button phx-click={show_modal("my-modal")}>Open Modal</button>
+
+        <.modal id="my-modal">
+          <h2 class="text-xl font-bold mb-4">Modal Title</h2>
+          <p>Modal content goes here</p>
+          <div class="mt-6 flex justify-end space-x-2">
+            <button phx-click="save" class="px-4 py-2 bg-blue-500 text-white rounded">Save</button>
+            <button phx-click={hide_modal("my-modal")} class="px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
+          </div>
+        </.modal>
+      </div>
+    </div>
+  </div>
+</Layouts.app>
