@@ -4,8 +4,8 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidatorTest do
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
 
   describe "hmac/1" do
-    @secret <<178, 159, 144, 161, 214, 231, 80, 36, 181, 80, 215, 64, 239, 86, 226, 252,
-  118, 16, 160, 183, 230, 164, 16, 143, 100, 199, 153, 51, 181, 207, 190, 1>>
+    @secret <<178, 159, 144, 161, 214, 231, 80, 36, 181, 80, 215, 64, 239, 86, 226, 252, 118, 16, 160, 183, 230, 164, 16, 143,
+              100, 199, 153, 51, 181, 207, 190, 1>>
     @body "{}"
 
     test "assert that a received body is signed with the right secret" do

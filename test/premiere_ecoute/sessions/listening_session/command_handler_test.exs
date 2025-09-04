@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
@@ -22,13 +23,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
 
   describe "handle/1 - PrepareListeningSession" do
-    test "successfully creates session and returns SessionPrepared event" do
+    test "successfully creates album session and returns SessionPrepared event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       album = album_fixture()
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user.id,
         album_id: album.album_id
       }
@@ -50,6 +52,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :get_album, fn ^album_id -> {:error, :not_found} end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user_id,
         album_id: album_id
       }
@@ -78,6 +81,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :get_album, fn ^album_id -> {:ok, album} end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user_id,
         album_id: album_id
       }
@@ -94,6 +98,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :get_album, 2, fn _ -> {:ok, album} end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user.id,
         album_id: album.album_id
       }
@@ -103,10 +108,31 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       assert event1.session_id != event2.session_id
     end
+
+    test "successfully creates playlist session and returns SessionPrepared event" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      playlist = playlist_fixture()
+
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+
+      command = %PrepareListeningSession{
+        source: :playlist,
+        user_id: user.id,
+        playlist_id: playlist.playlist_id
+      }
+
+      {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
+
+      assert session.user_id == user.id
+      assert session.status == :preparing
+
+      assert session.playlist.playlist_id == playlist.playlist_id
+      assert session.playlist.title == playlist.title
+    end
   end
 
   describe "handle/1 - StartListeningSession" do
-    test "successfully start a prepare session and returns SessionStarted event" do
+    test "successfully start a prepared album session and returns SessionStarted event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
       album = album_fixture()
@@ -130,13 +156,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user.id,
         album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
 
-      command = %StartListeningSession{session_id: event.session_id, scope: scope}
+      command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
@@ -163,9 +190,46 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       assert session_id == session.id
     end
+
+    test "successfully start a prepared playlist session and returns SessionStarted event" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      playlist = playlist_fixture()
+
+      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+
+      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ ->
+        {:ok, "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7"}
+      end)
+
+      # expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Track One" ->
+      #   {:ok, %{}}
+      # end)
+
+      command = %PrepareListeningSession{
+        source: :playlist,
+        user_id: user.id,
+        playlist_id: playlist.playlist_id
+      }
+
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      command = %StartListeningSession{source: :playlist, session_id: event.session_id, scope: scope}
+
+      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
+
+      session = ListeningSession.get(event.session_id)
+
+      assert session.status == :active
+
+      assert is_nil(Report.get_by(session_id: session.id))
+    end
   end
 
-  describe "handle/1 - GoNextTrackListeningSession" do
+  describe "handle/1 - SkipNextTrackListeningSession" do
     test "successfully skip to the next track until none are left and returns NextTrackStarted event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
@@ -198,20 +262,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user.id,
         album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
 
-      command = %StartListeningSession{session_id: event.session_id, scope: scope}
+      command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
       session = ListeningSession.get(event.session_id)
       assert session.current_track_id == Enum.at(session.album.tracks, 0).id
 
-      command = %SkipNextTrackListeningSession{session_id: event.session_id, scope: scope}
+      command = %SkipNextTrackListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, _, [%NextTrackStarted{} = event]} = CommandBus.apply(command)
 
@@ -266,20 +331,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user.id,
         album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
 
-      command = %StartListeningSession{session_id: event.session_id, scope: scope}
+      command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
       session = ListeningSession.get(event.session_id)
       assert session.current_track_id == Enum.at(session.album.tracks, 0).id
 
-      command = %SkipNextTrackListeningSession{session_id: event.session_id, scope: scope}
+      command = %SkipNextTrackListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, _, [%NextTrackStarted{} = event]} = CommandBus.apply(command)
 
@@ -326,13 +392,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, _ -> {:ok, %{}} end)
 
       command = %PrepareListeningSession{
+        source: :album,
         user_id: user.id,
         album_id: album.album_id
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
 
-      command = %StartListeningSession{session_id: event.session_id, scope: scope}
+      command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 

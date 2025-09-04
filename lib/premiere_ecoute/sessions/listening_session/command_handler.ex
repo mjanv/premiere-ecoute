@@ -33,7 +33,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
-  def handle(%PrepareListeningSession{user_id: user_id, album_id: album_id, playlist_id: nil, vote_options: vote_options}) do
+  def handle(%PrepareListeningSession{source: :album, user_id: user_id, album_id: album_id, vote_options: vote_options}) do
     with {:ok, album} <- Apis.spotify().get_album(album_id),
          {:ok, album} <- Album.create_if_not_exists(album),
          {:ok, session} <-
@@ -59,9 +59,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%PrepareListeningSession{user_id: user_id, album_id: nil, playlist_id: playlist_id, vote_options: vote_options}) do
+  def handle(%PrepareListeningSession{source: :playlist, user_id: user_id, playlist_id: playlist_id, vote_options: vote_options}) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
-         {:ok, playlist} <- Playlist.create(%{playlist | tracks: []}),
+         {:ok, playlist} <- get_or_create_playlist(playlist),
          {:ok, session} <-
            ListeningSession.create(%{
              user_id: user_id,
@@ -85,7 +85,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%StartListeningSession{session_id: session_id, scope: scope}) do
+  def handle(%StartListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with {:ok, devices} <- Apis.spotify().devices(scope),
          true <- Enum.any?(devices, fn device -> device["is_active"] end),
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
@@ -97,7 +97,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}") do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%SessionStarted{session_id: session.id}]}
     else
       false ->
@@ -109,15 +109,47 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%SkipNextTrackListeningSession{session_id: session_id, scope: scope}) do
+  def handle(%StartListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
+    with {:ok, devices} <- Apis.spotify().devices(scope),
+         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+         {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
+         {:ok, _} <- Apis.twitch().subscribe(scope, "channel.chat.message"),
+         session <- ListeningSession.get(session_id),
+         {:ok, session} <- ListeningSession.start(session),
+         Apis.spotify().start_resume_playback(scope, session.playlist) do
+      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
+      ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      {:ok, session, [%SessionStarted{session_id: session.id}]}
+    else
+      false ->
+        {:error, "No Spotify active device detected"}
+
+      reason ->
+        Logger.error("Cannot start listening session due to: #{inspect(reason)}")
+        {:error, []}
+    end
+  end
+
+  def handle(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
          _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
+    else
+      _ -> {:error, []}
+    end
+  end
+
+  def handle(%SkipNextTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, _} <- Apis.spotify().next_track(scope) do
+      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
+      ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: nil}]}
     else
       _ -> {:error, []}
     end
@@ -130,7 +162,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
       _ -> {:error, []}
@@ -155,6 +187,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       reason ->
         Logger.error("Cannot stop listening session due to: #{inspect(reason)}")
         {:error, []}
+    end
+  end
+
+  defp get_or_create_playlist(playlist) do
+    case Playlist.get_by(playlist_id: playlist.playlist_id, provider: playlist.provider) do
+      nil ->
+        Playlist.create(%{playlist | tracks: [], url: Playlist.url(playlist)})
+
+      existing_playlist ->
+        {:ok, existing_playlist}
     end
   end
 end

@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
   alias PremiereEcoute.Discography.Playlist
 
   @type t :: %__MODULE__{
-          id: integer(),
+          id: integer() | nil,
           provider: :spotify | :deezer,
           track_id: String.t(),
           album_id: String.t() | nil,
@@ -17,10 +17,10 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
           release_date: Date.t() | nil,
           duration_ms: integer() | nil,
           added_at: NaiveDateTime.t() | nil,
-          playlist_id: integer(),
+          playlist_id: integer() | nil,
           playlist: Playlist.t() | Ecto.Association.NotLoaded.t(),
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t()
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
         }
 
   schema "playlist_tracks" do

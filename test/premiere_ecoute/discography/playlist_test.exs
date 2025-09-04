@@ -150,6 +150,323 @@ defmodule PremiereEcoute.Discography.PlaylistTest do
     end
   end
 
+  describe "add_track_to_playlist/2" do
+    @payload %{
+      "actions" => %{"disallows" => %{"resuming" => true, "skipping_prev" => true}},
+      "context" => %{
+        "external_urls" => %{
+          "spotify" => "https://open.spotify.com/playlist/7nNETRSCPHls7AXTJkF0fZ"
+        },
+        "href" => "https://api.spotify.com/v1/playlists/7nNETRSCPHls7AXTJkF0fZ",
+        "type" => "playlist",
+        "uri" => "spotify:playlist:7nNETRSCPHls7AXTJkF0fZ"
+      },
+      "currently_playing_type" => "track",
+      "device" => %{
+        "id" => "e6dd577b6e46ccbb954ff8cf9f6847d4c01802e4",
+        "is_active" => true,
+        "is_private_session" => false,
+        "is_restricted" => false,
+        "name" => "maxime-xps",
+        "supports_volume" => true,
+        "type" => "Computer",
+        "volume_percent" => 65
+      },
+      "is_playing" => true,
+      "item" => %{
+        "album" => %{
+          "album_type" => "album",
+          "artists" => [
+            %{
+              "external_urls" => %{
+                "spotify" => "https://open.spotify.com/artist/4tZwfgrHOc3mvqYlEYSvVi"
+              },
+              "href" => "https://api.spotify.com/v1/artists/4tZwfgrHOc3mvqYlEYSvVi",
+              "id" => "4tZwfgrHOc3mvqYlEYSvVi",
+              "name" => "Daft Punk",
+              "type" => "artist",
+              "uri" => "spotify:artist:4tZwfgrHOc3mvqYlEYSvVi"
+            }
+          ],
+          "available_markets" => [],
+          "external_urls" => %{
+            "spotify" => "https://open.spotify.com/album/5uRdvUR7xCnHmUW8n64n9y"
+          },
+          "href" => "https://api.spotify.com/v1/albums/5uRdvUR7xCnHmUW8n64n9y",
+          "id" => "5uRdvUR7xCnHmUW8n64n9y",
+          "images" => [
+            %{
+              "height" => 640,
+              "url" => "https://i.scdn.co/image/ab67616d0000b2738ac778cc7d88779f74d33311",
+              "width" => 640
+            },
+            %{
+              "height" => 300,
+              "url" => "https://i.scdn.co/image/ab67616d00001e028ac778cc7d88779f74d33311",
+              "width" => 300
+            },
+            %{
+              "height" => 64,
+              "url" => "https://i.scdn.co/image/ab67616d000048518ac778cc7d88779f74d33311",
+              "width" => 64
+            }
+          ],
+          "name" => "Homework",
+          "release_date" => "1997-01-17",
+          "release_date_precision" => "day",
+          "total_tracks" => 16,
+          "type" => "album",
+          "uri" => "spotify:album:5uRdvUR7xCnHmUW8n64n9y"
+        },
+        "artists" => [
+          %{
+            "external_urls" => %{
+              "spotify" => "https://open.spotify.com/artist/4tZwfgrHOc3mvqYlEYSvVi"
+            },
+            "href" => "https://api.spotify.com/v1/artists/4tZwfgrHOc3mvqYlEYSvVi",
+            "id" => "4tZwfgrHOc3mvqYlEYSvVi",
+            "name" => "Daft Punk",
+            "type" => "artist",
+            "uri" => "spotify:artist:4tZwfgrHOc3mvqYlEYSvVi"
+          }
+        ],
+        "available_markets" => [],
+        "disc_number" => 1,
+        "duration_ms" => 429_533,
+        "explicit" => false,
+        "external_ids" => %{"isrc" => "GBDUW0600009"},
+        "external_urls" => %{
+          "spotify" => "https://open.spotify.com/track/1pKYYY0dkg23sQQXi0Q5zN"
+        },
+        "href" => "https://api.spotify.com/v1/tracks/1pKYYY0dkg23sQQXi0Q5zN",
+        "id" => "1pKYYY0dkg23sQQXi0Q5zN",
+        "is_local" => false,
+        "name" => "Around the World",
+        "popularity" => 73,
+        "preview_url" => nil,
+        "track_number" => 7,
+        "type" => "track",
+        "uri" => "spotify:track:1pKYYY0dkg23sQQXi0Q5zN"
+      },
+      "progress_ms" => 4388,
+      "repeat_state" => "off",
+      "shuffle_state" => false,
+      "smart_shuffle" => false,
+      "timestamp" => 1_757_014_333_601
+    }
+
+    @payload2 %{
+      "actions" => %{"disallows" => %{"resuming" => true}},
+      "context" => %{
+        "external_urls" => %{
+          "spotify" => "https://open.spotify.com/playlist/7nNETRSCPHls7AXTJkF0fZ"
+        },
+        "href" => "https://api.spotify.com/v1/playlists/7nNETRSCPHls7AXTJkF0fZ",
+        "type" => "playlist",
+        "uri" => "spotify:playlist:7nNETRSCPHls7AXTJkF0fZ"
+      },
+      "currently_playing_type" => "track",
+      "device" => %{
+        "id" => "e6dd577b6e46ccbb954ff8cf9f6847d4c01802e4",
+        "is_active" => true,
+        "is_private_session" => false,
+        "is_restricted" => false,
+        "name" => "maxime-xps",
+        "supports_volume" => true,
+        "type" => "Computer",
+        "volume_percent" => 65
+      },
+      "is_playing" => true,
+      "item" => %{
+        "album" => %{
+          "album_type" => "album",
+          "artists" => [
+            %{
+              "external_urls" => %{
+                "spotify" => "https://open.spotify.com/artist/3koiLjNrgRTNbOwViDipeA"
+              },
+              "href" => "https://api.spotify.com/v1/artists/3koiLjNrgRTNbOwViDipeA",
+              "id" => "3koiLjNrgRTNbOwViDipeA",
+              "name" => "Marvin Gaye",
+              "type" => "artist",
+              "uri" => "spotify:artist:3koiLjNrgRTNbOwViDipeA"
+            },
+            %{
+              "external_urls" => %{
+                "spotify" => "https://open.spotify.com/artist/75jNCko3SnEMI5gwGqrbb8"
+              },
+              "href" => "https://api.spotify.com/v1/artists/75jNCko3SnEMI5gwGqrbb8",
+              "id" => "75jNCko3SnEMI5gwGqrbb8",
+              "name" => "Tammi Terrell",
+              "type" => "artist",
+              "uri" => "spotify:artist:75jNCko3SnEMI5gwGqrbb8"
+            }
+          ],
+          "available_markets" => [],
+          "external_urls" => %{
+            "spotify" => "https://open.spotify.com/album/5LqviduT0g0J0ypFrFSwCE"
+          },
+          "href" => "https://api.spotify.com/v1/albums/5LqviduT0g0J0ypFrFSwCE",
+          "id" => "5LqviduT0g0J0ypFrFSwCE",
+          "images" => [
+            %{
+              "height" => 640,
+              "url" => "https://i.scdn.co/image/ab67616d0000b2739173e50e99bdea2400222f02",
+              "width" => 640
+            },
+            %{
+              "height" => 300,
+              "url" => "https://i.scdn.co/image/ab67616d00001e029173e50e99bdea2400222f02",
+              "width" => 300
+            },
+            %{
+              "height" => 64,
+              "url" => "https://i.scdn.co/image/ab67616d000048519173e50e99bdea2400222f02",
+              "width" => 64
+            }
+          ],
+          "name" => "United",
+          "release_date" => "1967-08-29",
+          "release_date_precision" => "day",
+          "total_tracks" => 12,
+          "type" => "album",
+          "uri" => "spotify:album:5LqviduT0g0J0ypFrFSwCE"
+        },
+        "artists" => [
+          %{
+            "external_urls" => %{
+              "spotify" => "https://open.spotify.com/artist/3koiLjNrgRTNbOwViDipeA"
+            },
+            "href" => "https://api.spotify.com/v1/artists/3koiLjNrgRTNbOwViDipeA",
+            "id" => "3koiLjNrgRTNbOwViDipeA",
+            "name" => "Marvin Gaye",
+            "type" => "artist",
+            "uri" => "spotify:artist:3koiLjNrgRTNbOwViDipeA"
+          },
+          %{
+            "external_urls" => %{
+              "spotify" => "https://open.spotify.com/artist/75jNCko3SnEMI5gwGqrbb8"
+            },
+            "href" => "https://api.spotify.com/v1/artists/75jNCko3SnEMI5gwGqrbb8",
+            "id" => "75jNCko3SnEMI5gwGqrbb8",
+            "name" => "Tammi Terrell",
+            "type" => "artist",
+            "uri" => "spotify:artist:75jNCko3SnEMI5gwGqrbb8"
+          }
+        ],
+        "available_markets" => [],
+        "disc_number" => 1,
+        "duration_ms" => 151_666,
+        "explicit" => false,
+        "external_ids" => %{"isrc" => "USMO16700534"},
+        "external_urls" => %{
+          "spotify" => "https://open.spotify.com/track/7tqhbajSfrz2F7E1Z75ASX"
+        },
+        "href" => "https://api.spotify.com/v1/tracks/7tqhbajSfrz2F7E1Z75ASX",
+        "id" => "7tqhbajSfrz2F7E1Z75ASX",
+        "is_local" => false,
+        "name" => "Ain't No Mountain High Enough",
+        "popularity" => 82,
+        "preview_url" => nil,
+        "track_number" => 1,
+        "type" => "track",
+        "uri" => "spotify:track:7tqhbajSfrz2F7E1Z75ASX"
+      },
+      "progress_ms" => 2166,
+      "repeat_state" => "off",
+      "shuffle_state" => false,
+      "smart_shuffle" => false,
+      "timestamp" => 1_757_015_509_109
+    }
+
+    test "add a new track to a playlist" do
+      {:ok, %Playlist{} = playlist} = Playlist.create(playlist_fixture(%{tracks: []}))
+
+      assert playlist.tracks == []
+
+      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload)
+
+      assert [
+               %Playlist.Track{
+                 provider: :spotify,
+                 artist: "Daft Punk",
+                 name: "Around the World",
+                 track_id: "1pKYYY0dkg23sQQXi0Q5zN",
+                 user_id: "ku296zgwbo0e3qff8cylptsjq",
+                 album_id: "5uRdvUR7xCnHmUW8n64n9y",
+                 duration_ms: 429_533,
+                 release_date: ~D[1900-01-01]
+               }
+             ] = playlist.tracks
+    end
+
+    test "add two new tracks to a playlist" do
+      {:ok, %Playlist{} = playlist} = Playlist.create(playlist_fixture(%{tracks: []}))
+
+      assert playlist.tracks == []
+
+      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload)
+      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload2)
+
+      assert [
+               %Playlist.Track{
+                 provider: :spotify,
+                 artist: "Daft Punk",
+                 name: "Around the World",
+                 track_id: "1pKYYY0dkg23sQQXi0Q5zN",
+                 user_id: "ku296zgwbo0e3qff8cylptsjq",
+                 album_id: "5uRdvUR7xCnHmUW8n64n9y",
+                 duration_ms: 429_533,
+                 release_date: ~D[1900-01-01]
+               },
+               %Playlist.Track{
+                 provider: :spotify,
+                 artist: "Marvin Gaye",
+                 name: "Ain't No Mountain High Enough",
+                 track_id: "7tqhbajSfrz2F7E1Z75ASX",
+                 album_id: "5LqviduT0g0J0ypFrFSwCE",
+                 user_id: "ku296zgwbo0e3qff8cylptsjq",
+                 duration_ms: 151_666,
+                 release_date: ~D[1900-01-01]
+               }
+             ] = playlist.tracks
+    end
+
+    test "cannot add the same track twice to a playlist" do
+      {:ok, %Playlist{} = playlist} = Playlist.create(playlist_fixture(%{tracks: []}))
+
+      assert playlist.tracks == []
+
+      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload)
+      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload2)
+      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload)
+      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload2)
+
+      assert [
+               %Playlist.Track{
+                 provider: :spotify,
+                 artist: "Daft Punk",
+                 name: "Around the World",
+                 track_id: "1pKYYY0dkg23sQQXi0Q5zN",
+                 user_id: "ku296zgwbo0e3qff8cylptsjq",
+                 album_id: "5uRdvUR7xCnHmUW8n64n9y",
+                 duration_ms: 429_533,
+                 release_date: ~D[1900-01-01]
+               },
+               %Playlist.Track{
+                 provider: :spotify,
+                 artist: "Marvin Gaye",
+                 name: "Ain't No Mountain High Enough",
+                 track_id: "7tqhbajSfrz2F7E1Z75ASX",
+                 album_id: "5LqviduT0g0J0ypFrFSwCE",
+                 user_id: "ku296zgwbo0e3qff8cylptsjq",
+                 duration_ms: 151_666,
+                 release_date: ~D[1900-01-01]
+               }
+             ] = playlist.tracks
+    end
+  end
+
   describe "delete/1" do
     test "delete an existing playlist" do
       {:ok, %Playlist{playlist_id: playlist_id} = playlist} = Playlist.create(playlist_fixture())
@@ -157,6 +474,7 @@ defmodule PremiereEcoute.Discography.PlaylistTest do
       {:ok, _} = Playlist.delete(playlist)
 
       assert is_nil(Playlist.get_by(playlist_id: playlist_id))
+      assert Playlist.Track.all(where: [playlist_id: playlist.id]) == []
     end
   end
 end

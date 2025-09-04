@@ -41,7 +41,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         end
 
       %{"is_playing" => false} = state ->
-        case SpotifyApi.Player.start_playback(socket.assigns.current_scope) do
+        case SpotifyApi.Player.start_playback(socket.assigns.current_scope, nil) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => true})
             {:noreply, socket}
@@ -56,7 +56,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   def handle_event("next_track", _params, socket) do
     %{listening_session: session} = socket.assigns
 
-    %SkipNextTrackListeningSession{session_id: session.id, scope: socket.assigns.current_scope}
+    %SkipNextTrackListeningSession{source: session.source, session_id: session.id, scope: socket.assigns.current_scope}
     |> PremiereEcoute.apply()
     |> case do
       {:ok, session, _} ->

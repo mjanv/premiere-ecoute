@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   require Logger
 
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Sessions.ListeningSession
 
   @impl true
@@ -46,8 +47,15 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     |> ListeningSession.get()
     |> ListeningSession.delete()
     |> case do
-      {:ok, _} -> put_flash(socket, :info, "Session deleted successfully")
-      {:error, _} -> put_flash(socket, :error, "Failed to delete session")
+      {:ok, session} ->
+        if session.playlist do
+          Playlist.delete(session.playlist)
+        end
+
+        put_flash(socket, :info, "Session deleted successfully")
+
+      {:error, _} ->
+        put_flash(socket, :error, "Failed to delete session")
     end
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)

@@ -8,7 +8,13 @@
           <!-- Page Title (2/3 width with right padding) -->
           <div class="w-2/3 pr-6">
             <.page_header
-              title={if @listening_session.album, do: @listening_session.album.name, else: @listening_session.playlist.title}
+              title={
+                cond do
+                  @listening_session.album -> @listening_session.album.name
+                  @listening_session.playlist -> @listening_session.playlist.title
+                  true -> "Listening Session"
+                end
+              }
               subtitle={
               gettext("by %{artist}", artist: @listening_session.user.username)
               <>
@@ -68,6 +74,54 @@
                   <div class="w-32 h-32 bg-white/20 rounded-lg flex items-center justify-center">
                     <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+          
+<!-- Playlist Details (1/3 width with left padding) -->
+          <%= if @listening_session.playlist do %>
+            <div class="w-1/3 pl-6 flex items-center justify-end space-x-4">
+              <!-- Playlist Info -->
+              <div class="text-right">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span class="text-purple-200 block">{gettext("Owner")}</span>
+                    <span class="font-medium text-white">{@listening_session.playlist.owner_name}</span>
+                  </div>
+                  <div>
+                    <span class="text-purple-200 block">{gettext("Provider")}</span>
+                    <span class="font-medium text-white">
+                      {String.capitalize(to_string(@listening_session.playlist.provider))}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-purple-200 block">{gettext("Tracks")}</span>
+                    <span class="font-medium text-white">{length(@listening_session.playlist.tracks || [])}</span>
+                  </div>
+                  <div>
+                    <span class="text-purple-200 block">{gettext("Public")}</span>
+                    <span class="font-medium text-white">
+                      {if @listening_session.playlist.public, do: gettext("Yes"), else: gettext("No")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+<!-- Playlist Cover -->
+              <div class="flex-shrink-0">
+                <%= if @listening_session.playlist.cover_url do %>
+                  <img
+                    src={@listening_session.playlist.cover_url}
+                    alt={"#{@listening_session.playlist.title} cover"}
+                    class="w-32 h-32 rounded-lg shadow-lg"
+                  />
+                <% else %>
+                  <div class="w-32 h-32 bg-white/20 rounded-lg flex items-center justify-center">
+                    <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 <% end %>
@@ -429,7 +483,7 @@
                     disabled={not @open_vote}
                     class={[
                       "px-2 py-1 text-sm rounded border transition-colors min-w-[32px]",
-                      if(@listening_session.current_track,
+                      if(@listening_session.current_track || @listening_session.current_playlist_track,
                         do: [
                           "bg-gray-700 border-gray-600 text-gray-300 hover:bg-purple-500/20 hover:border-purple-400 hover:text-purple-300",
                           if(assigns[:user_current_rating] == rating,
@@ -440,7 +494,7 @@
                         else: "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50"
                       )
                     ]}
-                    disabled={!@listening_session.current_track}
+                    disabled={!(@listening_session.current_track || @listening_session.current_playlist_track)}
                   >
                     {rating}
                   </button>
@@ -480,32 +534,33 @@
         <% end %>
 
         <div class="mb-6 mt-8">
-          <%= if @listening_session.album && length(@listening_session.album.tracks || []) > 0 do %>
+          <%= if (@listening_session.album && length(@listening_session.album.tracks || []) > 0) || (@listening_session.playlist && length(@listening_session.playlist.tracks || []) > 0) do %>
             <div class="space-y-3">
               <%= for {track, index} <- Enum.with_index(
-                (@listening_session.album.tracks || [])
+                ((@listening_session.album && @listening_session.album.tracks) || (@listening_session.playlist && @listening_session.playlist.tracks) || [])
                 |> Enum.sort_by(fn track ->
                   # Current track first, then original order
-                  if @listening_session.current_track && track.id == @listening_session.current_track.id do
+                  current_track = @listening_session.current_track || @listening_session.current_playlist_track
+                  if current_track && track.id == current_track.id do
                     0
                   else
-                    track.track_number || 999
+                    Map.get(track, :track_number, 999)
                   end
                 end), 1) do %>
                 <div
                   class={[
                     "rounded-lg transition-colors overflow-hidden",
                     if(
-                      @listening_session.current_track &&
-                        @listening_session.current_track.id == track.id,
+                      (@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                        (@listening_session.current_playlist_track && @listening_session.current_playlist_track.id == track.id),
                       do: if(@open_vote, do: "border-2 border-green-500/50", else: "border-2 border-orange-500/50"),
                       else: "hover:bg-gray-700"
                     )
                   ]}
                   style={
                     if(
-                      @listening_session.current_track &&
-                        @listening_session.current_track.id == track.id,
+                      (@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                        (@listening_session.current_playlist_track && @listening_session.current_playlist_track.id == track.id),
                       do: "",
                       else: "background-color: var(--color-dark-900);"
                     )
@@ -515,8 +570,8 @@
                   <div class={[
                     "p-4 transition-colors",
                     if(
-                      @listening_session.current_track &&
-                        @listening_session.current_track.id == track.id,
+                      (@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                        (@listening_session.current_playlist_track && @listening_session.current_playlist_track.id == track.id),
                       do:
                         if(@open_vote,
                           do: "bg-green-600/20 hover:bg-green-600/30",
@@ -527,22 +582,24 @@
                   ]}>
                     <div class="flex items-center justify-between">
                       <div class="flex items-center space-x-4 flex-1 min-w-0">
-                        <%= if @listening_session.current_track && @listening_session.current_track.id == track.id do %>
+                        <%= if (@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                              (@listening_session.current_playlist_track && @listening_session.current_playlist_track.id == track.id) do %>
                           <span class={[
                             "text-lg w-8 flex-shrink-0 font-medium",
                             if(@open_vote, do: "text-green-400", else: "text-orange-400")
                           ]}>
-                            {track.track_number || "?"}
+                            {Map.get(track, :track_number, "?")}
                           </span>
                         <% else %>
-                          <span class="text-lg text-gray-400 w-8 flex-shrink-0">{track.track_number || index}</span>
+                          <span class="text-lg text-gray-400 w-8 flex-shrink-0">{Map.get(track, :track_number, index)}</span>
                         <% end %>
                         <div class="flex-1 min-w-0">
                           <h4 class={[
                             "font-medium text-lg truncate",
                             if(
-                              @listening_session.current_track &&
-                                @listening_session.current_track.id == track.id,
+                              (@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                                (@listening_session.current_playlist_track &&
+                                   @listening_session.current_playlist_track.id == track.id),
                               do: if(@open_vote, do: "text-green-300", else: "text-orange-300"),
                               else: "text-white"
                             )
@@ -553,8 +610,9 @@
                             <p class={[
                               "text-sm",
                               if(
-                                @listening_session.current_track &&
-                                  @listening_session.current_track.id == track.id,
+                                (@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                                  (@listening_session.current_playlist_track &&
+                                     @listening_session.current_playlist_track.id == track.id),
                                 do: if(@open_vote, do: "text-green-400", else: "text-orange-400"),
                                 else: "text-gray-400"
                               )
@@ -566,7 +624,9 @@
                       </div>
 
                       <div class="flex items-center space-x-8 text-sm flex-shrink-0">
-                        <%= if @listening_session.status == :active && @listening_session.current_track && @listening_session.current_track.id == track.id do %>
+                        <%= if @listening_session.status == :active && 
+                              ((@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                               (@listening_session.current_playlist_track && @listening_session.current_playlist_track.id == track.id)) do %>
                           <div class="text-center">
                             <div class={[
                               "inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-1",
@@ -643,7 +703,9 @@
                   </div>
                   
 <!-- Histogram Section - show for current track when active, or all tracks when session ended -->
-                  <%= if (@listening_session.current_track && @listening_session.current_track.id == track.id) || @listening_session.status == :stopped do %>
+                  <%= if ((@listening_session.current_track && @listening_session.current_track.id == track.id) ||
+                           (@listening_session.current_playlist_track && @listening_session.current_playlist_track.id == track.id)) ||
+                          @listening_session.status == :stopped do %>
                     <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
                       <!-- Horizontal Histogram taking ~80% width -->
                       <div class="flex items-end justify-center h-32 mx-auto w-4/5">
@@ -717,7 +779,11 @@
               <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
               </svg>
-              <p>{gettext("No tracks found for this album.")}</p>
+              <p>
+                {gettext("No tracks found for this %{source}.",
+                  source: if(@listening_session.source == :album, do: "album", else: "playlist")
+                )}
+              </p>
             </div>
           <% end %>
         </div>

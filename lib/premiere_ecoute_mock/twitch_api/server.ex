@@ -233,21 +233,21 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
     }
   end
 
-  # defp bot do
-  #   %{
-  #     "id" => "789012",
-  #     "login" => "premiereecoutebot",
-  #     "display_name" => "PremiereEcouteBot",
-  #     "email" => "maxime.janvier+premiereecoute@gmail.com",
-  #     "type" => "",
-  #     "broadcaster_type" => "",
-  #     "description" => "Bot for Premiere Ecoute music listening sessions",
-  #     "profile_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/premiereecoutebot-profile_image-300x300.png",
-  #     "offline_image_url" => "",
-  #     "view_count" => 0,
-  #     "created_at" => "2024-01-10T14:20:00.000Z"
-  #   }
-  # end
+  defp bot do
+    %{
+      "id" => "789012",
+      "login" => "premiereecoutebot",
+      "display_name" => "PremiereEcouteBot",
+      "email" => "maxime.janvier+premiereecoute@gmail.com",
+      "type" => "",
+      "broadcaster_type" => "",
+      "description" => "Bot for Premiere Ecoute music listening sessions",
+      "profile_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/premiereecoutebot-profile_image-300x300.png",
+      "offline_image_url" => "",
+      "view_count" => 0,
+      "created_at" => "2024-01-10T14:20:00.000Z"
+    }
+  end
 
   defp send_webhook_notification(event_type, event_data) do
     broadcaster_user_id = event_data["broadcaster_user_id"] || "123456"

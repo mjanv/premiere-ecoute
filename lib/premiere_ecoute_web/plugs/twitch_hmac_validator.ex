@@ -3,8 +3,8 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
 
   import Plug.Conn
 
-  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)  
-  
+  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
+
   def init(_default), do: %{}
 
   def call(%Plug.Conn{req_headers: req_headers} = conn, _opts) do

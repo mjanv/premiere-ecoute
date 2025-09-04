@@ -4,10 +4,11 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
   use PremiereEcouteCore.Aggregate,
     identity: [:provider, :playlist_id]
 
+  import Ecto.Query
   alias PremiereEcoute.Accounts.User
 
   @type t :: %__MODULE__{
-          id: integer(),
+          id: integer() | nil,
           provider: :spotify | :deezer,
           playlist_id: String.t(),
           title: String.t() | nil,
@@ -18,8 +19,8 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
           track_count: integer(),
           metadata: map() | nil,
           user: User.t() | Ecto.Association.NotLoaded.t() | nil,
-          inserted_at: NaiveDateTime.t(),
-          updated_at: NaiveDateTime.t()
+          inserted_at: NaiveDateTime.t() | nil,
+          updated_at: NaiveDateTime.t() | nil
         }
 
   schema "library_playlists" do
@@ -60,5 +61,13 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
       where: p.user_id == ^id and p.playlist_id == ^playlist_id and p.provider == ^provider
     )
     |> Repo.exists?()
+  end
+
+  def all_for_user(%User{id: id}) do
+    from(p in __MODULE__,
+      where: p.user_id == ^id,
+      order_by: [desc: p.updated_at]
+    )
+    |> Repo.all()
   end
 end

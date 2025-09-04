@@ -7,8 +7,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcouteCore.Cache
-  
-  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)  
+
+  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
 
   def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}}) do
     TwitchApi.api()

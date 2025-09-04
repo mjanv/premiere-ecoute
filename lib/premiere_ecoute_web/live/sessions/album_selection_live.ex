@@ -15,6 +15,8 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> assign(:search_form, to_form(%{"query" => ""}))
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:selected_album, AsyncResult.ok(nil))
+    |> assign(:user_playlists, AsyncResult.ok([]))
+    |> assign(:selected_playlist, AsyncResult.ok(nil))
     |> assign(:current_scope, socket.assigns[:current_scope] || %{})
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
@@ -49,11 +51,14 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> assign(:search_albums, AsyncResult.ok([]))
     # Clear previous selection
     |> assign(:selected_album, AsyncResult.ok(nil))
+    |> assign(:selected_playlist, AsyncResult.ok(nil))
     # Reset search form
     |> assign(:search_form, to_form(%{"query" => ""}))
     # Reset vote options state
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
+    # Load playlists if playlist source is selected
+    |> maybe_load_playlists(source)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -65,8 +70,40 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("prepare_session", _params, %{assigns: %{selected_album: nil}} = socket) do
-    {:noreply, put_flash(socket, :error, "Please select an album first")}
+  def handle_event("select_playlist", %{"playlist_id" => ""}, socket) do
+    # Clear selection when empty value is selected
+    socket
+    |> assign(:selected_playlist, AsyncResult.ok(nil))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("select_playlist", %{"playlist_id" => playlist_id}, socket) do
+    # Find the library playlist from the loaded playlists
+    case socket.assigns.user_playlists do
+      %{result: playlists} when is_list(playlists) ->
+        case Enum.find(playlists, fn p -> p.playlist_id == playlist_id end) do
+          nil ->
+            socket
+            |> assign(:selected_playlist, AsyncResult.failed(socket.assigns.selected_playlist, {:error, "Playlist not found"}))
+            |> put_flash(:error, "Playlist not found")
+            |> then(fn socket -> {:noreply, socket} end)
+
+          playlist ->
+            socket
+            |> assign(:selected_playlist, AsyncResult.ok(playlist))
+            |> then(fn socket -> {:noreply, socket} end)
+        end
+
+      _ ->
+        socket
+        |> assign(:selected_playlist, AsyncResult.failed(socket.assigns.selected_playlist, {:error, "No playlists loaded"}))
+        |> put_flash(:error, "Please select playlist source first")
+        |> then(fn socket -> {:noreply, socket} end)
+    end
+  end
+
+  def handle_event("prepare_session", _params, %{assigns: %{selected_album: nil, selected_playlist: %{result: nil}}} = socket) do
+    {:noreply, put_flash(socket, :error, "Please select an album or playlist first")}
   end
 
   def handle_event("vote_options_preset_change", %{"preset" => preset}, socket) do
@@ -90,13 +127,35 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
         "prepare_session",
         _params,
         %{assigns: %{selected_album: %{result: album}}} = socket
-      ) do
+      )
+      when not is_nil(album) do
     vote_options = get_vote_options(socket.assigns)
 
     %PrepareListeningSession{
+      source: :album,
       user_id: get_user_id(socket),
       album_id: album.album_id,
       vote_options: vote_options
+    }
+    |> PremiereEcoute.apply()
+    |> case do
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
+      {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
+    end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event(
+        "prepare_session",
+        _params,
+        %{assigns: %{selected_playlist: %{result: playlist}}} = socket
+      )
+      when not is_nil(playlist) do
+    %PrepareListeningSession{
+      source: :playlist,
+      user_id: get_user_id(socket),
+      playlist_id: playlist.playlist_id,
+      vote_options: get_vote_options(socket.assigns)
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -148,6 +207,26 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  def handle_async(:load_playlists, {:ok, {:ok, playlists}}, socket) do
+    socket
+    |> assign(:user_playlists, AsyncResult.ok(playlists))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:load_playlists, {:ok, {:error, reason}}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:user_playlists, AsyncResult.failed(assigns.user_playlists, {:error, reason}))
+    |> put_flash(:error, "Failed to load playlists. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:load_playlists, {:exit, reason}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:user_playlists, AsyncResult.failed(assigns.user_playlists, {:error, reason}))
+    |> put_flash(:error, "Failed to load playlists. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def get_vote_options(%{vote_options_preset: "0-10"}), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   def get_vote_options(%{vote_options_preset: "1-5"}), do: ["1", "2", "3", "4", "5"]
   def get_vote_options(%{vote_options_preset: "smash-pass"}), do: ["smash", "pass"]
@@ -162,4 +241,20 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
       _ -> nil
     end
   end
+
+  defp maybe_load_playlists(socket, "playlist") do
+    case socket.assigns.current_scope do
+      %{user: user} ->
+        socket
+        |> assign(:user_playlists, AsyncResult.loading())
+        |> start_async(:load_playlists, fn -> {:ok, PremiereEcoute.Playlists.all_for_user(user)} end)
+
+      _ ->
+        socket
+        |> assign(:user_playlists, AsyncResult.failed(socket.assigns.user_playlists, {:error, "No authentication"}))
+        |> put_flash(:error, "Please authenticate to view your playlists")
+    end
+  end
+
+  defp maybe_load_playlists(socket, _), do: socket
 end

@@ -56,7 +56,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
     |> Req.put(
       url: "/me/player/play",
       json: %{
-        "context_uri" => "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7",
+        "context_uri" => "spotify:playlist:#{id}",
         "offset" => %{"position" => 0},
         "position_ms" => 0
       }
@@ -173,6 +173,16 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
       json: %{uris: ["spotify:track:#{track_id}"], position_ms: 0}
     )
     |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{track_id}" end)
+  end
+
+  def start_resume_playback(%Scope{} = scope, %Playlist{playlist_id: playlist_id}) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.put(
+      url: "/me/player/play",
+      json: %{context_uri: "spotify:playlist:#{playlist_id}", offset: %{position: 0}, position_ms: 0}
+    )
+    |> SpotifyApi.handle(204, fn _ -> "spotify:playlist:#{playlist_id}" end)
   end
 
   def add_item_to_playback_queue(%Scope{} = scope, %Track{provider: :spotify, track_id: track_id}) do

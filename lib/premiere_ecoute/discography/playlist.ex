@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Discography.Playlist do
   alias PremiereEcoute.Repo
 
   @type t :: %__MODULE__{
-          id: integer(),
+          id: integer() | nil,
           provider: :spotify | :deezer,
           playlist_id: String.t(),
           owner_id: String.t() | nil,
@@ -21,8 +21,8 @@ defmodule PremiereEcoute.Discography.Playlist do
           cover_url: String.t() | nil,
           public: boolean(),
           tracks: [Track.t()] | Ecto.Association.NotLoaded.t(),
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t()
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
         }
 
   schema "playlists" do
@@ -57,6 +57,25 @@ defmodule PremiereEcoute.Discography.Playlist do
     |> Map.from_struct()
     |> Map.update!(:tracks, fn tracks -> Enum.map(tracks, &Map.from_struct/1) end)
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
+  end
+
+  def add_track_to_playlist(%__MODULE__{} = playlist, %{"item" => track}) do
+    track = %{
+      provider: :spotify,
+      track_id: track["id"],
+      album_id: track["album"]["id"],
+      user_id: playlist.owner_id,
+      name: track["name"],
+      artist: PremiereEcoute.Apis.SpotifyApi.Parser.parse_primary_artist(track["artists"]),
+      duration_ms: track["duration_ms"],
+      added_at: NaiveDateTime.utc_now(),
+      release_date: ~D[1900-01-01]
+    }
+
+    playlist
+    |> cast(%{tracks: Enum.map(playlist.tracks, &Map.from_struct/1) ++ [track]}, [])
+    |> cast_assoc(:tracks)
+    |> Repo.update()
   end
 
   def url(%{provider: :spotify, playlist_id: id}), do: "https://open.spotify.com/playlist/#{id}"

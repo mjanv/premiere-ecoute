@@ -14,7 +14,7 @@ defmodule PremiereEcoute.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      compilers: [:boundary] ++ Mix.compilers(), 
+      compilers: [:boundary] ++ Mix.compilers(),
       test_coverage: [tool: ExCoveralls],
       dialyzer: [
         plt_add_apps: [:mix],

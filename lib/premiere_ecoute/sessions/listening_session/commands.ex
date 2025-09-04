@@ -6,12 +6,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     @type t :: %__MODULE__{
             user_id: integer(),
+            source: :album | :playlist,
             album_id: String.t() | nil,
             playlist_id: String.t() | nil,
             vote_options: [String.t()]
           }
 
-    defstruct [:user_id, :album_id, :playlist_id, :vote_options]
+    defstruct [:user_id, :source, :album_id, :playlist_id, :vote_options]
   end
 
   defmodule StartListeningSession do
@@ -19,9 +20,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
+    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist, scope: Scope.t()}
 
-    defstruct [:session_id, :scope]
+    defstruct [:session_id, :source, :scope]
   end
 
   defmodule SkipNextTrackListeningSession do
@@ -29,9 +30,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
+    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist, scope: Scope.t()}
 
-    defstruct [:session_id, :scope]
+    defstruct [:session_id, :source, :scope]
   end
 
   defmodule SkipPreviousTrackListeningSession do
@@ -39,9 +40,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
+    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist, scope: Scope.t()}
 
-    defstruct [:session_id, :scope]
+    defstruct [:session_id, :source, :scope]
   end
 
   defmodule StopListeningSession do
@@ -49,8 +50,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), scope: Scope.t()}
+    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist, scope: Scope.t()}
 
-    defstruct [:session_id, :scope]
+    defstruct [:session_id, :source, :scope]
   end
 end

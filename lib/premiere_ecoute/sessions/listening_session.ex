@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
   use PremiereEcouteCore.Aggregate,
-    root: [user: [:twitch, :spotify], album: [:tracks], current_track: [], playlist: [:tracks]],
+    root: [user: [:twitch, :spotify], album: [:tracks], current_track: [], playlist: [:tracks], current_playlist_track: []],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist]
 
   alias PremiereEcoute.Accounts.User
@@ -20,6 +20,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
           user: entity(User.t()),
           album: entity(Album.t()),
           current_track: entity(Album.Track.t()),
+          playlist: entity(Playlist.t()),
           report: entity(Report.t()),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
@@ -93,6 +94,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     {:error, :invalid_status}
   end
 
+  def next_track(%__MODULE__{source: :playlist} = session) do
+    %{playlist: %{tracks: tracks}, current_playlist_track: current_playlist_track} =
+      Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
+
+    current_track(session, hd(Enum.reverse(tracks)).id)
+  end
+
   def next_track(%__MODULE__{source: :album} = session) do
     session = Repo.preload(session, album: [:tracks], current_track: [])
     tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
@@ -145,6 +153,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     session
     |> change()
     |> put_change(:current_track_id, track_id)
+    |> Repo.update()
+    |> case do
+      {:ok, session} -> {:ok, preload(session)}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  def current_track(%__MODULE__{source: :playlist} = session, track_id) do
+    session
+    |> change()
+    |> put_change(:current_playlist_track_id, track_id)
     |> Repo.update()
     |> case do
       {:ok, session} -> {:ok, preload(session)}
