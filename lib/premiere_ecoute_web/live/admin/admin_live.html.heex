@@ -75,45 +75,100 @@
     </div>
     
 <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Users Card -->
-      <StatsCard.stats_card
-        navigate="/admin/users"
-        icon="hero-users"
-        value={@stats.users_count}
-        label={gettext("Users")}
-        color="blue"
-      />
+      <.link navigate="/admin/users" class="block">
+        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-900">
+              <svg class="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-2xl font-semibold text-white">{@stats.users_count}</p>
+              <p class="text-sm text-gray-400">{gettext("Users")}</p>
+            </div>
+          </div>
+        </div>
+      </.link>
       
 <!-- Sessions Card -->
-      <StatsCard.stats_card
-        navigate="/admin/sessions"
-        icon="hero-document-text"
-        value={@stats.sessions_count}
-        label={gettext("Sessions")}
-        color="green"
-      />
+      <.link navigate="/admin/sessions" class="block">
+        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-900">
+              <svg class="w-8 h-8 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-2xl font-semibold text-white">{@stats.sessions_count}</p>
+              <p class="text-sm text-gray-400">{gettext("Sessions")}</p>
+            </div>
+          </div>
+        </div>
+      </.link>
       
 <!-- Albums Card -->
-      <StatsCard.stats_card
-        navigate="/admin/albums"
-        icon="hero-musical-note"
-        value={@stats.albums_count}
-        label={gettext("Albums")}
-        color="yellow"
-      />
+      <.link navigate="/admin/albums" class="block">
+        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-900">
+              <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-2xl font-semibold text-white">{@stats.albums_count}</p>
+              <p class="text-sm text-gray-400">{gettext("Albums")}</p>
+            </div>
+          </div>
+        </div>
+      </.link>
       
-<!-- Votes Card -->
-      <StatsCard.stats_card icon="hero-hand-thumb-up" value={@stats.votes_count} label={gettext("Votes")} color="purple" />
-      
-<!-- Polls Card -->
-      <StatsCard.stats_card icon="hero-chart-bar" value={@stats.billboards_count} label={gettext("Billboards")} color="orange" />
+<!-- Billboards Card -->
+      <.link navigate="/admin/billboards" class="block">
+        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-purple-900">
+              <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-2xl font-semibold text-white">{@stats.billboards_count}</p>
+              <p class="text-sm text-gray-400">{gettext("Billboards")}</p>
+            </div>
+          </div>
+        </div>
+      </.link>
     </div>
     
 <!-- Event Store Section -->
     <div class="mt-8">
-      <Card.card class="p-0">
-        <div class="px-6 py-4 border-b border-surface">
+      <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-700">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-xl font-semibold text-white">{gettext("Event Store")}</h2>
@@ -259,7 +314,7 @@
             </nav>
           </div>
         </div>
-      </Card.card>
+      </div>
     </div>
   </div>
 </div>

@@ -12,25 +12,22 @@ defmodule PremiereEcoute.Accounts.BotTest do
     on_exit(fn -> Cache.clear(:users) end)
 
     stub(TwitchApi, :renew_token, fn _ ->
-      {:ok,
-       %{
-         access_token: "access_token",
-         refresh_token: "refresh_token",
-         expires_in: 3600
-       }}
+      {:ok, %{access_token: "access_token", refresh_token: "refresh_token", expires_in: 3600}}
     end)
 
     :ok
   end
 
   test "Bot is not available if no #{@email} user account exists" do
-    assert is_nil(Bot.get())
+    {:error, bot} = Bot.get()
+
+    assert is_nil(bot)
   end
 
   test "Bot is available if #{@email} user account exists" do
     %{id: id} = user_fixture(%{email: @email, twitch: %{refresh_token: "twitch_refresh_token"}})
 
-    bot = Bot.get()
+    {:ok, bot} = Bot.get()
 
     assert bot.id == id
   end
@@ -38,13 +35,13 @@ defmodule PremiereEcoute.Accounts.BotTest do
   test "Bot can be read from cache" do
     %{id: id} = user_fixture(%{email: @email, twitch: %{refresh_token: "twitch_refresh_token"}})
 
-    bot1 = Bot.get()
-    bot2 = Bot.get()
-    Cache.put(:users, :bot, :wrong, expire: 5 * 60 * 1_000)
-    bot3 = Bot.get()
+    {:ok, bot1} = Bot.get()
+    {:ok, bot2} = Bot.get()
+    Cache.put(:users, :bot, nil, expire: 5 * 60 * 1_000)
+    {:ok, bot3} = Bot.get()
 
     assert bot1.id == id
     assert bot2.id == id
-    assert bot3 == :wrong
+    assert bot3.id == id
   end
 end

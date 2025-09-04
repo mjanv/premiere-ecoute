@@ -47,7 +47,9 @@ defmodule PremiereEcouteWeb.Accounts.UserLoginLiveTest do
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
       form =
-        form(lv, "#login_form_password", user: %{email: user.email, password: valid_user_password(), remember_me: true})
+        form(lv, "#login_form_password", %{
+          "user" => %{"email" => user.email, "password" => valid_user_password(), "remember_me" => "true"}
+        })
 
       conn = submit_form(form, conn)
 
@@ -60,7 +62,9 @@ defmodule PremiereEcouteWeb.Accounts.UserLoginLiveTest do
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
       form =
-        form(lv, "#login_form_password", user: %{email: "test@email.com", password: "123456", remember_me: true})
+        form(lv, "#login_form_password", %{
+          "user" => %{"email" => "test@email.com", "password" => "123456", "remember_me" => "true"}
+        })
 
       render_submit(form)
 

@@ -160,6 +160,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/users", AdminUsersLive, :index
       live "/albums", AdminAlbumsLive, :index
       live "/sessions", AdminSessionsLive, :index
+      live "/billboards", AdminBillboardsLive, :index
     end
 
     pipe_through [:require_authenticated_user]

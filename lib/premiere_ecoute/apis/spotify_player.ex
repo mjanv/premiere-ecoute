@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
 
   require Logger
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis
@@ -19,24 +20,24 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
 
   @impl true
   def init(args) do
-    Process.send_after(self(), :poll, @poll_interval)
-    scope = Scope.for_user(User.get(args))
-    {:ok, phx_ref} = Presence.join(scope.user.id)
+    with _ <- Process.send_after(self(), :poll, @poll_interval),
+         scope <- Scope.for_user(User.get(args)),
+         {:ok, phx_ref} <- Presence.join(scope.user.id) do
+      state =
+        case Apis.spotify().get_playback_state(scope, %{}) do
+          {:ok, state} -> state
+          {:error, _} -> %{}
+        end
 
-    state =
-      case Apis.spotify().get_playback_state(scope, %{}) do
-        {:ok, state} -> state
-        {:error, _} -> %{}
-      end
-
-    {:ok, %{scope: scope, phx_ref: phx_ref, state: state}}
+      {:ok, %{scope: scope, phx_ref: phx_ref, state: state}}
+    end
   end
 
   @impl true
   def handle_info(:poll, %{scope: scope, state: old_state}) do
-    Process.send_after(self(), :poll, @poll_interval)
-
-    with {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
+    with _ <- Process.send_after(self(), :poll, @poll_interval),
+         scope <- Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :spotify),
+         {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
          {:ok, state, events} <- handle(old_state, new_state),
          :ok <- Enum.each(events, fn event -> publish(scope, event, state) end) do
       if length(PremiereEcoute.Presence.player(scope.user.id)) > 1 do
@@ -72,8 +73,8 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
     case {progress(old_state), progress(new_state)} do
       {0, 1} -> {:ok, new_state, [:start_track]}
       {97, 98} -> {:ok, new_state, [:end_track]}
-      {a, b} when abs(b - a) > 5 -> {:ok, new_state, [:skip]}
-      {a, b} when b > a -> {:ok, new_state, [b]}
+      {a, b} when abs(b - a) > 5 -> {:ok, new_state, [{:skip, b}]}
+      {a, b} when b > a -> {:ok, new_state, [{:percent, b}]}
       _ -> {:ok, new_state, []}
     end
   end

@@ -21,6 +21,90 @@
       </div>
     </div>
     
+<!-- Session Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <!-- Preparing Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-yellow-900">
+            <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@session_stats, :preparing, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Preparing")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Active Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-green-900">
+            <svg class="w-8 h-8 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-7 4h12l-1 4H8l-1-4z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@session_stats, :active, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Active")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Stopped Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-gray-700">
+            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@session_stats, :stopped, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Stopped")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Total Votes -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-purple-900">
+            <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@session_stats, :total_votes, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Total Votes")}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
 <!-- Sessions Table -->
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700">

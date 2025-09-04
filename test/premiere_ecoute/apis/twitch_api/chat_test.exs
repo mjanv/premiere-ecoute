@@ -1,19 +1,17 @@
 defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcouteCore.Cache
 
   setup do
-    scope =
-      user_scope_fixture(
-        user_fixture(%{
-          twitch: %{user_id: "141981764", access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"}
-        })
-      )
+    user = user_fixture(%{twitch: %{user_id: "141981764", access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"}})
+    bot = %User{twitch: %User.OauthToken{user_id: "467189141", access_token: "access_token"}}
 
-    Cache.put(:users, :bot, %{twitch: %{user_id: "467189141", access_token: "access_token"}})
+    scope = user_scope_fixture(user)
+    Cache.put(:users, :bot, bot)
 
     {:ok, %{scope: scope}}
   end

@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcouteCore.Cache
+  
+  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)  
 
   def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}}) do
     TwitchApi.api()
@@ -32,7 +34,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
         transport: %{
           method: "webhook",
           callback: Application.get_env(:premiere_ecoute, :twitch_webhook_callback_url),
-          secret: Application.get_env(:premiere_ecoute, :twitch_eventsub_secret)
+          secret: @secret
         }
       }
     )
@@ -77,7 +79,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   defp version(_), do: "0"
 
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.chat.message") do
-    bot = Bot.get()
+    {:ok, bot} = Bot.get()
     %{broadcaster_user_id: user_id, user_id: bot.twitch.user_id}
   end
 

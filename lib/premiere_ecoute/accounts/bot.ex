@@ -4,46 +4,26 @@ defmodule PremiereEcoute.Accounts.Bot do
   require Logger
 
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis
   alias PremiereEcouteCore.Cache
 
-  @bot "maxime.janvier+premiereecoute@gmail.com"
+  @bot Application.compile_env(:premiere_ecoute, PremiereEcoute.Accounts)[:bot]
 
   def get do
-    case Cache.get(:users, :bot) do
-      {:ok, nil} ->
-        case Accounts.get_user_by_email(@bot) do
-          nil ->
-            nil
-
-          %Accounts.User{} = user ->
-            case renew_twitch_token(user) do
-              {:ok, user} ->
-                Cache.put(:users, :bot, user, expire: 5 * 60 * 1_000)
-                user
-
-              {:error, user} ->
-                user
-            end
-        end
-
-      {:ok, user} ->
-        user
+    with {:ok, nil} <- Cache.get(:users, :bot),
+         %User{} = user <- Accounts.get_user_by_email(@bot),
+         %Scope{} = scope <- Scope.for_user(user),
+         %Scope{user: user} <- Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :twitch),
+         _ <- Cache.put(:users, :bot, user, expire: 5 * 60 * 1_000) do
+      {:ok, scope.user}
+    else
+      {:ok, %User{} = user} ->
+        {:ok, user}
 
       _ ->
-        nil
-    end
-  end
-
-  def renew_twitch_token(user) do
-    with {:ok, tokens} <- Apis.twitch().renew_token(user.twitch.refresh_token),
-         {:ok, user} <- User.refresh_token(user, :twitch, tokens) do
-      {:ok, user}
-    else
-      {:error, reason} ->
-        Logger.error("Failed to renew Bot twitch tokens: #{inspect(reason)}")
-        {:error, user}
+        Logger.error("Cannot read bot user")
+        {:error, nil}
     end
   end
 end

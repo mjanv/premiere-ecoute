@@ -1,5 +1,8 @@
 import Config
 
+config :premiere_ecoute,
+  twitch_eventsub_secret: "s3cre77890ab"
+
 config :premiere_ecoute, Oban, testing: :inline
 
 config :premiere_ecoute,

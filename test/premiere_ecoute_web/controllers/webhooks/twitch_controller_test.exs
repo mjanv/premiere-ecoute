@@ -104,9 +104,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
     defp sign_conn(conn, payload, signature \\ nil) do
       id = UUID.uuid4()
       timestamp = DateTime.to_iso8601(DateTime.utc_now(), :extended)
-      secret = :crypto.strong_rand_bytes(32)
-      Application.put_env(:premiere_ecoute, :twitch_eventsub_secret, Base.encode16(secret, case: :lower))
-      hmac = TwitchHmacValidator.signature(secret, id <> timestamp <> Jason.encode!(payload))
+      hmac = TwitchHmacValidator.signature("s3cre77890ab", id <> timestamp <> Jason.encode!(payload))
 
       conn
       |> put_req_header("twitch-eventsub-message-id", id)

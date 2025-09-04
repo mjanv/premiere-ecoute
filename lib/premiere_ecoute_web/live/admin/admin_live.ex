@@ -7,9 +7,6 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions
-  alias PremiereEcoute.Sessions.Scores
-  alias PremiereEcouteWeb.Components.Card
-  alias PremiereEcouteWeb.Components.StatsCard
 
   def mount(_params, _session, socket) do
     socket
@@ -17,7 +14,6 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
       users_count: User.count(:id),
       sessions_count: Sessions.ListeningSession.count(:id),
       albums_count: Album.count(:id),
-      votes_count: Scores.Vote.count(:id),
       billboards_count: Billboard.count(:id)
     })
     |> assign(:event_store, %{

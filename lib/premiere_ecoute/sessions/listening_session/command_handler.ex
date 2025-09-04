@@ -66,7 +66,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.start(session),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}") do
+         _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}") do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%SessionStarted{session_id: session.id}]}
@@ -84,9 +84,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
-         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}),
-         ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0) do
+         _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
+         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
+      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
     else
@@ -98,7 +98,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.previous_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         {:ok, _} <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
+         _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open", session_id: session.id, user_id: scope.user.id}, @cooldown)
@@ -114,7 +114,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
-         {:ok, _} <- Apis.twitch().send_chat_message(scope, "Good bye !"),
+         _ <- Apis.twitch().send_chat_message(scope, "Good bye !"),
          {:ok, session} <- ListeningSession.stop(session),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
       if is_active, do: Apis.spotify().pause_playback(scope)

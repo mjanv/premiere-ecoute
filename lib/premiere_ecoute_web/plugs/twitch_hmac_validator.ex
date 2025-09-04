@@ -3,27 +3,22 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
 
   import Plug.Conn
 
-  def init(_default) do
-    %{secret: Application.get_env(:premiere_ecoute, :twitch_eventsub_secret)}
-  end
+  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)  
+  
+  def init(_default), do: %{}
 
-  def call(%Plug.Conn{req_headers: req_headers} = conn, %{secret: secret}) do
+  def call(%Plug.Conn{req_headers: req_headers} = conn, _opts) do
     with id when id != "" <- at(req_headers, "id"),
          {:ok, body, _} <- read_body(conn) do
-      assign(conn, :twitch_hmac, hmac(req_headers, secret, body))
+      assign(conn, :twitch_hmac, hmac(req_headers, @secret, body))
     else
       _ -> conn
     end
   end
 
-  def call(conn, _default), do: conn
-
   def hmac(headers, secret, body) do
     (at(headers, "id") <> at(headers, "timestamp") <> body)
-    |> then(fn payload ->
-      secret = Base.decode16!(secret, case: :lower)
-      :crypto.mac(:hmac, :sha256, secret, payload)
-    end)
+    |> then(fn payload -> :crypto.mac(:hmac, :sha256, secret, payload) end)
     |> Base.encode16(case: :lower)
     |> then(fn hmac -> "sha256=" <> hmac end)
     |> then(fn hmac -> Plug.Crypto.secure_compare(hmac, at(headers, "signature")) end)

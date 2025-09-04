@@ -107,211 +107,210 @@
         </div>
         
 <!-- Top 3 Podium -->
-        <%= if true do %>
-          <div class="mb-12">
-            <%= cond do %>
-              <% @display_mode == :track -> %>
-                <div class="flex justify-center items-end space-x-8 mb-12">
-                  <!-- Track Mode Podium -->
+
+        <div class="mb-12">
+          <%= cond do %>
+            <% @display_mode == :track -> %>
+              <div class="flex justify-center items-end space-x-8 mb-12">
+                <!-- Track Mode Podium -->
                   <!-- 2nd Place -->
-                  <div class="text-center">
-                    <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
-                      <div class="text-4xl mb-2">🥈</div>
-                      <div class="text-xl font-bold text-yellow-100">#2</div>
-                    </div>
-                    <div
-                      class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
-                      phx-click="select_track"
-                      phx-value-rank="2"
-                    >
-                      <%= if length(@tracks) > 1 do %>
-                        <div class={"#{count_color(Enum.at(@tracks, 1).count)} font-bold text-lg"}>
-                          [{Enum.at(@tracks, 1).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 1).track.artist}</div>
-                        <div class="text-yellow-100 text-base truncate">{Enum.at(@tracks, 1).track.name}</div>
-                      <% end %>
-                    </div>
+                <div class="text-center">
+                  <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
+                    <div class="text-4xl mb-2">🥈</div>
+                    <div class="text-xl font-bold text-yellow-100">#2</div>
                   </div>
-                  
-<!-- 1st Place -->
-                  <div class="text-center">
-                    <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
-                      <div class="text-5xl mb-2">👑</div>
-                      <div class="text-2xl font-bold text-pink-100">#1</div>
-                    </div>
-                    <div
-                      class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
-                      phx-click="select_track"
-                      phx-value-rank="1"
-                    >
-                      <%= if length(@tracks) > 0 do %>
-                        <div class={"#{count_color(Enum.at(@tracks, 0).count)} font-bold text-xl"}>
-                          [{Enum.at(@tracks, 0).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-lg truncate">{Enum.at(@tracks, 0).track.artist}</div>
-                        <div class="text-pink-100 text-lg truncate">{Enum.at(@tracks, 0).track.name}</div>
-                      <% end %>
-                    </div>
-                  </div>
-                  
-<!-- 3rd Place -->
-                  <div class="text-center">
-                    <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
-                      <div class="text-3xl mb-2">🥉</div>
-                      <div class="text-xl font-bold text-cyan-200">#3</div>
-                    </div>
-                    <div
-                      class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
-                      phx-click="select_track"
-                      phx-value-rank="3"
-                    >
-                      <%= if length(@tracks) > 2 do %>
-                        <div class={"#{count_color(Enum.at(@tracks, 2).count)} font-bold text-lg"}>
-                          [{Enum.at(@tracks, 2).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 2).track.artist}</div>
-                        <div class="text-cyan-200 text-base truncate">{Enum.at(@tracks, 2).track.name}</div>
-                      <% end %>
-                    </div>
+                  <div
+                    class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
+                    phx-click="select_track"
+                    phx-value-rank="2"
+                  >
+                    <%= if length(@tracks) > 1 do %>
+                      <div class={"#{count_color(Enum.at(@tracks, 1).count)} font-bold text-lg"}>
+                        [{Enum.at(@tracks, 1).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 1).track.artist}</div>
+                      <div class="text-yellow-100 text-base truncate">{Enum.at(@tracks, 1).track.name}</div>
+                    <% end %>
                   </div>
                 </div>
-              <% @display_mode == :artist -> %>
-                <div class="flex justify-center items-end space-x-8 mb-12">
-                  <!-- Artist Mode Podium -->
-                  <!-- 2nd Place -->
-                  <div class="text-center">
-                    <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
-                      <div class="text-4xl mb-2">🥈</div>
-                      <div class="text-xl font-bold text-yellow-100">#2</div>
-                    </div>
-                    <div
-                      class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
-                      phx-click="select_artist"
-                      phx-value-rank="2"
-                    >
-                      <%= if length(@artists) > 1 do %>
-                        <div class={"#{count_color(Enum.at(@artists, 1).count)} font-bold text-lg"}>
-                          [{Enum.at(@artists, 1).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 1).artist}</div>
-                        <div class="text-yellow-100 text-base truncate">{length(Enum.at(@artists, 1).tracks)} tracks</div>
-                      <% end %>
-                    </div>
-                  </div>
-                  
+                
 <!-- 1st Place -->
-                  <div class="text-center">
-                    <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
-                      <div class="text-5xl mb-2">👑</div>
-                      <div class="text-2xl font-bold text-pink-100">#1</div>
-                    </div>
-                    <div
-                      class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
-                      phx-click="select_artist"
-                      phx-value-rank="1"
-                    >
-                      <%= if length(@artists) > 0 do %>
-                        <div class={"#{count_color(Enum.at(@artists, 0).count)} font-bold text-xl"}>
-                          [{Enum.at(@artists, 0).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-lg truncate">{Enum.at(@artists, 0).artist}</div>
-                        <div class="text-pink-100 text-lg truncate">{length(Enum.at(@artists, 0).tracks)} tracks</div>
-                      <% end %>
-                    </div>
+                <div class="text-center">
+                  <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
+                    <div class="text-5xl mb-2">👑</div>
+                    <div class="text-2xl font-bold text-pink-100">#1</div>
                   </div>
-                  
-<!-- 3rd Place -->
-                  <div class="text-center">
-                    <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
-                      <div class="text-3xl mb-2">🥉</div>
-                      <div class="text-xl font-bold text-cyan-200">#3</div>
-                    </div>
-                    <div
-                      class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
-                      phx-click="select_artist"
-                      phx-value-rank="3"
-                    >
-                      <%= if length(@artists) > 2 do %>
-                        <div class={"#{count_color(Enum.at(@artists, 2).count)} font-bold text-lg"}>
-                          [{Enum.at(@artists, 2).count}x]
-                        </div>
-                        <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 2).artist}</div>
-                        <div class="text-cyan-200 text-base truncate">{length(Enum.at(@artists, 2).tracks)} tracks</div>
-                      <% end %>
-                    </div>
+                  <div
+                    class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
+                    phx-click="select_track"
+                    phx-value-rank="1"
+                  >
+                    <%= if length(@tracks) > 0 do %>
+                      <div class={"#{count_color(Enum.at(@tracks, 0).count)} font-bold text-xl"}>
+                        [{Enum.at(@tracks, 0).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-lg truncate">{Enum.at(@tracks, 0).track.artist}</div>
+                      <div class="text-pink-100 text-lg truncate">{Enum.at(@tracks, 0).track.name}</div>
+                    <% end %>
                   </div>
                 </div>
-              <% @display_mode == :year -> %>
-                <div class="flex justify-center items-end space-x-8 mb-12">
-                  <!-- Year Mode Podium -->
-                  <% first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
-                  second_place = Enum.find(@year_podium, fn year -> year.rank == 2 end)
-                  third_place = Enum.find(@year_podium, fn year -> year.rank == 3 end) %>
-                  
+                
+<!-- 3rd Place -->
+                <div class="text-center">
+                  <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
+                    <div class="text-3xl mb-2">🥉</div>
+                    <div class="text-xl font-bold text-cyan-200">#3</div>
+                  </div>
+                  <div
+                    class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
+                    phx-click="select_track"
+                    phx-value-rank="3"
+                  >
+                    <%= if length(@tracks) > 2 do %>
+                      <div class={"#{count_color(Enum.at(@tracks, 2).count)} font-bold text-lg"}>
+                        [{Enum.at(@tracks, 2).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@tracks, 2).track.artist}</div>
+                      <div class="text-cyan-200 text-base truncate">{Enum.at(@tracks, 2).track.name}</div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% @display_mode == :artist -> %>
+              <div class="flex justify-center items-end space-x-8 mb-12">
+                <!-- Artist Mode Podium -->
+                  <!-- 2nd Place -->
+                <div class="text-center">
+                  <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
+                    <div class="text-4xl mb-2">🥈</div>
+                    <div class="text-xl font-bold text-yellow-100">#2</div>
+                  </div>
+                  <div
+                    class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
+                    phx-click="select_artist"
+                    phx-value-rank="2"
+                  >
+                    <%= if length(@artists) > 1 do %>
+                      <div class={"#{count_color(Enum.at(@artists, 1).count)} font-bold text-lg"}>
+                        [{Enum.at(@artists, 1).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 1).artist}</div>
+                      <div class="text-yellow-100 text-base truncate">{length(Enum.at(@artists, 1).tracks)} tracks</div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- 1st Place -->
+                <div class="text-center">
+                  <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
+                    <div class="text-5xl mb-2">👑</div>
+                    <div class="text-2xl font-bold text-pink-100">#1</div>
+                  </div>
+                  <div
+                    class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
+                    phx-click="select_artist"
+                    phx-value-rank="1"
+                  >
+                    <%= if length(@artists) > 0 do %>
+                      <div class={"#{count_color(Enum.at(@artists, 0).count)} font-bold text-xl"}>
+                        [{Enum.at(@artists, 0).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-lg truncate">{Enum.at(@artists, 0).artist}</div>
+                      <div class="text-pink-100 text-lg truncate">{length(Enum.at(@artists, 0).tracks)} tracks</div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- 3rd Place -->
+                <div class="text-center">
+                  <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
+                    <div class="text-3xl mb-2">🥉</div>
+                    <div class="text-xl font-bold text-cyan-200">#3</div>
+                  </div>
+                  <div
+                    class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
+                    phx-click="select_artist"
+                    phx-value-rank="3"
+                  >
+                    <%= if length(@artists) > 2 do %>
+                      <div class={"#{count_color(Enum.at(@artists, 2).count)} font-bold text-lg"}>
+                        [{Enum.at(@artists, 2).count}x]
+                      </div>
+                      <div class="text-white font-semibold text-base truncate">{Enum.at(@artists, 2).artist}</div>
+                      <div class="text-cyan-200 text-base truncate">{length(Enum.at(@artists, 2).tracks)} tracks</div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% @display_mode == :year -> %>
+              <div class="flex justify-center items-end space-x-8 mb-12">
+                <!-- Year Mode Podium -->
+                <% first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
+                second_place = Enum.find(@year_podium, fn year -> year.rank == 2 end)
+                third_place = Enum.find(@year_podium, fn year -> year.rank == 3 end) %>
+                
 <!-- 2nd Place -->
-                  <div class="text-center">
-                    <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
-                      <div class="text-4xl mb-2">🥈</div>
-                      <div class="text-xl font-bold text-yellow-100">#2</div>
-                    </div>
-                    <div
-                      class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
-                      phx-click="select_year"
-                      phx-value-rank={if second_place, do: second_place.rank, else: "2"}
-                    >
-                      <%= if second_place do %>
-                        <div class="text-yellow-200 font-bold text-lg">[{second_place.count}x]</div>
-                        <div class="text-white font-semibold text-base truncate">{second_place.year}</div>
-                        <div class="text-yellow-100 text-base truncate">{second_place.track_count} tracks</div>
-                      <% end %>
-                    </div>
+                <div class="text-center">
+                  <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
+                    <div class="text-4xl mb-2">🥈</div>
+                    <div class="text-xl font-bold text-yellow-100">#2</div>
                   </div>
-                  
-<!-- 1st Place -->
-                  <div class="text-center">
-                    <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
-                      <div class="text-5xl mb-2">👑</div>
-                      <div class="text-2xl font-bold text-pink-100">#1</div>
-                    </div>
-                    <div
-                      class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
-                      phx-click="select_year"
-                      phx-value-rank={if first_place, do: first_place.rank, else: "1"}
-                    >
-                      <%= if first_place do %>
-                        <div class="text-pink-200 font-bold text-xl">[{first_place.count}x]</div>
-                        <div class="text-white font-semibold text-lg truncate">{first_place.year}</div>
-                        <div class="text-pink-100 text-lg truncate">{first_place.track_count} tracks</div>
-                      <% end %>
-                    </div>
-                  </div>
-                  
-<!-- 3rd Place -->
-                  <div class="text-center">
-                    <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
-                      <div class="text-3xl mb-2">🥉</div>
-                      <div class="text-xl font-bold text-cyan-200">#3</div>
-                    </div>
-                    <div
-                      class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
-                      phx-click="select_year"
-                      phx-value-rank={if third_place, do: third_place.rank, else: "3"}
-                    >
-                      <%= if third_place do %>
-                        <div class="text-cyan-300 font-bold text-lg">[{third_place.count}x]</div>
-                        <div class="text-white font-semibold text-base truncate">{third_place.year}</div>
-                        <div class="text-cyan-200 text-base truncate">{third_place.track_count} tracks</div>
-                      <% end %>
-                    </div>
+                  <div
+                    class="bg-yellow-700 p-4 text-center w-64 cursor-pointer hover:bg-yellow-600 transition-colors"
+                    phx-click="select_year"
+                    phx-value-rank={if second_place, do: second_place.rank, else: "2"}
+                  >
+                    <%= if second_place do %>
+                      <div class="text-yellow-200 font-bold text-lg">[{second_place.count}x]</div>
+                      <div class="text-white font-semibold text-base truncate">{second_place.year}</div>
+                      <div class="text-yellow-100 text-base truncate">{second_place.track_count} tracks</div>
+                    <% end %>
                   </div>
                 </div>
-              <% true -> %>
-                <!-- No podium for playlist mode -->
-                <div></div>
-            <% end %>
-          </div>
-        <% end %>
+                
+<!-- 1st Place -->
+                <div class="text-center">
+                  <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
+                    <div class="text-5xl mb-2">👑</div>
+                    <div class="text-2xl font-bold text-pink-100">#1</div>
+                  </div>
+                  <div
+                    class="bg-pink-700 p-4 text-center w-64 cursor-pointer hover:bg-pink-600 transition-colors"
+                    phx-click="select_year"
+                    phx-value-rank={if first_place, do: first_place.rank, else: "1"}
+                  >
+                    <%= if first_place do %>
+                      <div class="text-pink-200 font-bold text-xl">[{first_place.count}x]</div>
+                      <div class="text-white font-semibold text-lg truncate">{first_place.year}</div>
+                      <div class="text-pink-100 text-lg truncate">{first_place.track_count} tracks</div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- 3rd Place -->
+                <div class="text-center">
+                  <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
+                    <div class="text-3xl mb-2">🥉</div>
+                    <div class="text-xl font-bold text-cyan-200">#3</div>
+                  </div>
+                  <div
+                    class="bg-cyan-800 p-4 text-center w-64 cursor-pointer hover:bg-cyan-700 transition-colors"
+                    phx-click="select_year"
+                    phx-value-rank={if third_place, do: third_place.rank, else: "3"}
+                  >
+                    <%= if third_place do %>
+                      <div class="text-cyan-300 font-bold text-lg">[{third_place.count}x]</div>
+                      <div class="text-white font-semibold text-base truncate">{third_place.year}</div>
+                      <div class="text-cyan-200 text-base truncate">{third_place.track_count} tracks</div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% true -> %>
+              <!-- No podium for playlist mode -->
+              <div></div>
+          <% end %>
+        </div>
         
 <!-- Full List -->
         <div class="font-mono text-lg">

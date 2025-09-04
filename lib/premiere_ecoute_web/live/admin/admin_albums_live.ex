@@ -4,10 +4,12 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track
 
   def mount(_params, _session, socket) do
     socket
     |> assign(:page, Album.page([], 1, 10))
+    |> assign(:album_stats, album_stats())
     |> assign(:selected_album, nil)
     |> assign(:show_modal, false)
     |> then(fn socket -> {:ok, socket} end)
@@ -67,5 +69,12 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
       true ->
         [1, :ellipsis, current_page - 1, current_page, current_page + 1, :ellipsis, total_pages]
     end
+  end
+
+  defp album_stats do
+    %{
+      total_albums: Album.count(:id),
+      total_tracks: Track.count(:id)
+    }
   end
 end

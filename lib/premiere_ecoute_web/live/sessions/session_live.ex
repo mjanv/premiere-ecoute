@@ -203,7 +203,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
           %{action: "next_track", session_id: session.id, user_id: scope.user.id},
           show[:next_track]
         )
-        |> IO.inspect()
 
       socket
       |> assign(:next_track_at, job.scheduled_at)

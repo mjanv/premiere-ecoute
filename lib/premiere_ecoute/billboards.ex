@@ -3,8 +3,8 @@ defmodule PremiereEcoute.Billboards do
 
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Billboards.Services.BillboardCreation
-  alias PremiereEcouteCore.GoofyWords
   alias PremiereEcouteCore.Cache
+  alias PremiereEcouteCore.GoofyWords
 
   defdelegate generate_billboard(playlist_urls, opts), to: BillboardCreation
   defdelegate all(clauses), to: Billboard

@@ -1,4 +1,4 @@
-<div style={"background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{@percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{@percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%); border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1;"}>
+<div style={"background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{@percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{@percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%); border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1; position: relative;"}>
   
 <!-- Player score display -->
   <div
@@ -199,4 +199,9 @@
       </div>
     </div>
   </.async_result>
+  
+<!-- Powered by notation -->
+  <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 16px; color: pink; font-weight: 400; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); text-decoration: wavy underline pink;">
+    Made with premiere-ecoute.fr
+  </div>
 </div>

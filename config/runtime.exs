@@ -22,8 +22,7 @@ config :premiere_ecoute,
   twitch_client_id: env!("TWITCH_CLIENT_ID"),
   twitch_client_secret: env!("TWITCH_CLIENT_SECRET"),
   twitch_redirect_uri: env!("TWITCH_REDIRECT_URI"),
-  twitch_webhook_callback_url: env!("TWITCH_WEBHOOK_CALLBACK_URL"),
-  twitch_eventsub_secret: env!("TWITCH_WEBHOOK_SECRET")
+  twitch_webhook_callback_url: env!("TWITCH_WEBHOOK_CALLBACK_URL")
 
 config :premiere_ecoute, :feature_flags,
   username: env!("AUTH_USERNAME"),
@@ -72,7 +71,7 @@ if config_env() == :prod do
   config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
     url: [host: env!("PHX_HOST"), port: 443, scheme: "https"],
     http: [
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
+      ip: {0, 0, 0, 0},
       port: env!("PORT", :integer, 4000)
     ],
     secret_key_base: env!("SECRET_KEY_BASE")

@@ -21,6 +21,49 @@
       </div>
     </div>
     
+<!-- Albums Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <!-- Total Albums -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-blue-900">
+            <svg class="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{@album_stats.total_albums}</p>
+            <p class="text-sm text-gray-400">{gettext("Total Albums")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Total Tracks -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-green-900">
+            <svg class="w-8 h-8 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{@album_stats.total_tracks}</p>
+            <p class="text-sm text-gray-400">{gettext("Total Tracks")}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
 <!-- Albums Table -->
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700">

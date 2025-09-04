@@ -4,10 +4,14 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   def mount(_params, _session, socket) do
+    sessions = ListeningSession.all([])
+
     socket
     |> assign(:page, ListeningSession.page([], 1, 10))
+    |> assign(:session_stats, session_stats(sessions))
     |> assign(:selected_session, nil)
     |> assign(:show_modal, false)
     |> assign(:show_delete_modal, false)
@@ -102,5 +106,16 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
       true ->
         [1, :ellipsis, current_page - 1, current_page, current_page + 1, :ellipsis, total_pages]
     end
+  end
+
+  defp session_stats(sessions) do
+    status_stats =
+      sessions
+      |> Enum.group_by(& &1.status)
+      |> Enum.into(%{}, fn {status, sessions} -> {status, length(sessions)} end)
+
+    total_votes = Vote.count(:id)
+
+    Map.put(status_stats, :total_votes, total_votes)
   end
 end

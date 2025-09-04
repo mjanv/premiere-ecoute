@@ -1,0 +1,330 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white">{gettext("Billboard Management")}</h1>
+          <p class="mt-2 text-gray-400">{gettext("Manage billboards and their submissions")}</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+          <.link
+            navigate="/admin"
+            class="inline-flex items-center px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {gettext("Back to Dashboard")}
+          </.link>
+        </div>
+      </div>
+    </div>
+    
+<!-- Billboard Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <!-- Created Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-yellow-900">
+            <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :created, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Created")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Active Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-green-900">
+            <svg class="w-8 h-8 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :active, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Active")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Stopped Stats -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-red-900">
+            <svg class="w-8 h-8 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :stopped, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Stopped")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Total Submissions -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-purple-900">
+            <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :total_submissions, 0)}</p>
+            <p class="text-sm text-gray-400">{gettext("Submissions")}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Billboards Table -->
+    <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-700">
+        <h2 class="text-lg font-medium text-white">{gettext("All Billboards")}</h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Title")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Streamer")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Status")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Submissions")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Created")}
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Actions")}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <%= for billboard <- @billboards do %>
+              <tr class="hover:bg-gray-700">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                  {billboard.title}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {billboard.streamer.username}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{status_color(billboard.status)}"}>
+                    {String.capitalize(to_string(billboard.status))}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <div class="flex items-center">
+                    <span class="font-medium">{length(billboard.submissions || [])}</span>
+                    <%= if length(billboard.submissions || []) > 0 do %>
+                      <span class="ml-2 text-xs text-gray-400">
+                        ({billboard.submissions |> Enum.count(&submission_reviewed?/1)} reviewed)
+                      </span>
+                    <% end %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {format_datetime(billboard.inserted_at)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    type="button"
+                    phx-click="show_billboard_modal"
+                    phx-value-billboard_id={billboard.id}
+                    class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-600 hover:bg-gray-700 text-white"
+                  >
+                    {gettext("Manage")}
+                  </button>
+                </td>
+              </tr>
+            <% end %>
+
+            <%= if Enum.empty?(@billboards) do %>
+              <tr>
+                <td colspan="6" class="px-6 py-12 text-center text-gray-400">
+                  <svg class="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                  <h3 class="mt-2 text-sm font-medium text-gray-400">{gettext("No billboards found")}</h3>
+                  <p class="mt-1 text-sm text-gray-500">{gettext("No billboards have been created yet.")}</p>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Billboard Management Modal -->
+<%= if @show_billboard_modal do %>
+  <div class="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" phx-click="close_billboard_modal">
+    <div
+      class="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto"
+      phx-click="modal_content_click"
+    >
+      <div class="px-6 py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <%= if @selected_billboard do %>
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                {gettext("Manage Billboard")}: {@selected_billboard.title}
+              </h3>
+              <p class="text-sm text-gray-400 mt-1">
+                {gettext("ID")}: {@selected_billboard.billboard_id} | {gettext("Streamer")}: {@selected_billboard.streamer.username}
+              </p>
+            <% else %>
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                {gettext("Billboard Not Found")}
+              </h3>
+              <p class="text-sm text-red-400 mt-1">
+                {gettext("The selected billboard could not be loaded.")}
+              </p>
+            <% end %>
+          </div>
+          <button
+            type="button"
+            class="bg-gray-800 rounded-md text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+            phx-click="close_billboard_modal"
+          >
+            <span class="sr-only">{gettext("Close")}</span>
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <%= if @selected_billboard do %>
+          <!-- Status Management -->
+          <div class="mt-6 border-t border-gray-700 pt-6">
+            <h4 class="text-sm font-medium text-white mb-4">{gettext("Status Management")}</h4>
+            <div class="flex flex-wrap gap-2">
+              <%= for status <- [:created, :active, :stopped] do %>
+                <button
+                  type="button"
+                  phx-click="change_status"
+                  phx-value-billboard_id={@selected_billboard.id}
+                  phx-value-status={status}
+                  class={"px-3 py-2 rounded-md text-sm font-medium transition-colors #{if @selected_billboard.status == status, do: "bg-blue-600 text-white", else: "bg-gray-700 text-gray-300 hover:bg-gray-600"}"}
+                >
+                  {String.capitalize(to_string(status))}
+                </button>
+              <% end %>
+            </div>
+          </div>
+          
+<!-- Submissions Management -->
+          <div class="mt-6 border-t border-gray-700 pt-6">
+            <h4 class="text-sm font-medium text-white mb-4">
+              {gettext("Submissions")} ({length(@selected_billboard.submissions || [])})
+            </h4>
+
+            <%= if Enum.empty?(@selected_billboard.submissions || []) do %>
+              <p class="text-gray-400 text-sm">{gettext("No submissions yet.")}</p>
+            <% else %>
+              <div class="space-y-3 max-h-64 overflow-y-auto">
+                <%= for {submission, index} <- Enum.with_index(@selected_billboard.submissions) do %>
+                  <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="flex items-start justify-between">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-3">
+                          <div class={"w-3 h-3 rounded-full #{if submission_reviewed?(submission), do: "bg-green-500", else: "bg-yellow-500"}"}>
+                          </div>
+                          <span class="text-sm text-gray-300">
+                            {gettext("Pseudo")}: <span class="font-medium">{submission["pseudo"] || gettext("Anonymous")}</span>
+                          </span>
+                        </div>
+                        <p class="text-sm text-blue-400 mt-1 truncate">
+                          {submission["url"]}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                          {gettext("Submitted")}: {format_datetime(elem(DateTime.from_iso8601(submission["submitted_at"]), 1))}
+                        </p>
+                      </div>
+                      <div class="flex space-x-2 ml-4">
+                        <button
+                          type="button"
+                          phx-click="toggle_submission_review"
+                          phx-value-billboard_id={@selected_billboard.id}
+                          phx-value-index={index}
+                          class={"px-2 py-1 rounded text-xs font-medium #{if submission_reviewed?(submission), do: "bg-green-600 text-white", else: "bg-yellow-600 text-white"}"}
+                        >
+                          <%= if submission_reviewed?(submission) do %>
+                            {gettext("Reviewed")}
+                          <% else %>
+                            {gettext("Review")}
+                          <% end %>
+                        </button>
+                        <button
+                          type="button"
+                          phx-click="remove_submission"
+                          phx-value-billboard_id={@selected_billboard.id}
+                          phx-value-index={index}
+                          class="px-2 py-1 rounded text-xs font-medium bg-red-600 text-white hover:bg-red-700"
+                          data-confirm={gettext("Are you sure you want to remove this submission?")}
+                        >
+                          {gettext("Remove")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          
+<!-- Danger Zone -->
+          <div class="mt-6 border-t border-red-900 pt-6">
+            <h4 class="text-sm font-medium text-red-400 mb-4">{gettext("Danger Zone")}</h4>
+            <button
+              type="button"
+              phx-click="confirm_delete_billboard"
+              phx-value-billboard_id={@selected_billboard.id}
+              data-confirm={gettext("Are you sure you want to delete this billboard? This action cannot be undone.")}
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              {gettext("Delete Billboard")}
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

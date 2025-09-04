@@ -14,7 +14,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       )
 
     Cache.put(:tokens, :twitch, "token")
-    Application.put_env(:premiere_ecoute, :twitch_eventsub_secret, "s3cre77890ab")
 
     {:ok, %{scope: scope}}
   end

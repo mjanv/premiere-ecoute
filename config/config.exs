@@ -9,7 +9,8 @@ config :premiere_ecoute,
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
     PremiereEcoute.Sessions.Scores.PollHandler
-  ]
+  ],
+  twitch_eventsub_secret: "094545d3d0d963dc017d44e66c075d7e11dbee8fc9209885b20fd5b5f2d3772f"
 
 config :premiere_ecoute, :scopes,
   user: [
@@ -25,6 +26,7 @@ config :premiere_ecoute, :scopes,
   ]
 
 config :premiere_ecoute, PremiereEcoute.Accounts,
+  bot: "maxime.janvier+premiereecoute@gmail.com",
   admins: ["lanfeust313"],
   bots: ["premiereecoutebot"],
   streamers: ["bebealc8"]
