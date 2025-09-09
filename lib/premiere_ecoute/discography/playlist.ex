@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Discography.Playlist do
     identity: [:playlist_id],
     json: [:id, :title, :cover_url]
 
+  alias PremiereEcoute.Apis.SpotifyApi.Parser
   alias PremiereEcoute.Discography.Playlist.Track
   alias PremiereEcoute.Repo
 
@@ -66,7 +67,7 @@ defmodule PremiereEcoute.Discography.Playlist do
       album_id: track["album"]["id"],
       user_id: playlist.owner_id,
       name: track["name"],
-      artist: PremiereEcoute.Apis.SpotifyApi.Parser.parse_primary_artist(track["artists"]),
+      artist: Parser.parse_primary_artist(track["artists"]),
       duration_ms: track["duration_ms"],
       added_at: NaiveDateTime.utc_now(),
       release_date: ~D[1900-01-01]

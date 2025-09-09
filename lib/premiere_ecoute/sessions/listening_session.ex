@@ -95,9 +95,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   def next_track(%__MODULE__{source: :playlist} = session) do
-    %{playlist: %{tracks: tracks}, current_playlist_track: current_playlist_track} =
-      Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
-
+    %{playlist: %{tracks: tracks}} = Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
     current_track(session, hd(Enum.reverse(tracks)).id)
   end
 
@@ -200,4 +198,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.one()
     |> preload()
   end
+
+  def title(%__MODULE__{album: nil, playlist: nil}), do: ""
+  def title(%__MODULE__{album: %{name: name}, playlist: nil}), do: name
+  def title(%__MODULE__{album: nil, playlist: %{title: title}}), do: title
 end

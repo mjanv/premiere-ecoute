@@ -3,6 +3,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   require Logger
 
+  import PremiereEcouteWeb.Sessions.Components.SessionComponents
+
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Discography.Playlist
@@ -197,10 +199,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         {:player, :end_track, state},
         %{assigns: %{show: show, listening_session: session, current_scope: scope}} = socket
       ) do
+    ListeningSessionWorker.in_seconds(%{action: "pause", session_id: session.id, user_id: scope.user.id}, 2)
+
     if show[:next_track] > 0 do
+      action = if session.source == :album, do: "next_track", else: "next_playlist_track"
+
       {:ok, job} =
         ListeningSessionWorker.in_seconds(
-          %{action: "next_track", session_id: session.id, user_id: scope.user.id},
+          %{action: action, session_id: session.id, user_id: scope.user.id},
           show[:next_track]
         )
 
@@ -217,11 +223,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_info({:player, :start_track, state}, %{assigns: %{listening_session: session}} = socket) do
     case state do
-      %{"context" => %{"type" => "playlist"}} = payload ->
+      %{"context" => %{"type" => "playlist", "uri" => "spotify:playlist:" <> _playlist_id}} = payload ->
         case Playlist.add_track_to_playlist(session.playlist, payload) do
           {:ok, _} ->
             session = ListeningSession.get(session.id)
-            {:ok, session} = ListeningSession.next_track(session) |> IO.inspect()
+            {:ok, session} = ListeningSession.next_track(session)
 
             assign(socket, :listening_session, session)
 
@@ -302,22 +308,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       track_summary -> track_summary["unique_votes"] || 0
     end
   end
-
-  def session_average_score(nil), do: "N/A"
-
-  def session_average_score(report) do
-    case report.session_summary do
-      %{"viewer_score" => score} when is_number(score) -> Float.round(score, 1)
-      %{"viewer_score" => score} when is_binary(score) -> score
-      _ -> "N/A"
-    end
-  end
-
-  def session_total_votes(nil), do: 0
-  def session_total_votes(report), do: report.session_summary["unique_votes"]
-
-  def session_unique_voters(nil), do: 0
-  def session_unique_voters(report), do: report.session_summary["unique_voters"]
 
   def session_tracks_rated(nil), do: 0
   def session_tracks_rated(report), do: report.session_summary["tracks_rated"]

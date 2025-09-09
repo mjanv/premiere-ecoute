@@ -207,7 +207,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
     test "cannot delete an album associated to at least one listening session" do
       user = user_fixture()
       {:ok, %Album{album_id: album_id} = album} = Album.create(album_fixture())
-      {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, _} = ListeningSession.create(%{source: :album, user_id: user.id, album_id: album.id})
 
       {:error, changeset} = Album.delete(album)
 

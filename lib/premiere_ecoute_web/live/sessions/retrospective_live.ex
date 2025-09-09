@@ -273,19 +273,22 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   end
 
   defp build_track_data_attributes(listening_session, report) do
-    case listening_session.album do
-      %{tracks: tracks} when is_list(tracks) and length(tracks) > 0 ->
+    tracks = get_session_tracks(listening_session)
+
+    case tracks do
+      tracks when is_list(tracks) and length(tracks) > 0 ->
         tracks
         |> Enum.with_index()
         |> Enum.reduce([], fn {track, index}, acc ->
-          viewer_score = track_average_score(track.id, report)
-          streamer_score = track_streamer_score(track.id, report)
+          track_id = get_track_id(track, listening_session)
+          viewer_score = track_average_score(track_id, report)
+          streamer_score = track_streamer_score(track_id, report)
 
           [
-            {"data-track#{index}-name", "#{index + 1}. #{track.name}"},
+            {"data-track#{index}-name", "#{index + 1}. #{get_track_name(track)}"},
             {"data-track#{index}-viewer-score", viewer_score},
             {"data-track#{index}-streamer-score", streamer_score},
-            {"data-track#{index}-id", track.id}
+            {"data-track#{index}-id", track_id}
             | acc
           ]
         end)
@@ -295,6 +298,26 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
         []
     end
   end
+
+  # AIDEV-NOTE: Helper functions to handle both album and playlist tracks
+  defp get_session_tracks(%{album: %{tracks: tracks}}) when is_list(tracks), do: tracks
+  defp get_session_tracks(%{playlist: %{tracks: tracks}}) when is_list(tracks), do: tracks
+  defp get_session_tracks(_), do: []
+
+  defp get_track_id(%{id: id}, %{source: :album}), do: id
+  defp get_track_id(%{id: id}, %{source: :playlist}), do: id
+  defp get_track_id(track, _), do: Map.get(track, :id) || Map.get(track, :track_id)
+
+  defp get_track_name(%{name: name}), do: name
+  defp get_track_name(track), do: Map.get(track, :name, "Unknown Track")
+
+  defp get_session_title(%{album: %{name: name}}) when not is_nil(name), do: name
+  defp get_session_title(%{playlist: %{title: title}}) when not is_nil(title), do: title
+  defp get_session_title(_), do: "Unknown"
+
+  defp get_session_artist(%{album: %{artist: artist}}) when not is_nil(artist), do: artist
+  defp get_session_artist(%{playlist: %{owner_name: owner_name}}) when not is_nil(owner_name), do: "by #{owner_name}"
+  defp get_session_artist(_), do: "Unknown Artist"
 
   # Calculate dynamic bar height based on vote count and maximum votes in the dataset.
   # Ensures bars scale proportionally and don't exceed container height.

@@ -115,8 +115,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
          {:ok, _} <- Apis.twitch().subscribe(scope, "channel.chat.message"),
          session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.start(session),
-         Apis.spotify().start_resume_playback(scope, session.playlist) do
+         _ <- Apis.spotify().start_resume_playback(scope, session.playlist) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%SessionStarted{session_id: session.id}]}

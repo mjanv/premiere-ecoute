@@ -20,8 +20,6 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
 
   @impl true
   def init(args) do
-    IO.inspect("START ?")
-
     with _ <- Process.send_after(self(), :poll, @poll_interval),
          scope <- Scope.for_user(User.get(args)),
          {:ok, phx_ref} <- Presence.join(scope.user.id) do

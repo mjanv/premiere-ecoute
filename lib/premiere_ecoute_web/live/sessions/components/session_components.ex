@@ -1,0 +1,221 @@
+defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
+  use Phoenix.Component
+  use Gettext, backend: PremiereEcoute.Gettext
+
+  def source_details(%{listening_session: %{source: :album, album: album}} = assigns) do
+    assigns = assign(assigns, :album, album)
+
+    ~H"""
+    <div>
+      <!-- Album Info -->
+      <div class="text-right">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="text-purple-200 block">{gettext("Artist")}</span>
+            <span class="font-medium text-white">{@album.artist}</span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Released")}</span>
+            <span class="font-medium text-white">
+              {if @album.release_date,
+                do: Calendar.strftime(@album.release_date, "%-d %b %Y"),
+                else: gettext("Unknown")}
+            </span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Tracks")}</span>
+            <span class="font-medium text-white">{@album.total_tracks}</span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Duration")}</span>
+            <span class="font-medium text-white">
+              {total =
+                (@album.tracks || [])
+                |> Enum.map(&(&1.duration_ms || 0))
+                |> Enum.sum()
+                |> div(60_000)
+
+              "#{total}min"}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+    <!-- Album Cover -->
+      <div class="flex-shrink-0">
+        <%= if @album.cover_url do %>
+          <img
+            src={@album.cover_url}
+            alt={"#{@album.name} cover"}
+            class="w-32 h-32 rounded-lg shadow-lg"
+          />
+        <% else %>
+          <div class="w-32 h-32 bg-white/20 rounded-lg flex items-center justify-center">
+            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    """
+  end
+
+  def source_details(%{listening_session: %{source: :playlist, playlist: playlist}} = assigns) do
+    assigns = assign(assigns, :playlist, playlist)
+
+    ~H"""
+    <div class="flex items-center justify-end space-x-4">
+      <!-- Playlist Info -->
+      <div class="text-right">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="text-purple-200 block">{gettext("Owner")}</span>
+            <span class="font-medium text-white">{@playlist.owner_name}</span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Provider")}</span>
+            <span class="font-medium text-white">
+              {String.capitalize(to_string(@playlist.provider))}
+            </span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Tracks")}</span>
+            <span class="font-medium text-white">{length(@playlist.tracks || [])}</span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Public")}</span>
+            <span class="font-medium text-white">
+              {if @playlist.public, do: gettext("Yes"), else: gettext("No")}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+    <!-- Playlist Cover -->
+      <div class="flex-shrink-0">
+        <%= if @playlist.cover_url do %>
+          <img
+            src={@playlist.cover_url}
+            alt={"#{@playlist.title} cover"}
+            class="w-32 h-32 rounded-lg shadow-lg"
+          />
+        <% else %>
+          <div class="w-32 h-32 bg-white/20 rounded-lg flex items-center justify-center">
+            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    """
+  end
+
+  attr :report, :any, required: true
+  attr :key, :string, required: true
+  attr :legend, :string, required: true
+  attr :base, :string, required: false, default: nil
+  attr :show, :boolean, required: false, default: true
+
+  def session_stat(assigns) do
+    ~H"""
+    <%= if @show do %>
+      <div class="text-center bg-white/20 rounded-lg p-3">
+        <div class="text-2xl font-bold text-white">
+          <.async_result :let={report} assign={@report}>
+            <:loading>--</:loading>
+            <:failed>--</:failed>
+            <%= case session_average_score2(report, @key) do %>
+              <% score when is_number(score) -> %>
+                {score}
+
+                <%= if @base do %>
+                  <span class="text-lg text-purple-200">/{@base}</span>
+                <% end %>
+              <% score when is_binary(score) -> %>
+                {score}
+            <% end %>
+          </.async_result>
+        </div>
+        <div class="text-xs text-purple-200 font-medium">{@legend}</div>
+      </div>
+    <% end %>
+    """
+  end
+
+  def session_average_score2(nil), do: "-"
+
+  def session_average_score2(%{session_summary: summary}, key) do
+    case summary[key] do
+      nil -> "-"
+      score -> score
+    end
+  end
+
+  attr :checked, :boolean, required: true
+  attr :legend, :string, required: true
+  attr :rest, :global
+
+  def session_toggle(assigns) do
+    ~H"""
+    <div class="flex items-center">
+      <label class="flex items-center cursor-pointer">
+        <input type="checkbox" {@rest} checked={@checked} class="sr-only" />
+        <div class={[
+          "relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ease-in-out mr-3",
+          if(@checked, do: "bg-purple-500", else: "bg-white/20")
+        ]}>
+          <span class={[
+            "inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out translate-y-0.5",
+            if(@checked, do: "translate-x-4", else: "translate-x-0.5")
+          ]}>
+          </span>
+        </div>
+        <span class="text-purple-200 text-sm font-medium">
+          {gettext("Display votes")}
+        </span>
+      </label>
+    </div>
+    """
+  end
+
+  def vote_bar(assigns) do
+    ~H"""
+    <%= if @listening_session.status == :active do %>
+      <div class="rounded-xl p-3 mb-6 bg-purple-900/20">
+        <div class="flex items-center justify-center space-x-3">
+          <span class="text-s text-white-300 whitespace-nowrap">
+            {gettext("Your rating")}
+          </span>
+          <div class="flex space-x-1">
+            <%= for rating <- @listening_session.vote_options do %>
+              <button
+                phx-click="vote_track"
+                phx-value-rating={rating}
+                disabled={not @open_vote}
+                class={[
+                  "px-2 py-1 text-sm rounded border transition-colors min-w-[32px]",
+                  if(@listening_session.current_track || @listening_session.current_playlist_track,
+                    do: [
+                      "bg-gray-700 border-gray-600 text-gray-300 hover:bg-purple-500/20 hover:border-purple-400 hover:text-purple-300",
+                      if(assigns[:user_current_rating] == rating,
+                        do: "bg-purple-600 border-purple-500 text-white",
+                        else: ""
+                      )
+                    ],
+                    else: "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50"
+                  )
+                ]}
+                disabled={!(@listening_session.current_track || @listening_session.current_playlist_track)}
+              >
+                {rating}
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    """
+  end
+end

@@ -3,7 +3,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Discography.Album
-  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
@@ -225,7 +224,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       assert session.status == :active
 
-      assert is_nil(Report.get_by(session_id: session.id))
+      report = Report.get_by(session_id: session.id)
+
+      assert %PremiereEcoute.Sessions.Retrospective.Report{
+               polls: [],
+               session_id: session_id,
+               session_summary: %{
+                 "unique_votes" => 0,
+                 "unique_voters" => 0,
+                 "streamer_score" => +0.0,
+                 "tracks_rated" => 0,
+                 "viewer_score" => +0.0
+               },
+               track_summaries: [],
+               votes: []
+             } = report
     end
   end
 

@@ -1,14 +1,14 @@
 <!-- Full-page retrospective layout without sidebar/header for sharing -->
 <div class="synthwave-bg min-h-screen text-white">
   
-<!-- Hero Section: Album Cover Background with Stats Overlay -->
-  <%= if @listening_session.album do %>
+<!-- Hero Section: Album/Playlist Cover Background with Stats Overlay -->
+  <%= if @listening_session.album || @listening_session.playlist do %>
     <div class="relative h-screen flex items-center justify-center overflow-hidden">
-      <!-- Full-width Album Cover Background -->
-      <%= if @listening_session.album.cover_url do %>
+      <!-- Full-width Album/Playlist Cover Background -->
+      <%= if (@listening_session.album && @listening_session.album.cover_url) || (@listening_session.playlist && @listening_session.playlist.cover_url) do %>
         <div
           class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={"background-image: url('#{@listening_session.album.cover_url}')"}
+          style={"background-image: url('#{(@listening_session.album && @listening_session.album.cover_url) || (@listening_session.playlist && @listening_session.playlist.cover_url)}')"}
         >
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
         </div>
@@ -105,8 +105,8 @@
               phx-hook="Carousel"
               data-session-viewer-score={session_average_score(report)}
               data-session-streamer-score={session_streamer_score(report)}
-              data-album-name-only={@listening_session.album.name}
-              data-album-artist={@listening_session.album.artist}
+              data-album-name-only={get_session_title(@listening_session)}
+              data-album-artist={get_session_artist(@listening_session)}
               data-most-liked-track={if @most_liked.ok?, do: @most_liked.result, else: ""}
               data-least-liked-track={if @least_liked.ok?, do: @least_liked.result, else: ""}
               {build_track_data_attributes(@listening_session, report)}
@@ -128,10 +128,10 @@
                 </span>
 
                 <h2 id="carousel-title" class="text-4xl md:text-5xl font-bold text-purple-300 drop-shadow-xl">
-                  {@listening_session.album.name}
+                  {get_session_title(@listening_session)}
                 </h2>
                 <p id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg">
-                  {@listening_session.album.artist}
+                  {get_session_artist(@listening_session)}
                 </p>
               </div>
 
@@ -178,14 +178,15 @@
                   </div>
                   
 <!-- Track Histograms -->
-                  <%= if @listening_session.album && length(@listening_session.album.tracks || []) > 0 do %>
+                  <%= if length(get_session_tracks(@listening_session)) > 0 do %>
                     <.async_result :let={_most_liked} assign={@most_liked}>
                       <:loading>
-                        <%= for {track, index} <- Enum.with_index(@listening_session.album.tracks, 1) do %>
+                        <%= for {track, index} <- Enum.with_index(get_session_tracks(@listening_session), 1) do %>
                           <div class="w-full flex-shrink-0">
                             <div class="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
                               <div class="flex items-end justify-center h-80 mx-auto overflow-x-auto">
-                                <% track_distribution = track_vote_distribution(track.id, report, @listening_session) %>
+                                <% track_distribution =
+                                  track_vote_distribution(get_track_id(track, @listening_session), report, @listening_session) %>
                                 <% track_max_votes = track_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end) %>
                                 <% vote_options = session_vote_options(@listening_session) %>
                                 <% padding_class = bar_padding_class(length(vote_options)) %>
@@ -223,11 +224,12 @@
                         <% end %>
                       </:loading>
                       <:failed>
-                        <%= for {track, index} <- Enum.with_index(@listening_session.album.tracks, 1) do %>
+                        <%= for {track, index} <- Enum.with_index(get_session_tracks(@listening_session), 1) do %>
                           <div class="w-full flex-shrink-0">
                             <div class="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
                               <div class="flex items-end justify-center h-80 mx-auto overflow-x-auto">
-                                <% track_distribution = track_vote_distribution(track.id, report, @listening_session) %>
+                                <% track_distribution =
+                                  track_vote_distribution(get_track_id(track, @listening_session), report, @listening_session) %>
                                 <% track_max_votes = track_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end) %>
                                 <% vote_options = session_vote_options(@listening_session) %>
                                 <% padding_class = bar_padding_class(length(vote_options)) %>
@@ -265,16 +267,16 @@
                         <% end %>
                       </:failed>
 
-                      <%= for {track, index} <- Enum.with_index(@listening_session.album.tracks, 1) do %>
+                      <%= for {track, index} <- Enum.with_index(get_session_tracks(@listening_session), 1) do %>
                         <div class="w-full flex-shrink-0">
                           <!-- Highlight most liked track with pink background -->
                           <div class={[
                             "backdrop-blur-md rounded-2xl p-6 border",
                             cond do
-                              @most_liked.ok? && @most_liked.result == track.id ->
+                              @most_liked.ok? && @most_liked.result == get_track_id(track, @listening_session) ->
                                 "bg-gradient-to-br from-pink-900/20 to-purple-900/20 border-pink-400/50"
 
-                              @least_liked.ok? && @least_liked.result == track.id ->
+                              @least_liked.ok? && @least_liked.result == get_track_id(track, @listening_session) ->
                                 "bg-gradient-to-br from-red-900/20 to-orange-900/20 border-red-400/50"
 
                               true ->
@@ -282,7 +284,8 @@
                             end
                           ]}>
                             <div class="flex items-end justify-center h-80 mx-auto">
-                              <% track_distribution = track_vote_distribution(track.id, report, @listening_session) %>
+                              <% track_distribution =
+                                track_vote_distribution(get_track_id(track, @listening_session), report, @listening_session) %>
                               <% track_max_votes = track_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end) %>
                               <% vote_options = session_vote_options(@listening_session) %>
                               <% padding_class = bar_padding_class(length(vote_options)) %>
@@ -342,7 +345,7 @@
 <!-- Dot Indicators -->
                 <div class="flex justify-center space-x-2">
                   <button class="w-3 h-3 bg-white/60 rounded-full carousel-dot active"></button>
-                  <%= for _ <- @listening_session.album.tracks do %>
+                  <%= for _ <- get_session_tracks(@listening_session) do %>
                     <button class="w-3 h-3 bg-white/30 rounded-full carousel-dot"></button>
                   <% end %>
                 </div>

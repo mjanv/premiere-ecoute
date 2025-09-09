@@ -23,7 +23,7 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     ]
   ]
 
-config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 5
+config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 15
 
 config :premiere_ecoute, PremiereEcoute.Repo,
   stacktrace: true,
