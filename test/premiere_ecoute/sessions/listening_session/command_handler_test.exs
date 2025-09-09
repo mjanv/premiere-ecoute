@@ -239,6 +239,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
                track_summaries: [],
                votes: []
              } = report
+
+      assert session_id == session.id
     end
   end
 

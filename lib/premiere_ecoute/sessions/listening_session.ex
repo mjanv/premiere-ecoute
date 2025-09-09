@@ -202,4 +202,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def title(%__MODULE__{album: nil, playlist: nil}), do: ""
   def title(%__MODULE__{album: %{name: name}, playlist: nil}), do: name
   def title(%__MODULE__{album: nil, playlist: %{title: title}}), do: title
+
+  def current_track(%__MODULE__{current_track: nil, current_playlist_track: nil}), do: nil
+  def current_track(%__MODULE__{current_track: track, current_playlist_track: nil}), do: track
+  def current_track(%__MODULE__{current_track: nil, current_playlist_track: track}), do: track
+
+  def current?(%__MODULE__{source: :album, current_track: %{id: id}}, %{id: id}), do: true
+  def current?(%__MODULE__{source: :playlist, current_playlist_track: %{id: id}}, %{id: id}), do: true
+  def current?(_, _), do: false
+
+  def tracks(%__MODULE__{album: nil, playlist: nil}), do: []
+  def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks
+  def tracks(%__MODULE__{album: nil, playlist: %{tracks: tracks}}), do: tracks
 end

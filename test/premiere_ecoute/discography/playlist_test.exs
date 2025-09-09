@@ -439,8 +439,8 @@ defmodule PremiereEcoute.Discography.PlaylistTest do
 
       {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload)
       {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload2)
-      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload)
-      {:ok, playlist} = Playlist.add_track_to_playlist(playlist, @payload2)
+      {:error, _changeset} = Playlist.add_track_to_playlist(playlist, @payload)
+      {:error, _changeset} = Playlist.add_track_to_playlist(playlist, @payload2)
 
       assert [
                %Playlist.Track{

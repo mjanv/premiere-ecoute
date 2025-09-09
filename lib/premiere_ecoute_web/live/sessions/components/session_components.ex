@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
+  @moduledoc false
+
   use Phoenix.Component
   use Gettext, backend: PremiereEcoute.Gettext
 
@@ -6,7 +8,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     assigns = assign(assigns, :album, album)
 
     ~H"""
-    <div>
+    <div class="flex items-center justify-end space-x-4">
       <!-- Album Info -->
       <div class="text-right">
         <div class="grid grid-cols-2 gap-4 text-sm">
@@ -144,7 +146,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
-  def session_average_score2(nil), do: "-"
+  def session_average_score2(nil, _), do: "-"
 
   def session_average_score2(%{session_summary: summary}, key) do
     case summary[key] do
@@ -176,6 +178,91 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           {gettext("Display votes")}
         </span>
       </label>
+    </div>
+    """
+  end
+
+  attr :value, :integer, required: true
+  attr :at, :any, required: true
+  attr :rest, :global
+
+  def next_track(assigns) do
+    ~H"""
+    <div class="pt-2">
+      <%= if @at do %>
+        <!-- Active Timer - replaces slider when countdown is active -->
+        <div class="flex items-center justify-center space-x-2">
+          <span class="text-purple-200 text-xs font-medium">
+            {gettext("Next track in")}
+          </span>
+          <div
+            id="next-track-timer"
+            phx-hook="NextTrackTimer"
+            data-next-track-at={DateTime.to_iso8601(@at)}
+            class="bg-purple-600/20 px-2 py-1 rounded border border-purple-500/30"
+          >
+            <span class="font-mono text-sm font-bold text-purple-300" id="timer-display">
+              --:--
+            </span>
+          </div>
+        </div>
+      <% else %>
+        <!-- Slider - shown when no timer is active -->
+        <div class="flex items-center space-x-4">
+          <span class="text-purple-200 text-sm font-medium whitespace-nowrap">
+            {gettext("Next track in")}
+          </span>
+          <div class="flex-1 px-1 relative">
+            <form phx-change="update_next_track">
+              <input
+                type="range"
+                name="next_track"
+                min="0"
+                max="60"
+                value={@value}
+                id="next-track-slider"
+                class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-white/20 slider-purple"
+              />
+            </form>
+            <style>
+              .slider-purple::-webkit-slider-thumb {
+                appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #8b5cf6;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+              }
+              .slider-purple::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #8b5cf6;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+              }
+              .slider-purple::-webkit-slider-track {
+                height: 8px;
+                border-radius: 4px;
+                background: linear-gradient(to right, #8b5cf6 0%, #8b5cf6 {(@show[:next_track] / 60) * 100}%, rgba(255,255,255,0.2) {(@show[:next_track] / 60) * 100}%, rgba(255,255,255,0.2) 100%);
+              }
+            </style>
+          </div>
+          <span class={[
+            "text-sm font-medium min-w-[60px] text-center",
+            if(@value == 0, do: "text-gray-400", else: "text-white")
+          ]}>
+            <%= if @value == 0 do %>
+              {gettext("Off")}
+            <% else %>
+              {@value}s
+            <% end %>
+          </span>
+        </div>
+      <% end %>
     </div>
     """
   end

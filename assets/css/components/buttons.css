@@ -1,3 +1,9 @@
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none; /* prevents hover/click effects */
+}
+
 .btn-primary {
   background: var(--color-primary-600);
   color: white;

@@ -2,6 +2,7 @@ defmodule PremiereEcouteCore.FeatureFlag do
   @moduledoc false
 
   defdelegate enabled?(flag, opts \\ []), to: FunWithFlags
+  def disabled?(flag, opts \\ []), do: not enabled?(flag, opts)
   defdelegate enable(flag, opts \\ []), to: FunWithFlags
   defdelegate disable(flag, opts \\ []), to: FunWithFlags
   defdelegate clear(flag, opts \\ []), to: FunWithFlags

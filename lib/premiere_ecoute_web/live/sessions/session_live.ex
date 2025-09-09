@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   require Logger
 
   import PremiereEcouteWeb.Sessions.Components.SessionComponents
+  import PremiereEcouteWeb.Components.Backgrounds
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis.PlayerSupervisor
