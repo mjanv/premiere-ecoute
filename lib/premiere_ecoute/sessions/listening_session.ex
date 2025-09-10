@@ -211,7 +211,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def current?(%__MODULE__{source: :playlist, current_playlist_track: %{id: id}}, %{id: id}), do: true
   def current?(_, _), do: false
 
+  def playing?(%__MODULE__{source: :album, current_track: nil}), do: false
+  def playing?(%__MODULE__{source: :playlist, current_playlist_track: nil}), do: false
+  def playing?(%__MODULE__{}), do: true
+
   def tracks(%__MODULE__{album: nil, playlist: nil}), do: []
   def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks
   def tracks(%__MODULE__{album: nil, playlist: %{tracks: tracks}}), do: tracks
+
+  def total_duration(%__MODULE__{} = listening_session) do
+    listening_session
+    |> tracks()
+    |> Enum.map(&(&1.duration_ms || 0))
+    |> Enum.sum()
+    |> div(60_000)
+  end
 end

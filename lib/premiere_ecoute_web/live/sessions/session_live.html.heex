@@ -14,7 +14,7 @@
 
     <div class="max-w-7xl mx-auto px-6 flex h-screen">
       <div class="w-1/3 p-6 overflow-y-auto">
-        <.gradient_bg status={@listening_session.status} statutes={[:preparing, :active]}>
+        <.gradient_bg class="p-6 mb-6" status={@listening_session.status} statutes={[:preparing, :active]}>
           <.live_component
             module={PremiereEcouteWeb.Sessions.Components.SpotifyPlayer}
             id="spotify-player"
@@ -23,14 +23,11 @@
             current_scope={@current_scope}
           />
         </.gradient_bg>
-        
-<!-- Session Information -->
-        <.gradient_bg>
+
+        <.gradient_bg class="p-6">
           <div class="flex items-center space-x-3 mb-4">
             <div class="flex items-center w-full">
-              <.status_badge size="sm">
-                {gettext("Vote Format")}: {vote_type_display(@listening_session)}
-              </.status_badge>
+              <.status_badge size="sm">{gettext("Vote Format")}: {vote_type_display(@listening_session)}</.status_badge>
               <div class="flex-1"></div>
               <.status_badge status={Atom.to_string(@listening_session.status)} size="sm" />
             </div>
@@ -171,67 +168,28 @@
 <!-- Right Column - Track List (2/3) -->
       <div class="w-2/3 p-6 overflow-y-auto">
         <.vote_bar listening_session={@listening_session} open_vote={@open_vote} user_current_rating={@user_current_rating} />
-        
-<!-- Note Graph - Show when session started, update on report changes -->
-        <%= if @show[:scores] && @listening_session.status in [:active, :stopped] do %>
-          <div class="mb-6">
-            <div
-              id="note-graph"
-              phx-hook="NoteGraph"
-              data-vote-data={
-                Jason.encode!(
-                  case @vote_trends do
-                    %Phoenix.LiveView.AsyncResult{ok?: true, result: trends} ->
-                      Enum.map(trends, fn {timestamp, avg} -> [timestamp, avg] end)
 
-                    _ ->
-                      []
-                  end
-                )
-              }
-              data-vote-options={Jason.encode!(@listening_session.vote_options)}
-              data-session-start={Jason.encode!(@listening_session.started_at)}
-              class="rounded-lg pt-4 pr-4 pl-4"
-              style="background-color: var(--color-dark-900);"
-            >
-              <div style="position: relative; height: 150px; width: 100%;">
-                <canvas id="note-graph-canvas"></canvas>
-              </div>
-            </div>
-          </div>
+        <%= if @show[:scores] do %>
+          <.gradient_bg status={@listening_session.status} statutes={[:active, :stopped]}>
+            <.note_graph listening_session={@listening_session} trends={@vote_trends} />
+          </.gradient_bg>
         <% end %>
 
         <div class="mb-6 mt-8">
           <%= if length(ListeningSession.tracks(@listening_session)) > 0 do %>
-            <div class="space-y-3">
-              <%= for {track, index} <- 
-                @listening_session
-                |> ListeningSession.tracks()
-                |> Enum.sort_by(fn track ->
-                  current_track = ListeningSession.current_track(@listening_session)
-                  if current_track && track.id == current_track.id do
-                    0
-                  else
-                    Map.get(track, :track_number, 999)
-                  end
-                end)
-                |> Enum.with_index(1)
-                do %>
-                <div
-                  class={[
-                    "rounded-lg transition-colors overflow-hidden",
-                    if(ListeningSession.current?(@listening_session, track),
-                      do: if(@open_vote, do: "border-2 border-green-500/50", else: "border-2 border-orange-500/50"),
-                      else: "hover:bg-gray-700"
-                    )
-                  ]}
-                  style={
-                    if(ListeningSession.current?(@listening_session, track),
-                      do: "",
-                      else: "background-color: var(--color-dark-900);"
-                    )
-                  }
-                >
+            <div class="flex flex-col space-y-3">
+              <%= for {track, index} <- Enum.with_index(ListeningSession.tracks(@listening_session), 1) do %>
+                <div class={[
+                  "rounded-lg transition-colors overflow-hidden",
+                  if(ListeningSession.current?(@listening_session, track),
+                    do:
+                      if(@open_vote,
+                        do: "order-first border-2 border-green-500/50",
+                        else: "order-first border-2 border-orange-500/50"
+                      ),
+                    else: "border-purple-300/50 border-2 hover:bg-purple-300/30"
+                  )
+                ]}>
                   <!-- Track Row with Green Background -->
                   <div class={[
                     "p-4 transition-colors",
@@ -251,7 +209,7 @@
                             "text-lg w-8 flex-shrink-0 font-medium",
                             if(@open_vote, do: "text-green-400", else: "text-orange-400")
                           ]}>
-                            {Map.get(track, :track_number) || index}
+                            {index}
                           </span>
                         <% else %>
                           <span class="text-lg text-gray-400 w-8 flex-shrink-0">{Map.get(track, :track_number, index)}</span>
@@ -266,17 +224,15 @@
                           ]}>
                             {track.name}
                           </h4>
-                          <%= if track.duration_ms do %>
-                            <p class={[
-                              "text-sm",
-                              if(ListeningSession.current?(@listening_session, track),
-                                do: if(@open_vote, do: "text-green-400", else: "text-orange-400"),
-                                else: "text-gray-400"
-                              )
-                            ]}>
-                              {PremiereEcouteCore.Duration.timer(track.duration_ms)}
-                            </p>
-                          <% end %>
+                          <p class={[
+                            "text-sm",
+                            if(ListeningSession.current?(@listening_session, track),
+                              do: if(@open_vote, do: "text-green-400", else: "text-orange-400"),
+                              else: "text-gray-400"
+                            )
+                          ]}>
+                            {PremiereEcouteCore.Duration.timer(track.duration_ms)}
+                          </p>
                         </div>
                       </div>
 
@@ -288,70 +244,37 @@
                               if(@open_vote, do: "bg-green-500/20 text-green-300", else: "bg-orange-500/20 text-orange-300")
                             ]}>
                               <%= if @open_vote do %>
-                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                  <path
-                                    fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd"
-                                  />
-                                </svg>
                                 {gettext("Open votes")}
                               <% else %>
-                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                  <path
-                                    fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clip-rule="evenodd"
-                                  />
-                                </svg>
                                 {gettext("Closed votes")}
                               <% end %>
                             </div>
                           </div>
                         <% end %>
                         <%= if @show[:votes] do %>
-                          <div class="text-center">
-                            <p class="text-xl font-bold text-purple-300">
-                              <.async_result :let={report} assign={@report}>
-                                <:loading>--</:loading>
-                                <:failed>--</:failed>
-                                {track_votes_count(track.id, report)}
-                              </.async_result>
-                            </p>
-                            <p class="text-purple-400/70">{gettext("Votes")}</p>
-                          </div>
+                          <.session_track_stat
+                            report={@report}
+                            track={track}
+                            key="unique_votes"
+                            color="purple"
+                            legend={gettext("Votes")}
+                          />
                         <% end %>
                         <%= if @show[:scores] do %>
-                          <div class="text-center">
-                            <p class="text-xl font-bold text-pink-300">
-                              <.async_result :let={report} assign={@report}>
-                                <:loading>--</:loading>
-                                <:failed>--</:failed>
-                                <%= case track_score(track.id, report) do %>
-                                  <% "N/A" -> %>
-                                    <span class="text-gray-500">--</span>
-                                  <% score -> %>
-                                    {score}
-                                <% end %>
-                              </.async_result>
-                            </p>
-                            <p class="text-pink-400/70">{gettext("Score")}</p>
-                          </div>
-                          <div class="text-center">
-                            <p class="text-xl font-bold text-emerald-300">
-                              <.async_result :let={report} assign={@report}>
-                                <:loading>--</:loading>
-                                <:failed>--</:failed>
-                                <%= case track_streamer_score(track.id, report) do %>
-                                  <% "N/A" -> %>
-                                    <span class="text-gray-500">--</span>
-                                  <% score -> %>
-                                    {score}
-                                <% end %>
-                              </.async_result>
-                            </p>
-                            <p class="text-emerald-400/70">{gettext("My Score")}</p>
-                          </div>
+                          <.session_track_stat
+                            report={@report}
+                            track={track}
+                            key="viewer_score"
+                            color="pink"
+                            legend={gettext("Score")}
+                          />
+                          <.session_track_stat
+                            report={@report}
+                            track={track}
+                            key="streamer_score"
+                            color="emerald"
+                            legend={gettext("My Score")}
+                          />
                         <% end %>
                       </div>
                     </div>
@@ -361,62 +284,7 @@
                     <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
                       <!-- Horizontal Histogram taking ~80% width -->
                       <div class="flex items-end justify-center h-32 mx-auto w-4/5">
-                        <.async_result :let={report} assign={@report}>
-                          <:loading>
-                            <%= for rating <- @listening_session.vote_options do %>
-                              <div class="flex-1 flex flex-col items-center px-1">
-                                <div class="w-full bg-gray-600 rounded-t animate-pulse" style="height: 8px"></div>
-                                <span class="text-xs text-gray-400 font-medium mt-1">
-                                  {rating}
-                                </span>
-                              </div>
-                            <% end %>
-                          </:loading>
-                          <:failed>
-                            <%= for rating <- @listening_session.vote_options do %>
-                              <div class="flex-1 flex flex-col items-center px-1">
-                                <div class="w-full bg-red-600 rounded-t" style="height: 6px"></div>
-                                <span class="text-xs text-gray-400 font-medium mt-1">
-                                  {rating}
-                                </span>
-                              </div>
-                            <% end %>
-                          </:failed>
-                          <% track_distribution = track_vote_distribution(track.id, report, @listening_session) %>
-                          <% track_max_votes = track_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end) %>
-                          <% padding_class = bar_padding_class(length(@listening_session.vote_options)) %>
-                          <% font_size_class = vote_count_font_size(track_max_votes) %>
-                          <%= for {rating, votes} <- track_distribution do %>
-                            <% bar_height = calculate_bar_height(votes, track_max_votes, 110, 6) %>
-                            <% vote_position = vote_count_position(bar_height) %>
-                            <div class={"flex-1 flex flex-col items-center #{padding_class} min-w-0"}>
-                              <!-- Vote count above bar (on the roof) -->
-                              <%= if votes > 0 && vote_position == :above do %>
-                                <span class={"#{font_size_class} font-medium text-white mb-1"}>
-                                  {format_vote_count(votes)}
-                                </span>
-                              <% end %>
-
-                              <div
-                                class={[
-                                  "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
-                                  vote_option_color(rating, @listening_session)
-                                ]}
-                                style={"height: #{bar_height}px"}
-                              >
-                                <%= if votes > 0 && vote_position == :inside do %>
-                                  <span class={"#{font_size_class} font-medium text-white"}>
-                                    {format_vote_count(votes)}
-                                  </span>
-                                <% end %>
-                              </div>
-
-                              <span class="text-xs text-gray-400 font-medium mt-1">
-                                {rating}
-                              </span>
-                            </div>
-                          <% end %>
-                        </.async_result>
+                        <.distribution_graph listening_session={@listening_session} report={@report} track={track} />
                       </div>
                     </div>
                   <% end %>

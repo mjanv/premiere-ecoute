@@ -4,6 +4,9 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   use Phoenix.Component
   use Gettext, backend: PremiereEcoute.Gettext
 
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Sessions.ListeningSession
+
   def source_details(%{listening_session: %{source: :album, album: album}} = assigns) do
     assigns = assign(assigns, :album, album)
 
@@ -18,11 +21,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
           <div>
             <span class="text-purple-200 block">{gettext("Released")}</span>
-            <span class="font-medium text-white">
-              {if @album.release_date,
-                do: Calendar.strftime(@album.release_date, "%-d %b %Y"),
-                else: gettext("Unknown")}
-            </span>
+            <span class="font-medium text-white">{PremiereEcouteCore.Date.date(@album.release_date)}</span>
           </div>
           <div>
             <span class="text-purple-200 block">{gettext("Tracks")}</span>
@@ -30,15 +29,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
           <div>
             <span class="text-purple-200 block">{gettext("Duration")}</span>
-            <span class="font-medium text-white">
-              {total =
-                (@album.tracks || [])
-                |> Enum.map(&(&1.duration_ms || 0))
-                |> Enum.sum()
-                |> div(60_000)
-
-              "#{total}min"}
-            </span>
+            <span class="font-medium text-white">{PremiereEcouteCore.Duration.duration(Album.total_duration(@album))}</span>
           </div>
         </div>
       </div>
@@ -267,6 +258,10 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
+  attr :listening_session, :any, required: true
+  attr :user_current_rating, :string, required: true
+  attr :open_vote, :boolean, required: true
+
   def vote_bar(assigns) do
     ~H"""
     <%= if @listening_session.status == :active do %>
@@ -283,18 +278,15 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
                 disabled={not @open_vote}
                 class={[
                   "px-2 py-1 text-sm rounded border transition-colors min-w-[32px]",
-                  if(@listening_session.current_track || @listening_session.current_playlist_track,
+                  if(ListeningSession.playing?(@listening_session),
                     do: [
                       "bg-gray-700 border-gray-600 text-gray-300 hover:bg-purple-500/20 hover:border-purple-400 hover:text-purple-300",
-                      if(assigns[:user_current_rating] == rating,
-                        do: "bg-purple-600 border-purple-500 text-white",
-                        else: ""
-                      )
+                      if(@user_current_rating == rating, do: "bg-purple-600 border-purple-500 text-white", else: "")
                     ],
                     else: "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50"
                   )
                 ]}
-                disabled={!(@listening_session.current_track || @listening_session.current_playlist_track)}
+                disabled={!ListeningSession.playing?(@listening_session)}
               >
                 {rating}
               </button>
@@ -304,5 +296,153 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
       </div>
     <% end %>
     """
+  end
+
+  attr :listening_session, :any, required: true
+  attr :trends, :any, required: true
+  attr :class, :string, default: ""
+
+  def note_graph(assigns) do
+    ~H"""
+    <.async_result :let={trends} assign={@trends}>
+      <:loading>
+        <div class="flex items-center justify-center h-[150px] text-sm text-gray-400">
+          Loading trends…
+        </div>
+      </:loading>
+
+      <:failed>
+        <div class="flex items-center justify-center h-[150px] text-sm text-red-400">
+          Could not load vote trends.
+        </div>
+      </:failed>
+
+      <div
+        id="note-graph"
+        phx-hook="NoteGraph"
+        data-vote-data={Jason.encode!(Enum.map(trends, fn {timestamp, avg} -> [timestamp, avg] end))}
+        data-vote-options={Jason.encode!(@listening_session.vote_options)}
+        data-session-start={Jason.encode!(@listening_session.started_at)}
+        class={["rounded-lg pt-4 pr-4 pl-4", @class]}
+      >
+        <div style="position: relative; height: 150px; width: 100%;">
+          <canvas id="note-graph-canvas"></canvas>
+        </div>
+      </div>
+    </.async_result>
+    """
+  end
+
+  def distribution_graph(assigns) do
+    ~H"""
+    <.async_result :let={report} assign={@report}>
+      <:loading>
+        <%= for rating <- @listening_session.vote_options do %>
+          <div class="flex-1 flex flex-col items-center px-1">
+            <div class="w-full bg-gray-600 rounded-t animate-pulse" style="height: 8px"></div>
+            <span class="text-xs text-gray-400 font-medium mt-1">
+              {rating}
+            </span>
+          </div>
+        <% end %>
+      </:loading>
+      <:failed></:failed>
+      <% distribution = track_vote_distribution(@track.id, report, @listening_session) %>
+      <% track_max_votes = distribution |> Enum.map(&elem(&1, 1)) |> Enum.max() %>
+      <%= for {rating, votes} <- distribution do %>
+        <div class="flex-1 flex flex-col items-center px-1 min-w-0">
+          <div
+            class={[
+              "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
+              vote_option_color(rating, @listening_session)
+            ]}
+            style={"height: #{bar_height(votes, track_max_votes, 110, 15)}px"}
+          >
+            <span class="text-sm font-medium text-white">{Integer.to_string(votes)}</span>
+          </div>
+
+          <span class="text-xs text-gray-400 font-medium mt-1">{rating}</span>
+        </div>
+      <% end %>
+    </.async_result>
+    """
+  end
+
+  def track_vote_distribution(_track_id, nil, session),
+    do: for(rating <- session.vote_options, do: {rating, 0})
+
+  def track_vote_distribution(track_id, report, session) do
+    distribution =
+      report.votes
+      |> Enum.filter(&(&1.track_id == track_id))
+      |> Enum.group_by(& &1.value)
+      |> Map.new(fn {value, votes} -> {value, length(votes)} end)
+
+    for rating <- session.vote_options do
+      {rating, Map.get(distribution, rating, 0)}
+    end
+  end
+
+  defp bar_height(votes, max_votes, container_height, min_height) do
+    cond do
+      votes == 0 -> min_height
+      max_votes == 0 -> min_height
+      true -> max(round(votes * container_height * 0.85 / max_votes), min_height)
+    end
+  end
+
+  def vote_option_color(vote_option, session) do
+    index = Enum.find_index(session.vote_options, &(&1 == vote_option)) || 0
+
+    cond do
+      vote_option == "smash" ->
+        "bg-green-500"
+
+      vote_option == "pass" ->
+        "bg-red-500"
+
+      true ->
+        colors = [
+          "bg-red-500",
+          "bg-orange-500",
+          "bg-yellow-500",
+          "bg-green-500",
+          "bg-blue-500",
+          "bg-purple-500",
+          "bg-pink-500",
+          "bg-indigo-500"
+        ]
+
+        Enum.at(colors, rem(index, length(colors)), "bg-gray-500")
+    end
+  end
+
+  def session_track_stat(assigns) do
+    ~H"""
+    <div class="text-center">
+      <p class={"text-xl font-bold text-#{@color}-300"}>
+        <.async_result :let={report} assign={@report}>
+          <:loading>-</:loading>
+          <:failed>-</:failed>
+          <%= case track_score(@track.id, report, @key) do %>
+            <% "N/A" -> %>
+              -
+            <% score -> %>
+              {score}
+          <% end %>
+        </.async_result>
+      </p>
+      <p class={"text-#{@color}-400/70"}>{@legend}</p>
+    </div>
+    """
+  end
+
+  def track_score(_track_id, nil), do: "-"
+
+  def track_score(track_id, report, key) do
+    case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
+      nil -> "-"
+      track_summary -> Map.get(track_summary, key, "-")
+    end
   end
 end

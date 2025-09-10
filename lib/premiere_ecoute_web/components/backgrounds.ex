@@ -12,7 +12,7 @@ defmodule PremiereEcouteWeb.Components.Backgrounds do
     ~H"""
     <%= if is_nil(@status) or @status in @statutes do %>
       <div class={[
-        "rounded-xl p-6 mb-6 bg-gradient-to-br from-purple-900/80 to-pink-900/80",
+        "rounded-xl bg-gradient-to-br from-purple-900/80 to-pink-900/80",
         @class
       ]}>
         {render_slot(@inner_block)}

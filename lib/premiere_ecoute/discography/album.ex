@@ -63,4 +63,10 @@ defmodule PremiereEcoute.Discography.Album do
     |> Map.update!(:tracks, fn tracks -> Enum.map(tracks, &Map.from_struct/1) end)
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
+
+  def total_duration(%__MODULE__{tracks: tracks}) do
+    tracks
+    |> Enum.map(&(&1.duration_ms || 0))
+    |> Enum.sum()
+  end
 end

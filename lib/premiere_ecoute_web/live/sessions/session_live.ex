@@ -285,31 +285,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def session_status_class(:stopped),
     do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"
 
-  def track_score(_track_id, nil), do: "N/A"
-
-  def track_score(track_id, report) do
-    case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
-      nil ->
-        "N/A"
-
-      track_summary ->
-        case track_summary["viewer_score"] do
-          score when is_number(score) -> Float.round(score, 1)
-          score when is_binary(score) -> score
-          _ -> "N/A"
-        end
-    end
-  end
-
-  def track_votes_count(_track_id, nil), do: 0
-
-  def track_votes_count(track_id, report) do
-    case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
-      nil -> 0
-      track_summary -> track_summary["unique_votes"] || 0
-    end
-  end
-
   def session_tracks_rated(nil), do: 0
   def session_tracks_rated(report), do: report.session_summary["tracks_rated"]
 
@@ -325,9 +300,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   def vote_type_display(_), do: "0-10"
-
-  def session_vote_options(nil), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-  def session_vote_options(%{vote_options: vote_options}) when is_list(vote_options), do: vote_options
 
   def session_streamer_score(nil), do: "N/A"
 
@@ -355,38 +327,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  def track_vote_distribution(_track_id, nil, session),
-    do: for(rating <- session_vote_options(session), do: {rating, 0})
-
-  def track_vote_distribution(track_id, report, session) do
-    # Calculate distribution from individual votes
-    individual_distribution =
-      report.votes
-      |> Enum.filter(&(&1.track_id == track_id))
-      |> Enum.group_by(& &1.value)
-      |> Map.new(fn {value, votes} -> {value, length(votes)} end)
-
-    # Calculate distribution from poll votes
-    poll_distribution =
-      report.polls
-      |> Enum.filter(&(&1.track_id == track_id))
-      |> Enum.reduce(%{}, fn poll, acc ->
-        poll.votes
-        |> Enum.reduce(acc, fn {rating_str, count}, inner_acc ->
-          # Handle both numeric and string ratings
-          rating = if String.match?(rating_str, ~r/^\d+$/), do: String.to_integer(rating_str), else: rating_str
-          Map.update(inner_acc, rating, count, &(&1 + count))
-        end)
-      end)
-
-    for rating <- session_vote_options(session) do
-      individual_count = Map.get(individual_distribution, rating, 0)
-      poll_count = Map.get(poll_distribution, rating, 0)
-      total_count = individual_count + poll_count
-      {rating, total_count}
-    end
-  end
-
   def track_max_votes(_track_id, nil, _session), do: 0
 
   def track_max_votes(track_id, report, session) do
@@ -396,7 +336,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   def vote_option_color(vote_option, session) do
-    vote_options = session_vote_options(session)
+    vote_options = session.vote_options
     total_options = length(vote_options)
 
     # Find the index of this vote option
@@ -466,68 +406,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       "both" -> "#{base_url}?score=viewer+streamer"
       "player" -> "#{base_url}?score=player"
       _ -> base_url
-    end
-  end
-
-  # Calculate dynamic bar height based on vote count and maximum votes in the dataset.
-  # Ensures bars scale proportionally and don't exceed container height.
-  defp calculate_bar_height(votes, max_votes, container_height, min_height) do
-    cond do
-      votes == 0 ->
-        0
-
-      max_votes == 0 ->
-        min_height
-
-      true ->
-        # Use 85% of container height for maximum bar
-        max_bar_height = container_height * 0.85
-        scale_factor = max_bar_height / max_votes
-        calculated_height = votes * scale_factor
-
-        # Ensure minimum height for visibility
-        max(calculated_height, min_height)
-        |> round()
-    end
-  end
-
-  # Format vote count for display, using abbreviated format for large numbers.
-  defp format_vote_count(count) when is_integer(count) do
-    cond do
-      count < 1000 -> Integer.to_string(count)
-      count < 10_000 -> "#{Float.round(count / 1000, 1)}k"
-      count < 1_000_000 -> "#{round(count / 1000)}k"
-      true -> "#{Float.round(count / 1_000_000, 1)}M"
-    end
-  end
-
-  defp format_vote_count(_), do: "0"
-
-  # Determine if vote count should be displayed inside or above the bar based on bar height.
-  defp vote_count_position(bar_height, min_height_for_inside \\ 20) do
-    if bar_height >= min_height_for_inside do
-      :inside
-    else
-      :above
-    end
-  end
-
-  # Calculate responsive font size class for vote counts based on maximum vote count.
-  defp vote_count_font_size(max_votes) do
-    cond do
-      max_votes < 100 -> "text-sm"
-      max_votes < 1000 -> "text-xs"
-      true -> "text-xs"
-    end
-  end
-
-  # Calculate responsive padding for histogram bars based on number of vote options.
-  defp bar_padding_class(vote_option_count) do
-    cond do
-      vote_option_count <= 5 -> "px-1"
-      vote_option_count <= 10 -> "px-0.5"
-      vote_option_count <= 15 -> "px-0"
-      true -> ""
     end
   end
 end
