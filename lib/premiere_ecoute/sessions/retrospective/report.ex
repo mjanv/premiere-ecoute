@@ -87,18 +87,15 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   """
   @spec generate(ListeningSession.t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def generate(%ListeningSession{id: session_id} = session) do
-    votes = Vote.all() |> Enum.filter(&(&1.session_id == session_id))
-    polls = Poll.all() |> Enum.filter(&(&1.session_id == session_id))
+    votes = Vote.all(where: [session_id: session_id]) 
+    polls = Poll.all(where: [session_id: session_id])
 
     session_stats = calculate_session_stats(session_id)
 
     session_summary =
       session
       |> calculate_session_summary(votes, polls)
-      |> Map.merge(%{
-        unique_votes: session_stats.unique_votes,
-        unique_voters: session_stats.unique_voters
-      })
+      |> Map.merge(session_stats)
 
     attrs = %{
       session_id: session_id,
