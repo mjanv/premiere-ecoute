@@ -213,6 +213,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
                 value={@value}
                 id="next-track-slider"
                 class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-white/20 slider-purple"
+                phx-debounce="300"
               />
             </form>
             <style>
@@ -437,7 +438,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
-  def track_score(_track_id, nil), do: "-"
+  def track_score(_track_id, nil, _), do: "-"
 
   def track_score(track_id, report, key) do
     case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do

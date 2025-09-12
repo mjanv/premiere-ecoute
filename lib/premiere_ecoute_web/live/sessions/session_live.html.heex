@@ -35,29 +35,29 @@
 
           <div class="space-y-3">
             <div class="grid grid-cols-2 gap-4 mb-4">
-              <.session_stat show={@show[:scores]} report={@report} base="10" key="viewer_score" legend={gettext("Viewers")} />
-              <.session_stat show={@show[:scores]} report={@report} base="10" key="streamer_score" legend={gettext("Streamer")} />
-              <.session_stat show={@show[:votes]} report={@report} key="unique_votes" legend={gettext("Total Votes")} />
-              <.session_stat show={@show[:votes]} report={@report} key="unique_voters" legend={gettext("Unique Voters")} />
+              <.session_stat show={@listening_session.options["scores"]} report={@report} base="10" key="viewer_score" legend={gettext("Viewers")} />
+              <.session_stat show={@listening_session.options["scores"]} report={@report} base="10" key="streamer_score" legend={gettext("Streamer")} />
+              <.session_stat show={@listening_session.options["votes"]} report={@report} key="unique_votes" legend={gettext("Total Votes")} />
+              <.session_stat show={@listening_session.options["votes"]} report={@report} key="unique_voters" legend={gettext("Unique Voters")} />
             </div>
 
             <div class="flex justify-center space-x-6 pt-2">
               <.session_toggle
                 phx-click="toggle"
                 phx-value-flag="votes"
-                checked={@show[:votes]}
+                checked={@listening_session.options["votes"]}
                 legend={gettext("Display votes")}
               />
               <.session_toggle
                 phx-click="toggle"
                 phx-value-flag="scores"
-                checked={@show[:scores]}
+                checked={@listening_session.options["scores"]}
                 legend={gettext("Display scores")}
               />
             </div>
             
 <!-- Next Track Timer/Slider -->
-            <.next_track value={@show[:next_track]} at={@next_track_at} phx-change="update_next_track" />
+            <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
             
 <!-- Overlay link section with dropdown selector -->
             <div class="mt-4 pt-4 border-t border-white/20" id="overlay-hooks">
@@ -169,7 +169,7 @@
       <div class="w-2/3 p-6 overflow-y-auto">
         <.vote_bar listening_session={@listening_session} open_vote={@open_vote} user_current_rating={@user_current_rating} />
 
-        <%= if @show[:scores] do %>
+        <%= if @listening_session.options["scores"] do %>
           <.gradient_bg status={@listening_session.status} statutes={[:active, :stopped]}>
             <.note_graph listening_session={@listening_session} trends={@vote_trends} />
           </.gradient_bg>
@@ -251,7 +251,7 @@
                             </div>
                           </div>
                         <% end %>
-                        <%= if @show[:votes] do %>
+                        <%= if @listening_session.options["votes"] do %>
                           <.session_track_stat
                             report={@report}
                             track={track}
@@ -260,7 +260,7 @@
                             legend={gettext("Votes")}
                           />
                         <% end %>
-                        <%= if @show[:scores] do %>
+                        <%= if @listening_session.options["scores"] do %>
                           <.session_track_stat
                             report={@report}
                             track={track}

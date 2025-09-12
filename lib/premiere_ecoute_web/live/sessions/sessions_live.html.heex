@@ -103,8 +103,7 @@
           >
             <div
               :for={session <- sessions.entries}
-              class="rounded-lg p-6 cursor-pointer transition-colors border border-gray-700 hover:border-purple-500 hover:bg-gray-700"
-              style="background-color: var(--color-dark-900);"
+              class="rounded-lg p-6 cursor-pointer transition-colors border border-gray-700 hover:border-purple-500 hover:bg-purple-300/20 backdrop-blur-sm"
               id={"session-#{session.id}"}
               phx-click="navigate"
               phx-value-session_id={session.id}
@@ -158,7 +157,7 @@
                             clip-rule="evenodd"
                           />
                         </svg>
-                        {PremiereEcouteCore.Date.date(session.started_at)}
+                        {PremiereEcouteCore.Date.date(session.started_at || session.inserted_at)}
                       </span>
                     </div>
                   </div>

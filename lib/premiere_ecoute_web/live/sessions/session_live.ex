@@ -39,7 +39,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:open_vote, !is_nil(cached_session))
       |> assign(:player_state, nil)
       |> assign(:session_id, id)
-      |> assign(:show, %{votes: true, scores: true, next_track: 0})
       |> assign(:user_current_rating, nil)
       |> assign(:report, nil)
       |> assign(:overlay_score_type, "streamer")
@@ -102,15 +101,17 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("toggle", %{"flag" => flag}, %{assigns: assigns} = socket) do
-    {:noreply, assign(socket, :show, Map.update!(assigns.show, String.to_existing_atom(flag), fn v -> !v end))}
+    options = Map.update(assigns.listening_session.options, flag, true, fn v -> !v end)
+    {:ok, listening_session} = ListeningSession.update(assigns.listening_session, %{options: options})
+    {:noreply, assign(socket, :listening_session, listening_session)}
   end
 
   @impl true
   def handle_event("update_next_track", %{"next_track" => value}, %{assigns: assigns} = socket) do
-    case Integer.parse(value) do
-      {value, _} when value >= 0 and value <= 60 -> {:noreply, assign(socket, :show, Map.put(assigns.show, :next_track, value))}
-      _ -> {:noreply, socket}
-    end
+    {value, _} = Integer.parse(value)
+    options = Map.update(assigns.listening_session.options, "next_track", 0, fn _ -> value end)
+    {:ok, listening_session} = ListeningSession.update(assigns.listening_session, %{options: options})
+    {:noreply, assign(socket, :listening_session, listening_session)}
   end
 
   @impl true
@@ -198,22 +199,18 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_info(
         {:player, :end_track, state},
-        %{assigns: %{show: show, listening_session: session, current_scope: scope}} = socket
+        %{assigns: %{listening_session: session, current_scope: scope}} = socket
       ) do
     ListeningSessionWorker.in_seconds(%{action: "pause", session_id: session.id, user_id: scope.user.id}, 2)
-
-    if show[:next_track] > 0 do
+    next_track = Map.get(session.options, :next_track, 0)
+    
+    if next_track > 0 do
       action = if session.source == :album, do: "next_track", else: "next_playlist_track"
-
-      {:ok, job} =
-        ListeningSessionWorker.in_seconds(
-          %{action: action, session_id: session.id, user_id: scope.user.id},
-          show[:next_track]
-        )
+      {:ok, job} = ListeningSessionWorker.in_seconds(%{action: action, session_id: session.id, user_id: scope.user.id}, next_track)
 
       socket
       |> assign(:next_track_at, job.scheduled_at)
-      |> put_flash(:info, "Next track in #{show[:next_track]} seconds")
+      |> put_flash(:info, "Next track in #{next_track} seconds")
     else
       socket
     end

@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
     field :source, Ecto.Enum, values: [:album, :playlist], default: :album
-    field :options, :map, default: %{}
+    field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     field :started_at, :utc_datetime
     field :ended_at, :utc_datetime
