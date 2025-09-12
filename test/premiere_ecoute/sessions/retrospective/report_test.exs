@@ -108,7 +108,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
 
       assert report.session_id == session.id
       assert report.session_summary.unique_votes == 19
-      assert report.session_summary.unique_voters == 14
+      assert report.session_summary.unique_voters == 4
 
       session_summary = report.session_summary
       assert session_summary.tracks_rated == 2
@@ -123,13 +123,13 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
 
       assert track1_summary.unique_votes == 4
       assert track1_summary.poll_count == 6
-      assert track1_summary.unique_voters == 9
+      assert track1_summary.unique_voters == 4
       assert_in_delta track1_summary.viewer_score, 7.165, 0.1
       assert track1_summary.streamer_score == 9.0
 
       assert track2_summary.unique_votes == 4
       assert track2_summary.poll_count == 5
-      assert track2_summary.unique_voters == 8
+      assert track2_summary.unique_voters == 4
       assert_in_delta track2_summary.viewer_score, 8.065, 0.1
       assert track2_summary.streamer_score == 7.0
     end
@@ -234,10 +234,10 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
 
       assert report.session_id == session.id
       assert report.session_summary.unique_votes == 19
-      assert report.session_summary.unique_voters == 14
+      assert report.session_summary.unique_voters == 4
 
       assert report.session_summary.tracks_rated == 2
-      assert report.session_summary.viewer_score == "smash"
+      assert report.session_summary.viewer_score == "even"
       assert report.session_summary.streamer_score == "even"
 
       track_summaries = report.track_summaries
@@ -248,13 +248,13 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
 
       assert track1_summary.unique_votes == 4
       assert track1_summary.poll_count == 6
-      assert track1_summary.unique_voters == 9
-      assert track1_summary.viewer_score == "smash"
+      assert track1_summary.unique_voters == 4
+      assert track1_summary.viewer_score == "even"
       assert track1_summary.streamer_score == "pass"
 
       assert track2_summary.unique_votes == 4
       assert track2_summary.poll_count == 5
-      assert track2_summary.unique_voters == 8
+      assert track2_summary.unique_voters == 4
       assert track2_summary.viewer_score == "smash"
       assert track2_summary.streamer_score == "smash"
     end
@@ -363,7 +363,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
 
       assert report.session_id == session.id
       assert report.session_summary.unique_votes == 19
-      assert report.session_summary.unique_voters == 14
+      assert report.session_summary.unique_voters == 4
 
       session_summary = report.session_summary
       assert session_summary.tracks_rated == 2
@@ -378,13 +378,13 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
 
       assert track1_summary.unique_votes == 4
       assert track1_summary.poll_count == 6
-      assert track1_summary.unique_voters == 9
+      assert track1_summary.unique_voters == 4
       assert_in_delta track1_summary.viewer_score, 7.165, 0.1
       assert track1_summary.streamer_score == 9.0
 
       assert track2_summary.unique_votes == 4
       assert track2_summary.poll_count == 5
-      assert track2_summary.unique_voters == 8
+      assert track2_summary.unique_voters == 4
       assert_in_delta track2_summary.viewer_score, 8.065, 0.1
       assert track2_summary.streamer_score == 7.0
     end

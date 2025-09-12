@@ -179,9 +179,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
                session_summary: %{
                  "unique_votes" => 0,
                  "unique_voters" => 0,
-                 "streamer_score" => +0.0,
+                 "streamer_score" => nil,
                  "tracks_rated" => 0,
-                 "viewer_score" => +0.0
+                 "viewer_score" => nil
                },
                track_summaries: [],
                votes: []
@@ -232,9 +232,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
                session_summary: %{
                  "unique_votes" => 0,
                  "unique_voters" => 0,
-                 "streamer_score" => +0.0,
+                 "streamer_score" => nil,
                  "tracks_rated" => 0,
-                 "viewer_score" => +0.0
+                 "viewer_score" => nil
                },
                track_summaries: [],
                votes: []
@@ -433,9 +433,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
                session_summary: %{
                  "unique_votes" => 0,
                  "unique_voters" => 0,
-                 "streamer_score" => +0.0,
+                 "streamer_score" => nil,
                  "tracks_rated" => 0,
-                 "viewer_score" => +0.0
+                 "viewer_score" => nil
                },
                track_summaries: [],
                votes: []
