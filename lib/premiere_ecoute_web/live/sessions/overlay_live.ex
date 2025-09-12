@@ -3,6 +3,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   require Logger
 
+  import PremiereEcouteWeb.Sessions.Overlay
+
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Presence
@@ -114,10 +116,4 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp overlay_width(_), do: 240
 
   defp overlay_height(_), do: 240
-
-  defp score_value(nil, _), do: "-"
-  defp score_value(summary, :viewer), do: summary["viewer_score"] || summary.viewer_score
-  defp score_value(summary, :streamer), do: summary["streamer_score"] || summary.streamer_score
-  defp score_label(:viewer), do: "Chat"
-  defp score_label(:streamer), do: "Streamer"
 end

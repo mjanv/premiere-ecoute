@@ -50,6 +50,12 @@ defmodule PremiereEcouteCore.Aggregate do
       def all(clauses \\ []), do: Repo.all(all_query(clauses))
       def all_by(query \\ __MODULE__, clauses), do: preload(Repo.all_by(query, clauses))
       def page(clauses \\ [], page, page_size \\ 1), do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
+      def next_page(clauses \\ [], page)
+      def next_page(clauses, %Phoenix.LiveView.AsyncResult{result: page}), do: next_page(clauses, page)
+      def next_page(clauses, %Scrivener.Page{page_number: page_number, total_pages: page_number} = page), do: page
+
+      def next_page(clauses, %Scrivener.Page{page_number: page_number, page_size: page_size}),
+        do: page(clauses, page_number + 1, page_size)
 
       defp all_query(clauses \\ []) do
         __MODULE__

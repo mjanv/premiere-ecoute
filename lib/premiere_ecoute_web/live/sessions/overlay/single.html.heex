@@ -1,0 +1,25 @@
+<.async_result :let={summary} assign={@summary}>
+  <:loading>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+        --
+      </span>
+      <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+        {@score}
+      </div>
+    </div>
+  </:loading>
+
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+      <%= if @open_vote do %>
+        {score_value(summary, @score)}
+      <% else %>
+        -
+      <% end %>
+    </span>
+    <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+      {score_label(@score)}
+    </div>
+  </div>
+</.async_result>

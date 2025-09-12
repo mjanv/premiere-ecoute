@@ -11,13 +11,22 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     socket
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)
-    |> assign_async(:sessions, fn -> {:ok, %{sessions: ListeningSession.all(where: [user_id: scope.user.id])}} end)
+    |> assign_async(:sessions, fn -> {:ok, %{sessions: ListeningSession.page([where: [user_id: scope.user.id]], 1, 10)}} end)
     |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("next-page", _params, %{assigns: %{current_scope: scope, sessions: sessions}} = socket) do
+    socket
+    |> assign_async(:sessions, fn ->
+      {:ok, %{sessions: ListeningSession.next_page([where: [user_id: scope.user.id]], sessions)}}
+    end)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
