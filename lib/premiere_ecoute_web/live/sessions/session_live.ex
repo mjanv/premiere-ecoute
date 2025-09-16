@@ -202,7 +202,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         %{assigns: %{listening_session: session, current_scope: scope}} = socket
       ) do
     ListeningSessionWorker.in_seconds(%{action: "pause", session_id: session.id, user_id: scope.user.id}, 2)
-    next_track = Map.get(session.options, :next_track, 0)
+    next_track = Map.get(session.options, "next_track", 0)
     
     if next_track > 0 do
       action = if session.source == :album, do: "next_track", else: "next_playlist_track"
