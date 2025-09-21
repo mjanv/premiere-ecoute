@@ -35,10 +35,32 @@
 
           <div class="space-y-3">
             <div class="grid grid-cols-2 gap-4 mb-4">
-              <.session_stat show={@listening_session.options["scores"]} report={@report} base="10" key="viewer_score" legend={gettext("Viewers")} />
-              <.session_stat show={@listening_session.options["scores"]} report={@report} base="10" key="streamer_score" legend={gettext("Streamer")} />
-              <.session_stat show={@listening_session.options["votes"]} report={@report} key="unique_votes" legend={gettext("Total Votes")} />
-              <.session_stat show={@listening_session.options["votes"]} report={@report} key="unique_voters" legend={gettext("Unique Voters")} />
+              <.session_stat
+                show={@listening_session.options["scores"]}
+                report={@report}
+                base="10"
+                key="viewer_score"
+                legend={gettext("Viewers")}
+              />
+              <.session_stat
+                show={@listening_session.options["scores"]}
+                report={@report}
+                base="10"
+                key="streamer_score"
+                legend={gettext("Streamer")}
+              />
+              <.session_stat
+                show={@listening_session.options["votes"]}
+                report={@report}
+                key="unique_votes"
+                legend={gettext("Total Votes")}
+              />
+              <.session_stat
+                show={@listening_session.options["votes"]}
+                report={@report}
+                key="unique_voters"
+                legend={gettext("Unique Voters")}
+              />
             </div>
 
             <div class="flex justify-center space-x-6 pt-2">

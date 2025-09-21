@@ -62,6 +62,8 @@ config :premiere_ecoute, PremiereEcoute.Apis,
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30
 
+config :premiere_ecoute, PremiereEcoute.Festivals, model: PremiereEcoute.Festivals.Models.Static
+
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -152,6 +154,9 @@ config :logger, :default_formatter,
 
 config :phoenix, :json_library, Jason
 config :phoenix, :logger, false
+
+config :instructor,
+  adapter: Instructor.Adapters.OpenAI
 
 config :ueberauth, Ueberauth,
   providers: [

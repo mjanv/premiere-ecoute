@@ -39,6 +39,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     # Albums
     @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}
 
+    # Artists
+    @callback get_artist_top_track(artist_id :: String.t()) :: {:ok, Playlist.Track.t()} | {:error, term()}
+
+    # Artists
+    @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}
+
     # Player
     @callback devices(scope :: Scope.t()) :: any()
     @callback get_playback_state(scope :: Scope.t(), state :: map()) :: {:ok, map()} | {:error, term()}
@@ -64,6 +70,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
     # Search
     @callback search_albums(query :: String.t()) :: {:ok, [Album.t()]} | {:error, term()}
+    @callback search_artist(query :: String.t()) :: {:ok, String.t()} | {:error, term()}
 
     # Users
     @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
@@ -128,6 +135,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   # Albums
   defdelegate get_album(album_id), to: __MODULE__.Albums
 
+  # Artists
+  defdelegate get_artist_top_track(artist_id), to: __MODULE__.Artists
+
   # Player
   defdelegate devices(scope), to: __MODULE__.Player
   defdelegate get_playback_state(scope, state), to: __MODULE__.Player
@@ -148,6 +158,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
 
   # Search
   defdelegate search_albums(query), to: __MODULE__.Search
+  defdelegate search_artist(query), to: __MODULE__.Search
 
   # Users
   defdelegate get_user_profile(access_token), to: __MODULE__.Users

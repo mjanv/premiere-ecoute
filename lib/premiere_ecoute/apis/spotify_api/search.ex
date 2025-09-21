@@ -30,4 +30,18 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Search do
       end)
     end)
   end
+
+  @doc """
+  Search for Artist
+
+  Reference: https://developer.spotify.com/documentation/web-api/reference/search
+  """
+  def search_artist(query) when is_binary(query) do
+    SpotifyApi.api()
+    |> SpotifyApi.get(url: "/search?q=#{URI.encode(query)}&type=artist&limit=1")
+    |> SpotifyApi.handle(200, fn
+      %{"artists" => %{"items" => [%{"uri" => "spotify:artist:" <> id}]}} -> id
+      _ -> nil
+    end)
+  end
 end

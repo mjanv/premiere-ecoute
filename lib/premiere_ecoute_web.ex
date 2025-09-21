@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb do
       Components.StatusBadge
     ]
 
-  def static_paths, do: ~w(doc assets fonts images favicon.ico robots.txt)
+  def static_paths, do: ~w(doc assets fonts images uploads favicon.ico robots.txt)
 
   def router do
     quote do

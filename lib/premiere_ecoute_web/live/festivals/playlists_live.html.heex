@@ -1,0 +1,402 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="festivals">
+  <div class="synthwave-bg text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold text-white mb-2">
+          {gettext("Festival Playlists")}
+        </h1>
+        <p class="text-gray-400">
+          {gettext("Upload festival posters and create playlists for your events")}
+        </p>
+      </div>
+      
+<!-- Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+        <!-- Left Side - Image Upload -->
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+          <h2 class="text-2xl font-semibold text-white mb-4">
+            {gettext("Poster")}
+          </h2>
+
+          <%= if Enum.empty?(@uploaded_files) do %>
+            <!-- Upload Form -->
+            <.form for={%{}} as={:upload} phx-submit="save" phx-change="validate" class="space-y-4">
+              <!-- File Input -->
+              <div class="space-y-4">
+                <.live_file_input upload={@uploads.poster} class="hidden" />
+                
+<!-- Custom Upload Area -->
+                <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-gray-500 transition-colors">
+                  <div class="space-y-4">
+                    <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                    </div>
+
+                    <div>
+                      <button
+                        type="button"
+                        onclick="document.querySelector('input[type=file]').click()"
+                        class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+                      >
+                        {gettext("Choose Festival Poster")}
+                      </button>
+                      <p class="text-sm text-gray-400 mt-2">
+                        {gettext("PNG, JPG up to 10MB")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+<!-- Upload Errors -->
+                <%= for entry <- @uploads.poster.entries do %>
+                  <div class="space-y-2">
+                    <!-- Progress Bar -->
+                    <div class="bg-gray-700 rounded-full h-2">
+                      <div
+                        class="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                        style={"width: #{entry.progress}%"}
+                      >
+                      </div>
+                    </div>
+                    
+<!-- File Info and Cancel Button -->
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-gray-300">{entry.client_name}</span>
+                      <button
+                        type="button"
+                        phx-click="cancel-upload"
+                        phx-value-ref={entry.ref}
+                        class="text-red-400 hover:text-red-300"
+                      >
+                        {gettext("Cancel")}
+                      </button>
+                    </div>
+                    
+<!-- Entry Errors -->
+                    <%= for err <- upload_errors(@uploads.poster, entry) do %>
+                      <p class="text-red-400 text-sm">
+                        {Phoenix.Naming.humanize(err)}
+                      </p>
+                    <% end %>
+                  </div>
+                <% end %>
+                
+<!-- General Upload Errors -->
+                <%= for err <- upload_errors(@uploads.poster) do %>
+                  <p class="text-red-400 text-sm">
+                    {Phoenix.Naming.humanize(err)}
+                  </p>
+                <% end %>
+              </div>
+              
+<!-- Submit Button -->
+              <button
+                type="submit"
+                disabled={Enum.empty?(@uploads.poster.entries)}
+                class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              >
+                {gettext("Upload Poster")}
+              </button>
+            </.form>
+          <% end %>
+          
+<!-- Uploaded Images Display -->
+          <%= if not Enum.empty?(@uploaded_files) do %>
+            <div class="mt-6 space-y-4">
+              <%= for file_url <- @uploaded_files do %>
+                <div class="relative">
+                  <img
+                    src={file_url}
+                    alt={gettext("Festival poster")}
+                    class="w-full h-auto rounded-lg shadow-lg"
+                  />
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        
+<!-- Right Side - Artists Display -->
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-semibold text-white">
+              {gettext("Festival")}
+              <%= if @festival.ok? do %>
+                <span class="text-lg text-gray-400 font-normal ml-2">
+                  ({length(@festival.result.concerts)} {ngettext("artist", "artists", length(@festival.result.concerts))})
+                </span>
+              <% end %>
+            </h2>
+            <%= if length(@uploaded_files) > 0 && @festival.loading do %>
+              <div class="flex items-center space-x-2 text-purple-400">
+                <svg class="animate-spin w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span class="text-sm">{gettext("Analyzing...")}</span>
+              </div>
+            <% end %>
+          </div>
+
+          <%= cond do %>
+            <% @festival.ok? -> %>
+              <!-- Festival Results (partial or final) -->
+              <div class="space-y-4">
+                <%= if @festival.result.name do %>
+                  <div class="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50">
+                    <h3 class="text-xl font-bold text-white mb-2">{@festival.result.name}</h3>
+                    <%= if @festival.result.start_date do %>
+                      <p class="text-slate-300 text-sm">
+                        {PremiereEcouteCore.Date.date(@festival.result.start_date)} - {PremiereEcouteCore.Date.date(
+                          @festival.result.end_date
+                        )}
+                      </p>
+                    <% end %>
+                    <%= if @festival.result.location || @festival.result.country do %>
+                      <p class="text-slate-400 text-sm mt-1">
+                        <%= if @festival.result.location do %>
+                          <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                          {@festival.result.location}
+                          <%= if @festival.result.country do %>
+                            , {@festival.result.country}
+                          <% end %>
+                        <% else %>
+                          <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
+                            />
+                          </svg>
+                          {@festival.result.country}
+                        <% end %>
+                      </p>
+                    <% end %>
+                  </div>
+                <% end %>
+                
+<!-- Spotify Playlist Export Section -->
+                <%= if @festival.result.concerts && not Enum.empty?(@festival.result.concerts) do %>
+                  <div class="mt-6 mb-3 p-4 bg-green-600/20 rounded-lg border border-green-500/30">
+                    <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.859-.179-.98-.539-.122-.421.18-.86.54-.98 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.299 1.02v.08zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                        </svg>
+                        <h4 class="text-lg font-medium text-green-300">
+                          {gettext("Export to Spotify Playlist")}
+                        </h4>
+                      </div>
+                      <%= if @tracks.loading do %>
+                        <div class="flex items-center space-x-2 text-yellow-400">
+                          <svg class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                          </svg>
+                          <span class="text-xs">{gettext("Finding tracks...")}</span>
+                        </div>
+                      <% end %>
+                    </div>
+
+                    <%= if @tracks.loading do %>
+                      <p class="text-sm text-gray-400 mb-4">
+                        {gettext("Searching for popular tracks from %{count} discovered artists...",
+                          count: length(@festival.result.concerts)
+                        )}
+                      </p>
+                    <% else %>
+                      <%= if @tracks.ok? && not Enum.empty?(@tracks.result) do %>
+                        <p class="text-sm text-gray-400 mb-4">
+                          {gettext("Found %{count} tracks! Ready to create festival playlist.", count: length(@tracks.result))}
+                        </p>
+                        
+<!-- Export Button -->
+                        <button
+                          phx-click="create_festival_playlist"
+                          disabled={@export.ok? && @export.result}
+                          class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+                        >
+                          <%= if @export.ok? && @export.result do %>
+                            <div class="flex items-center justify-center space-x-2">
+                              <svg class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                />
+                              </svg>
+                              <span>{gettext("Creating playlist...")}</span>
+                            </div>
+                          <% else %>
+                            <div class="flex items-center justify-center space-x-2">
+                              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.859-.179-.98-.539-.122-.421.18-.86.54-.98 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.299 1.02v.08zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                              </svg>
+                              <span>{gettext("Create Festival Playlist")}</span>
+                            </div>
+                          <% end %>
+                        </button>
+
+                        <%= if @export.failed do %>
+                          <p class="text-xs text-red-400 mt-2 text-center">
+                            {gettext("Playlist creation failed: %{error}", error: @export.failed)}
+                          </p>
+                        <% end %>
+                      <% else %>
+                        <p class="text-sm text-gray-400 mb-4">
+                          <%= if @tracks.failed do %>
+                            {gettext("Failed to find tracks for the discovered artists.")}
+                          <% else %>
+                            {gettext("No tracks found for the discovered artists.")}
+                          <% end %>
+                        </p>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
+
+                <%= if @festival.result.concerts && length(@festival.result.concerts) > 0 do %>
+                  <div class="space-y-2">
+                    <%= for {concert, index} <- Enum.with_index(@festival.result.concerts, 1) do %>
+                      <div class={[
+                        "bg-gray-700/50 rounded-lg px-4 py-2 border transition-colors",
+                        if @festival.loading do
+                          "border-purple-500/30 bg-purple-700/10"
+                        else
+                          "border-gray-600 hover:border-purple-500"
+                        end
+                      ]}>
+                        <div class="flex items-center space-x-3">
+                          <span class={[
+                            "inline-flex items-center justify-center w-5 h-5 text-white text-xs font-bold rounded-full flex-shrink-0",
+                            if @festival.loading do
+                              "bg-purple-600"
+                            else
+                              "bg-green-600"
+                            end
+                          ]}>
+                            {index}
+                          </span>
+                          <h3 class="text-base font-semibold text-white flex-1 min-w-0 truncate">
+                            {concert.artist}
+                          </h3>
+                          <%= if concert.date do %>
+                            <div class="flex items-center space-x-1 text-sm text-green-400 flex-shrink-0">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              <span>{Date.to_string(concert.date)}</span>
+                            </div>
+                          <% end %>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <%= if @festival.loading do %>
+                    <div class="flex items-center justify-center h-32 text-gray-400">
+                      <div class="text-center">
+                        <p class="text-sm text-purple-300">
+                          {gettext("Extracting artist information from the poster...")}
+                        </p>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            <% length(@uploaded_files) > 0 && @festival.loading -> %>
+              <!-- Loading State -->
+              <div class="flex items-center justify-center h-32 text-gray-400">
+                <div class="text-center">
+                  <p class="text-sm text-purple-300">
+                    {gettext("Extracting artist information from the poster...")}
+                  </p>
+                </div>
+              </div>
+            <% @festival.failed -> %>
+              <!-- Analysis Error -->
+              <div class="flex items-center justify-center h-64 text-gray-400">
+                <div class="text-center">
+                  <svg class="w-16 h-16 mx-auto mb-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                  <p class="text-lg font-medium text-red-400">
+                    {gettext("Analysis Failed")}
+                  </p>
+                  <p class="text-sm text-gray-500 mt-2">
+                    {gettext("Unable to extract artist information from the image")}
+                  </p>
+                  <%= if @festival.failed do %>
+                    <p class="text-xs text-gray-600 mt-2 italic">
+                      {@festival.failed}
+                    </p>
+                  <% end %>
+                </div>
+              </div>
+            <% true -> %>
+              <!-- No Image Uploaded -->
+              <div class="flex items-center justify-center h-64 text-gray-400">
+                <div class="text-center">
+                  <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <p class="text-lg font-medium">
+                    {gettext("Upload a Festival Poster")}
+                  </p>
+                  <p class="text-sm text-gray-500 mt-2">
+                    {gettext("Artists will be automatically detected and displayed here")}
+                  </p>
+                </div>
+              </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

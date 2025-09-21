@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Playlists.Services.PlaylistExport do
   def export_tracks_to_playlist(scope, playlist_id, tracks) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
          {:ok, _} <- remove_all_playlist_tracks(scope, playlist_id, playlist),
-         {:ok, result} <- Apis.spotify().add_items_to_playlist(scope, playlist_id, tracks) do
+         {:ok, result} <- Apis.spotify().add_items_to_playlist(scope, playlist_id, Enum.take(tracks, 100)) do
       {:ok, result}
     else
       {:error, reason} -> {:error, reason}

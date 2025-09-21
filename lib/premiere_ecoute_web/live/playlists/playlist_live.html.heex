@@ -193,6 +193,60 @@
               </div>
             </div>
             
+<!-- Festival Analysis section -->
+            <%= if @festival || @analyzing_festival || @finding_tracks do %>
+              <div class="max-w-7xl mx-auto px-6 pb-6">
+                <div class="bg-gradient-to-r from-purple-900/30 via-purple-800/30 to-purple-900/30 rounded-xl p-6 border border-purple-500/30">
+                  <!-- AIDEV-NOTE: Festival analysis status and results display -->
+                  <%= if @analyzing_festival do %>
+                    <div class="flex items-center space-x-4">
+                      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                      <div>
+                        <h3 class="text-lg font-semibold text-white">{gettext("Analyzing Festival Poster...")}</h3>
+                        <p class="text-purple-300">{gettext("Extracting artist information from the uploaded image")}</p>
+                      </div>
+                    </div>
+                  <% end %>
+
+                  <%= if @festival do %>
+                    <div class="space-y-4">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <h3 class="text-xl font-bold text-white">{@festival.name || gettext("Festival Lineup")}</h3>
+                          <%= if @festival.start_date do %>
+                            <p class="text-purple-300">
+                              {PremiereEcouteCore.Date.date(@festival.start_date)} {if @festival.end_date,
+                                do: "- #{@festival.end_date}",
+                                else: ""}
+                            </p>
+                          <% end %>
+                        </div>
+                        <%= if @finding_tracks do %>
+                          <div class="flex items-center space-x-2">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
+                            <span class="text-green-300">{gettext("Finding tracks...")}</span>
+                          </div>
+                        <% end %>
+                      </div>
+
+                      <%= if @festival.concerts && length(@festival.concerts) > 0 do %>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                          <%= for concert <- @festival.concerts do %>
+                            <div class="bg-gray-800/50 rounded-lg p-3 border border-gray-600/50">
+                              <div class="font-medium text-white">{concert.artist}</div>
+                              <%= if concert.date do %>
+                                <div class="text-sm text-gray-400">{PremiereEcouteCore.Date.date(concert.date)}</div>
+                              <% end %>
+                            </div>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            
 <!-- Search and Filters section -->
             <div class="max-w-7xl mx-auto px-6 pb-6">
               <div class="bg-slate-800/30 rounded-xl p-6 border border-gray-700/50">

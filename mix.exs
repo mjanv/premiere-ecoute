@@ -55,7 +55,7 @@ defmodule PremiereEcoute.MixProject do
   def cli do
     [
       default_task: "phx.server",
-      preferred_envs: [test: :test, "test.cover": :test]
+      preferred_envs: [test: :test, "test.cover": :test, "test.watch": :test]
     ]
   end
 
@@ -110,6 +110,7 @@ defmodule PremiereEcoute.MixProject do
       {:resend, "~> 0.4"},
       {:broadway, "~> 1.2"},
       {:xml_builder, "~> 2.1"},
+      {:instructor, "~> 0.1.0"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -126,6 +127,7 @@ defmodule PremiereEcoute.MixProject do
       {:excoveralls, "~> 0.18", only: :test},
       {:lazy_html, "~> 0.1", only: :test},
       {:bypass, "~> 2.1", only: :test},
+      {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
       # Development
       {:doctor, "~> 0.22.0", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
