@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Festivals.PlaylistsLive do
   require Logger
 
   alias PremiereEcoute.Festivals
+  alias PremiereEcoute.Discography.Playlist
 
   @impl true
   def mount(_params, _session, socket) do
@@ -73,18 +74,29 @@ defmodule PremiereEcouteWeb.Festivals.PlaylistsLive do
   end
 
   @impl true
-  def handle_async(:analyze_poster, {:ok, {:ok, final_festival}}, %{assigns: %{festival: festival}} = socket) do
+  def handle_async(
+        :analyze_poster,
+        {:ok, {:ok, final_festival}},
+        %{assigns: %{festival: festival, current_scope: scope}} = socket
+      ) do
     socket
     |> assign(:festival, AsyncResult.ok(festival, final_festival))
-    |> start_async(:tracks, fn -> Festivals.find_tracks(final_festival) end)
+    |> start_async(:tracks, fn -> Festivals.find_tracks(scope, final_festival) end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
-  def handle_async(:tracks, {:ok, found_tracks}, %{assigns: %{tracks: tracks}} = socket) do
+  def handle_async(:tracks, {:ok, festival}, %{assigns: %{tracks: tracks}} = socket) do
+    found_tracks =
+      festival.concerts
+      |> Enum.map(fn
+        %{track: nil} -> nil
+        %{track: track} -> %Playlist.Track{track_id: track.track_id, name: track.name}
+      end)
+      |> Enum.reject(&is_nil/1)
+
     socket
     |> assign(:tracks, AsyncResult.ok(tracks, found_tracks))
-    |> put_flash(:info, gettext("Found %{count} tracks from festival artists!", count: length(found_tracks)))
     |> then(fn socket -> {:noreply, socket} end)
   end
 

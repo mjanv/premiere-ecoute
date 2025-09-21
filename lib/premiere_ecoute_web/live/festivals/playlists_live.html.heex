@@ -310,6 +310,9 @@
                           </span>
                           <h3 class="text-base font-semibold text-white flex-1 min-w-0 truncate">
                             {concert.artist}
+                            <%= if concert.track do %>
+                              - {concert.track.name}
+                            <% end %>
                           </h3>
                           <%= if concert.date do %>
                             <div class="flex items-center space-x-1 text-sm text-green-400 flex-shrink-0">
