@@ -51,7 +51,7 @@ defmodule PremiereEcouteWeb.Components.Modal do
     <div
       id={@id}
       class="hidden fixed inset-0 flex items-center justify-center z-50"
-      style="display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);"
+      style="backdrop-filter: blur(8px);"
       phx-click={@on_cancel}
       {@rest}
     >

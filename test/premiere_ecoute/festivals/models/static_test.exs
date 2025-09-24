@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Festivals.Model.StaticTest do
     test "returns one festival" do
       stream = Static.extract_festival("1")
 
-      [_, _, festival] = Enum.to_list(stream)
+      [_, _, {:ok, festival}] = Enum.to_list(stream)
 
       assert festival == %Festival{
                name: "Awesome",

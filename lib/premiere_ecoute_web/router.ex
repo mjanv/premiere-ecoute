@@ -128,8 +128,8 @@ defmodule PremiereEcouteWeb.Router do
   scope "/festivals", PremiereEcouteWeb.Festivals do
     pipe_through [:browser]
 
-    live_session :festivals, on_mount: [{UserAuth, :viewer}] do
-      live "/playlists", PlaylistsLive, :index
+    live_session :festivals, on_mount: [{UserAuth, :streamer}] do
+      live "/new", PosterLive, :index
     end
   end
 

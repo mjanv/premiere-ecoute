@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Festivals.PlaylistsLive do
+defmodule PremiereEcouteWeb.Festivals.PosterLive do
   use PremiereEcouteWeb, :live_view
 
   require Logger

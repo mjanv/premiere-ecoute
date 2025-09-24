@@ -13,6 +13,7 @@ PremiereEcouteCore.FeatureFlag.enable(:listening_session_playlist)
 PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
 PremiereEcouteCore.FeatureFlag.enable(:playlists)
 PremiereEcouteCore.FeatureFlag.enable(:playlist_workflows)
+PremiereEcouteCore.FeatureFlag.enable(:festivals)
 
 # Accounts
 Logger.info(IO.ANSI.green() <> IO.ANSI.bright() <> "Accounts:" <> IO.ANSI.reset())

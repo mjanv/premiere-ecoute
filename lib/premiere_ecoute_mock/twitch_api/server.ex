@@ -213,7 +213,7 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
 
     case Repo.get_by(User, username: "lanfeust313") do
       nil -> lanfeust_313()
-      _user -> lanfeust_313()
+      _user -> bot()
     end
   end
 
