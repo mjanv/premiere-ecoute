@@ -72,8 +72,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                       {gettext("Retrospective")}
                     </.sidebar_link>
                   <% end %>
-                  
-    <!-- My votes link - shows viewer votes by period using get_votes_by_period -->
+
                   <.sidebar_link
                     href={~p"/retrospective/votes"}
                     current_page={@current_page}

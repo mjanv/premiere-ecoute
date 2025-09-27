@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
 
   import Ecto.Query, warn: false
 
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
@@ -17,8 +18,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   @doc """
   Get all albums listened by a specific streamer during a time period.
   """
-  @spec get_albums_by_period(integer(), time_period(), map()) :: [map()]
-  def get_albums_by_period(user_id, period, opts \\ %{}) do
+  @spec get_albums_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_albums_by_period(%User{id: user_id}, period, opts \\ %{}) do
     current_date = DateTime.utc_now()
     year = Map.get(opts, :year, current_date.year)
     month = Map.get(opts, :month, current_date.month)
@@ -48,10 +49,10 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   end
 
   @doc """
-  Get all albums listened by a specific viewer during a time period.
+  Get all votes casted by a specific viewer during a time period.
   """
-  @spec get_votes_by_period(integer(), time_period(), map()) :: [map()]
-  def get_votes_by_period(user_id, period, opts \\ %{}) do
+  @spec get_votes_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_votes_by_period(%User{twitch: %{user_id: user_id}}, period, opts \\ %{}) do
     current_date = DateTime.utc_now()
     year = Map.get(opts, :year, current_date.year)
     month = Map.get(opts, :month, current_date.month)

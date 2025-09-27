@@ -10,6 +10,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
 
   setup do
     user = user_fixture()
+    viewer = user_fixture(%{twitch: %{user_id: "viewer1"}})
+
     {:ok, album1} = Album.create(spotify_album_fixture("7aJuG4TFXa2hmE4z1yxc3n"))
     {:ok, session1} = ListeningSession.create(%{user_id: user.id, album_id: album1.id})
     {:ok, session1} = ListeningSession.start(session1)
@@ -56,17 +58,29 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
     {:ok, session3} = ListeningSession.stop(session3)
     {:ok, _report3} = Report.generate(session3)
 
-    {:ok, %{user: user, sessions: [session1, session2, session3]}}
+    {:ok, %{user: user, viewer: viewer, sessions: [session1, session2, session3]}}
   end
 
-  describe "get_albums_by_period/3" do
+  describe "get_albums_by_period/2" do
     test "returns the list of albums grouped per month", %{user: user} do
-      retrospective = History.get_albums_by_period(user.id, :month)
+      retrospective = History.get_albums_by_period(user, :month)
 
       assert length(retrospective) == 3
 
       for entry <- retrospective do
         %{album: %Album{}, session: %ListeningSession{}, report: %Report{}} = entry
+      end
+    end
+  end
+
+  describe "get_votes_by_period/2" do
+    test "returns the list of votes grouped per month", %{viewer: viewer} do
+      retrospective = History.get_votes_by_period(viewer, :month)
+
+      assert length(retrospective) == 1
+
+      for entry <- retrospective do
+        %{album: %Album{}, score: _score} = entry
       end
     end
   end

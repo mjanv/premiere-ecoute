@@ -21,14 +21,14 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
       |> assign(:show_modal, false)
       |> assign(:modal_session_id, nil)
 
-    user_id = socket.assigns.current_user.id
+    user = socket.assigns.current_user
     period = :month
     year = current_date.year
     month = current_date.month
 
     socket
     |> assign_async(:albums_data, fn ->
-      albums = Sessions.get_albums_by_period(user_id, period, %{year: year, month: month})
+      albums = Sessions.get_albums_by_period(user, period, %{year: year, month: month})
       {:ok, %{albums_data: albums}}
     end)
     |> then(fn socket -> {:ok, socket} end)
@@ -50,11 +50,11 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
     socket = assign(socket, :selected_year, year)
     socket = assign(socket, :selected_month, month)
 
-    user_id = socket.assigns.current_user.id
+    user = socket.assigns.current_user
 
     socket
     |> assign_async(:albums_data, fn ->
-      albums = Sessions.get_albums_by_period(user_id, period, %{year: year, month: month})
+      albums = Sessions.get_albums_by_period(user, period, %{year: year, month: month})
       {:ok, %{albums_data: albums}}
     end)
     |> then(fn socket -> {:noreply, socket} end)
@@ -66,7 +66,6 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
     {year, ""} = Integer.parse(year_str)
     {month, ""} = Integer.parse(month_str)
 
-    # Build new URL with updated parameters
     url_params = build_params(period, year, month)
     {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{url_params}")}
   end

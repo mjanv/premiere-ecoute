@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate create_vote(vote), to: Scores.Vote, as: :create
 
   # Retrospective
-  defdelegate get_albums_by_period(user_id, period, opts \\ %{}), to: Retrospective.History
-  defdelegate get_votes_by_period(user_id, period, opts \\ %{}), to: Retrospective.History
+  defdelegate get_albums_by_period(user, period, opts \\ %{}), to: Retrospective.History
+  defdelegate get_votes_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_album_session_details(session_id), to: Retrospective.History
 end

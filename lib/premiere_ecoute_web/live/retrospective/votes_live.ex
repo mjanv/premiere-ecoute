@@ -35,14 +35,14 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
           |> assign(:show_modal, false)
           |> assign(:modal_album_id, nil)
 
-        user_id = socket.assigns.current_user.twitch.user_id
+        user = socket.assigns.current_user
         period = :month
         year = current_date.year
         month = current_date.month
 
         socket
         |> assign_async(:votes_data, fn ->
-          votes = Sessions.get_votes_by_period(user_id, period, %{year: year, month: month})
+          votes = Sessions.get_votes_by_period(user, period, %{year: year, month: month})
           {:ok, %{votes_data: votes}}
         end)
         |> then(fn socket -> {:ok, socket} end)
@@ -65,11 +65,11 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
     socket = assign(socket, :selected_year, year)
     socket = assign(socket, :selected_month, month)
 
-    user_id = socket.assigns.current_user.twitch.user_id
+    user = socket.assigns.current_user
 
     socket
     |> assign_async(:votes_data, fn ->
-      votes = Sessions.get_votes_by_period(user_id, period, %{year: year, month: month})
+      votes = Sessions.get_votes_by_period(user, period, %{year: year, month: month})
       {:ok, %{votes_data: votes}}
     end)
     |> then(fn socket -> {:noreply, socket} end)

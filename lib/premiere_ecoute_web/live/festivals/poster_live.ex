@@ -3,8 +3,8 @@ defmodule PremiereEcouteWeb.Festivals.PosterLive do
 
   require Logger
 
-  alias PremiereEcoute.Festivals
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Festivals
 
   @impl true
   def mount(_params, _session, socket) do
