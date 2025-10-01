@@ -32,7 +32,7 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
 
         if current_user.id == billboard.user_id do
           if connected?(socket) do
-            Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "billboard:#{billboard.id}")
+            PremiereEcoute.PubSub.subscribe("billboard:#{billboard.id}")
           end
 
           cache_status = check_billboard_cache_status(billboard.billboard_id)

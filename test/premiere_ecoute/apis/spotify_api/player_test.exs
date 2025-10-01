@@ -21,6 +21,63 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
     {:ok, scope: scope}
   end
 
+  describe "devices/1" do
+    test "returns list of available devices", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player/devices"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
+        response: "spotify_api/player/devices/response.json",
+        status: 200
+      )
+
+      {:ok, devices} = SpotifyApi.devices(scope)
+
+      assert devices == [
+        %{
+          "id" => "1e463fc3e7d2bd24126918bde04abee6cbfb4ff2",
+          "is_active" => true,
+          "is_private_session" => false,
+          "is_restricted" => false,
+          "name" => "Kitchen speaker",
+          "type" => "computer",
+          "volume_percent" => 59,
+          "supports_volume" => false
+        },
+        %{
+          "id" => "a1b2c3d4e5f6789012345678901234567890abcd",
+          "is_active" => false,
+          "is_private_session" => false,
+          "is_restricted" => false,
+          "name" => "Living Room TV",
+          "type" => "tv",
+          "volume_percent" => 75,
+          "supports_volume" => true
+        }
+      ]
+    end
+
+    test "returns error when API call fails", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player/devices"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"}
+        ],
+        response: %{"error" => %{"status" => 401, "message" => "Invalid access token"}},
+        status: 401
+      )
+
+      {:error, error} = SpotifyApi.devices(scope)
+
+      assert error == []
+    end
+  end
+
   describe "get_playback_state/1" do
     test "return a playing playback state", %{scope: scope} do
       ApiMock.expect(

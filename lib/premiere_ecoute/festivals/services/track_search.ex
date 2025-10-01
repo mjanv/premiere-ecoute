@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Festivals.Services.TrackSearch do
   end
 
   def find_track(%Concert{artist: artist}) do
-    with {:ok, id} <- Apis.spotify().search_artist(artist),
+    with {:ok, %{id: id}} <- Apis.spotify().search_artist(artist),
          {:ok, track} <- Apis.spotify().get_artist_top_track(id) do
       %Concert.Track{provider: "spotify", track_id: track.track_id, name: track.name}
     else

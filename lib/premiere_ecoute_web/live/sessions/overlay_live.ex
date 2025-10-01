@@ -18,8 +18,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     if connected?(socket) do
       {:ok, _} = Presence.join(session.user.id)
 
-      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{session.id}")
-      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{session.user.id}")
+      PremiereEcoute.PubSub.subscribe(["session:#{session.id}", "playback:#{session.user.id}"])
     end
 
     {:ok, _} = PlayerSupervisor.start(session.user.id)

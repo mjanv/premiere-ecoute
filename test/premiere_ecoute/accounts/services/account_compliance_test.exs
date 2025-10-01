@@ -159,6 +159,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
 
     test "deleting non-existent user raises appropriate error" do
       user = user_fixture(%{role: :viewer, twitch: %{user_id: "test123"}})
+      
       Repo.delete!(user)
 
       assert_raise Ecto.StaleEntryError, fn -> Accounts.delete_account(Scope.for_user(user)) end

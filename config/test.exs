@@ -1,7 +1,12 @@
 import Config
 
 config :premiere_ecoute,
-  twitch_eventsub_secret: "s3cre77890ab"
+  twitch_eventsub_secret: "s3cre77890ab",
+  twitch_client_id: "test_twitch_client_id",
+  twitch_client_secret: "test_twitch_client_secret",
+  twitch_redirect_uri: "http://localhost:4000/auth/twitch/callback",
+  tidal_client_id: "test_tidal_client_id",
+  tidal_client_secret: "test_tidal_client_secret"
 
 config :premiere_ecoute, Oban, testing: :inline
 
@@ -27,6 +32,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   deezer: [
     api: PremiereEcoute.Apis.DeezerApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.DeezerApi}]
+  ],
+  tidal: [
+    api: PremiereEcoute.Apis.TidalApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.TidalApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

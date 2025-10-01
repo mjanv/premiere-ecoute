@@ -106,7 +106,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
     end
   end
 
-  describe "create_playlist/1" do
+  describe "create_playlist/2" do
     test "create a playlist" do
       ApiMock.expect(
         SpotifyApi,
@@ -140,7 +140,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
     end
   end
 
-  describe "add_items_to_playlist/1" do
+  describe "add_items_to_playlist/3" do
     test "add one or more items to a user's playlist" do
       ApiMock.expect(
         SpotifyApi,
@@ -163,6 +163,32 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       {:ok, snapshot} = SpotifyApi.add_items_to_playlist(scope, id, tracks)
 
       assert snapshot == %{"snapshot_id" => "abc"}
+    end
+  end
+  
+  describe "replace_items_to_playlist/1" do
+    test "add one or more items to a user's playlist" do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        request: "spotify_api/playlists/add_items_to_playlist/request_replace.json",
+        response: "spotify_api/playlists/add_items_to_playlist/response_replace.json",
+        status: 200
+      )
+
+      id = "2gW4sqiC2OXZLe9m0yDQX7"
+
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
+
+      tracks = [%Track{track_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{track_id: "6TGd66r0nlPaYm3KIoI7ET"}]
+
+      {:ok, snapshot} = SpotifyApi.replace_items_to_playlist(scope, id, tracks)
+
+      assert snapshot == %{"snapshot_id" => "def"}
     end
   end
 

@@ -1,0 +1,7 @@
+{
+  "access_token": "rfx2uswqe8l4g1mkagrvg5tv0ks3",
+  "expires_in": 14124,
+  "refresh_token": "5b93chm6hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01",
+  "scope": ["user:read:email", "user:read:follows"],
+  "token_type": "bearer"
+}

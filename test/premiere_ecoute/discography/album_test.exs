@@ -1,6 +1,7 @@
 defmodule PremiereEcoute.Discography.AlbumTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Repo
@@ -8,7 +9,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
 
   describe "create/1" do
     test "creates an album with tracks" do
-      {:ok, album} = Album.create(album_fixture())
+      {:ok, album} = Discography.create_album(album_fixture())
 
       assert %Album{
                provider: :spotify,

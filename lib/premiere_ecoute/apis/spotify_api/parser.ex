@@ -1,13 +1,7 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Parser do
   @moduledoc false
 
-  def parse_primary_artist(artists) when is_list(artists) do
-    case List.first(artists) do
-      %{"name" => name} -> name
-      _ -> "Unknown Artist"
-    end
-  end
-
+  def parse_primary_artist([%{"name" => name} | _]), do: name
   def parse_primary_artist(_), do: "Unknown Artist"
 
   def parse_release_date(nil), do: nil
@@ -22,13 +16,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Parser do
   end
 
   def parse_album_cover_url(images) when is_list(images) do
-    # Get the medium-sized image (usually 300x300)
-    medium_image =
-      Enum.find(images, fn img ->
-        (img["height"] || 0) >= 250 && (img["height"] || 0) <= 350
-      end)
+    medium = Enum.find(images, fn img -> (img["height"] || 0) >= 250 && (img["height"] || 0) <= 350 end)
 
-    case medium_image || List.first(images) do
+    case medium || List.first(images) do
       %{"url" => url} -> url
       _ -> nil
     end

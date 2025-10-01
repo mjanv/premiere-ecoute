@@ -27,8 +27,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       if connected?(socket) do
         Process.send_after(self(), :refresh, 100)
         {:ok, _} = Presence.join(current_scope.user.id)
-        Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{current_scope.user.id}")
-        Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "session:#{id}")
+        PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{id}"])
       end
 
       {:ok, _} = PlayerSupervisor.start(current_scope.user.id)

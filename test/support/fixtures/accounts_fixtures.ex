@@ -62,7 +62,6 @@ defmodule PremiereEcoute.AccountsFixtures do
     |> Enum.into(%{})
   end
 
-  def user_scope_fixture, do: user_scope_fixture(user_fixture())
   def user_scope_fixture(user), do: Scope.for_user(user)
 
   def set_password(user) do

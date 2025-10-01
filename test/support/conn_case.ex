@@ -36,6 +36,11 @@ defmodule PremiereEcouteWeb.ConnCase do
       import PremiereEcoute.Discography.AlbumFixtures
       import PremiereEcoute.Discography.PlaylistFixtures
       import PremiereEcoute.Sessions.ScoresFixtures
+      
+      import Hammox
+
+      setup :set_mox_from_context
+      setup :verify_on_exit!
 
       import Swoosh.TestAssertions
     end

@@ -3,8 +3,13 @@
     "skip_files": [
       "lib/mix",
       "lib/application.ex",
+      "lib/premiere_ecoute/repo/release.ex",
       "lib/premiere_ecoute/telemetry/prom_ex.ex",
+      "lib/premiere_ecoute_core/api.ex",
+      "lib/premiere_ecoute_core/subscriber.ex",
       "lib/premiere_ecoute_mock",
+      "lib/premiere_ecoute_web",
+      "test/support/conn_case.ex",
       "storybook"
     ]
 }

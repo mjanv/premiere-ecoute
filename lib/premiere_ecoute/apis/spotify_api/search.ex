@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Search do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/search?q=#{URI.encode(query)}&type=artist&limit=1")
     |> SpotifyApi.handle(200, fn
-      %{"artists" => %{"items" => [%{"uri" => "spotify:artist:" <> id}]}} -> id
+      %{"artists" => %{"items" => [%{"uri" => "spotify:artist:" <> id}]}} -> %{id: id}
       _ -> nil
     end)
   end

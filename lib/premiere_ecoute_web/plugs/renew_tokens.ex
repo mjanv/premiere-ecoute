@@ -1,6 +1,6 @@
 defmodule PremiereEcouteWeb.Plugs.RenewTokens do
   @moduledoc """
-  Plug that automatically renews expired Spotify tokens for authenticated users.
+  Plug that automatically renews expired tokens for authenticated users.
   """
 
   import Plug.Conn

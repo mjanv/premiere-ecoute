@@ -10,7 +10,7 @@ defmodule PremiereEcouteWeb.Festivals.PosterLive do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       id = socket.assigns.current_scope.user.id
-      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "festival:#{id}")
+      PremiereEcoute.PubSub.subscribe("festival:#{id}")
     end
 
     socket

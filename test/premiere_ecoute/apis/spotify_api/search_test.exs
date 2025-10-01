@@ -25,7 +25,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
           {"content-type", "application/json"}
         ],
         params: %{"q" => "billie", "type" => "album", "limit" => "20"},
-        response: "spotify_api/search/search_for_item/billie.json",
+        response: "spotify_api/search/search_for_item/albums.json",
         status: 200
       )
 
@@ -62,6 +62,28 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
                tracks: [],
                total_tracks: 10
              } in albums
+    end
+  end
+  
+  describe "search_artist/1" do
+    test "can search an artist from a string query", %{token: token} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/search"},
+        headers: [
+          {"authorization", "Bearer #{token}"},
+          {"content-type", "application/json"}
+        ],
+        params: %{"q" => "billie", "type" => "artist", "limit" => "1"},
+        response: "spotify_api/search/search_for_item/artist.json",
+        status: 200
+      )
+
+      query = "billie"
+
+      {:ok, artist} = SpotifyApi.search_artist(query)
+
+      assert artist == %{id: "5OlAhdgR13gu6r0MZU8eKj"}
     end
   end
 end

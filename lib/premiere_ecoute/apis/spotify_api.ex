@@ -35,6 +35,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     alias PremiereEcoute.Discography.Album.Track
     alias PremiereEcoute.Discography.LibraryPlaylist
     alias PremiereEcoute.Discography.Playlist
+    
+    # Accounts
+    @callback client_credentials() :: {:ok, map()} | {:error, any()}
+    @callback authorization_url(scope :: String.t() | nil, state :: String.t() | nil) :: String.t()
+    @callback renew_token(refresh_token :: String.t()) :: {:ok, map()} | {:error, any()}
 
     # Albums
     @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}

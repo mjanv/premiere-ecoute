@@ -1,13 +1,14 @@
 defmodule PremiereEcoute.Discography.PlaylistTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
   alias PremiereEcoute.Repo
 
   describe "create/1" do
     test "creates an playlist with tracks" do
-      {:ok, playlist} = Playlist.create(playlist_fixture())
+      {:ok, playlist} = Discography.create_playlist(playlist_fixture())
 
       assert %Playlist{
                provider: :spotify,
