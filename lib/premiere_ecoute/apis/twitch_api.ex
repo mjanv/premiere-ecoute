@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Accounts.User
-  
+
     # Accounts
     @callback client_credentials() :: {:ok, map()} | {:error, any()}
     @callback authorization_url(scope :: String.t() | nil, state :: String.t() | nil) :: String.t()

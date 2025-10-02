@@ -37,27 +37,27 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
       {:ok, devices} = SpotifyApi.devices(scope)
 
       assert devices == [
-        %{
-          "id" => "1e463fc3e7d2bd24126918bde04abee6cbfb4ff2",
-          "is_active" => true,
-          "is_private_session" => false,
-          "is_restricted" => false,
-          "name" => "Kitchen speaker",
-          "type" => "computer",
-          "volume_percent" => 59,
-          "supports_volume" => false
-        },
-        %{
-          "id" => "a1b2c3d4e5f6789012345678901234567890abcd",
-          "is_active" => false,
-          "is_private_session" => false,
-          "is_restricted" => false,
-          "name" => "Living Room TV",
-          "type" => "tv",
-          "volume_percent" => 75,
-          "supports_volume" => true
-        }
-      ]
+               %{
+                 "id" => "1e463fc3e7d2bd24126918bde04abee6cbfb4ff2",
+                 "is_active" => true,
+                 "is_private_session" => false,
+                 "is_restricted" => false,
+                 "name" => "Kitchen speaker",
+                 "type" => "computer",
+                 "volume_percent" => 59,
+                 "supports_volume" => false
+               },
+               %{
+                 "id" => "a1b2c3d4e5f6789012345678901234567890abcd",
+                 "is_active" => false,
+                 "is_private_session" => false,
+                 "is_restricted" => false,
+                 "name" => "Living Room TV",
+                 "type" => "tv",
+                 "volume_percent" => 75,
+                 "supports_volume" => true
+               }
+             ]
     end
 
     test "returns error when API call fails", %{scope: scope} do

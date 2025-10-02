@@ -71,7 +71,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
         %{album: %Album{}, session: %ListeningSession{}, report: %Report{}} = entry
       end
     end
-    
+
     test "returns the list of albums grouped per year", %{user: user} do
       retrospective = History.get_albums_by_period(user, :year)
 
@@ -93,7 +93,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
         %{album: %Album{}, score: _score} = entry
       end
     end
-    
+
     test "returns the list of votes grouped per year", %{viewer: viewer} do
       retrospective = History.get_votes_by_period(viewer, :year)
 

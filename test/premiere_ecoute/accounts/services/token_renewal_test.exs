@@ -4,10 +4,9 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
   alias PremiereEcoute.Accounts.{Scope, User}
   alias PremiereEcoute.Accounts.Services.TokenRenewal
   alias PremiereEcoute.Accounts.User.OauthToken
-  
+
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
-
 
   setup do
     stub(SpotifyApi, :renew_token, fn _refresh_token ->
@@ -27,87 +26,91 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
 
   describe "maybe_renew_token/2" do
     test "renews expired Spotify token successfully", %{user: user, conn: conn} do
-      {:ok, user} = OauthToken.create(user, :spotify, %{
-        user_id: "spotify_user_id",
-        username: "spotify_username", 
-        access_token: "old_access_token",
-        refresh_token: "old_refresh_token",
-        expires_in: -3600
-      })
+      {:ok, user} =
+        OauthToken.create(user, :spotify, %{
+          user_id: "spotify_user_id",
+          username: "spotify_username",
+          access_token: "old_access_token",
+          refresh_token: "old_refresh_token",
+          expires_in: -3600
+        })
 
       conn = put_in(conn.assigns.current_scope.user, user)
 
       result = TokenRenewal.maybe_renew_token(conn, :spotify)
-      
+
       assert %Scope{user: %User{spotify: %OauthToken{access_token: "new_access_token"}}} = result
     end
 
     test "renews expired Twitch token successfully", %{user: user, conn: conn} do
-      {:ok, user} = OauthToken.create(user, :twitch, %{
-        user_id: "twitch_user_id",
-        username: "twitch_username",
-        access_token: "old_access_token", 
-        refresh_token: "old_refresh_token",
-        expires_in: -3600
-      })
+      {:ok, user} =
+        OauthToken.create(user, :twitch, %{
+          user_id: "twitch_user_id",
+          username: "twitch_username",
+          access_token: "old_access_token",
+          refresh_token: "old_refresh_token",
+          expires_in: -3600
+        })
 
       conn = put_in(conn.assigns.current_scope.user, user)
 
       result = TokenRenewal.maybe_renew_token(conn, :twitch)
-      
+
       assert %Scope{user: %User{twitch: %OauthToken{access_token: "new_access_token"}}} = result
     end
 
     test "does not renew non-expired token", %{user: user, conn: conn} do
-      {:ok, user} = OauthToken.create(user, :spotify, %{
-        user_id: "spotify_user_id",
-        username: "spotify_username",
-        access_token: "current_access_token",
-        refresh_token: "current_refresh_token", 
-        expires_in: 3600
-      })
-      
+      {:ok, user} =
+        OauthToken.create(user, :spotify, %{
+          user_id: "spotify_user_id",
+          username: "spotify_username",
+          access_token: "current_access_token",
+          refresh_token: "current_refresh_token",
+          expires_in: 3600
+        })
+
       conn = put_in(conn.assigns.current_scope.user, user)
-      
+
       result = TokenRenewal.maybe_renew_token(conn, :spotify)
-      
+
       assert %Scope{user: %User{spotify: %OauthToken{access_token: "current_access_token"}}} = result
     end
 
     test "returns original scope when user has no token for provider", %{conn: conn, scope: scope} do
       new_scope = TokenRenewal.maybe_renew_token(conn, :spotify)
-      
+
       assert new_scope == scope
     end
 
     test "returns original scope when no current_scope in conn" do
       conn = %Plug.Conn{assigns: %{}}
-      
+
       scope = TokenRenewal.maybe_renew_token(conn, :spotify)
-      
+
       assert is_nil(scope)
     end
 
     test "returns original scope when user is nil in scope", %{conn: conn} do
       scope = %Scope{user: nil}
       conn = put_in(conn.assigns.current_scope, scope)
-      
+
       scope = TokenRenewal.maybe_renew_token(conn, :spotify)
-      
+
       assert %Scope{user: nil} = scope
     end
 
     test "handles API renewal failure gracefully", %{user: user, conn: conn} do
       stub(SpotifyApi, :renew_token, fn _refresh_token -> {:error, "Nope"} end)
-      
-      {:ok, user} = OauthToken.create(user, :spotify, %{
-        user_id: "spotify_user_id",
-        username: "spotify_username",
-        access_token: "old_access_token",
-        refresh_token: "old_refresh_token",
-        expires_in: 0,
-        expired_at: DateTime.add(DateTime.utc_now(), -3600, :second)
-      })
+
+      {:ok, user} =
+        OauthToken.create(user, :spotify, %{
+          user_id: "spotify_user_id",
+          username: "spotify_username",
+          access_token: "old_access_token",
+          refresh_token: "old_refresh_token",
+          expires_in: 0,
+          expired_at: DateTime.add(DateTime.utc_now(), -3600, :second)
+        })
 
       conn = put_in(conn.assigns.current_scope.user, user)
 

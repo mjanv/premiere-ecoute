@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Apis.TidalApiTest do
+defmodule PremiereEcoute.Apis.TidalApi.AccountTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.ApiMock
@@ -24,11 +24,11 @@ defmodule PremiereEcoute.Apis.TidalApiTest do
       {:ok, response} = TidalApi.client_credentials()
 
       assert %{
-        "access_token" => "xHhiYE85rkDfPt7wLOyq3MqN2gKmB9n5WvJcP3sA",
-        "token_type" => "Bearer",
-        "expires_in" => 86400,
-        "scope" => "openapi"
-      } = response
+               "access_token" => "xHhiYE85rkDfPt7wLOyq3MqN2gKmB9n5WvJcP3sA",
+               "token_type" => "Bearer",
+               "expires_in" => 86_400,
+               "scope" => "openapi"
+             } = response
     end
   end
 end

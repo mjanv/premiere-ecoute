@@ -93,9 +93,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.start(session),
+         f <- fn ->
+           gettext("Welcome to the premiere of %{name} by %{artist}", name: session.album.name, artist: session.album.artist)
+         end,
+         _ <- Apis.twitch().send_chat_message(scope, Gettext.with_locale(Atom.to_string(scope.user.profile.language), f)),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}") do
+         _ <-
+           Apis.twitch().send_chat_message(
+             scope,
+             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}"
+           ) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
       {:ok, session, [%SessionStarted{session_id: session.id}]}
@@ -135,7 +143,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
+         _ <-
+           Apis.twitch().send_chat_message(
+             scope,
+             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}"
+           ),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
@@ -160,7 +172,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.previous_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         _ <- Apis.twitch().send_chat_message(scope, "#{session.current_track.name}"),
+         _ <-
+           Apis.twitch().send_chat_message(
+             scope,
+             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}"
+           ),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
@@ -176,7 +192,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
-         _ <- Apis.twitch().send_chat_message(scope, "Good bye !"),
+         f <- fn -> gettext("The premiere of %{name} is over", name: session.album.name) end,
+         _ <- Apis.twitch().send_chat_message(scope, Gettext.with_locale(Atom.to_string(scope.user.profile.language), f)),
          {:ok, session} <- ListeningSession.stop(session),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
       if is_active, do: Apis.spotify().pause_playback(scope)

@@ -22,7 +22,6 @@ defmodule PremiereEcoute.BillboardsTest do
 
   describe "add_submission/3" do
     test "can store 10 submissions one after the other", %{billboard: billboard} do
-
       {updated_billboard, _tokens} =
         Enum.reduce(1..10, {billboard, []}, fn i, {current_billboard, tokens} ->
           url = "https://open.spotify.com/playlist/test-playlist-#{i}"
@@ -80,11 +79,11 @@ defmodule PremiereEcoute.BillboardsTest do
       {:ok, billboard, _token1} = Billboards.add_submission(billboard, "https://playlist1.com", "user1")
       {:ok, billboard, _token2} = Billboards.add_submission(billboard, "https://playlist2.com", "user2")
       {:ok, billboard, _token3} = Billboards.add_submission(billboard, "https://playlist3.com", "user3")
-      
+
       assert length(billboard.submissions) == 3
-      
+
       {:ok, updated_billboard} = Billboards.remove_submission(billboard, 1)
-      
+
       assert length(updated_billboard.submissions) == 2
 
       remaining_urls = Enum.map(updated_billboard.submissions, fn s -> s["url"] end)
@@ -96,11 +95,11 @@ defmodule PremiereEcoute.BillboardsTest do
     test "can remove first submission (index 0)", %{billboard: billboard} do
       {:ok, billboard, _token1} = Billboards.add_submission(billboard, "https://playlist1.com", "user1")
       {:ok, billboard, _token2} = Billboards.add_submission(billboard, "https://playlist2.com", "user2")
-      
+
       assert length(billboard.submissions) == 2
 
       {:ok, updated_billboard} = Billboards.remove_submission(billboard, 0)
-      
+
       assert length(updated_billboard.submissions) == 1
       remaining_submission = hd(updated_billboard.submissions)
       assert remaining_submission["url"] == "https://playlist1.com"
@@ -109,11 +108,11 @@ defmodule PremiereEcoute.BillboardsTest do
     test "can remove last submission", %{billboard: billboard} do
       {:ok, billboard, _token1} = Billboards.add_submission(billboard, "https://playlist1.com", "user1")
       {:ok, billboard, _token2} = Billboards.add_submission(billboard, "https://playlist2.com", "user2")
-      
+
       assert length(billboard.submissions) == 2
 
       {:ok, updated_billboard} = Billboards.remove_submission(billboard, 1)
-      
+
       assert length(updated_billboard.submissions) == 1
       remaining_submission = hd(updated_billboard.submissions)
       assert remaining_submission["url"] == "https://playlist2.com"
@@ -121,7 +120,7 @@ defmodule PremiereEcoute.BillboardsTest do
 
     test "returns error for invalid index (negative)", %{billboard: billboard} do
       {:ok, billboard, _token} = Billboards.add_submission(billboard, "https://playlist1.com", "user1")
-      
+
       {:error, :invalid_index} = Billboards.remove_submission(billboard, -1)
     end
 
@@ -135,7 +134,7 @@ defmodule PremiereEcoute.BillboardsTest do
 
     test "returns error for empty submissions list", %{billboard: billboard} do
       assert billboard.submissions == []
-      
+
       {:error, :invalid_index} = Billboards.remove_submission(billboard, 0)
     end
   end
@@ -145,11 +144,11 @@ defmodule PremiereEcoute.BillboardsTest do
       {:ok, billboard, token1} = Billboards.add_submission(billboard, "https://playlist1.com", "user1")
       {:ok, billboard, token2} = Billboards.add_submission(billboard, "https://playlist2.com", "user2")
       {:ok, billboard, token3} = Billboards.add_submission(billboard, "https://playlist3.com", "user3")
-      
+
       assert length(billboard.submissions) == 3
 
       {:ok, updated_billboard} = Billboards.remove_submission_by_token(billboard, token2)
-      
+
       assert length(updated_billboard.submissions) == 2
 
       remaining_urls = Enum.map(updated_billboard.submissions, fn s -> s["url"] end)
@@ -165,19 +164,19 @@ defmodule PremiereEcoute.BillboardsTest do
 
     test "returns error for non-existent token", %{billboard: billboard} do
       {:ok, billboard, _token} = Billboards.add_submission(billboard, "https://playlist1.com", "user1")
-      
+
       {:error, :token_not_found} = Billboards.remove_submission_by_token(billboard, "non-existent-token")
     end
 
     test "returns error for empty token string", %{billboard: billboard} do
       {:ok, billboard, _token} = Billboards.add_submission(billboard, "https://playlist1.com", "user1")
-      
+
       {:error, :token_not_found} = Billboards.remove_submission_by_token(billboard, "")
     end
 
     test "works with empty submissions list", %{billboard: billboard} do
       assert billboard.submissions == []
-      
+
       {:error, :token_not_found} = Billboards.remove_submission_by_token(billboard, "any-token")
     end
 
@@ -188,11 +187,11 @@ defmodule PremiereEcoute.BillboardsTest do
         "submitted_at" => DateTime.utc_now(),
         deletion_token: "test-token-atom"
       }
-      
+
       {:ok, billboard} = Billboards.update_billboard(billboard, %{submissions: [submission_with_atom_key]})
-      
+
       {:ok, updated_billboard} = Billboards.remove_submission_by_token(billboard, "test-token-atom")
-      
+
       assert updated_billboard.submissions == []
     end
   end

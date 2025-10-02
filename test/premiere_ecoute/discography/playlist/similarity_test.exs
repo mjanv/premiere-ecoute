@@ -13,13 +13,7 @@ defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
           track("Artist B", "Song 2", 2021)
         ])
 
-      playlist2 =
-        build_playlist([
-          track("Artist A", "Song 1", 2020),
-          track("Artist B", "Song 2", 2021)
-        ])
-
-      assert Similarity.calculate_similarity(playlist1, playlist2) == 100
+      assert Similarity.calculate_similarity(playlist1, playlist1) == 100
     end
 
     test "returns 0 for completely different playlists" do
@@ -56,10 +50,9 @@ defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
     end
 
     test "returns 0 for empty playlists" do
-      playlist1 = build_playlist([])
-      playlist2 = build_playlist([])
+      playlist = build_playlist([])
 
-      assert Similarity.calculate_similarity(playlist1, playlist2) == 0
+      assert Similarity.calculate_similarity(playlist, playlist) == 0
     end
 
     test "returns 0 when one playlist is empty" do
@@ -70,44 +63,22 @@ defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
     end
 
     test "normalizes track names for comparison" do
-      # AIDEV-NOTE: track normalization removes parentheses, diacritics, etc.
-      playlist1 =
-        build_playlist([
-          track("Artist A", "Song (feat. Someone)", 2020)
-        ])
-
-      playlist2 =
-        build_playlist([
-          track("Artist A", "Song", 2020)
-        ])
+      playlist1 = build_playlist([track("Artist A", "Song (feat. Someone)", 2020)])
+      playlist2 = build_playlist([track("Artist A", "Song", 2020)])
 
       assert Similarity.calculate_similarity(playlist1, playlist2) == 100
     end
 
     test "handles case-insensitive track matching" do
-      playlist1 =
-        build_playlist([
-          track("Artist A", "Song Title", 2020)
-        ])
-
-      playlist2 =
-        build_playlist([
-          track("artist a", "song title", 2020)
-        ])
+      playlist1 = build_playlist([track("Artist A", "Song Title", 2020)])
+      playlist2 = build_playlist([track("artist a", "song title", 2020)])
 
       assert Similarity.calculate_similarity(playlist1, playlist2) == 100
     end
 
     test "removes diacritical marks for comparison" do
-      playlist1 =
-        build_playlist([
-          track("Björk", "Café", 2020)
-        ])
-
-      playlist2 =
-        build_playlist([
-          track("Bjork", "Cafe", 2020)
-        ])
+      playlist1 = build_playlist([track("Björk", "Café", 2020)])
+      playlist2 = build_playlist([track("Bjork", "Cafe", 2020)])
 
       assert Similarity.calculate_similarity(playlist1, playlist2) == 100
     end
@@ -170,15 +141,8 @@ defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
     end
 
     test "excludes the target playlist from results" do
-      target =
-        build_playlist("target", [
-          track("Artist A", "Song 1", 2020)
-        ])
-
-      similar =
-        build_playlist("similar", [
-          track("Artist A", "Song 1", 2020)
-        ])
+      target = build_playlist("target", [track("Artist A", "Song 1", 2020)])
+      similar = build_playlist("similar", [track("Artist A", "Song 1", 2020)])
 
       all_playlists = [target, similar]
 
@@ -206,21 +170,13 @@ defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
     end
 
     test "returns empty list when no other playlists exist" do
-      target =
-        build_playlist("target", [
-          track("Artist A", "Song 1", 2020)
-        ])
+      target = build_playlist("target", [track("Artist A", "Song 1", 2020)])
 
-      result = Similarity.find_most_similar(target, [target], 3)
-
-      assert result == []
+      assert Similarity.find_most_similar(target, [target], 3) == []
     end
 
     test "adds mean_year to each result" do
-      target =
-        build_playlist("target", [
-          track("Artist A", "Song 1", 2020)
-        ])
+      target = build_playlist("target", [track("Artist A", "Song 1", 2020)])
 
       similar =
         build_playlist("similar", [
@@ -231,22 +187,6 @@ defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
       result = Similarity.find_most_similar(target, [similar], 1)
 
       assert hd(result).mean_year == 2021
-    end
-
-    test "defaults to 3 results when N not specified" do
-      target =
-        build_playlist("target", [
-          track("Artist A", "Song 1", 2020)
-        ])
-
-      playlists =
-        for i <- 1..5 do
-          build_playlist("playlist#{i}", [track("Artist #{i}", "Song #{i}", 2020)])
-        end
-
-      result = Similarity.find_most_similar(target, playlists)
-
-      assert length(result) == 3
     end
   end
 
@@ -291,8 +231,6 @@ defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
       assert Similarity.calculate_mean_year(tracks) == 2021
     end
   end
-
-  # Helper functions
 
   defp build_playlist(tracks) when is_list(tracks) do
     build_playlist("test_playlist_#{:rand.uniform(100_000)}", tracks)

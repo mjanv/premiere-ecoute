@@ -2,10 +2,10 @@ defmodule PremiereEcoute.Billboards.BillboardTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Billboards.Billboard
-  
+
   setup do
     user = user_fixture()
-    
+
     {:ok, %{user: user}}
   end
 
@@ -38,40 +38,43 @@ defmodule PremiereEcoute.Billboards.BillboardTest do
 
   describe "submissions/1" do
     test "returns billboards containing submissions from a specific pseudo", %{user: user} do
-      {:ok, billboard1} = Billboard.create(%Billboard{
-        title: "Billboard 1",
-        user_id: user.id,
-        submissions: [
-          %{"pseudo" => "target_user", "url" => "https://spotify.com/playlist/1"},
-          %{"pseudo" => "other_user", "url" => "https://spotify.com/playlist/2"}
-        ],
-        status: :created
-      })
+      {:ok, billboard1} =
+        Billboard.create(%Billboard{
+          title: "Billboard 1",
+          user_id: user.id,
+          submissions: [
+            %{"pseudo" => "target_user", "url" => "https://spotify.com/playlist/1"},
+            %{"pseudo" => "other_user", "url" => "https://spotify.com/playlist/2"}
+          ],
+          status: :created
+        })
 
-      {:ok, _billboard2} = Billboard.create(%Billboard{
-        title: "Billboard 2", 
-        user_id: user.id,
-        submissions: [
-          %{"pseudo" => "other_user", "url" => "https://spotify.com/playlist/3"}
-        ],
-        status: :created
-      })
+      {:ok, _billboard2} =
+        Billboard.create(%Billboard{
+          title: "Billboard 2",
+          user_id: user.id,
+          submissions: [
+            %{"pseudo" => "other_user", "url" => "https://spotify.com/playlist/3"}
+          ],
+          status: :created
+        })
 
-      {:ok, billboard3} = Billboard.create(%Billboard{
-        title: "Billboard 3",
-        user_id: user.id,
-        submissions: [
-          %{"pseudo" => "some_user", "url" => "https://spotify.com/playlist/4"},
-          %{"pseudo" => "target_user", "url" => "https://spotify.com/playlist/5"},
-          %{"pseudo" => "another_user", "url" => "https://spotify.com/playlist/6"}
-        ],
-        status: :created
-      })
+      {:ok, billboard3} =
+        Billboard.create(%Billboard{
+          title: "Billboard 3",
+          user_id: user.id,
+          submissions: [
+            %{"pseudo" => "some_user", "url" => "https://spotify.com/playlist/4"},
+            %{"pseudo" => "target_user", "url" => "https://spotify.com/playlist/5"},
+            %{"pseudo" => "another_user", "url" => "https://spotify.com/playlist/6"}
+          ],
+          status: :created
+        })
 
       billboards = Billboard.submissions("target_user")
 
       assert length(billboards) == 2
-      
+
       billboard_ids = Enum.map(billboards, & &1.billboard_id)
       assert billboard1.billboard_id in billboard_ids
       assert billboard3.billboard_id in billboard_ids
@@ -82,15 +85,16 @@ defmodule PremiereEcoute.Billboards.BillboardTest do
     end
 
     test "returns empty list when pseudo not found", %{user: user} do
-      {:ok, _billboard} = Billboard.create(%Billboard{
-        title: "Test Billboard",
-        user_id: user.id,
-        submissions: [
-          %{"pseudo" => "user1", "url" => "https://spotify.com/playlist/1"},
-          %{"pseudo" => "user2", "url" => "https://spotify.com/playlist/2"}
-        ],
-        status: :created
-      })
+      {:ok, _billboard} =
+        Billboard.create(%Billboard{
+          title: "Test Billboard",
+          user_id: user.id,
+          submissions: [
+            %{"pseudo" => "user1", "url" => "https://spotify.com/playlist/1"},
+            %{"pseudo" => "user2", "url" => "https://spotify.com/playlist/2"}
+          ],
+          status: :created
+        })
 
       result = Billboard.submissions("nonexistent_user")
       assert result == []

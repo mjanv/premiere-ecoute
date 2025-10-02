@@ -42,15 +42,16 @@ defmodule PremiereEcoute.Apis.TidalApi.PlaylistsTest do
       {:ok, playlist} = TidalApi.get_playlist(id)
 
       assert %Playlist{
-        provider: :tidal,
-        playlist_id: "eaaa8f2b-b891-466d-828b-879891adf264",
-        title: "Je suis en Juillet",
-        tracks: tracks
-      } = playlist
+               provider: :tidal,
+               playlist_id: "eaaa8f2b-b891-466d-828b-879891adf264",
+               title: "Je suis en Juillet",
+               tracks: tracks
+             } = playlist
 
       # Verify that tracks are track IDs as strings (as per the current implementation)
       assert is_list(tracks)
-      assert length(tracks) == 20  # Number of tracks in the response data
+      # Number of tracks in the response data
+      assert length(tracks) == 20
 
       # Check that track IDs are extracted correctly
       assert "77690190" in tracks

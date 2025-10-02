@@ -3002,3 +3002,19 @@ msgid "artist"
 msgid_plural "artists"
 msgstr[0] ""
 msgstr[1] ""
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:195
+#, elixir-autogen, elixir-format
+msgid "The premiere of %{name} is over"
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:24
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:39
+#, elixir-autogen, elixir-format
+msgid "Votes are open !"
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:97
+#, elixir-autogen, elixir-format
+msgid "Welcome to the premiere of %{name} by %{artist}"
+msgstr ""

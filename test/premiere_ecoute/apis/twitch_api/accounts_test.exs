@@ -17,10 +17,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
       {:ok, response} = TwitchApi.client_credentials()
 
       assert %{
-        "access_token" => "prau3ol6mg5glgek8m89ec2s9q5i3i",
-        "expires_in" => 5011271,
-        "token_type" => "bearer"
-      } = response
+               "access_token" => "prau3ol6mg5glgek8m89ec2s9q5i3i",
+               "expires_in" => 5_011_271,
+               "token_type" => "bearer"
+             } = response
     end
   end
 
@@ -47,16 +47,16 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
       {:ok, user_data} = TwitchApi.authorization_code("test_auth_code")
 
       assert %{
-        user_id: "141981764",
-        email: "not-real@email.com",
-        username: "twitchdev",
-        display_name: "TwitchDev",
-        broadcaster_type: "partner",
-        access_token: "rfx2uswqe8l4g1mkagrvg5tv0ks3",
-        refresh_token: "5b93chm6hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01",
-        expires_in: 14124,
-        scope: ["user:read:email", "user:read:follows"]
-      } = user_data
+               user_id: "141981764",
+               email: "not-real@email.com",
+               username: "twitchdev",
+               display_name: "TwitchDev",
+               broadcaster_type: "partner",
+               access_token: "rfx2uswqe8l4g1mkagrvg5tv0ks3",
+               refresh_token: "5b93chm6hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01",
+               expires_in: 14_124,
+               scope: ["user:read:email", "user:read:follows"]
+             } = user_data
     end
   end
 
@@ -73,10 +73,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
       {:ok, token_data} = TwitchApi.renew_token("old_refresh_token")
 
       assert %{
-        access_token: "1ssjqsqfy6bads1rmgh0rvnvre09kgpz3b",
-        refresh_token: "eyJfaWQmNzMtNGCJ9%6VFV5LNrZFUj8oU231/3Aj",
-        expires_in: 14124
-      } = token_data
+               access_token: "1ssjqsqfy6bads1rmgh0rvnvre09kgpz3b",
+               refresh_token: "eyJfaWQmNzMtNGCJ9%6VFV5LNrZFUj8oU231/3Aj",
+               expires_in: 14_124
+             } = token_data
     end
   end
 
@@ -114,7 +114,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
       uri = URI.parse(url)
       query = URI.decode_query(uri.query)
 
-      expected_scope = "user:read:email user:read:follows user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcements"
+      expected_scope =
+        "user:read:email user:read:follows user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcements"
+
       assert query["scope"] == expected_scope
     end
 

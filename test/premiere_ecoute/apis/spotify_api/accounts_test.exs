@@ -24,10 +24,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AccountsTest do
       {:ok, response} = SpotifyApi.Accounts.client_credentials()
 
       assert %{
-        "access_token" => "BQCKrzBNz_WbxC0HsGUMcTKVe9VzOL-dKRXlFY4wTwdE1KjKv3Kx_0Q5...",
-        "token_type" => "Bearer",
-        "expires_in" => 3600
-      } = response
+               "access_token" => "BQCKrzBNz_WbxC0HsGUMcTKVe9VzOL-dKRXlFY4wTwdE1KjKv3Kx_0Q5...",
+               "token_type" => "Bearer",
+               "expires_in" => 3600
+             } = response
     end
   end
 
@@ -63,16 +63,16 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AccountsTest do
       {:ok, user_data} = SpotifyApi.Accounts.authorization_code("test_auth_code", "test_state")
 
       assert %{
-        user_id: "lanfeust313",
-        email: "maxime.janvier@gmail.com",
-        username: "lanfeust313",
-        display_name: "lanfeust313",
-        country: "FR",
-        product: "premium",
-        access_token: "NgCXRK...MzYjw",
-        refresh_token: "NgAagA...Um_SHo",
-        expires_in: 3600
-      } = user_data
+               user_id: "lanfeust313",
+               email: "maxime.janvier@gmail.com",
+               username: "lanfeust313",
+               display_name: "lanfeust313",
+               country: "FR",
+               product: "premium",
+               access_token: "NgCXRK...MzYjw",
+               refresh_token: "NgAagA...Um_SHo",
+               expires_in: 3600
+             } = user_data
     end
   end
 
@@ -96,10 +96,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AccountsTest do
       {:ok, token_data} = SpotifyApi.Accounts.renew_token("old_refresh_token")
 
       assert %{
-        access_token: "NgCXRKjs...HIjw",
-        refresh_token: "NgAagAAU...SHo",
-        expires_in: 3600
-      } = token_data
+               access_token: "NgCXRKjs...HIjw",
+               refresh_token: "NgAagAAU...SHo",
+               expires_in: 3600
+             } = token_data
     end
 
     test "can renew access token when no new refresh token is provided" do
@@ -121,10 +121,10 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AccountsTest do
       {:ok, token_data} = SpotifyApi.Accounts.renew_token("original_refresh_token")
 
       assert %{
-        access_token: "NgCXRKjs...HIjw",
-        refresh_token: "original_refresh_token",
-        expires_in: 3600
-      } = token_data
+               access_token: "NgCXRKjs...HIjw",
+               refresh_token: "original_refresh_token",
+               expires_in: 3600
+             } = token_data
     end
 
     test "returns error when token refresh fails with HTTP error" do

@@ -5,26 +5,28 @@ defmodule PremiereEcoute.Billboards.Services.BillboardCreationTest do
   alias PremiereEcoute.Billboards.Services.BillboardCreation
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
-  
+
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
 
   describe "generate_billboard/1" do
     test "generate a billboard from a list of playlist URLs" do
-      
       playlist = playlist_fixture()
       expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
-      
+
       urls = [
         "https://open.spotify.com/playlist/28Anwq5yS87ujCDWdFFr4b"
       ]
 
-      {:ok, %{playlists: playlists, track: track, artist: artist, year: year, year_podium: year_podium}} = Billboards.generate_billboard(urls, [])
-      
-      
+      {:ok, %{playlists: playlists, track: track, artist: artist, year: year, year_podium: year_podium}} =
+        Billboards.generate_billboard(urls, [])
+
       assert [%{count: 1, year: 2025, rank: 1, tracks: [_], track_count: 1, max_count: 1}] = year
       assert [%{count: 1, year: 2025, rank: 1, tracks: [_], track_count: 1, max_count: 1}] = year_podium
       assert [%{count: 1, artist: "Unknown Artist", rank: 1, tracks: [_], track_count: 1}] = artist
-      assert [%{count: 1, track: %Track{name: "Mind Loaded (feat. Caroline Polachek, Lorde & Mustafa)"}, rank: 1, tracks: [_]}] = track
+
+      assert [%{count: 1, track: %Track{name: "Mind Loaded (feat. Caroline Polachek, Lorde & Mustafa)"}, rank: 1, tracks: [_]}] =
+               track
+
       assert [%Playlist{playlist_id: "2gW4sqiC2OXZLe9m0yDQX7"}] = playlists
     end
   end

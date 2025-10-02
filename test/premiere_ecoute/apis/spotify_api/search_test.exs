@@ -64,7 +64,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.SearchTest do
              } in albums
     end
   end
-  
+
   describe "search_artist/1" do
     test "can search an artist from a string query", %{token: token} do
       ApiMock.expect(

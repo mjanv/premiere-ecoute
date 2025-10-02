@@ -165,7 +165,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlaylistsTest do
       assert snapshot == %{"snapshot_id" => "abc"}
     end
   end
-  
+
   describe "replace_items_to_playlist/1" do
     test "add one or more items to a user's playlist" do
       ApiMock.expect(
