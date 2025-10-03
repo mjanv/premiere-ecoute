@@ -34,7 +34,11 @@ defmodule PremiereEcoute.Gettext do
 
   use Gettext.Backend, otp_app: :premiere_ecoute
 
+  alias PremiereEcoute.Accounts.Scope
+
   def gettext(msgid), do: Gettext.gettext(__MODULE__, msgid)
+
+  def t(%Scope{user: %{profile: %{language: language}}}, f), do: Gettext.with_locale(Atom.to_string(language), f)
 
   @doc "Gets the locale for the current process"
   @spec locale :: Gettext.locale()

@@ -160,7 +160,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
+      {:ok, _, [%SessionStarted{} = event, %NextTrackStarted{}]} = CommandBus.apply(command)
 
       session = ListeningSession.get(event.session_id)
 
@@ -270,7 +270,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
+      {:ok, _, [%SessionStarted{} = event, %NextTrackStarted{}]} = CommandBus.apply(command)
 
       session = ListeningSession.get(event.session_id)
       assert session.current_track_id == Enum.at(session.album.tracks, 0).id
@@ -325,7 +325,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
+      {:ok, _, [%SessionStarted{} = event, %NextTrackStarted{}]} = CommandBus.apply(command)
 
       session = ListeningSession.get(event.session_id)
       assert session.current_track_id == Enum.at(session.album.tracks, 0).id
@@ -383,7 +383,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
+      {:ok, _, [%SessionStarted{} = event, %NextTrackStarted{}]} = CommandBus.apply(command)
 
       command = %StopListeningSession{session_id: event.session_id, scope: scope}
 

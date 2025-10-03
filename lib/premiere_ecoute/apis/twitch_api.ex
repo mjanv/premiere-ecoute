@@ -39,6 +39,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
 
     # Chat
     @callback send_chat_message(scope :: Scope.t(), message :: String.t()) :: {:ok, map()} | {:error, term()}
+    @callback send_chat_messages(scope :: Scope.t(), messages :: [String.t()]) :: :ok
     @callback send_chat_announcement(scope :: Scope.t(), message :: String.t(), color :: String.t()) ::
                 {:ok, String.t()} | {:error, term()}
 
@@ -124,7 +125,8 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defdelegate renew_token(refresh_token), to: __MODULE__.Accounts
 
   # Chat
-  defdelegate send_chat_message(scope, type), to: __MODULE__.Chat
+  defdelegate send_chat_message(scope, message), to: __MODULE__.Chat
+  defdelegate send_chat_messages(scope, messages, interval \\ 1_000), to: __MODULE__.Chat
   defdelegate send_chat_announcement(scope, type, color), to: __MODULE__.Chat
 
   # EventSub

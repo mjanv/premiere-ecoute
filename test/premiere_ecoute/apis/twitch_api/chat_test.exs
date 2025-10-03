@@ -41,6 +41,28 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
     end
   end
 
+  describe "send_chat_messages/3" do
+    test "can send multiple messages to a chat", %{scope: scope} do
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/chat/messages"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        response: "twitch_api/chat/send_chat_message/response.json",
+        status: 200,
+        n: 3
+      )
+
+      messages = ["Hello, world! twitchdevHype", "How is everyone?", "Great to be here!!!"]
+
+      result = TwitchApi.send_chat_messages(scope, messages, 0)
+
+      assert result == :ok
+    end
+  end
+
   describe "send_announcement/3" do
     test "can send an annoucement to a chat", %{scope: scope} do
       ApiMock.expect(
