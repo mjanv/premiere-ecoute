@@ -1,0 +1,181 @@
+<!-- AIDEV-NOTE: Large overlay layout (1400x800px) featuring album cover, details, track list, progression bar, and voting scores -->
+<div
+  :if={@score in [:large]}
+  style="display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding: 20px; width: 1300px; height: 1000px; box-sizing: border-box;"
+>
+  <!-- Top Row: Album Cover with Details Below, and Track List -->
+  <div style="display: flex; flex-direction: row; align-items: stretch; gap: 20px;">
+    
+<!-- Left Column: Album Cover and Details -->
+    <div style="display: flex; flex-direction: column; gap: 20px; flex: 0 0 360px;">
+      <!-- Album Cover -->
+      <%= if @listening_session.album && @listening_session.album.cover_url do %>
+        <div style="width: 360px; height: 360px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); overflow: hidden;">
+          <img
+            src={@listening_session.album.cover_url}
+            alt={"#{@listening_session.album.name} cover"}
+            style="width: 100%; height: 100%; object-fit: cover;"
+          />
+        </div>
+      <% else %>
+        <div style="width: 360px; height: 360px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center;">
+          <div style="font-size: 24px; color: rgba(255, 255, 255, 0.6); text-align: center;">ALBUM COVER</div>
+        </div>
+      <% end %>
+      
+<!-- Album Details -->
+      <%= if @listening_session.album do %>
+        <div style="padding: 12px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+<!-- Album Name -->
+          <div style="font-size: 24px; font-weight: 600; color: white; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {@listening_session.album.name}
+          </div>
+          
+<!-- Artist -->
+          <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {@listening_session.album.artist}
+          </div>
+          
+<!-- Release Date and Track Count -->
+          <div style="font-size: 16px; color: rgba(255, 255, 255, 0.6);">
+            {PremiereEcouteCore.Date.date(@listening_session.album.release_date)} • {@listening_session.album.total_tracks} tracks
+          </div>
+        </div>
+        
+        <!-- Small footer under album details -->
+        <div style="padding: 12px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+          <div style="font-size: 12px; color: rgba(255, 255, 255, 0.4); font-weight: 400;">
+            Made with premiere-ecoute.fr
+          </div>
+        </div>
+      <% else %>
+        <div style="flex: 1; padding: 16px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="color: rgba(255, 255, 255, 0.6);">No album information available</div>
+        </div>
+        
+        <!-- Small footer under album details -->
+        <div style="padding: 12px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+          <div style="font-size: 12px; color: rgba(255, 255, 255, 0.4); font-weight: 400;">
+            Made with premiere-ecoute.fr
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+<!-- Track List -->
+    <div style="flex: 1; padding: 20px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden;">
+      <div style="max-height: 100%; overflow-y: auto;">
+        <%= for track <- Enum.sort_by(PremiereEcoute.Sessions.ListeningSession.tracks(@listening_session), & &1.track_number) do %>
+          <% is_current_track = 
+            case @progress do
+              %{ok?: true, result: progress} -> track.track_number == progress["item"]["track_number"]
+              _ -> false
+            end %>
+          <div style={if is_current_track, do: "background-color: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 4px solid #ff6b9d; display: flex; justify-content: space-between; align-items: center;", else: "padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;"}>
+            <div style="font-size: 16px; font-weight: 600; color: white; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; margin-right: 16px;">
+              {track.track_number}. {track.name}
+            </div>
+            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7); white-space: nowrap;">
+              {PremiereEcouteCore.Duration.timer(track.duration_ms)}
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+<!-- Track Progression Row -->
+  <div style="display: flex; flex-direction: row; align-items: stretch; gap: 20px; height: 180px;">
+    <!-- Left spacer to align with album cover -->
+    <div style="flex: 0 0 360px;"></div>
+    
+<!-- Track Progression Bar -->
+    <div style="flex: 1; padding: 20px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; gap: 16px;">
+      <!-- Progress bar container -->
+      <div style="flex: 1; height: 40px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden;">
+        <.async_result :let={progress} assign={@progress}>
+          <:loading></:loading>
+          <:failed :let={_reason}></:failed>
+          
+          <div style={"position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(to right, rgba(255, 107, 157, 0.8) 0%, rgba(255, 107, 157, 0.4) 100%); width: #{round(100 * progress["progress_ms"] / progress["item"]["duration_ms"])}%; transition: width 0.3s ease;"}>
+          </div>
+        </.async_result>
+      </div>
+      
+      <!-- Time display on the right -->
+      <div style="white-space: nowrap;">
+        <.async_result :let={progress} assign={@progress}>
+          <:loading>
+            <span style="font-size: 18px; color: rgba(255, 255, 255, 0.9); font-weight: 600;">
+              {PremiereEcouteCore.Duration.timer(0)} / {PremiereEcouteCore.Duration.timer(0)}
+            </span>
+          </:loading>
+          
+          <:failed :let={_reason}>
+            <span style="font-size: 18px; color: rgba(255, 255, 255, 0.9); font-weight: 600;">
+              {PremiereEcouteCore.Duration.timer(0)} / {PremiereEcouteCore.Duration.timer(0)}
+            </span>
+          </:failed>
+          
+          <span style="font-size: 18px; color: rgba(255, 255, 255, 0.9); font-weight: 600;">
+            {PremiereEcouteCore.Duration.timer(progress["progress_ms"])} / {PremiereEcouteCore.Duration.timer(progress["item"]["duration_ms"])}
+          </span>
+        </.async_result>
+      </div>
+    </div>
+  </div>
+  
+<!-- Voting Notes Row -->
+  <div style="display: flex; flex-direction: row; align-items: stretch; gap: 20px; height: 150px;">
+    
+<!-- Viewer Note -->
+    <.async_result :let={summary} assign={@summary}>
+      <:loading>
+        <div style="flex: 1; padding: 20px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="font-size: 80px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">-</div>
+          <div style="font-size: 20px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-top: 8px;">
+            {score_label(:viewer)}
+          </div>
+        </div>
+      </:loading>
+
+      <div style="flex: 1; padding: 20px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="font-size: 80px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+          <%= if @open_vote do %>
+            {score_value(summary, :viewer)}
+          <% else %>
+            -
+          <% end %>
+        </div>
+        <div style="font-size: 20px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-top: 8px;">
+          {score_label(:viewer)}
+        </div>
+      </div>
+    </.async_result>
+    
+<!-- Streamer Note -->
+    <.async_result :let={summary} assign={@summary}>
+      <:loading>
+        <div style="flex: 1; padding: 20px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="font-size: 80px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">-</div>
+          <div style="font-size: 20px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-top: 8px;">
+            {score_label(:streamer)}
+          </div>
+        </div>
+      </:loading>
+
+      <div style="flex: 1; padding: 20px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="font-size: 80px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+          <%= if @open_vote do %>
+            {score_value(summary, :streamer)}
+          <% else %>
+            -
+          <% end %>
+        </div>
+        <div style="font-size: 20px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-top: 8px;">
+          {score_label(:streamer)}
+        </div>
+      </div>
+    </.async_result>
+  </div>
+</div>
