@@ -75,7 +75,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   defp version(_), do: "0"
 
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.chat.message") do
-    {:ok, bot} = Bot.get()
+    {:ok, bot} = Bot.get() |> IO.inspect()
     %{broadcaster_user_id: user_id, user_id: bot.twitch.user_id}
   end
 
