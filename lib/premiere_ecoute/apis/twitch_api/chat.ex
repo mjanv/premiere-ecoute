@@ -15,6 +15,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
 
     :ok
   end
+  
+  def send_chat_message(_, _), do: :ok
 
   def send_chat_message(%Scope{user: %{twitch: %{user_id: user_id}}}, message) do
     case Bot.get() do
