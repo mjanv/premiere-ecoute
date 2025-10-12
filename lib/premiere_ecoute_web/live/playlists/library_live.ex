@@ -105,7 +105,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
       {:ok, _playlist} ->
         socket
         |> assign(:show_create_playlist_modal, false)
-        |> assign(:library_playlists, Discography.LibraryPlaylist.all(where: [user_id: current_scope.current_user.id]))
+        |> assign(:library_playlists, Discography.LibraryPlaylist.all(where: [user_id: current_scope.user.id]))
         |> put_flash(:success, gettext("Playlist created successfully!"))
 
       {:error, reason} ->

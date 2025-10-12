@@ -13,6 +13,7 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi.Player
+  alias PremiereEcoute.Apis.SpotifyApi.Playlists
   alias PremiereEcoute.Sessions
   alias PremiereEcouteCore.Cache
 
@@ -70,25 +71,119 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   @doc """
   POST /api/extension/save-track
 
-  Logs track save requests from the extension.
-  For now, just logs the request without implementing save functionality.
+  Saves the track to the user's "Flonflon" playlist on Spotify.
   """
-  def save_track(conn, params) do
-    # Log the save track request
+  def save_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id} = params) do
     Logger.info("Extension save track request #{inspect(params)}")
 
-    # For testing, just return success without auth check
+    case save_track_to_flonflon_playlist(user_id, spotify_track_id) do
+      {:ok, playlist_name} ->
+        conn
+        |> put_status(:ok)
+        |> json(%{
+          success: true,
+          message: "Track saved successfully",
+          playlist_name: playlist_name,
+          spotify_track_id: spotify_track_id
+        })
+
+      {:error, :no_user} ->
+        Logger.info("No user found for user ID: #{user_id}")
+
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User not found or not connected to Spotify"})
+
+      {:error, :no_spotify} ->
+        Logger.info("User #{user_id} has no Spotify connection")
+
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User not connected to Spotify"})
+
+      {:error, :no_flonflon_playlist} ->
+        Logger.info("No Flonflon playlist found for user #{user_id}")
+
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No Flonflon playlist found. Please create a playlist with 'Flonflon' in the name."})
+
+      {:error, reason} ->
+        Logger.error("Failed to save track for user #{user_id}: #{inspect(reason)}")
+
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Failed to save track"})
+    end
+  end
+
+  def save_track(conn, params) do
+    Logger.warning("Invalid save track request: #{inspect(params)}")
+
     conn
-    |> put_status(:ok)
-    |> json(%{
-      success: true,
-      message: "Track save request logged (not implemented yet)",
-      user_id: "mock_user_id",
-      channel_id: "mock_channel_id"
-    })
+    |> put_status(:bad_request)
+    |> json(%{error: "Missing required parameters: user_id and spotify_track_id"})
   end
 
   # Private functions
+
+  defp save_track_to_flonflon_playlist(user_id, spotify_track_id) do
+    with {:ok, user} <- get_saver_user(user_id),
+         {:ok, spotify_scope} <- get_spotify_scope(user),
+         {:ok, flonflon_playlist} <- find_flonflon_playlist(spotify_scope),
+         {:ok, _result} <- add_track_to_playlist(spotify_scope, flonflon_playlist, spotify_track_id) do
+      {:ok, flonflon_playlist.title}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp get_saver_user(user_id) do
+    case Accounts.get_user_by_twitch_id(user_id) do
+      nil -> {:error, :no_user}
+      user -> {:ok, user}
+    end
+  end
+
+  defp find_flonflon_playlist(spotify_scope) do
+    case get_all_user_playlists(spotify_scope) do
+      {:ok, playlists} ->
+        flonflon_playlist =
+          Enum.find(playlists, fn playlist ->
+            String.contains?(String.downcase(playlist.title), "flonflon")
+          end)
+
+        case flonflon_playlist do
+          nil -> {:error, :no_flonflon_playlist}
+          playlist -> {:ok, playlist}
+        end
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp get_all_user_playlists(spotify_scope, page \\ 1, all_playlists \\ []) do
+    case Playlists.get_library_playlists(spotify_scope, page) do
+      {:ok, []} ->
+        # No more playlists, return accumulated results
+        {:ok, all_playlists}
+
+      {:ok, playlists} ->
+        # Get next page recursively
+        get_all_user_playlists(spotify_scope, page + 1, all_playlists ++ playlists)
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp add_track_to_playlist(spotify_scope, playlist, spotify_track_id) do
+    # Create a track struct with the Spotify ID
+    track = %{track_id: spotify_track_id}
+
+    Playlists.add_items_to_playlist(spotify_scope, playlist.playlist_id, [track])
+  end
 
   defp get_current_spotify_track(broadcaster_id) do
     with {:ok, user} <- get_broadcaster_user(broadcaster_id),

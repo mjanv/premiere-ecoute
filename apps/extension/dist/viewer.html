@@ -1291,6 +1291,7 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 
 var PREMIERE_ECOUTE_API =  false ? 0 : 'https://premiere-ecoute.fr';
 var SaveTrackExtension_SaveTrackExtension = function SaveTrackExtension(_ref) {
+  var _auth$userId;
   var auth = _ref.auth;
   var _useState = (0,react.useState)(null),
     _useState2 = _slicedToArray(_useState, 2),
@@ -1315,7 +1316,8 @@ var SaveTrackExtension_SaveTrackExtension = function SaveTrackExtension(_ref) {
 
   // Get broadcaster ID and user ID from auth context
   var broadcasterId = auth.channelId;
-  var userId = auth.userId;
+  // Remove any "U" prefix from userId if present
+  var userId = (_auth$userId = auth.userId) !== null && _auth$userId !== void 0 && _auth$userId.startsWith('U') ? auth.userId.slice(1) : auth.userId;
 
   // Debug log the auth context (remove in production)
   (0,react.useEffect)(function () {

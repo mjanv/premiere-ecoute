@@ -14,7 +14,8 @@ const SaveTrackExtension = ({ auth }) => {
 
   // Get broadcaster ID and user ID from auth context
   const broadcasterId = auth.channelId;
-  const userId = auth.userId;
+  // Remove any "U" prefix from userId if present
+  const userId = auth.userId?.startsWith('U') ? auth.userId.slice(1) : auth.userId;
   
   // Debug log the auth context (remove in production)
   useEffect(() => {
