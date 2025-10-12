@@ -1,0 +1,18 @@
+{
+  "manifest_version": 1,
+  "type": "panel",
+  "author_name": "Premiere Ecoute",
+  "description": "Save tracks from listening sessions to your Spotify playlists",
+  "summary": "One-click save tracks to Spotify during live music sessions",
+  "support_email": "contact@premiere-ecoute.fr",
+  "vendor_code": "premiere-ecoute",
+  "sku": "premiere-ecoute-save-track",
+  "views": {
+    "panel": {
+      "viewer_url": "viewer.html",
+      "height": 300,
+      "can_link_external_content": false
+    }
+  },
+  "version": "1.0.0"
+}

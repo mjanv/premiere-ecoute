@@ -26,6 +26,9 @@ defmodule PremiereEcouteWeb.Endpoint do
     plug Tidewave
   end
 
+  # CORS for extension API
+  plug CORSPlug, origin: "*"
+
   if code_reloading? do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader

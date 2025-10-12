@@ -79,6 +79,7 @@ defmodule PremiereEcoute.MixProject do
       {:gettext, "~> 0.26"},
       {:dns_cluster, "~> 0.2"},
       {:plug_content_security_policy, "~> 0.2.1"},
+      {:cors_plug, "~> 3.0"},
       {:fun_with_flags, "~> 1.13"},
       {:fun_with_flags_ui, "~> 1.1"},
       # Backend
@@ -111,6 +112,7 @@ defmodule PremiereEcoute.MixProject do
       {:broadway, "~> 1.2"},
       {:xml_builder, "~> 2.1"},
       {:instructor, "~> 0.1.0"},
+      {:jose, "~> 1.11"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},

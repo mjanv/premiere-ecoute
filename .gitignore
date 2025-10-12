@@ -45,3 +45,6 @@ phx_new_cache-*.tar
 docs/product/
 priv/docs/
 
+# Javascript
+node_modules/
+*.zip

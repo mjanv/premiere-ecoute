@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Repo
@@ -193,6 +194,20 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
         ),
         desc: s.updated_at
       ],
+      limit: 1
+    )
+    |> Repo.one()
+    |> preload()
+  end
+
+  def get_active_session_by_twitch_user_id(twitch_user_id) when is_binary(twitch_user_id) do
+    from(s in __MODULE__,
+      join: u in User,
+      on: u.id == s.user_id,
+      join: t in OauthToken,
+      on: t.parent_id == u.id and t.provider == :twitch,
+      where: t.user_id == ^twitch_user_id and s.status == :active,
+      order_by: [desc: s.updated_at],
       limit: 1
     )
     |> Repo.one()

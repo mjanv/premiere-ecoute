@@ -35,6 +35,10 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_session
   end
 
+  pipeline :api do
+    plug :accepts, ["json"]
+  end
+
   pipeline :app do
     plug :accepts, ["html"]
     plug :put_secure_browser_headers
@@ -182,6 +186,13 @@ defmodule PremiereEcouteWeb.Router do
     get "/:provider", AuthController, :request
     get "/:provider/callback", AuthController, :callback
     get "/:provider/complete", AuthController, :complete
+  end
+
+  scope "/api/extension", PremiereEcouteWeb.Api do
+    pipe_through :api
+
+    get "/current-track/:broadcaster_id", ExtensionController, :current_track
+    post "/save-track", ExtensionController, :save_track
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do
