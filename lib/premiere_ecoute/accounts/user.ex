@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Accounts.User do
     root: [[channels: [:twitch, :spotify]], :twitch, :spotify],
     json: [:id, :email, :role, :twitch, :spotify]
 
+  import Ecto.Query
+
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Accounts.User.Profile
@@ -147,6 +149,18 @@ defmodule PremiereEcoute.Accounts.User do
   end
 
   def get!(id), do: Repo.get!(__MODULE__, id)
+
+  @doc """
+  Gets a user by their Twitch user ID.
+  """
+  def get_user_by_twitch_id(twitch_user_id) do
+    from(u in __MODULE__,
+      join: t in assoc(u, :twitch),
+      where: t.user_id == ^twitch_user_id,
+      preload: [:twitch, :spotify]
+    )
+    |> Repo.one()
+  end
 
   @doc """
   Gets a user by email and password.

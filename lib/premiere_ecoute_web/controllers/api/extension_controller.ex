@@ -10,6 +10,9 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
 
   use PremiereEcouteWeb, :controller
 
+  alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Apis.SpotifyApi.Player
   alias PremiereEcoute.Sessions
   alias PremiereEcouteCore.Cache
 
@@ -20,28 +23,48 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   @doc """
   GET /api/extension/current-track/:broadcaster_id
 
-  Returns a static track for testing purposes.
+  Returns the current playing track from the broadcaster's Spotify account.
   """
   def current_track(conn, %{"broadcaster_id" => broadcaster_id}) do
-    # Return static track for testing
-    track_data = %{
-      id: 1,
-      name: "Blinding Lights",
-      artist: "The Weeknd",
-      album: "After Hours",
-      track_number: 3,
-      duration_ms: 200_040,
-      spotify_id: "0VjIjW4GlUZAMYd2vXMi3b",
-      preview_url: "https://p.sndcdn.com/preview.mp3"
-    }
+    Logger.info("Extension current track request for broadcaster: #{broadcaster_id}")
 
-    conn
-    |> put_status(:ok)
-    |> json(%{
-      track: track_data,
-      session_id: 123,
-      broadcaster_id: broadcaster_id
-    })
+    case get_current_spotify_track(broadcaster_id) do
+      {:ok, track_data} ->
+        conn
+        |> put_status(:ok)
+        |> json(%{
+          track: track_data,
+          broadcaster_id: broadcaster_id
+        })
+
+      {:error, :no_user} ->
+        Logger.info("No user found for broadcaster ID: #{broadcaster_id}")
+
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "Broadcaster not found or not connected to Spotify"})
+
+      {:error, :no_spotify} ->
+        Logger.info("Broadcaster #{broadcaster_id} has no Spotify connection")
+
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "Broadcaster not connected to Spotify"})
+
+      {:error, :no_track} ->
+        Logger.info("No track currently playing for broadcaster #{broadcaster_id}")
+
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No track currently playing"})
+
+      {:error, reason} ->
+        Logger.error("Failed to get current track for broadcaster #{broadcaster_id}: #{inspect(reason)}")
+
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Failed to fetch current track"})
+    end
   end
 
   @doc """
@@ -66,6 +89,61 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   end
 
   # Private functions
+
+  defp get_current_spotify_track(broadcaster_id) do
+    with {:ok, user} <- get_broadcaster_user(broadcaster_id),
+         {:ok, spotify_scope} <- get_spotify_scope(user),
+         {:ok, playback_state} <- Player.get_playback_state(spotify_scope, %{}),
+         {:ok, track_data} <- extract_track_from_playback(playback_state) do
+      {:ok, track_data}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp get_broadcaster_user(broadcaster_id) do
+    case Accounts.get_user_by_twitch_id(broadcaster_id) do
+      nil -> {:error, :no_user}
+      user -> {:ok, user}
+    end
+  end
+
+  defp get_spotify_scope(%{spotify: nil}), do: {:error, :no_spotify}
+
+  defp get_spotify_scope(%{spotify: _spotify_token} = user) do
+    # Create a Scope struct with the user (which includes preloaded spotify data)
+    scope = %Scope{user: user}
+    {:ok, scope}
+  end
+
+  defp extract_track_from_playback(%{"is_playing" => false}), do: {:error, :no_track}
+  defp extract_track_from_playback(%{"item" => nil}), do: {:error, :no_track}
+
+  defp extract_track_from_playback(%{"item" => item, "is_playing" => true}) do
+    track_data = %{
+      # We don't have internal track ID
+      id: nil,
+      name: item["name"],
+      artist: get_artist_names(item["artists"]),
+      album: item["album"]["name"],
+      track_number: item["track_number"],
+      duration_ms: item["duration_ms"],
+      spotify_id: item["id"],
+      preview_url: item["preview_url"]
+    }
+
+    {:ok, track_data}
+  end
+
+  defp extract_track_from_playback(_), do: {:error, :no_track}
+
+  defp get_artist_names(artists) when is_list(artists) do
+    artists
+    |> Enum.map(& &1["name"])
+    |> Enum.join(", ")
+  end
+
+  defp get_artist_names(_), do: "Unknown Artist"
 
   defp get_active_session_for_broadcaster(broadcaster_id) do
     # Check cache first for performance

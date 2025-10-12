@@ -219,7 +219,7 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
 
   defp lanfeust_313 do
     %{
-      "id" => "123456",
+      "id" => "441903922",
       "login" => "lanfeust313",
       "display_name" => "Lanfeust313",
       "email" => "lanfeust313@twitch.fr",
