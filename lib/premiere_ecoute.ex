@@ -9,6 +9,7 @@ defmodule PremiereEcoute do
       {Billboard, except: []},
       {Discography, except: []},
       {Events, except: []},
+      {Extension, except: []},
       {Festivals, except: []},
       {Playlists, except: []},
       {Sessions, except: []},
