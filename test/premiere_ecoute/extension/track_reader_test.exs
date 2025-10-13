@@ -1,23 +1,24 @@
 defmodule PremiereEcoute.Extension.TrackReaderTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Extension.TrackReader
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Extension.TrackReader
 
   describe "get_current_track/1" do
     setup do
-      user = user_fixture(%{
-        twitch: %{user_id: "broadcaster123"},
-        spotify: %{user_id: "spotify_user_123"}
-      })
+      user =
+        user_fixture(%{
+          twitch: %{user_id: "broadcaster123"},
+          spotify: %{user_id: "spotify_user_123"}
+        })
 
       {:ok, user: user}
     end
 
     test "returns current playing track successfully", %{user: user} do
       broadcaster_id = user.twitch.user_id
-      
+
       # Mock successful playback state response from Spotify
       playback_response = %{
         "is_playing" => true,
@@ -42,7 +43,8 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
       result = TrackReader.get_current_track(broadcaster_id)
 
       assert {:ok, track_data} = result
-      assert track_data.id == nil  # We don't have internal track ID
+      # We don't have internal track ID
+      assert track_data.id == nil
       assert track_data.name == "Test Song"
       assert track_data.artist == "Artist One, Artist Two"
       assert track_data.album == "Test Album"
@@ -61,10 +63,11 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
     end
 
     test "returns error when user has no Spotify connection" do
-      user = user_fixture(%{
-        twitch: %{user_id: "broadcaster456"}
-      })
-      
+      user =
+        user_fixture(%{
+          twitch: %{user_id: "broadcaster456"}
+        })
+
       broadcaster_id = user.twitch.user_id
 
       result = TrackReader.get_current_track(broadcaster_id)
@@ -86,7 +89,7 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
 
     test "returns error when nothing is playing", %{user: user} do
       broadcaster_id = user.twitch.user_id
-      
+
       playback_response = %{
         "is_playing" => false,
         "item" => %{
@@ -106,7 +109,7 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
 
     test "returns error when no item in playback state", %{user: user} do
       broadcaster_id = user.twitch.user_id
-      
+
       playback_response = %{
         "is_playing" => true,
         "item" => nil
@@ -123,7 +126,7 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
 
     test "handles single artist correctly", %{user: user} do
       broadcaster_id = user.twitch.user_id
-      
+
       playback_response = %{
         "is_playing" => true,
         "item" => %{
@@ -150,13 +153,14 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
 
     test "handles malformed artists data", %{user: user} do
       broadcaster_id = user.twitch.user_id
-      
+
       playback_response = %{
         "is_playing" => true,
         "item" => %{
           "id" => "track_123",
           "name" => "Unknown Artist Song",
-          "artists" => nil,  # Malformed artists data
+          # Malformed artists data
+          "artists" => nil,
           "album" => %{"name" => "Unknown Album"},
           "track_number" => 1,
           "duration_ms" => 180_000,
@@ -176,7 +180,7 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
 
     test "returns error for unexpected playback state format", %{user: user} do
       broadcaster_id = user.twitch.user_id
-      
+
       # Unexpected/malformed response
       playback_response = %{"unexpected" => "format"}
 

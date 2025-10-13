@@ -15,6 +15,7 @@ defmodule Mix.Tasks.Twitch.Extension do
   """
 
   use Mix.Task
+  use Boundary, classify_to: PremiereEcouteMix
 
   require Logger
 

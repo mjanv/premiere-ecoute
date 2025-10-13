@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
 
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Discography.LibraryPlaylist
+  alias PremiereEcoute.Playlists.PlaylistRule
 
   describe "GET /extension/tracks/current/:broadcaster_id" do
     test "returns current track when broadcaster has active Spotify session", %{conn: conn} do
@@ -71,29 +72,27 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
 
   describe "POST /extension/tracks/save" do
     test "saves track to user's playlist successfully", %{conn: conn} do
-      # Setup: Create user with Spotify token and mock playlist
+      # Setup: Create user with Spotify token and playlist rule
       user = insert_user_with_spotify()
+
+      # Create library playlist and set up playlist rule
+      {:ok, library_playlist} =
+        LibraryPlaylist.create(user, %{
+          provider: :spotify,
+          playlist_id: "playlist_123",
+          title: "My Configured Playlist",
+          url: "https://open.spotify.com/playlist/123",
+          public: false,
+          track_count: 0
+        })
+
+      {:ok, _rule} = PlaylistRule.set_save_tracks_playlist(user, library_playlist)
 
       # Mock adding track to playlist
       Mox.expect(SpotifyApi.Mock, :add_items_to_playlist, fn _scope, "playlist_123", tracks ->
-        # Verify the tracks parameter is what we expect
-        assert tracks == [%{track_id: "4HCcvFdHfwR2u3WPPPVRv6"}]
+        # Verify the tracks parameter is what we expect (now Track structs)
+        assert [%PremiereEcoute.Discography.Album.Track{track_id: "4HCcvFdHfwR2u3WPPPVRv6"}] = tracks
         {:ok, %{"snapshot_id" => "abc123"}}
-      end)
-
-      # Mock getting user's playlists
-      Mox.expect(SpotifyApi.Mock, :get_library_playlists, fn _scope ->
-        {:ok,
-         [
-           %LibraryPlaylist{
-             provider: :spotify,
-             playlist_id: "playlist_123",
-             title: "My Flonflon Hits",
-             description: "My favorite tracks",
-             public: false,
-             track_count: 0
-           }
-         ]}
       end)
 
       params = %{
@@ -108,8 +107,26 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
       assert json_response(conn, 200) == %{
                "success" => true,
                "message" => "Track saved successfully",
-               "playlist_name" => "My Flonflon Hits",
+               "playlist_name" => "My Configured Playlist",
                "spotify_track_id" => "4HCcvFdHfwR2u3WPPPVRv6"
+             }
+    end
+
+    test "returns error when no playlist rule configured", %{conn: conn} do
+      # Setup: Create user with Spotify token but NO playlist rule
+      user = insert_user_with_spotify()
+
+      params = %{
+        "user_id" => user.twitch.user_id,
+        "spotify_track_id" => "4HCcvFdHfwR2u3WPPPVRv6",
+        "broadcaster_id" => "123456",
+        "track_id" => 1
+      }
+
+      conn = post(conn, ~p"/extension/tracks/save", params)
+
+      assert json_response(conn, 404) == %{
+               "error" => "No playlist rule configured. Please configure a playlist rule in the application settings."
              }
     end
 

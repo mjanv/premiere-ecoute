@@ -13,5 +13,5 @@ defmodule PremiereEcoute.Extension do
 
   # AIDEV-NOTE: defdelegate pattern for clean separation of read vs write operations
   defdelegate get_current_track(broadcaster_id), to: TrackReader
-  defdelegate save_track(user_id, spotify_track_id, playlist_search_term), to: TrackSaver
+  defdelegate save_track(user_id, spotify_track_id), to: TrackSaver
 end

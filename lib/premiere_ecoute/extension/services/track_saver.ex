@@ -10,27 +10,31 @@ defmodule PremiereEcoute.Extension.Services.TrackSaver do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Playlists
 
   require Logger
 
   @doc """
-  Saves a track to a user's playlist matching the given search term.
+  Saves a track to a user's designated playlist.
 
-  Finds the user's playlist containing the search term in the name and adds the specified
-  Spotify track to it.
+  Uses playlist rules to determine the target playlist. If no rule is 
+  configured, the track will not be saved.
 
   ## Examples
 
-      iex> save_track("user123", "spotify_track_id", "flonflon")
-      {:ok, "My Flonflon Hits"}
+      iex> save_track("user123", "spotify_track_id")
+      {:ok, "My Configured Playlist"}
       
-      iex> save_track("nonexistent", "track_id", "flonflon")
+      iex> save_track("user_no_rule", "track_id")
+      {:error, :no_playlist_rule}
+      
+      iex> save_track("nonexistent", "track_id")
       {:error, :no_user}
   """
-  def save_track(user_id, spotify_track_id, playlist_search_term) do
+  def save_track(user_id, spotify_track_id) do
     with {:ok, user} <- get_user(user_id),
          {:ok, spotify_scope} <- get_spotify_scope(user),
-         {:ok, target_playlist} <- find_playlist_by_search_term(spotify_scope, playlist_search_term),
+         {:ok, target_playlist} <- find_target_playlist(user),
          {:ok, _result} <- add_track_to_playlist(spotify_scope, target_playlist, spotify_track_id) do
       {:ok, target_playlist.title}
     else
@@ -55,29 +59,29 @@ defmodule PremiereEcoute.Extension.Services.TrackSaver do
     {:ok, scope}
   end
 
-  defp find_playlist_by_search_term(spotify_scope, search_term) do
-    case get_all_user_playlists(spotify_scope) do
-      {:ok, playlists} ->
-        target_playlist =
-          Enum.find(playlists, fn playlist ->
-            String.contains?(String.downcase(playlist.title), String.downcase(search_term))
-          end)
+  # AIDEV-NOTE: Playlist resolution logic - uses configured playlist rules only
+  defp find_target_playlist(user) do
+    case Playlists.get_save_tracks_playlist(user) do
+      %PremiereEcoute.Discography.LibraryPlaylist{} = playlist ->
+        {:ok, playlist}
 
-        case target_playlist do
-          nil -> {:error, :no_matching_playlist}
-          playlist -> {:ok, playlist}
-        end
-
-      {:error, reason} ->
-        {:error, reason}
+      nil ->
+        Logger.info("No playlist rule configured for user #{user.id}, track will not be saved")
+        {:error, :no_playlist_rule}
     end
   end
 
-  defp get_all_user_playlists(spotify_scope) do
-    Apis.spotify().get_library_playlists(spotify_scope)
-  end
-
   defp add_track_to_playlist(spotify_scope, playlist, spotify_track_id) do
-    Apis.spotify().add_items_to_playlist(spotify_scope, playlist.playlist_id, [%{track_id: spotify_track_id}])
+    # AIDEV-NOTE: Create Track struct for Spotify API - Hammox type checking requires proper struct
+    track = %PremiereEcoute.Discography.Album.Track{
+      provider: :spotify,
+      track_id: spotify_track_id,
+      # We don't have track metadata here, just the ID
+      name: "Unknown",
+      track_number: 1,
+      duration_ms: 0
+    }
+
+    Apis.spotify().add_items_to_playlist(spotify_scope, playlist.playlist_id, [track])
   end
 end

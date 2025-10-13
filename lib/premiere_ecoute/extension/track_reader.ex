@@ -76,9 +76,7 @@ defmodule PremiereEcoute.Extension.TrackReader do
   defp extract_track_from_playback(_), do: {:error, :no_track}
 
   defp get_artist_names(artists) when is_list(artists) do
-    artists
-    |> Enum.map(& &1["name"])
-    |> Enum.join(", ")
+    Enum.map_join(artists, ", ", & &1["name"])
   end
 
   defp get_artist_names(_), do: "Unknown Artist"

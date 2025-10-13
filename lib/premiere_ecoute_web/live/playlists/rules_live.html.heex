@@ -1,0 +1,190 @@
+<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="rules">
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
+    <!-- Playlist Rules Configuration page -->
+    <div class="flex-1 py-12">
+      <div class="max-w-4xl mx-auto px-6">
+        <div class="w-full">
+          <!-- Playlist Rules page header -->
+          <.page_header
+            title={gettext("Playlist Rules")}
+            subtitle={gettext("Configure which playlist automatically receives saved tracks from your Twitch extension")}
+          />
+          
+<!-- Save Tracks Destination -->
+          <div class="mb-8 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+            <h3 class="text-lg font-semibold mb-6 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              {gettext("Save Tracks Destination")}
+            </h3>
+            
+<!-- Current Status -->
+            <%= if @current_rule do %>
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center">
+                  <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                  <div>
+                    <p class="font-medium">{@current_rule.library_playlist.title}</p>
+                    <p class="text-sm text-gray-400">
+                      {gettext("Tracks saved from your extension will be added to this playlist")}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex gap-3">
+                  <%= unless Enum.empty?(@library_playlists) do %>
+                    <button
+                      phx-click={PremiereEcouteWeb.Components.Modal.show_modal("playlist-modal")}
+                      class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm inline-flex items-center"
+                    >
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                      {gettext("Change")}
+                    </button>
+                  <% end %>
+                  <button
+                    phx-click="deactivate_rule"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium text-sm"
+                    data-confirm={
+                      gettext(
+                        "Are you sure you want to deactivate the current rule? Tracks will not be saved from your extension without an active playlist rule."
+                      )
+                    }
+                  >
+                    {gettext("Deactivate")}
+                  </button>
+                </div>
+              </div>
+            <% else %>
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center">
+                  <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                  <div>
+                    <p class="font-medium text-yellow-400">{gettext("No playlist rule configured")}</p>
+                    <p class="text-sm text-gray-400">
+                      {gettext("Tracks from your extension will not be saved without a playlist rule")}
+                    </p>
+                  </div>
+                </div>
+                <%= unless Enum.empty?(@library_playlists) do %>
+                  <button
+                    phx-click={PremiereEcouteWeb.Components.Modal.show_modal("playlist-modal")}
+                    class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm inline-flex items-center"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                      />
+                    </svg>
+                    {gettext("Choose Playlist")}
+                  </button>
+                <% end %>
+              </div>
+            <% end %>
+            
+<!-- No playlists state -->
+            <%= if Enum.empty?(@library_playlists) do %>
+              <div class="text-center py-8 border-t border-gray-700 mt-4 pt-6">
+                <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1"
+                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                  />
+                </svg>
+                <p class="text-gray-400 mb-3 text-sm">{gettext("No playlists found in your library")}</p>
+                <.link
+                  navigate={~p"/playlists/library"}
+                  class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm inline-flex items-center"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  {gettext("Go to My Library")}
+                </.link>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<!-- Playlist Selection Modal -->
+  <PremiereEcouteWeb.Components.Modal.modal
+    id="playlist-modal"
+    on_cancel={PremiereEcouteWeb.Components.Modal.hide_modal("playlist-modal")}
+    size="md"
+  >
+    <div class="space-y-4" phx-click="modal_content_click">
+      <h3 class="text-lg font-medium text-white">
+        {gettext("Select Playlist")}
+      </h3>
+
+      <form phx-submit="select_playlist">
+        <div class="mb-4">
+          <select
+            name="playlist_id"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none transition-colors"
+            phx-click="modal_content_click"
+          >
+            <option value="">
+              {gettext("Choose a playlist...")}
+            </option>
+            <%= for playlist <- @library_playlists do %>
+              <option value={playlist.id} selected={@selected_playlist_id == playlist.id}>
+                {playlist.title} ({gettext("%{count} tracks", count: playlist.track_count || 0)})
+              </option>
+            <% end %>
+          </select>
+        </div>
+        
+<!-- Modal buttons -->
+        <div class="flex justify-end gap-3">
+          <button
+            type="button"
+            phx-click={PremiereEcouteWeb.Components.Modal.hide_modal("playlist-modal")}
+            class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors font-medium"
+          >
+            {gettext("Cancel")}
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
+          >
+            {gettext("Apply")}
+          </button>
+        </div>
+      </form>
+    </div>
+  </PremiereEcouteWeb.Components.Modal.modal>
+
+  <script>
+    window.addEventListener("phx:hide-modal", (e) => {
+      const modal = document.getElementById(e.detail.id);
+      if (modal) {
+        // Add transition classes and hide
+        modal.style.transition = "opacity 500ms ease-in";
+        modal.style.opacity = "0";
+        
+        setTimeout(() => {
+          modal.classList.add("hidden");
+          modal.style.display = "none";
+          document.body.classList.remove("overflow-hidden");
+          modal.style.opacity = "";
+          modal.style.transition = "";
+        }, 500);
+      }
+    });
+  </script>
+</Layouts.app>

@@ -1,8 +1,8 @@
 defmodule PremiereEcoute.ExtensionTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Extension
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Extension
 
   # AIDEV-NOTE: Integration tests since Extension uses defdelegate - testing actual behavior
   describe "get_current_track/1" do
@@ -10,29 +10,32 @@ defmodule PremiereEcoute.ExtensionTest do
       stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
       :ok
     end
+
     test "successfully gets current track via TrackReader delegation" do
       # Create user with Spotify connection
-      user = user_fixture(%{
-        twitch: %{user_id: "broadcaster123"},
-        spotify: %{user_id: "spotify_user_123"}
-      })
+      user =
+        user_fixture(%{
+          twitch: %{user_id: "broadcaster123"},
+          spotify: %{user_id: "spotify_user_123"}
+        })
 
       broadcaster_id = user.twitch.user_id
-      
+
       # Mock Spotify API response
       expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
-        {:ok, %{
-          "is_playing" => true,
-          "item" => %{
-            "id" => "track_123",
-            "name" => "Test Song",
-            "artists" => [%{"name" => "Test Artist"}],
-            "album" => %{"name" => "Test Album"},
-            "track_number" => 1,
-            "duration_ms" => 180_000,
-            "preview_url" => nil
-          }
-        }}
+        {:ok,
+         %{
+           "is_playing" => true,
+           "item" => %{
+             "id" => "track_123",
+             "name" => "Test Song",
+             "artists" => [%{"name" => "Test Artist"}],
+             "album" => %{"name" => "Test Album"},
+             "track_number" => 1,
+             "duration_ms" => 180_000,
+             "preview_url" => nil
+           }
+         }}
       end)
 
       result = Extension.get_current_track(broadcaster_id)
@@ -54,39 +57,42 @@ defmodule PremiereEcoute.ExtensionTest do
       stub(SpotifyApi, :add_items_to_playlist, fn _scope, _id, _tracks -> {:ok, %{}} end)
       :ok
     end
+
     test "successfully saves track via TrackSaver delegation" do
       # Create user with Spotify connection
-      user = user_fixture(%{
-        twitch: %{user_id: "user123"},
-        spotify: %{user_id: "spotify_user_123"}
-      })
+      user =
+        user_fixture(%{
+          twitch: %{user_id: "user123"},
+          spotify: %{user_id: "spotify_user_123"}
+        })
 
       user_id = user.twitch.user_id
       spotify_track_id = "track_456"
 
-      # Mock get playlists - return proper LibraryPlaylist struct
-      expect(SpotifyApi, :get_library_playlists, fn _scope ->
-        {:ok, [%PremiereEcoute.Discography.LibraryPlaylist{
-          playlist_id: "playlist_123",
-          title: "My Flonflon Hits",
-          provider: :spotify,
-          track_count: 42,
-          public: true
-        }]}
-      end)
+      # Create library playlist and set up playlist rule
+      {:ok, library_playlist} = PremiereEcoute.Discography.LibraryPlaylist.create(user, %{
+        provider: :spotify,
+        playlist_id: "playlist_123",
+        title: "My Configured Playlist",
+        url: "https://open.spotify.com/playlist/123",
+        public: true,
+        track_count: 42
+      })
+      
+      {:ok, _rule} = PremiereEcoute.Playlists.PlaylistRule.set_save_tracks_playlist(user, library_playlist)
 
       # Mock add track to playlist
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, _playlist_id, _tracks ->
         {:ok, %{"snapshot_id" => "snap_123"}}
       end)
 
-      result = Extension.save_track(user_id, spotify_track_id, "flonflon")
+      result = Extension.save_track(user_id, spotify_track_id)
 
-      assert result == {:ok, "My Flonflon Hits"}
+      assert result == {:ok, "My Configured Playlist"}
     end
 
     test "returns error when user not found via TrackSaver delegation" do
-      result = Extension.save_track("nonexistent", "some_track", "flonflon")
+      result = Extension.save_track("nonexistent", "some_track")
       assert result == {:error, :no_user}
     end
   end

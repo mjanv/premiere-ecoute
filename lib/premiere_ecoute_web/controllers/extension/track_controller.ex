@@ -57,8 +57,8 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
   end
 
   def save_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
-    # AIDEV-NOTE: Fixed playlist search term for now, configurable later
-    case Extension.save_track(user_id, spotify_track_id, "flonflon") do
+    # AIDEV-NOTE: Uses configured playlist rules only - no fallback behavior
+    case Extension.save_track(user_id, spotify_track_id) do
       {:ok, playlist_name} ->
         conn
         |> put_status(:ok)
@@ -83,12 +83,14 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
         |> put_status(:not_found)
         |> json(%{error: "User not connected to Spotify"})
 
-      {:error, :no_matching_playlist} ->
-        Logger.info("No matching playlist found for user #{user_id}")
+      {:error, :no_playlist_rule} ->
+        Logger.info("No playlist rule configured for user #{user_id}")
 
         conn
         |> put_status(:not_found)
-        |> json(%{error: "No matching playlist found. Please create a playlist with 'Flonflon' in the name."})
+        |> json(%{
+          error: "No playlist rule configured. Please configure a playlist rule in the application settings."
+        })
 
       {:error, reason} ->
         Logger.error("Failed to save track for user #{user_id}: #{inspect(reason)}")
