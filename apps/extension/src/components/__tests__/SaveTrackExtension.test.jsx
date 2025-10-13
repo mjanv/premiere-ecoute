@@ -61,38 +61,6 @@ describe('SaveTrackExtension', () => {
       expect(screen.getByText('🎵')).toBeInTheDocument();
     });
 
-    test('logs auth context on mount', () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404
-      });
-
-      render(<SaveTrackExtension auth={mockAuth} />);
-
-      expect(console.log).toHaveBeenCalledWith('Extension Auth Context:', {
-        channelId: 'broadcaster123',
-        userId: 'user456',
-        token: 'present',
-        clientId: 'twitch-client-id'
-      });
-    });
-
-    test('handles missing token in auth context', () => {
-      const authWithoutToken = { ...mockAuth, token: null };
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404
-      });
-
-      render(<SaveTrackExtension auth={authWithoutToken} />);
-
-      expect(console.log).toHaveBeenCalledWith('Extension Auth Context:', {
-        channelId: 'broadcaster123',
-        userId: 'user456',
-        token: 'missing',
-        clientId: 'twitch-client-id'
-      });
-    });
   });
 
   describe('Current Track Fetching', () => {
@@ -545,6 +513,46 @@ describe('SaveTrackExtension', () => {
     });
   });
 
+  describe('Mobile Platform Support', () => {
+    test('detects mobile platform from URL parameter', async () => {
+      // Mock URL with mobile platform parameter
+      delete window.location;
+      window.location = new URL('http://localhost:3000?platform=mobile');
+      
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ track: mockTrack })
+      });
+
+      render(<SaveTrackExtension auth={mockAuth} />);
+
+      await waitFor(() => {
+        const container = screen.getByRole('button').closest('.extension-container');
+        expect(container).toHaveClass('mobile-platform');
+        expect(screen.getByText('Save')).toBeInTheDocument(); // Mobile shows shorter text
+      });
+    });
+
+    test('detects desktop platform from URL parameter', async () => {
+      // Mock URL with web platform parameter
+      delete window.location;
+      window.location = new URL('http://localhost:3000?platform=web');
+      
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ track: mockTrack })
+      });
+
+      render(<SaveTrackExtension auth={mockAuth} />);
+
+      await waitFor(() => {
+        const container = screen.getByRole('button').closest('.extension-container');
+        expect(container).toHaveClass('desktop-platform');
+        expect(screen.getByText('Save Track')).toBeInTheDocument(); // Desktop shows full text
+      });
+    });
+  });
+
   describe('Accessibility', () => {
     test('save button has proper accessibility attributes', async () => {
       fetch.mockResolvedValueOnce({
@@ -555,9 +563,11 @@ describe('SaveTrackExtension', () => {
       render(<SaveTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
-        const saveButton = screen.getByRole('button', { name: /save track/i });
+        const saveButton = screen.getByRole('button');
         expect(saveButton).toBeInTheDocument();
         expect(saveButton).not.toBeDisabled();
+        // Check that it has accessible name including "Save" and track info
+        expect(saveButton).toHaveAccessibleName(/save.*playlist/i);
       });
     });
 

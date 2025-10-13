@@ -18,11 +18,6 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
 
   # plug PremiereEcouteWeb.Plugs.TwitchExtensionAuth  # Disabled for testing
 
-  @doc """
-  GET /api/extension/current-track/:broadcaster_id
-
-  Returns the current playing track from the broadcaster's Spotify account.
-  """
   def current_track(conn, %{"broadcaster_id" => broadcaster_id}) do
     case get_current_spotify_track(broadcaster_id) do
       {:ok, track_data} ->
@@ -63,11 +58,6 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
     end
   end
 
-  @doc """
-  POST /api/extension/save-track
-
-  Saves the track to the user's "Flonflon" playlist on Spotify.
-  """
   def save_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
     case save_track_to_flonflon_playlist(user_id, spotify_track_id) do
       {:ok, playlist_name} ->
