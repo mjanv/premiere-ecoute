@@ -31,7 +31,7 @@ const SaveTrackExtension = ({ auth }) => {
   const fetchCurrentTrack = async () => {
     try {
       const response = await fetch(
-        `${PREMIERE_ECOUTE_API}/api/extension/current-track/${broadcasterId}`,
+        `${PREMIERE_ECOUTE_API}/extension/tracks/current/${broadcasterId}`,
         {
           headers: {
             'Authorization': `Bearer ${auth.token}`,
@@ -87,7 +87,7 @@ const SaveTrackExtension = ({ auth }) => {
       // Debug log the request (remove in production)
       console.log('Saving track with payload:', requestPayload);
       
-      const response = await fetch(`${PREMIERE_ECOUTE_API}/api/extension/save-track`, {
+      const response = await fetch(`${PREMIERE_ECOUTE_API}/extension/tracks/save`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${auth.token}`,

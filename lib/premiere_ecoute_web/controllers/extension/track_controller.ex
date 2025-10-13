@@ -1,6 +1,6 @@
-defmodule PremiereEcouteWeb.Api.ExtensionController do
+defmodule PremiereEcouteWeb.Extension.TrackController do
   @moduledoc """
-  API controller for Twitch extension endpoints.
+  Controller for Twitch extension track-related endpoints.
 
   Handles requests from the Twitch extension including:
   - Fetching current track from active listening sessions
@@ -12,10 +12,7 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
-  alias PremiereEcoute.Apis.SpotifyApi.Player
-  alias PremiereEcoute.Apis.SpotifyApi.Playlists
-  alias PremiereEcoute.Sessions
-  alias PremiereEcouteCore.Cache
+  alias PremiereEcoute.Apis
 
   require Logger
 
@@ -27,8 +24,6 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   Returns the current playing track from the broadcaster's Spotify account.
   """
   def current_track(conn, %{"broadcaster_id" => broadcaster_id}) do
-    Logger.info("Extension current track request for broadcaster: #{broadcaster_id}")
-
     case get_current_spotify_track(broadcaster_id) do
       {:ok, track_data} ->
         conn
@@ -73,9 +68,7 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
 
   Saves the track to the user's "Flonflon" playlist on Spotify.
   """
-  def save_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id} = params) do
-    Logger.info("Extension save track request #{inspect(params)}")
-
+  def save_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
     case save_track_to_flonflon_playlist(user_id, spotify_track_id) do
       {:ok, playlist_name} ->
         conn
@@ -163,32 +156,18 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
     end
   end
 
-  defp get_all_user_playlists(spotify_scope, page \\ 1, all_playlists \\ []) do
-    case Playlists.get_library_playlists(spotify_scope, page) do
-      {:ok, []} ->
-        # No more playlists, return accumulated results
-        {:ok, all_playlists}
-
-      {:ok, playlists} ->
-        # Get next page recursively
-        get_all_user_playlists(spotify_scope, page + 1, all_playlists ++ playlists)
-
-      {:error, reason} ->
-        {:error, reason}
-    end
+  defp get_all_user_playlists(spotify_scope) do
+    Apis.spotify().get_library_playlists(spotify_scope)
   end
 
   defp add_track_to_playlist(spotify_scope, playlist, spotify_track_id) do
-    # Create a track struct with the Spotify ID
-    track = %{track_id: spotify_track_id}
-
-    Playlists.add_items_to_playlist(spotify_scope, playlist.playlist_id, [track])
+    Apis.spotify().add_items_to_playlist(spotify_scope, playlist.playlist_id, [%{track_id: spotify_track_id}])
   end
 
   defp get_current_spotify_track(broadcaster_id) do
     with {:ok, user} <- get_broadcaster_user(broadcaster_id),
          {:ok, spotify_scope} <- get_spotify_scope(user),
-         {:ok, playback_state} <- Player.get_playback_state(spotify_scope, %{}),
+         {:ok, playback_state} <- Apis.spotify().get_playback_state(spotify_scope, %{}),
          {:ok, track_data} <- extract_track_from_playback(playback_state) do
       {:ok, track_data}
     else
@@ -239,38 +218,4 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   end
 
   defp get_artist_names(_), do: "Unknown Artist"
-
-  defp get_active_session_for_broadcaster(broadcaster_id) do
-    # Check cache first for performance
-    case Cache.get(:sessions, broadcaster_id) do
-      nil ->
-        # Fallback to database query
-        Sessions.get_active_session_by_twitch_user_id(broadcaster_id)
-
-      cached_session ->
-        # Validate cached session is still active
-        if cached_session.status == :active do
-          cached_session
-        else
-          nil
-        end
-    end
-  end
-
-  defp format_track_for_extension(%{current_track: nil}), do: nil
-
-  defp format_track_for_extension(%{current_track: track, album: album}) when not is_nil(track) do
-    %{
-      id: track.id,
-      name: track.name,
-      artist: album.artist,
-      album: album.name,
-      track_number: track.track_number,
-      duration_ms: track.duration_ms,
-      spotify_id: track.spotify_id,
-      preview_url: track.preview_url
-    }
-  end
-
-  defp format_track_for_extension(_), do: nil
 end

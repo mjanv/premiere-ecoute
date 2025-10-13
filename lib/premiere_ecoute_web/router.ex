@@ -188,11 +188,11 @@ defmodule PremiereEcouteWeb.Router do
     get "/:provider/complete", AuthController, :complete
   end
 
-  scope "/api/extension", PremiereEcouteWeb.Api do
+  scope "/extension", PremiereEcouteWeb.Extension do
     pipe_through :api
 
-    get "/current-track/:broadcaster_id", ExtensionController, :current_track
-    post "/save-track", ExtensionController, :save_track
+    get "/tracks/current/:broadcaster_id", TrackController, :current_track
+    post "/tracks/save", TrackController, :save_track
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do

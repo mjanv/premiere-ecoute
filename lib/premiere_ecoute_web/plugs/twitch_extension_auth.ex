@@ -7,9 +7,8 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
   """
 
   import Plug.Conn
-  require Logger
 
-  alias PremiereEcoute.Accounts
+  require Logger
 
   @doc false
   def init(opts), do: opts
