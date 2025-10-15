@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLikerTest do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Discography.LibraryPlaylist
-  alias PremiereEcoute.Events.LikedTrack
+  alias PremiereEcoute.Events.TrackLiked
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Extension.Services.TrackLiker
   alias PremiereEcoute.Playlists.PlaylistRule
@@ -63,7 +63,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLikerTest do
       {:ok, user: user}
     end
 
-    test "emits LikedTrack event to EventStore on successful like", %{} do
+    test "emits TrackLiked event to EventStore on successful like", %{} do
       # Create a unique user for this test
       unique_user_id = "event_test_single_#{System.unique_integer()}"
 
@@ -99,7 +99,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLikerTest do
       assert length(events) == 1
 
       assert [
-               %LikedTrack{
+               %TrackLiked{
                  id: ^unique_user_id,
                  # Atoms are serialized as strings in EventStore
                  provider: "spotify",
@@ -153,7 +153,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLikerTest do
 
       # Verify all events have correct structure
       for event <- events do
-        assert %LikedTrack{
+        assert %TrackLiked{
                  id: ^unique_user_id,
                  provider: "spotify",
                  user_id: user_db_id

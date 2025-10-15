@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLiker do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
-  alias PremiereEcoute.Events.LikedTrack
+  alias PremiereEcoute.Events.TrackLiked
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Playlists
 
@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLiker do
          {:ok, _result} <- add_track_to_playlist(spotify_scope, target_playlist, spotify_track_id) do
       {:ok, target_playlist.title}
       |> Store.ok("like", fn _title ->
-        %LikedTrack{
+        %TrackLiked{
           id: user_id,
           provider: :spotify,
           user_id: user.id,
