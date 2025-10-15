@@ -3007,19 +3007,19 @@ msgid "Welcome to the premiere of %{name} by %{artist}"
 msgstr "Bienvenue à la première écoute de %{name} par %{artist}"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:146
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "%{count} tracks"
-msgstr ""
+msgstr "%{count} pistes"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:165
 #, elixir-autogen, elixir-format
 msgid "Apply"
-msgstr ""
+msgstr "Appliquer"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:55
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to deactivate the current rule? Tracks will not be liked from your extension without an active playlist rule."
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir désactiver la règle actuelle ? Les pistes ne seront pas aimées depuis votre extension sans règle de playlist active."
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:48
 #, elixir-autogen, elixir-format, fuzzy
@@ -3034,12 +3034,12 @@ msgstr "Choisissez une playlist..."
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:10
 #, elixir-autogen, elixir-format
 msgid "Configure which playlist automatically receives liked tracks from your Twitch extension"
-msgstr ""
+msgstr "Configurez quelle playlist reçoit automatiquement les pistes aimées depuis votre extension Twitch"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:60
 #, elixir-autogen, elixir-format
 msgid "Deactivate"
-msgstr ""
+msgstr "Désactiver"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.ex:50
 #, elixir-autogen, elixir-format, fuzzy
@@ -3054,12 +3054,12 @@ msgstr "Ma Bibliothèque"
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:19
 #, elixir-autogen, elixir-format
 msgid "Like Tracks Destination"
-msgstr ""
+msgstr "Destination des Pistes Aimées"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.ex:75
 #, elixir-autogen, elixir-format
 msgid "No active rule to deactivate"
-msgstr ""
+msgstr "Aucune règle active à désactiver"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:69
 #, elixir-autogen, elixir-format, fuzzy
@@ -3079,17 +3079,17 @@ msgstr "Playlist"
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:45
 #, elixir-autogen, elixir-format
 msgid "Rules"
-msgstr ""
+msgstr "Règles"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.ex:44
 #, elixir-autogen, elixir-format
 msgid "Save tracks playlist updated to \"%{title}\""
-msgstr ""
+msgstr "Playlist de sauvegarde des pistes mise à jour vers \"%{title}\""
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.ex:70
 #, elixir-autogen, elixir-format
 msgid "Save tracks rule deactivated"
-msgstr ""
+msgstr "Règle de sauvegarde des pistes désactivée"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:131
 #, elixir-autogen, elixir-format, fuzzy
@@ -3099,9 +3099,9 @@ msgstr "Sélectionner une playlist..."
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:71
 #, elixir-autogen, elixir-format
 msgid "Tracks from your extension will not be liked without a playlist rule"
-msgstr ""
+msgstr "Les pistes de votre extension ne seront pas aimées sans règle de playlist"
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:30
 #, elixir-autogen, elixir-format
 msgid "Tracks liked from your extension will be added to this playlist"
-msgstr ""
+msgstr "Les pistes aimées depuis votre extension seront ajoutées à cette playlist"

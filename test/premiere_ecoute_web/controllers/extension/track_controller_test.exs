@@ -5,7 +5,9 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.PlaylistRule
 
-  @test_secret Application.compile_env(:premiere_ecoute, :twitch_extension_secret)
+  # AIDEV-NOTE: Config contains base64-encoded secret, decode it for JWT signing
+  @test_secret_base64 Application.compile_env(:premiere_ecoute, :twitch_extension_secret)
+  @test_secret Base.decode64!(@test_secret_base64)
 
   describe "GET /extension/tracks/current/:broadcaster_id" do
     test "returns current track when broadcaster has active Spotify session", %{conn: conn} do

@@ -4,8 +4,8 @@ defmodule PremiereEcoute.Extension.Services.TrackLikerTest do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Discography.LibraryPlaylist
-  alias PremiereEcoute.Events.TrackLiked
   alias PremiereEcoute.Events.Store
+  alias PremiereEcoute.Events.TrackLiked
   alias PremiereEcoute.Extension.Services.TrackLiker
   alias PremiereEcoute.Playlists.PlaylistRule
 

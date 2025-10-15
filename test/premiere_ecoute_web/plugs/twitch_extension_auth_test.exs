@@ -3,7 +3,27 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuthTest do
 
   alias PremiereEcouteWeb.Plugs.TwitchExtensionAuth
 
-  @test_secret Application.compile_env(:premiere_ecoute, :twitch_extension_secret)
+  @test_secret "test_secret_key_for_twitch_extension"
+  @test_secret_base64 Base.encode64(@test_secret)
+
+  setup do
+    # Store original config value
+    original_secret = Application.get_env(:premiere_ecoute, :twitch_extension_secret)
+
+    # AIDEV-NOTE: Set base64-encoded secret to match production behavior
+    Application.put_env(:premiere_ecoute, :twitch_extension_secret, @test_secret_base64)
+
+    on_exit(fn ->
+      # Restore original value
+      if original_secret do
+        Application.put_env(:premiere_ecoute, :twitch_extension_secret, original_secret)
+      else
+        Application.delete_env(:premiere_ecoute, :twitch_extension_secret)
+      end
+    end)
+
+    :ok
+  end
 
   describe "call/2 with valid authenticated JWT" do
     test "assigns extension_context with user claims", %{conn: conn} do

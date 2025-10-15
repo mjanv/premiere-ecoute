@@ -9,8 +9,8 @@ defmodule PremiereEcoute.Extension.Services.TrackLiker do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
-  alias PremiereEcoute.Events.TrackLiked
   alias PremiereEcoute.Events.Store
+  alias PremiereEcoute.Events.TrackLiked
   alias PremiereEcoute.Playlists
 
   require Logger

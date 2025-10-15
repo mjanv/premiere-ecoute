@@ -10,6 +10,7 @@ source!([
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: env!("PHX_SERVER", :boolean, false)
 
 config :premiere_ecoute,
+  twitch_extension_secret: env!("TWITCH_EXTENSION_SECRET"),
   spotify_client_id: env!("SPOTIFY_CLIENT_ID"),
   spotify_client_secret: env!("SPOTIFY_CLIENT_SECRET"),
   spotify_redirect_uri: env!("SPOTIFY_REDIRECT_URI")

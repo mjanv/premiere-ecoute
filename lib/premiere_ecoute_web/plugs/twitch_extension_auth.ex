@@ -36,8 +36,9 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
   end
 
   defp verify_extension_token(conn, token) do
-    # Get the extension secret from config
-    extension_secret = get_extension_secret()
+    # AIDEV-NOTE: Extension secret is base64-encoded by Twitch, must decode before use
+    extension_secret_base64 = Application.get_env(:premiere_ecoute, :twitch_extension_secret)
+    extension_secret = Base.decode64!(extension_secret_base64)
 
     case verify_jwt(token, extension_secret) do
       {:ok, claims} ->
@@ -54,7 +55,6 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
   end
 
   defp verify_jwt(token, secret) do
-    # AIDEV-NOTE: JWT verification using JOSE library for Twitch extension tokens
     jwk = JOSE.JWK.from_oct(secret)
 
     case JOSE.JWT.verify(jwk, token) do
@@ -96,10 +96,5 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
     }
 
     assign(conn, :extension_context, extension_context)
-  end
-
-  defp get_extension_secret do
-    Application.get_env(:premiere_ecoute, :twitch_extension_secret) ||
-      raise "TWITCH_EXTENSION_SECRET environment variable not set"
   end
 end
