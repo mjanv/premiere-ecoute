@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import './SaveTrackExtension.css';
+import './LikeTrackExtension.css';
 
 const PREMIERE_ECOUTE_API = process.env.NODE_ENV === 'development' 
   ? 'http://localhost:4000' 
   : 'https://premiere-ecoute.fr';
 
-const SaveTrackExtension = ({ auth }) => {
+const LikeTrackExtension = ({ auth }) => {
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastSaved, setLastSaved] = useState(null);
+  const [lastLiked, setLastLiked] = useState(null);
   const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -58,8 +58,8 @@ const SaveTrackExtension = ({ auth }) => {
     }
   };
 
-  // Save current track to user's Spotify playlist
-  const saveTrack = async () => {
+  // Like current track to user's Spotify playlist
+  const likeTrack = async () => {
     if (!currentTrack || isLoading) return;
 
     // Ensure we have the required IDs
@@ -69,7 +69,7 @@ const SaveTrackExtension = ({ auth }) => {
     }
     
     if (!userId) {
-      setError('Please log in to save tracks');
+      setError('Please log in to like tracks');
       return;
     }
 
@@ -84,7 +84,7 @@ const SaveTrackExtension = ({ auth }) => {
         user_id: userId
       };
       
-      const response = await fetch(`${PREMIERE_ECOUTE_API}/extension/tracks/save`, {
+      const response = await fetch(`${PREMIERE_ECOUTE_API}/extension/tracks/like`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${auth.token}`,
@@ -95,24 +95,24 @@ const SaveTrackExtension = ({ auth }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setLastSaved({
+        setLastLiked({
           track: currentTrack,
           timestamp: Date.now(),
-          playlist: data.playlist_name || 'Premiere Ecoute Saved Tracks'
+          playlist: data.playlist_name || 'Premiere Ecoute Liked Tracks'
         });
         
         // Show success feedback for 3 seconds
-        setTimeout(() => setLastSaved(null), 3000);
+        setTimeout(() => setLastLiked(null), 3000);
       } else if (response.status === 401) {
         setError('Please connect your Spotify account first');
       } else if (response.status === 404) {
         setError('Track not found on Spotify');
       } else {
-        throw new Error('Failed to save track');
+        throw new Error('Failed to like track');
       }
     } catch (err) {
       console.error('Error saving track:', err);
-      setError('Failed to save track. Please try again.');
+      setError('Failed to like track. Please try again.');
       setTimeout(() => setError(null), 3000);
     } finally {
       setIsLoading(false);
@@ -128,13 +128,13 @@ const SaveTrackExtension = ({ auth }) => {
   }, [broadcasterId]);
 
   // Handle user interaction
-  const handleSaveClick = () => {
+  const handleLikeClick = () => {
     if (!isConnected) {
       setError('No active listening session detected');
       setTimeout(() => setError(null), 3000);
       return;
     }
-    saveTrack();
+    likeTrack();
   };
 
   if (!isConnected && !error) {
@@ -157,10 +157,10 @@ const SaveTrackExtension = ({ auth }) => {
         </div>
       )}
       
-      {lastSaved && (
+      {lastLiked && (
         <div className="success-message">
           <span className="success-icon">✅</span>
-          Saved to {lastSaved.playlist}!
+          Liked to {lastLiked.playlist}!
         </div>
       )}
       
@@ -172,11 +172,11 @@ const SaveTrackExtension = ({ auth }) => {
           </div>
           
           <button 
-            className={`save-button ${isLoading ? 'loading' : ''} ${isMobile ? 'mobile-button' : ''}`}
-            onClick={handleSaveClick}
+            className={`like-button ${isLoading ? 'loading' : ''} ${isMobile ? 'mobile-button' : ''}`}
+            onClick={handleLikeClick}
             disabled={isLoading}
             // Add mobile-specific attributes
-            aria-label={isLoading ? 'Saving track to playlist...' : `Save ${currentTrack.name} to playlist`}
+            aria-label={isLoading ? 'Liking track to playlist...' : `Like ${currentTrack.name} to playlist`}
             {...(isMobile && {
               onTouchStart: (e) => {
                 // Add slight haptic-like feedback for mobile
@@ -194,11 +194,11 @@ const SaveTrackExtension = ({ auth }) => {
             {isLoading ? (
               <span className="loading-spinner">⏳</span>
             ) : (
-              <span className="save-icon">💾</span>
+              <span className="like-icon">❤️</span>
             )}
             {isLoading 
-              ? (isMobile ? 'Saving...' : 'Saving...') 
-              : (isMobile ? 'Save' : 'Save Track')
+              ? (isMobile ? 'Liking...' : 'Liking...') 
+              : (isMobile ? 'Like' : 'Like Track')
             }
           </button>
         </div>
@@ -207,4 +207,4 @@ const SaveTrackExtension = ({ auth }) => {
   );
 };
 
-export default SaveTrackExtension;
+export default LikeTrackExtension;

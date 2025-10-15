@@ -4,7 +4,7 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
 
   Handles requests from the Twitch extension including:
   - Fetching current track from active listening sessions
-  - Saving tracks to user Spotify playlists
+  - Liking tracks to user Spotify playlists
   - Managing extension user preferences
   """
 
@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
 
   require Logger
 
-  # plug PremiereEcouteWeb.Plugs.TwitchExtensionAuth  # Disabled for testing
+  plug PremiereEcouteWeb.Plugs.TwitchExtensionAuth
 
   def current_track(conn, %{"broadcaster_id" => broadcaster_id}) do
     case Extension.get_current_track(broadcaster_id) do
@@ -56,15 +56,15 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
     end
   end
 
-  def save_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
+  def like_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
     # AIDEV-NOTE: Uses configured playlist rules only - no fallback behavior
-    case Extension.save_track(user_id, spotify_track_id) do
+    case Extension.like_track(user_id, spotify_track_id) do
       {:ok, playlist_name} ->
         conn
         |> put_status(:ok)
         |> json(%{
           success: true,
-          message: "Track saved successfully",
+          message: "Track liked successfully",
           playlist_name: playlist_name,
           spotify_track_id: spotify_track_id
         })
@@ -93,16 +93,16 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
         })
 
       {:error, reason} ->
-        Logger.error("Failed to save track for user #{user_id}: #{inspect(reason)}")
+        Logger.error("Failed to like track for user #{user_id}: #{inspect(reason)}")
 
         conn
         |> put_status(:internal_server_error)
-        |> json(%{error: "Failed to save track"})
+        |> json(%{error: "Failed to like track"})
     end
   end
 
-  def save_track(conn, params) do
-    Logger.warning("Invalid save track request: #{inspect(params)}")
+  def like_track(conn, params) do
+    Logger.warning("Invalid like track request: #{inspect(params)}")
 
     conn
     |> put_status(:bad_request)

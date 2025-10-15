@@ -2,6 +2,7 @@ import Config
 
 config :premiere_ecoute,
   twitch_eventsub_secret: "s3cre77890ab",
+  twitch_extension_secret: "test_secret_key_for_twitch_extension",
   twitch_client_id: "test_twitch_client_id",
   twitch_client_secret: "test_twitch_client_secret",
   twitch_redirect_uri: "http://localhost:4000/auth/twitch/callback",

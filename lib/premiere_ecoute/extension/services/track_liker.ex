@@ -1,42 +1,51 @@
-defmodule PremiereEcoute.Extension.Services.TrackSaver do
+defmodule PremiereEcoute.Extension.Services.TrackLiker do
   @moduledoc """
-  Service for saving tracks to user playlists.
+  Service for liking tracks to user playlists.
 
-  This service handles the business logic for saving Spotify tracks
-  to a user's designated playlist by searching for playlists containing
-  a specified search term.
+  This service handles the business logic for liking Spotify tracks
+  to a user's designated playlist using configured playlist rules.
   """
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Events.LikedTrack
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Playlists
 
   require Logger
 
   @doc """
-  Saves a track to a user's designated playlist.
+  Likes a track to a user's designated playlist.
 
   Uses playlist rules to determine the target playlist. If no rule is 
-  configured, the track will not be saved.
+  configured, the track will not be liked.
 
   ## Examples
 
-      iex> save_track("user123", "spotify_track_id")
+      iex> like_track("user123", "spotify_track_id")
       {:ok, "My Configured Playlist"}
       
-      iex> save_track("user_no_rule", "track_id")
+      iex> like_track("user_no_rule", "track_id")
       {:error, :no_playlist_rule}
       
-      iex> save_track("nonexistent", "track_id")
+      iex> like_track("nonexistent", "track_id")
       {:error, :no_user}
   """
-  def save_track(user_id, spotify_track_id) do
+  def like_track(user_id, spotify_track_id) do
     with {:ok, user} <- get_user(user_id),
          {:ok, spotify_scope} <- get_spotify_scope(user),
          {:ok, target_playlist} <- find_target_playlist(user),
          {:ok, _result} <- add_track_to_playlist(spotify_scope, target_playlist, spotify_track_id) do
       {:ok, target_playlist.title}
+      |> Store.ok("like", fn _title ->
+        %LikedTrack{
+          id: user_id,
+          provider: :spotify,
+          user_id: user.id,
+          track_id: spotify_track_id
+        }
+      end)
     else
       {:error, reason} -> {:error, reason}
     end
@@ -66,7 +75,7 @@ defmodule PremiereEcoute.Extension.Services.TrackSaver do
         {:ok, playlist}
 
       nil ->
-        Logger.info("No playlist rule configured for user #{user.id}, track will not be saved")
+        Logger.info("No playlist rule configured for user #{user.id}, track will not be liked")
         {:error, :no_playlist_rule}
     end
   end

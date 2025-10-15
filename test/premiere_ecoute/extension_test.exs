@@ -2,9 +2,10 @@ defmodule PremiereEcoute.ExtensionTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Extension
+  alias PremiereEcoute.Playlists.PlaylistRule
 
-  # AIDEV-NOTE: Integration tests since Extension uses defdelegate - testing actual behavior
   describe "get_current_track/1" do
     setup do
       stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
@@ -12,7 +13,6 @@ defmodule PremiereEcoute.ExtensionTest do
     end
 
     test "successfully gets current track via TrackReader delegation" do
-      # Create user with Spotify connection
       user =
         user_fixture(%{
           twitch: %{user_id: "broadcaster123"},
@@ -21,7 +21,6 @@ defmodule PremiereEcoute.ExtensionTest do
 
       broadcaster_id = user.twitch.user_id
 
-      # Mock Spotify API response
       expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
         {:ok,
          %{
@@ -51,15 +50,14 @@ defmodule PremiereEcoute.ExtensionTest do
     end
   end
 
-  describe "save_track/2" do
+  describe "like_track/2" do
     setup do
       stub(SpotifyApi, :get_library_playlists, fn _scope -> {:ok, []} end)
       stub(SpotifyApi, :add_items_to_playlist, fn _scope, _id, _tracks -> {:ok, %{}} end)
       :ok
     end
 
-    test "successfully saves track via TrackSaver delegation" do
-      # Create user with Spotify connection
+    test "successfully likes track via TrackLiker delegation" do
       user =
         user_fixture(%{
           twitch: %{user_id: "user123"},
@@ -69,30 +67,29 @@ defmodule PremiereEcoute.ExtensionTest do
       user_id = user.twitch.user_id
       spotify_track_id = "track_456"
 
-      # Create library playlist and set up playlist rule
-      {:ok, library_playlist} = PremiereEcoute.Discography.LibraryPlaylist.create(user, %{
-        provider: :spotify,
-        playlist_id: "playlist_123",
-        title: "My Configured Playlist",
-        url: "https://open.spotify.com/playlist/123",
-        public: true,
-        track_count: 42
-      })
-      
-      {:ok, _rule} = PremiereEcoute.Playlists.PlaylistRule.set_save_tracks_playlist(user, library_playlist)
+      {:ok, library_playlist} =
+        LibraryPlaylist.create(user, %{
+          provider: :spotify,
+          playlist_id: "playlist_123",
+          title: "My Configured Playlist",
+          url: "https://open.spotify.com/playlist/123",
+          public: true,
+          track_count: 42
+        })
 
-      # Mock add track to playlist
+      {:ok, _rule} = PlaylistRule.set_save_tracks_playlist(user, library_playlist)
+
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, _playlist_id, _tracks ->
         {:ok, %{"snapshot_id" => "snap_123"}}
       end)
 
-      result = Extension.save_track(user_id, spotify_track_id)
+      result = Extension.like_track(user_id, spotify_track_id)
 
       assert result == {:ok, "My Configured Playlist"}
     end
 
-    test "returns error when user not found via TrackSaver delegation" do
-      result = Extension.save_track("nonexistent", "some_track")
+    test "returns error when user not found via TrackLiker delegation" do
+      result = Extension.like_track("nonexistent", "some_track")
       assert result == {:error, :no_user}
     end
   end

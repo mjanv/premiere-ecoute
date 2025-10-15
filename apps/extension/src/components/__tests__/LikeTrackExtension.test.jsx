@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import SaveTrackExtension from '../SaveTrackExtension';
+import LikeTrackExtension from '../LikeTrackExtension';
 
 // Mock the CSS import
-jest.mock('../SaveTrackExtension.css', () => ({}));
+jest.mock('../LikeTrackExtension.css', () => ({}));
 
 // Mock environment variable
 const originalEnv = process.env;
@@ -16,7 +16,7 @@ afterEach(() => {
   process.env = originalEnv;
 });
 
-describe('SaveTrackExtension', () => {
+describe('LikeTrackExtension', () => {
   const mockAuth = {
     channelId: 'broadcaster123',
     userId: 'user456',
@@ -52,7 +52,7 @@ describe('SaveTrackExtension', () => {
         status: 404
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
         expect(screen.getByText('No Premiere Ecoute session active')).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('SaveTrackExtension', () => {
         })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
         expect(screen.getByText('Test Song')).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe('SaveTrackExtension', () => {
         status: 404
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
         expect(fetch).toHaveBeenCalledWith(
@@ -113,7 +113,7 @@ describe('SaveTrackExtension', () => {
     test('handles fetch error gracefully', async () => {
       fetch.mockRejectedValueOnce(new Error('Network error'));
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       // When fetch fails, the component shows the error message
       await waitFor(() => {
@@ -132,7 +132,7 @@ describe('SaveTrackExtension', () => {
         })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       // Initial fetch
       await waitFor(() => {
@@ -167,10 +167,10 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={authWithPrefix} />);
+      render(<LikeTrackExtension auth={authWithPrefix} />);
 
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       // When we click save, it should use the cleaned userId
@@ -182,11 +182,11 @@ describe('SaveTrackExtension', () => {
         })
       });
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       await waitFor(() => {
         expect(fetch).toHaveBeenCalledWith(
-          'https://premiere-ecoute.fr/extension/tracks/save',
+          'https://premiere-ecoute.fr/extension/tracks/like',
           expect.objectContaining({
             body: JSON.stringify({
               track_id: 1,
@@ -205,10 +205,10 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       fetch.mockResolvedValueOnce({
@@ -219,11 +219,11 @@ describe('SaveTrackExtension', () => {
         })
       });
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       await waitFor(() => {
         expect(fetch).toHaveBeenCalledWith(
-          'https://premiere-ecoute.fr/extension/tracks/save',
+          'https://premiere-ecoute.fr/extension/tracks/like',
           expect.objectContaining({
             body: JSON.stringify({
               track_id: 1,
@@ -237,7 +237,7 @@ describe('SaveTrackExtension', () => {
     });
   });
 
-  describe('Save Track Functionality', () => {
+  describe('Like Track Functionality', () => {
     beforeEach(async () => {
       // Setup component with a current track
       fetch.mockResolvedValueOnce({
@@ -245,39 +245,39 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       fetch.mockClear();
     });
 
-    test('saves track successfully', async () => {
+    test('likes track successfully', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           success: true,
-          message: 'Track saved successfully',
+          message: 'Track liked successfully',
           playlist_name: 'My Flonflon Hits',
           spotify_track_id: 'spotify123'
         })
       });
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       // Should show loading state
-      expect(screen.getByText('Saving...')).toBeInTheDocument();
+      expect(screen.getByText('Liking...')).toBeInTheDocument();
       expect(screen.getByText('⏳')).toBeInTheDocument();
 
       await waitFor(() => {
-        expect(screen.getByText('Saved to My Flonflon Hits!')).toBeInTheDocument();
+        expect(screen.getByText('Liked to My Flonflon Hits!')).toBeInTheDocument();
         expect(screen.getByText('✅')).toBeInTheDocument();
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://premiere-ecoute.fr/extension/tracks/save',
+        'https://premiere-ecoute.fr/extension/tracks/like',
         {
           method: 'POST',
           headers: {
@@ -294,13 +294,13 @@ describe('SaveTrackExtension', () => {
       );
     });
 
-    test('handles save track error', async () => {
+    test('handles like track error', async () => {
       fetch.mockRejectedValueOnce(new Error('Network error'));
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       await waitFor(() => {
-        expect(screen.getByText('Failed to save track. Please try again.')).toBeInTheDocument();
+        expect(screen.getByText('Failed to like track. Please try again.')).toBeInTheDocument();
         expect(screen.getByText('⚠️')).toBeInTheDocument();
       });
 
@@ -313,7 +313,7 @@ describe('SaveTrackExtension', () => {
         status: 401
       });
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       await waitFor(() => {
         expect(screen.getByText('Please connect your Spotify account first')).toBeInTheDocument();
@@ -326,7 +326,7 @@ describe('SaveTrackExtension', () => {
         status: 404
       });
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       await waitFor(() => {
         expect(screen.getByText('Track not found on Spotify')).toBeInTheDocument();
@@ -336,20 +336,20 @@ describe('SaveTrackExtension', () => {
     test('disables save button when loading', async () => {
       fetch.mockImplementationOnce(() => new Promise(() => {})); // Never resolves
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
-      const saveButton = screen.getByRole('button');
-      expect(saveButton).toBeDisabled();
-      expect(saveButton).toHaveClass('loading');
+      const likeButton = screen.getByRole('button');
+      expect(likeButton).toBeDisabled();
+      expect(likeButton).toHaveClass('loading');
     });
 
     test('prevents multiple save attempts while loading', async () => {
       fetch.mockImplementationOnce(() => new Promise(() => {})); // Never resolves
 
-      const saveButton = screen.getByText('Save Track');
-      fireEvent.click(saveButton);
-      fireEvent.click(saveButton);
-      fireEvent.click(saveButton);
+      const likeButton = screen.getByText('Like Track');
+      fireEvent.click(likeButton);
+      fireEvent.click(likeButton);
+      fireEvent.click(likeButton);
 
       expect(fetch).toHaveBeenCalledTimes(1);
     });
@@ -361,22 +361,22 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
       
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       // Wait for track to load
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       // Clear and reset all mocks so fetch calls fail
       fetch.mockReset();
 
       // Click save button - this will cause a network error
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       // Should show error message from network failure
       await waitFor(() => {
-        expect(screen.getByText('Failed to save track. Please try again.')).toBeInTheDocument();
+        expect(screen.getByText('Failed to like track. Please try again.')).toBeInTheDocument();
       });
     });
 
@@ -389,22 +389,22 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
       
-      render(<SaveTrackExtension auth={authWithoutUser} />);
+      render(<LikeTrackExtension auth={authWithoutUser} />);
 
       // Wait for track to load
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       fetch.mockClear();
 
       // Click save button - client-side validation should trigger
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       // Should show appropriate error message
       await waitFor(() => {
-        const loginError = screen.queryByText('Please log in to save tracks');
-        const networkError = screen.queryByText('Failed to save track. Please try again.');
+        const loginError = screen.queryByText('Please log in to like tracks');
+        const networkError = screen.queryByText('Failed to like track. Please try again.');
         
         // Should show either validation error or network error
         expect(loginError || networkError).toBeTruthy();
@@ -420,10 +420,10 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       // Mock successful save
@@ -435,10 +435,10 @@ describe('SaveTrackExtension', () => {
         })
       });
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       await waitFor(() => {
-        expect(screen.getByText('Saved to Test Playlist!')).toBeInTheDocument();
+        expect(screen.getByText('Liked to Test Playlist!')).toBeInTheDocument();
       });
 
       // Advance time by 3 seconds
@@ -447,7 +447,7 @@ describe('SaveTrackExtension', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByText('Saved to Test Playlist!')).not.toBeInTheDocument();
+        expect(screen.queryByText('Liked to Test Playlist!')).not.toBeInTheDocument();
       });
     });
 
@@ -458,19 +458,19 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       // Mock failed save
       fetch.mockRejectedValueOnce(new Error('Network error'));
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       await waitFor(() => {
-        expect(screen.getByText('Failed to save track. Please try again.')).toBeInTheDocument();
+        expect(screen.getByText('Failed to like track. Please try again.')).toBeInTheDocument();
       });
 
       // Advance time by 3 seconds
@@ -479,7 +479,7 @@ describe('SaveTrackExtension', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByText('Failed to save track. Please try again.')).not.toBeInTheDocument();
+        expect(screen.queryByText('Failed to like track. Please try again.')).not.toBeInTheDocument();
       });
     });
 
@@ -489,20 +489,20 @@ describe('SaveTrackExtension', () => {
         status: 404
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
         expect(screen.getByText('No Premiere Ecoute session active')).toBeInTheDocument();
       });
 
-      // Since there's no save button when not connected, we need to test the handleSaveClick logic
+      // Since there's no like button when not connected, we need to test the handleLikeClick logic
       // This would be tested through integration or by exposing the handler
     });
   });
 
   describe('Component Cleanup', () => {
     test('clears interval on unmount', async () => {
-      const { unmount } = render(<SaveTrackExtension auth={mockAuth} />);
+      const { unmount } = render(<LikeTrackExtension auth={mockAuth} />);
       
       const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
       
@@ -524,12 +524,12 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
         const container = screen.getByRole('button').closest('.extension-container');
         expect(container).toHaveClass('mobile-platform');
-        expect(screen.getByText('Save')).toBeInTheDocument(); // Mobile shows shorter text
+        expect(screen.getByText('Like')).toBeInTheDocument(); // Mobile shows shorter text
       });
     });
 
@@ -543,12 +543,12 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
         const container = screen.getByRole('button').closest('.extension-container');
         expect(container).toHaveClass('desktop-platform');
-        expect(screen.getByText('Save Track')).toBeInTheDocument(); // Desktop shows full text
+        expect(screen.getByText('Like Track')).toBeInTheDocument(); // Desktop shows full text
       });
     });
   });
@@ -560,14 +560,14 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
-        const saveButton = screen.getByRole('button');
-        expect(saveButton).toBeInTheDocument();
-        expect(saveButton).not.toBeDisabled();
-        // Check that it has accessible name including "Save" and track info
-        expect(saveButton).toHaveAccessibleName(/save.*playlist/i);
+        const likeButton = screen.getByRole('button');
+        expect(likeButton).toBeInTheDocument();
+        expect(likeButton).not.toBeDisabled();
+        // Check that it has accessible name including "Like" and track info
+        expect(likeButton).toHaveAccessibleName(/like.*playlist/i);
       });
     });
 
@@ -577,19 +577,19 @@ describe('SaveTrackExtension', () => {
         json: async () => ({ track: mockTrack })
       });
 
-      render(<SaveTrackExtension auth={mockAuth} />);
+      render(<LikeTrackExtension auth={mockAuth} />);
 
       await waitFor(() => {
-        expect(screen.getByText('Save Track')).toBeInTheDocument();
+        expect(screen.getByText('Like Track')).toBeInTheDocument();
       });
 
       fetch.mockImplementationOnce(() => new Promise(() => {}));
 
-      fireEvent.click(screen.getByText('Save Track'));
+      fireEvent.click(screen.getByText('Like Track'));
 
       const loadingButton = screen.getByRole('button');
       expect(loadingButton).toBeDisabled();
-      expect(loadingButton).toHaveTextContent('Saving...');
+      expect(loadingButton).toHaveTextContent('Liking...');
     });
   });
 });

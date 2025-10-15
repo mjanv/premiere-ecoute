@@ -1,11 +1,11 @@
 # Premiere Ecoute Twitch Extension
 
-A Twitch overlay extension that allows viewers to save tracks from active Premiere Ecoute listening sessions to their Spotify playlists.
+A Twitch overlay extension that allows viewers to like tracks from active Premiere Ecoute listening sessions to their Spotify playlists.
 
 ## Features
 
 - 🎵 Shows currently playing track from active listening sessions
-- 💾 One-click save to Spotify playlists
+- ❤️ One-click like to Spotify playlists
 - 🎨 Synthwave/cyberpunk UI matching Premiere Ecoute branding
 - 📱 Mobile and desktop responsive
 
@@ -42,7 +42,7 @@ This creates a production build in the `dist/` directory.
 ## Extension Structure
 
 - `src/viewer.js` - Main entry point that initializes the extension
-- `src/components/SaveTrackExtension.jsx` - Main React component
+- `src/components/LikeTrackExtension.jsx` - Main React component
 - `public/viewer.html` - HTML template for the extension
 - `public/manifest.json` - Twitch extension manifest
 
@@ -51,7 +51,7 @@ This creates a production build in the `dist/` directory.
 The extension communicates with the Premiere Ecoute backend via:
 
 - `GET /api/extension/current-track/:broadcaster_id` - Get current track
-- `POST /api/extension/save-track` - Save track (logs request for now)
+- `POST /api/extension/like-track` - Like track (logs request for now)
 
 ## Deployment
 

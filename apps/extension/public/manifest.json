@@ -2,11 +2,11 @@
   "manifest_version": 1,
   "type": "panel",
   "author_name": "Premiere Ecoute",
-  "description": "Save tracks from listening sessions to your Spotify playlists",
-  "summary": "One-click save tracks to Spotify during live music sessions",
+  "description": "Like tracks from listening sessions to your Spotify playlists",
+  "summary": "One-click like tracks to Spotify during live music sessions",
   "support_email": "contact@premiere-ecoute.fr",
   "vendor_code": "premiere-ecoute",
-  "sku": "premiere-ecoute-save-track",
+  "sku": "premiere-ecoute-like-track",
   "views": {
     "panel": {
       "viewer_url": "viewer.html",

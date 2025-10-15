@@ -14,6 +14,7 @@
   {"lib/premiere_ecoute/discography/playlist.ex", :call_without_opaque},
   {"lib/premiere_ecoute/discography/playlist/track.ex", :call_without_opaque},
   {"lib/premiere_ecoute/playlists/library_playlist.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/playlists/playlist_rule.ex", :call_without_opaque},
   {"lib/premiere_ecoute/sessions/retrospective/report.ex", :call_without_opaque},
   {"lib/premiere_ecoute/sessions/scores/poll.ex", :call_without_opaque},
   {"lib/premiere_ecoute/sessions/scores/vote.ex", :call_without_opaque},

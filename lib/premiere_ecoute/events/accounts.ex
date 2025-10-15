@@ -39,3 +39,9 @@ defmodule PremiereEcoute.Events.ChannelUnfollowed do
 
   use PremiereEcouteCore.Event, fields: [:streamer_id]
 end
+
+defmodule PremiereEcoute.Events.LikedTrack do
+  @moduledoc false
+
+  use PremiereEcouteCore.Event, fields: [:provider, :user_id, :track_id]
+end

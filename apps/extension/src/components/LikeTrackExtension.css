@@ -24,7 +24,7 @@
   scroll-behavior: smooth;
 }
 
-.extension-container.mobile-platform .save-button {
+.extension-container.mobile-platform .like-button {
   /* Ensure minimum touch target size */
   min-height: 56px;
 }
@@ -116,8 +116,8 @@
   word-wrap: break-word;
 }
 
-/* Save button */
-.save-button {
+/* Like button */
+.like-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,29 +141,29 @@
   box-sizing: border-box;
 }
 
-.save-button:hover {
+.like-button:hover {
   background: linear-gradient(135deg, #00cc6a, #00aa55);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
-.save-button:active {
+.like-button:active {
   transform: translateY(0);
 }
 
-.save-button.loading {
+.like-button.loading {
   background: linear-gradient(135deg, #6b7280, #4b5563);
   cursor: not-allowed;
   transform: none;
 }
 
-.save-button:disabled {
+.like-button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 /* Icons */
-.save-icon,
+.like-icon,
 .loading-spinner {
   font-size: 36px;
 }
@@ -249,7 +249,7 @@
     -webkit-line-clamp: 2;
   }
   
-  .save-button {
+  .like-button {
     padding: 16px 20px;
     font-size: 14px;
     font-weight: 800;
@@ -261,7 +261,7 @@
     -webkit-tap-highlight-color: rgba(0, 255, 136, 0.2);
   }
   
-  .save-button:active {
+  .like-button:active {
     transform: scale(0.98);
     transition: transform 0.1s ease;
   }
@@ -288,7 +288,7 @@
     border-radius: 8px;
   }
   
-  .save-icon,
+  .like-icon,
   .loading-spinner {
     font-size: 20px;
   }
@@ -322,7 +322,7 @@
     font-size: 13px;
   }
   
-  .save-button {
+  .like-button {
     min-height: 40px;
     padding: 10px 20px;
     font-size: 13px;
@@ -331,7 +331,7 @@
 
 /* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
-  .save-button {
+  .like-button {
     /* Larger touch targets for mobile */
     min-height: 60px;
     padding: 18px 24px;
@@ -339,14 +339,14 @@
     border-radius: 14px;
   }
   
-  .save-button:hover {
+  .like-button:hover {
     /* Remove hover effects on touch devices */
     background: linear-gradient(135deg, #00ff88, #00cc6a);
     transform: none;
     box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4);
   }
   
-  .save-button:active {
+  .like-button:active {
     background: linear-gradient(135deg, #00cc6a, #00aa55);
     transform: scale(0.97);
   }
@@ -374,7 +374,7 @@
     margin-bottom: 0;
   }
   
-  .save-button {
+  .like-button {
     flex-shrink: 0;
     width: auto;
     min-width: 120px;
@@ -406,7 +406,7 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .save-button,
+  .like-button,
   .loading-spinner,
   .error-message,
   .success-message {
@@ -414,7 +414,7 @@
     transition: none;
   }
   
-  .save-button:active {
+  .like-button:active {
     transform: none;
   }
 }

@@ -7,7 +7,7 @@
           <!-- Playlist Rules page header -->
           <.page_header
             title={gettext("Playlist Rules")}
-            subtitle={gettext("Configure which playlist automatically receives saved tracks from your Twitch extension")}
+            subtitle={gettext("Configure which playlist automatically receives liked tracks from your Twitch extension")}
           />
           
 <!-- Save Tracks Destination -->
@@ -16,7 +16,7 @@
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              {gettext("Save Tracks Destination")}
+              {gettext("Like Tracks Destination")}
             </h3>
             
 <!-- Current Status -->
@@ -27,7 +27,7 @@
                   <div>
                     <p class="font-medium">{@current_rule.library_playlist.title}</p>
                     <p class="text-sm text-gray-400">
-                      {gettext("Tracks saved from your extension will be added to this playlist")}
+                      {gettext("Tracks liked from your extension will be added to this playlist")}
                     </p>
                   </div>
                 </div>
@@ -53,7 +53,7 @@
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium text-sm"
                     data-confirm={
                       gettext(
-                        "Are you sure you want to deactivate the current rule? Tracks will not be saved from your extension without an active playlist rule."
+                        "Are you sure you want to deactivate the current rule? Tracks will not be liked from your extension without an active playlist rule."
                       )
                     }
                   >
@@ -68,7 +68,7 @@
                   <div>
                     <p class="font-medium text-yellow-400">{gettext("No playlist rule configured")}</p>
                     <p class="text-sm text-gray-400">
-                      {gettext("Tracks from your extension will not be saved without a playlist rule")}
+                      {gettext("Tracks from your extension will not be liked without a playlist rule")}
                     </p>
                   </div>
                 </div>

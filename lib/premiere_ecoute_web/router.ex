@@ -193,7 +193,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through :api
 
     get "/tracks/current/:broadcaster_id", TrackController, :current_track
-    post "/tracks/save", TrackController, :save_track
+    post "/tracks/like", TrackController, :like_track
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do

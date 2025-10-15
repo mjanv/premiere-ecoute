@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import SaveTrackExtension from './components/SaveTrackExtension';
+import LikeTrackExtension from './components/LikeTrackExtension';
 
 // Wait for Twitch Extension Helper to be available
 const initializeExtension = () => {
@@ -21,7 +21,7 @@ const initializeExtension = () => {
         context: extensionContext
       };
       
-      root.render(<SaveTrackExtension auth={enhancedAuth} />);
+      root.render(<LikeTrackExtension auth={enhancedAuth} />);
     });
 
     // Set up mobile viewport optimizations
