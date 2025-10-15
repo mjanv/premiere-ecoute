@@ -46,5 +46,6 @@ docs/product/
 priv/docs/
 
 # Javascript
+dist/
 node_modules/
 *.zip

@@ -1,9 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import './LikeTrackExtension.css';
 
-const PREMIERE_ECOUTE_API = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:4000' 
-  : 'https://premiere-ecoute.fr';
+// AIDEV-NOTE: Detect API URL based on environment
+// - Local development (localhost:8080): use local backend
+// - Twitch Hosted Test (*.ext-twitch.tv): use production backend
+// - Production: use production backend
+const getApiUrl = () => {
+  const hostname = window.location.hostname;
+
+  // Check if running on Twitch's hosted test environment
+  if (hostname.endsWith('.ext-twitch.tv')) {
+    return 'https://premiere-ecoute.fr';
+  }
+
+  // Check if running on localhost for development
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:4000';
+  }
+
+  // Default to production
+  return 'https://premiere-ecoute.fr';
+};
+
+const PREMIERE_ECOUTE_API = getApiUrl();
+
+// Log API URL for debugging
+console.log('[Premiere Ecoute Extension] Using API:', PREMIERE_ECOUTE_API);
 
 const LikeTrackExtension = ({ auth }) => {
   const [currentTrack, setCurrentTrack] = useState(null);

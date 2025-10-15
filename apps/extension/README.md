@@ -51,7 +51,17 @@ This creates a production build in the `dist/` directory.
 The extension communicates with the Premiere Ecoute backend via:
 
 - `GET /api/extension/current-track/:broadcaster_id` - Get current track
-- `POST /api/extension/like-track` - Like track (logs request for now)
+- `POST /api/extension/like-track` - Like track to user's playlist
+
+### API URL Selection
+
+The extension automatically detects the environment and uses the appropriate API URL:
+
+- **Local Development** (`localhost:8080`): `http://localhost:4000`
+- **Twitch Hosted Test** (`*.ext-twitch.tv`): `https://premiere-ecoute.fr`
+- **Production**: `https://premiere-ecoute.fr`
+
+This allows seamless testing across different environments without rebuilding.
 
 ## Deployment
 
