@@ -43,7 +43,6 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   end
 
   def handle_event("delete_session", %{"session_id" => session_id}, socket) do
-    # AIDEV-NOTE: Show confirmation modal instead of deleting directly
     session = ListeningSession.get(session_id)
 
     socket

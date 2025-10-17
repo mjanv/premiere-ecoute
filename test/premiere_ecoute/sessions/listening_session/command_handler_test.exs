@@ -186,7 +186,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert session_id == session.id
     end
 
-    # AIDEV-NOTE: test one-active-session-per-user business rule at command handler level
     test "fails to start a session when user already has an active session" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)

@@ -10,7 +10,6 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuthTest do
     # Store original config value
     original_secret = Application.get_env(:premiere_ecoute, :twitch_extension_secret)
 
-    # AIDEV-NOTE: Set base64-encoded secret to match production behavior
     Application.put_env(:premiere_ecoute, :twitch_extension_secret, @test_secret_base64)
 
     on_exit(fn ->
@@ -71,7 +70,6 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuthTest do
 
   describe "call/2 with valid anonymous JWT" do
     test "assigns extension_context for anonymous user (ID starts with 'A')", %{conn: conn} do
-      # AIDEV-NOTE: Anonymous users have IDs prefixed with 'A' per Twitch spec
       claims = %{
         "exp" => System.system_time(:second) + 3600,
         "user_id" => "A123456789",
@@ -160,7 +158,6 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuthTest do
       assert json_response(conn, 401) == %{"error" => "Invalid token"}
     end
 
-    # AIDEV-NOTE: Verify 5-second leeway allows recently expired tokens
     test "accepts token expired 3 seconds ago (within leeway window)", %{conn: conn} do
       claims = %{
         "exp" => System.system_time(:second) - 3,

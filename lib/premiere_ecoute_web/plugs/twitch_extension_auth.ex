@@ -36,7 +36,6 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
   end
 
   defp verify_extension_token(conn, token) do
-    # AIDEV-NOTE: Extension secret is base64-encoded by Twitch, must decode before use
     extension_secret_base64 = Application.get_env(:premiere_ecoute, :twitch_extension_secret)
     extension_secret = Base.decode64!(extension_secret_base64)
 
@@ -54,7 +53,6 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
     end
   end
 
-  # AIDEV-NOTE: 5 second leeway prevents flaky tests due to timing/clock drift
   @exp_leeway_seconds 5
 
   defp verify_jwt(token, secret) do

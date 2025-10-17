@@ -5,7 +5,6 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.PlaylistRule
 
-  # AIDEV-NOTE: Config contains base64-encoded secret, decode it for JWT signing
   @test_secret_base64 Application.compile_env(:premiere_ecoute, :twitch_extension_secret)
   @test_secret Base.decode64!(@test_secret_base64)
 

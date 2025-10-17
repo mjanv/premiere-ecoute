@@ -77,7 +77,6 @@ defmodule PremiereEcouteWeb.Playlists.RulesLive do
     end
   end
 
-  # AIDEV-NOTE: Helper to get current playlist ID from rule, returns nil if no rule
   defp get_current_playlist_id(user) do
     case Playlists.get_save_tracks_rule(user) do
       nil -> nil

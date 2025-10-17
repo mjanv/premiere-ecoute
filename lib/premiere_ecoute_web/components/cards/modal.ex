@@ -7,7 +7,6 @@ defmodule PremiereEcouteWeb.Components.Modal do
   alias Phoenix.LiveView.JS
   alias PremiereEcouteWeb.CoreComponents
 
-  # AIDEV-NOTE: Client-side only modal using Phoenix.LiveView.JS - no server state required
   @doc """
   Renders a modal dialog with backdrop and consistent styling.
   Uses client-side JS for show/hide without server state.

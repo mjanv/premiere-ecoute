@@ -172,7 +172,6 @@ defmodule PremiereEcouteWeb.Playlists.WorkflowsLive do
     History.get_tracks_by_period(scope.user.twitch.user_id, count, :month, %{year: year, month: month})
   end
 
-  # AIDEV-NOTE: Format month and year as "October 2025" using Calendar.strftime/2
   defp format_time_period(%{month: month, year: year}) do
     Date.new!(year, month, 1)
     |> Calendar.strftime("%B %Y")

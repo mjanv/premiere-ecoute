@@ -299,7 +299,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
-  # AIDEV-NOTE: Helper functions to handle both album and playlist tracks
   defp get_session_tracks(%{album: %{tracks: tracks}}) when is_list(tracks), do: tracks
   defp get_session_tracks(%{playlist: %{tracks: tracks}}) when is_list(tracks), do: tracks
   defp get_session_tracks(_), do: []

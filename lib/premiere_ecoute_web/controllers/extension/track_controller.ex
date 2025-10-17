@@ -57,7 +57,6 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
   end
 
   def like_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
-    # AIDEV-NOTE: Uses configured playlist rules only - no fallback behavior
     case Extension.like_track(user_id, spotify_track_id) do
       {:ok, playlist_name} ->
         conn

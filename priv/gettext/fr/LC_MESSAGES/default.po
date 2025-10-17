@@ -212,7 +212,7 @@ msgstr "Total des Votes"
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:84
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:223
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:168
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:167
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:27
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:76
 #, elixir-autogen, elixir-format
@@ -415,7 +415,7 @@ msgstr "Email"
 msgid "Ended"
 msgstr "Terminé"
 
-#: lib/premiere_ecoute_web/live/admin/admin_sessions_live.ex:80
+#: lib/premiere_ecoute_web/live/admin/admin_sessions_live.ex:79
 #, elixir-autogen, elixir-format
 msgid "Failed to delete session"
 msgstr "Échec de suppression de la session"
@@ -514,7 +514,7 @@ msgstr "Détails de la Session"
 msgid "Session Information"
 msgstr "Informations de la Session"
 
-#: lib/premiere_ecoute_web/live/admin/admin_sessions_live.ex:74
+#: lib/premiere_ecoute_web/live/admin/admin_sessions_live.ex:73
 #, elixir-autogen, elixir-format
 msgid "Session deleted successfully"
 msgstr "Session supprimée avec succès"
@@ -1078,7 +1078,7 @@ msgid "Permanently remove your account and all associated data from our servers.
 msgstr "Supprimer définitivement votre compte et toutes les données associées de nos serveurs. Cette action ne peut pas être annulée."
 
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:112
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:257
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:256
 #: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:132
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:142
 #, elixir-autogen, elixir-format
@@ -1232,7 +1232,7 @@ msgstr "Aucune playlist sélectionnée"
 
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:524
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:269
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:270
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:269
 #, elixir-autogen, elixir-format
 msgid "No playlists found"
 msgstr "Aucune playlist trouvée"
@@ -2318,7 +2318,7 @@ msgid "Failed to load votes"
 msgstr "Échec du chargement des détails de l'album"
 
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:90
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:47
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:46
 #, elixir-autogen, elixir-format
 msgid "My votes"
 msgstr "Mes votes"
@@ -2424,12 +2424,12 @@ msgstr "Rétrospectives globales pour les streamers et récapitulatifs personnel
 msgid "Host album release listening sessions and let your chat votes for every track"
 msgstr "Organisez des sessions d'écoute de sortie d'album et laissez votre chat voter pour chaque morceau"
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:181
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:180
 #, elixir-autogen, elixir-format
 msgid "Login as streamer"
 msgstr "Se connecter comme streamer"
 
-#: lib/premiere_ecoute_web/live/homepage_live.html.heex:218
+#: lib/premiere_ecoute_web/live/homepage_live.html.heex:217
 #, elixir-autogen, elixir-format
 msgid "Login as viewer"
 msgstr "Se connecter comme viewer"
@@ -2491,7 +2491,7 @@ msgstr "Automatisations"
 msgid "Anyone can search for and view this playlist"
 msgstr "Tout le monde peut rechercher et voir cette playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:219
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:218
 #, elixir-autogen, elixir-format
 msgid "Click 'Preview Tracks' to see your data"
 msgstr "Cliquez sur 'Prévisualiser les pistes' pour voir vos données"
@@ -2507,17 +2507,17 @@ msgstr "Créer une nouvelle playlist"
 msgid "Create Playlist"
 msgstr "Créer une playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:327
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:326
 #, elixir-autogen, elixir-format
 msgid "Create Workflow"
 msgstr "Créer un workflow"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:38
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:37
 #, elixir-autogen, elixir-format
 msgid "Data source"
 msgstr "Source de données"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:248
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:247
 #, elixir-autogen, elixir-format
 msgid "Data target"
 msgstr "Cible de données"
@@ -2527,7 +2527,7 @@ msgstr "Cible de données"
 msgid "Off"
 msgstr "Off"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:64
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:63
 #, elixir-autogen, elixir-format
 msgid "Decrease track count"
 msgstr "Diminuer le nombre de pistes"
@@ -2537,7 +2537,7 @@ msgstr "Diminuer le nombre de pistes"
 msgid "Description"
 msgstr "Description"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:265
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:264
 #, elixir-autogen, elixir-format
 msgid "Destination playlist"
 msgstr "Playlist de destination"
@@ -2573,7 +2573,7 @@ msgstr "Échec de la lecture : %{reason}"
 msgid "Failed to export tracks: %{reason}"
 msgstr "Échec de la pause : %{reason}"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:86
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:85
 #, elixir-autogen, elixir-format
 msgid "Increase track count"
 msgstr "Augmenter le nombre de pistes"
@@ -2588,7 +2588,7 @@ msgstr "Rendre la playlist publique"
 msgid "Multiple (>3)"
 msgstr "Multiple (>3)"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:127
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:126
 #, elixir-autogen, elixir-format
 msgid "Next month"
 msgstr "Mois prochain"
@@ -2599,12 +2599,12 @@ msgstr "Mois prochain"
 msgid "Next track in"
 msgstr "Prochaine dans"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:195
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:194
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No tracks found for the selected criteria"
 msgstr "Aucun morceau trouvé pour cet album."
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:55
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:54
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Number of tracks"
 msgstr "Nombre de pistes à exporter"
@@ -2624,27 +2624,27 @@ msgstr "Veuillez d'abord charger les pistes."
 msgid "Please select tracks and a playlist first."
 msgstr "Veuillez sélectionner une playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:159
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:158
 #, elixir-autogen, elixir-format
 msgid "Preview Tracks"
 msgstr "Prévisualiser les pistes"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:113
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:112
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Previous month"
 msgstr "Précédent"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:279
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:278
 #, elixir-autogen, elixir-format
 msgid "Select playlist..."
 msgstr "Sélectionner une playlist..."
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:239
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:238
 #, elixir-autogen, elixir-format
 msgid "Target"
 msgstr "Cible"
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:105
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:104
 #, elixir-autogen, elixir-format
 msgid "Time period"
 msgstr "Période de temps"
@@ -2664,7 +2664,7 @@ msgstr "Soumissions utilisateur"
 msgid "Workflow created successfully! Tracks exported to playlist."
 msgstr "Workflow créé avec succès ! Pistes exportées vers la playlist."
 
-#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:308
+#: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:307
 #, elixir-autogen, elixir-format
 msgid "Workflow will replace all tracks in the selected playlist."
 msgstr "Le workflow remplacera toutes les pistes de la playlist sélectionnée."
@@ -2990,7 +2990,7 @@ msgid_plural "artists"
 msgstr[0] "Artiste"
 msgstr[1] "Artiste"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:190
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:196
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La première écoute de %{name} est terminée"

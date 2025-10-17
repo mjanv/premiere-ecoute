@@ -246,7 +246,6 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
     end
   end
 
-  # AIDEV-NOTE: Integration test to verify the full polling cycle behavior
   describe "integration tests" do
     test "full polling cycle with state changes", %{user: user} do
       initial_playback = %{

@@ -68,7 +68,6 @@ defmodule PremiereEcoute.Extension.Services.TrackLiker do
     {:ok, scope}
   end
 
-  # AIDEV-NOTE: Playlist resolution logic - uses configured playlist rules only
   defp find_target_playlist(user) do
     case Playlists.get_save_tracks_playlist(user) do
       %PremiereEcoute.Discography.LibraryPlaylist{} = playlist ->
@@ -81,7 +80,6 @@ defmodule PremiereEcoute.Extension.Services.TrackLiker do
   end
 
   defp add_track_to_playlist(spotify_scope, playlist, spotify_track_id) do
-    # AIDEV-NOTE: Create Track struct for Spotify API - Hammox type checking requires proper struct
     track = %PremiereEcoute.Discography.Album.Track{
       provider: :spotify,
       track_id: spotify_track_id,

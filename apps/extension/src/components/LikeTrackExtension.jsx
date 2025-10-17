@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LikeTrackExtension.css';
 
-// AIDEV-NOTE: Detect API URL based on environment
 // - Local development (localhost:8080): use local backend
 // - Twitch Hosted Test (*.ext-twitch.tv): use production backend
 // - Production: use production backend
