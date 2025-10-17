@@ -141,15 +141,15 @@ defmodule PremiereEcouteWeb.Router do
   scope "/sessions", PremiereEcouteWeb.Sessions do
     pipe_through [:browser]
 
+    live_session :overlays, on_mount: [{UserAuth, :current_scope}] do
+      live "/overlay/:id", OverlayLive, :show
+    end
+
     live_session :sessions, on_mount: [{UserAuth, :streamer}] do
       live "/", SessionsLive, :index
       live "/new", AlbumSelectionLive, :index
       live "/:id", SessionLive, :show
       live "/:id/retrospective", RetrospectiveLive, :show
-    end
-
-    live_session :overlays, on_mount: [{UserAuth, :current_scope}] do
-      live "/:id/:overlay", OverlayLive, :show
     end
   end
 

@@ -392,11 +392,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   defp build_overlay_url(socket) do
-    get_current_overlay_url(socket.host_uri, socket.assigns.listening_session.id, socket.assigns.overlay_score_type)
+    user_id = socket.assigns.current_scope.user.id
+    get_current_overlay_url(socket.host_uri, user_id, socket.assigns.overlay_score_type)
   end
 
-  defp get_current_overlay_url(host_uri, session_id, score_type) do
-    base_url = "#{host_uri}/sessions/#{session_id}/overlay"
+  defp get_current_overlay_url(host_uri, user_id, score_type) do
+    base_url = "#{host_uri}/sessions/overlay/#{user_id}"
 
     case score_type do
       "streamer" -> "#{base_url}?score=streamer"

@@ -12,50 +12,78 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   alias PremiereEcoute.Sessions.Retrospective.Report
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    session = ListeningSession.get(id)
-
-    if connected?(socket) do
-      {:ok, _} = Presence.join(session.user.id)
-
-      PremiereEcoute.PubSub.subscribe(["session:#{session.id}", "playback:#{session.user.id}"])
-    end
-
-    {:ok, _} = PlayerSupervisor.start(session.user.id)
+  def mount(%{"id" => user_id}, _session, socket) do
+    # Find user by ID and get their active session
+    user = PremiereEcoute.Accounts.get_user!(user_id)
+    listening_session = ListeningSession.get_active_session(user)
 
     socket =
-      socket
-      |> assign(:id, id)
-      |> assign(:score, :streamer)
-      |> assign(:percent, 0)
-      |> assign(:progress, AsyncResult.loading())
-      |> assign(:open_vote, true)
-      |> assign(:listening_session, session)
+      case listening_session do
+        nil ->
+          socket
+          |> assign(:id, nil)
+          |> assign(:score, :streamer)
+          |> assign(:percent, 0)
+          |> assign(:progress, AsyncResult.loading())
+          |> assign(:open_vote, false)
+          |> assign(:listening_session, nil)
+          |> assign(:summary, AsyncResult.loading())
 
-    case Report.get_by(session_id: id) do
-      nil ->
-        {:ok, assign(socket, :summary, AsyncResult.loading())}
+        session ->
+          if connected?(socket) do
+            {:ok, _} = Presence.join(session.user.id)
+            PremiereEcoute.PubSub.subscribe(["session:#{session.id}", "playback:#{session.user.id}"])
+          end
 
-      report ->
-        summary = Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
+          # Start PlayerSupervisor, ignore if it's already running or max children reached
+          _ = PlayerSupervisor.start(session.user.id)
 
-        if is_nil(summary) do
-          {:ok, assign(socket, :summary, AsyncResult.loading())}
-        else
-          {:ok, assign(socket, :summary, AsyncResult.ok(summary))}
-        end
-    end
+          summary_result =
+            case Report.get_by(session_id: session.id) do
+              nil ->
+                AsyncResult.loading()
+
+              report ->
+                summary = Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
+
+                if is_nil(summary) do
+                  AsyncResult.loading()
+                else
+                  AsyncResult.ok(summary)
+                end
+            end
+
+          socket
+          |> assign(:id, session.id)
+          |> assign(:score, :streamer)
+          |> assign(:percent, 0)
+          |> assign(:progress, AsyncResult.loading())
+          |> assign(:open_vote, true)
+          |> assign(:listening_session, session)
+          |> assign(:summary, summary_result)
+      end
+
+    {:ok, socket}
   end
 
   @impl true
-  def terminate(_reason, %{assigns: assigns}) do
-    Presence.unjoin(assigns.listening_session.user.id)
+  def terminate(_reason, %{assigns: %{listening_session: nil}}) do
+    :ok
+  end
+
+  def terminate(_reason, %{assigns: %{listening_session: session}}) do
+    Presence.unjoin(session.user.id)
     :ok
   end
 
   @impl true
   def handle_params(%{"score" => score}, _url, socket) do
     {:noreply, assign(socket, :score, parse_score(score))}
+  end
+
+  @impl true
+  def handle_params(_params, _url, socket) do
+    {:noreply, socket}
   end
 
   @impl true

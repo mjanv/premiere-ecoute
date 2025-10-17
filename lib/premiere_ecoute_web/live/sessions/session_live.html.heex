@@ -104,7 +104,7 @@
                 <input
                   type="text"
                   readonly
-                  value={get_current_overlay_url(@socket.host_uri, @listening_session.id, @overlay_score_type)}
+                  value={get_current_overlay_url(@socket.host_uri, @current_scope.user.id, @overlay_score_type)}
                   class="w-full bg-white/10 border border-white/20 rounded-lg pl-30 pr-10 py-2 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
                   id={"overlay-url-input-#{@overlay_score_type}"}
                 />

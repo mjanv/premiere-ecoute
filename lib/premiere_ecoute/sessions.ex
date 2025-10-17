@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate next_track(session), to: ListeningSession
   defdelegate previous_track(session), to: ListeningSession
   defdelegate active_sessions(user), to: ListeningSession
-  defdelegate get_active_session_by_twitch_user_id(twitch_user_id), to: ListeningSession
+  defdelegate get_active_session(user), to: ListeningSession
   def publish_message(event), do: PremiereEcouteCore.publish(Scores.MessagePipeline, event)
   def publish_poll(event), do: PremiereEcouteCore.publish(Scores.PollPipeline, event)
 
