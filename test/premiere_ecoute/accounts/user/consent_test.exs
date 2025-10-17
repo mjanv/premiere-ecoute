@@ -31,16 +31,22 @@ defmodule PremiereEcoute.Accounts.User.ConsentTest do
     test "can create multiple accepted consents", %{user: user, documents: documents} do
       {:ok, _multi} = Consent.accept(user, documents)
 
+      consents = Consent.all(user_id: user.id) |> Enum.sort_by(& &1.document)
+
       assert [
                %Consent{document: :cookies, version: "1.0", accepted: true, user_id: user_id},
-               %Consent{document: :terms, version: "1.0", accepted: true, user_id: user_id},
-               %Consent{document: :privacy, version: "1.0", accepted: true, user_id: user_id}
-             ] = Consent.all(user_id: user.id)
+               %Consent{document: :privacy, version: "1.0", accepted: true, user_id: user_id},
+               %Consent{document: :terms, version: "1.0", accepted: true, user_id: user_id}
+             ] = consents
 
-      assert Store.last("user-#{user.id}", 3) == [
+      assert user_id == user.id
+
+      events = Store.last("user-#{user.id}", 3) |> Enum.sort_by(& &1.document)
+
+      assert events == [
                %ConsentGiven{id: user.id, document: "cookies", version: "1.0", accepted: true},
-               %ConsentGiven{id: user.id, document: "terms", version: "1.0", accepted: true},
-               %ConsentGiven{id: user.id, document: "privacy", version: "1.0", accepted: true}
+               %ConsentGiven{id: user.id, document: "privacy", version: "1.0", accepted: true},
+               %ConsentGiven{id: user.id, document: "terms", version: "1.0", accepted: true}
              ]
     end
 

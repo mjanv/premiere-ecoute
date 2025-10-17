@@ -235,7 +235,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       {:error, error_message} =
         CommandBus.apply(%StartListeningSession{source: :album, session_id: event2.session_id, scope: scope})
 
-      assert error_message == "Cannot start session: you already have an active listening session"
+      assert error_message == "You already have an active listening session"
     end
 
     test "successfully start a prepared playlist session and returns SessionStarted event" do

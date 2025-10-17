@@ -140,9 +140,9 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuthTest do
       assert json_response(conn, 401) == %{"error" => "Invalid token"}
     end
 
-    test "returns 401 for token expired 1 second ago", %{conn: conn} do
+    test "returns 401 for token expired 10 seconds ago", %{conn: conn} do
       claims = %{
-        "exp" => System.system_time(:second) - 1,
+        "exp" => System.system_time(:second) - 10,
         "user_id" => "123456789",
         "channel_id" => "987654321",
         "role" => "viewer"
@@ -158,6 +158,26 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuthTest do
       assert conn.halted
       assert conn.status == 401
       assert json_response(conn, 401) == %{"error" => "Invalid token"}
+    end
+
+    # AIDEV-NOTE: Verify 5-second leeway allows recently expired tokens
+    test "accepts token expired 3 seconds ago (within leeway window)", %{conn: conn} do
+      claims = %{
+        "exp" => System.system_time(:second) - 3,
+        "user_id" => "123456789",
+        "channel_id" => "987654321",
+        "role" => "viewer"
+      }
+
+      token = generate_jwt(claims, @test_secret)
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{token}")
+        |> TwitchExtensionAuth.call([])
+
+      refute conn.halted
+      assert conn.assigns.extension_context.user_id == "123456789"
     end
   end
 

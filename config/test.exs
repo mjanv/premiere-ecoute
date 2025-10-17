@@ -2,7 +2,6 @@ import Config
 
 config :premiere_ecoute,
   twitch_eventsub_secret: "s3cre77890ab",
-  # AIDEV-NOTE: Extension secret must be base64-encoded (Twitch provides it in base64 format)
   twitch_extension_secret: Base.encode64("test_secret_key_for_twitch_extension"),
   twitch_client_id: "test_twitch_client_id",
   twitch_client_secret: "test_twitch_client_secret",

@@ -194,7 +194,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       assert after_session.started_at.__struct__ == DateTime
     end
 
-    # AIDEV-NOTE: test one-active-session-per-user business rule at schema level
     test "cannot start a session when user already has an active session", %{user: user, album: album} do
       {:ok, session1} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _active_session} = ListeningSession.start(session1)
@@ -205,7 +204,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       assert reason == :active_session_exists
     end
 
-    # AIDEV-NOTE: test one-active-session-per-user - allow start after stopping
     test "can start a session after stopping the previous active session", %{user: user, album: album} do
       {:ok, session1} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, active_session} = ListeningSession.start(session1)
@@ -217,7 +215,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       assert new_active_session.status == :active
     end
 
-    # AIDEV-NOTE: test that different users can have active sessions simultaneously
     test "different users can have active sessions at the same time", %{viewer: viewer, user: user, album: album} do
       {:ok, session1} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, active_session1} = ListeningSession.start(session1)
@@ -368,7 +365,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     end
   end
 
-  # AIDEV-NOTE: updated test - one user can only have one active session at a time
   describe "active_sessions/1" do
     test "can list all active sessions linked to a viewer", %{viewer: viewer, user: user, album: album} do
       {:ok, _} = Accounts.follow(viewer, user)

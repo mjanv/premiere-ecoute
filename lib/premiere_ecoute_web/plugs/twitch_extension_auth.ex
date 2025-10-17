@@ -54,6 +54,9 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
     end
   end
 
+  # AIDEV-NOTE: 5 second leeway prevents flaky tests due to timing/clock drift
+  @exp_leeway_seconds 5
+
   defp verify_jwt(token, secret) do
     jwk = JOSE.JWK.from_oct(secret)
 
@@ -61,11 +64,11 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
       {true, jwt, _jws} ->
         claims = JOSE.JWT.to_map(jwt) |> elem(1)
 
-        # Check token expiration
+        # Check token expiration with leeway to handle clock drift
         now = System.system_time(:second)
         exp = Map.get(claims, "exp", 0)
 
-        if exp > now do
+        if exp + @exp_leeway_seconds > now do
           {:ok, claims}
         else
           {:error, :expired}

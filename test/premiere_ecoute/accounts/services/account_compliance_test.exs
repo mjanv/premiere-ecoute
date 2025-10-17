@@ -37,7 +37,6 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
         album
       end
 
-    # AIDEV-NOTE: create sessions sequentially, stopping previous before starting next (one-active-session-per-user rule)
     [first_album, second_album] = albums
 
     {:ok, session1} = ListeningSession.create(%{user_id: streamer.id, album_id: first_album.id})
