@@ -37,18 +37,26 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
         album
       end
 
-    sessions =
-      for album <- albums do
-        {:ok, session} = ListeningSession.create(%{user_id: streamer.id, album_id: album.id})
-        {:ok, session} = ListeningSession.start(session)
-        {:ok, session} = ListeningSession.next_track(session)
-        session
-      end
+    # AIDEV-NOTE: create sessions sequentially, stopping previous before starting next (one-active-session-per-user rule)
+    [first_album, second_album] = albums
 
-    for session <- sessions do
-      vote(streamer, session)
-      vote(viewer, session)
-    end
+    {:ok, session1} = ListeningSession.create(%{user_id: streamer.id, album_id: first_album.id})
+    {:ok, session1} = ListeningSession.start(session1)
+    {:ok, session1} = ListeningSession.next_track(session1)
+
+    vote(streamer, session1)
+    vote(viewer, session1)
+
+    {:ok, session1} = ListeningSession.stop(session1)
+
+    {:ok, session2} = ListeningSession.create(%{user_id: streamer.id, album_id: second_album.id})
+    {:ok, session2} = ListeningSession.start(session2)
+    {:ok, session2} = ListeningSession.next_track(session2)
+
+    vote(streamer, session2)
+    vote(viewer, session2)
+
+    sessions = [session1, session2]
 
     %{streamer: streamer, viewer: viewer, sessions: sessions, albums: albums}
   end

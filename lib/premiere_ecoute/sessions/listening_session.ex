@@ -70,12 +70,18 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> foreign_key_constraint(:current_playlist_track_id)
   end
 
-  def start(%__MODULE__{} = session) do
-    session
-    |> change()
-    |> put_change(:status, :active)
-    |> put_change(:started_at, DateTime.utc_now(:second))
-    |> Repo.update()
+  def start(%__MODULE__{id: session_id, user_id: user_id} = session) do
+    case has_active_session?(user_id, session_id) do
+      true ->
+        {:error, :active_session_exists}
+
+      false ->
+        session
+        |> change()
+        |> put_change(:status, :active)
+        |> put_change(:started_at, DateTime.utc_now(:second))
+        |> Repo.update()
+    end
   end
 
   def stop(%__MODULE__{status: :active} = session) do
@@ -240,5 +246,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Enum.map(&(&1.duration_ms || 0))
     |> Enum.sum()
     |> div(60_000)
+  end
+
+  defp has_active_session?(user_id, exclude_session_id) do
+    from(s in __MODULE__,
+      where: s.user_id == ^user_id and s.status == :active and s.id != ^exclude_session_id
+    )
+    |> Repo.exists?()
   end
 end

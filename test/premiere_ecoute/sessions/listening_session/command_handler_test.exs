@@ -186,6 +186,58 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert session_id == session.id
     end
 
+    # AIDEV-NOTE: test one-active-session-per-user business rule at command handler level
+    test "fails to start a session when user already has an active session" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      album = album_fixture()
+
+      # First session setup - full expectations
+      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      expect(SpotifyApi, :get_album, 2, fn _ -> {:ok, album} end)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
+        {:ok, %{}}
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One" -> {:ok, %{}} end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> {:ok, %{}} end)
+
+      # Second session setup - partial expectations (fails before most API calls)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      # Prepare and start first session
+      {:ok, _, [%SessionPrepared{} = event1]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :album,
+          user_id: user.id,
+          album_id: album.album_id
+        })
+
+      {:ok, _, [%SessionStarted{}, %NextTrackStarted{}]} =
+        CommandBus.apply(%StartListeningSession{source: :album, session_id: event1.session_id, scope: scope})
+
+      # Prepare second session
+      {:ok, _, [%SessionPrepared{} = event2]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :album,
+          user_id: user.id,
+          album_id: album.album_id
+        })
+
+      # Try to start second session - should fail
+      {:error, error_message} =
+        CommandBus.apply(%StartListeningSession{source: :album, session_id: event2.session_id, scope: scope})
+
+      assert error_message == "Cannot start session: you already have an active listening session"
+    end
+
     test "successfully start a prepared playlist session and returns SessionStarted event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)

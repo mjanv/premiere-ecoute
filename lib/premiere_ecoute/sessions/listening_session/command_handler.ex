@@ -85,6 +85,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
+  # AIDEV-NOTE: enforce one-active-session-per-user at command level
   def handle(%StartListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with {:ok, devices} <- Apis.spotify().devices(scope),
          true <- Enum.any?(devices, fn device -> device["is_active"] end),
@@ -105,12 +106,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       false ->
         {:error, "No Spotify active device detected"}
 
+      {:error, :active_session_exists} ->
+        {:error, "You already have an active listening session"}
+
       reason ->
         Logger.error("Cannot start listening session due to: #{inspect(reason)}")
         {:error, []}
     end
   end
 
+  # AIDEV-NOTE: enforce one-active-session-per-user at command level
   def handle(%StartListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with {:ok, devices} <- Apis.spotify().devices(scope),
          true <- Enum.any?(devices, fn device -> device["is_active"] end),
@@ -126,6 +131,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     else
       false ->
         {:error, "No Spotify active device detected"}
+
+      {:error, :active_session_exists} ->
+        {:error, "You already have an active listening session"}
 
       reason ->
         Logger.error("Cannot start listening session due to: #{inspect(reason)}")
