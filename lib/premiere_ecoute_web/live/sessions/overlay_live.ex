@@ -127,6 +127,25 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def handle_info(:stop, %{assigns: %{listening_session: session}} = socket) when not is_nil(session) do
+    socket =
+      socket
+      |> assign(:id, nil)
+      |> assign(:listening_session, nil)
+      |> assign(:summary, AsyncResult.loading())
+      |> assign(:open_vote, false)
+      |> assign(:progress, AsyncResult.loading())
+      |> assign(:percent, 0)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(:stop, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(_event, socket) do
     {:noreply, socket}
   end

@@ -1172,7 +1172,7 @@ msgstr "Sombre"
 msgid "English"
 msgstr "Anglais"
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:150
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:154
 #, elixir-autogen, elixir-format
 msgid "Failed to add playlist to your library"
 msgstr "Échec de l'ajout de la playlist à votre bibliothèque"
@@ -1225,7 +1225,7 @@ msgstr "Ma Bibliothèque"
 msgid "My Spotify Playlists"
 msgstr "Mes Playlists Spotify"
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:122
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:124
 #, elixir-autogen, elixir-format
 msgid "No playlist selected"
 msgstr "Aucune playlist sélectionnée"
@@ -1242,12 +1242,12 @@ msgstr "Aucune playlist trouvée"
 msgid "Open"
 msgstr "Ouvrir"
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:146
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:148
 #, elixir-autogen, elixir-format
 msgid "Playlist added to your library!"
 msgstr "Playlist ajoutée à votre bibliothèque !"
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:126
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:128
 #, elixir-autogen, elixir-format
 msgid "Playlist is already in your library"
 msgstr "La playlist est déjà dans votre bibliothèque"
@@ -2563,7 +2563,7 @@ msgid "Enter playlist title"
 msgstr "Entrez le titre de la playlist"
 
 #: lib/premiere_ecoute_web/live/festivals/poster_live.ex:113
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:113
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:115
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to create playlist: %{reason}"
 msgstr "Échec de la lecture : %{reason}"
@@ -2609,7 +2609,7 @@ msgstr "Aucun morceau trouvé pour cet album."
 msgid "Number of tracks"
 msgstr "Nombre de pistes à exporter"
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:109
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:111
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Playlist created successfully!"
 msgstr "Playlist soumise avec succès !"
@@ -3105,3 +3105,8 @@ msgstr "Les pistes de votre extension ne seront pas aimées sans règle de playl
 #, elixir-autogen, elixir-format
 msgid "Tracks liked from your extension will be added to this playlist"
 msgstr "Les pistes aimées depuis votre extension seront ajoutées à cette playlist"
+
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:51
+#, elixir-autogen, elixir-format
+msgid "Votes close in 30 seconds !"
+msgstr "Les votes ferment dans 30 secondes !"

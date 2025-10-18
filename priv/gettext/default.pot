@@ -1171,7 +1171,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:150
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:154
 #, elixir-autogen, elixir-format
 msgid "Failed to add playlist to your library"
 msgstr ""
@@ -1224,7 +1224,7 @@ msgstr ""
 msgid "My Spotify Playlists"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:122
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:124
 #, elixir-autogen, elixir-format
 msgid "No playlist selected"
 msgstr ""
@@ -1241,12 +1241,12 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:146
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:148
 #, elixir-autogen, elixir-format
 msgid "Playlist added to your library!"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:126
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:128
 #, elixir-autogen, elixir-format
 msgid "Playlist is already in your library"
 msgstr ""
@@ -2562,7 +2562,7 @@ msgid "Enter playlist title"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/festivals/poster_live.ex:113
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:113
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:115
 #, elixir-autogen, elixir-format
 msgid "Failed to create playlist: %{reason}"
 msgstr ""
@@ -2608,7 +2608,7 @@ msgstr ""
 msgid "Number of tracks"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/playlists/library_live.ex:109
+#: lib/premiere_ecoute_web/live/playlists/library_live.ex:111
 #, elixir-autogen, elixir-format
 msgid "Playlist created successfully!"
 msgstr ""
@@ -3103,4 +3103,9 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:30
 #, elixir-autogen, elixir-format
 msgid "Tracks liked from your extension will be added to this playlist"
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:51
+#, elixir-autogen, elixir-format
+msgid "Votes close in 30 seconds !"
 msgstr ""
