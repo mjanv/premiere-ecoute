@@ -11,6 +11,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
   setup :verify_on_exit!
 
   setup do
+    start_supervised(PremiereEcoute.Apis.PlayerSupervisor)
+
     user =
       user_fixture(%{
         role: :streamer,

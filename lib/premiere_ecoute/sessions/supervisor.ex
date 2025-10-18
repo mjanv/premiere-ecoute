@@ -11,12 +11,22 @@ defmodule PremiereEcoute.Sessions.Supervisor do
 
   @impl true
   def init(_args) do
-    children = [
-      {Cache, name: :sessions},
-      {PremiereEcoute.Sessions.Scores.MessagePipeline, []},
-      {PremiereEcoute.Sessions.Scores.PollPipeline, []}
+    mandatory = [
+      {Cache, name: :sessions}
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    optionals =
+      case Application.get_env(:premiere_ecoute, :environment) do
+        :test ->
+          []
+
+        _ ->
+          [
+            {PremiereEcoute.Sessions.Scores.MessagePipeline, []},
+            {PremiereEcoute.Sessions.Scores.PollPipeline, []}
+          ]
+      end
+
+    Supervisor.init(mandatory ++ optionals, strategy: :one_for_one)
   end
 end

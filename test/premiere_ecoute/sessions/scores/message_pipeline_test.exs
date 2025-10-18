@@ -11,6 +11,8 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
   @pipeline PremiereEcoute.Sessions.Scores.MessagePipeline
 
   setup do
+    start_supervised(@pipeline)
+
     user = user_fixture(%{twitch: %{user_id: "1234"}})
     {:ok, album} = Album.create(album_fixture())
     {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, status: :active})

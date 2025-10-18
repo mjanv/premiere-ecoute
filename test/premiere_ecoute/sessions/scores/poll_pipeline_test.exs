@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Sessions.Scores.PollPipelineTest do
   @pipeline PremiereEcoute.Sessions.Scores.PollPipeline
 
   setup do
+    start_supervised(@pipeline)
+
     user = user_fixture(%{twitch: %{user_id: "1234"}})
     {:ok, album} = Album.create(album_fixture())
 
