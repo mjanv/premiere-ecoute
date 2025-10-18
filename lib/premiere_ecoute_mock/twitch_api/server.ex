@@ -183,7 +183,15 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
   get "/users" do
     case get_req_header(conn, "authorization") do
       ["Bearer " <> token] ->
-        json(conn, 200, data(user(token), %{}))
+        case user(token) do
+          nil ->
+            conn
+            |> put_status(401)
+            |> json(401, %{"error" => "Unauthorized", "status" => 401, "message" => "Invalid access token"})
+
+          user_data ->
+            json(conn, 200, data(user_data, %{}))
+        end
 
       _ ->
         conn
@@ -207,16 +215,26 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
   defp data(payload, root) when is_list(payload), do: %{"data" => payload} |> Map.merge(root)
   defp data(payload, root), do: %{"data" => [payload]} |> Map.merge(root)
 
-  defp user(_token) do
-    alias PremiereEcoute.Accounts.User
-    alias PremiereEcoute.Repo
+  # AIDEV-NOTE: validates real OAuth token against Twitch API and returns mock data for known users
+  defp user(token) do
+    client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
 
-    case Repo.get_by(User, username: "lanfeust313") do
-      nil ->
-        lanfeust_313()
+    case Req.get("https://api.twitch.tv/helix/users",
+           headers: [
+             {"Authorization", "Bearer #{token}"},
+             {"Client-Id", client_id}
+           ]
+         ) do
+      {:ok, %{status: 200, body: %{"data" => [user_data | _]}}} ->
+        user_data
 
-      _user ->
-        bot()
+      {:ok, %{status: 401}} ->
+        Logger.warning("Invalid Twitch access token")
+        nil
+
+      {:error, reason} ->
+        Logger.error("Failed to validate Twitch token: #{inspect(reason)}")
+        # Fallback to default user on API error
         lanfeust_313()
     end
   end
