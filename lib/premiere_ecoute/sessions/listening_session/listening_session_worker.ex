@@ -43,6 +43,18 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   end
 
   @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"action" => "votes_closing", "user_id" => user_id}}) do
+    with scope <- Scope.for_user(User.get(user_id)),
+         _ <-
+           Apis.twitch().send_chat_message(
+             scope,
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes close in 30 seconds !") end)
+           ) do
+      :ok
+    end
+  end
+
+  @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "close", "user_id" => user_id, "session_id" => session_id}}) do
     with scope <- Scope.for_user(User.get(user_id)),
          {:ok, _} <- Cache.del(:sessions, scope.user.twitch.user_id) do

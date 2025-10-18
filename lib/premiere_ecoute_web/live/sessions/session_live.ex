@@ -196,6 +196,38 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_info({:player, :start_track, state}, %{assigns: %{listening_session: session}} = socket) do
+    case state do
+      %{"context" => %{"type" => "playlist", "uri" => "spotify:playlist:" <> _playlist_id}} = payload ->
+        case Playlist.add_track_to_playlist(session.playlist, payload) do
+          {:ok, _} ->
+            session = ListeningSession.get(session.id)
+            {:ok, session} = ListeningSession.next_track(session)
+
+            assign(socket, :listening_session, session)
+
+          {:error, _} ->
+            socket
+        end
+
+      _ ->
+        socket
+    end
+    |> assign(:next_track_at, nil)
+    |> assign(:player_state, state)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:player, {:percent, percent}, state}, %{assigns: %{current_scope: scope}} = socket) do
+    if percent == round(100 * (1 - 30_000 / state["item"]["duration_ms"])) do
+      ListeningSessionWorker.in_seconds(%{action: "votes_closing", user_id: scope.user.id}, 0)
+    end
+
+    {:noreply, assign(socket, :player_state, state)}
+  end
+
+  @impl true
   def handle_info(
         {:player, :end_track, state},
         %{assigns: %{listening_session: session, current_scope: scope}} = socket
@@ -215,29 +247,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     else
       socket
     end
-    |> assign(:player_state, state)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info({:player, :start_track, state}, %{assigns: %{listening_session: session}} = socket) do
-    case state do
-      %{"context" => %{"type" => "playlist", "uri" => "spotify:playlist:" <> _playlist_id}} = payload ->
-        case Playlist.add_track_to_playlist(session.playlist, payload) do
-          {:ok, _} ->
-            session = ListeningSession.get(session.id)
-            {:ok, session} = ListeningSession.next_track(session)
-
-            assign(socket, :listening_session, session)
-
-          {:error, _} ->
-            socket
-        end
-
-      _ ->
-        socket
-    end
-    |> assign(:next_track_at, nil)
     |> assign(:player_state, state)
     |> then(fn socket -> {:noreply, socket} end)
   end

@@ -13,7 +13,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   @impl true
   def mount(%{"id" => user_id}, _session, socket) do
-    # Find user by ID and get their active session
     user = PremiereEcoute.Accounts.get_user!(user_id)
     listening_session = ListeningSession.get_active_session(user)
 
@@ -35,7 +34,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
             PremiereEcoute.PubSub.subscribe(["session:#{session.id}", "playback:#{session.user.id}"])
           end
 
-          # Start PlayerSupervisor, ignore if it's already running or max children reached
           _ = PlayerSupervisor.start(session.user.id)
 
           summary_result =

@@ -1,6 +1,8 @@
 defmodule PremiereEcouteWeb.Playlists.LibraryLive do
   use PremiereEcouteWeb, :live_view
 
+  require Logger
+
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Discography
@@ -145,7 +147,9 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
               |> assign(:library_playlists, Discography.LibraryPlaylist.all(where: [user_id: current_scope.user.id]))
               |> put_flash(:success, gettext("Playlist added to your library!"))
 
-            {:error, _} ->
+            {:error, reason} ->
+              Logger.error("#{inspect(reason)}")
+
               socket
               |> put_flash(:error, gettext("Failed to add playlist to your library"))
           end

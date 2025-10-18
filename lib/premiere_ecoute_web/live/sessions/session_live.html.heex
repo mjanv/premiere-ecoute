@@ -206,8 +206,8 @@
                   if(ListeningSession.current?(@listening_session, track),
                     do:
                       if(@open_vote,
-                        do: "order-first border-2 border-green-500/50",
-                        else: "order-first border-2 border-orange-500/50"
+                        do: "order-first mb-3 border-2 border-green-500/50 hover:bg-green-300/30",
+                        else: "order-first mb-3 border-2 border-orange-500/50 hover:bg-orange-300/30"
                       ),
                     else: "border-purple-300/50 border-2 hover:bg-purple-300/30"
                   )

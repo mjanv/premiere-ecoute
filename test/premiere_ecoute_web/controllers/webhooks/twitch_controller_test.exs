@@ -9,6 +9,12 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
   alias PremiereEcouteWeb.Webhooks.TwitchController
 
+  setup do
+    start_supervised(PremiereEcoute.Sessions.Scores.MessagePipeline)
+
+    :ok
+  end
+
   describe "POST /webhooks/twitch" do
     test "handles webhook verification challenge", %{conn: conn} do
       payload = %{

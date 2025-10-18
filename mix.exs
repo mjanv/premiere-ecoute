@@ -6,7 +6,7 @@ defmodule PremiereEcoute.MixProject do
       app: :premiere_ecoute,
       name: "Premiere Ecoute",
       version: "1.0.0",
-      elixir: "~> 1.19",
+      elixir: "~> 1.18",
       source_url: "https://github.com/mjanv/premiere-ecoute",
       homepage_url: "https://premiere-ecoute.fr/",
       elixirc_paths: elixirc_paths(Mix.env()),

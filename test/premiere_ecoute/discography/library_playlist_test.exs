@@ -109,7 +109,7 @@ defmodule PremiereEcoute.Discography.LibraryPlaylistTest do
       {:ok, _} = LibraryPlaylist.create(user, attrs)
       {:error, changeset} = LibraryPlaylist.create(user, attrs)
 
-      assert errors_on(changeset) == %{playlist_id: ["has already been taken"]}
+      assert errors_on(changeset) == %{user_id: ["has already been taken"]}
     end
   end
 

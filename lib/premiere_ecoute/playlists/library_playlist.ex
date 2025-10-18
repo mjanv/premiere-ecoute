@@ -46,7 +46,7 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     |> cast(attrs, [:provider, :playlist_id, :title, :description, :url, :cover_url, :public, :track_count, :metadata, :user_id])
     |> validate_required([:provider, :playlist_id, :title, :url, :user_id])
     |> validate_inclusion(:provider, [:spotify, :deezer])
-    |> unique_constraint([:playlist_id, :provider])
+    |> unique_constraint([:user_id, :playlist_id, :provider])
     |> foreign_key_constraint(:user_id)
   end
 

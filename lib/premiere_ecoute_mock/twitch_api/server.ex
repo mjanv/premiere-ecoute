@@ -219,12 +219,14 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
   defp user(token) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
 
-    case Req.get("https://api.twitch.tv/helix/users",
-           headers: [
-             {"Authorization", "Bearer #{token}"},
-             {"Client-Id", client_id}
-           ]
-         ) do
+    Req.get(
+      "https://api.twitch.tv/helix/users",
+      headers: [
+        {"Authorization", "Bearer #{token}"},
+        {"Client-Id", client_id}
+      ]
+    )
+    |> case do
       {:ok, %{status: 200, body: %{"data" => [user_data | _]}}} ->
         user_data
 
@@ -234,41 +236,8 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
 
       {:error, reason} ->
         Logger.error("Failed to validate Twitch token: #{inspect(reason)}")
-        # Fallback to default user on API error
-        lanfeust_313()
+        nil
     end
-  end
-
-  defp lanfeust_313 do
-    %{
-      "id" => "441903922",
-      "login" => "lanfeust313",
-      "display_name" => "Lanfeust313",
-      "email" => "lanfeust313@twitch.fr",
-      "type" => "",
-      "broadcaster_type" => "affiliate",
-      "description" => "Streamer and developer passionate about music discovery",
-      "profile_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/lanfeust313-profile_image-300x300.png",
-      "offline_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/lanfeust313-channel_offline_image-1920x1080.png",
-      "view_count" => 42_530,
-      "created_at" => "2016-03-15T10:30:00.000Z"
-    }
-  end
-
-  defp bot do
-    %{
-      "id" => "789012",
-      "login" => "premiereecoutebot",
-      "display_name" => "PremiereEcouteBot",
-      "email" => "maxime.janvier+premiereecoute@gmail.com",
-      "type" => "",
-      "broadcaster_type" => "",
-      "description" => "Bot for Premiere Ecoute music listening sessions",
-      "profile_image_url" => "https://static-cdn.jtvnw.net/jtv_user_pictures/premiereecoutebot-profile_image-300x300.png",
-      "offline_image_url" => "",
-      "view_count" => 0,
-      "created_at" => "2024-01-10T14:20:00.000Z"
-    }
   end
 
   defp send_webhook_notification(event_type, event_data) do
