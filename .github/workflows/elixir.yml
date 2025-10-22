@@ -107,6 +107,25 @@ jobs:
 
     env:
       MIX_ENV: test
+      # AIDEV-NOTE: Postgres configuration matches the service above
+      POSTGRES_DATABASE: premiere_ecoute_test
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOSTNAME: localhost
+      POSTGRES_ENCRYPTION_KEY: dGVzdF9lbmNyeXB0aW9uX2tleV8zMl9ieXRlc19sb25nIQ==
+      # AIDEV-NOTE: Spotify and Twitch credentials are fake values (not used in unit tests)
+      SPOTIFY_CLIENT_ID: fake_spotify_client_id
+      SPOTIFY_CLIENT_SECRET: fake_spotify_client_secret
+      SPOTIFY_REDIRECT_URI: http://localhost:4000/auth/spotify/callback
+      TWITCH_CLIENT_ID: fake_twitch_client_id
+      TWITCH_CLIENT_SECRET: fake_twitch_client_secret
+      TWITCH_REDIRECT_URI: http://localhost:4000/auth/twitch/callback
+      TWITCH_WEBHOOK_CALLBACK_URL: http://localhost:4000/webhooks/twitch
+      # AIDEV-NOTE: Feature flags and other service credentials
+      AUTH_USERNAME: admin
+      AUTH_PASSWORD: test_password
+      RESEND_API_KEY: fake_resend_api_key
+      SENTRY_DSN: https://fake@sentry.io/123456
 
     steps:
       - uses: actions/checkout@v4
