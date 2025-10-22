@@ -24,8 +24,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.18.4'
-          otp-version: '28.0.1'
+          elixir-version: '1.19.0-otp-28'
+          otp-version: '28.1'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -57,8 +57,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.18.4'
-          otp-version: '28.0.1'
+          elixir-version: '1.19.0-otp-28'
+          otp-version: '28.1'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -92,7 +92,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:18
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -114,8 +114,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.18.4'
-          otp-version: '28.0.1'
+          elixir-version: '1.19.0-otp-28'
+          otp-version: '28.1'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -142,8 +142,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.18.4'
-          otp-version: '28.0.1'
+          elixir-version: '1.19.0-otp-28'
+          otp-version: '28.1'
 
       - name: Restore dependencies cache
         uses: actions/cache@v4
