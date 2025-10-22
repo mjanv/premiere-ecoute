@@ -112,7 +112,7 @@ jobs:
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOSTNAME: localhost
-      POSTGRES_ENCRYPTION_KEY: dGVzdF9lbmNyeXB0aW9uX2tleV8zMl9ieXRlc19sb25nIQ==
+      POSTGRES_ENCRYPTION_KEY: dGVzdF9rZXlfMzJfYnl0ZXNfX19fX19fX19fX19fX18=
       # AIDEV-NOTE: Spotify and Twitch credentials are fake values (not used in unit tests)
       SPOTIFY_CLIENT_ID: fake_spotify_client_id
       SPOTIFY_CLIENT_SECRET: fake_spotify_client_secret
