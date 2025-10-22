@@ -1,9 +1,10 @@
-name: Generate and Deploy Docs
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -12,8 +13,9 @@ permissions:
   id-token: write
 
 jobs:
-  build:
-    name: Build documentation
+  # AIDEV-NOTE: Setup and install dependencies - foundation for all subsequent jobs
+  deps:
+    name: Setup and Dependencies
     runs-on: ubuntu-latest
 
     steps:
@@ -25,8 +27,132 @@ jobs:
           elixir-version: '1.18.4'
           otp-version: '28.0.1'
 
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        id: deps-cache
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
       - name: Install dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: mix deps.get
+
+      - name: Compile dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: mix deps.compile
+
+  # AIDEV-NOTE: Quality checks - format, credo, dialyzer, compile warnings
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    needs: deps
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir and Erlang
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.18.4'
+          otp-version: '28.0.1'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Restore PLT cache
+        uses: actions/cache@v4
+        id: plt-cache
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-plt-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-plt-
+
+      - name: Create PLTs directory
+        if: steps.plt-cache.outputs.cache-hit != 'true'
+        run: mkdir -p priv/plts
+
+      - name: Run quality checks
+        run: mix quality
+
+  # AIDEV-NOTE: Unit tests with Postgres for Ecto and EventStore
+  tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: deps
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: premiere_ecoute_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      MIX_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir and Erlang
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.18.4'
+          otp-version: '28.0.1'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Run tests
+        run: mix test
+
+  # AIDEV-NOTE: Documentation generation - only runs after quality and tests pass
+  build:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    needs: [quality, tests]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir and Erlang
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.18.4'
+          otp-version: '28.0.1'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
 
       - name: Generate ExDoc
         run: mix ci.docs
@@ -40,6 +166,7 @@ jobs:
     name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deploy-to-pages.outputs.page_url }}
