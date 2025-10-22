@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   # AIDEV-NOTE: Setup and install dependencies - foundation for all subsequent jobs
+  # This job compiles everything and saves the build cache for quality and tests jobs
   deps:
     name: Setup and Dependencies
     runs-on: ubuntu-latest
@@ -28,7 +29,7 @@ jobs:
           otp-version: '28.1'
 
       - name: Restore dependencies cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         id: deps-cache
         with:
           path: |
@@ -41,11 +42,21 @@ jobs:
         if: steps.deps-cache.outputs.cache-hit != 'true'
         run: mix deps.get
 
-      - name: Compile dependencies
+      - name: Compile dependencies and project
         if: steps.deps-cache.outputs.cache-hit != 'true'
-        run: mix deps.compile
+        run: mix compile
+
+      - name: Save dependencies cache
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
 
   # AIDEV-NOTE: Quality checks - format, credo, dialyzer, compile warnings
+  # Restores build cache from deps job for faster execution
   quality:
     name: Quality Checks
     runs-on: ubuntu-latest
@@ -60,8 +71,8 @@ jobs:
           elixir-version: '1.19.0-otp-28'
           otp-version: '28.1'
 
-      - name: Restore dependencies cache
-        uses: actions/cache@v4
+      - name: Restore dependencies and build cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             deps
@@ -85,6 +96,7 @@ jobs:
         run: mix quality
 
   # AIDEV-NOTE: Unit tests with Postgres for Ecto and EventStore
+  # Restores build cache from deps job for faster execution
   tests:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -92,7 +104,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:18
+        image: postgres:17.6
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -136,8 +148,8 @@ jobs:
           elixir-version: '1.19.0-otp-28'
           otp-version: '28.1'
 
-      - name: Restore dependencies cache
-        uses: actions/cache@v4
+      - name: Restore dependencies and build cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             deps
@@ -164,8 +176,8 @@ jobs:
           elixir-version: '1.19.0-otp-28'
           otp-version: '28.1'
 
-      - name: Restore dependencies cache
-        uses: actions/cache@v4
+      - name: Restore dependencies and build cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             deps
