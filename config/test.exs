@@ -9,6 +9,10 @@ config :premiere_ecoute,
   tidal_client_id: "test_tidal_client_id",
   tidal_client_secret: "test_tidal_client_secret"
 
+# AIDEV-NOTE: Fake OpenAI API key for unit tests
+config :instructor,
+  openai: [api_key: "sk-test-fake-openai-key-for-unit-tests"]
+
 config :premiere_ecoute, Oban, testing: :inline
 
 config :premiere_ecoute,
