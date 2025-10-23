@@ -58,6 +58,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
       api: "https://openapi.tidal.com/v2",
       accounts: "https://auth.tidal.com/v1"
     ]
+  ],
+  frankfurter: [
+    api: PremiereEcoute.Apis.FrankfurterApi,
+    urls: [
+      api: "https://api.frankfurter.app"
+    ]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30

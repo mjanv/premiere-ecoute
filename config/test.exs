@@ -37,6 +37,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   tidal: [
     api: PremiereEcoute.Apis.TidalApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.TidalApi}]
+  ],
+  frankfurter: [
+    api: PremiereEcoute.Apis.FrankfurterApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.FrankfurterApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,
