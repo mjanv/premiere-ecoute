@@ -26,6 +26,9 @@ config :premiere_ecoute,
   twitch_webhook_callback_url: env!("TWITCH_WEBHOOK_CALLBACK_URL"),
   discord_bot_token: env!("DISCORD_BOT_TOKEN")
 
+config :premiere_ecoute,
+  buymeacoffee_api_key: env!("BUYMEACOFFEE_API_KEY")
+
 config :premiere_ecoute, :feature_flags,
   username: env!("AUTH_USERNAME"),
   password: env!("AUTH_PASSWORD")

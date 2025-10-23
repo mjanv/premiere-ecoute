@@ -3,7 +3,8 @@ import Config
 config :premiere_ecoute,
   twitch_eventsub_secret: "s3cre77890ab",
   tidal_client_id: "test_tidal_client_id",
-  tidal_client_secret: "test_tidal_client_secret"
+  tidal_client_secret: "test_tidal_client_secret",
+  buymeacoffee_api_key: "test_buymeacoffee_api_key"
 
 config :premiere_ecoute, Oban, testing: :inline
 
@@ -41,6 +42,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   discord: [
     api: PremiereEcoute.Apis.DiscordApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.DiscordApi}]
+  ],
+  buymeacoffee: [
+    api: PremiereEcoute.Apis.BuyMeACoffeeApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.BuyMeACoffeeApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

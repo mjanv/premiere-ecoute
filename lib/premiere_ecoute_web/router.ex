@@ -201,6 +201,7 @@ defmodule PremiereEcouteWeb.Router do
 
     post "/twitch", TwitchController, :handle
     post "/twilio", TwilioController, :handle
+    post "/buymeacoffee", BuyMeACoffeeController, :handle
   end
 
   scope "/changelog", PremiereEcouteWeb.Static.Changelog do
