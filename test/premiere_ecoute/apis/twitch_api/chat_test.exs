@@ -13,11 +13,15 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
     scope = user_scope_fixture(user)
     Cache.put(:users, :bot, bot)
 
+    # Req.Test.set_req_test_to_shared()
+    # Req.Test.verify_on_exit!()
+    # setup_req_test()
+
     {:ok, %{scope: scope}}
   end
 
-  describe "send_chat_message/2" do
-    test "can send a message to a chat", %{scope: scope} do
+  describe "send_chat_message/3" do
+    test "can send a message to a chat with zero delay", %{scope: scope} do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/messages"},
@@ -32,17 +36,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
       message = "Hello, world! twitchdevHype"
 
-      {:ok, message} = TwitchApi.send_chat_message(scope, message)
+      :ok = TwitchApi.send_chat_message(scope, message, 0)
 
-      assert message == %{
-               "message_id" => "abc-123-def",
-               "is_sent" => true
-             }
+      :timer.sleep(100)
     end
-  end
 
-  describe "send_chat_messages/3" do
-    test "can send multiple messages to a chat", %{scope: scope} do
+    test "can send a message to a chat with delay", %{scope: scope} do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/messages"},
@@ -50,16 +49,39 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
         ],
+        request: "twitch_api/chat/send_chat_message/request.json",
+        response: "twitch_api/chat/send_chat_message/response.json",
+        status: 200
+      )
+
+      message = "Hello, world! twitchdevHype"
+
+      :ok = TwitchApi.send_chat_message(scope, message, 50)
+
+      :timer.sleep(100)
+    end
+  end
+
+  describe "send_chat_messages/3" do
+    test "can send multiple messages to a chat with minimal delay", %{scope: scope} do
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/chat/messages"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        request: "twitch_api/chat/send_chat_message/request.json",
         response: "twitch_api/chat/send_chat_message/response.json",
         status: 200,
         n: 3
       )
 
-      messages = ["Hello, world! twitchdevHype", "How is everyone?", "Great to be here!!!"]
+      messages = ["Hello, world! twitchdevHype", "Hello, world! twitchdevHype", "Hello, world! twitchdevHype"]
 
-      result = TwitchApi.send_chat_messages(scope, messages, 0)
+      :ok = TwitchApi.send_chat_messages(scope, messages, 10)
 
-      assert result == :ok
+      :timer.sleep(100)
     end
   end
 

@@ -3,9 +3,10 @@ defmodule PremiereEcouteMock.TwitchApi.Mock do
 
   require Logger
 
-  def send_chat_message(_, message) do
-    Logger.info("Chat message: #{message}")
-    {:ok, ""}
+  # AIDEV-NOTE: mock matches real implementation - async with delay support, returns :ok
+  def send_chat_message(_, message, delay \\ 0) do
+    Logger.info("Chat message (delay: #{delay}ms): #{message}")
+    :ok
   end
 
   def send_chat_announcement(_, message, color) do

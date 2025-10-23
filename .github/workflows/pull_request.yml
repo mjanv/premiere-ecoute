@@ -4,8 +4,6 @@ on:
   pull_request:
 
 jobs:
-  # AIDEV-NOTE: Setup and install dependencies - foundation for all subsequent jobs
-  # This job compiles everything and saves the build cache for quality and tests jobs
   deps:
     name: Setup and Dependencies
     runs-on: ubuntu-latest
@@ -46,8 +44,6 @@ jobs:
             _build
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
 
-  # AIDEV-NOTE: Quality checks - format, credo, dialyzer, compile warnings
-  # Restores build cache from deps job for faster execution
   quality:
     name: Quality Checks
     runs-on: ubuntu-latest
@@ -86,8 +82,6 @@ jobs:
       - name: Run quality checks
         run: mix quality
 
-  # AIDEV-NOTE: Unit tests with Postgres for Ecto and EventStore
-  # Restores build cache from deps job for faster execution
   tests:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -110,13 +104,11 @@ jobs:
 
     env:
       MIX_ENV: test
-      # AIDEV-NOTE: Postgres configuration matches the service above
       POSTGRES_DATABASE: premiere_ecoute_test
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOSTNAME: localhost
       POSTGRES_ENCRYPTION_KEY: dGVzdF9rZXlfMzJfYnl0ZXNfX19fX19fX19fX19fX18=
-      # AIDEV-NOTE: Spotify and Twitch credentials are fake values (not used in unit tests)
       SPOTIFY_CLIENT_ID: fake_spotify_client_id
       SPOTIFY_CLIENT_SECRET: fake_spotify_client_secret
       SPOTIFY_REDIRECT_URI: http://localhost:4000/auth/spotify/callback
@@ -124,7 +116,7 @@ jobs:
       TWITCH_CLIENT_SECRET: fake_twitch_client_secret
       TWITCH_REDIRECT_URI: http://localhost:4000/auth/twitch/callback
       TWITCH_WEBHOOK_CALLBACK_URL: http://localhost:4000/webhooks/twitch
-      # AIDEV-NOTE: Feature flags and other service credentials
+      TWITCH_EXTENSION_SECRET: dGVzdF9zZWNyZXRfa2V5X2Zvcl90d2l0Y2hfZXh0ZW5zaW9u
       AUTH_USERNAME: admin
       AUTH_PASSWORD: test_password
       RESEND_API_KEY: fake_resend_api_key

@@ -4,7 +4,9 @@ defmodule PremiereEcoute.ApiMock do
   import ExUnit.Assertions
 
   def expect(module, opts \\ []) do
-    Req.Test.expect(module, Keyword.get(opts, :n, 1), fn conn -> fun(conn, opts) end)
+    Req.Test.expect(module, Keyword.get(opts, :n, 1), fn conn ->
+      fun(conn, opts)
+    end)
   end
 
   def stub(module, opts \\ []) do

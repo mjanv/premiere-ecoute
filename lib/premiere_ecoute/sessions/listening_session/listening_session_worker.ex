@@ -21,7 +21,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
          _ <-
            Apis.twitch().send_chat_message(
              scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end),
+             0
            ) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
     end
@@ -36,7 +37,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
          _ <-
            Apis.twitch().send_chat_message(
              scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end),
+             0
            ) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
     end
@@ -48,7 +50,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
          _ <-
            Apis.twitch().send_chat_message(
              scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes close in 30 seconds !") end)
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes close in 30 seconds !") end),
+             0
            ) do
       :ok
     end

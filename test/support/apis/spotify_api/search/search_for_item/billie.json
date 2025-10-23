@@ -1,0 +1,932 @@
+{
+  "albums": {
+    "href": "https://api.spotify.com/v1/search?offset=0&limit=20&query=billie&type=album&market=FR&locale=en-US,en;q%3D0.9",
+    "limit": 20,
+    "next": "https://api.spotify.com/v1/search?offset=20&limit=20&query=billie&type=album&market=FR&locale=en-US,en;q%3D0.9",
+    "offset": 0,
+    "previous": null,
+    "total": 710,
+    "items": [
+      {
+        "album_type": "album",
+        "total_tracks": 14,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/0S0KGZnfBGSIssfF54WSJh"
+        },
+        "href": "https://api.spotify.com/v1/albums/0S0KGZnfBGSIssfF54WSJh",
+        "id": "0S0KGZnfBGSIssfF54WSJh",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27350a3147b4edd7701a876c6ce",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0250a3147b4edd7701a876c6ce",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485150a3147b4edd7701a876c6ce",
+            "width": 64
+          }
+        ],
+        "name": "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
+        "release_date": "2019-03-29",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:0S0KGZnfBGSIssfF54WSJh",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "album",
+        "total_tracks": 10,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/7aJuG4TFXa2hmE4z1yxc3n"
+        },
+        "href": "https://api.spotify.com/v1/albums/7aJuG4TFXa2hmE4z1yxc3n",
+        "id": "7aJuG4TFXa2hmE4z1yxc3n",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27371d62ea7ea8a5be92d3c1f62",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485171d62ea7ea8a5be92d3c1f62",
+            "width": 64
+          }
+        ],
+        "name": "HIT ME HARD AND SOFT",
+        "release_date": "2024-05-17",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:7aJuG4TFXa2hmE4z1yxc3n",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "album",
+        "total_tracks": 16,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/0JGOiO34nwfUdDrD612dOp"
+        },
+        "href": "https://api.spotify.com/v1/albums/0JGOiO34nwfUdDrD612dOp",
+        "id": "0JGOiO34nwfUdDrD612dOp",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2732a038d3bf875d23e4aeaa84e",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e022a038d3bf875d23e4aeaa84e",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048512a038d3bf875d23e4aeaa84e",
+            "width": 64
+          }
+        ],
+        "name": "Happier Than Ever",
+        "release_date": "2021-07-30",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:0JGOiO34nwfUdDrD612dOp",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 9,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/7fRrTyKvE4Skh93v97gtcU"
+        },
+        "href": "https://api.spotify.com/v1/albums/7fRrTyKvE4Skh93v97gtcU",
+        "id": "7fRrTyKvE4Skh93v97gtcU",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273a9f6c04ba168640b48aa5795",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02a9f6c04ba168640b48aa5795",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851a9f6c04ba168640b48aa5795",
+            "width": 64
+          }
+        ],
+        "name": "dont smile at me",
+        "release_date": "2017-12-22",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:7fRrTyKvE4Skh93v97gtcU",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/3AafSrFIbJPH6BJHiJm1Cd"
+        },
+        "href": "https://api.spotify.com/v1/albums/3AafSrFIbJPH6BJHiJm1Cd",
+        "id": "3AafSrFIbJPH6BJHiJm1Cd",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273ed317ec13d3de9e01fb99c9e",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02ed317ec13d3de9e01fb99c9e",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851ed317ec13d3de9e01fb99c9e",
+            "width": 64
+          }
+        ],
+        "name": "What Was I Made For? [From The Motion Picture \"Barbie\"]",
+        "release_date": "2023-07-13",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:3AafSrFIbJPH6BJHiJm1Cd",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/2kzPJWrTjVKEYWWhowXLnz"
+        },
+        "href": "https://api.spotify.com/v1/albums/2kzPJWrTjVKEYWWhowXLnz",
+        "id": "2kzPJWrTjVKEYWWhowXLnz",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27331aa3ebe23f59778bff800c9",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0231aa3ebe23f59778bff800c9",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485131aa3ebe23f59778bff800c9",
+            "width": 64
+          }
+        ],
+        "name": "Happier Than Ever (Edit)",
+        "release_date": "2021-07-28",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:2kzPJWrTjVKEYWWhowXLnz",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 2,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/1YPWxMpQEC8kcOuefgXbhj"
+        },
+        "href": "https://api.spotify.com/v1/albums/1YPWxMpQEC8kcOuefgXbhj",
+        "id": "1YPWxMpQEC8kcOuefgXbhj",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2737a4781629469bb83356cd318",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e027a4781629469bb83356cd318",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048517a4781629469bb83356cd318",
+            "width": 64
+          }
+        ],
+        "name": "Guitar Songs",
+        "release_date": "2022-07-21",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:1YPWxMpQEC8kcOuefgXbhj",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/5iq9BytomHl2yBtORjUlzP"
+        },
+        "href": "https://api.spotify.com/v1/albums/5iq9BytomHl2yBtORjUlzP",
+        "id": "5iq9BytomHl2yBtORjUlzP",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273c820a9669147be3addd7f221",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02c820a9669147be3addd7f221",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851c820a9669147be3addd7f221",
+            "width": 64
+          }
+        ],
+        "name": "hotline (edit)",
+        "release_date": "2023-05-09",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:5iq9BytomHl2yBtORjUlzP",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/0ifM8RTX9HjtCJtY9452bW"
+        },
+        "href": "https://api.spotify.com/v1/albums/0ifM8RTX9HjtCJtY9452bW",
+        "id": "0ifM8RTX9HjtCJtY9452bW",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27348a98a5a97b2cc7963016888",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0248a98a5a97b2cc7963016888",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485148a98a5a97b2cc7963016888",
+            "width": 64
+          }
+        ],
+        "name": "come out and play",
+        "release_date": "2018-11-20",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:0ifM8RTX9HjtCJtY9452bW",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/2sBB17RXTamvj7Ncps15AK"
+        },
+        "href": "https://api.spotify.com/v1/albums/2sBB17RXTamvj7Ncps15AK",
+        "id": "2sBB17RXTamvj7Ncps15AK",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2738a3f0a3ca7929dea23cd274c",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e028a3f0a3ca7929dea23cd274c",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048518a3f0a3ca7929dea23cd274c",
+            "width": 64
+          }
+        ],
+        "name": "lovely (with Khalid)",
+        "release_date": "2018-04-19",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:2sBB17RXTamvj7Ncps15AK",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6LuN9FCkKOj5PcnpouEgny"
+            },
+            "href": "https://api.spotify.com/v1/artists/6LuN9FCkKOj5PcnpouEgny",
+            "id": "6LuN9FCkKOj5PcnpouEgny",
+            "name": "Khalid",
+            "type": "artist",
+            "uri": "spotify:artist:6LuN9FCkKOj5PcnpouEgny"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 6,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/65iIAXOPCaPKh6dtg3V4Ed"
+        },
+        "href": "https://api.spotify.com/v1/albums/65iIAXOPCaPKh6dtg3V4Ed",
+        "id": "65iIAXOPCaPKh6dtg3V4Ed",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273fe0c299aca6e620b058bf785",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02fe0c299aca6e620b058bf785",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851fe0c299aca6e620b058bf785",
+            "width": 64
+          }
+        ],
+        "name": "Billie",
+        "release_date": "2021-11-05",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:65iIAXOPCaPKh6dtg3V4Ed",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6l9qERC6dfJQkEz5oaWe19"
+            },
+            "href": "https://api.spotify.com/v1/artists/6l9qERC6dfJQkEz5oaWe19",
+            "id": "6l9qERC6dfJQkEz5oaWe19",
+            "name": "Slim & The Beast",
+            "type": "artist",
+            "uri": "spotify:artist:6l9qERC6dfJQkEz5oaWe19"
+          }
+        ]
+      },
+      {
+        "album_type": "album",
+        "total_tracks": 12,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/4MkdTflpaaGGcXb5vtOYRs"
+        },
+        "href": "https://api.spotify.com/v1/albums/4MkdTflpaaGGcXb5vtOYRs",
+        "id": "4MkdTflpaaGGcXb5vtOYRs",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273f8743d2c7812763f7f66e83b",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02f8743d2c7812763f7f66e83b",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851f8743d2c7812763f7f66e83b",
+            "width": 64
+          }
+        ],
+        "name": "Billie Holiday",
+        "release_date": "1957-01-01",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:4MkdTflpaaGGcXb5vtOYRs",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1YzCsTRb22dQkh9lghPIrp"
+            },
+            "href": "https://api.spotify.com/v1/artists/1YzCsTRb22dQkh9lghPIrp",
+            "id": "1YzCsTRb22dQkh9lghPIrp",
+            "name": "Billie Holiday",
+            "type": "artist",
+            "uri": "spotify:artist:1YzCsTRb22dQkh9lghPIrp"
+          }
+        ]
+      },
+      {
+        "album_type": "compilation",
+        "total_tracks": 19,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/6CqXthOJBMMmagymEEa8pl"
+        },
+        "href": "https://api.spotify.com/v1/albums/6CqXthOJBMMmagymEEa8pl",
+        "id": "6CqXthOJBMMmagymEEa8pl",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27399ae8316804e6388d168bf8d",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0299ae8316804e6388d168bf8d",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485199ae8316804e6388d168bf8d",
+            "width": 64
+          }
+        ],
+        "name": "Billie Holiday's Greatest Hits",
+        "release_date": "1995-02-03",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:6CqXthOJBMMmagymEEa8pl",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1YzCsTRb22dQkh9lghPIrp"
+            },
+            "href": "https://api.spotify.com/v1/artists/1YzCsTRb22dQkh9lghPIrp",
+            "id": "1YzCsTRb22dQkh9lghPIrp",
+            "name": "Billie Holiday",
+            "type": "artist",
+            "uri": "spotify:artist:1YzCsTRb22dQkh9lghPIrp"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/54yxF35LTvEZY8MOcdg0ZV"
+        },
+        "href": "https://api.spotify.com/v1/albums/54yxF35LTvEZY8MOcdg0ZV",
+        "id": "54yxF35LTvEZY8MOcdg0ZV",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273f1e2e79b99a1dcb83cb58eaa",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02f1e2e79b99a1dcb83cb58eaa",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851f1e2e79b99a1dcb83cb58eaa",
+            "width": 64
+          }
+        ],
+        "name": "billie",
+        "release_date": "2025-07-03",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:54yxF35LTvEZY8MOcdg0ZV",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/5gU8eqolA1bziWv6e3Wjp3"
+            },
+            "href": "https://api.spotify.com/v1/artists/5gU8eqolA1bziWv6e3Wjp3",
+            "id": "5gU8eqolA1bziWv6e3Wjp3",
+            "name": "Django",
+            "type": "artist",
+            "uri": "spotify:artist:5gU8eqolA1bziWv6e3Wjp3"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/1Zdq5p0HthL4XeWd48sXLJ"
+        },
+        "href": "https://api.spotify.com/v1/albums/1Zdq5p0HthL4XeWd48sXLJ",
+        "id": "1Zdq5p0HthL4XeWd48sXLJ",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2735f5f52780f622f4cccd6f895",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e025f5f52780f622f4cccd6f895",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048515f5f52780f622f4cccd6f895",
+            "width": 64
+          }
+        ],
+        "name": "Billie Jean",
+        "release_date": "2025-07-29",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:1Zdq5p0HthL4XeWd48sXLJ",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/4BoTna9gEMXM6YLxrM78w7"
+            },
+            "href": "https://api.spotify.com/v1/artists/4BoTna9gEMXM6YLxrM78w7",
+            "id": "4BoTna9gEMXM6YLxrM78w7",
+            "name": "Gazzarino",
+            "type": "artist",
+            "uri": "spotify:artist:4BoTna9gEMXM6YLxrM78w7"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/3ThlxfLSy4bfKzxWqmC7VN"
+        },
+        "href": "https://api.spotify.com/v1/albums/3ThlxfLSy4bfKzxWqmC7VN",
+        "id": "3ThlxfLSy4bfKzxWqmC7VN",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273dca19fcb7a25410224da080b",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02dca19fcb7a25410224da080b",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851dca19fcb7a25410224da080b",
+            "width": 64
+          }
+        ],
+        "name": "Guess featuring billie eilish",
+        "release_date": "2024-08-01",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:3ThlxfLSy4bfKzxWqmC7VN",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/25uiPmTg16RbhZWAqwLBy5"
+            },
+            "href": "https://api.spotify.com/v1/artists/25uiPmTg16RbhZWAqwLBy5",
+            "id": "25uiPmTg16RbhZWAqwLBy5",
+            "name": "Charli xcx",
+            "type": "artist",
+            "uri": "spotify:artist:25uiPmTg16RbhZWAqwLBy5"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH"
+            },
+            "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH",
+            "id": "6qqNVTkY8uBg9cP3Jd7DAH",
+            "name": "Billie Eilish",
+            "type": "artist",
+            "uri": "spotify:artist:6qqNVTkY8uBg9cP3Jd7DAH"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 3,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/5IAd8bwXN7jNrHKnU0i6Kh"
+        },
+        "href": "https://api.spotify.com/v1/albums/5IAd8bwXN7jNrHKnU0i6Kh",
+        "id": "5IAd8bwXN7jNrHKnU0i6Kh",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273b3abf958427b5878f4a37a91",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02b3abf958427b5878f4a37a91",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851b3abf958427b5878f4a37a91",
+            "width": 64
+          }
+        ],
+        "name": "Billie Jean (His Eyes Were Like Mine) - Hoodtrap / Jerk",
+        "release_date": "2025-07-31",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:5IAd8bwXN7jNrHKnU0i6Kh",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/3Ho5XTSEry6fxezAbUbieJ"
+            },
+            "href": "https://api.spotify.com/v1/artists/3Ho5XTSEry6fxezAbUbieJ",
+            "id": "3Ho5XTSEry6fxezAbUbieJ",
+            "name": "HoodTrapJerk",
+            "type": "artist",
+            "uri": "spotify:artist:3Ho5XTSEry6fxezAbUbieJ"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/2rxKRjvd3WpcxP4foxfywM"
+            },
+            "href": "https://api.spotify.com/v1/artists/2rxKRjvd3WpcxP4foxfywM",
+            "id": "2rxKRjvd3WpcxP4foxfywM",
+            "name": "TRPJRK",
+            "type": "artist",
+            "uri": "spotify:artist:2rxKRjvd3WpcxP4foxfywM"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 3,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/2IDoD2LUp7GsNKnIgRI5hx"
+        },
+        "href": "https://api.spotify.com/v1/albums/2IDoD2LUp7GsNKnIgRI5hx",
+        "id": "2IDoD2LUp7GsNKnIgRI5hx",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273a98a880137668227f3c1b238",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02a98a880137668227f3c1b238",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851a98a880137668227f3c1b238",
+            "width": 64
+          }
+        ],
+        "name": "BULLY",
+        "release_date": "2025-06-20",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:2IDoD2LUp7GsNKnIgRI5hx",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/3NlsBPwqJuDgtXZ2rv5Dmq"
+            },
+            "href": "https://api.spotify.com/v1/artists/3NlsBPwqJuDgtXZ2rv5Dmq",
+            "id": "3NlsBPwqJuDgtXZ2rv5Dmq",
+            "name": "Ye",
+            "type": "artist",
+            "uri": "spotify:artist:3NlsBPwqJuDgtXZ2rv5Dmq"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/5K4W6rqBFWDnAN6FQUkS6x"
+            },
+            "href": "https://api.spotify.com/v1/artists/5K4W6rqBFWDnAN6FQUkS6x",
+            "id": "5K4W6rqBFWDnAN6FQUkS6x",
+            "name": "Kanye West",
+            "type": "artist",
+            "uri": "spotify:artist:5K4W6rqBFWDnAN6FQUkS6x"
+          }
+        ]
+      },
+      {
+        "album_type": "album",
+        "total_tracks": 19,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/4Tt3uZDzZtHrcbJEsNCuQc"
+        },
+        "href": "https://api.spotify.com/v1/albums/4Tt3uZDzZtHrcbJEsNCuQc",
+        "id": "4Tt3uZDzZtHrcbJEsNCuQc",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273d8c30427036eecd67ef0a967",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02d8c30427036eecd67ef0a967",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851d8c30427036eecd67ef0a967",
+            "width": 64
+          }
+        ],
+        "name": "4 Saisons Été, pt. 4",
+        "release_date": "2025-07-04",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:4Tt3uZDzZtHrcbJEsNCuQc",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/76xhXA0WSzUzUzwMYkGhEW"
+            },
+            "href": "https://api.spotify.com/v1/artists/76xhXA0WSzUzUzwMYkGhEW",
+            "id": "76xhXA0WSzUzUzwMYkGhEW",
+            "name": "Bilel",
+            "type": "artist",
+            "uri": "spotify:artist:76xhXA0WSzUzUzwMYkGhEW"
+          }
+        ]
+      },
+      {
+        "album_type": "single",
+        "total_tracks": 1,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/3Q1ArfQPzVTNa06Y2m0chD"
+        },
+        "href": "https://api.spotify.com/v1/albums/3Q1ArfQPzVTNa06Y2m0chD",
+        "id": "3Q1ArfQPzVTNa06Y2m0chD",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2733b896d07ca521c7454028b56",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e023b896d07ca521c7454028b56",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048513b896d07ca521c7454028b56",
+            "width": 64
+          }
+        ],
+        "name": "Pinocchio",
+        "release_date": "2025-01-31",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:3Q1ArfQPzVTNa06Y2m0chD",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1NB6QyaNXhrDd82y0WyG3I"
+            },
+            "href": "https://api.spotify.com/v1/artists/1NB6QyaNXhrDd82y0WyG3I",
+            "id": "1NB6QyaNXhrDd82y0WyG3I",
+            "name": "Bilouki",
+            "type": "artist",
+            "uri": "spotify:artist:1NB6QyaNXhrDd82y0WyG3I"
+          }
+        ]
+      }
+    ]
+  }
+}
