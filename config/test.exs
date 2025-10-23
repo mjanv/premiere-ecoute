@@ -38,9 +38,9 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     api: PremiereEcoute.Apis.TidalApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.TidalApi}]
   ],
-  currency: [
-    api: PremiereEcoute.Apis.CurrencyApi,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.CurrencyApi}]
+  frankfurter: [
+    api: PremiereEcoute.Apis.FrankfurterApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.FrankfurterApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,
