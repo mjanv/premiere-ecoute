@@ -13,6 +13,10 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
     scope = user_scope_fixture(user)
     Cache.put(:users, :bot, bot)
 
+    # Req.Test.set_req_test_to_shared()
+    # Req.Test.verify_on_exit!()
+    # setup_req_test()
+
     {:ok, %{scope: scope}}
   end
 
@@ -32,9 +36,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
       message = "Hello, world! twitchdevHype"
 
-      assert :ok = TwitchApi.send_chat_message(scope, message, 0)
-      # AIDEV-NOTE: small delay to allow async process to complete
-      Process.sleep(10)
+      :ok = TwitchApi.send_chat_message(scope, message, 0)
+
+      :timer.sleep(100)
     end
 
     test "can send a message to a chat with delay", %{scope: scope} do
@@ -52,9 +56,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
       message = "Hello, world! twitchdevHype"
 
-      assert :ok = TwitchApi.send_chat_message(scope, message, 50)
-      # AIDEV-NOTE: wait for delay + small buffer for async process
-      Process.sleep(60)
+      :ok = TwitchApi.send_chat_message(scope, message, 50)
+
+      :timer.sleep(100)
     end
   end
 
@@ -67,18 +71,17 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
         ],
+        request: "twitch_api/chat/send_chat_message/request.json",
         response: "twitch_api/chat/send_chat_message/response.json",
         status: 200,
         n: 3
       )
 
-      messages = ["Hello, world! twitchdevHype", "How is everyone?", "Great to be here!!!"]
+      messages = ["Hello, world! twitchdevHype", "Hello, world! twitchdevHype", "Hello, world! twitchdevHype"]
 
-      # AIDEV-NOTE: returns immediately without blocking
-      assert :ok = TwitchApi.send_chat_messages(scope, messages, 10)
+      :ok = TwitchApi.send_chat_messages(scope, messages, 10)
 
-      # AIDEV-NOTE: wait for all async messages: last message at 2*10ms + 10ms buffer
-      Process.sleep(30)
+      :timer.sleep(100)
     end
   end
 

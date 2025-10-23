@@ -7,7 +7,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
 
-  # AIDEV-NOTE: async chat messages using Process.send_after for non-blocking sends
   def send_chat_messages(%Scope{} = scope, messages, interval \\ 1_000) do
     messages
     |> Enum.with_index()
@@ -18,17 +17,17 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
     :ok
   end
 
-  # AIDEV-NOTE: fire-and-forget async send; spawns process, uses Process.send_after for delay
-  def send_chat_message(%Scope{} = scope, message, delay \\ 0)
-      when is_integer(delay) and delay >= 0 do
-    pid =
-      spawn(fn ->
-        receive do
-          :send -> do_send_chat_message(scope, message)
-        end
-      end)
+  def send_chat_message(%Scope{} = scope, message, 0) do
+    do_send_chat_message(scope, message)
+    :ok
+  end
 
-    Process.send_after(pid, :send, delay)
+  def send_chat_message(%Scope{} = scope, message, delay) do
+    spawn(fn ->
+      :timer.sleep(delay)
+      do_send_chat_message(scope, message)
+    end)
+
     :ok
   end
 

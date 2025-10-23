@@ -41,12 +41,27 @@ defmodule PremiereEcoute.DataCase do
       import Swoosh.TestAssertions
 
       alias PremiereEcoute.Repo
+
+      setup do
+        Req.Test.set_req_test_to_shared()
+        Req.Test.verify_on_exit!()
+
+        :ok
+      end
     end
   end
 
   setup tags do
     PremiereEcoute.DataCase.setup_sandbox(tags)
     :ok
+  end
+
+  @doc """
+  Setup the Request test environment
+  """
+  def setup_req_test do
+    Req.Test.set_req_test_to_shared()
+    Req.Test.verify_on_exit!()
   end
 
   @doc """
