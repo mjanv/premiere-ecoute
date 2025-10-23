@@ -23,7 +23,8 @@ config :premiere_ecoute,
   twitch_client_id: env!("TWITCH_CLIENT_ID"),
   twitch_client_secret: env!("TWITCH_CLIENT_SECRET"),
   twitch_redirect_uri: env!("TWITCH_REDIRECT_URI"),
-  twitch_webhook_callback_url: env!("TWITCH_WEBHOOK_CALLBACK_URL")
+  twitch_webhook_callback_url: env!("TWITCH_WEBHOOK_CALLBACK_URL"),
+  discord_bot_token: env!("DISCORD_BOT_TOKEN")
 
 config :premiere_ecoute, :feature_flags,
   username: env!("AUTH_USERNAME"),
