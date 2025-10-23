@@ -59,8 +59,8 @@ config :premiere_ecoute, PremiereEcoute.Apis,
       accounts: "https://auth.tidal.com/v1"
     ]
   ],
-  currency_conversion: [
-    api: PremiereEcoute.Apis.CurrencyConversionApi,
+  currency: [
+    api: PremiereEcoute.Apis.CurrencyApi,
     urls: [
       api: "https://api.frankfurter.app"
     ]
