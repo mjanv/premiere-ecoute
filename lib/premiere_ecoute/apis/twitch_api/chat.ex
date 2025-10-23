@@ -7,16 +7,32 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi
 
+  # AIDEV-NOTE: async chat messages using Process.send_after for non-blocking sends
   def send_chat_messages(%Scope{} = scope, messages, interval \\ 1_000) do
-    for message <- messages do
-      send_chat_message(scope, message)
-      :timer.sleep(interval)
-    end
+    messages
+    |> Enum.with_index()
+    |> Enum.each(fn {message, index} ->
+      send_chat_message(scope, message, index * interval)
+    end)
 
     :ok
   end
 
-  def send_chat_message(%Scope{user: %{twitch: %{user_id: user_id}}}, message) do
+  # AIDEV-NOTE: fire-and-forget async send; spawns process, uses Process.send_after for delay
+  def send_chat_message(%Scope{} = scope, message, delay \\ 0)
+      when is_integer(delay) and delay >= 0 do
+    pid =
+      spawn(fn ->
+        receive do
+          :send -> do_send_chat_message(scope, message)
+        end
+      end)
+
+    Process.send_after(pid, :send, delay)
+    :ok
+  end
+
+  defp do_send_chat_message(%Scope{user: %{twitch: %{user_id: user_id}}}, message) do
     case Bot.get() do
       {:ok, bot} ->
         bot
@@ -35,6 +51,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
         end)
 
       {:error, reason} ->
+        Logger.error("Cannot get bot for sending message due to #{inspect(reason)}")
         {:error, reason}
     end
   end

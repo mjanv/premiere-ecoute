@@ -16,8 +16,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
     {:ok, %{scope: scope}}
   end
 
-  describe "send_chat_message/2" do
-    test "can send a message to a chat", %{scope: scope} do
+  describe "send_chat_message/3" do
+    test "can send a message to a chat with zero delay", %{scope: scope} do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/messages"},
@@ -32,17 +32,34 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
       message = "Hello, world! twitchdevHype"
 
-      {:ok, message} = TwitchApi.send_chat_message(scope, message)
+      assert :ok = TwitchApi.send_chat_message(scope, message, 0)
+      # AIDEV-NOTE: small delay to allow async process to complete
+      Process.sleep(10)
+    end
 
-      assert message == %{
-               "message_id" => "abc-123-def",
-               "is_sent" => true
-             }
+    test "can send a message to a chat with delay", %{scope: scope} do
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/chat/messages"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        request: "twitch_api/chat/send_chat_message/request.json",
+        response: "twitch_api/chat/send_chat_message/response.json",
+        status: 200
+      )
+
+      message = "Hello, world! twitchdevHype"
+
+      assert :ok = TwitchApi.send_chat_message(scope, message, 50)
+      # AIDEV-NOTE: wait for delay + small buffer for async process
+      Process.sleep(60)
     end
   end
 
   describe "send_chat_messages/3" do
-    test "can send multiple messages to a chat", %{scope: scope} do
+    test "can send multiple messages to a chat with minimal delay", %{scope: scope} do
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/chat/messages"},
@@ -57,9 +74,11 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
 
       messages = ["Hello, world! twitchdevHype", "How is everyone?", "Great to be here!!!"]
 
-      result = TwitchApi.send_chat_messages(scope, messages, 0)
+      # AIDEV-NOTE: returns immediately without blocking
+      assert :ok = TwitchApi.send_chat_messages(scope, messages, 10)
 
-      assert result == :ok
+      # AIDEV-NOTE: wait for all async messages: last message at 2*10ms + 10ms buffer
+      Process.sleep(30)
     end
   end
 
