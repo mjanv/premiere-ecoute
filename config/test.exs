@@ -37,6 +37,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   tidal: [
     api: PremiereEcoute.Apis.TidalApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.TidalApi}]
+  ],
+  currency_conversion: [
+    api: PremiereEcoute.Apis.CurrencyConversionApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.CurrencyConversionApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,
