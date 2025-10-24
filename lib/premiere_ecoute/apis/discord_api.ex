@@ -57,6 +57,9 @@ defmodule PremiereEcoute.Apis.DiscordApi do
   def channel(channel_key) do
     get_in(env(), [:channels, channel_key])
   end
+  
+  @spec client_credentials() :: {:ok, %{String.t() => String.t() | integer()}}
+  def client_credentials, do: {:ok, %{"access_token" => "", "expires_in" => 0}}
 
   # Messages
   defdelegate send_message(channel_key, content), to: __MODULE__.Messages
