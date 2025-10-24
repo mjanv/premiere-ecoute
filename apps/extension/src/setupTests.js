@@ -1,6 +1,18 @@
 // Jest setup file for testing React components
 import '@testing-library/jest-dom';
 
+// Mock window.location to simulate Twitch hosted environment
+// This ensures components use the production API URL (https://premiere-ecoute.fr)
+Object.defineProperty(window, 'location', {
+  value: {
+    hostname: 'test.ext-twitch.tv',
+    href: 'https://test.ext-twitch.tv',
+    search: '',
+  },
+  writable: true,
+  configurable: true
+});
+
 // Mock global fetch for API calls
 global.fetch = jest.fn();
 
