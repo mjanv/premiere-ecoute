@@ -70,7 +70,6 @@ defmodule PremiereEcoute.Donations.Goal do
     |> validate_date_range()
   end
 
-  # AIDEV-NOTE: Ensures end_date is after start_date
   defp validate_date_range(changeset) do
     start_date = get_field(changeset, :start_date)
     end_date = get_field(changeset, :end_date)

@@ -74,7 +74,6 @@ defmodule PremiereEcoute.Donations.Donation do
     |> validate_currency_matches_goal()
   end
 
-  # AIDEV-NOTE: Ensures donation currency matches goal currency for consistency
   defp validate_currency_matches_goal(changeset) do
     goal_id = get_field(changeset, :goal_id)
     currency = get_field(changeset, :currency)

@@ -2,7 +2,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateDonationTables do
   use Ecto.Migration
 
   def change do
-    # AIDEV-NOTE: Goals table stores fundraising campaigns with date ranges and target amounts
     create table(:goals) do
       add :title, :string, null: false
       add :description, :text
@@ -26,7 +25,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateDonationTables do
     create index(:goals, [:active])
     create index(:goals, [:start_date, :end_date])
 
-    # AIDEV-NOTE: Donations table stores payments from BuyMeACoffee with full webhook payload
     create table(:donations) do
       add :amount, :decimal, precision: 15, scale: 2, null: false
       add :currency, :string, null: false
@@ -60,7 +58,6 @@ defmodule PremiereEcoute.Repo.Migrations.CreateDonationTables do
     create index(:donations, [:created_at])
     execute("CREATE INDEX donation_payloads ON donations USING GIN(payload)")
 
-    # AIDEV-NOTE: Expenses table tracks spending against goals for transparency
     create table(:expenses) do
       add :title, :string, null: false
       add :description, :text
