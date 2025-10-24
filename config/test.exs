@@ -7,7 +7,8 @@ config :premiere_ecoute,
   twitch_client_secret: "test_twitch_client_secret",
   twitch_redirect_uri: "http://localhost:4000/auth/twitch/callback",
   tidal_client_id: "test_tidal_client_id",
-  tidal_client_secret: "test_tidal_client_secret"
+  tidal_client_secret: "test_tidal_client_secret",
+  discord_bot_token: "test_bot_token"
 
 # AIDEV-NOTE: Fake OpenAI API key for unit tests
 config :instructor,
@@ -45,6 +46,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   frankfurter: [
     api: PremiereEcoute.Apis.FrankfurterApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.FrankfurterApi}]
+  ],
+  discord: [
+    api: PremiereEcoute.Apis.DiscordApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.DiscordApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

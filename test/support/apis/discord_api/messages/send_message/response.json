@@ -1,0 +1,24 @@
+{
+  "id": "987654321098765432",
+  "type": 0,
+  "content": "Hello from Premiere Ecoute!",
+  "channel_id": "123456789012345678",
+  "author": {
+    "id": "111222333444555666",
+    "username": "PremiereEcouteBot",
+    "discriminator": "0000",
+    "avatar": null,
+    "bot": true
+  },
+  "attachments": [],
+  "embeds": [],
+  "mentions": [],
+  "mention_roles": [],
+  "pinned": false,
+  "mention_everyone": false,
+  "tts": false,
+  "timestamp": "2025-10-24T10:00:00.000000+00:00",
+  "edited_timestamp": null,
+  "flags": 0,
+  "components": []
+}
