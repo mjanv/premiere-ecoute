@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApi.Supporters do
   require Logger
 
   alias PremiereEcoute.Apis.BuyMeACoffeeApi
-  alias PremiereEcoute.BuyMeACoffee.Donation
+  alias PremiereEcoute.Events.BuyMeACoffee.Donation
 
   @doc """
   Retrieves the list of one-time supporters.

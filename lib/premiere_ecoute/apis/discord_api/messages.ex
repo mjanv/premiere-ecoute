@@ -65,7 +65,6 @@ defmodule PremiereEcoute.Apis.DiscordApi.Messages do
   """
   @spec send_message_to_channel(String.t(), String.t()) :: {:ok, map()} | {:error, term()}
   def send_message_to_channel(channel_id, content) when is_binary(channel_id) and is_binary(content) do
-    # AIDEV-NOTE: Discord API endpoint for creating messages in a channel
     DiscordApi.api()
     |> DiscordApi.post(
       url: "/channels/#{channel_id}/messages",

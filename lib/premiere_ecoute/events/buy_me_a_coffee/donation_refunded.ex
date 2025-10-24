@@ -1,11 +1,10 @@
-defmodule PremiereEcoute.BuyMeACoffee.DonationRefunded do
+defmodule PremiereEcoute.Events.BuyMeACoffee.DonationRefunded do
   @moduledoc """
   Represents a "donation.refunded" webhook event from BuyMeACoffee.
 
   This event is triggered when a donation is refunded.
   """
 
-  # AIDEV-NOTE: Struct matches BuyMeACoffee webhook payload for donation.refunded event
   @type t :: %__MODULE__{
           type: String.t(),
           live_mode: boolean(),
@@ -50,14 +49,6 @@ defmodule PremiereEcoute.BuyMeACoffee.DonationRefunded do
 
   @doc """
   Parses a webhook payload into a DonationRefunded struct.
-
-  ## Examples
-
-      iex> parse(%{"type" => "donation.refunded", ...})
-      {:ok, %DonationRefunded{type: "donation.refunded", ...}}
-
-      iex> parse(%{"invalid" => "payload"})
-      {:error, :invalid_payload}
   """
   @spec parse(map()) :: {:ok, t()} | {:error, :invalid_payload}
   def parse(payload) when is_map(payload) do

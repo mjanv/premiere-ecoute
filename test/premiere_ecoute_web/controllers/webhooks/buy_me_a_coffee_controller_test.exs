@@ -3,9 +3,6 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
 
   import ExUnit.CaptureLog
 
-  alias PremiereEcoute.BuyMeACoffee.DonationCreated
-  alias PremiereEcoute.BuyMeACoffee.DonationRefunded
-
   describe "POST /webhooks/buymeacoffee" do
     test "handles donation.created event", %{conn: conn} do
       payload = %{

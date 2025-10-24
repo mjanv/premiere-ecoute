@@ -144,8 +144,6 @@ jobs:
       - name: Run tests
         run: mix test
 
-  # AIDEV-NOTE: Extension unit tests with Jest - fully independent parallel job
-  # No dependencies on backend jobs, runs immediately in parallel
   extension-tests:
     name: Extension Tests
     runs-on: ubuntu-latest

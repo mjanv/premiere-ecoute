@@ -3,11 +3,10 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeController do
 
   require Logger
 
-  alias PremiereEcoute.BuyMeACoffee.DonationCreated
-  alias PremiereEcoute.BuyMeACoffee.DonationRefunded
+  alias PremiereEcoute.Events.BuyMeACoffee.DonationCreated
+  alias PremiereEcoute.Events.BuyMeACoffee.DonationRefunded
   alias PremiereEcoute.Telemetry.ApiMetrics
 
-  # AIDEV-NOTE: Webhook controller for BuyMeACoffee donation events; no HMAC validation yet
   def handle(conn, _params) do
     event_type = get_in(conn.body_params, ["type"])
     ApiMetrics.webhook_event(:buymeacoffee, event_type)
@@ -26,7 +25,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeController do
         send_resp(conn, 400, "Invalid payload")
 
       {:error, :unknown_event_type} ->
-        Logger.info("Unknown BuyMeACoffee event type: #{event_type}")
+        Logger.error("Unknown BuyMeACoffee event type: #{event_type}")
         send_resp(conn, 202, "")
     end
   end
@@ -44,7 +43,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeController do
   defp handle(_), do: {:error, :invalid_payload}
 
   defp log_donation_created(%DonationCreated{data: data}) do
-    Logger.info(
+    Logger.error(
       "BuyMeACoffee donation created: " <>
         "id=#{data.id} " <>
         "supporter=#{data.supporter_name} " <>

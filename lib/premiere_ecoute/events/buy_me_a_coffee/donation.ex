@@ -1,11 +1,10 @@
-defmodule PremiereEcoute.BuyMeACoffee.Donation do
+defmodule PremiereEcoute.Events.BuyMeACoffee.Donation do
   @moduledoc """
   Represents a donation from a BuyMeACoffee supporter.
 
   This struct is returned by the API when fetching supporter information.
   """
 
-  # AIDEV-NOTE: Donation struct for BuyMeACoffee API responses; mirrors supporter payment data
   @type t :: %__MODULE__{
           supporter_name: String.t(),
           support_note: String.t(),
@@ -40,11 +39,6 @@ defmodule PremiereEcoute.BuyMeACoffee.Donation do
 
   @doc """
   Parses API supporter data into a Donation struct.
-
-  ## Examples
-
-      iex> parse(%{"supporter_name" => "John", ...})
-      %Donation{supporter_name: "John", ...}
   """
   @spec parse(map()) :: t()
   def parse(data) when is_map(data) do

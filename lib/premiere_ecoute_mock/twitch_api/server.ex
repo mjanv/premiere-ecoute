@@ -215,7 +215,6 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
   defp data(payload, root) when is_list(payload), do: %{"data" => payload} |> Map.merge(root)
   defp data(payload, root), do: %{"data" => [payload]} |> Map.merge(root)
 
-  # AIDEV-NOTE: validates real OAuth token against Twitch API and returns mock data for known users
   defp user(token) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
 

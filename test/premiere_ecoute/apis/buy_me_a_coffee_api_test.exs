@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApiTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.BuyMeACoffeeApi
-  alias PremiereEcoute.BuyMeACoffee.Donation
+  alias PremiereEcoute.Events.BuyMeACoffee.Donation
 
   setup do
     Application.put_env(:premiere_ecoute, :buymeacoffee_api_key, "test_api_key")
@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApiTest do
 
       assert [
                %Donation{
-                 support_id: 63434,
+                 support_id: 63_434,
                  supporter_name: "John",
                  support_note: "Thanks for the good work",
                  support_coffees: 5,
@@ -39,13 +39,13 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApiTest do
                  support_created_on: "2020-03-08 20:38:00",
                  support_updated_on: "2020-03-08 20:38:00",
                  transfer_id: nil,
-                 support_note_id: 64335,
+                 support_note_id: 64_335,
                  supporter_id: nil,
                  supporter_email: nil,
-                 payment_id: 32452
+                 payment_id: 32_452
                },
                %Donation{
-                 support_id: 63431,
+                 support_id: 63_431,
                  supporter_name: "Jane Doe",
                  support_note: "Keep it up!",
                  support_coffees: 3,
@@ -54,10 +54,10 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApiTest do
                  support_created_on: "2020-03-07 15:22:00",
                  support_updated_on: "2020-03-07 15:22:00",
                  transfer_id: nil,
-                 support_note_id: 64332,
+                 support_note_id: 64_332,
                  supporter_id: 1234,
                  supporter_email: "jane@example.com",
-                 payment_id: 32449
+                 payment_id: 32_449
                }
              ] = supporters
     end

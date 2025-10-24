@@ -14,17 +14,16 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApi do
 
   use PremiereEcouteCore.Api, api: :buymeacoffee
 
-  alias PremiereEcoute.BuyMeACoffee.Donation
+  alias PremiereEcoute.Events.BuyMeACoffee.Donation
 
   defmodule Behaviour do
     @moduledoc "BuyMeACoffee API Behaviour"
 
-    alias PremiereEcoute.BuyMeACoffee.Donation
+    alias PremiereEcoute.Events.BuyMeACoffee.Donation
 
     @callback get_supporters() :: {:ok, [Donation.t()]} | {:error, term()}
   end
 
-  # AIDEV-NOTE: API client uses Bearer token auth from BUYMEACOFFEE_API_KEY env var
   @spec api :: Req.Request.t()
   def api do
     api_key = Application.get_env(:premiere_ecoute, :buymeacoffee_api_key)
@@ -38,6 +37,9 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApi do
     ]
     |> new()
   end
+
+  @spec client_credentials() :: {:ok, %{String.t() => String.t() | integer()}}
+  def client_credentials, do: {:ok, %{"access_token" => "", "expires_in" => 0}}
 
   # Supporters
   defdelegate get_supporters, to: __MODULE__.Supporters

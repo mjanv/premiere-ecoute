@@ -90,7 +90,6 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
   def handle_event("navigate", %{"direction" => direction}, socket) do
     current_date = Date.new!(socket.assigns.selected_year, socket.assigns.selected_month, 1)
 
-    # AIDEV-NOTE: Use Date.shift/2 for proper month arithmetic to avoid skipping months
     new_date =
       case {direction, socket.assigns.selected_period} do
         {"previous", :month} -> Date.shift(current_date, month: -1)
