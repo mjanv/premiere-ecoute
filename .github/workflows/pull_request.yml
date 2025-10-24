@@ -143,3 +143,32 @@ jobs:
 
       - name: Run tests
         run: mix test
+
+  # AIDEV-NOTE: Extension unit tests with Jest - fully independent parallel job
+  # No dependencies on backend jobs, runs immediately in parallel
+  extension-tests:
+    name: Extension Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: apps/extension/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('apps/extension/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install extension dependencies
+        working-directory: apps/extension
+        run: npm ci
+
+      - name: Run extension tests
+        working-directory: apps/extension
+        run: npm test

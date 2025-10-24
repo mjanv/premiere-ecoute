@@ -38,6 +38,9 @@ describe('LikeTrackExtension', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     fetch.mockClear();
+    // Reset window.location search to empty (setupTests.js sets the default hostname)
+    // Individual tests can override this for specific scenarios (e.g., platform parameter)
+    window.location.search = '';
   });
 
   afterEach(() => {
@@ -516,8 +519,15 @@ describe('LikeTrackExtension', () => {
   describe('Mobile Platform Support', () => {
     test('detects mobile platform from URL parameter', async () => {
       // Mock URL with mobile platform parameter
-      delete window.location;
-      window.location = new URL('http://localhost:3000?platform=mobile');
+      Object.defineProperty(window, 'location', {
+        value: {
+          hostname: 'test.ext-twitch.tv',
+          href: 'https://test.ext-twitch.tv?platform=mobile',
+          search: '?platform=mobile',
+        },
+        writable: true,
+        configurable: true
+      });
       
       fetch.mockResolvedValueOnce({
         ok: true,
@@ -535,8 +545,15 @@ describe('LikeTrackExtension', () => {
 
     test('detects desktop platform from URL parameter', async () => {
       // Mock URL with web platform parameter
-      delete window.location;
-      window.location = new URL('http://localhost:3000?platform=web');
+      Object.defineProperty(window, 'location', {
+        value: {
+          hostname: 'test.ext-twitch.tv',
+          href: 'https://test.ext-twitch.tv?platform=web',
+          search: '?platform=web',
+        },
+        writable: true,
+        configurable: true
+      });
       
       fetch.mockResolvedValueOnce({
         ok: true,
