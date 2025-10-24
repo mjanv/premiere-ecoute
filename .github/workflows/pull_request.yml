@@ -117,6 +117,8 @@ jobs:
       TWITCH_REDIRECT_URI: http://localhost:4000/auth/twitch/callback
       TWITCH_WEBHOOK_CALLBACK_URL: http://localhost:4000/webhooks/twitch
       TWITCH_EXTENSION_SECRET: dGVzdF9zZWNyZXRfa2V5X2Zvcl90d2l0Y2hfZXh0ZW5zaW9u
+      DISCORD_BOT_TOKEN: abc
+      BUYMEACOFFEE_API_KEY: abc
       AUTH_USERNAME: admin
       AUTH_PASSWORD: test_password
       RESEND_API_KEY: fake_resend_api_key
