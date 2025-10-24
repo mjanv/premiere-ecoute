@@ -10,17 +10,14 @@ defmodule PremiereEcoute.Repo.Migrations.CreateDonationTables do
       add :start_date, :date, null: false
       add :end_date, :date, null: false
       add :active, :boolean, default: false, null: false
+      add :balance, :map, null: false, default: %{}
 
       timestamps(type: :utc_datetime)
     end
 
-    create constraint(:goals, :currency_must_be_valid,
-             check: "length(currency) = 3"
-           )
+    create constraint(:goals, :currency_must_be_valid, check: "length(currency) = 3")
 
-    create constraint(:goals, :end_date_after_start_date,
-             check: "end_date > start_date"
-           )
+    create constraint(:goals, :end_date_after_start_date, check: "end_date > start_date")
 
     create index(:goals, [:active])
     create index(:goals, [:start_date, :end_date])
@@ -40,17 +37,13 @@ defmodule PremiereEcoute.Repo.Migrations.CreateDonationTables do
       timestamps(type: :utc_datetime)
     end
 
-    create constraint(:donations, :provider_must_be_valid,
-             check: "provider IN ('buymeacoffee')"
-           )
+    create constraint(:donations, :provider_must_be_valid, check: "provider IN ('buymeacoffee')")
 
     create constraint(:donations, :status_must_be_valid,
              check: "status IN ('created', 'refunded')"
            )
 
-    create constraint(:donations, :currency_must_be_valid,
-             check: "length(currency) = 3"
-           )
+    create constraint(:donations, :currency_must_be_valid, check: "length(currency) = 3")
 
     create unique_index(:donations, [:external_id])
     create index(:donations, [:goal_id])
@@ -76,9 +69,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateDonationTables do
              check: "status IN ('created', 'paid', 'refunded')"
            )
 
-    create constraint(:expenses, :currency_must_be_valid,
-             check: "length(currency) = 3"
-           )
+    create constraint(:expenses, :currency_must_be_valid, check: "length(currency) = 3")
 
     create index(:expenses, [:goal_id])
     create index(:expenses, [:status])

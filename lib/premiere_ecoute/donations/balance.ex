@@ -2,11 +2,12 @@ defmodule PremiereEcoute.Donations.Balance do
   @moduledoc """
   Embedded schema representing the financial balance of a goal.
 
-  Computed on-demand and attached as a virtual field to Goal structs.
+  Stored in the database and updated when donations/expenses are added or revoked.
   Excludes refunded donations and expenses from calculations.
   """
 
-  use PremiereEcouteCore.Aggregate.Object
+  use Ecto.Schema
+  import Ecto.Changeset
 
   @type t :: %__MODULE__{
           collected_amount: Decimal.t(),
@@ -20,6 +21,11 @@ defmodule PremiereEcoute.Donations.Balance do
     field :spent_amount, :decimal
     field :remaining_amount, :decimal
     field :progress, :float
+  end
+
+  def changeset(balance, attrs) do
+    balance
+    |> cast(attrs, [:collected_amount, :spent_amount, :remaining_amount, :progress])
   end
 
   @doc """

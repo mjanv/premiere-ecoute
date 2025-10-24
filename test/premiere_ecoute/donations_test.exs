@@ -376,7 +376,7 @@ defmodule PremiereEcoute.DonationsTest do
     test "excludes refunded donations from balance" do
       {:ok, goal} = create_test_goal("Test Goal")
 
-      {:ok, donation1} = create_test_donation(goal, "txn_1", Decimal.new("100"))
+      {:ok, _donation1} = create_test_donation(goal, "txn_1", Decimal.new("100"))
       {:ok, donation2} = create_test_donation(goal, "txn_2", Decimal.new("50"))
 
       {:ok, _} = Donations.revoke_donation(donation2)
@@ -390,7 +390,7 @@ defmodule PremiereEcoute.DonationsTest do
       {:ok, goal} = create_test_goal("Test Goal")
 
       {:ok, _} = create_test_donation(goal, "txn_1", Decimal.new("100"))
-      {:ok, expense1} = create_test_expense(goal, "Expense 1", Decimal.new("30"))
+      {:ok, _expense1} = create_test_expense(goal, "Expense 1", Decimal.new("30"))
       {:ok, expense2} = create_test_expense(goal, "Expense 2", Decimal.new("20"))
 
       {:ok, _} = Donations.revoke_expense(expense2)

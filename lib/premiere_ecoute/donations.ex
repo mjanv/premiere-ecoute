@@ -91,7 +91,7 @@ defmodule PremiereEcoute.Donations do
   # Donation operations
 
   @doc """
-  Adds a donation to the specified goal.
+  Adds a donation to the specified goal and updates the goal's balance.
 
   ## Examples
 
@@ -102,15 +102,23 @@ defmodule PremiereEcoute.Donations do
       {:error, %Ecto.Changeset{}}
   """
   def add_donation(%Goal{} = goal, attrs) do
-    attrs
-    |> Map.put(:goal_id, goal.id)
-    |> Map.put_new(:created_at, DateTime.utc_now())
-    |> Map.put_new(:payload, %{})
-    |> Donation.create()
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:donation, Donation.changeset(%Donation{}, attrs |> Map.put(:goal_id, goal.id) |> Map.put_new(:created_at, DateTime.utc_now()) |> Map.put_new(:payload, %{})))
+    |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
+      fresh_goal = Repo.preload(Goal.get(goal.id), [:donations, :expenses], force: true)
+      balance = compute_balance(fresh_goal)
+      Goal.update(fresh_goal, %{balance: Map.from_struct(balance)})
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{donation: donation}} -> {:ok, donation}
+      {:error, :donation, changeset, _} -> {:error, changeset}
+      {:error, :update_balance, reason, _} -> {:error, reason}
+    end
   end
 
   @doc """
-  Revokes a donation by updating its status to :refunded.
+  Revokes a donation by updating its status to :refunded and updates the goal's balance.
   Does not delete the donation record.
 
   ## Examples
@@ -119,13 +127,25 @@ defmodule PremiereEcoute.Donations do
       {:ok, %Donation{status: :refunded}}
   """
   def revoke_donation(%Donation{} = donation) do
-    Donation.update(donation, %{status: :refunded})
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:donation, Donation.changeset(donation, %{status: :refunded}))
+    |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
+      goal = Repo.preload(Goal.get(donation.goal_id), [:donations, :expenses], force: true)
+      balance = compute_balance(goal)
+      Goal.update(goal, %{balance: Map.from_struct(balance)})
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{donation: donation}} -> {:ok, donation}
+      {:error, :donation, changeset, _} -> {:error, changeset}
+      {:error, :update_balance, reason, _} -> {:error, reason}
+    end
   end
 
   # Expense operations
 
   @doc """
-  Adds an expense to the specified goal.
+  Adds an expense to the specified goal and updates the goal's balance.
 
   ## Examples
 
@@ -136,14 +156,23 @@ defmodule PremiereEcoute.Donations do
       {:error, %Ecto.Changeset{}}
   """
   def add_expense(%Goal{} = goal, attrs) do
-    attrs
-    |> Map.put(:goal_id, goal.id)
-    |> Map.put_new(:incurred_at, DateTime.utc_now())
-    |> Expense.create()
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:expense, Expense.changeset(%Expense{}, attrs |> Map.put(:goal_id, goal.id) |> Map.put_new(:incurred_at, DateTime.utc_now())))
+    |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
+      fresh_goal = Repo.preload(Goal.get(goal.id), [:donations, :expenses], force: true)
+      balance = compute_balance(fresh_goal)
+      Goal.update(fresh_goal, %{balance: Map.from_struct(balance)})
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{expense: expense}} -> {:ok, expense}
+      {:error, :expense, changeset, _} -> {:error, changeset}
+      {:error, :update_balance, reason, _} -> {:error, reason}
+    end
   end
 
   @doc """
-  Revokes an expense by updating its status to :refunded.
+  Revokes an expense by updating its status to :refunded and updates the goal's balance.
   Does not delete the expense record.
 
   ## Examples
@@ -152,7 +181,19 @@ defmodule PremiereEcoute.Donations do
       {:ok, %Expense{status: :refunded}}
   """
   def revoke_expense(%Expense{} = expense) do
-    Expense.update(expense, %{status: :refunded})
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:expense, Expense.changeset(expense, %{status: :refunded}))
+    |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
+      goal = Repo.preload(Goal.get(expense.goal_id), [:donations, :expenses], force: true)
+      balance = compute_balance(goal)
+      Goal.update(goal, %{balance: Map.from_struct(balance)})
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{expense: expense}} -> {:ok, expense}
+      {:error, :expense, changeset, _} -> {:error, changeset}
+      {:error, :update_balance, reason, _} -> {:error, reason}
+    end
   end
 
   # Balance operations
@@ -172,7 +213,7 @@ defmodule PremiereEcoute.Donations do
       %Balance{collected_amount: Decimal.new(100), spent_amount: Decimal.new(25), remaining_amount: Decimal.new(75), progress: 50.0}
   """
   def compute_balance(%Goal{} = goal) do
-    goal = Repo.preload(goal, [:donations, :expenses])
+    goal = Repo.preload(goal, [:donations, :expenses], force: true)
 
     collected =
       goal.donations
@@ -190,7 +231,7 @@ defmodule PremiereEcoute.Donations do
   end
 
   @doc """
-  Retrieves the current active goal with its computed balance.
+  Retrieves the current active goal with its stored balance converted to Balance struct.
 
   ## Examples
 
@@ -202,10 +243,28 @@ defmodule PremiereEcoute.Donations do
   """
   def get_current_goal_with_balance do
     case get_current_goal() do
-      nil -> nil
-      goal -> %{goal | balance: compute_balance(goal)}
+      nil ->
+        nil
+
+      goal ->
+        balance =
+          if goal.balance != %{} do
+            %Balance{
+              collected_amount: string_to_decimal(goal.balance["collected_amount"]),
+              spent_amount: string_to_decimal(goal.balance["spent_amount"]),
+              remaining_amount: string_to_decimal(goal.balance["remaining_amount"]),
+              progress: goal.balance["progress"]
+            }
+          else
+            nil
+          end
+
+        %{goal | balance: balance}
     end
   end
+
+  defp string_to_decimal(value) when is_binary(value), do: Decimal.new(value)
+  defp string_to_decimal(value), do: value
 
   # Delegated functions for direct schema access
   defdelegate get_goal(id), to: Goal, as: :get

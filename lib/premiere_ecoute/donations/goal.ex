@@ -3,8 +3,7 @@ defmodule PremiereEcoute.Donations.Goal do
   Goal schema representing fundraising campaigns with target amounts and date ranges.
 
   A goal tracks donations and expenses over a specified period. Only one goal
-  can be active at a time. The balance is computed on-demand and attached as
-  a virtual embedded schema.
+  can be active at a time. The balance is stored in the database as an embedded schema.
   """
 
   use PremiereEcouteCore.Aggregate,
@@ -37,8 +36,7 @@ defmodule PremiereEcoute.Donations.Goal do
     field :start_date, :date
     field :end_date, :date
     field :active, :boolean, default: false
-
-    embeds_one :balance, Balance, on_replace: :update
+    field :balance, :map, default: %{}
 
     has_many :donations, Donation
     has_many :expenses, Expense
@@ -55,7 +53,8 @@ defmodule PremiereEcoute.Donations.Goal do
       :currency,
       :start_date,
       :end_date,
-      :active
+      :active,
+      :balance
     ])
     |> validate_required([
       :title,
