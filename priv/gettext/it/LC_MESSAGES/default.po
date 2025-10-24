@@ -2990,13 +2990,13 @@ msgid_plural "artists"
 msgstr[0] "Artista"
 msgstr[1] "Artista"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:196
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:198
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La prima di %{name} è finita"
 
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:24
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:39
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:40
 #, elixir-autogen, elixir-format
 msgid "Votes are open !"
 msgstr "Le votazioni sono aperte!"
@@ -3106,7 +3106,7 @@ msgstr "I brani dalla tua estensione non verranno piaciuti senza una regola di p
 msgid "Tracks liked from your extension will be added to this playlist"
 msgstr "I brani piaciuti dalla tua estensione verranno aggiunti a questa playlist"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:51
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:53
 #, elixir-autogen, elixir-format
 msgid "Votes close in 30 seconds !"
 msgstr "I voti si chiudono tra 30 secondi!"

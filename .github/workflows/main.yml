@@ -12,8 +12,6 @@ permissions:
   id-token: write
 
 jobs:
-  # AIDEV-NOTE: Deploy application to Fly.io
-  # Runs in parallel with documentation deployment
   deploy-app:
     name: Deploy to Fly.io
     runs-on: ubuntu-latest
@@ -29,8 +27,6 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-  # AIDEV-NOTE: Build and deploy documentation to GitHub Pages
-  # Runs in parallel with Fly.io deployment
   deploy-docs:
     name: Deploy Documentation
     runs-on: ubuntu-latest

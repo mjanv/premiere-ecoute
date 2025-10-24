@@ -2989,13 +2989,13 @@ msgid_plural "artists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:196
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:198
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr ""
 
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:24
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:39
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:40
 #, elixir-autogen, elixir-format
 msgid "Votes are open !"
 msgstr ""
@@ -3105,7 +3105,7 @@ msgstr ""
 msgid "Tracks liked from your extension will be added to this playlist"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:51
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:53
 #, elixir-autogen, elixir-format
 msgid "Votes close in 30 seconds !"
 msgstr ""

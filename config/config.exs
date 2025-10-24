@@ -74,6 +74,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
       notifications: "your_channel_id_here",
       announcements: "your_channel_id_here"
     ]
+  ],
+  buymeacoffee: [
+    api: PremiereEcoute.Apis.BuyMeACoffeeApi,
+    urls: [
+      api: "https://developers.buymeacoffee.com"
+    ]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30

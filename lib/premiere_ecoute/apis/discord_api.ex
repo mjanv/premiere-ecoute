@@ -52,7 +52,6 @@ defmodule PremiereEcoute.Apis.DiscordApi do
     |> new()
   end
 
-  # AIDEV-NOTE: helper to retrieve predefined channel IDs from config
   @spec channel(atom()) :: String.t() | nil
   def channel(channel_key) do
     get_in(env(), [:channels, channel_key])
