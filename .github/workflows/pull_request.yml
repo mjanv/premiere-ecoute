@@ -121,6 +121,7 @@ jobs:
       AUTH_PASSWORD: test_password
       RESEND_API_KEY: fake_resend_api_key
       SENTRY_DSN: https://fake@sentry.io/123456
+      OPENAI_API_KEY: sk-proj-3Qd9_ItzEYh0eu0aJH_v1ZTr8x5EsFsgPHN2McIUHkRmOGW7BOBF57
 
     steps:
       - uses: actions/checkout@v4
