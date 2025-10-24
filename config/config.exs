@@ -71,7 +71,6 @@ config :premiere_ecoute, PremiereEcoute.Apis,
       api: "https://discord.com/api/v10"
     ],
     channels: [
-      # AIDEV-NOTE: predefined Discord channel IDs for notifications
       notifications: "your_channel_id_here",
       announcements: "your_channel_id_here"
     ]

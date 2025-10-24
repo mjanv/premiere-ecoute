@@ -4,7 +4,11 @@ defmodule PremiereEcoute.Apis.DiscordApi.MessagesTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.DiscordApi
 
-  # AIDEV-NOTE: Discord uses bot token auth, no need for user scope setup
+  setup do
+    Application.put_env(:premiere_ecoute, :discord_bot_token, "discord_bot_token")
+
+    :ok
+  end
 
   describe "send_message_to_channel/2" do
     test "successfully sends a message to a Discord channel" do
@@ -13,9 +17,9 @@ defmodule PremiereEcoute.Apis.DiscordApi.MessagesTest do
 
       ApiMock.expect(
         DiscordApi,
-        path: {:post, "/channels/#{channel_id}/messages"},
+        path: {:post, "/api/v10/channels/#{channel_id}/messages"},
         headers: [
-          {"authorization", "Bot test_bot_token"},
+          {"authorization", "Bot discord_bot_token"},
           {"content-type", "application/json"}
         ],
         request: "discord_api/messages/send_message/request.json",
@@ -33,13 +37,13 @@ defmodule PremiereEcoute.Apis.DiscordApi.MessagesTest do
 
     test "handles error when bot lacks permissions" do
       channel_id = "123456789012345678"
-      content = "Test message"
+      content = "Hello from Premiere Ecoute!"
 
       ApiMock.expect(
         DiscordApi,
-        path: {:post, "/channels/#{channel_id}/messages"},
+        path: {:post, "/api/v10/channels/#{channel_id}/messages"},
         headers: [
-          {"authorization", "Bot test_bot_token"},
+          {"authorization", "Bot discord_bot_token"},
           {"content-type", "application/json"}
         ],
         request: "discord_api/messages/send_message/request.json",
@@ -54,13 +58,13 @@ defmodule PremiereEcoute.Apis.DiscordApi.MessagesTest do
 
     test "sends message with different content" do
       channel_id = "999888777666555444"
-      content = "Server maintenance starting in 5 minutes"
+      content = "Hello from Premiere Ecoute!"
 
       ApiMock.expect(
         DiscordApi,
-        path: {:post, "/channels/#{channel_id}/messages"},
+        path: {:post, "/api/v10/channels/#{channel_id}/messages"},
         headers: [
-          {"authorization", "Bot test_bot_token"},
+          {"authorization", "Bot discord_bot_token"},
           {"content-type", "application/json"}
         ],
         status: 201
@@ -72,31 +76,11 @@ defmodule PremiereEcoute.Apis.DiscordApi.MessagesTest do
 
   describe "send_message/2" do
     test "successfully sends message to predefined channel by key" do
-      # AIDEV-NOTE: Testing with :notifications channel key from config
-      content = "Test notification message"
+      content = "Hello from Premiere Ecoute!"
 
-      # Mock the channel() function to return a test channel ID
-      # In real config, this would come from Application.get_env
-      channel_id = "your_channel_id_here"
-
-      ApiMock.expect(
-        DiscordApi,
-        path: {:post, "/channels/#{channel_id}/messages"},
-        headers: [
-          {"authorization", "Bot test_bot_token"},
-          {"content-type", "application/json"}
-        ],
-        response: "discord_api/messages/send_message/response.json",
-        status: 201
-      )
-
-      # This will use the configured channel ID for :notifications
       result = DiscordApi.send_message(:notifications, content)
 
-      # Should either succeed or return error about channel not configured
-      # depending on test environment setup
-      assert result == {:error, "Channel :notifications not configured"} or
-               match?({:ok, %{"id" => _}}, result)
+      assert result == {:error, "Channel :notifications not configured"}
     end
 
     test "returns error when channel key is not configured" do

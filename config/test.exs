@@ -2,17 +2,8 @@ import Config
 
 config :premiere_ecoute,
   twitch_eventsub_secret: "s3cre77890ab",
-  twitch_extension_secret: Base.encode64("test_secret_key_for_twitch_extension"),
-  twitch_client_id: "test_twitch_client_id",
-  twitch_client_secret: "test_twitch_client_secret",
-  twitch_redirect_uri: "http://localhost:4000/auth/twitch/callback",
   tidal_client_id: "test_tidal_client_id",
-  tidal_client_secret: "test_tidal_client_secret",
-  discord_bot_token: "test_bot_token"
-
-# AIDEV-NOTE: Fake OpenAI API key for unit tests
-config :instructor,
-  openai: [api_key: "sk-test-fake-openai-key-for-unit-tests"]
+  tidal_client_secret: "test_tidal_client_secret"
 
 config :premiere_ecoute, Oban, testing: :inline
 
