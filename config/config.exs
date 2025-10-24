@@ -64,6 +64,16 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     urls: [
       api: "https://api.frankfurter.app"
     ]
+  ],
+  discord: [
+    api: PremiereEcoute.Apis.DiscordApi,
+    urls: [
+      api: "https://discord.com/api/v10"
+    ],
+    channels: [
+      notifications: "your_channel_id_here",
+      announcements: "your_channel_id_here"
+    ]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30
