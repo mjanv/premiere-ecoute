@@ -64,6 +64,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
               "broadcaster_name" => "BasketWeaver101",
               "followed_at" => "2022-05-24T22:22:08Z"
             }
+
             {:ok, payload}
 
           "test_2" ->
