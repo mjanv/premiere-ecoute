@@ -18,5 +18,11 @@
   {"lib/premiere_ecoute/sessions/retrospective/report.ex", :call_without_opaque},
   {"lib/premiere_ecoute/sessions/scores/poll.ex", :call_without_opaque},
   {"lib/premiere_ecoute/sessions/scores/vote.ex", :call_without_opaque},
-  {"lib/premiere_ecoute/sessions/listening_session.ex", :call_without_opaque}
+  {"lib/premiere_ecoute/sessions/listening_session.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/donations/donation.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/donations/expense.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/donations/goal.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/donations/services/donations.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/donations/services/expenses.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/donations/services/goals.ex", :call_without_opaque}
 ]

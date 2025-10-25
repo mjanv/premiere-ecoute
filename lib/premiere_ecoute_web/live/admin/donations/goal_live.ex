@@ -124,7 +124,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.GoalLive do
             datetime = DateTime.new!(date, Time.new!(0, 0, 0), "Etc/UTC")
             Map.put(params, "incurred_at", datetime)
 
-          :error ->
+          {:error, _reason} ->
             params
         end
 
