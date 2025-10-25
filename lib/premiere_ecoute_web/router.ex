@@ -168,12 +168,18 @@ defmodule PremiereEcouteWeb.Router do
   scope "/admin", PremiereEcouteWeb.Admin do
     pipe_through [:browser]
 
+    live_session :donations_overlay, on_mount: [{UserAuth, :current_scope}] do
+      live "/donations/overlay", Donations.OverlayLive, :index
+    end
+
     live_session :admin, on_mount: [{UserAuth, :admin}] do
       live "/", AdminLive, :index
       live "/users", AdminUsersLive, :index
       live "/albums", AdminAlbumsLive, :index
       live "/sessions", AdminSessionsLive, :index
       live "/billboards", AdminBillboardsLive, :index
+      live "/donations", Donations.DonationsLive, :index
+      live "/donations/goals/:id", Donations.GoalLive, :show
     end
 
     pipe_through [:require_authenticated_user]

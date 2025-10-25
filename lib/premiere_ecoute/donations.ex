@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Donations do
   defdelegate get_current_goal(), to: @service
 
   @service PremiereEcoute.Donations.Services.Donations
+  defdelegate create_donation(attrs), to: @service
   defdelegate add_donation(goal, attrs), to: @service
   defdelegate revoke_donation(donation), to: @service
 

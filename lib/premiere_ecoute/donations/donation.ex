@@ -62,8 +62,7 @@ defmodule PremiereEcoute.Donations.Donation do
       :provider,
       :status,
       :external_id,
-      :created_at,
-      :goal_id
+      :created_at
     ])
     |> validate_number(:amount, greater_than: 0)
     |> validate_length(:currency, is: 3)

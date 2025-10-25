@@ -1,0 +1,449 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div class="flex items-center gap-4 mb-2">
+            <.link
+              navigate="/admin/donations"
+              class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              {gettext("Back to Donations")}
+            </.link>
+          </div>
+          <h1 class="text-3xl font-bold text-white">{@goal.title}</h1>
+          <%= if @goal.description do %>
+            <p class="mt-2 text-gray-400">{@goal.description}</p>
+          <% end %>
+        </div>
+        <div class="mt-4 sm:mt-0">
+          <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-900 text-blue-300">
+            {Decimal.to_string(@goal.target_amount)} {@goal.currency}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Balance Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <!-- Collected Amount -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-green-900">
+            <svg class="w-8 h-8 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Decimal.to_string(@balance.collected_amount)}</p>
+            <p class="text-sm text-gray-400">{gettext("Collected")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Spent Amount -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-orange-900">
+            <svg class="w-8 h-8 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Decimal.to_string(@balance.spent_amount)}</p>
+            <p class="text-sm text-gray-400">{gettext("Spent")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Remaining Amount -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-blue-900">
+            <svg class="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{Decimal.to_string(@balance.remaining_amount)}</p>
+            <p class="text-sm text-gray-400">{gettext("Remaining")}</p>
+          </div>
+        </div>
+      </div>
+      
+<!-- Progress -->
+      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-purple-900">
+            <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-2xl font-semibold text-white">{:erlang.float_to_binary(@balance.progress, decimals: 1)}%</p>
+            <p class="text-sm text-gray-400">{gettext("Progress")}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Expenses Section -->
+    <div class="bg-gray-800 rounded-lg shadow mb-8">
+      <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-semibold text-white">{gettext("Expenses")}</h2>
+          <p class="text-gray-400">{gettext("Total expenses: ")}<span class="font-medium">{length(@goal.expenses)}</span></p>
+        </div>
+        <button
+          phx-click="show_expense_modal"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          {gettext("Add Expense")}
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Title")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Category")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Amount")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Status")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Date")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Actions")}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <%= if Enum.empty?(@goal.expenses) do %>
+              <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                  {gettext("No expenses added yet")}
+                </td>
+              </tr>
+            <% else %>
+              <%= for expense <- @goal.expenses do %>
+                <tr class="hover:bg-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-white">
+                      {expense.title}
+                    </div>
+                    <%= if expense.description do %>
+                      <div class="text-sm text-gray-400">
+                        {String.slice(expense.description, 0..50)}{if String.length(expense.description) > 50, do: "..."}
+                      </div>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <span class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-gray-700 text-gray-300">
+                      {expense.category}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                    {Decimal.to_string(expense.amount)} {expense.currency}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class={[
+                      "inline-flex px-2 py-1 text-xs font-semibold rounded-full",
+                      case expense.status do
+                        :created -> "bg-blue-100 text-blue-800"
+                        :paid -> "bg-green-100 text-green-800"
+                        :refunded -> "bg-red-100 text-red-800"
+                      end
+                    ]}>
+                      {String.capitalize(to_string(expense.status))}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {Calendar.strftime(expense.incurred_at, "%b %d, %Y")}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      phx-click="delete_expense"
+                      phx-value-expense_id={expense.id}
+                      data-confirm={gettext("Are you sure you want to delete this expense?")}
+                      class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition-colors"
+                    >
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                      {gettext("Delete")}
+                    </button>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+<!-- Donations Section -->
+    <div class="bg-gray-800 rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-700">
+        <div>
+          <h2 class="text-xl font-semibold text-white">{gettext("Donations")}</h2>
+          <p class="text-gray-400">{gettext("Total donations: ")}<span class="font-medium">{length(@goal.donations)}</span></p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Donor")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Amount")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Provider")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Status")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Date")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Actions")}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <%= if Enum.empty?(@goal.donations) do %>
+              <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                  {gettext("No donations received yet")}
+                </td>
+              </tr>
+            <% else %>
+              <%= for donation <- @goal.donations do %>
+                <tr class="hover:bg-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-white">
+                      {donation.donor_name || gettext("Anonymous")}
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold">
+                    {Decimal.to_string(donation.amount)} {donation.currency}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <span class="inline-flex px-2 py-1 rounded-full text-xs font-semibold bg-gray-700 text-gray-300">
+                      {String.capitalize(to_string(donation.provider))}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class={[
+                      "inline-flex px-2 py-1 text-xs font-semibold rounded-full",
+                      case donation.status do
+                        :created -> "bg-blue-100 text-blue-800"
+                        :refunded -> "bg-red-100 text-red-800"
+                      end
+                    ]}>
+                      {String.capitalize(to_string(donation.status))}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {Calendar.strftime(donation.created_at, "%b %d, %Y")}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      phx-click="delete_donation"
+                      phx-value-donation_id={donation.id}
+                      data-confirm={gettext("Are you sure you want to revoke this donation?")}
+                      class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition-colors"
+                    >
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                      {gettext("Revoke")}
+                    </button>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Expense Modal -->
+<div
+  :if={@show_expense_modal}
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+  phx-click="close_expense_modal"
+>
+  <div
+    class="bg-gray-800 rounded-lg shadow-lg max-w-2xl w-full mx-4 border border-gray-700"
+    phx-click="modal_content_click"
+  >
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-white">
+        {gettext("Add Expense")}
+      </h2>
+      <button
+        phx-click="close_expense_modal"
+        class="text-gray-400 hover:text-gray-300 transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+<!-- Modal Content -->
+    <div class="px-6 py-4">
+      <%= if @expense_form do %>
+        <form id="expense-form" phx-change="validate_expense_form" phx-submit="save_expense" method="post">
+          <!-- Title Field -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              {gettext("Title")} <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="expense[title]"
+              value={@expense_form.params["title"] || ""}
+              placeholder={gettext("Enter expense title")}
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <%= if @expense_form.errors[:title] do %>
+              <p class="mt-1 text-sm text-red-500">{gettext("Title is required")}</p>
+            <% end %>
+          </div>
+          
+<!-- Description Field -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              {gettext("Description")}
+            </label>
+            <textarea
+              name="expense[description]"
+              placeholder={gettext("Enter expense description")}
+              rows="2"
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            ><%= @expense_form.params["description"] || "" %></textarea>
+          </div>
+          
+<!-- Category Field -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              {gettext("Category")} <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="expense[category]"
+              value={@expense_form.params["category"] || ""}
+              placeholder={gettext("e.g., hosting, server, bandwidth")}
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <%= if @expense_form.errors[:category] do %>
+              <p class="mt-1 text-sm text-red-500">{gettext("Category is required")}</p>
+            <% end %>
+          </div>
+          
+<!-- Amount Field -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              {gettext("Amount")} <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              name="expense[amount]"
+              value={@expense_form.params["amount"] || ""}
+              placeholder={gettext("100.00")}
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <%= if @expense_form.errors[:amount] do %>
+              <p class="mt-1 text-sm text-red-500">{gettext("Amount is required")}</p>
+            <% end %>
+          </div>
+          
+<!-- Date Field -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              {gettext("Date")} <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              name="expense[incurred_at]"
+              value={@expense_form.params["incurred_at"] || ""}
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <%= if @expense_form.errors[:incurred_at] do %>
+              <p class="mt-1 text-sm text-red-500">{gettext("Date is required")}</p>
+            <% end %>
+          </div>
+          
+<!-- Form Actions -->
+          <div class="flex gap-3">
+            <button
+              type="submit"
+              class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+            >
+              {gettext("Add Expense")}
+            </button>
+            <button
+              type="button"
+              phx-click="close_expense_modal"
+              class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md font-medium transition-colors"
+            >
+              {gettext("Cancel")}
+            </button>
+          </div>
+        </form>
+      <% end %>
+    </div>
+  </div>
+</div>

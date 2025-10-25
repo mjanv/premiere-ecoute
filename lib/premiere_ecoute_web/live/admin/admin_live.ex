@@ -6,15 +6,17 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.Album
-  alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Donations.Goal
+  alias PremiereEcoute.Sessions.ListeningSession
 
   def mount(_params, _session, socket) do
     socket
     |> assign(:stats, %{
       users_count: User.count(:id),
-      sessions_count: Sessions.ListeningSession.count(:id),
+      sessions_count: ListeningSession.count(:id),
       albums_count: Album.count(:id),
-      billboards_count: Billboard.count(:id)
+      billboards_count: Billboard.count(:id),
+      goals_count: Goal.count(:id)
     })
     |> assign(:event_store, %{
       stream: "users",

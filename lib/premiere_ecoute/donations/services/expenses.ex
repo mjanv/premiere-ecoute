@@ -23,10 +23,13 @@ defmodule PremiereEcoute.Donations.Services.Expenses do
       {:error, %Ecto.Changeset{}}
   """
   def add_expense(%Goal{} = goal, attrs) do
+    # AIDEV-NOTE: Normalize attrs to string keys to handle both form data and test fixtures
+    attrs = stringify_keys(attrs)
+
     Ecto.Multi.new()
     |> Ecto.Multi.insert(
       :expense,
-      Expense.changeset(%Expense{}, attrs |> Map.put(:goal_id, goal.id) |> Map.put_new(:incurred_at, DateTime.utc_now()))
+      Expense.changeset(%Expense{}, attrs |> Map.put("goal_id", goal.id) |> Map.put_new("incurred_at", DateTime.utc_now()))
     )
     |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
       fresh_goal = Repo.preload(Goal.get(goal.id), [:donations, :expenses], force: true)
@@ -68,5 +71,13 @@ defmodule PremiereEcoute.Donations.Services.Expenses do
       {:error, :expense, changeset, _} -> {:error, changeset}
       {:error, :update_balance, reason, _} -> {:error, reason}
     end
+  end
+
+  # Private helper to normalize atom keys to string keys
+  defp stringify_keys(map) when is_map(map) do
+    Map.new(map, fn
+      {k, v} when is_atom(k) -> {Atom.to_string(k), v}
+      {k, v} -> {k, v}
+    end)
   end
 end
