@@ -422,7 +422,7 @@ defmodule PremiereEcoute.DonationsTest do
     end
   end
 
-  describe "get_current_goal_with_balance/0" do
+  describe "balance in get_current_goal/0" do
     test "returns current goal with computed balance" do
       today = Date.utc_today()
       start_date = Date.add(today, -10)
@@ -440,16 +440,12 @@ defmodule PremiereEcoute.DonationsTest do
       {:ok, _} = Donations.enable_goal(goal)
       {:ok, _} = create_test_donation(goal, "txn_1", Decimal.new("75"))
 
-      current_goal = Donations.get_current_goal_with_balance()
+      current_goal = Donations.get_current_goal()
 
       assert current_goal.id == goal.id
       assert %Balance{} = current_goal.balance
       assert Decimal.equal?(current_goal.balance.collected_amount, Decimal.new("75"))
       assert current_goal.balance.progress == 75.0
-    end
-
-    test "returns nil if no current goal" do
-      assert Donations.get_current_goal_with_balance() == nil
     end
   end
 

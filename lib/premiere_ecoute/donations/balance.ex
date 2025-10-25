@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Donations.Balance do
   """
 
   use Ecto.Schema
+
   import Ecto.Changeset
 
   @type t :: %__MODULE__{
@@ -16,6 +17,7 @@ defmodule PremiereEcoute.Donations.Balance do
           progress: float()
         }
 
+  @primary_key false
   embedded_schema do
     field :collected_amount, :decimal
     field :spent_amount, :decimal

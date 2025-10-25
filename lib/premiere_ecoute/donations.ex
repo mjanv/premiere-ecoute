@@ -107,7 +107,9 @@ defmodule PremiereEcoute.Donations do
     |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
       fresh_goal = Repo.preload(Goal.get(goal.id), [:donations, :expenses], force: true)
       balance = compute_balance(fresh_goal)
-      Goal.update(fresh_goal, %{balance: Map.from_struct(balance)})
+      # Convert Balance struct to map for storage
+      balance_map = Map.from_struct(balance)
+      Goal.update(fresh_goal, %{balance: balance_map})
     end)
     |> Repo.transaction()
     |> case do
@@ -132,7 +134,9 @@ defmodule PremiereEcoute.Donations do
     |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
       goal = Repo.preload(Goal.get(donation.goal_id), [:donations, :expenses], force: true)
       balance = compute_balance(goal)
-      Goal.update(goal, %{balance: Map.from_struct(balance)})
+      # Convert Balance struct to map for storage
+      balance_map = Map.from_struct(balance)
+      Goal.update(goal, %{balance: balance_map})
     end)
     |> Repo.transaction()
     |> case do
@@ -161,7 +165,9 @@ defmodule PremiereEcoute.Donations do
     |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
       fresh_goal = Repo.preload(Goal.get(goal.id), [:donations, :expenses], force: true)
       balance = compute_balance(fresh_goal)
-      Goal.update(fresh_goal, %{balance: Map.from_struct(balance)})
+      # Convert Balance struct to map for storage
+      balance_map = Map.from_struct(balance)
+      Goal.update(fresh_goal, %{balance: balance_map})
     end)
     |> Repo.transaction()
     |> case do
@@ -186,7 +192,9 @@ defmodule PremiereEcoute.Donations do
     |> Ecto.Multi.run(:update_balance, fn _repo, _changes ->
       goal = Repo.preload(Goal.get(expense.goal_id), [:donations, :expenses], force: true)
       balance = compute_balance(goal)
-      Goal.update(goal, %{balance: Map.from_struct(balance)})
+      # Convert Balance struct to map for storage
+      balance_map = Map.from_struct(balance)
+      Goal.update(goal, %{balance: balance_map})
     end)
     |> Repo.transaction()
     |> case do
@@ -229,42 +237,6 @@ defmodule PremiereEcoute.Donations do
 
     Balance.new(collected, spent, goal.target_amount)
   end
-
-  @doc """
-  Retrieves the current active goal with its stored balance converted to Balance struct.
-
-  ## Examples
-
-      iex> get_current_goal_with_balance()
-      %Goal{balance: %Balance{}}
-
-      iex> get_current_goal_with_balance()
-      nil
-  """
-  def get_current_goal_with_balance do
-    case get_current_goal() do
-      nil ->
-        nil
-
-      goal ->
-        balance =
-          if goal.balance != %{} do
-            %Balance{
-              collected_amount: string_to_decimal(goal.balance["collected_amount"]),
-              spent_amount: string_to_decimal(goal.balance["spent_amount"]),
-              remaining_amount: string_to_decimal(goal.balance["remaining_amount"]),
-              progress: goal.balance["progress"]
-            }
-          else
-            nil
-          end
-
-        %{goal | balance: balance}
-    end
-  end
-
-  defp string_to_decimal(value) when is_binary(value), do: Decimal.new(value)
-  defp string_to_decimal(value), do: value
 
   # Delegated functions for direct schema access
   defdelegate get_goal(id), to: Goal, as: :get
