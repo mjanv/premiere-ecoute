@@ -8,6 +8,7 @@ defmodule PremiereEcoute do
       {Accounts, except: []},
       {Billboard, except: []},
       {Discography, except: []},
+      {Donations, except: []},
       {Events, except: []},
       {Extension, except: []},
       {Festivals, except: []},

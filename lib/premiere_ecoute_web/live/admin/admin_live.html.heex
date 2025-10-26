@@ -75,7 +75,7 @@
     </div>
     
 <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
       <!-- Users Card -->
       <.link navigate="/admin/users" class="block">
         <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
@@ -159,6 +159,28 @@
             <div class="ml-4">
               <p class="text-2xl font-semibold text-white">{@stats.billboards_count}</p>
               <p class="text-sm text-gray-400">{gettext("Billboards")}</p>
+            </div>
+          </div>
+        </div>
+      </.link>
+      
+<!-- Goals Card -->
+      <.link navigate="/admin/donations" class="block">
+        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-red-900">
+              <svg class="w-8 h-8 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-2xl font-semibold text-white">{@stats.goals_count}</p>
+              <p class="text-sm text-gray-400">{gettext("Goals")}</p>
             </div>
           </div>
         </div>
