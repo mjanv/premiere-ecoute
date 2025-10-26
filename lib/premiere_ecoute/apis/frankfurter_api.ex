@@ -19,6 +19,8 @@ defmodule PremiereEcoute.Apis.FrankfurterApi do
 
     @callback convert(params :: %{amount: number(), currency: String.t()}) ::
                 {:ok, %{amount: number(), currency: String.t()}} | {:error, term()}
+    @callback convert(params :: %{amount: number(), from: String.t(), to: String.t()}) ::
+                {:ok, %{amount: number(), currency: String.t()}} | {:error, term()}
     @callback client_credentials() :: {:ok, map()} | {:error, any()}
   end
 

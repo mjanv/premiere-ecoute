@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Donations.Services.Donations do
   - Revoke donations and update goal balance
   """
 
+  alias PremiereEcoute.Apis.FrankfurterApi
   alias PremiereEcoute.Donations.{Donation, Goal}
   alias PremiereEcoute.Donations.Services.{Balance, Goals}
   alias PremiereEcoute.Repo
@@ -17,9 +18,10 @@ defmodule PremiereEcoute.Donations.Services.Donations do
   @doc """
   Creates a donation from webhook data.
 
-  If a current active goal exists and matches the currency, attaches the donation to it.
-  Otherwise, creates the donation without a goal association.
-  Always stores the full webhook payload and broadcasts a PubSub event.
+  If a current active goal exists, attaches the donation to it.
+  If currencies don't match, converts the donation amount to the goal's currency using Frankfurter API.
+  The original payload is always preserved; only amount and currency fields are updated after conversion.
+  Broadcasts a PubSub event on successful creation.
 
   ## Examples
 
@@ -40,12 +42,46 @@ defmodule PremiereEcoute.Donations.Services.Donations do
     # Try to find current goal
     current_goal = Goals.get_current_goal()
 
-    # Determine if we should attach to the goal
-    goal_id =
-      if current_goal && current_goal.currency == attrs[:currency] do
-        current_goal.id
+    # Convert currency if needed and attach to goal
+    {attrs, goal_id} =
+      if current_goal do
+        if current_goal.currency == attrs[:currency] do
+          # Currencies match - no conversion needed
+          {attrs, current_goal.id}
+        else
+          # Currencies don't match - convert amount
+          case convert_currency(attrs[:amount], attrs[:currency], current_goal.currency) do
+            {:ok, converted_amount} ->
+              # AIDEV-NOTE: Update amount and currency, but preserve original payload
+              # Convert float to Decimal (Decimal.new only accepts integers/strings)
+              converted_decimal =
+                converted_amount
+                |> Float.to_string()
+                |> Decimal.new()
+
+              attrs_with_conversion =
+                attrs
+                |> Map.put(:amount, converted_decimal)
+                |> Map.put(:currency, current_goal.currency)
+
+              Logger.info(
+                "Currency converted: #{attrs[:amount]} #{attrs[:currency]} -> #{converted_amount} #{current_goal.currency}"
+              )
+
+              {attrs_with_conversion, current_goal.id}
+
+            {:error, reason} ->
+              Logger.warning(
+                "Failed to convert currency from #{attrs[:currency]} to #{current_goal.currency}: #{inspect(reason)}"
+              )
+
+              # Create donation without goal if conversion fails
+              {attrs, nil}
+          end
+        end
       else
-        nil
+        # No current goal - create donation without goal
+        {attrs, nil}
       end
 
     attrs = if goal_id, do: Map.put(attrs, :goal_id, goal_id), else: attrs
@@ -81,6 +117,21 @@ defmodule PremiereEcoute.Donations.Services.Donations do
 
       {:error, _} = error ->
         error
+    end
+  end
+
+  # AIDEV-NOTE: Convert amount from one currency to another using Frankfurter API
+  defp convert_currency(amount, from_currency, to_currency) do
+    # Convert Decimal to float for API call
+    amount_float =
+      case amount do
+        %Decimal{} -> Decimal.to_float(amount)
+        num when is_number(num) -> num
+      end
+
+    case FrankfurterApi.convert(%{amount: amount_float, from: from_currency, to: to_currency}) do
+      {:ok, %{amount: converted_amount}} -> {:ok, converted_amount}
+      {:error, _} = error -> error
     end
   end
 

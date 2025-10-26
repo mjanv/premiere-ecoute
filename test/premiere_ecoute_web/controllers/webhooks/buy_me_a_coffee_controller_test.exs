@@ -3,6 +3,8 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
 
   import ExUnit.CaptureLog
 
+  alias PremiereEcoute.ApiMock
+  alias PremiereEcoute.Apis.FrankfurterApi
   alias PremiereEcoute.Donations
 
   describe "POST /webhooks/buymeacoffee - donation.created" do
@@ -72,8 +74,8 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
       assert donation.payload == payload
     end
 
-    test "creates donation record without goal when currencies don't match", %{conn: conn} do
-      # Create an active goal with different currency
+    test "creates donation record with currency conversion when currencies don't match", %{conn: conn} do
+      # Create an active goal with different currency (EUR)
       {:ok, goal} =
         Donations.create_goal(%{
           title: "Test Goal",
@@ -84,6 +86,20 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
         })
 
       {:ok, _} = Donations.enable_goal(goal)
+
+      # Mock the Frankfurter API to convert USD to EUR
+      ApiMock.expect(
+        FrankfurterApi,
+        path: {:get, "/latest"},
+        params: %{"amount" => "10.0", "from" => "USD", "to" => "EUR"},
+        response: %{
+          "amount" => 10,
+          "base" => "USD",
+          "date" => "2025-10-26",
+          "rates" => %{"EUR" => 9.25}
+        },
+        status: 200
+      )
 
       payload = %{
         "type" => "donation.created",
@@ -123,14 +139,17 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
 
       assert response.status == 202
 
-      # Verify donation was created without goal
+      # Verify donation was created with currency conversion
       donations = Donations.all_donations()
       assert length(donations) == 1
       donation = hd(donations)
 
-      assert Decimal.equal?(donation.amount, Decimal.new(10))
-      assert donation.currency == "USD"
-      assert donation.goal_id == nil
+      # Amount and currency should be converted to goal's currency
+      assert Decimal.equal?(donation.amount, Decimal.new("9.25"))
+      assert donation.currency == "EUR"
+      # Donation should be attached to the goal
+      assert donation.goal_id == goal.id
+      # Original payload should be preserved unchanged
       assert donation.payload == payload
     end
 
@@ -363,10 +382,10 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
             |> put_req_header("content-type", "application/json")
             |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
 
-          assert response.status == 202
+          assert response.status == 400
         end)
 
-      assert log =~ "Unknown BuyMeACoffee event type: some.unknown.event"
+      assert log =~ "Invalid BuyMeACoffee webhook payload"
     end
 
     test "rejects invalid payload", %{conn: conn} do
