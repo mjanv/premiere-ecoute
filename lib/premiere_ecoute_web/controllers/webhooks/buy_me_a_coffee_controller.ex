@@ -36,12 +36,12 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeController do
         end
 
       {:ok, %DonationRefunded{data: data}} ->
-        
         case Donations.Donation.get_by(external_id: data.transaction_id) do
           nil ->
             Logger.warning("Refund received for unknown donation: transaction_id=#{data.transaction_id}")
 
             {:error, :donation_not_found}
+
           donation ->
             Donations.revoke_donation(donation)
         end
