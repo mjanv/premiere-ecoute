@@ -37,10 +37,7 @@
 <!-- Last Donation -->
         <div class="text-left">
           <%= if @last_donation do %>
-            <p class="text-2xl text-gray-500 mb-2">{gettext("Last Donation")}</p>
-            <p class="text-4xl font-bold text-gray-900">
-              @last_donation.donor_name - {Decimal.to_string(@last_donation.amount)} {@last_donation.currency}
-            </p>
+            <p class="text-2xl text-gray-500 mb-2">{gettext("Last Donation")}: {@last_donation.donor_name} - {Decimal.to_string(@last_donation.amount)} {@last_donation.currency}</p>
           <% else %>
             <p class="text-3xl text-gray-500">{gettext("Be the first to donate")}</p>
           <% end %>

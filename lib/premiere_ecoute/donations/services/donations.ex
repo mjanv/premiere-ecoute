@@ -109,10 +109,6 @@ defmodule PremiereEcoute.Donations.Services.Donations do
           )
         end
 
-        Logger.info(
-          "Donation created: external_id=#{donation.external_id} amount=#{donation.amount} #{donation.currency} goal_id=#{goal_id || "none"}"
-        )
-
         {:ok, donation}
 
       {:error, _} = error ->

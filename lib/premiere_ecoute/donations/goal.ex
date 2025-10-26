@@ -12,7 +12,10 @@ defmodule PremiereEcoute.Donations.Goal do
     root: [:donations, :expenses],
     json: [:id, :title, :description, :target_amount, :currency, :start_date, :end_date, :active]
 
+  import Ecto.Query
+
   alias PremiereEcoute.Donations.{Balance, Donation, Expense}
+  alias PremiereEcoute.Repo
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -80,5 +83,34 @@ defmodule PremiereEcoute.Donations.Goal do
     else
       changeset
     end
+  end
+
+  @doc """
+  Returns the most recent created donation for a goal using a SQL query.
+
+  This is more efficient than loading all donations and filtering in memory.
+
+  ## Examples
+
+      iex> Goal.last_donation(goal)
+      %Donation{}
+
+      iex> Goal.last_donation(goal_id)
+      %Donation{}
+
+      iex> Goal.last_donation(goal_with_no_donations)
+      nil
+  """
+  @spec last_donation(t() | integer()) :: Donation.t() | nil
+  def last_donation(%__MODULE__{id: goal_id}), do: last_donation(goal_id)
+
+  def last_donation(goal_id) when is_integer(goal_id) do
+    from(d in Donation,
+      where: d.goal_id == ^goal_id,
+      where: d.status == :created,
+      order_by: [desc: d.inserted_at],
+      limit: 1
+    )
+    |> Repo.one()
   end
 end

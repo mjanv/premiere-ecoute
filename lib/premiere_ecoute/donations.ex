@@ -27,6 +27,7 @@ defmodule PremiereEcoute.Donations do
 
   defdelegate get_goal(id), to: Goal, as: :get
   defdelegate all_goals(clauses \\ []), to: Goal, as: :all
+  defdelegate last_donation(goal_or_id), to: Goal
   defdelegate get_donation(id), to: Donation, as: :get
   defdelegate all_donations(clauses \\ []), to: Donation, as: :all
   defdelegate get_expense(id), to: Expense, as: :get
