@@ -18,6 +18,8 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:469
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:528
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:413
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:383
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:442
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:117
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:394
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:565
@@ -36,6 +38,8 @@ msgid "Connect with Twitch"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:419
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:219
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:210
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:78
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:42
 #, elixir-autogen, elixir-format
@@ -110,6 +114,9 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:131
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:130
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:329
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:140
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:148
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:250
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr ""
@@ -243,8 +250,8 @@ msgstr ""
 msgid "Failed to play: %{reason}"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:301
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:308
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:323
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:330
 #: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:177
 #, elixir-autogen, elixir-format
 msgid "Next"
@@ -270,8 +277,8 @@ msgstr ""
 msgid "Play"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:265
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:272
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:287
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:294
 #: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:145
 #, elixir-autogen, elixir-format
 msgid "Previous"
@@ -364,6 +371,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:18
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:18
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:18
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:34
 #, elixir-autogen, elixir-format
 msgid "Back to Dashboard"
 msgstr ""
@@ -542,6 +550,9 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:120
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:119
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:137
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:142
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:244
 #, elixir-autogen, elixir-format
 msgid "Status"
 msgstr ""
@@ -777,42 +788,42 @@ msgstr ""
 msgid "Unknown Artist"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:197
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:219
 #, elixir-autogen, elixir-format
 msgid "#"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:175
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:197
 #, elixir-autogen, elixir-format
 msgid "Browse and inspect stored events"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:212
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:234
 #, elixir-autogen, elixir-format
 msgid "Created At"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:209
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:231
 #, elixir-autogen, elixir-format
 msgid "Data"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:206
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:228
 #, elixir-autogen, elixir-format
 msgid "Event"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:174
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:196
 #, elixir-autogen, elixir-format
 msgid "Event Store"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:200
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:222
 #, elixir-autogen, elixir-format
 msgid "Stream"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:203
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:225
 #, elixir-autogen, elixir-format
 msgid "Version"
 msgstr ""
@@ -1781,6 +1792,10 @@ msgid "This playlist has already been submitted"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:114
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:128
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:269
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:133
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:351
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:49
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:366
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:479
@@ -2013,6 +2028,7 @@ msgstr[1] ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:56
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:61
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:181
 #: lib/premiere_ecoute_web/live/home_live.html.heex:61
 #, elixir-autogen, elixir-format
 msgid "Active"
@@ -2531,6 +2547,8 @@ msgstr ""
 msgid "Decrease track count"
 msgstr ""
 
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:286
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:368
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:377
 #, elixir-autogen, elixir-format
 msgid "Description"
@@ -2674,6 +2692,7 @@ msgid "All Billboards"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:271
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:266
 #, elixir-autogen, elixir-format
 msgid "Anonymous"
 msgstr ""
@@ -2836,6 +2855,7 @@ msgstr ""
 msgid "Playlist Selection"
 msgstr ""
 
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:241
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:70
 #, elixir-autogen, elixir-format
 msgid "Provider"
@@ -3035,6 +3055,7 @@ msgstr ""
 msgid "Configure which playlist automatically receives liked tracks from your Twitch extension"
 msgstr ""
 
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:195
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:60
 #, elixir-autogen, elixir-format
 msgid "Deactivate"
@@ -3108,4 +3129,372 @@ msgstr ""
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:53
 #, elixir-autogen, elixir-format
 msgid "Votes close in 30 seconds !"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:307
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:405
+#, elixir-autogen, elixir-format
+msgid "100.00"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:203
+#, elixir-autogen, elixir-format
+msgid "Activate"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:77
+#, elixir-autogen, elixir-format
+msgid "Active Goals"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:124
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:332
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:435
+#, elixir-autogen, elixir-format
+msgid "Add Expense"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:139
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:238
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:398
+#, elixir-autogen, elixir-format
+msgid "Amount"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:409
+#, elixir-autogen, elixir-format
+msgid "Amount is required"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:199
+#, elixir-autogen, elixir-format
+msgid "Are you sure you want to delete this expense?"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:216
+#, elixir-autogen, elixir-format
+msgid "Are you sure you want to delete this goal?"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:295
+#, elixir-autogen, elixir-format
+msgid "Are you sure you want to revoke this donation?"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:16
+#, elixir-autogen, elixir-format
+msgid "Back to Donations"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/overlay_live.html.heex:45
+#, elixir-autogen, elixir-format
+msgid "Be the first to donate"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:136
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:381
+#, elixir-autogen, elixir-format
+msgid "Category"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:391
+#, elixir-autogen, elixir-format
+msgid "Category is required"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:49
+#, elixir-autogen, elixir-format
+msgid "Collected"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:119
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:247
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:373
+#, elixir-autogen, elixir-format
+msgid "Create Goal"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:110
+#, elixir-autogen, elixir-format
+msgid "Create and manage fundraising goals"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:317
+#, elixir-autogen, elixir-format
+msgid "Currency"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:328
+#, elixir-autogen, elixir-format
+msgid "Currency is required"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:145
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:247
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:416
+#, elixir-autogen, elixir-format
+msgid "Date"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:134
+#, elixir-autogen, elixir-format
+msgid "Date Range"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:425
+#, elixir-autogen, elixir-format
+msgid "Date is required"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:108
+#, elixir-autogen, elixir-format
+msgid "Donation has been revoked successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:225
+#, elixir-autogen, elixir-format
+msgid "Donations"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:8
+#, elixir-autogen, elixir-format
+msgid "Donations Management"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:235
+#, elixir-autogen, elixir-format
+msgid "Donor"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:211
+#, elixir-autogen, elixir-format
+msgid "Edit"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:249
+#, elixir-autogen, elixir-format
+msgid "Edit Goal"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:352
+#, elixir-autogen, elixir-format
+msgid "End Date"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:361
+#, elixir-autogen, elixir-format
+msgid "End date must be after start date"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:372
+#, elixir-autogen, elixir-format
+msgid "Enter expense description"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:357
+#, elixir-autogen, elixir-format
+msgid "Enter expense title"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:290
+#, elixir-autogen, elixir-format
+msgid "Enter goal description"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:275
+#, elixir-autogen, elixir-format
+msgid "Enter goal title"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:64
+#, elixir-autogen, elixir-format
+msgid "Expense has been added successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:87
+#, elixir-autogen, elixir-format
+msgid "Expense has been deleted successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:114
+#, elixir-autogen, elixir-format
+msgid "Expenses"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:89
+#, elixir-autogen, elixir-format
+msgid "Failed to activate goal"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:108
+#, elixir-autogen, elixir-format
+msgid "Failed to deactivate goal"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:92
+#, elixir-autogen, elixir-format
+msgid "Failed to delete expense"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:129
+#, elixir-autogen, elixir-format
+msgid "Failed to delete goal"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:113
+#, elixir-autogen, elixir-format
+msgid "Failed to revoke donation"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:84
+#, elixir-autogen, elixir-format
+msgid "Goal has been activated successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:146
+#, elixir-autogen, elixir-format
+msgid "Goal has been created successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:103
+#, elixir-autogen, elixir-format
+msgid "Goal has been deactivated successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:124
+#, elixir-autogen, elixir-format
+msgid "Goal has been deleted successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:171
+#, elixir-autogen, elixir-format
+msgid "Goal has been updated successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:183
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:109
+#, elixir-autogen, elixir-format
+msgid "Goals"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:183
+#, elixir-autogen, elixir-format
+msgid "Inactive"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/overlay_live.html.heex:40
+#, elixir-autogen, elixir-format
+msgid "Last Donation"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:9
+#, elixir-autogen, elixir-format
+msgid "Manage fundraising goals and track donations"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/overlay_live.html.heex:60
+#, elixir-autogen, elixir-format
+msgid "No Active Goal"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:258
+#, elixir-autogen, elixir-format
+msgid "No donations received yet"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:156
+#, elixir-autogen, elixir-format
+msgid "No expenses added yet"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:148
+#, elixir-autogen, elixir-format
+msgid "No goals created yet. Create your first fundraising goal!"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:25
+#, elixir-autogen, elixir-format
+msgid "OBS Overlay"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:104
+#, elixir-autogen, elixir-format
+msgid "Progress"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:84
+#, elixir-autogen, elixir-format
+msgid "Remaining"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:306
+#, elixir-autogen, elixir-format
+msgid "Revoke"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:64
+#, elixir-autogen, elixir-format
+msgid "Spent"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:337
+#, elixir-autogen, elixir-format
+msgid "Start Date"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:346
+#, elixir-autogen, elixir-format
+msgid "Start date is required"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:131
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:300
+#, elixir-autogen, elixir-format
+msgid "Target Amount"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:311
+#, elixir-autogen, elixir-format
+msgid "Target amount is required"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:279
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:361
+#, elixir-autogen, elixir-format
+msgid "Title is required"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:57
+#, elixir-autogen, elixir-format
+msgid "Total Goals"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:226
+#, elixir-autogen, elixir-format
+msgid "Total donations: "
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:115
+#, elixir-autogen, elixir-format
+msgid "Total expenses: "
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:324
+#, elixir-autogen, elixir-format
+msgid "USD"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:99
+#, elixir-autogen, elixir-format
+msgid "Upcoming Goals"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:375
+#, elixir-autogen, elixir-format
+msgid "Update Goal"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:387
+#, elixir-autogen, elixir-format
+msgid "e.g., hosting, server, bandwidth"
 msgstr ""

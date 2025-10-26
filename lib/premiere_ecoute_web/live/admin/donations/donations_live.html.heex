@@ -150,11 +150,7 @@
               </tr>
             <% else %>
               <%= for goal <- @goals do %>
-                <tr
-                  class="hover:bg-gray-700 cursor-pointer"
-                  phx-click="navigate"
-                  phx-value-path={"/admin/donations/goals/#{goal.id}"}
-                >
+                <tr class="hover:bg-gray-700">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm font-medium text-white">
                       <.link navigate={"/admin/donations/goals/#{goal.id}"} class="text-blue-400 hover:text-blue-300">
