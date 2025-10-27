@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     root: [user: [:twitch, :spotify], album: [:tracks], current_track: [], playlist: [:tracks], current_playlist_track: []],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist]
 
+  alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Discography.Album
@@ -15,6 +16,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @type t :: %__MODULE__{
           id: integer() | nil,
           status: atom(),
+          visibility: atom(),
           started_at: DateTime.t() | nil,
           ended_at: DateTime.t() | nil,
           user: entity(User.t()),
@@ -29,6 +31,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
     field :source, Ecto.Enum, values: [:album, :playlist], default: :album
+    # AIDEV-NOTE: visibility controls retrospective access (issue #17)
+    field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
     field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     field :started_at, :utc_datetime
@@ -52,6 +56,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> cast(attrs, [
       :status,
       :source,
+      :visibility,
       :options,
       :vote_options,
       :started_at,
@@ -244,6 +249,31 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Enum.sum()
     |> div(60_000)
   end
+
+  # AIDEV-NOTE: authorization for retrospective access (issue #17)
+  @doc """
+  Checks if the given scope can view the retrospective for a session based on visibility settings.
+
+  Returns `true` if:
+  - The scope's user is an admin (can view all sessions)
+  - Session is :public (anyone can view)
+  - Session is :protected and scope has an authenticated user
+  - Session is :private and scope's user is the session owner
+
+  Returns `false` otherwise.
+  """
+  def can_view_retrospective?(%__MODULE__{visibility: :public}, _scope), do: true
+
+  def can_view_retrospective?(%__MODULE__{}, %Scope{user: %User{role: :admin}}), do: true
+
+  def can_view_retrospective?(%__MODULE__{visibility: :protected}, %Scope{user: %User{}}), do: true
+
+  def can_view_retrospective?(%__MODULE__{user_id: user_id, visibility: :private}, %Scope{
+        user: %User{id: user_id}
+      }),
+      do: true
+
+  def can_view_retrospective?(%__MODULE__{}, _scope), do: false
 
   defp has_active_session?(user_id, exclude_session_id) do
     from(s in __MODULE__,

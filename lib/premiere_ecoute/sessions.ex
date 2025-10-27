@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate previous_track(session), to: ListeningSession
   defdelegate active_sessions(user), to: ListeningSession
   defdelegate get_active_session(user), to: ListeningSession
+  defdelegate can_view_retrospective?(session, scope), to: ListeningSession
   def publish_message(event), do: PremiereEcouteCore.publish(Scores.MessagePipeline, event)
   def publish_poll(event), do: PremiereEcouteCore.publish(Scores.PollPipeline, event)
 

@@ -1,16 +1,20 @@
 defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   @moduledoc """
-  Public retrospective view for ended listening sessions.
-  No authentication required - designed for sharing with public audience.
+  Retrospective view for ended listening sessions.
+  Visibility is controlled by session.visibility setting (private/protected/public).
   """
   use PremiereEcouteWeb, :live_view
 
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Retrospective.VoteTrends
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    # AIDEV-NOTE: authorization checks for visibility (issue #17)
+    current_scope = socket.assigns[:current_scope]
+
     case ListeningSession.get(id) do
       nil ->
         socket
@@ -26,29 +30,39 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
           |> redirect(to: ~p"/")
           |> then(fn socket -> {:ok, socket} end)
         else
-          socket
-          |> assign(:listening_session, listening_session)
-          |> assign_async(:report, fn ->
-            case Report.generate(listening_session) do
-              {:ok, report} -> {:ok, %{report: report}}
-              error -> {:error, error}
-            end
-          end)
-          |> assign_async([:most_liked, :least_liked], fn ->
-            consensus =
-              listening_session.id
-              |> VoteTrends.track_distribution()
-              |> VoteTrends.consensus()
+          # Check authorization based on visibility settings
+          if Sessions.can_view_retrospective?(listening_session, current_scope) do
+            socket
+            |> assign(:listening_session, listening_session)
+            |> assign_async(:report, fn ->
+              case Report.generate(listening_session) do
+                {:ok, report} -> {:ok, %{report: report}}
+                error -> {:error, error}
+              end
+            end)
+            |> assign_async([:most_liked, :least_liked], fn ->
+              consensus =
+                listening_session.id
+                |> VoteTrends.track_distribution()
+                |> VoteTrends.consensus()
 
-            most_liked = Enum.max(Enum.map(consensus, fn {_, %{score: score}} -> score end))
-            {most_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == most_liked end)
+              most_liked = Enum.max(Enum.map(consensus, fn {_, %{score: score}} -> score end))
+              {most_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == most_liked end)
 
-            least_liked = Enum.min(Enum.map(consensus, fn {_, %{score: score}} -> score end))
-            {least_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == least_liked end)
+              least_liked = Enum.min(Enum.map(consensus, fn {_, %{score: score}} -> score end))
+              {least_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == least_liked end)
 
-            {:ok, %{most_liked: most_liked, least_liked: least_liked}}
-          end)
-          |> then(fn socket -> {:ok, socket} end)
+              {:ok, %{most_liked: most_liked, least_liked: least_liked}}
+            end)
+            |> then(fn socket -> {:ok, socket} end)
+          else
+            error_message = authorization_error_message(listening_session, current_scope)
+
+            socket
+            |> put_flash(:error, error_message)
+            |> redirect(to: ~p"/")
+            |> then(fn socket -> {:ok, socket} end)
+          end
         end
     end
   end
@@ -56,6 +70,23 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  # AIDEV-NOTE: contextual error messages for visibility (issue #17)
+  defp authorization_error_message(%{visibility: :private}, nil) do
+    "This retrospective is private. Please log in if you have access."
+  end
+
+  defp authorization_error_message(%{visibility: :private}, _scope) do
+    "This retrospective is private and can only be viewed by the streamer."
+  end
+
+  defp authorization_error_message(%{visibility: :protected}, nil) do
+    "This retrospective is protected. Please log in to view."
+  end
+
+  defp authorization_error_message(_session, _scope) do
+    "You don't have permission to view this retrospective."
   end
 
   defp session_average_score(nil), do: "N/A"
