@@ -101,7 +101,6 @@ Ensure your changes:
 
 - Don't break existing functionality
 - Follow the project's coding standards from `CLAUDE.md`
-- Add `AIDEV-NOTE` comments for complex internationalization decisions
 - Preserve existing code structure and formatting
 - Handle edge cases (empty strings, nil values)
 
