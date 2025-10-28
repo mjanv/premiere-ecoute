@@ -1,0 +1,14 @@
+{
+  "name": "premiere-ecoute-slides",
+  "version": "1.0.0",
+  "description": "Slidev presentations for Premiere Ecoute",
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^0.49.0",
+    "@slidev/theme-default": "latest"
+  }
+}
