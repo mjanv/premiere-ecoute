@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
 
+  # AIDEV-NOTE: Session status tracks overlay state: :not_started, :active, :ended
   @impl true
   def mount(%{"id" => user_id}, _session, socket) do
     user = PremiereEcoute.Accounts.get_user!(user_id)
@@ -27,6 +28,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
           |> assign(:open_vote, false)
           |> assign(:listening_session, nil)
           |> assign(:summary, AsyncResult.loading())
+          |> assign(:session_status, :not_started)
 
         session ->
           if connected?(socket) do
@@ -59,6 +61,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
           |> assign(:open_vote, true)
           |> assign(:listening_session, session)
           |> assign(:summary, summary_result)
+          |> assign(:session_status, :active)
       end
 
     {:ok, socket}
@@ -126,16 +129,17 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  # AIDEV-NOTE: When session stops, preserve summary and mark as ended (green background)
   @impl true
   def handle_info(:stop, %{assigns: %{listening_session: session}} = socket) when not is_nil(session) do
     socket =
       socket
       |> assign(:id, nil)
       |> assign(:listening_session, nil)
-      |> assign(:summary, AsyncResult.loading())
       |> assign(:open_vote, false)
       |> assign(:progress, AsyncResult.loading())
       |> assign(:percent, 0)
+      |> assign(:session_status, :ended)
 
     {:noreply, socket}
   end
@@ -160,4 +164,11 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp overlay_width(_), do: 240
 
   defp overlay_height(_), do: 240
+
+  # AIDEV-NOTE: Background gradient changes based on session status
+  defp overlay_background(:not_started, _percent), do: "background: black"
+  defp overlay_background(:ended, _percent), do: "background: oklch(0.65 0.20 145 / 0.9)"
+  defp overlay_background(:active, percent) do
+    "background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%)"
+  end
 end

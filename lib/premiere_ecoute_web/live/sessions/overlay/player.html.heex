@@ -4,36 +4,48 @@
 >
   <.async_result :let={progress} assign={@progress}>
     <:loading>
-      <!-- Album Cover Skeleton -->
-      <div style="flex-shrink: 0;">
-        <div style="width: 200px; height: 200px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
-        </div>
-      </div>
-      
-<!-- Track Information Skeleton -->
-      <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
-        <!-- Album Name Skeleton -->
-        <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px;">
-          - / - - -
-        </div>
-        
-<!-- Track Name Skeleton -->
-        <div style="font-size: 36px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px;">
-          -
-        </div>
-        
-<!-- Artist Skeleton -->
-        <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px;">
-          -
-        </div>
-        
-<!-- Track and Timer Row Skeleton -->
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
-            --:-- / --:--
+      <%= if @session_status == :not_started do %>
+        <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+          <div style="width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;">
           </div>
         </div>
-      </div>
+        <style>
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        </style>
+      <% else %>
+        <!-- Album Cover Skeleton -->
+        <div style="flex-shrink: 0;">
+          <div style="width: 200px; height: 200px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
+          </div>
+        </div>
+
+  <!-- Track Information Skeleton -->
+        <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
+          <!-- Album Name Skeleton -->
+          <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px;">
+            - / - - -
+          </div>
+
+  <!-- Track Name Skeleton -->
+          <div style="font-size: 36px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px;">
+            -
+          </div>
+
+  <!-- Artist Skeleton -->
+          <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px;">
+            -
+          </div>
+
+  <!-- Track and Timer Row Skeleton -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+              --:-- / --:--
+            </div>
+          </div>
+        </div>
+      <% end %>
     </:loading>
     <!-- Album Cover -->
     <div style="flex-shrink: 0;">
@@ -75,27 +87,29 @@
 <!-- Notes Row -->
   <.async_result :let={summary} assign={@summary}>
     <:loading>
-      <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
-        <!-- Chat Note Skeleton -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-          <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            -
-          </span>
-          <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
-            Viewer
+      <%= if @session_status != :not_started do %>
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
+          <!-- Chat Note Skeleton -->
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+              -
+            </span>
+            <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+              Viewer
+            </div>
+          </div>
+
+  <!-- Streamer Note Skeleton -->
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+              -
+            </span>
+            <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+              Streamer
+            </div>
           </div>
         </div>
-        
-<!-- Streamer Note Skeleton -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-          <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            -
-          </span>
-          <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
-            Streamer
-          </div>
-        </div>
-      </div>
+      <% end %>
     </:loading>
 
     <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">

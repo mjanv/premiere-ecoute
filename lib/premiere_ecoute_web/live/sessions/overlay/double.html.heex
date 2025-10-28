@@ -1,10 +1,22 @@
 <.async_result :let={summary} assign={@summary}>
   <:loading>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-        -
-      </span>
-    </div>
+    <%= if @session_status == :not_started do %>
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <div style="width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;">
+        </div>
+      </div>
+      <style>
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
+    <% else %>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+          -
+        </span>
+      </div>
+    <% end %>
   </:loading>
 
   <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 500px; margin: 0 auto;">

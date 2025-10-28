@@ -1,13 +1,25 @@
 <.async_result :let={summary} assign={@summary}>
   <:loading>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-        --
-      </span>
-      <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
-        {@score}
+    <%= if @session_status == :not_started do %>
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <div style="width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;">
+        </div>
       </div>
-    </div>
+      <style>
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
+    <% else %>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+          -
+        </span>
+        <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+          {score_label(@score)}
+        </div>
+      </div>
+    <% end %>
   </:loading>
 
   <div style="display: flex; flex-direction: column; align-items: center;">
