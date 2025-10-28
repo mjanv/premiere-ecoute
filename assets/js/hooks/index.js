@@ -7,9 +7,10 @@ import { NoteGraph } from "./note_graph";
 import { ClickOutside } from "./click_outside";
 import { AutoDismissFlash } from "./auto_dismiss_flash";
 import { NextTrackTimer } from "./next_track_timer";
+import { VisibilityDropdown } from "./visibility_dropdown";
 
 
- 
+
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
   CopyToClipboard: CopyToClipboard,
@@ -19,5 +20,6 @@ export const Hooks = {
   Carousel: Carousel,
   NoteGraph: NoteGraph,
   ClickOutside: ClickOutside,
-  NextTrackTimer: NextTrackTimer
+  NextTrackTimer: NextTrackTimer,
+  VisibilityDropdown: VisibilityDropdown
 };

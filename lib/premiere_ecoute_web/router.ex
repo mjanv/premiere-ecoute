@@ -145,7 +145,6 @@ defmodule PremiereEcouteWeb.Router do
       live "/overlay/:id", OverlayLive, :show
     end
 
-    # AIDEV-NOTE: retrospective uses :current_scope for visibility-based auth (issue #17)
     live_session :retrospective, on_mount: [{UserAuth, :current_scope}] do
       live "/:id/retrospective", RetrospectiveLive, :show
     end

@@ -149,10 +149,13 @@
                         {session_status_icon(session.status)}
                         {String.capitalize(to_string(session.status))}
                       </span>
-                      <span class={[
-                        "inline-flex items-center px-2 py-1 rounded text-xs font-medium border",
-                        visibility_class(session.visibility)
-                      ]} title={gettext("Retrospective visibility")}>
+                      <span
+                        class={[
+                          "inline-flex items-center px-2 py-1 rounded text-xs font-medium border",
+                          visibility_class(session.visibility)
+                        ]}
+                        title={gettext("Retrospective visibility")}
+                      >
                         {visibility_icon(session.visibility)}
                         {visibility_label(session.visibility)}
                       </span>

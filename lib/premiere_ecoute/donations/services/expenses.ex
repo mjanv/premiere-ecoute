@@ -23,7 +23,6 @@ defmodule PremiereEcoute.Donations.Services.Expenses do
       {:error, %Ecto.Changeset{}}
   """
   def add_expense(%Goal{} = goal, attrs) do
-    # AIDEV-NOTE: Normalize attrs to string keys to handle both form data and test fixtures
     attrs = stringify_keys(attrs)
 
     Ecto.Multi.new()

@@ -446,4 +446,114 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
       track_summary -> Map.get(track_summary, key, "-")
     end
   end
+
+  attr :current_visibility, :atom, required: true
+  attr :visibility_options, :list, required: true
+
+  def visibility_dropdown(assigns) do
+    ~H"""
+    <div class="relative" id="visibility-dropdown" phx-hook="VisibilityDropdown">
+      <!-- Selected option display / Dropdown trigger -->
+      <button
+        type="button"
+        id="visibility-dropdown-button"
+        class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-2">
+          <.visibility_icon_svg visibility={@current_visibility} />
+          <span>{visibility_label(@current_visibility)}</span>
+        </div>
+        <svg class="w-4 h-4 transition-transform" id="dropdown-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+    <!-- Dropdown menu -->
+      <div
+        id="visibility-dropdown-menu"
+        class="hidden absolute z-10 w-full mt-2 bg-gray-800 border border-white/20 rounded-lg shadow-lg overflow-hidden"
+      >
+        <%= for %{value: value, label: label, description: description} <- @visibility_options do %>
+          <button
+            type="button"
+            phx-click="update_visibility"
+            phx-value-visibility={Atom.to_string(value)}
+            class={[
+              "w-full text-left px-4 py-3 hover:bg-white/10 transition-colors border-b border-white/10 last:border-b-0",
+              if(@current_visibility == value, do: "bg-purple-600/20", else: "")
+            ]}
+          >
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 mt-0.5">
+                <.visibility_icon_svg visibility={value} />
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white">
+                  {label}
+                </div>
+                <div class="text-xs text-purple-300/70 mt-1">
+                  {description}
+                </div>
+              </div>
+              <%= if @current_visibility == value do %>
+                <svg class="w-5 h-5 text-purple-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              <% end %>
+            </div>
+          </button>
+        <% end %>
+      </div>
+    </div>
+    """
+  end
+
+  attr :visibility, :atom, required: true
+
+  defp visibility_icon_svg(%{visibility: :private} = assigns) do
+    ~H"""
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+      />
+    </svg>
+    """
+  end
+
+  defp visibility_icon_svg(%{visibility: :protected} = assigns) do
+    ~H"""
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+      />
+    </svg>
+    """
+  end
+
+  defp visibility_icon_svg(%{visibility: :public} = assigns) do
+    ~H"""
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    """
+  end
+
+  defp visibility_label(:private), do: "Private"
+  defp visibility_label(:protected), do: "Protected"
+  defp visibility_label(:public), do: "Public"
 end

@@ -95,7 +95,7 @@ msgid "Album cover"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:192
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:169
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:179
 #, elixir-autogen, elixir-format
 msgid "Delete session"
 msgstr ""
@@ -170,12 +170,12 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:163
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:188
 #, elixir-autogen, elixir-format
 msgid "End Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:298
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:323
 #, elixir-autogen, elixir-format
 msgid "My Score"
 msgstr ""
@@ -191,12 +191,12 @@ msgstr ""
 msgid "Released"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:291
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:316
 #, elixir-autogen, elixir-format
 msgid "Score"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:147
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:172
 #, elixir-autogen, elixir-format
 msgid "Start Session"
 msgstr ""
@@ -231,7 +231,7 @@ msgstr ""
 msgid "Unique Voters"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:282
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:307
 #, elixir-autogen, elixir-format
 msgid "Votes"
 msgstr ""
@@ -2313,7 +2313,7 @@ msgstr ""
 msgid "Failed to load data"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:181
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:206
 #, elixir-autogen, elixir-format
 msgid "View Retrospective"
 msgstr ""
@@ -2470,7 +2470,7 @@ msgstr ""
 msgid "Are you sure you want to delete this session? This action cannot be undone."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:271
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:296
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Closed votes"
 msgstr ""
@@ -2486,7 +2486,7 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:269
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:294
 #, elixir-autogen, elixir-format
 msgid "Open votes"
 msgstr ""
@@ -2841,7 +2841,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:321
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:346
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No tracks found for this %{source}."
 msgstr ""
@@ -3247,7 +3247,7 @@ msgstr ""
 msgid "Date is required"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:108
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:106
 #, elixir-autogen, elixir-format
 msgid "Donation has been revoked successfully"
 msgstr ""
@@ -3307,12 +3307,12 @@ msgstr ""
 msgid "Enter goal title"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:64
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:62
 #, elixir-autogen, elixir-format
 msgid "Expense has been added successfully"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:87
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:85
 #, elixir-autogen, elixir-format
 msgid "Expense has been deleted successfully"
 msgstr ""
@@ -3332,7 +3332,7 @@ msgstr ""
 msgid "Failed to deactivate goal"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:92
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:90
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to delete expense"
 msgstr ""
@@ -3342,7 +3342,7 @@ msgstr ""
 msgid "Failed to delete goal"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:113
+#: lib/premiere_ecoute_web/live/admin/donations/goal_live.ex:111
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to revoke donation"
 msgstr ""
@@ -3383,7 +3383,7 @@ msgstr ""
 msgid "Inactive"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/admin/donations/overlay_live.html.heex:40
+#: lib/premiere_ecoute_web/live/admin/donations/overlay_live.html.heex:42
 #, elixir-autogen, elixir-format
 msgid "Last Donation"
 msgstr ""
@@ -3498,4 +3498,9 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:387
 #, elixir-autogen, elixir-format
 msgid "e.g., hosting, server, bandwidth"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:157
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Retrospective visibility"
 msgstr ""

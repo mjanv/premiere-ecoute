@@ -19,7 +19,6 @@ defmodule PremiereEcouteWeb.Admin.Donations.GoalLive do
   end
 
   def handle_event("show_expense_modal", _params, socket) do
-    # AIDEV-NOTE: Initialize form with empty Expense changeset for proper form data binding
     changeset = Donations.Expense.changeset(%Donations.Expense{}, %{})
 
     socket
@@ -43,7 +42,6 @@ defmodule PremiereEcouteWeb.Admin.Donations.GoalLive do
   end
 
   def handle_event("save_expense", %{"expense" => expense_params}, socket) do
-    # AIDEV-NOTE: Convert date string (YYYY-MM-DD) to DateTime at midnight UTC
     # Also add goal's currency to ensure expense currency matches goal currency
     expense_params =
       expense_params
