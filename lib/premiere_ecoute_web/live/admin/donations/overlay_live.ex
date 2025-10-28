@@ -4,7 +4,6 @@ defmodule PremiereEcouteWeb.Admin.Donations.OverlayLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Donations
-  alias PremiereEcoute.Repo
 
   def mount(_params, _session, socket) do
     Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "donations")
