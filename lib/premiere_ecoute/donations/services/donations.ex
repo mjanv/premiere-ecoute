@@ -52,7 +52,6 @@ defmodule PremiereEcoute.Donations.Services.Donations do
           # Currencies don't match - convert amount
           case convert_currency(attrs[:amount], attrs[:currency], current_goal.currency) do
             {:ok, converted_amount} ->
-              # AIDEV-NOTE: Update amount and currency, but preserve original payload
               # Convert float to Decimal (Decimal.new only accepts integers/strings)
               converted_decimal =
                 converted_amount
@@ -116,9 +115,7 @@ defmodule PremiereEcoute.Donations.Services.Donations do
     end
   end
 
-  # AIDEV-NOTE: Convert amount from one currency to another using Frankfurter API
   defp convert_currency(amount, from_currency, to_currency) do
-    # Convert Decimal to float for API call
     amount_float =
       case amount do
         %Decimal{} -> Decimal.to_float(amount)

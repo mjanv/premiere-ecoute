@@ -12,59 +12,73 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    # AIDEV-NOTE: authorization checks for visibility (issue #17)
     current_scope = socket.assigns[:current_scope]
 
-    case ListeningSession.get(id) do
+    with listening_session when not is_nil(listening_session) <- ListeningSession.get(id),
+         :ok <- validate_session_stopped(listening_session),
+         :ok <- validate_authorization(listening_session, current_scope) do
+      mount_retrospective(socket, listening_session)
+    else
       nil ->
-        socket
-        |> put_flash(:error, "Session not found")
-        |> redirect(to: ~p"/")
-        |> then(fn socket -> {:ok, socket} end)
+        redirect_with_error(socket, "Session not found")
 
-      listening_session ->
-        # Only allow access to stopped sessions
-        if listening_session.status != :stopped do
-          socket
-          |> put_flash(:error, "Retrospective only available for ended sessions")
-          |> redirect(to: ~p"/")
-          |> then(fn socket -> {:ok, socket} end)
-        else
-          # Check authorization based on visibility settings
-          if Sessions.can_view_retrospective?(listening_session, current_scope) do
-            socket
-            |> assign(:listening_session, listening_session)
-            |> assign_async(:report, fn ->
-              case Report.generate(listening_session) do
-                {:ok, report} -> {:ok, %{report: report}}
-                error -> {:error, error}
-              end
-            end)
-            |> assign_async([:most_liked, :least_liked], fn ->
-              consensus =
-                listening_session.id
-                |> VoteTrends.track_distribution()
-                |> VoteTrends.consensus()
+      {:error, :not_stopped} ->
+        redirect_with_error(socket, "Retrospective only available for ended sessions")
 
-              most_liked = Enum.max(Enum.map(consensus, fn {_, %{score: score}} -> score end))
-              {most_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == most_liked end)
-
-              least_liked = Enum.min(Enum.map(consensus, fn {_, %{score: score}} -> score end))
-              {least_liked, _} = Enum.find(consensus, fn {_, %{score: score}} -> score == least_liked end)
-
-              {:ok, %{most_liked: most_liked, least_liked: least_liked}}
-            end)
-            |> then(fn socket -> {:ok, socket} end)
-          else
-            error_message = authorization_error_message(listening_session, current_scope)
-
-            socket
-            |> put_flash(:error, error_message)
-            |> redirect(to: ~p"/")
-            |> then(fn socket -> {:ok, socket} end)
-          end
-        end
+      {:error, :unauthorized, listening_session} ->
+        error_message = authorization_error_message(listening_session, current_scope)
+        redirect_with_error(socket, error_message)
     end
+  end
+
+  defp validate_session_stopped(%{status: :stopped}), do: :ok
+  defp validate_session_stopped(_), do: {:error, :not_stopped}
+
+  defp validate_authorization(listening_session, current_scope) do
+    if Sessions.can_view_retrospective?(listening_session, current_scope) do
+      :ok
+    else
+      {:error, :unauthorized, listening_session}
+    end
+  end
+
+  defp redirect_with_error(socket, message) do
+    socket
+    |> put_flash(:error, message)
+    |> redirect(to: ~p"/")
+    |> then(fn socket -> {:ok, socket} end)
+  end
+
+  defp mount_retrospective(socket, listening_session) do
+    socket
+    |> assign(:listening_session, listening_session)
+    |> assign_async(:report, fn ->
+      case Report.generate(listening_session) do
+        {:ok, report} -> {:ok, %{report: report}}
+        error -> {:error, error}
+      end
+    end)
+    |> assign_async([:most_liked, :least_liked], fn ->
+      calculate_track_extremes(listening_session.id)
+    end)
+    |> then(fn socket -> {:ok, socket} end)
+  end
+
+  defp calculate_track_extremes(session_id) do
+    consensus =
+      session_id
+      |> VoteTrends.track_distribution()
+      |> VoteTrends.consensus()
+
+    scores = Enum.map(consensus, fn {_, %{score: score}} -> score end)
+
+    most_liked_score = Enum.max(scores)
+    {most_liked, _} = Enum.find(consensus, &match?({_, %{score: ^most_liked_score}}, &1))
+
+    least_liked_score = Enum.min(scores)
+    {least_liked, _} = Enum.find(consensus, &match?({_, %{score: ^least_liked_score}}, &1))
+
+    {:ok, %{most_liked: most_liked, least_liked: least_liked}}
   end
 
   @impl true
@@ -72,7 +86,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     {:noreply, socket}
   end
 
-  # AIDEV-NOTE: contextual error messages for visibility (issue #17)
   defp authorization_error_message(%{visibility: :private}, nil) do
     "This retrospective is private. Please log in if you have access."
   end

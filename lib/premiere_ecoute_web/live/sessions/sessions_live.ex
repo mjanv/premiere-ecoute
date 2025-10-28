@@ -80,7 +80,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   def session_status_icon(:active), do: "🎵"
   def session_status_icon(:stopped), do: "⏹️"
 
-  # AIDEV-NOTE: visibility helper functions (issue #17)
   def visibility_class(:private), do: "bg-red-600/20 text-red-400 border-red-500/30"
   def visibility_class(:protected), do: "bg-blue-600/20 text-blue-400 border-blue-500/30"
   def visibility_class(:public), do: "bg-green-600/20 text-green-400 border-green-500/30"

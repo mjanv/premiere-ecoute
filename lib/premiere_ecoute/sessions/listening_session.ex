@@ -31,7 +31,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
     field :source, Ecto.Enum, values: [:album, :playlist], default: :album
-    # AIDEV-NOTE: visibility controls retrospective access (issue #17)
     field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
     field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -250,7 +249,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> div(60_000)
   end
 
-  # AIDEV-NOTE: authorization for retrospective access (issue #17)
   @doc """
   Checks if the given scope can view the retrospective for a session based on visibility settings.
 

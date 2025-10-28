@@ -115,8 +115,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("update_visibility", %{"visibility" => visibility}, %{assigns: assigns} = socket) do
-    visibility_atom = String.to_existing_atom(visibility)
-    {:ok, listening_session} = ListeningSession.update(assigns.listening_session, %{visibility: visibility_atom})
+    {:ok, listening_session} =
+      ListeningSession.update(assigns.listening_session, %{visibility: String.to_existing_atom(visibility)})
+
     {:noreply, assign(socket, :listening_session, listening_session)}
   end
 
@@ -424,7 +425,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
-  # AIDEV-NOTE: helper for visibility display (issue #17)
   def visibility_label(:private), do: "Private"
   def visibility_label(:protected), do: "Protected"
   def visibility_label(:public), do: "Public"
