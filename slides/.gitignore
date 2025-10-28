@@ -1,0 +1,21 @@
+# Node.js dependencies
+node_modules/
+
+# Slidev build output
+dist/
+.slidev/
+
+# Export outputs
+*.pdf
+*.pptx
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
