@@ -1,11 +1,12 @@
 {
   "name": "premiere-ecoute-slides",
   "version": "1.0.0",
-  "description": "Slidev presentation for Premiere Ecoute",
+  "description": "Slidev presentations for Premiere Ecoute",
   "scripts": {
-    "dev": "slidev",
-    "build": "slidev build",
-    "export": "slidev export",
+    "dev": "node scripts/slidev-runner.js dev",
+    "build": "node scripts/slidev-runner.js build",
+    "export": "node scripts/slidev-runner.js export",
+    "list": "node scripts/slidev-runner.js list",
     "install:pdf-export": "npm install playwright-chromium"
   },
   "dependencies": {

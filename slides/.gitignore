@@ -1,13 +1,20 @@
 # Node.js dependencies
 node_modules/
+package-lock.json
 
-# Slidev build output
+# Slidev build output (root and subdirectories)
 dist/
 .slidev/
+*/dist/
+*/.slidev/
 
-# Export outputs
+# Export outputs (root and subdirectories)
 *.pdf
 *.pptx
+*/*.pdf
+*/*.pptx
+slides-export.*
+*/slides-export.*
 
 # OS files
 .DS_Store
