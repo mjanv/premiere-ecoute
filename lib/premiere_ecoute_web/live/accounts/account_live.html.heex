@@ -128,7 +128,7 @@
                     class="w-full px-4 py-4 text-base rounded-xl bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 shadow-lg hover:bg-gray-900/80"
                   />
                 </div>
-                
+
 <!-- Color Scheme Selection -->
                 <div>
                   <label class="block text-base font-semibold text-gray-200 mb-4">{gettext("Color Scheme")}</label>
@@ -144,6 +144,32 @@
                   />
                 </div>
               </div>
+
+              <!-- Overlay Color (Streamers Only) -->
+              <%= if @current_user.role in [:streamer, :admin] do %>
+                <div class="mt-8 pt-8 border-t border-gray-700/50">
+                  <h3 class="text-lg font-semibold text-gray-200 mb-6">{gettext("Overlay Settings")}</h3>
+                  <div>
+                    <label class="block text-base font-semibold text-gray-200 mb-4">{gettext("Overlay Border Color")}</label>
+                    <div class="flex items-center gap-4">
+                      <.input
+                        field={@profile_form[:overlay_color]}
+                        type="text"
+                        placeholder="#9333ea"
+                        class="flex-1 px-4 py-4 text-base rounded-xl bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 shadow-lg hover:bg-gray-900/80 font-mono"
+                      />
+                      <div
+                        style={"background-color: #{Phoenix.HTML.Form.input_value(@profile_form, :overlay_color) || "#9333ea"}"}
+                        class="w-16 h-16 rounded-xl border-2 border-gray-600 shadow-lg flex-shrink-0"
+                      >
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-2">
+                      {gettext("Choose the color for your overlay border (e.g., #9333ea)")}
+                    </p>
+                  </div>
+                </div>
+              <% end %>
               
 <!-- Save Button -->
               <div class="mt-8 flex justify-end">

@@ -60,6 +60,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
           socket
           |> assign(:id, session.id)
+          |> assign(:user, user)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
           |> assign(:progress, AsyncResult.loading())
@@ -187,9 +188,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   defp overlay_height(_), do: 240
 
-  # AIDEV-NOTE: Border/text color based on session status: nil/:preparing=white, :active=purple, :stopped=green
-  defp overlay_border_color(nil), do: "white"
-  defp overlay_border_color(%{status: :preparing}), do: "white"
-  defp overlay_border_color(%{status: :stopped}), do: "oklch(0.65 0.20 145)"
-  defp overlay_border_color(%{status: :active}), do: "oklch(0.70 0.25 305)"
+  # AIDEV-NOTE: Border/text color from user profile, green when stopped
+  defp overlay_border_color(user, nil), do: user.profile.overlay_color || "#ffffff"
+  defp overlay_border_color(user, %{status: :preparing}), do: user.profile.overlay_color || "#ffffff"
+  defp overlay_border_color(_user, %{status: :stopped}), do: "oklch(0.65 0.20 145)"
+  defp overlay_border_color(user, %{status: :active}), do: user.profile.overlay_color || "#9333ea"
 end
