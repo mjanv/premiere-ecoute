@@ -1,11 +1,11 @@
-<div style={"#{overlay_background(@session_status, @percent)}; border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1; position: relative;"}>
+<div style={"#{overlay_background(@listening_session, @percent)}; border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1; position: relative;"}>
   <%= if @score in [:player] do %>
-    <.player progress={@progress} summary={@summary} open_vote={@open_vote} score={@score} session_status={@session_status} />
+    <.player progress={@progress} summary={@summary} open_vote={@open_vote} score={@score} listening_session={@listening_session} />
   <% end %>
   <%= if @score in [:viewer, :streamer] do %>
-    <.single summary={@summary} open_vote={@open_vote} score={@score} session_status={@session_status} />
+    <.single summary={@summary} open_vote={@open_vote} score={@score} listening_session={@listening_session} />
   <% end %>
   <%= if @score in [:both] do %>
-    <.double summary={@summary} open_vote={@open_vote} score={@score} session_status={@session_status} />
+    <.double summary={@summary} open_vote={@open_vote} score={@score} listening_session={@listening_session} />
   <% end %>
 </div>

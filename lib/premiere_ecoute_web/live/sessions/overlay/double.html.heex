@@ -1,6 +1,6 @@
 <.async_result :let={summary} assign={@summary}>
   <:loading>
-    <%= if @session_status == :not_started do %>
+    <%= if is_nil(@listening_session) or @listening_session.status == :preparing do %>
       <div style="display: flex; align-items: center; justify-content: center;">
         <div style="width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;">
         </div>

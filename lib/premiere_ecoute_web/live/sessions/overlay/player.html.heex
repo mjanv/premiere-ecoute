@@ -4,7 +4,7 @@
 >
   <.async_result :let={progress} assign={@progress}>
     <:loading>
-      <%= if @session_status == :not_started do %>
+      <%= if is_nil(@listening_session) or @listening_session.status == :preparing do %>
         <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
           <div style="width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;">
           </div>
@@ -87,7 +87,7 @@
 <!-- Notes Row -->
   <.async_result :let={summary} assign={@summary}>
     <:loading>
-      <%= if @session_status != :not_started do %>
+      <%= if not is_nil(@listening_session) and @listening_session.status != :preparing do %>
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
           <!-- Chat Note Skeleton -->
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
