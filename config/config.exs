@@ -109,8 +109,8 @@ config :premiere_ecoute, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
   queues: [
-    sessions: 1
-    # twitch: 1,
+    sessions: 1,
+    twitch: 1
     # spotify: 1
   ],
   plugins: [
@@ -120,7 +120,8 @@ config :premiere_ecoute, Oban,
     {Oban.Plugins.Cron,
      crontab: [
        {"@reboot", PremiereEcoute.Apis.Workers.RenewTwitchTokens},
-       {"@reboot", PremiereEcoute.Apis.Workers.RenewSpotifyTokens}
+       {"@reboot", PremiereEcoute.Apis.Workers.RenewSpotifyTokens},
+       {"@reboot", PremiereEcoute.Apis.Workers.SubscribeStreamEvents}
      ]}
   ]
 
