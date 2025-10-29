@@ -187,11 +187,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   defp overlay_height(_), do: 240
 
-  # AIDEV-NOTE: Background changes based on session status: nil/:preparing=black, :active=gradient, :stopped=green
-  defp overlay_background(nil, _percent), do: "background: black"
-  defp overlay_background(%{status: :preparing}, _percent), do: "background: black"
-  defp overlay_background(%{status: :stopped}, _percent), do: "background: oklch(0.65 0.20 145 / 0.9)"
-  defp overlay_background(%{status: :active}, percent) do
-    "background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%)"
-  end
+  # AIDEV-NOTE: Border/text color based on session status: nil/:preparing=white, :active=purple, :stopped=green
+  defp overlay_border_color(nil), do: "white"
+  defp overlay_border_color(%{status: :preparing}), do: "white"
+  defp overlay_border_color(%{status: :stopped}), do: "oklch(0.65 0.20 145)"
+  defp overlay_border_color(%{status: :active}), do: "oklch(0.70 0.25 305)"
 end

@@ -1,12 +1,12 @@
 <div
   :if={@score in [:player]}
-  style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 12px; width: 1200px; height: 240px; box-sizing: border-box;"
+  style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 12px; width: 100%; height: 100%; box-sizing: border-box;"
 >
   <.async_result :let={progress} assign={@progress}>
     <:loading>
       <%= if is_nil(@listening_session) or @listening_session.status == :preparing do %>
         <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
-          <div style="width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;">
+          <div style={"width: 40px; height: 40px; border: 4px solid #{@text_color}33; border-top-color: #{@text_color}; border-radius: 50%; animation: spin 1s linear infinite;"}>
           </div>
         </div>
         <style>
@@ -17,30 +17,30 @@
       <% else %>
         <!-- Album Cover Skeleton -->
         <div style="flex-shrink: 0;">
-          <div style="width: 200px; height: 200px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
+          <div style={"width: 200px; height: 200px; border-radius: 12px; background-color: #{@text_color}1A; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);"}>
           </div>
         </div>
 
   <!-- Track Information Skeleton -->
         <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
           <!-- Album Name Skeleton -->
-          <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px;">
+          <div style={"font-size: 18px; font-weight: 500; color: #{@text_color}CC; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px;"}>
             - / - - -
           </div>
 
   <!-- Track Name Skeleton -->
-          <div style="font-size: 36px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px;">
+          <div style={"font-size: 36px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px;"}>
             -
           </div>
 
   <!-- Artist Skeleton -->
-          <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px;">
+          <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}CC; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px;"}>
             -
           </div>
 
   <!-- Track and Timer Row Skeleton -->
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+            <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}CC; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
               --:-- / --:--
             </div>
           </div>
@@ -54,28 +54,28 @@
         style="width: 200px; height: 200px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);"
       />
     </div>
-    
+
 <!-- Track Information -->
     <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
       <!-- Album Name -->
-      <div style="font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+      <div style={"font-size: 18px; font-weight: 500; color: #{@text_color}CC; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"}>
         {progress["item"]["track_number"]} / {progress["item"]["album"]["total_tracks"]} - {progress["item"]["album"]["name"]}
       </div>
-      
+
 <!-- Track Name -->
-      <div style="font-size: 36px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+      <div style={"font-size: 36px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"}>
         {progress["item"]["name"]}
       </div>
-      
+
 <!-- Album Name -->
-      <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+      <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}CC; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"}>
         {progress["artist"]}
       </div>
-      
+
 <!-- Track and Timer Row -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <!-- Track -->
-        <div style="font-size: 24px; font-weight: 500; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+        <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}CC; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
           {PremiereEcouteCore.Duration.timer(progress["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
             progress["item"]["duration_ms"]
           )}
@@ -91,20 +91,20 @@
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
           <!-- Chat Note Skeleton -->
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+            <span style={"font-size: 100px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
               -
             </span>
-            <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+            <div style={"font-size: 24px; color: #{@text_color}CC; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
               Viewer
             </div>
           </div>
 
   <!-- Streamer Note Skeleton -->
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+            <span style={"font-size: 100px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
               -
             </span>
-            <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+            <div style={"font-size: 24px; color: #{@text_color}CC; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
               Streamer
             </div>
           </div>
@@ -115,35 +115,35 @@
     <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
       <!-- Chat Note -->
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+        <span style={"font-size: 100px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
           <%= if @open_vote do %>
             {score_value(summary, :viewer)}
           <% else %>
             -
           <% end %>
         </span>
-        <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+        <div style={"font-size: 24px; color: #{@text_color}CC; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
           {score_label(:viewer)}
         </div>
       </div>
-      
+
 <!-- Streamer Note -->
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <span style="font-size: 100px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+        <span style={"font-size: 100px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
           <%= if @open_vote do %>
             {score_value(summary, :streamer)}
           <% else %>
             -
           <% end %>
         </span>
-        <div style="font-size: 24px; color: rgba(255, 255, 255, 0.8); text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+        <div style={"font-size: 24px; color: #{@text_color}CC; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
           {score_label(:streamer)}
         </div>
       </div>
     </div>
   </.async_result>
 
-  <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 16px; color: pink; font-weight: 400; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); text-decoration: wavy underline pink;">
+  <div style={"position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 16px; color: #{@text_color}80; font-weight: 400; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);"}>
     Made with premiere-ecoute.fr
   </div>
 </div>
