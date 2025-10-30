@@ -13,52 +13,36 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEvents do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Apis.TwitchApi.EventSub
 
   @impl true
   def perform(%Oban.Job{attempt: attempt}) do
     streamers = User.all(where: [role: :streamer])
-
     Logger.info("Subscribing #{length(streamers)} streamers to stream events (attempt #{attempt}/3)")
+    Enum.each(streamers, &subscribe_streamer/1)
 
-    results =
-      streamers
-      |> Enum.map(&subscribe_streamer/1)
-      |> Enum.group_by(fn {status, _} -> status end)
-
-    successful = length(Map.get(results, :ok, []))
-    failed = length(Map.get(results, :error, []))
-
-    Logger.info("Stream event subscription complete: #{successful} successful, #{failed} failed")
-
-    # AIDEV-NOTE: Job succeeds even if some subscriptions fail to avoid blocking startup
-    case failed do
-      0 ->
-        :ok
-      _ ->
-        Logger.warning("Failed subscriptions: #{inspect(Map.get(results, :error, []))}")
-        :ok
-    end
+    :ok
   end
 
-  # AIDEV-NOTE: Subscribes a single streamer to both stream.online and stream.offline events
-  defp subscribe_streamer(%User{twitch: nil} = user) do
-    Logger.warning("Skipping user #{user.id} - no Twitch OAuth token")
-    {:error, {:no_twitch_token, user.id}}
-  end
-
-  defp subscribe_streamer(%User{} = user) do
+  # AIDEV-NOTE: Made public for testing - tests functional methods directly
+  def subscribe_streamer(%User{twitch: %OauthToken{} = twitch} = user) do
     scope = Scope.for_user(user)
-    username = user.twitch.username
+    username = twitch.username
 
     with {:ok, _} <- EventSub.subscribe(scope, "stream.online"),
          {:ok, _} <- EventSub.subscribe(scope, "stream.offline") do
       Logger.info("Subscribed streamer: #{username} (ID: #{user.id})")
       {:ok, user.id}
     else
-      {:error, reason} = error ->
+      {:error, reason} ->
         Logger.error("Failed to subscribe streamer #{username} (ID: #{user.id}): #{inspect(reason)}")
         {:error, {user.id, reason}}
     end
+  end
+
+  def subscribe_streamer(%User{} = user) do
+    Logger.warning("Skipping user #{user.id} - no Twitch OAuth token")
+    {:error, {:no_twitch_token, user.id}}
   end
 end
