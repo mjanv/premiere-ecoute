@@ -11,7 +11,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
 
-  # AIDEV-NOTE: Uses actual session status: :preparing, :active, :stopped (or nil when no session)
   @impl true
   def mount(%{"id" => user_id}, _session, socket) do
     user = PremiereEcoute.Accounts.get_user!(user_id)
@@ -119,10 +118,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Handle session_updated to set up overlay when session is created
   @impl true
   def handle_info({:session_updated, session}, %{assigns: %{listening_session: nil}} = socket) do
-    # Subscribe to the new session
     PremiereEcoute.PubSub.subscribe(["session:#{session.id}"])
     _ = PlayerSupervisor.start(session.user.id)
 

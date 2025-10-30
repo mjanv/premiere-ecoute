@@ -6,7 +6,6 @@ defmodule PremiereEcoute.Accounts.User.Profile do
   @schemes [:light, :dark, :system]
   @languages [:en, :fr, :it]
 
-  # AIDEV-NOTE: overlay_color stores streamer's custom overlay color in hex format
   embedded_schema do
     field :color_scheme, Ecto.Enum, values: @schemes, default: :system
     field :language, Ecto.Enum, values: @languages, default: :en
@@ -22,7 +21,6 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     |> validate_hex_color(:overlay_color)
   end
 
-  # AIDEV-NOTE: Validates hex color format (#RRGGBB or #RGB)
   defp validate_hex_color(changeset, field) do
     validate_change(changeset, field, fn ^field, value ->
       if is_nil(value) or value == "" or Regex.match?(~r/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, value) do
