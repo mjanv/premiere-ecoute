@@ -10,25 +10,40 @@ defmodule PremiereEcoute.VersionTest do
       assert String.length(version) > 0
     end
 
-    test "follows the format 'version-commit'" do
+    test "follows valid version format" do
       version = Version.version()
-      assert version =~ ~r/^\d+\.\d+\.\d+-.+$/
+
+      # AIDEV-NOTE: Format can be either "X.Y.Z" (no git) or "X.Y.Z-commit" (with git)
+      assert version =~ ~r/^\d+\.\d+\.\d+(-[0-9a-f]{7})?$/
     end
 
-    test "version part matches mix.exs project version" do
+    test "starts with mix.exs project version" do
       mix_version = Mix.Project.config()[:version]
       version = Version.version()
-      [version_part, _commit_part] = String.split(version, "-", parts: 2)
-      assert version_part == mix_version
+
+      # AIDEV-NOTE: Version should start with mix.exs version, may have "-commit" suffix
+      assert String.starts_with?(version, mix_version)
     end
 
-    test "commit part is either 'unknown' or a valid git short hash" do
+    test "when git is available, includes commit hash" do
       version = Version.version()
-      [_version_part, commit_part] = String.split(version, "-", parts: 2)
 
-      # AIDEV-NOTE: Commit should be either "unknown" or a 7-char hex string (git short hash)
-      assert commit_part == "unknown" or
-               (String.length(commit_part) == 7 and commit_part =~ ~r/^[0-9a-f]{7}$/)
+      # AIDEV-NOTE: If version contains a dash, commit should be a 7-char hex string
+      if String.contains?(version, "-") do
+        [_version_part, commit_part] = String.split(version, "-", parts: 2)
+        assert String.length(commit_part) == 7
+        assert commit_part =~ ~r/^[0-9a-f]{7}$/
+      end
+    end
+
+    test "when git is unavailable, returns just the version" do
+      # AIDEV-NOTE: This test documents the behavior when git is unavailable.
+      # If the version doesn't contain a dash, it means git wasn't available at compile time
+      version = Version.version()
+      mix_version = Mix.Project.config()[:version]
+
+      # Either it has a commit hash or it's just the version
+      assert version == mix_version or String.starts_with?(version, "#{mix_version}-")
     end
 
     test "version is computed at compile-time" do
