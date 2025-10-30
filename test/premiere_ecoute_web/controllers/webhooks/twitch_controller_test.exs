@@ -166,5 +166,23 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
                votes: %{"Blue" => 120, "Yellow" => 140, "Green" => 80}
              }
     end
+
+    test "stream.online" do
+      payload = ApiMock.payload("twitch_api/eventsub/stream_online.json")
+
+      event = TwitchController.handle(payload)
+
+      # stream.online handler returns nil as it only logs the event
+      assert event == nil
+    end
+
+    test "stream.offline" do
+      payload = ApiMock.payload("twitch_api/eventsub/stream_offline.json")
+
+      event = TwitchController.handle(payload)
+
+      # stream.offline handler returns nil as it only logs the event
+      assert event == nil
+    end
   end
 end

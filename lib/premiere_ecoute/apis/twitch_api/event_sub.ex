@@ -73,9 +73,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end
   end
 
+  # AIDEV-NOTE: EventSub versions per Twitch API docs - ensure version matches latest API
   defp version("channel.chat.message"), do: "1"
   defp version("channel.follow"), do: "2"
   defp version("channel.poll.progress"), do: "1"
+  defp version("stream.online"), do: "1"
+  defp version("stream.offline"), do: "1"
   defp version(_), do: "0"
 
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.chat.message") do
@@ -87,6 +90,13 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     do: %{broadcaster_user_id: user_id, moderator_user_id: user_id}
 
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.poll.progress"),
+    do: %{broadcaster_user_id: user_id}
+
+  # AIDEV-NOTE: Stream status events - used to detect when streamer goes live/offline
+  defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "stream.online"),
+    do: %{broadcaster_user_id: user_id}
+
+  defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "stream.offline"),
     do: %{broadcaster_user_id: user_id}
 
   defp condition(_, _), do: %{}

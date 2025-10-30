@@ -93,5 +93,32 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
     %PollEnded{id: id, votes: votes}
   end
 
+  # AIDEV-NOTE: Stream status handlers - logs stream start/stop events for monitoring
+  def handle(%{
+        "subscription" => %{"type" => "stream.online"},
+        "event" =>
+          %{
+            "broadcaster_user_id" => broadcaster_id,
+            "broadcaster_user_name" => broadcaster_name
+          } = event
+      }) do
+    Logger.info(
+      "Stream started: #{broadcaster_name} (ID: #{broadcaster_id}) - #{inspect(Map.take(event, ["type", "started_at"]))}"
+    )
+
+    nil
+  end
+
+  def handle(%{
+        "subscription" => %{"type" => "stream.offline"},
+        "event" => %{
+          "broadcaster_user_id" => broadcaster_id,
+          "broadcaster_user_name" => broadcaster_name
+        }
+      }) do
+    Logger.info("Stream ended: #{broadcaster_name} (ID: #{broadcaster_id})")
+    nil
+  end
+
   def handle(_), do: nil
 end
