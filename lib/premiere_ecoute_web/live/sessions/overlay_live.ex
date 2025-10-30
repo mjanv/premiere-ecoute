@@ -16,11 +16,17 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     user = PremiereEcoute.Accounts.get_user!(user_id)
     listening_session = ListeningSession.get_active_session(user)
 
+    # Subscribe to playback events even without active session to catch when session starts
+    if connected?(socket) do
+      PremiereEcoute.PubSub.subscribe(["playback:#{user.id}"])
+    end
+
     socket =
       case listening_session do
         nil ->
           socket
           |> assign(:id, nil)
+          |> assign(:user, user)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
           |> assign(:progress, AsyncResult.loading())
@@ -31,7 +37,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
         session ->
           if connected?(socket) do
             {:ok, _} = Presence.join(session.user.id)
-            PremiereEcoute.PubSub.subscribe(["session:#{session.id}", "playback:#{session.user.id}"])
+            PremiereEcoute.PubSub.subscribe(["session:#{session.id}"])
           end
 
           _ = PlayerSupervisor.start(session.user.id)
@@ -53,10 +59,11 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
           socket
           |> assign(:id, session.id)
+          |> assign(:user, user)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
           |> assign(:progress, AsyncResult.loading())
-          |> assign(:open_vote, true)
+          |> assign(:open_vote, session.status == :active)
           |> assign(:listening_session, session)
           |> assign(:summary, summary_result)
       end
@@ -112,6 +119,26 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def handle_info({:session_updated, session}, %{assigns: %{listening_session: nil}} = socket) do
+    PremiereEcoute.PubSub.subscribe(["session:#{session.id}"])
+    _ = PlayerSupervisor.start(session.user.id)
+
+    socket
+    |> assign(:id, session.id)
+    |> assign(:listening_session, session)
+    |> assign(:open_vote, session.status == :active)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:session_updated, session}, socket) do
+    socket
+    |> assign(:listening_session, session)
+    |> assign(:open_vote, session.status == :active)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
   def handle_info(:vote_close, %{assigns: %{summary: summary}} = socket) do
     summary =
       if summary.ok? do
@@ -126,18 +153,15 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  # AIDEV-NOTE: When session stops, preserve session and summary for stopped state display
   @impl true
   def handle_info(:stop, %{assigns: %{listening_session: session}} = socket) when not is_nil(session) do
-    socket =
-      socket
-      |> assign(:id, nil)
-      |> assign(:listening_session, nil)
-      |> assign(:summary, AsyncResult.loading())
-      |> assign(:open_vote, false)
-      |> assign(:progress, AsyncResult.loading())
-      |> assign(:percent, 0)
-
-    {:noreply, socket}
+    # Update the session status to :stopped (done by command handler, here we just keep it)
+    socket
+    |> assign(:open_vote, false)
+    |> assign(:progress, AsyncResult.loading())
+    |> assign(:percent, 0)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -160,4 +184,10 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp overlay_width(_), do: 240
 
   defp overlay_height(_), do: 240
+
+  # AIDEV-NOTE: Border/text color from user profile, green when stopped
+  defp overlay_border_color(user, nil), do: user.profile.overlay_color || "#ffffff"
+  defp overlay_border_color(user, %{status: :preparing}), do: user.profile.overlay_color || "#ffffff"
+  defp overlay_border_color(_user, %{status: :stopped}), do: "oklch(0.65 0.20 145)"
+  defp overlay_border_color(user, %{status: :active}), do: user.profile.overlay_color || "#9333ea"
 end
