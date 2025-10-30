@@ -79,47 +79,55 @@ defmodule PremiereEcouteWeb.Layouts do
       
     <!-- Footer - spans full width under both sidebar and content -->
       <footer class="py-4 px-6 mt-auto" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">
-        <div class="max-w-5xl mx-auto text-center">
-          <div class="flex justify-center items-center space-x-3">
-            <.link
-              href={~p"/changelog"}
-              class="text-sm font-medium transition-colors hover:text-white"
-              style="color: var(--color-dark-300);"
-            >
-              {gettext("Changelog")}
-            </.link>
-            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-            <.link
-              href={~p"/legal/privacy"}
-              class="text-sm font-medium transition-colors hover:text-white"
-              style="color: var(--color-dark-300);"
-            >
-              {gettext("Privacy")}
-            </.link>
-            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-            <.link
-              href={~p"/legal/cookies"}
-              class="text-sm font-medium transition-colors hover:text-white"
-              style="color: var(--color-dark-300);"
-            >
-              {gettext("Cookies")}
-            </.link>
-            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-            <.link
-              href={~p"/legal/terms"}
-              class="text-sm font-medium transition-colors hover:text-white"
-              style="color: var(--color-dark-300);"
-            >
-              {gettext("Terms")}
-            </.link>
-            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-            <.link
-              href={~p"/legal/contact"}
-              class="text-sm font-medium transition-colors hover:text-white"
-              style="color: var(--color-dark-300);"
-            >
-              {gettext("Contact")}
-            </.link>
+        <div class="max-w-7xl mx-auto">
+          <div class="flex justify-between items-center">
+            <!-- AIDEV-NOTE: Version computed at compile-time from mix.exs and git commit -->
+            <span class="text-sm font-medium" style="color: var(--color-dark-300);">
+              {gettext("Version")} {PremiereEcoute.Version.version()}
+            </span>
+
+            <!-- AIDEV-NOTE: Legal and info links on the right -->
+            <div class="flex items-center space-x-3">
+              <.link
+                href={~p"/changelog"}
+                class="text-sm font-medium transition-colors hover:text-white"
+                style="color: var(--color-dark-300);"
+              >
+                {gettext("Changelog")}
+              </.link>
+              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+              <.link
+                href={~p"/legal/privacy"}
+                class="text-sm font-medium transition-colors hover:text-white"
+                style="color: var(--color-dark-300);"
+              >
+                {gettext("Privacy")}
+              </.link>
+              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+              <.link
+                href={~p"/legal/cookies"}
+                class="text-sm font-medium transition-colors hover:text-white"
+                style="color: var(--color-dark-300);"
+              >
+                {gettext("Cookies")}
+              </.link>
+              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+              <.link
+                href={~p"/legal/terms"}
+                class="text-sm font-medium transition-colors hover:text-white"
+                style="color: var(--color-dark-300);"
+              >
+                {gettext("Terms")}
+              </.link>
+              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+              <.link
+                href={~p"/legal/contact"}
+                class="text-sm font-medium transition-colors hover:text-white"
+                style="color: var(--color-dark-300);"
+              >
+                {gettext("Contact")}
+              </.link>
+            </div>
           </div>
         </div>
       </footer>
