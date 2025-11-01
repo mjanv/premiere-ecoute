@@ -1,11 +1,15 @@
-<div style={"background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{@percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{@percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%); border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1; position: relative;"}>
-  <%= if @score in [:player] do %>
-    <.player progress={@progress} summary={@summary} open_vote={@open_vote} score={@score} />
-  <% end %>
-  <%= if @score in [:viewer, :streamer] do %>
-    <.single summary={@summary} open_vote={@open_vote} score={@score} />
-  <% end %>
-  <%= if @score in [:both] do %>
-    <.double summary={@summary} open_vote={@open_vote} score={@score} />
-  <% end %>
-</div>
+<%= if @score in [:large] do %>
+  <.large progress={@progress} listening_session={@listening_session} summary={@summary} open_vote={@open_vote} score={@score} />
+<% else %>
+  <div style={"background: linear-gradient(to right, oklch(0.40 0.18 305 / 0.8) 0%, oklch(0.40 0.18 305 / 0.8) calc(#{@percent}% - 4%), oklch(0.40 0.18   2 / 0.8) calc(#{@percent}% + 4%), oklch(0.40 0.18   2 / 0.8) 100%); border-radius: 0px; width: #{overlay_width(@score)}px; height: #{overlay_height(@score)}px; display: flex; align-items: center; justify-content: center; color: white; line-height: 1; position: relative;"}>
+    <%= if @score in [:player] do %>
+      <.player progress={@progress} summary={@summary} open_vote={@open_vote} score={@score} />
+    <% end %>
+    <%= if @score in [:viewer, :streamer] do %>
+      <.single summary={@summary} open_vote={@open_vote} score={@score} />
+    <% end %>
+    <%= if @score in [:both] do %>
+      <.double summary={@summary} open_vote={@open_vote} score={@score} />
+    <% end %>
+  </div>
+<% end %>
