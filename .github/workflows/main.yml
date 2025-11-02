@@ -12,20 +12,147 @@ permissions:
   id-token: write
 
 jobs:
-  deploy-app:
-    name: Deploy to Fly.io
+  build-release:
+    name: Build Production Release
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Set up Elixir and Erlang
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.19.0-otp-28'
+          otp-version: '28.1'
 
-      - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-prod-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-prod-
+            ${{ runner.os }}-mix-
+
+      - name: Restore assets cache
+        uses: actions/cache@v4
+        with:
+          path: assets/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('assets/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: mix deps.get --only prod
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          MIX_ENV: prod
+
+      - name: Compile dependencies
+        run: mix deps.compile
+        env:
+          MIX_ENV: prod
+
+      - name: Deploy assets
+        run: mix assets.deploy
+        env:
+          MIX_ENV: prod
+
+      - name: Build release
+        run: mix release --overwrite
+        env:
+          MIX_ENV: prod
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: premiere-ecoute-release
+          path: _build/prod/rel/premiere_ecoute/
+          retention-days: 1
+
+  deploy-to-digital-ocean:
+    name: Deploy to Digital Ocean
+    runs-on: ubuntu-latest
+    needs: build-release
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: premiere-ecoute-release
+          path: _build/prod/rel/premiere_ecoute/
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 68.183.219.251 >> ~/.ssh/known_hosts
+
+      - name: Create .env.production file
+        run: |
+          cat << 'EOF' > .env.production
+          # Phoenix
+          PHX_HOST=${{ secrets.PHX_HOST }}
+          PORT=4000
+          SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
+          MIX_ENV=prod
+
+          # Database
+          POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}
+          POSTGRES_USERNAME=${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOSTNAME=localhost
+          POSTGRES_ENCRYPTION_KEY=${{ secrets.POSTGRES_ENCRYPTION_KEY }}
+
+          # Spotify API
+          SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REDIRECT_URI=${{ secrets.SPOTIFY_REDIRECT_URI }}
+
+          # Tidal API
+          TIDAL_CLIENT_ID=${{ secrets.TIDAL_CLIENT_ID }}
+          TIDAL_CLIENT_SECRET=${{ secrets.TIDAL_CLIENT_SECRET }}
+
+          # Twitch API
+          TWITCH_CLIENT_ID=${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET=${{ secrets.TWITCH_CLIENT_SECRET }}
+          TWITCH_REDIRECT_URI=${{ secrets.TWITCH_REDIRECT_URI }}
+          TWITCH_WEBHOOK_CALLBACK_URL=${{ secrets.TWITCH_WEBHOOK_CALLBACK_URL }}
+          TWITCH_EXTENSION_SECRET=${{ secrets.TWITCH_EXTENSION_SECRET }}
+
+          # Other APIs
+          DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+          BUYMEACOFFEE_API_KEY=${{ secrets.BUYMEACOFFEE_API_KEY }}
+          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+
+          # Feature Flags Auth
+          AUTH_USERNAME=${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD=${{ secrets.AUTH_PASSWORD }}
+          EOF
+
+      - name: Deploy release to server
+        run: |
+          rsync -avz --delete --exclude='.env' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
+
+      - name: Deploy .env file
+        run: |
+          scp .env.production root@68.183.219.251:/opt/premiere-ecoute/.env
+
+      - name: Restart application
+        run: |
+          ssh root@68.183.219.251 'systemctl restart premiere-ecoute'
+
+      - name: Verify deployment
+        run: |
+          ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
 
   deploy-docs:
     name: Deploy Documentation

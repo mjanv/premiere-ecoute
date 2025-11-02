@@ -1,6 +1,6 @@
 # Deployment Guide - Digital Ocean
 
-This guide covers deploying the Premiere Ecoute application to a Digital Ocean droplet using Docker, Docker Compose, and Traefik as a reverse proxy.
+This guide covers deploying the Premiere Ecoute application to a Digital Ocean droplet using a native Elixir release with systemd services and Traefik as a reverse proxy.
 
 ## Prerequisites
 
@@ -13,18 +13,18 @@ This guide covers deploying the Premiere Ecoute application to a Digital Ocean d
 
 The production deployment consists of:
 
-- **App Container**: Phoenix/Elixir application running on port 4000
-- **PostgreSQL**: Database with persistent volume storage
-- **Traefik**: Reverse proxy handling HTTP/HTTPS traffic and SSL certificates
+- **Phoenix/Elixir Application**: Native Elixir release running as systemd service on port 4000
+- **PostgreSQL**: Native installation managed by systemd
+- **Traefik**: Reverse proxy handling HTTP/HTTPS traffic and SSL certificates (Let's Encrypt)
 
 ```
 Internet
     ↓
 Traefik (ports 80, 443)
     ↓
-App Container (port 4000)
+Phoenix App (port 4000) - systemd service
     ↓
-PostgreSQL (internal network)
+PostgreSQL (localhost) - systemd service
 ```
 
 ## Deployment Steps
@@ -53,62 +53,59 @@ Edit `.env.production` and configure all required values:
 - `TWITCH_REDIRECT_URI=https://68.183.219.251/auth/twitch/callback`
 - `TWITCH_WEBHOOK_CALLBACK_URL=https://68.183.219.251/webhooks/twitch`
 
-### 2. Deploy Using Automated Script
+### 2. Automated Deployment (GitHub Actions)
 
-The easiest way to deploy is using the provided deployment script:
+**Recommended**: The easiest way to deploy is using the automated GitHub Actions workflow. See the [GitHub Actions CI/CD Pipeline](#github-actions-cicd-pipeline) section below for setup instructions.
+
+### 3. Manual Deployment (Using Deployment Script)
+
+For manual deployments from your local machine:
 
 ```bash
+cd apps/digital_ocean
 chmod +x deploy.sh
 ./deploy.sh
 ```
 
 This script will:
-1. Build the Elixir release locally
-2. Create deployment directory on droplet (`/opt/premiere-ecoute`)
-3. Copy release to droplet
-4. Copy production environment configuration as `.env`
-5. Install PostgreSQL, Traefik, and dependencies (first time only)
-6. Install systemd services
-7. Start all services (migrations run automatically via `ExecStartPre`)
+1. Build the Elixir release locally (`MIX_ENV=prod mix release`)
+2. Copy release to droplet (`/opt/premiere-ecoute`)
+3. Copy production environment configuration as `.env`
+4. Copy systemd service files and Traefik configuration
+5. Restart the `premiere-ecoute` systemd service
+6. Migrations run automatically via `ExecStartPre` in the systemd service
 
-### 3. Manual Deployment (Alternative)
+**First-time setup**: If this is your first deployment to the droplet, run `apps/digital_ocean/setup.sh` first to install PostgreSQL, Traefik, create system users, and configure the firewall.
 
-If you prefer manual deployment:
+### 4. Alternative Manual Deployment
 
-#### 3.1. Copy Files to Droplet
+If you prefer step-by-step manual deployment:
+
+#### 4.1. Build Release Locally
 
 ```bash
-rsync -avz --exclude='_build' \
-           --exclude='deps' \
-           --exclude='.git' \
-           --exclude='node_modules' \
-           . root@68.183.219.251:/opt/premiere-ecoute/
-
-scp .env.production root@68.183.219.251:/opt/premiere-ecoute/
+MIX_ENV=prod mix deps.get --only prod
+MIX_ENV=prod mix assets.deploy
+MIX_ENV=prod mix release --overwrite
 ```
 
-#### 3.2. Setup Server (First Time Only)
+#### 4.2. Copy Release to Droplet
 
 ```bash
-ssh root@68.183.219.251
-cd /opt/premiere-ecoute
-chmod +x setup-server.sh
-./setup-server.sh
+rsync -avz --delete --exclude='.env' \
+  _build/prod/rel/premiere_ecoute/ \
+  root@68.183.219.251:/opt/premiere-ecoute/
+
+scp .env.production root@68.183.219.251:/opt/premiere-ecoute/.env
 ```
 
-#### 3.3. Start Services
+#### 4.3. Restart Service
 
 ```bash
-ssh root@68.183.219.251
-cd /opt/premiere-ecoute
+ssh root@68.183.219.251 'systemctl restart premiere-ecoute'
 
-# Reload systemd and start services
-systemctl daemon-reload
-systemctl start premiere-ecoute
-
-# Migrations run automatically before the app starts
 # Check status
-systemctl status premiere-ecoute
+ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
 ```
 
 ## Post-Deployment
@@ -118,26 +115,37 @@ systemctl status premiere-ecoute
 After deployment, verify the services are running:
 
 ```bash
-ssh root@68.183.219.251
-cd /opt/premiere-ecoute
-docker compose -f docker-compose.prod.yml ps
+# Check application status
+ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
+
+# Check Traefik status
+ssh root@68.183.219.251 'systemctl status traefik --no-pager'
+
+# Check PostgreSQL status
+ssh root@68.183.219.251 'systemctl status postgresql --no-pager'
 ```
 
-All services should show as "Up" or "healthy".
+All services should show as "active (running)".
 
 ### Access Points
 
-- **Application**: https://68.183.219.251
+- **Application**: https://premiere-ecoute.fr (or https://68.183.219.251)
 - **Traefik Dashboard**: http://68.183.219.251:8080
 
 ### View Logs
 
 ```bash
-# All services
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml logs -f'
+# Application logs
+ssh root@68.183.219.251 'journalctl -u premiere-ecoute -f'
 
-# Specific service
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml logs -f app'
+# Traefik logs
+ssh root@68.183.219.251 'journalctl -u traefik -f'
+
+# PostgreSQL logs
+ssh root@68.183.219.251 'journalctl -u postgresql -f'
+
+# All logs together
+ssh root@68.183.219.251 'journalctl -u premiere-ecoute -u traefik -u postgresql -f'
 ```
 
 ## Management Commands
@@ -145,72 +153,99 @@ ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-com
 ### Restart Services
 
 ```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml restart'
+# Restart application
+ssh root@68.183.219.251 'systemctl restart premiere-ecoute'
+
+# Restart Traefik
+ssh root@68.183.219.251 'systemctl restart traefik'
+
+# Restart all services
+ssh root@68.183.219.251 'systemctl restart premiere-ecoute traefik'
 ```
 
 ### Stop Services
 
 ```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml down'
+# Stop application
+ssh root@68.183.219.251 'systemctl stop premiere-ecoute'
+
+# Stop Traefik
+ssh root@68.183.219.251 'systemctl stop traefik'
 ```
 
 ### Update Application
 
-To deploy updates:
+**Recommended**: Push to `main` branch to trigger automated GitHub Actions deployment.
+
+Or manually using the deployment script:
 
 ```bash
+cd apps/digital_ocean
 ./deploy.sh
+```
+
+Migrations run automatically via the systemd service's `ExecStartPre` directive.
+
+### Database Backup
+
+Using the provided backup script:
+
+```bash
+cd apps/digital_ocean
+./backup.sh
+```
+
+This creates a timestamped backup in `backups/premiere_ecoute_prod_YYYYMMDD_HHMMSS.sql.gz`.
+
+Or manually:
+
+```bash
+ssh root@68.183.219.251 'sudo -u postgres pg_dump premiere_ecoute_prod | gzip' > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+```
+
+### Database Restore
+
+Using the provided restore script:
+
+```bash
+cd apps/digital_ocean
+./restore.sh backups/premiere_ecoute_prod_YYYYMMDD_HHMMSS.sql.gz
 ```
 
 Or manually:
 
 ```bash
-# Copy updated files
-rsync -avz --exclude='_build' --exclude='deps' --exclude='.git' . root@68.183.219.251:/opt/premiere-ecoute/
-
-# Rebuild and restart
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml up -d --build'
-
-# Run new migrations if any
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml exec app bin/premiere_ecoute eval "PremiereEcoute.Repo.Release.migrate()"'
-```
-
-### Database Backup
-
-```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml exec postgres pg_dump -U postgres premiere_ecoute_prod > backup.sql'
-```
-
-### Database Restore
-
-```bash
-scp backup.sql root@68.183.219.251:/opt/premiere-ecoute/
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml exec -T postgres psql -U postgres premiere_ecoute_prod < backup.sql'
+scp backup.sql.gz root@68.183.219.251:/tmp/
+ssh root@68.183.219.251 'systemctl stop premiere-ecoute && \
+  sudo -u postgres dropdb premiere_ecoute_prod && \
+  sudo -u postgres createdb premiere_ecoute_prod && \
+  gunzip -c /tmp/backup.sql.gz | sudo -u postgres psql premiere_ecoute_prod && \
+  systemctl start premiere-ecoute'
 ```
 
 ## SSL Certificates
 
-Traefik automatically obtains and renews Let's Encrypt SSL certificates. Certificates are stored in `/opt/premiere-ecoute/letsencrypt/acme.json` on the droplet.
+Traefik automatically obtains and renews Let's Encrypt SSL certificates. Certificates are stored in `/opt/traefik/acme.json` on the droplet.
 
 **Important**:
-- Ensure `ACME_EMAIL` is set in `.env.production`
+- The email for Let's Encrypt is configured in `/opt/traefik/traefik.yml` (currently set to `maxime.janvier+premiereecoute@gmail.com`)
 - Certificates are obtained when first accessing the application via HTTPS
 - HTTP requests are automatically redirected to HTTPS
 
 ## Using a Custom Domain
 
-To use a custom domain instead of the IP address:
+The application is currently configured to use `premiere-ecoute.fr` domain. To use a different custom domain:
 
 1. Point your domain's DNS A record to `68.183.219.251`
-2. Update `.env.production`:
-   ```bash
-   PHX_HOST=yourdomain.com
-   SPOTIFY_REDIRECT_URI=https://yourdomain.com/auth/spotify/callback
-   TWITCH_REDIRECT_URI=https://yourdomain.com/auth/twitch/callback
-   TWITCH_WEBHOOK_CALLBACK_URL=https://yourdomain.com/webhooks/twitch
-   ```
+2. Update GitHub Secrets (for automated deployments):
+   - `PHX_HOST`: `yourdomain.com`
+   - `SPOTIFY_REDIRECT_URI`: `https://yourdomain.com/auth/spotify/callback`
+   - `TWITCH_REDIRECT_URI`: `https://yourdomain.com/auth/twitch/callback`
+   - `TWITCH_WEBHOOK_CALLBACK_URL`: `https://yourdomain.com/webhooks/twitch`
 3. Update API application settings on Spotify and Twitch developer consoles
-4. Redeploy: `./deploy.sh`
+4. Deploy: Push to `main` branch or run `./deploy.sh`
+
+For manual deployments, update `.env.production` with the same values before deploying.
 
 ## Firewall Configuration
 
@@ -232,62 +267,235 @@ ufw allow from YOUR_IP to any port 8080
 
 ### Services Not Starting
 
-Check logs:
+Check service status and logs:
 ```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml logs'
+# Check if service is active
+ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
+
+# View recent logs
+ssh root@68.183.219.251 'journalctl -u premiere-ecoute -n 100 --no-pager'
+
+# Follow logs in real-time
+ssh root@68.183.219.251 'journalctl -u premiere-ecoute -f'
 ```
 
 ### Database Connection Issues
 
-Verify PostgreSQL is healthy:
+Verify PostgreSQL is running and accepting connections:
 ```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml exec postgres pg_isready -U postgres'
+ssh root@68.183.219.251 'systemctl status postgresql --no-pager'
+ssh root@68.183.219.251 'sudo -u postgres psql -c "SELECT version();"'
+```
+
+Check database exists:
+```bash
+ssh root@68.183.219.251 'sudo -u postgres psql -l | grep premiere_ecoute_prod'
 ```
 
 ### SSL Certificate Issues
 
 Check Traefik logs:
 ```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml logs traefik'
+ssh root@68.183.219.251 'journalctl -u traefik -n 100 --no-pager'
 ```
 
-Verify `ACME_EMAIL` is set correctly in `.env.production`.
+Verify certificate file permissions:
+```bash
+ssh root@68.183.219.251 'ls -la /opt/traefik/acme.json'
+# Should be owned by traefik:traefik with 600 permissions
+```
 
 ### Application Errors
 
 View application logs:
 ```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml logs -f app'
+ssh root@68.183.219.251 'journalctl -u premiere-ecoute -f'
 ```
 
-Connect to running container:
+Connect to running application for IEx console:
 ```bash
-ssh root@68.183.219.251 'cd /opt/premiere-ecoute && docker compose -f docker-compose.prod.yml exec app sh'
+ssh root@68.183.219.251
+/opt/premiere-ecoute/bin/premiere_ecoute remote
+```
+
+### Permission Issues
+
+If you encounter permission errors:
+```bash
+# Verify ownership
+ssh root@68.183.219.251 'ls -la /opt/premiere-ecoute'
+# Should be owned by premiere:premiere
+
+# Fix if needed
+ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute'
 ```
 
 ## Security Considerations
 
-1. **Change default passwords**: Ensure all passwords in `.env.production` are strong and unique
-2. **Restrict Traefik dashboard**: Limit access to port 8080 or disable it in production
-3. **Regular updates**: Keep Docker images and system packages updated
-4. **Backup strategy**: Implement regular database backups
-5. **Monitor logs**: Regularly check logs for suspicious activity
-6. **API secrets**: Never commit `.env.production` to version control
+1. **Secrets management**:
+   - All production secrets are stored as GitHub Secrets, never in version control
+   - Never commit `.env.production` to git
+   - Regularly rotate API keys and secrets
 
-## Adding Prometheus and Grafana
+2. **SSH access**:
+   - Use SSH keys only (no password authentication)
+   - Restrict SSH key permissions to deployment-only operations
+   - Consider using a dedicated deployment user instead of root
 
-When ready to add observability:
+3. **Restrict Traefik dashboard**:
+   - Limit access to port 8080 or disable it in production
+   - Use UFW to allow only specific IPs
 
-1. Update `docker-compose.prod.yml` to include Prometheus and Grafana services (from `docker-compose.yml`)
-2. Configure Grafana with proper authentication (remove anonymous access)
-3. Update firewall rules if external access is needed
-4. Update `config/runtime.exs` to enable PromEx Grafana integration
+4. **System security**:
+   - Application runs as non-root user `premiere`
+   - Traefik runs as non-root user `traefik`
+   - Keep system packages updated: `ssh root@68.183.219.251 'apt update && apt upgrade'`
+
+5. **Backup strategy**:
+   - Implement regular database backups
+   - Store backups off-server (consider automated S3/DO Spaces uploads)
+
+6. **Monitor logs**:
+   - Regularly check logs for suspicious activity
+   - Consider log aggregation service for production
+
+7. **Firewall**:
+   - UFW configured to allow only necessary ports (22, 80, 443, 8080)
+   - Review and adjust as needed
+
+## GitHub Actions CI/CD Pipeline
+
+The repository includes an automated deployment pipeline via GitHub Actions that deploys to Digital Ocean on every push to the `main` branch.
+
+### Workflow Overview
+
+The deployment workflow (`.github/workflows/main.yml`) consists of two jobs:
+
+1. **build-release**: Builds the production Elixir release
+   - Sets up Erlang/Elixir environment
+   - Caches dependencies and build artifacts for faster builds
+   - Compiles assets (`mix assets.deploy`)
+   - Creates production release (`MIX_ENV=prod mix release`)
+   - Uploads release artifact for deployment
+
+2. **deploy-to-digital-ocean**: Deploys the release to the droplet
+   - Downloads release artifact from build job
+   - Sets up SSH connection to droplet
+   - Reconstructs `.env.production` from GitHub Secrets
+   - Syncs release to `/opt/premiere-ecoute/` via rsync
+   - Restarts the `premiere-ecoute` systemd service
+   - Verifies deployment success
+
+### Required GitHub Secrets
+
+To enable automated deployments, configure the following secrets in your GitHub repository settings (**Settings → Secrets and variables → Actions → New repository secret**):
+
+#### SSH Access
+- `DO_SSH_PRIVATE_KEY`: Private SSH key for passwordless login to `root@68.183.219.251`
+
+#### Phoenix/Application
+- `PHX_HOST`: `premiere-ecoute.fr` (or your domain/IP)
+- `SECRET_KEY_BASE`: Generate with `mix phx.gen.secret`
+
+#### Database
+- `POSTGRES_DATABASE`: `premiere_ecoute_prod`
+- `POSTGRES_USERNAME`: `postgres`
+- `POSTGRES_PASSWORD`: Your database password
+- `POSTGRES_ENCRYPTION_KEY`: Base64-encoded 32-byte key (generate with `mix guardian.gen.secret | base64`)
+
+#### Spotify API
+- `SPOTIFY_CLIENT_ID`: From Spotify Developer Dashboard
+- `SPOTIFY_CLIENT_SECRET`: From Spotify Developer Dashboard
+- `SPOTIFY_REDIRECT_URI`: `https://premiere-ecoute.fr/auth/spotify/callback`
+
+#### Tidal API
+- `TIDAL_CLIENT_ID`: From Tidal Developer Portal
+- `TIDAL_CLIENT_SECRET`: From Tidal Developer Portal
+
+#### Twitch API
+- `TWITCH_CLIENT_ID`: From Twitch Developer Console
+- `TWITCH_CLIENT_SECRET`: From Twitch Developer Console
+- `TWITCH_REDIRECT_URI`: `https://premiere-ecoute.fr/auth/twitch/callback`
+- `TWITCH_WEBHOOK_CALLBACK_URL`: `https://premiere-ecoute.fr/webhooks/twitch`
+- `TWITCH_EXTENSION_SECRET`: Your webhook secret
+
+#### Other APIs
+- `DISCORD_BOT_TOKEN`: Discord bot token
+- `BUYMEACOFFEE_API_KEY`: Buy Me a Coffee API key
+- `RESEND_API_KEY`: Resend API key (for email via Swoosh)
+- `OPENAI_API_KEY`: OpenAI API key
+- `SENTRY_DSN`: Sentry DSN for error tracking
+
+#### Feature Flags Authentication
+- `AUTH_USERNAME`: Admin username for feature flags
+- `AUTH_PASSWORD`: Admin password for feature flags
+
+### Setting Up SSH Access
+
+1. **Generate SSH key pair** (if you don't have one):
+   ```bash
+   ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/premiere_ecoute_deploy
+   ```
+
+2. **Add public key to droplet**:
+   ```bash
+   ssh-copy-id -i ~/.ssh/premiere_ecoute_deploy.pub root@68.183.219.251
+   ```
+
+3. **Add private key to GitHub Secrets**:
+   ```bash
+   cat ~/.ssh/premiere_ecoute_deploy
+   # Copy the entire output (including BEGIN and END lines)
+   # Add as DO_SSH_PRIVATE_KEY secret in GitHub
+   ```
+
+### Triggering Deployments
+
+Deployments are triggered automatically:
+- On every push to the `main` branch
+- Can be manually triggered via **Actions → Deploy to Production → Run workflow**
+
+### Monitoring Deployments
+
+1. Go to **Actions** tab in your GitHub repository
+2. Click on the latest workflow run
+3. Monitor the progress of `build-release` and `deploy-to-digital-ocean` jobs
+4. Check logs for any errors
+
+### Deployment Cache
+
+The workflow caches:
+- **Dependencies** (`deps` + `_build`): Keyed on `mix.lock`, speeds up builds when dependencies haven't changed
+- **Assets** (`assets/node_modules`): Keyed on `package-lock.json`, speeds up asset compilation
+
+This reduces build time from ~5 minutes to ~2-3 minutes for incremental changes.
+
+### Rollback Strategy
+
+If a deployment fails or introduces issues:
+
+1. **Immediate rollback**: Revert the commit on `main` and push, which will trigger a new deployment
+2. **Manual rollback**: SSH into the droplet and restore a previous release:
+   ```bash
+   ssh root@68.183.219.251
+   # Keep previous releases for rollback
+   systemctl stop premiere-ecoute
+   # Restore previous release backup
+   systemctl start premiere-ecoute
+   ```
+
+### Best Practices
+
+- **Test before merging**: Always test changes in a PR before merging to `main`
+- **Monitor first deploy**: Watch the first deployment after setting up to catch any configuration issues
+- **Secrets rotation**: Regularly rotate API keys and secrets
+- **Database backups**: Consider adding a pre-deployment backup step for safety
 
 ## Next Steps
 
-- [ ] Configure custom domain
+- [x] Implement CI/CD pipeline with GitHub Actions
+- [ ] Configure custom domain (currently using `premiere-ecoute.fr`)
 - [ ] Set up automated backups
 - [ ] Configure monitoring and alerting
 - [ ] Set up log aggregation
-- [ ] Implement CI/CD pipeline
 - [ ] Add Prometheus/Grafana for observability
