@@ -96,7 +96,7 @@ jobs:
 
       - name: Create .env.production file
         run: |
-          envsubst > .env.production << 'ENVEOF'
+          envsubst > .env.production << ENVEOF
           # Phoenix
           PHX_HOST=$PHX_HOST
           PORT=4000
