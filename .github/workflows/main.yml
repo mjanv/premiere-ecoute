@@ -96,7 +96,7 @@ jobs:
 
       - name: Create .env.production file
         run: |
-          cat << 'EOF' > .env.production
+          cat > .env.production << EOF
           # Phoenix
           PHX_HOST=${{ secrets.PHX_HOST }}
           PORT=4000
@@ -145,6 +145,10 @@ jobs:
       - name: Deploy .env file
         run: |
           scp .env.production root@68.183.219.251:/opt/premiere-ecoute/.env
+
+      - name: Fix permissions
+        run: |
+          ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute -type f \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -name "*.so" \) -exec chmod +x {} \;'
 
       - name: Restart application
         run: |
