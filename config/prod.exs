@@ -5,12 +5,12 @@ config :premiere_ecoute,
   grafana: "https://fly-metrics.net/d/fly-app/fly-app?orgId=140881"
 
 config :premiere_ecoute, PremiereEcoute.Repo,
-  ssl: true,
-  pool_size: 5
+  ssl: false,
+  pool_size: 2
 
 config :premiere_ecoute, PremiereEcoute.Events.Store,
-  ssl: true,
-  pool_size: 5
+  ssl: false,
+  pool_size: 2
 
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 

@@ -74,7 +74,7 @@ config :instructor,
 config :sentry, dsn: env!("SENTRY_DSN")
 
 if config_env() == :prod do
-  config :premiere_ecoute, :dns_cluster_query, env!("DNS_CLUSTER_QUERY")
+  # config :premiere_ecoute, :dns_cluster_query, env!("DNS_CLUSTER_QUERY")
 
   config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
     url: [host: env!("PHX_HOST"), port: 443, scheme: "https"],
@@ -82,7 +82,11 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0},
       port: env!("PORT", :integer, 4000)
     ],
-    secret_key_base: env!("SECRET_KEY_BASE")
+    secret_key_base: env!("SECRET_KEY_BASE"),
+    check_origin: [
+      "//#{env!("PHX_HOST")}",
+      "//www.#{env!("PHX_HOST")}"
+    ]
 
   config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
     manual_metrics_start_delay: :no_delay,

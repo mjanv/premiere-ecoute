@@ -1,0 +1,24 @@
+# AIDEV-NOTE: Traefik dynamic configuration - routing rules
+# Separate routers needed because Let's Encrypt cannot issue certs for IP addresses
+http:
+  routers:
+    app-domain:
+      rule: "Host(`premiere-ecoute.fr`)"
+      service: app
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    app-ip:
+      rule: "Host(`68.183.219.251`)"
+      service: app
+      entryPoints:
+        - websecure
+      tls: {}
+
+  services:
+    app:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:4000"
