@@ -174,9 +174,13 @@ jobs:
         run: |
           ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -name "*.so" \) -type f -exec chmod +x {} \;'
 
+      - name: Ensure PostgreSQL is running
+        run: |
+          ssh root@68.183.219.251 'systemctl start postgresql && systemctl is-active postgresql'
+
       - name: Restart application
         run: |
-          ssh root@68.183.219.251 'systemctl restart premiere-ecoute'
+          ssh root@68.183.219.251 'systemctl restart premiere-ecoute || (journalctl -u premiere-ecoute -n 50 --no-pager && exit 1)'
 
       - name: Verify deployment
         run: |
