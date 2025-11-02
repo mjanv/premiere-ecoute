@@ -96,47 +96,71 @@ jobs:
 
       - name: Create .env.production file
         run: |
-          cat > .env.production << EOF
+          envsubst > .env.production << 'ENVEOF'
           # Phoenix
-          PHX_HOST=${{ secrets.PHX_HOST }}
+          PHX_HOST=$PHX_HOST
           PORT=4000
-          SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
+          SECRET_KEY_BASE=$SECRET_KEY_BASE
           MIX_ENV=prod
 
           # Database
-          POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}
-          POSTGRES_USERNAME=${{ secrets.POSTGRES_USERNAME }}
-          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE=$POSTGRES_DATABASE
+          POSTGRES_USERNAME=$POSTGRES_USERNAME
+          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
           POSTGRES_HOSTNAME=localhost
-          POSTGRES_ENCRYPTION_KEY=${{ secrets.POSTGRES_ENCRYPTION_KEY }}
+          POSTGRES_ENCRYPTION_KEY=$POSTGRES_ENCRYPTION_KEY
 
           # Spotify API
-          SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}
-          SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}
-          SPOTIFY_REDIRECT_URI=${{ secrets.SPOTIFY_REDIRECT_URI }}
+          SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID
+          SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET
+          SPOTIFY_REDIRECT_URI=$SPOTIFY_REDIRECT_URI
 
           # Tidal API
-          TIDAL_CLIENT_ID=${{ secrets.TIDAL_CLIENT_ID }}
-          TIDAL_CLIENT_SECRET=${{ secrets.TIDAL_CLIENT_SECRET }}
+          TIDAL_CLIENT_ID=$TIDAL_CLIENT_ID
+          TIDAL_CLIENT_SECRET=$TIDAL_CLIENT_SECRET
 
           # Twitch API
-          TWITCH_CLIENT_ID=${{ secrets.TWITCH_CLIENT_ID }}
-          TWITCH_CLIENT_SECRET=${{ secrets.TWITCH_CLIENT_SECRET }}
-          TWITCH_REDIRECT_URI=${{ secrets.TWITCH_REDIRECT_URI }}
-          TWITCH_WEBHOOK_CALLBACK_URL=${{ secrets.TWITCH_WEBHOOK_CALLBACK_URL }}
-          TWITCH_EXTENSION_SECRET=${{ secrets.TWITCH_EXTENSION_SECRET }}
+          TWITCH_CLIENT_ID=$TWITCH_CLIENT_ID
+          TWITCH_CLIENT_SECRET=$TWITCH_CLIENT_SECRET
+          TWITCH_REDIRECT_URI=$TWITCH_REDIRECT_URI
+          TWITCH_WEBHOOK_CALLBACK_URL=$TWITCH_WEBHOOK_CALLBACK_URL
+          TWITCH_EXTENSION_SECRET=$TWITCH_EXTENSION_SECRET
 
           # Other APIs
-          DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
-          BUYMEACOFFEE_API_KEY=${{ secrets.BUYMEACOFFEE_API_KEY }}
-          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
-          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN
+          BUYMEACOFFEE_API_KEY=$BUYMEACOFFEE_API_KEY
+          RESEND_API_KEY=$RESEND_API_KEY
+          OPENAI_API_KEY=$OPENAI_API_KEY
+          SENTRY_DSN=$SENTRY_DSN
 
           # Feature Flags Auth
-          AUTH_USERNAME=${{ secrets.AUTH_USERNAME }}
-          AUTH_PASSWORD=${{ secrets.AUTH_PASSWORD }}
-          EOF
+          AUTH_USERNAME=$AUTH_USERNAME
+          AUTH_PASSWORD=$AUTH_PASSWORD
+          ENVEOF
+        env:
+          PHX_HOST: ${{ secrets.PHX_HOST }}
+          SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+          POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_ENCRYPTION_KEY: ${{ secrets.POSTGRES_ENCRYPTION_KEY }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI }}
+          TIDAL_CLIENT_ID: ${{ secrets.TIDAL_CLIENT_ID }}
+          TIDAL_CLIENT_SECRET: ${{ secrets.TIDAL_CLIENT_SECRET }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          TWITCH_REDIRECT_URI: ${{ secrets.TWITCH_REDIRECT_URI }}
+          TWITCH_WEBHOOK_CALLBACK_URL: ${{ secrets.TWITCH_WEBHOOK_CALLBACK_URL }}
+          TWITCH_EXTENSION_SECRET: ${{ secrets.TWITCH_EXTENSION_SECRET }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          BUYMEACOFFEE_API_KEY: ${{ secrets.BUYMEACOFFEE_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
 
       - name: Deploy release to server
         run: |
@@ -148,7 +172,7 @@ jobs:
 
       - name: Fix permissions
         run: |
-          ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute -type f \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -name "*.so" \) -exec chmod +x {} \;'
+          ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -name "*.so" \) -type f -exec chmod +x {} \;'
 
       - name: Restart application
         run: |
