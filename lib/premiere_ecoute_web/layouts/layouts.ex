@@ -40,7 +40,7 @@ defmodule PremiereEcouteWeb.Layouts do
     ~H"""
     <div class={"min-h-screen bg-gray-900 flex flex-col #{if @show_modal, do: "blur-sm", else: ""}"}>
       <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
-      
+
     <!-- Spotify connection notification for streamers -->
       <%= if @current_scope && Map.get(@current_scope, :user) && Map.get(@current_scope, :user).role in [:streamer, :admin] && needs_spotify_connection?(Map.get(@current_scope, :user)) do %>
         <div class="bg-green-600 px-6 py-2">
@@ -62,7 +62,7 @@ defmodule PremiereEcouteWeb.Layouts do
           </div>
         </div>
       <% end %>
-      
+
     <!-- Layout with left sidebar for authenticated users -->
       <div class="flex flex-1">
         <.left_sidebar
@@ -70,64 +70,60 @@ defmodule PremiereEcouteWeb.Layouts do
           current_scope={@current_scope}
           current_page={@current_page}
         />
-        
+
     <!-- Main content area -->
         <main class="flex-1">
           {render_slot(@inner_block)}
         </main>
       </div>
-      
+
     <!-- Footer - spans full width under both sidebar and content -->
       <footer class="py-4 px-6 mt-auto" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">
-        <div class="max-w-7xl mx-auto">
-          <div class="flex justify-between items-center">
-            <!-- AIDEV-NOTE: Version computed at compile-time from mix.exs and git commit -->
+        <div class="max-w-5xl mx-auto text-center">
+          <div class="flex justify-center items-center space-x-3">
             <span class="text-sm font-medium" style="color: var(--color-dark-300);">
-              {gettext("Version")} {PremiereEcoute.Version.version()}
+              v{PremiereEcoute.version()}
             </span>
-
-            <!-- AIDEV-NOTE: Legal and info links on the right -->
-            <div class="flex items-center space-x-3">
-              <.link
-                href={~p"/changelog"}
-                class="text-sm font-medium transition-colors hover:text-white"
-                style="color: var(--color-dark-300);"
-              >
-                {gettext("Changelog")}
-              </.link>
-              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-              <.link
-                href={~p"/legal/privacy"}
-                class="text-sm font-medium transition-colors hover:text-white"
-                style="color: var(--color-dark-300);"
-              >
-                {gettext("Privacy")}
-              </.link>
-              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-              <.link
-                href={~p"/legal/cookies"}
-                class="text-sm font-medium transition-colors hover:text-white"
-                style="color: var(--color-dark-300);"
-              >
-                {gettext("Cookies")}
-              </.link>
-              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-              <.link
-                href={~p"/legal/terms"}
-                class="text-sm font-medium transition-colors hover:text-white"
-                style="color: var(--color-dark-300);"
-              >
-                {gettext("Terms")}
-              </.link>
-              <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
-              <.link
-                href={~p"/legal/contact"}
-                class="text-sm font-medium transition-colors hover:text-white"
-                style="color: var(--color-dark-300);"
-              >
-                {gettext("Contact")}
-              </.link>
-            </div>
+            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+            <.link
+              href={~p"/changelog"}
+              class="text-sm font-medium transition-colors hover:text-white"
+              style="color: var(--color-dark-300);"
+            >
+              {gettext("Changelog")}
+            </.link>
+            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+            <.link
+              href={~p"/legal/privacy"}
+              class="text-sm font-medium transition-colors hover:text-white"
+              style="color: var(--color-dark-300);"
+            >
+              {gettext("Privacy")}
+            </.link>
+            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+            <.link
+              href={~p"/legal/cookies"}
+              class="text-sm font-medium transition-colors hover:text-white"
+              style="color: var(--color-dark-300);"
+            >
+              {gettext("Cookies")}
+            </.link>
+            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+            <.link
+              href={~p"/legal/terms"}
+              class="text-sm font-medium transition-colors hover:text-white"
+              style="color: var(--color-dark-300);"
+            >
+              {gettext("Terms")}
+            </.link>
+            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+            <.link
+              href={~p"/legal/contact"}
+              class="text-sm font-medium transition-colors hover:text-white"
+              style="color: var(--color-dark-300);"
+            >
+              {gettext("Contact")}
+            </.link>
           </div>
         </div>
       </footer>
