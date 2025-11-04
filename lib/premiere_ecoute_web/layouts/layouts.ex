@@ -81,6 +81,10 @@ defmodule PremiereEcouteWeb.Layouts do
       <footer class="py-4 px-6 mt-auto" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">
         <div class="max-w-5xl mx-auto text-center">
           <div class="flex justify-center items-center space-x-3">
+            <span class="text-sm font-medium" style="color: var(--color-dark-300);">
+              v{PremiereEcoute.version()}
+            </span>
+            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
             <.link
               href={~p"/changelog"}
               class="text-sm font-medium transition-colors hover:text-white"
