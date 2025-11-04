@@ -100,6 +100,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          _ <- Apis.twitch().send_chat_message(scope, message, 0),
          {:ok, session, events} <-
            PremiereEcoute.apply(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
+      # AIDEV-NOTE: Schedule promotional message 60 seconds after session start (fire-and-forget)
+      ListeningSessionWorker.in_minutes(%{action: "send_promo_message", user_id: scope.user.id}, 1)
       {:ok, session, [%SessionStarted{session_id: session.id}] ++ events}
     else
       false ->
@@ -125,6 +127,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          _ <- Apis.spotify().start_resume_playback(scope, session.playlist) do
       ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
       ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session.id, user_id: scope.user.id}, @cooldown)
+      # AIDEV-NOTE: Schedule promotional message 60 seconds after session start (fire-and-forget)
+      ListeningSessionWorker.in_minutes(%{action: "send_promo_message", user_id: scope.user.id}, 1)
       {:ok, session, [%SessionStarted{session_id: session.id}]}
     else
       false ->
