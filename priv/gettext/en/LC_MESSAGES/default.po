@@ -290,8 +290,8 @@ msgstr ""
 msgid "Progress:"
 msgstr ""
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:178
-#: lib/premiere_ecoute_web/layouts/layouts.ex:190
+#: lib/premiere_ecoute_web/layouts/layouts.ex:182
+#: lib/premiere_ecoute_web/layouts/layouts.ex:194
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
 msgstr ""
@@ -307,12 +307,12 @@ msgstr ""
 msgid "My Sessions"
 msgstr ""
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:185
+#: lib/premiere_ecoute_web/layouts/layouts.ex:189
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
 msgstr ""
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:173
+#: lib/premiere_ecoute_web/layouts/layouts.ex:177
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
 msgstr ""
@@ -677,27 +677,27 @@ msgid "Bot"
 msgstr ""
 
 #: lib/premiere_ecoute_web/controllers/static/changelog/html/entry.html.heex:3
-#: lib/premiere_ecoute_web/layouts/layouts.ex:89
+#: lib/premiere_ecoute_web/layouts/layouts.ex:93
 #, elixir-autogen, elixir-format
 msgid "Changelog"
 msgstr ""
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:121
+#: lib/premiere_ecoute_web/layouts/layouts.ex:125
 #, elixir-autogen, elixir-format
 msgid "Contact"
 msgstr ""
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:105
+#: lib/premiere_ecoute_web/layouts/layouts.ex:109
 #, elixir-autogen, elixir-format
 msgid "Cookies"
 msgstr ""
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:97
+#: lib/premiere_ecoute_web/layouts/layouts.ex:101
 #, elixir-autogen, elixir-format
 msgid "Privacy"
 msgstr ""
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:113
+#: lib/premiere_ecoute_web/layouts/layouts.ex:117
 #, elixir-autogen, elixir-format
 msgid "Terms"
 msgstr ""

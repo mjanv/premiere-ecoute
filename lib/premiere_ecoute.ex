@@ -18,8 +18,7 @@ defmodule PremiereEcoute do
       PubSub,
       Presence,
       Repo,
-      DataCase,
-      Version
+      DataCase
     ]
 
   alias PremiereEcoute.Events.Store

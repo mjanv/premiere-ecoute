@@ -40,7 +40,7 @@ defmodule PremiereEcouteWeb.Layouts do
     ~H"""
     <div class={"min-h-screen bg-gray-900 flex flex-col #{if @show_modal, do: "blur-sm", else: ""}"}>
       <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
-
+      
     <!-- Spotify connection notification for streamers -->
       <%= if @current_scope && Map.get(@current_scope, :user) && Map.get(@current_scope, :user).role in [:streamer, :admin] && needs_spotify_connection?(Map.get(@current_scope, :user)) do %>
         <div class="bg-green-600 px-6 py-2">
@@ -62,7 +62,7 @@ defmodule PremiereEcouteWeb.Layouts do
           </div>
         </div>
       <% end %>
-
+      
     <!-- Layout with left sidebar for authenticated users -->
       <div class="flex flex-1">
         <.left_sidebar
@@ -70,13 +70,13 @@ defmodule PremiereEcouteWeb.Layouts do
           current_scope={@current_scope}
           current_page={@current_page}
         />
-
+        
     <!-- Main content area -->
         <main class="flex-1">
           {render_slot(@inner_block)}
         </main>
       </div>
-
+      
     <!-- Footer - spans full width under both sidebar and content -->
       <footer class="py-4 px-6 mt-auto" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">
         <div class="max-w-5xl mx-auto text-center">
