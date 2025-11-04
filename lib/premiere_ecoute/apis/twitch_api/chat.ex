@@ -16,6 +16,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
 
     :ok
   end
+  
+  def send_chat_message(_, _), do: :ok
 
   def send_chat_message(%Scope{} = scope, message, 0) do
     do_send_chat_message(scope, message)
