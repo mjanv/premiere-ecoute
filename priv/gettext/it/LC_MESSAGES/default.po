@@ -3010,7 +3010,7 @@ msgid_plural "artists"
 msgstr[0] "Artista"
 msgstr[1] "Artista"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:198
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:202
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La prima di %{name} è finita"
