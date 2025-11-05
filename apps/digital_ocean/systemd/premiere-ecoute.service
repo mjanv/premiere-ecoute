@@ -29,6 +29,16 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=premiere-ecoute
 
+# AIDEV-NOTE: Resource limits to prevent OOM issues
+# Limit memory to 512MB (adjust based on actual droplet size)
+MemoryMax=512M
+MemoryHigh=400M
+# Allow some swap usage for occasional spikes
+MemorySwapMax=128M
+
+# CPU limits (allow bursting but prevent CPU starvation of other services)
+CPUQuota=80%
+
 # Security hardening
 NoNewPrivileges=true
 PrivateTmp=true
