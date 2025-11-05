@@ -91,7 +91,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     end
   end
 
-  # AIDEV-NOTE: Fire-and-forget promotional message sent 1 minute after session start
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "send_promo_message", "user_id" => user_id}}) do
     with scope <- Scope.for_user(User.get(user_id)),

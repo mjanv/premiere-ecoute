@@ -203,6 +203,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          _ <- Apis.twitch().send_chat_message(scope, message, 0),
          {:ok, session} <- ListeningSession.stop(session),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
+      ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: scope.user.id}, 10)
+
       if is_active, do: Apis.spotify().pause_playback(scope)
       {:ok, session, [%SessionStopped{session_id: session.id}]}
     else

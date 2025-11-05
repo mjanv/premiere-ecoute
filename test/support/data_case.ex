@@ -45,6 +45,7 @@ defmodule PremiereEcoute.DataCase do
       setup do
         Req.Test.set_req_test_to_shared()
         Req.Test.verify_on_exit!()
+        Hammox.verify_on_exit!()
 
         :ok
       end

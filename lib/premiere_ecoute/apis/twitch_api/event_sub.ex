@@ -73,7 +73,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end
   end
 
-  # AIDEV-NOTE: EventSub versions per Twitch API docs - ensure version matches latest API
   defp version("channel.chat.message"), do: "1"
   defp version("channel.follow"), do: "2"
   defp version("channel.poll.progress"), do: "1"
