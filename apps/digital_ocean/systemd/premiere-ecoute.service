@@ -29,6 +29,16 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=premiere-ecoute
 
+# AIDEV-NOTE: Resource limits to prevent OOM issues on 1GB droplet
+# Allocate ~600MB for Phoenix app (remaining ~400MB for PostgreSQL, Traefik, OS)
+MemoryMax=600M
+MemoryHigh=500M
+# Allow some swap usage for occasional spikes
+MemorySwapMax=200M
+
+# CPU limits (allow bursting but prevent CPU starvation of other services)
+CPUQuota=80%
+
 # Security hardening
 NoNewPrivileges=true
 PrivateTmp=true
