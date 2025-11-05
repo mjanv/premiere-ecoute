@@ -106,4 +106,20 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
       :ok
     end
   end
+
+  # AIDEV-NOTE: Fire-and-forget message sent 10 seconds after session ends
+  @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"action" => "send_session_end_message", "user_id" => user_id}}) do
+    with scope <- Scope.for_user(User.get(user_id)),
+         _ <-
+           Apis.twitch().send_chat_message(
+             scope,
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+               gettext("You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account")
+             end),
+             0
+           ) do
+      :ok
+    end
+  end
 end
