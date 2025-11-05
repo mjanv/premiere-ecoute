@@ -90,4 +90,20 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_updated, session})
     end
   end
+
+  # AIDEV-NOTE: Fire-and-forget promotional message sent 1 minute after session start
+  @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"action" => "send_promo_message", "user_id" => user_id}}) do
+    with scope <- Scope.for_user(User.get(user_id)),
+         _ <-
+           Apis.twitch().send_chat_message(
+             scope,
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+               gettext("You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account")
+             end),
+             0
+           ) do
+      :ok
+    end
+  end
 end
