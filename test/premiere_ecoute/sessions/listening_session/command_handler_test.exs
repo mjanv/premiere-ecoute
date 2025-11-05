@@ -442,6 +442,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   end
 
   describe "handle/1 - StopListeningSession" do
+    @tag :wip
     test "successfully creates session and generate a report" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
@@ -465,13 +466,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One", 0 -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{},
+      expect(TwitchApi, :send_chat_message, fn _scope,
                                                "You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account",
                                                0 ->
         :ok
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "The premiere of Sample Album is over", 0 -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn _scope, "The premiere of Sample Album is over", 0 -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn _scope,
+                                               "You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account",
+                                               0 ->
+        :ok
+      end)
 
       command = %PrepareListeningSession{
         source: :album,

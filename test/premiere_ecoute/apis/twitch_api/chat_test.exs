@@ -13,10 +13,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
     scope = user_scope_fixture(user)
     Cache.put(:users, :bot, bot)
 
-    # Req.Test.set_req_test_to_shared()
-    # Req.Test.verify_on_exit!()
-    # setup_req_test()
-
     {:ok, %{scope: scope}}
   end
 
