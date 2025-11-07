@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Endpoint do
 
   socket "/socket", PremiereEcouteWeb.UserSocket,
     websocket: true,
-    longpoll: true
+    longpoll: false
 
   plug Plug.Static,
     at: "/",

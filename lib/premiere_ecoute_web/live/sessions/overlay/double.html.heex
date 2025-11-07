@@ -1,7 +1,7 @@
 <.async_result :let={summary} assign={@summary}>
   <:loading>
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+      <span style={"font-size: 128px; font-weight: 700; color: #{if @open_vote, do: "white", else: "rgba(229, 231, 235, 1)"}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
         -
       </span>
     </div>
@@ -10,31 +10,24 @@
   <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 500px; margin: 0 auto;">
     <!-- Viewer Score -->
     <div style="display: flex; flex-direction: column; align-items: center; flex: 1; padding: 0 8px;">
-      <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-        <%= if @open_vote do %>
-          {score_value(summary, :viewer)}
-        <% else %>
-          -
-        <% end %>
+      <span style={"font-size: 128px; font-weight: 700; color: #{if @open_vote, do: "white", else: "rgba(229, 231, 235, 1)"}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
+        {score_value(summary, :viewer)}
       </span>
-      <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
+      <div style={"font-size: 32px; color: #{if @open_vote, do: "rgba(255, 255, 255, 0.8)", else: "rgba(229, 231, 235, 0.8)"}; text-transform: uppercase; letter-spacing: 0.5px;"}>
         {score_label(:viewer)}
       </div>
     </div>
     
 <!-- Vertical Separator -->
-    <div style="width: 2px; height: 160px; background: rgba(255, 255, 255, 0.8); margin: 0 16px; flex-shrink: 0;"></div>
+    <div style={"width: 2px; height: 160px; background: #{if @open_vote, do: "rgba(255, 255, 255, 0.8)", else: "rgba(229, 231, 235, 0.6)"}; margin: 0 16px; flex-shrink: 0;"}>
+    </div>
     
 <!-- Streamer Score -->
     <div style="display: flex; flex-direction: column; align-items: center; flex: 1; padding: 0 8px;">
-      <span style="font-size: 128px; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-        <%= if @open_vote do %>
-          {score_value(summary, :streamer)}
-        <% else %>
-          -
-        <% end %>
+      <span style={"font-size: 128px; font-weight: 700; color: #{if @open_vote, do: "white", else: "rgba(229, 231, 235, 1)"}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
+        {score_value(summary, :streamer)}
       </span>
-      <div style="font-size: 32px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.5px;">
+      <div style={"font-size: 32px; color: #{if @open_vote, do: "rgba(255, 255, 255, 0.8)", else: "rgba(229, 231, 235, 0.8)"}; text-transform: uppercase; letter-spacing: 0.5px;"}>
         {score_label(:streamer)}
       </div>
     </div>

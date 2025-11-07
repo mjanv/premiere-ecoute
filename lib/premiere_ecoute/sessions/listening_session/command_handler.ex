@@ -102,6 +102,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            PremiereEcoute.apply(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
       # AIDEV-NOTE: Schedule promotional message 60 seconds after session start (fire-and-forget)
       ListeningSessionWorker.in_minutes(%{action: "send_promo_message", user_id: scope.user.id}, 1)
+      PremiereEcoute.PubSub.broadcast("playback:#{scope.user.id}", {:session_started, session.id})
       {:ok, session, [%SessionStarted{session_id: session.id}] ++ events}
     else
       false ->
@@ -204,6 +205,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.stop(session),
          :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
       ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: scope.user.id}, 10)
+      PremiereEcoute.PubSub.broadcast("playback:#{scope.user.id}", {:session_stopped, session.id})
 
       if is_active, do: Apis.spotify().pause_playback(scope)
       {:ok, session, [%SessionStopped{session_id: session.id}]}

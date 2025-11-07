@@ -10,16 +10,23 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   alias PremiereEcoute.Presence
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcouteCore.Cache
 
   @impl true
   def mount(%{"id" => user_id}, _session, socket) do
     user = PremiereEcoute.Accounts.get_user!(user_id)
     listening_session = ListeningSession.get_active_session(user)
 
+    # AIDEV-NOTE: Always subscribe to playback topic to receive session start/stop events
+    if connected?(socket) do
+      PremiereEcoute.PubSub.subscribe("playback:#{user_id}")
+    end
+
     socket =
       case listening_session do
         nil ->
           socket
+          |> assign(:user_id, user_id)
           |> assign(:id, nil)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
@@ -31,10 +38,23 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
         session ->
           if connected?(socket) do
             {:ok, _} = Presence.join(session.user.id)
-            PremiereEcoute.PubSub.subscribe(["session:#{session.id}", "playback:#{session.user.id}"])
+            PremiereEcoute.PubSub.subscribe("session:#{session.id}")
           end
 
           _ = PlayerSupervisor.start(session.user.id)
+
+          # AIDEV-NOTE: Check cache to determine if vote is currently open
+          open_vote =
+            case session.user.twitch do
+              nil ->
+                false
+
+              twitch ->
+                case Cache.get(:sessions, twitch.user_id) do
+                  {:ok, cached_session} when not is_nil(cached_session) -> true
+                  _ -> false
+                end
+            end
 
           summary_result =
             case Report.get_by(session_id: session.id) do
@@ -45,18 +65,19 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
                 summary = Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
 
                 if is_nil(summary) do
-                  AsyncResult.loading()
+                  AsyncResult.ok(%{viewer_score: nil, streamer_score: nil})
                 else
                   AsyncResult.ok(summary)
                 end
             end
 
           socket
+          |> assign(:user_id, user_id)
           |> assign(:id, session.id)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
           |> assign(:progress, AsyncResult.loading())
-          |> assign(:open_vote, true)
+          |> assign(:open_vote, open_vote)
           |> assign(:listening_session, session)
           |> assign(:summary, summary_result)
       end
@@ -85,6 +106,14 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def handle_info({:session_updated, session}, %{assigns: %{summary: summary}} = socket) do
+    socket
+    |> assign(:listening_session, session)
+    |> assign(:summary, AsyncResult.ok(summary, %{viewer_score: nil, streamer_score: nil}))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
   def handle_info({:session_summary, session_summary}, %{assigns: assigns} = socket) do
     {:noreply, assign(socket, :summary, AsyncResult.ok(assigns.summary, session_summary))}
   end
@@ -105,17 +134,19 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_info(:vote_open, socket) do
+  def handle_info(:vote_open, %{assigns: %{summary: summary}} = socket) do
     socket
     |> assign(:open_vote, true)
+    |> assign(:summary, AsyncResult.ok(summary, %{viewer_score: nil, streamer_score: nil}))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
   def handle_info(:vote_close, %{assigns: %{summary: summary}} = socket) do
+    # AIDEV-NOTE: When vote closes, reset scores to nil to show dashes until next vote
     summary =
       if summary.ok? do
-        AsyncResult.ok(summary, Map.merge(summary.result, %{"viewer_score" => 0.0, "streamer_score" => 0.0}))
+        AsyncResult.ok(summary, Map.merge(summary.result, %{viewer_score: nil, streamer_score: nil}))
       else
         summary
       end
@@ -127,7 +158,44 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_info(:stop, %{assigns: %{listening_session: session}} = socket) when not is_nil(session) do
+  def handle_info({:session_started, session_id}, %{assigns: %{user_id: user_id}} = socket) do
+    # AIDEV-NOTE: Subscribe to new session topic when session starts
+    session = ListeningSession.get(session_id)
+    PremiereEcoute.PubSub.subscribe("session:#{session_id}")
+    _ = Presence.join(user_id)
+    _ = PlayerSupervisor.start(user_id)
+
+    # AIDEV-NOTE: Check cache to determine if vote is currently open
+    open_vote =
+      case session.user.twitch do
+        nil ->
+          false
+
+        twitch ->
+          case Cache.get(:sessions, twitch.user_id) do
+            {:ok, cached_session} when not is_nil(cached_session) -> true
+            _ -> false
+          end
+      end
+
+    socket =
+      socket
+      |> assign(:id, session.id)
+      |> assign(:listening_session, session)
+      |> assign(:summary, AsyncResult.ok(%{viewer_score: nil, streamer_score: nil}))
+      |> assign(:open_vote, open_vote)
+      |> assign(:progress, AsyncResult.loading())
+      |> assign(:percent, 0)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(:session_stopped, %{assigns: %{listening_session: session, user_id: user_id}} = socket)
+      when not is_nil(session) do
+    PremiereEcoute.PubSub.unsubscribe("session:#{session.id}")
+    Presence.unjoin(user_id)
+
     socket =
       socket
       |> assign(:id, nil)
@@ -141,7 +209,16 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_info(:stop, socket) do
+  def handle_info(:stop, %{assigns: %{listening_session: session}} = socket) when not is_nil(session) do
+    socket =
+      socket
+      |> assign(:id, nil)
+      |> assign(:listening_session, nil)
+      |> assign(:summary, AsyncResult.loading())
+      |> assign(:open_vote, false)
+      |> assign(:progress, AsyncResult.loading())
+      |> assign(:percent, 0)
+
     {:noreply, socket}
   end
 
