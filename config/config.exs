@@ -83,7 +83,9 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     ]
   ]
 
-config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30
+config :premiere_ecoute, PremiereEcoute.Sessions,
+  vote_cooldown: 30,
+  batch_timeout: 1_000
 
 config :premiere_ecoute, PremiereEcoute.Festivals, model: PremiereEcoute.Festivals.Models.Static
 
