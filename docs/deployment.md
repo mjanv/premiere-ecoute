@@ -115,13 +115,8 @@ ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
 After deployment, verify the services are running:
 
 ```bash
-# Check application status
 ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
-
-# Check Traefik status
 ssh root@68.183.219.251 'systemctl status traefik --no-pager'
-
-# Check PostgreSQL status
 ssh root@68.183.219.251 'systemctl status postgresql --no-pager'
 ```
 
@@ -135,16 +130,9 @@ All services should show as "active (running)".
 ### View Logs
 
 ```bash
-# Application logs
 ssh root@68.183.219.251 'journalctl -u premiere-ecoute -f'
-
-# Traefik logs
 ssh root@68.183.219.251 'journalctl -u traefik -f'
-
-# PostgreSQL logs
 ssh root@68.183.219.251 'journalctl -u postgresql -f'
-
-# All logs together
 ssh root@68.183.219.251 'journalctl -u premiere-ecoute -u traefik -u postgresql -f'
 ```
 
@@ -462,40 +450,5 @@ Deployments are triggered automatically:
 3. Monitor the progress of `build-release` and `deploy-to-digital-ocean` jobs
 4. Check logs for any errors
 
-### Deployment Cache
 
-The workflow caches:
-- **Dependencies** (`deps` + `_build`): Keyed on `mix.lock`, speeds up builds when dependencies haven't changed
-- **Assets** (`assets/node_modules`): Keyed on `package-lock.json`, speeds up asset compilation
 
-This reduces build time from ~5 minutes to ~2-3 minutes for incremental changes.
-
-### Rollback Strategy
-
-If a deployment fails or introduces issues:
-
-1. **Immediate rollback**: Revert the commit on `main` and push, which will trigger a new deployment
-2. **Manual rollback**: SSH into the droplet and restore a previous release:
-   ```bash
-   ssh root@68.183.219.251
-   # Keep previous releases for rollback
-   systemctl stop premiere-ecoute
-   # Restore previous release backup
-   systemctl start premiere-ecoute
-   ```
-
-### Best Practices
-
-- **Test before merging**: Always test changes in a PR before merging to `main`
-- **Monitor first deploy**: Watch the first deployment after setting up to catch any configuration issues
-- **Secrets rotation**: Regularly rotate API keys and secrets
-- **Database backups**: Consider adding a pre-deployment backup step for safety
-
-## Next Steps
-
-- [x] Implement CI/CD pipeline with GitHub Actions
-- [ ] Configure custom domain (currently using `premiere-ecoute.fr`)
-- [ ] Set up automated backups
-- [ ] Configure monitoring and alerting
-- [ ] Set up log aggregation
-- [ ] Add Prometheus/Grafana for observability
