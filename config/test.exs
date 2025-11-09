@@ -6,6 +6,10 @@ config :premiere_ecoute,
   tidal_client_secret: "test_tidal_client_secret",
   buymeacoffee_api_key: "test_buymeacoffee_api_key"
 
+config :premiere_ecoute, PremiereEcoute.Sessions,
+  vote_cooldown: 5,
+  batch_timeout: 100
+
 config :premiere_ecoute, Oban, testing: :inline
 
 config :premiere_ecoute,

@@ -18,6 +18,8 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcouteCore.Cache
 
+  @batch_timeout Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:batch_timeout]
+
   @doc """
   Starts the Broadway pipeline for chat vote processing.
 
@@ -29,7 +31,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
       name: __MODULE__,
       producer: [module: {PremiereEcouteCore.BroadwayProducer, []}, concurrency: 1],
       processors: [session: [concurrency: 1]],
-      batchers: [writer: [concurrency: 1, batch_size: 5, batch_timeout: 1_000]]
+      batchers: [writer: [concurrency: 1, batch_size: 5, batch_timeout: @batch_timeout]]
     )
   end
 
@@ -57,7 +59,8 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
            Cache.get(:sessions, broadcaster_id),
          {:ok, value} <-
            Vote.from_message(message, session.vote_options),
-         now <- DateTime.truncate(DateTime.utc_now(), :second),
+         # AIDEV-NOTE: keep microsecond precision to preserve ordering when votes arrive in quick succession
+         now <- DateTime.utc_now(),
          vote <- %{
            viewer_id: user_id,
            session_id: session.id,
@@ -80,7 +83,27 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   """
   @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
-    Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
+    # AIDEV-NOTE: deduplicate votes within batch (keep latest per viewer+track based on updated_at), then upsert to DB
+    votes =
+      messages
+      |> Enum.map(fn message -> message.data end)
+      |> Enum.group_by(fn vote -> {vote.viewer_id, vote.track_id} end)
+      |> Enum.map(fn {_key, votes_list} ->
+        # Keep vote with latest timestamp (using microsecond precision for ordering)
+        latest_vote = Enum.max_by(votes_list, fn vote -> vote.updated_at end, DateTime)
+        # Truncate timestamps to seconds for DB compatibility
+        %{
+          latest_vote
+          | updated_at: DateTime.truncate(latest_vote.updated_at, :second),
+            inserted_at: DateTime.truncate(latest_vote.inserted_at, :second)
+        }
+      end)
+
+    Vote.create_all(
+      votes,
+      on_conflict: {:replace, [:value, :updated_at]},
+      conflict_target: [:viewer_id, :session_id, :track_id]
+    )
 
     {:ok, report} = Report.generate(%ListeningSession{id: session_id})
 
