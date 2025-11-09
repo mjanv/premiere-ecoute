@@ -1,7 +1,11 @@
 defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   @moduledoc false
 
-  use PremiereEcouteCore.Worker, queue: :sessions, max_attempts: 1
+  use PremiereEcouteCore.Worker,
+    queue: :sessions,
+    max_attempts: 1,
+    unique: [period: 5, keys: [:action, :session_id]]
+
   use Gettext, backend: PremiereEcoute.Gettext
 
   require Logger
@@ -26,6 +30,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
            ) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
     end
+
+    :ok
   end
 
   @impl Oban.Worker
@@ -42,19 +48,21 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
            ) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
     end
+
+    :ok
   end
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "votes_closing", "user_id" => user_id}}) do
-    with scope <- Scope.for_user(User.get(user_id)),
-         _ <-
-           Apis.twitch().send_chat_message(
-             scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes close in 30 seconds !") end),
-             0
-           ) do
-      :ok
-    end
+    scope = Scope.for_user(User.get(user_id))
+
+    Apis.twitch().send_chat_message(
+      scope,
+      Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes close in 30 seconds !") end),
+      0
+    )
+
+    :ok
   end
 
   @impl Oban.Worker
@@ -63,14 +71,16 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
          {:ok, _} <- Cache.del(:sessions, scope.user.twitch.user_id) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_close)
     end
+
+    :ok
   end
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "pause", "user_id" => user_id, "session_id" => _session_id}}) do
-    with scope <- Scope.for_user(User.get(user_id)),
-         {:ok, _} <- Apis.spotify().pause_playback(scope) do
-      :ok
-    end
+    scope = Scope.for_user(User.get(user_id))
+    Apis.spotify().pause_playback(scope)
+
+    :ok
   end
 
   @impl Oban.Worker
@@ -89,20 +99,22 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
            PremiereEcoute.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_updated, session})
     end
+
+    :ok
   end
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "send_promo_message", "user_id" => user_id}}) do
-    with scope <- Scope.for_user(User.get(user_id)),
-         _ <-
-           Apis.twitch().send_chat_message(
-             scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
-               gettext("You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account")
-             end),
-             0
-           ) do
-      :ok
-    end
+    scope = Scope.for_user(User.get(user_id))
+
+    Apis.twitch().send_chat_message(
+      scope,
+      Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+        gettext("You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account")
+      end),
+      0
+    )
+
+    :ok
   end
 end

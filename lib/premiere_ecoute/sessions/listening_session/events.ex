@@ -25,32 +25,32 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   defmodule SessionStarted do
     @moduledoc false
 
-    defstruct [:session_id]
+    defstruct [:source, :session_id, :user_id]
 
-    @type t :: %__MODULE__{session_id: String.t()}
+    @type t :: %__MODULE__{source: atom(), session_id: String.t(), user_id: integer()}
   end
 
   defmodule NextTrackStarted do
     @moduledoc false
 
-    defstruct [:session_id, :track_id]
+    defstruct [:source, :session_id, :user_id, :track]
 
-    @type t :: %__MODULE__{session_id: String.t(), track_id: String.t()}
+    @type t :: %__MODULE__{source: atom(), session_id: String.t(), user_id: integer(), track: any()}
   end
 
   defmodule PreviousTrackStarted do
     @moduledoc false
 
-    defstruct [:session_id, :track_id]
+    defstruct [:session_id, :user_id, :track]
 
-    @type t :: %__MODULE__{session_id: String.t(), track_id: String.t()}
+    @type t :: %__MODULE__{session_id: String.t(), user_id: integer(), track: any()}
   end
 
   defmodule SessionStopped do
     @moduledoc false
 
-    defstruct [:session_id]
+    defstruct [:session_id, :user_id]
 
-    @type t :: %__MODULE__{session_id: String.t()}
+    @type t :: %__MODULE__{session_id: String.t(), user_id: integer()}
   end
 end

@@ -3010,7 +3010,7 @@ msgid_plural "artists"
 msgstr[0] "Artista"
 msgstr[1] "Artista"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:202
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:184
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La prima di %{name} è finita"
@@ -3021,7 +3021,7 @@ msgstr "La prima di %{name} è finita"
 msgid "Votes are open !"
 msgstr "Le votazioni sono aperte!"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:98
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:95
 #, elixir-autogen, elixir-format
 msgid "Welcome to the premiere of %{name} by %{artist}"
 msgstr "Benvenuti alla prima di %{name} di %{artist}"
@@ -3132,7 +3132,7 @@ msgstr "I brani piaciuti dalla tua estensione verranno aggiunti a questa playlis
 msgid "Votes close in 30 seconds !"
 msgstr "I voti si chiudono tra 30 secondi!"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:102
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:101
 #, elixir-autogen, elixir-format
 msgid "You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account"
 msgstr "Puoi recuperare tutte le tue note registrandoti su https://premiere-ecoute.fr/ usando il tuo account Twitch"
