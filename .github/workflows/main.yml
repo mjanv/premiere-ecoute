@@ -96,8 +96,8 @@ jobs:
 
       - name: Create .env.production file
         run: |
-          # AIDEV-NOTE: Using quoted heredoc ('EOF') prevents shell expansion, then envsubst for proper variable substitution
-          cat > .env.production <<'EOF'
+          # AIDEV-NOTE: Direct bash variable expansion in heredoc - unquoted EOF allows variable substitution
+          cat > .env.production <<EOF
           # Phoenix
           PHX_HOST=${PHX_HOST}
           PHX_SERVER=true
@@ -126,6 +126,7 @@ jobs:
           TWITCH_CLIENT_SECRET=${TWITCH_CLIENT_SECRET}
           TWITCH_REDIRECT_URI=${TWITCH_REDIRECT_URI}
           TWITCH_WEBHOOK_CALLBACK_URL=${TWITCH_WEBHOOK_CALLBACK_URL}
+          TWITCH_WEBHOOK_SECRET=${TWITCH_WEBHOOK_SECRET}
           TWITCH_EXTENSION_SECRET=${TWITCH_EXTENSION_SECRET}
 
           # Other APIs
@@ -139,10 +140,6 @@ jobs:
           AUTH_USERNAME=${AUTH_USERNAME}
           AUTH_PASSWORD=${AUTH_PASSWORD}
           EOF
-
-          # Substitute environment variables using envsubst
-          envsubst < .env.production > .env.production.tmp
-          mv .env.production.tmp .env.production
         env:
           PHX_HOST: ${{ secrets.PHX_HOST }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
@@ -159,6 +156,7 @@ jobs:
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
           TWITCH_REDIRECT_URI: ${{ secrets.TWITCH_REDIRECT_URI }}
           TWITCH_WEBHOOK_CALLBACK_URL: ${{ secrets.TWITCH_WEBHOOK_CALLBACK_URL }}
+          TWITCH_WEBHOOK_SECRET: ${{ secrets.TWITCH_WEBHOOK_SECRET }}
           TWITCH_EXTENSION_SECRET: ${{ secrets.TWITCH_EXTENSION_SECRET }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           BUYMEACOFFEE_API_KEY: ${{ secrets.BUYMEACOFFEE_API_KEY }}

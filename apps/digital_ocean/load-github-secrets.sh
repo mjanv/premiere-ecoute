@@ -47,7 +47,6 @@ EXCLUDED_KEYS=(
     "DNS_CLUSTER_QUERY"
     "ECTO_IPV6"
     "DATABASE_SSL"
-    "TWITCH_WEBHOOK_SECRET"  # Deprecated, using TWITCH_EXTENSION_SECRET
 )
 
 # Function to check if a key should be excluded
@@ -93,7 +92,8 @@ while IFS= read -r line; do
         fi
 
         # Set the secret using gh CLI
-        if echo "$value" | gh secret set "$key" --body - 2>/dev/null; then
+        # AIDEV-NOTE: Use printf instead of echo to avoid newline issues, and quote variable properly
+        if printf '%s' "$value" | gh secret set "$key" 2>/dev/null; then
             echo -e "${GREEN}✓ Set $key${NC}"
             secret_count=$((secret_count + 1))
         else
