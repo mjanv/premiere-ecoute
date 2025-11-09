@@ -3133,7 +3133,7 @@ msgstr ""
 
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:101
 #, elixir-autogen, elixir-format
-msgid "You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account"
+msgid "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:307

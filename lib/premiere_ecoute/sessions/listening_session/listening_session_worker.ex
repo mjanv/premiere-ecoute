@@ -110,7 +110,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     Apis.twitch().send_chat_message(
       scope,
       Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
-        gettext("You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account")
+        gettext("You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account")
       end),
       0
     )

@@ -3134,8 +3134,8 @@ msgstr "Les votes ferment dans 30 secondes !"
 
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:101
 #, elixir-autogen, elixir-format
-msgid "You can retrieve all your notes by registering to https://premiere-ecoute.fr/ using your Twitch account"
-msgstr "Vous pouvez retrouver toutes vos notes en vous inscrivant sur https://premiere-ecoute.fr/ avec votre compte Twitch"
+msgid "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account"
+msgstr "Vous pouvez retrouver toutes vos notes en vous inscrivant sur premiere-ecoute.fr avec votre compte Twitch"
 
 #: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:307
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:405

@@ -2,7 +2,9 @@
 
 ![Banner](https://images.unsplash.com/photo-1727797216812-a0478ec92b64?ixlib=rb-4.1.0&q=85&fm=jpg&crop=center&cs=srgb&w=1200&h=300&fit=crop)
 
-> Select, listen and note new album releases with your Twitch community on [**https://premiere-ecoute.fly.dev/**](https://premiere-ecoute.fly.dev/)
+> Select, listen and note new album releases with your Twitch community on [**https://premiere-ecoute.fr/**](https://premiere-ecoute.fr/)
+
+> Status page of the project is accessible at [**https://status.premiere-ecoute.fr/**](https://status.premiere-ecoute.fr/)
 
 ## What is it ?
 
