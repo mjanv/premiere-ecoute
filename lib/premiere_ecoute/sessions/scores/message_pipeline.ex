@@ -55,11 +55,8 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   """
   @spec process(MessageSent.t()) :: {:ok, map()} | {:error, term()}
   def process(%MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: message, is_streamer: is_streamer}) do
-    with {:ok, %{current_track_id: track_id} = session} when not is_nil(track_id) <-
-           Cache.get(:sessions, broadcaster_id),
-         {:ok, value} <-
-           Vote.from_message(message, session.vote_options),
-         # AIDEV-NOTE: keep microsecond precision to preserve ordering when votes arrive in quick succession
+    with {:ok, %{current_track_id: track_id} = session} when not is_nil(track_id) <- Cache.get(:sessions, broadcaster_id),
+         {:ok, value} <- Vote.from_message(message, session.vote_options),
          now <- DateTime.utc_now(),
          vote <- %{
            viewer_id: user_id,
@@ -83,24 +80,18 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   """
   @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
-    # AIDEV-NOTE: deduplicate votes within batch (keep latest per viewer+track based on updated_at), then upsert to DB
-    votes =
-      messages
-      |> Enum.map(fn message -> message.data end)
-      |> Enum.group_by(fn vote -> {vote.viewer_id, vote.track_id} end)
-      |> Enum.map(fn {_key, votes_list} ->
-        # Keep vote with latest timestamp (using microsecond precision for ordering)
-        latest_vote = Enum.max_by(votes_list, fn vote -> vote.updated_at end, DateTime)
-        # Truncate timestamps to seconds for DB compatibility
-        %{
-          latest_vote
-          | updated_at: DateTime.truncate(latest_vote.updated_at, :second),
-            inserted_at: DateTime.truncate(latest_vote.inserted_at, :second)
-        }
-      end)
-
-    Vote.create_all(
-      votes,
+    messages
+    |> Enum.map(fn message -> message.data end)
+    |> Enum.group_by(fn vote -> {vote.viewer_id, vote.track_id} end)
+    |> Enum.map(fn {_key, votes} ->
+      latest_vote = Enum.max_by(votes, fn vote -> vote.updated_at end, DateTime)
+      %{
+        latest_vote
+        | updated_at: DateTime.truncate(latest_vote.updated_at, :second),
+          inserted_at: DateTime.truncate(latest_vote.inserted_at, :second)
+      }
+    end)
+    |> Vote.create_all(
       on_conflict: {:replace, [:value, :updated_at]},
       conflict_target: [:viewer_id, :session_id, :track_id]
     )
