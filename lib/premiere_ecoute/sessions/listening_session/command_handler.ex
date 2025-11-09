@@ -22,7 +22,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
-  alias PremiereEcoute.Sessions.ListeningSessionWorker
   alias PremiereEcoute.Sessions.Retrospective.Report
 
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
@@ -30,8 +29,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession)
-
-  @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
   def handle(%PrepareListeningSession{source: :album, user_id: user_id, album_id: album_id, vote_options: vote_options}) do
     with {:ok, album} <- Apis.spotify().get_album(album_id),
@@ -97,13 +94,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            PremiereEcoute.Gettext.t(scope, fn ->
              gettext("Welcome to the premiere of %{name} by %{artist}", name: album.name, artist: album.artist)
            end),
-         _ <- Apis.twitch().send_chat_message(scope, message, 0),
-         {:ok, session, events} <-
-           PremiereEcoute.apply(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
-      # AIDEV-NOTE: Schedule promotional message 60 seconds after session start (fire-and-forget)
-      ListeningSessionWorker.in_minutes(%{action: "send_promo_message", user_id: scope.user.id}, 1)
-      PremiereEcoute.PubSub.broadcast("playback:#{scope.user.id}", {:session_started, session.id})
-      {:ok, session, [%SessionStarted{session_id: session.id}] ++ events}
+         _ <- Apis.twitch().send_chat_message(scope, message, 0) do
+      {:ok, session, [%SessionStarted{source: :album, session_id: session.id, user_id: scope.user.id}]}
     else
       false ->
         {:error, "No Spotify active device detected"}
@@ -126,11 +118,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.start(session),
          _ <- Apis.spotify().start_resume_playback(scope, session.playlist) do
-      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session.id, user_id: scope.user.id}, @cooldown)
-      # AIDEV-NOTE: Schedule promotional message 60 seconds after session start (fire-and-forget)
-      ListeningSessionWorker.in_minutes(%{action: "send_promo_message", user_id: scope.user.id}, 1)
-      {:ok, session, [%SessionStarted{session_id: session.id}]}
+      {:ok, session, [%SessionStarted{source: :playlist, session_id: session.id, user_id: scope.user.id}]}
     else
       false ->
         {:error, "No Spotify active device detected"}
@@ -153,11 +141,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              scope,
              "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}",
              0
-           ),
-         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, session.current_track}) do
-      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
-      {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
+           ) do
+      {:ok, session,
+       [%NextTrackStarted{source: :album, session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
     else
       _ -> {:error, []}
     end
@@ -166,9 +152,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%SkipNextTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, _} <- Apis.spotify().next_track(scope) do
-      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session.id, user_id: scope.user.id}, @cooldown)
-      {:ok, session, [%NextTrackStarted{session_id: session.id, track_id: nil}]}
+      {:ok, session, [%NextTrackStarted{session_id: session.id, user_id: scope.user.id, track: nil}]}
     else
       _ -> {:error, []}
     end
@@ -183,11 +167,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              scope,
              "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}",
              0
-           ),
-         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, session.current_track}) do
-      ListeningSessionWorker.in_seconds(%{action: "close", session_id: session.id, user_id: scope.user.id}, 0)
-      ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session.id, user_id: scope.user.id}, @cooldown)
-      {:ok, session, [%PreviousTrackStarted{session_id: session.id, track_id: session.current_track.id}]}
+           ) do
+      {:ok, session, [%PreviousTrackStarted{session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
     else
       _ -> {:error, []}
     end
@@ -202,13 +183,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          message <-
            PremiereEcoute.Gettext.t(scope, fn -> gettext("The premiere of %{name} is over", name: session.album.name) end),
          _ <- Apis.twitch().send_chat_message(scope, message, 0),
-         {:ok, session} <- ListeningSession.stop(session),
-         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop) do
-      ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: scope.user.id}, 10)
-      PremiereEcoute.PubSub.broadcast("playback:#{scope.user.id}", {:session_stopped, session.id})
-
+         {:ok, session} <- ListeningSession.stop(session) do
       if is_active, do: Apis.spotify().pause_playback(scope)
-      {:ok, session, [%SessionStopped{session_id: session.id}]}
+      {:ok, session, [%SessionStopped{session_id: session.id, user_id: scope.user.id}]}
     else
       false ->
         {:error, "No Spotify active device detected"}

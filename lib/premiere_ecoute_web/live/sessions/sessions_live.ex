@@ -8,10 +8,13 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: scope}} = socket) do
+    page = ListeningSession.page([where: [user_id: scope.user.id]], 1, 10)
+
     socket
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)
-    |> assign_async(:sessions, fn -> {:ok, %{sessions: ListeningSession.page([where: [user_id: scope.user.id]], 1, 10)}} end)
+    |> assign(:page, page)
+    |> stream(:sessions, page.entries)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -21,11 +24,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   end
 
   @impl true
-  def handle_event("next-page", _params, %{assigns: %{current_scope: scope, sessions: sessions}} = socket) do
+  def handle_event("next-page", _params, %{assigns: %{current_scope: scope, page: page}} = socket) do
+    next_page = ListeningSession.next_page([where: [user_id: scope.user.id]], page)
+
     socket
-    |> assign_async(:sessions, fn ->
-      {:ok, %{sessions: ListeningSession.next_page([where: [user_id: scope.user.id]], sessions)}}
-    end)
+    |> assign(:page, next_page)
+    |> stream(:sessions, next_page.entries)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -50,25 +54,29 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  # AIDEV-NOTE: Use stream_delete to update UI without full reload (template uses phx-update="stream")
   @impl true
-  def handle_event("confirm_delete", _params, %{assigns: %{current_scope: scope, session_to_delete: session_id}} = socket) do
-    session_id
-    |> ListeningSession.get()
-    |> ListeningSession.delete()
-    |> case do
-      {:ok, session} ->
-        if session.playlist do
-          Playlist.delete(session.playlist)
-        end
+  def handle_event("confirm_delete", _params, %{assigns: %{session_to_delete: session_id}} = socket) do
+    session = ListeningSession.get(session_id)
 
-        put_flash(socket, :info, "Session deleted successfully")
+    socket =
+      case ListeningSession.delete(session) do
+        {:ok, deleted_session} ->
+          if deleted_session.playlist do
+            Playlist.delete(deleted_session.playlist)
+          end
 
-      {:error, _} ->
-        put_flash(socket, :error, "Failed to delete session")
-    end
+          socket
+          |> put_flash(:info, "Session deleted successfully")
+          |> stream_delete(:sessions, deleted_session)
+
+        {:error, _} ->
+          put_flash(socket, :error, "Failed to delete session")
+      end
+
+    socket
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)
-    |> assign_async(:sessions, fn -> {:ok, %{sessions: ListeningSession.all(where: [user_id: scope.user.id])}} end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 

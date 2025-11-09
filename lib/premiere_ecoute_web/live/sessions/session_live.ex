@@ -13,6 +13,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Presence
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
   alias PremiereEcoute.Sessions.ListeningSessionWorker
@@ -75,10 +76,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         _params,
         %{assigns: %{listening_session: session, current_scope: scope}} = socket
       ) do
-    %StartListeningSession{source: session.source, session_id: session.id, scope: scope}
-    |> PremiereEcoute.apply()
-    |> case do
-      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+    with {:ok, session, _} <-
+           PremiereEcoute.apply(%StartListeningSession{source: session.source, session_id: session.id, scope: scope}),
+         {:ok, session, _} <-
+           PremiereEcoute.apply(%SkipNextTrackListeningSession{source: session.source, session_id: session.id, scope: scope}) do
+      {:noreply, assign(socket, :listening_session, session)}
+    else
       {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
       {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
     end
@@ -227,7 +230,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_info({:player, {:percent, percent}, state}, %{assigns: %{current_scope: scope}} = socket) do
+  def handle_info(
+        {:player, {:percent, percent}, state},
+        %{assigns: %{listening_session: %ListeningSession{status: :active}, current_scope: scope}} = socket
+      ) do
     if percent == round(100 * (1 - 30_000 / state["item"]["duration_ms"])) do
       ListeningSessionWorker.in_seconds(%{action: "votes_closing", user_id: scope.user.id}, 0)
     end
@@ -238,7 +244,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_info(
         {:player, :end_track, state},
-        %{assigns: %{listening_session: session, current_scope: scope}} = socket
+        %{assigns: %{listening_session: %ListeningSession{status: :active} = session, current_scope: scope}} = socket
       ) do
     ListeningSessionWorker.in_seconds(%{action: "pause", session_id: session.id, user_id: scope.user.id}, 2)
     next_track = Map.get(session.options, "next_track", 0)
