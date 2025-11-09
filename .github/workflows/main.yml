@@ -176,7 +176,7 @@ jobs:
 
       - name: Fix permissions
         run: |
-          ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -name "*.so" \) -type f -exec chmod +x {} \;'
+          ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -path "*/releases/*/iex" -o -name "*.so" \) -type f -exec chmod +x {} \;'
 
       - name: Ensure PostgreSQL is running
         run: |
