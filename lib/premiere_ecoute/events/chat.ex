@@ -14,6 +14,21 @@ defmodule PremiereEcoute.Events.Chat do
     defstruct [:broadcaster_id, :user_id, :message, :is_streamer]
   end
 
+  defmodule CommandSent do
+    @moduledoc false
+
+    @type t :: %__MODULE__{
+            broadcaster_id: String.t(),
+            user_id: String.t(),
+            message_id: String.t(),
+            command: String.t(),
+            args: [String.t()],
+            is_streamer: boolean()
+          }
+
+    defstruct [:broadcaster_id, :user_id, :message_id, :command, :args, :is_streamer]
+  end
+
   defmodule PollEnded do
     @moduledoc false
 

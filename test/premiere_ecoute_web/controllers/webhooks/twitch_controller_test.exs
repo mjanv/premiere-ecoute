@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   use PremiereEcouteWeb.ConnCase
 
   alias PremiereEcoute.ApiMock
+  alias PremiereEcoute.Events.Chat.CommandSent
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Events.Chat.PollEnded
   alias PremiereEcoute.Events.Chat.PollStarted
@@ -120,7 +121,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   end
 
   describe "handle/1" do
-    test "channel.chat.message" do
+    test "channel.chat.message - message" do
       payload = ApiMock.payload("twitch_api/eventsub/channel_chat_message.json")
 
       event = TwitchController.handle(payload)
@@ -129,6 +130,21 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
                broadcaster_id: "1971641",
                user_id: "4145994",
                message: "Hi chat",
+               is_streamer: false
+             }
+    end
+
+    test "channel.chat.message - command" do
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_command.json")
+
+      event = TwitchController.handle(payload)
+
+      assert event == %CommandSent{
+               broadcaster_id: "1971641",
+               user_id: "4145994",
+               message_id: "cc106a89-1814-919d-454c-f4f2f970aae7",
+               command: "command",
+               args: ["arg1", "arg2"],
                is_streamer: false
              }
     end

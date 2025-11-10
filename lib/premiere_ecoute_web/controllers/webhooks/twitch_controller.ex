@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
 
   require Logger
 
+  alias PremiereEcoute.Events.Chat.CommandSent
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Events.Chat.PollEnded
   alias PremiereEcoute.Events.Chat.PollStarted
@@ -34,11 +35,33 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
       {true, "notification", conn} ->
         case handle(conn.body_params) do
           %MessageSent{} = event -> Sessions.publish_message(event)
+          %CommandSent{} = _event -> :ok
           event -> Sessions.publish_poll(event)
         end
 
         send_resp(conn, 202, "")
     end
+  end
+
+  def handle(%{
+        "subscription" => %{"type" => "channel.chat.message"},
+        "event" => %{
+          "broadcaster_user_id" => broadcaster_id,
+          "chatter_user_id" => user_id,
+          "message_id" => message_id,
+          "message" => %{"text" => "!" <> text}
+        }
+      }) do
+    [command | args] = String.split(text, " ")
+
+    %CommandSent{
+      broadcaster_id: broadcaster_id,
+      user_id: user_id,
+      message_id: message_id,
+      command: command,
+      args: args,
+      is_streamer: false
+    }
   end
 
   def handle(%{
