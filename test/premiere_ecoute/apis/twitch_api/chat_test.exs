@@ -98,9 +98,30 @@ defmodule PremiereEcoute.Apis.TwitchApi.ChatTest do
       message = "Hello chat!"
       color = "purple"
 
-      {:ok, message} = TwitchApi.send_chat_announcement(scope, message, color)
+      :ok = TwitchApi.send_chat_announcement(scope, message, color)
+    end
+  end
 
-      assert message == "Hello chat!"
+  describe "send_reply_message/3" do
+    test "can send a reply message to a chat message", %{scope: scope} do
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/chat/messages"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        request: "twitch_api/chat/send_reply_message/request.json",
+        response: "twitch_api/chat/send_reply_message/response.json",
+        status: 200
+      )
+
+      message = "Hello, world! twitchdevHype"
+      reply_message_id = "e8ee4b0d-601a-4fe8-b17f-c7305216e4b1"
+
+      :ok = TwitchApi.send_reply_message(scope, message, reply_message_id)
+
+      :timer.sleep(100)
     end
   end
 end

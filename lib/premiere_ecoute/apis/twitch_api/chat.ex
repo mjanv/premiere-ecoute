@@ -31,16 +31,21 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
     :ok
   end
 
-  defp do_send_chat_message(%Scope{user: %{twitch: %{user_id: user_id}}}, message) do
+  def send_reply_message(%Scope{} = scope, message, reply_message_id) do
+    do_send_chat_message(scope, message, reply_message_id)
+    :ok
+  end
+
+  defp do_send_chat_message(%Scope{user: %{twitch: %{user_id: user_id}}}, message, reply_message_id \\ nil) do
     case Bot.get() do
       {:ok, bot} ->
+        json1 = %{broadcaster_id: user_id, sender_id: bot.twitch.user_id, message: message}
+        json2 = if is_nil(reply_message_id), do: %{}, else: %{reply_parent_message_id: reply_message_id}
+
         bot
         |> Scope.for_user()
         |> TwitchApi.api()
-        |> TwitchApi.post(
-          url: "/chat/messages",
-          json: %{broadcaster_id: user_id, sender_id: bot.twitch.user_id, message: message}
-        )
+        |> TwitchApi.post(url: "/chat/messages", json: Map.merge(json1, json2))
         |> TwitchApi.handle(200, fn
           %{"data" => [%{"is_sent" => false, "drop_reason" => reason}]} ->
             Logger.error("Cannot sent message to chat #{user_id} due to #{inspect(reason)}")
@@ -71,5 +76,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
       {:error, reason} ->
         {:error, reason}
     end
+
+    :ok
   end
 end
