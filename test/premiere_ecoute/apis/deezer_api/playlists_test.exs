@@ -7,6 +7,9 @@ defmodule PremiereEcoute.Apis.DeezerApi.PlaylistsTest do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   describe "get_playlist/1" do
     test "get a playlist from an unique identifier" do
       ApiMock.expect(

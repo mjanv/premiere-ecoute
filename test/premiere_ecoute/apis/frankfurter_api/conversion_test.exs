@@ -4,6 +4,9 @@ defmodule PremiereEcoute.Apis.FrankfurterApi.ConversionTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.FrankfurterApi
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   describe "convert/1" do
     test "can convert USD to EUR with specified amount" do
       ApiMock.expect(

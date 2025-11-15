@@ -7,6 +7,9 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
   alias PremiereEcoute.Apis.FrankfurterApi
   alias PremiereEcoute.Donations
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   describe "POST /webhooks/buymeacoffee - donation.created" do
     test "creates donation record with active goal when currencies match", %{conn: conn} do
       # Create an active goal with matching currency

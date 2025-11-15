@@ -8,6 +8,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   setup do
     scope =
       user_scope_fixture(

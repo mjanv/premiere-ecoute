@@ -3,79 +3,54 @@ defmodule PremiereEcoute.Apis.TwitchApi.Chat do
 
   require Logger
 
-  alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Apis.TwitchQueue
 
-  def send_chat_messages(%Scope{} = scope, messages, interval \\ 1_000) do
-    messages
-    |> Enum.with_index()
-    |> Enum.each(fn {message, index} ->
-      send_chat_message(scope, message, index * interval)
+  def send_chat_message(%Scope{user: %User{twitch: %{user_id: user_id}}}, message) do
+    TwitchQueue.push({:do_send_chat_message, %{user_id: user_id, message: message}})
+    :ok
+  end
+
+  def send_reply_message(%Scope{user: %User{twitch: %{user_id: user_id}}}, message, reply_to) do
+    TwitchQueue.push({:do_send_chat_message, %{user_id: user_id, message: message, reply_to: reply_to}})
+    :ok
+  end
+
+  def send_chat_announcement(%Scope{user: %User{twitch: %{user_id: user_id}}}, message, color \\ "purple") do
+    TwitchQueue.push({:do_send_chat_announcement, %{user_id: user_id, message: message, color: color}})
+    :ok
+  end
+
+  def do_send_chat_message(%User{twitch: %{user_id: bot_id}} = bot, %{user_id: user_id, message: message} = tmp) do
+    message = %{broadcaster_id: user_id, sender_id: bot_id, message: message}
+    reply_to = Map.get(tmp, :reply_to)
+    reply = if is_nil(reply_to), do: %{}, else: %{reply_parent_message_id: reply_to}
+
+    bot
+    |> Scope.for_user()
+    |> TwitchApi.api()
+    |> TwitchApi.post(url: "/chat/messages", json: Map.merge(message, reply))
+    |> TwitchApi.handle(200, fn
+      %{"data" => [%{"is_sent" => false, "drop_reason" => reason}]} ->
+        Logger.error("Cannot sent message to chat #{user_id} due to #{inspect(reason)}")
+
+      %{"data" => [message]} ->
+        message
     end)
-
-    :ok
   end
 
-  def send_chat_message(%Scope{} = scope, message, 0) do
-    do_send_chat_message(scope, message)
-    :ok
-  end
-
-  def send_chat_message(%Scope{} = scope, message, delay) do
-    spawn(fn ->
-      :timer.sleep(delay)
-      do_send_chat_message(scope, message)
-    end)
-
-    :ok
-  end
-
-  def send_reply_message(%Scope{} = scope, message, reply_message_id) do
-    do_send_chat_message(scope, message, reply_message_id)
-    :ok
-  end
-
-  defp do_send_chat_message(%Scope{user: %{twitch: %{user_id: user_id}}}, message, reply_message_id \\ nil) do
-    case Bot.get() do
-      {:ok, bot} ->
-        json1 = %{broadcaster_id: user_id, sender_id: bot.twitch.user_id, message: message}
-        json2 = if is_nil(reply_message_id), do: %{}, else: %{reply_parent_message_id: reply_message_id}
-
-        bot
-        |> Scope.for_user()
-        |> TwitchApi.api()
-        |> TwitchApi.post(url: "/chat/messages", json: Map.merge(json1, json2))
-        |> TwitchApi.handle(200, fn
-          %{"data" => [%{"is_sent" => false, "drop_reason" => reason}]} ->
-            Logger.error("Cannot sent message to chat #{user_id} due to #{inspect(reason)}")
-
-          %{"data" => [message]} ->
-            message
-        end)
-
-      {:error, reason} ->
-        Logger.error("Cannot get bot for sending message due to #{inspect(reason)}")
-        {:error, reason}
-    end
-  end
-
-  def send_chat_announcement(%Scope{user: %{twitch: %{user_id: user_id}}}, message, color \\ "purple") do
-    case Bot.get() do
-      {:ok, bot} ->
-        bot
-        |> Scope.for_user()
-        |> TwitchApi.api()
-        |> TwitchApi.post(
-          url: "/chat/announcements",
-          params: %{broadcaster_id: user_id, moderator_id: bot.twitch.user_id},
-          json: %{message: message, color: color}
-        )
-        |> TwitchApi.handle(204, fn _ -> message end)
-
-      {:error, reason} ->
-        {:error, reason}
-    end
+  def do_send_chat_announcement(%User{twitch: %{user_id: bot_id}} = bot, %{user_id: user_id, message: message} = chat) do
+    bot
+    |> Scope.for_user()
+    |> TwitchApi.api()
+    |> TwitchApi.post(
+      url: "/chat/announcements",
+      params: %{broadcaster_id: user_id, moderator_id: bot_id},
+      json: %{message: message, color: Map.get(chat, :color, "purple")}
+    )
+    |> TwitchApi.handle(204, fn _ -> message end)
 
     :ok
   end

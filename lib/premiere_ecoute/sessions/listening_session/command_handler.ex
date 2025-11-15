@@ -94,7 +94,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            PremiereEcoute.Gettext.t(scope, fn ->
              gettext("Welcome to the premiere of %{name} by %{artist}", name: album.name, artist: album.artist)
            end),
-         _ <- Apis.twitch().send_chat_message(scope, message, 0) do
+         :ok <- Apis.twitch().send_chat_message(scope, message) do
       {:ok, session, [%SessionStarted{source: :album, session_id: session.id, user_id: scope.user.id}]}
     else
       false ->
@@ -136,11 +136,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         _ <-
+         :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}",
-             0
+             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}"
            ) do
       {:ok, session,
        [%NextTrackStarted{source: :album, session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
@@ -162,11 +161,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.previous_track(session),
          {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
-         _ <-
+         :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}",
-             0
+             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}"
            ) do
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
     else
@@ -182,7 +180,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.twitch().cancel_all_subscriptions(scope),
          message <-
            PremiereEcoute.Gettext.t(scope, fn -> gettext("The premiere of %{name} is over", name: session.album.name) end),
-         _ <- Apis.twitch().send_chat_message(scope, message, 0),
+         :ok <- Apis.twitch().send_chat_message(scope, message),
          {:ok, session} <- ListeningSession.stop(session) do
       if is_active, do: Apis.spotify().pause_playback(scope)
       {:ok, session, [%SessionStopped{session_id: session.id, user_id: scope.user.id}]}

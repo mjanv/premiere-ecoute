@@ -22,11 +22,10 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     with scope <- Scope.for_user(User.get(user_id)),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, Map.take(session, [:id, :vote_options, :current_track_id])),
-         _ <-
+         :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end),
-             0
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
            ) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
     end
@@ -40,11 +39,10 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
          session <- ListeningSession.get(session_id),
          session <- %{id: session.id, vote_options: session.vote_options, current_track_id: session.current_playlist_track_id},
          {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, session),
-         _ <-
+         :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end),
-             0
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
            ) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
     end
@@ -58,8 +56,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
 
     Apis.twitch().send_chat_message(
       scope,
-      Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes close in 30 seconds !") end),
-      0
+      Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes close in 30 seconds !") end)
     )
 
     :ok
@@ -111,8 +108,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
       scope,
       Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
         gettext("You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account")
-      end),
-      0
+      end)
     )
 
     :ok

@@ -38,10 +38,9 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     @callback renew_token(refresh_token :: String.t()) :: {:ok, map()} | {:error, any()}
 
     # Chat
-    @callback send_chat_message(scope :: Scope.t(), message :: String.t(), delay :: non_neg_integer()) :: :ok
-    @callback send_chat_messages(scope :: Scope.t(), messages :: [String.t()], interval :: pos_integer()) :: :ok
+    @callback send_chat_message(scope :: Scope.t(), message :: String.t()) :: :ok
+    @callback send_reply_message(scope :: Scope.t(), message :: String.t(), reply_to :: String.t()) :: :ok
     @callback send_chat_announcement(scope :: Scope.t(), message :: String.t(), color :: String.t()) :: :ok
-    @callback send_reply_message(scope :: Scope.t(), message :: String.t(), reply_message_id :: String.t()) :: :ok
 
     # EventSub
     @callback get_event_subscriptions(scope :: Scope.t()) :: {:ok, [map()]} | {:error, term()}
@@ -125,10 +124,9 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defdelegate renew_token(refresh_token), to: __MODULE__.Accounts
 
   # Chat
-  defdelegate send_chat_message(scope, message, delay \\ 0), to: __MODULE__.Chat
-  defdelegate send_chat_messages(scope, messages, interval \\ 1_000), to: __MODULE__.Chat
+  defdelegate send_chat_message(scope, message), to: __MODULE__.Chat
+  defdelegate send_reply_message(scope, message, reply_to), to: __MODULE__.Chat
   defdelegate send_chat_announcement(scope, type, color), to: __MODULE__.Chat
-  defdelegate send_reply_message(scope, message, reply_message_id), to: __MODULE__.Chat
 
   # EventSub
   defdelegate get_event_subscriptions(scope), to: __MODULE__.EventSub

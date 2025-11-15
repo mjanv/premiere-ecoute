@@ -34,21 +34,13 @@ defmodule PremiereEcoute.DataCase do
       import PremiereEcoute.Sessions.ScoresFixtures
 
       import Hammox
+      import Swoosh.TestAssertions
 
       setup :set_mox_from_context
       setup :verify_on_exit!
-
-      import Swoosh.TestAssertions
+      setup {Hammox, :verify_on_exit!}
 
       alias PremiereEcoute.Repo
-
-      setup do
-        Req.Test.set_req_test_to_shared()
-        Req.Test.verify_on_exit!()
-        Hammox.verify_on_exit!()
-
-        :ok
-      end
     end
   end
 
