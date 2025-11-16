@@ -28,7 +28,7 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
 
   # Handlers
   def handle_cast({action, message}, %{circuit: :closed, bot: bot, messages: messages} = state) do
-    bot = maybe_refresh_bot(bot)
+    {:ok, bot} = maybe_refresh_bot(bot)
 
     {circuit, new_timer, messages} =
       case try_send(bot, action, message) do
@@ -65,12 +65,11 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
 
   # Private
   defp maybe_refresh_bot(%{twitch: %{expires_at: expires_at}} = bot) do
-    if token_expired?(expires_at), do: Bot.get() |> IO.inspect(), else: {:ok, bot}
+    if token_expired?(expires_at), do: Bot.get(), else: {:ok, bot}
   end
 
   defp token_expired?(nil), do: false
-  # DateTime.compare(DateTime.utc_now(), DateTime.add(at, -300, :second)) == :gt
-  defp token_expired?(at), do: true
+  defp token_expired?(at), do: DateTime.compare(DateTime.utc_now(), DateTime.add(at, -300, :second)) == :gt
 
   defp try_send(bot, action, message) do
     message
