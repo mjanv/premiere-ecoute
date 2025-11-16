@@ -90,6 +90,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, %{album: album}} <- ListeningSession.start(session),
+         {:ok, _} <- Apis.spotify().toggle_playback_shuffle(scope, false),
+         {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
          message <-
            PremiereEcoute.Gettext.t(scope, fn ->
              gettext("Welcome to the premiere of %{name} by %{artist}", name: album.name, artist: album.artist)
@@ -117,6 +119,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.start(session),
+         {:ok, _} <- Apis.spotify().toggle_playback_shuffle(scope, false),
+         {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
          _ <- Apis.spotify().start_resume_playback(scope, session.playlist) do
       {:ok, session, [%SessionStarted{source: :playlist, session_id: session.id, user_id: scope.user.id}]}
     else

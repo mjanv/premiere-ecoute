@@ -141,6 +141,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
@@ -198,6 +200,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_album, 2, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
@@ -248,6 +252,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7"} end)
 
@@ -305,6 +311,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track002"} end)
 
@@ -367,6 +375,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track002"} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
@@ -442,6 +452,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, 2, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
       expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
 

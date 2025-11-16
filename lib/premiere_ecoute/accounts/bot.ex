@@ -21,7 +21,8 @@ defmodule PremiereEcoute.Accounts.Bot do
       {:ok, %User{} = user} ->
         {:ok, user}
 
-      _ ->
+      reason ->
+        IO.inspect(reason)
         Logger.error("Cannot read bot user")
         {:error, nil}
     end

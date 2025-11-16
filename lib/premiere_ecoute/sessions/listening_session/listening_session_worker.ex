@@ -73,14 +73,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   end
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"action" => "pause", "user_id" => user_id, "session_id" => _session_id}}) do
-    scope = Scope.for_user(User.get(user_id))
-    Apis.spotify().pause_playback(scope)
-
-    :ok
-  end
-
-  @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "next_track", "user_id" => user_id, "session_id" => session_id}}) do
     with scope <- Scope.for_user(User.get(user_id)),
          {:ok, session, _} <-
