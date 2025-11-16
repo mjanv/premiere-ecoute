@@ -398,6 +398,59 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
     end
   end
 
+  describe "set_repeat_mode/2" do
+    test "sets repeat mode to track", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/repeat"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
+        params: %{"state" => "track"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = SpotifyApi.set_repeat_mode(scope, :track)
+    end
+
+    test "sets repeat mode to context", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/repeat"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
+        params: %{"state" => "context"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = SpotifyApi.set_repeat_mode(scope, :context)
+    end
+
+    test "sets repeat mode to off", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/repeat"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
+        params: %{"state" => "off"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = SpotifyApi.set_repeat_mode(scope, :off)
+    end
+  end
+
   describe "start_resume_playback/1" do
     setup do
       {:ok, album} = Album.create(album_fixture(%{album_id: "5ht7ItJgpBH7W6vJ5BqpPr"}))

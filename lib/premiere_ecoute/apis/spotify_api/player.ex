@@ -126,6 +126,22 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   end
 
   @doc """
+  Set repeat mode (:track, :context, or :off) on the user's active device.
+  """
+  def set_repeat_mode(%Scope{} = scope, state) when state in [:track, :context, :off] do
+    scope
+    |> SpotifyApi.api()
+    |> Req.merge(
+      headers: [
+        {"Content-Length", "0"},
+        {"Content-Type", "application/json"}
+      ]
+    )
+    |> Req.put(url: "/me/player/repeat", params: %{state: Atom.to_string(state)})
+    |> handle_playback_response()
+  end
+
+  @doc """
   Get information about the user's current playback state.
   """
   def get_playback_state(%Scope{} = scope, state) do
