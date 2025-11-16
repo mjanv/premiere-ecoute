@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
   @moduledoc """
   Twitch message queue
 
-  If the bot account user is not present at initialization, the bot will not be started. If the bot is created afterwards, the application must be redeployed to enable the message queue.
+  Manages a circuit-breaker protected message queue for sending Twitch chat messages with automatic rate limiting. When rate limits are exceeded (1 message per second per broadcaster, 20 messages per 30 seconds globally), the circuit opens and queues messages until the limit window expires, then automatically retries. Requires a bot account to exist in the database at startup; if no bot is found, the GenServer returns `:ignore` and the application must be redeployed after creating the bot account.
   """
 
   use GenServer
@@ -16,13 +16,17 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
   end
 
   def init(_args) do
-    # TODO: Write more specific unit tests about Twitch Queue
     case Bot.get() do
       {:ok, bot} -> {:ok, %{circuit: :closed, bot: bot, timer: nil, messages: []}}
       {:error, _} -> :ignore
     end
   end
 
+  # API
+  def push(messages) when is_list(messages), do: Enum.each(messages, &push/1)
+  def push({action, message}), do: GenServer.cast(__MODULE__, {action, message})
+
+  # Handlers
   def handle_cast({action, message}, %{circuit: :closed, bot: bot, messages: messages} = state) do
     {circuit, new_timer, messages} =
       case try_send(bot, action, message) do
@@ -55,11 +59,11 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
     {:noreply, %{state | timer: timer, messages: messages}}
   end
 
-  def try_send(bot, action, message) do
+  defp try_send(bot, action, message) do
     message
     |> hit([
-      {"twitch", :timer.seconds(5), 1},
-      {"broadcaster:#{message.user_id}", :timer.seconds(5), 1}
+      {"broadcaster:#{message.user_id}", :timer.seconds(1), 1},
+      {"twitch", :timer.seconds(30), 20}
     ])
     |> case do
       {:allow, message} ->
@@ -80,7 +84,4 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
       rates -> {:deny, rates |> Enum.map(fn {_, retry_after} -> retry_after end) |> Enum.max()}
     end
   end
-
-  def push(messages) when is_list(messages), do: Enum.each(messages, &push/1)
-  def push({action, message}), do: GenServer.cast(__MODULE__, {action, message})
 end
