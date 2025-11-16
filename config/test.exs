@@ -12,6 +12,7 @@ config :premiere_ecoute,
   handlers: [
     PremiereEcoute.Sessions.ListeningSession.CommandHandler,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
+    PremiereEcoute.Sessions.Scores.CommandHandler,
     PremiereEcoute.Sessions.Scores.PollHandler,
     PremiereEcouteCore.CommandBusTest.Handler,
     PremiereEcouteCore.CommandBusTest.EventDispatcher,

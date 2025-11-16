@@ -33,7 +33,8 @@ defmodule PremiereEcoute.Apis.TwitchQueueTest do
     test "circuit opens when rate limit is hit and queues messages", %{bot: _bot} do
       message = %{user_id: "141981764", message: "test"}
 
-      RateLimit.hit("twitch", :timer.seconds(5), 1)
+      # Pre-hit the broadcaster rate limit (1 message per second)
+      RateLimit.hit("broadcaster:#{message.user_id}", :timer.seconds(1), 1)
 
       TwitchQueue.push({:do_send_chat_message, message})
       :timer.sleep(100)
@@ -49,7 +50,8 @@ defmodule PremiereEcoute.Apis.TwitchQueueTest do
       message1 = %{user_id: "141981764", message: "test1"}
       message2 = %{user_id: "141981764", message: "test2"}
 
-      RateLimit.hit("twitch", :timer.seconds(5), 1)
+      # Pre-hit the broadcaster rate limit
+      RateLimit.hit("broadcaster:#{message1.user_id}", :timer.seconds(1), 1)
 
       TwitchQueue.push({:do_send_chat_message, message1})
       :timer.sleep(100)
@@ -75,12 +77,13 @@ defmodule PremiereEcoute.Apis.TwitchQueueTest do
 
       ApiMock.stub(
         TwitchApi,
-        path: {:post, "/chat/messages"},
+        path: {:post, "/helix/chat/messages"},
         status: 200,
         response: %{"data" => [%{"message_id" => "abc-123-def", "is_sent" => true}]}
       )
 
-      RateLimit.hit("twitch", :timer.seconds(5), 1)
+      # Pre-hit the broadcaster rate limit
+      RateLimit.hit("broadcaster:#{message.user_id}", :timer.seconds(1), 1)
 
       TwitchQueue.push({:do_send_chat_message, message})
       :timer.sleep(100)
@@ -88,7 +91,8 @@ defmodule PremiereEcoute.Apis.TwitchQueueTest do
       state = :sys.get_state(TwitchQueue)
       assert state.circuit == :open
 
-      :timer.sleep(6000)
+      # Wait for the rate limit window to expire
+      :timer.sleep(1100)
 
       state = :sys.get_state(TwitchQueue)
       assert state.circuit == :closed

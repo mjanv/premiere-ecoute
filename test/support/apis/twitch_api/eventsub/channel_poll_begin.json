@@ -19,7 +19,7 @@
         "broadcaster_user_id": "1337",
         "broadcaster_user_login": "cool_user",
         "broadcaster_user_name": "Cool_User",
-        "title": "Aren’t shoes just really hard socks?",
+        "title": "Aren't shoes just really hard socks?",
         "choices": [
             {"id": "123", "title": "Yeah!"},
             {"id": "124", "title": "No!"},
