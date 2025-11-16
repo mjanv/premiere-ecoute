@@ -85,6 +85,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
     |> Enum.group_by(fn vote -> {vote.viewer_id, vote.track_id} end)
     |> Enum.map(fn {_key, votes} ->
       latest_vote = Enum.max_by(votes, fn vote -> vote.updated_at end, DateTime)
+
       %{
         latest_vote
         | updated_at: DateTime.truncate(latest_vote.updated_at, :second),
