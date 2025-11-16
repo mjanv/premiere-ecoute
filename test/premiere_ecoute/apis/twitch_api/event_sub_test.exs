@@ -5,6 +5,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
   alias PremiereEcoute.Apis.TwitchApi
   alias PremiereEcouteCore.Cache
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   setup do
     scope =
       user_scope_fixture(

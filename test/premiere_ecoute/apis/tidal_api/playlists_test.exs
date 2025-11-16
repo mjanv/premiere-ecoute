@@ -6,6 +6,9 @@ defmodule PremiereEcoute.Apis.TidalApi.PlaylistsTest do
 
   alias PremiereEcoute.Discography.Playlist
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   describe "get_playlist/1" do
     test "can get a playlist from a unique identifier" do
       client_id = Application.get_env(:premiere_ecoute, :tidal_client_id)

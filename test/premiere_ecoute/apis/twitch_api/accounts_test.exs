@@ -4,6 +4,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   describe "client_credentials/0" do
     test "can retrieve access token using client credentials flow" do
       ApiMock.expect(

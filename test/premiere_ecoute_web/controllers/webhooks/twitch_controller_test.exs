@@ -2,12 +2,16 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   use PremiereEcouteWeb.ConnCase
 
   alias PremiereEcoute.ApiMock
+  alias PremiereEcoute.Commands.Chat.SendChatCommand
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Events.Chat.PollEnded
   alias PremiereEcoute.Events.Chat.PollStarted
   alias PremiereEcoute.Events.Chat.PollUpdated
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
   alias PremiereEcouteWeb.Webhooks.TwitchController
+
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
 
   setup do
     start_supervised(PremiereEcoute.Sessions.Scores.MessagePipeline)
@@ -16,6 +20,77 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   end
 
   describe "POST /webhooks/twitch" do
+    test "handles !hello command", %{conn: conn} do
+      _broadcaster = user_fixture(%{twitch: %{user_id: "1971641", access_token: "broadcaster_token"}})
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_hello_command.json")
+
+      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.twitch.user_id == "1971641"
+        assert message == "Hello!"
+        assert reply_to == "cc106a89-1814-919d-454c-f4f2f970aae7"
+        :ok
+      end)
+
+      response =
+        conn
+        |> sign_conn(payload)
+        |> put_req_header("twitch-eventsub-message-type", "notification")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
+
+      assert response.status == 202
+      assert response.resp_body == ""
+    end
+
+    test "handles !vote command with active session", %{conn: conn} do
+      # AIDEV-NOTE: E2E test for !vote command - verifies full flow with votes in active session
+      broadcaster = user_fixture(%{twitch: %{user_id: "1971641", access_token: "broadcaster_token"}})
+      viewer_id = "4145994"
+
+      # Create active session and votes
+      session = session_fixture(%{user_id: broadcaster.id, status: :active})
+      vote_fixture(%{viewer_id: viewer_id, session_id: session.id, track_id: 1, value: "8"})
+      vote_fixture(%{viewer_id: viewer_id, session_id: session.id, track_id: 2, value: "10"})
+
+      payload = %{
+        "subscription" => %{
+          "id" => "test-sub-id",
+          "type" => "channel.chat.message",
+          "version" => "1",
+          "condition" => %{"broadcaster_user_id" => "1971641", "user_id" => "bot_id"},
+          "created_at" => "2023-11-06T18:11:47.492253549Z"
+        },
+        "event" => %{
+          "broadcaster_user_id" => "1971641",
+          "broadcaster_user_login" => "streamer",
+          "broadcaster_user_name" => "streamer",
+          "chatter_user_id" => viewer_id,
+          "chatter_user_login" => "viewer32",
+          "chatter_user_name" => "viewer32",
+          "message_id" => "vote-msg-123",
+          "message" => %{"text" => "!vote", "fragments" => [%{"type" => "text", "text" => "!vote"}]},
+          "message_type" => "text"
+        }
+      }
+
+      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+        assert message == "9.0/10"
+        assert reply_to == "vote-msg-123"
+        :ok
+      end)
+
+      response =
+        conn
+        |> sign_conn(payload)
+        |> put_req_header("twitch-eventsub-message-type", "notification")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
+
+      assert response.status == 202
+      assert response.resp_body == ""
+    end
+
     test "handles webhook verification challenge", %{conn: conn} do
       payload = %{
         "challenge" => "pogchamp-kappa-360noscope-vohiyo",
@@ -120,7 +195,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   end
 
   describe "handle/1" do
-    test "channel.chat.message" do
+    test "channel.chat.message - message" do
       payload = ApiMock.payload("twitch_api/eventsub/channel_chat_message.json")
 
       event = TwitchController.handle(payload)
@@ -133,6 +208,36 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
              }
     end
 
+    test "channel.chat.message - command" do
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_command.json")
+
+      event = TwitchController.handle(payload)
+
+      assert event == %SendChatCommand{
+               broadcaster_id: "1971641",
+               user_id: "4145994",
+               message_id: "cc106a89-1814-919d-454c-f4f2f970aae7",
+               command: "command",
+               args: ["arg1", "arg2"],
+               is_streamer: false
+             }
+    end
+
+    test "channel.chat.message - !hello command" do
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_hello_command.json")
+
+      event = TwitchController.handle(payload)
+
+      assert event == %SendChatCommand{
+               broadcaster_id: "1971641",
+               user_id: "4145994",
+               message_id: "cc106a89-1814-919d-454c-f4f2f970aae7",
+               command: "hello",
+               args: [],
+               is_streamer: false
+             }
+    end
+
     test "channel.poll.begin" do
       payload = ApiMock.payload("twitch_api/eventsub/channel_poll_begin.json")
 
@@ -140,7 +245,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       assert event == %PollStarted{
                id: "1243456",
-               title: "Aren’t shoes just really hard socks?",
+               title: "Aren't shoes just really hard socks?",
                votes: %{"Yeah!" => 0, "No!" => 0, "Maybe!" => 0}
              }
     end

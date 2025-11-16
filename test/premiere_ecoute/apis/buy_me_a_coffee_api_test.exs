@@ -5,6 +5,9 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApiTest do
   alias PremiereEcoute.Apis.BuyMeACoffeeApi
   alias PremiereEcoute.Events.BuyMeACoffee.Donation
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   setup do
     Application.put_env(:premiere_ecoute, :buymeacoffee_api_key, "test_api_key")
 

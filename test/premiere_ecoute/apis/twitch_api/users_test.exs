@@ -4,6 +4,9 @@ defmodule PremiereEcoute.Apis.TwitchApi.UsersTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.TwitchApi
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   setup do
     Application.put_env(:premiere_ecoute, :twitch_client_id, "client_id")
 

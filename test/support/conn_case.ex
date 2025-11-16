@@ -35,6 +35,7 @@ defmodule PremiereEcouteWeb.ConnCase do
       import PremiereEcoute.AccountsFixtures
       import PremiereEcoute.Discography.AlbumFixtures
       import PremiereEcoute.Discography.PlaylistFixtures
+      import PremiereEcoute.Sessions.ListeningSessionFixtures
       import PremiereEcoute.Sessions.ScoresFixtures
 
       import Hammox

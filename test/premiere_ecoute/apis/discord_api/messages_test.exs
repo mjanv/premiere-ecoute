@@ -4,6 +4,9 @@ defmodule PremiereEcoute.Apis.DiscordApi.MessagesTest do
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.DiscordApi
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   setup do
     Application.put_env(:premiere_ecoute, :discord_bot_token, "discord_bot_token")
 

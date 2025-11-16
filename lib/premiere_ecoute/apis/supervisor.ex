@@ -19,8 +19,15 @@ defmodule PremiereEcoute.Apis.Supervisor do
 
     optionals =
       case Application.get_env(:premiere_ecoute, :environment) do
-        :test -> []
-        _ -> [PremiereEcoute.Apis.PlayerSupervisor]
+        :test ->
+          []
+
+        _ ->
+          [
+            PremiereEcoute.Apis.PlayerSupervisor,
+            PremiereEcoute.Apis.TwitchQueue,
+            PremiereEcoute.Apis.RateLimit
+          ]
       end
 
     Supervisor.init(mandatory ++ optionals, strategy: :one_for_one)

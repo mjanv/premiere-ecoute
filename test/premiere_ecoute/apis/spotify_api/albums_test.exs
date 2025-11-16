@@ -10,6 +10,9 @@ defmodule PremiereEcoute.Apis.SpotifyApi.AlbumsTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
 
+  setup {Req.Test, :set_req_test_to_shared}
+  setup {Req.Test, :verify_on_exit!}
+
   setup_all do
     token = UUID.uuid4()
 

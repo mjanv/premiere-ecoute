@@ -1,0 +1,80 @@
+defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
+  @moduledoc false
+
+  use PremiereEcouteCore.CommandBus.Handler
+
+  require Logger
+
+  import Ecto.Query
+
+  alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Apis
+  alias PremiereEcoute.Commands.Chat.SendChatCommand
+  alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Scores.Vote
+
+  command(PremiereEcoute.Commands.Chat.SendChatCommand)
+
+  def handle(%SendChatCommand{command: "hello", broadcaster_id: broadcaster_id, message_id: message_id}) do
+    send_chat_reply(broadcaster_id, message_id, "Hello!")
+  end
+
+  def handle(%SendChatCommand{command: "vote", broadcaster_id: broadcaster_id, user_id: viewer_id, message_id: message_id}) do
+    with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
+         session when not is_nil(session) <- get_active_session(broadcaster.id),
+         message when not is_nil(message) <- get_vote_message(session.id, viewer_id, session.vote_options) do
+      send_chat_reply(broadcaster_id, message_id, message)
+    else
+      _ -> {:ok, []}
+    end
+  end
+
+  def handle(_), do: {:ok, []}
+
+  defp send_chat_reply(broadcaster_id, message_id, message) do
+    with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
+         scope <- Scope.for_user(broadcaster),
+         :ok <- Apis.twitch().send_reply_message(scope, message, message_id) do
+      {:ok, []}
+    else
+      nil ->
+        Logger.error("Cannot send chat reply due to unknown broadcaster")
+        {:error, []}
+
+      {:error, reason} ->
+        Logger.error("Cannot send chat reply due to: #{inspect(reason)}")
+        {:error, []}
+    end
+  end
+
+  defp get_active_session(user_id) do
+    from(s in ListeningSession,
+      where: s.user_id == ^user_id and s.status == :active,
+      order_by: [desc: s.updated_at],
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
+  defp get_vote_message(session_id, viewer_id, vote_options) do
+    from(v in Vote,
+      where: v.session_id == ^session_id and v.viewer_id == ^viewer_id,
+      select: avg(fragment("CAST(? AS FLOAT)", v.value))
+    )
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      avg -> "#{Float.round(avg, 1)}/#{get_max_vote_option(vote_options)}"
+    end
+  end
+
+  defp get_max_vote_option(vote_options) when is_list(vote_options) do
+    vote_options
+    |> Enum.map(&String.to_integer(&1))
+    |> Enum.max()
+  rescue
+    _ -> List.last(vote_options) || "10"
+  end
+end

@@ -142,15 +142,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
-                                               "Welcome to the premiere of Sample Album by Sample Artist",
-                                               0 ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
       end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
-                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account",
-                                               0 ->
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
         :ok
       end)
 
@@ -202,15 +199,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :get_album, 2, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
-                                               "Welcome to the premiere of Sample Album by Sample Artist",
-                                               0 ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
       end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
-                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account",
-                                               0 ->
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
         :ok
       end)
 
@@ -257,11 +251,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7"} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
-                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account",
-                                               0 ->
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
         :ok
       end)
 
@@ -315,22 +308,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track002"} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
-                                               "Welcome to the premiere of Sample Album by Sample Artist",
-                                               0 ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
       end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
-                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account",
-                                               0 ->
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
         :ok
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(2/2) Track Two", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(2/2) Track Two" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       command = %PrepareListeningSession{
         source: :album,
@@ -381,24 +371,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track002"} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
-                                               "Welcome to the premiere of Sample Album by Sample Artist",
-                                               0 ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
       end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
-                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account",
-                                               0 ->
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
         :ok
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(2/2) Track Two", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(2/2) Track Two" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       command = %PrepareListeningSession{
         source: :album,
@@ -458,26 +445,22 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
       expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
-                                               "Welcome to the premiere of Sample Album by Sample Artist",
-                                               0 ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One", 0 -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !", 0 -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       expect(TwitchApi, :send_chat_message, fn _scope,
-                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account",
-                                               0 ->
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
         :ok
       end)
 
-      expect(TwitchApi, :send_chat_message, fn _scope, "The premiere of Sample Album is over", 0 -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn _scope, "The premiere of Sample Album is over" -> :ok end)
 
       expect(TwitchApi, :send_chat_message, fn _scope,
-                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account",
-                                               0 ->
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
         :ok
       end)
 
