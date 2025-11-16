@@ -42,6 +42,55 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
       assert response.resp_body == ""
     end
 
+    test "handles !vote command with active session", %{conn: conn} do
+      # AIDEV-NOTE: E2E test for !vote command - verifies full flow with votes in active session
+      broadcaster = user_fixture(%{twitch: %{user_id: "1971641", access_token: "broadcaster_token"}})
+      viewer_id = "4145994"
+
+      # Create active session and votes
+      session = session_fixture(%{user_id: broadcaster.id, status: :active})
+      vote_fixture(%{viewer_id: viewer_id, session_id: session.id, track_id: 1, value: "8"})
+      vote_fixture(%{viewer_id: viewer_id, session_id: session.id, track_id: 2, value: "10"})
+
+      payload = %{
+        "subscription" => %{
+          "id" => "test-sub-id",
+          "type" => "channel.chat.message",
+          "version" => "1",
+          "condition" => %{"broadcaster_user_id" => "1971641", "user_id" => "bot_id"},
+          "created_at" => "2023-11-06T18:11:47.492253549Z"
+        },
+        "event" => %{
+          "broadcaster_user_id" => "1971641",
+          "broadcaster_user_login" => "streamer",
+          "broadcaster_user_name" => "streamer",
+          "chatter_user_id" => viewer_id,
+          "chatter_user_login" => "viewer32",
+          "chatter_user_name" => "viewer32",
+          "message_id" => "vote-msg-123",
+          "message" => %{"text" => "!vote", "fragments" => [%{"type" => "text", "text" => "!vote"}]},
+          "message_type" => "text"
+        }
+      }
+
+      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+        assert message == "9.0/10"
+        assert reply_to == "vote-msg-123"
+        :ok
+      end)
+
+      response =
+        conn
+        |> sign_conn(payload)
+        |> put_req_header("twitch-eventsub-message-type", "notification")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
+
+      assert response.status == 202
+      assert response.resp_body == ""
+    end
+
     test "handles webhook verification challenge", %{conn: conn} do
       payload = %{
         "challenge" => "pogchamp-kappa-360noscope-vohiyo",

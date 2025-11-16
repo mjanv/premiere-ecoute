@@ -23,6 +23,28 @@ defmodule PremiereEcoute.Apis.TwitchQueueTest do
   end
 
   describe "circuit breaker transitions" do
+    defp wait_for_circuit_state(expected_state, timeout_ms, interval_ms \\ 10) do
+      end_time = System.monotonic_time(:millisecond) + timeout_ms
+      do_wait_for_circuit_state(expected_state, end_time, interval_ms)
+    end
+
+    defp do_wait_for_circuit_state(expected_state, end_time, interval_ms) do
+      state = :sys.get_state(TwitchQueue)
+
+      if state.circuit == expected_state do
+        :ok
+      else
+        now = System.monotonic_time(:millisecond)
+
+        if now < end_time do
+          Process.sleep(interval_ms)
+          do_wait_for_circuit_state(expected_state, end_time, interval_ms)
+        else
+          raise "Timeout waiting for circuit state #{expected_state}, got #{state.circuit}"
+        end
+      end
+    end
+
     test "circuit starts in closed state" do
       state = :sys.get_state(TwitchQueue)
       assert state.circuit == :closed
@@ -36,8 +58,11 @@ defmodule PremiereEcoute.Apis.TwitchQueueTest do
       # Pre-hit the broadcaster rate limit (1 message per second)
       RateLimit.hit("broadcaster:#{message.user_id}", :timer.seconds(1), 1)
 
+      # Push message which should be denied and circuit should open
       TwitchQueue.push({:do_send_chat_message, message})
-      :timer.sleep(100)
+
+      # Wait for circuit to open by polling state
+      wait_for_circuit_state(:open, 200)
 
       state = :sys.get_state(TwitchQueue)
       assert state.circuit == :open

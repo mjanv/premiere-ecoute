@@ -53,7 +53,7 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
           {nil, messages}
 
         {:error, timer} ->
-          {timer, [message] ++ messages}
+          {timer, [{action, message}] ++ messages}
       end
 
     {:noreply, %{state | timer: timer, messages: messages}}

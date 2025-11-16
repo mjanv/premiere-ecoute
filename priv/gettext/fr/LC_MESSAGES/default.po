@@ -95,20 +95,10 @@ msgid "Album cover"
 msgstr "Couverture d'album"
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:192
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:179
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:149
 #, elixir-autogen, elixir-format
 msgid "Delete session"
 msgstr "Supprimer la session"
-
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:93
-#, elixir-autogen, elixir-format
-msgid "Please try refreshing the page."
-msgstr "Veuillez essayer de rafraîchir la page."
-
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:91
-#, elixir-autogen, elixir-format
-msgid "Unable to load sessions"
-msgstr "Impossible de charger les sessions"
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:90
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:129
@@ -331,7 +321,7 @@ msgstr "Tableau de Bord Admin"
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:78
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:125
 #: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:108
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:140
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:110
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Album"
 msgstr "Album"
@@ -1091,7 +1081,7 @@ msgstr "Supprimer définitivement votre compte et toutes les données associées
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:112
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:256
 #: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:132
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:142
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:112
 #, elixir-autogen, elixir-format
 msgid "Playlist"
 msgstr "Playlist"
@@ -3010,13 +3000,13 @@ msgid_plural "artists"
 msgstr[0] "Artiste"
 msgstr[1] "Artiste"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:184
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:182
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La première écoute de %{name} est terminée"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:24
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:40
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:28
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:45
 #, elixir-autogen, elixir-format
 msgid "Votes are open !"
 msgstr "Les votes sont ouverts !"
@@ -3127,12 +3117,12 @@ msgstr "Les pistes de votre extension ne seront pas aimées sans règle de playl
 msgid "Tracks liked from your extension will be added to this playlist"
 msgstr "Les pistes aimées depuis votre extension seront ajoutées à cette playlist"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:53
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:59
 #, elixir-autogen, elixir-format
 msgid "Votes close in 30 seconds !"
 msgstr "Les votes ferment dans 30 secondes !"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:101
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:110
 #, elixir-autogen, elixir-format
 msgid "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account"
 msgstr "Vous pouvez retrouver toutes vos notes en vous inscrivant sur premiere-ecoute.fr avec votre compte Twitch"
@@ -3505,7 +3495,7 @@ msgstr "Mettre à jour le Rôle"
 msgid "e.g., hosting, server, bandwidth"
 msgstr "p.ex., hébergement, serveur, bande passante"
 
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:157
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:127
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Retrospective visibility"
 msgstr "Rétrospective"
