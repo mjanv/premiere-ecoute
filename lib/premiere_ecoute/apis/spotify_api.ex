@@ -59,6 +59,8 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     @callback previous_track(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
     @callback set_repeat_mode(scope :: Scope.t(), state :: :track | :context | :off) ::
                 {:ok, atom()} | {:error, term()}
+    @callback toggle_playback_shuffle(scope :: Scope.t(), state :: boolean()) ::
+                {:ok, atom()} | {:error, term()}
     @callback start_resume_playback(scope :: Scope.t(), item :: Album.t() | Track.t() | Playlist.t()) ::
                 {:ok, String.t()} | {:error, term()}
     @callback add_item_to_playback_queue(scope :: Scope.t(), item :: Album.t() | Track.t()) ::
@@ -153,6 +155,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
   defdelegate next_track(scope), to: __MODULE__.Player
   defdelegate previous_track(scope), to: __MODULE__.Player
   defdelegate set_repeat_mode(scope, state), to: __MODULE__.Player
+  defdelegate toggle_playback_shuffle(scope, state), to: __MODULE__.Player
   defdelegate start_resume_playback(scope, album), to: __MODULE__.Player
   defdelegate add_item_to_playback_queue(scope, item), to: __MODULE__.Player
 

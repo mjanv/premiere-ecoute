@@ -142,6 +142,22 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   end
 
   @doc """
+  Toggle shuffle mode (false or true) on the user's active device.
+  """
+  def toggle_playback_shuffle(%Scope{} = scope, state) when is_boolean(state) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.merge(
+      headers: [
+        {"Content-Length", "0"},
+        {"Content-Type", "application/json"}
+      ]
+    )
+    |> Req.put(url: "/me/player/shuffle", params: %{state: to_string(state)})
+    |> handle_playback_response()
+  end
+
+  @doc """
   Get information about the user's current playback state.
   """
   def get_playback_state(%Scope{} = scope, state) do

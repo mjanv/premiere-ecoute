@@ -451,6 +451,42 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
     end
   end
 
+  describe "toggle_playback_shuffle/2" do
+    test "enables shuffle mode", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/shuffle"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
+        params: %{"state" => "true"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = SpotifyApi.toggle_playback_shuffle(scope, true)
+    end
+
+    test "disables shuffle mode", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/shuffle"},
+        headers: [
+          {"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"},
+          {"content-type", "application/json"},
+          {"content-length", "0"}
+        ],
+        params: %{"state" => "false"},
+        response: %{},
+        status: 204
+      )
+
+      {:ok, :success} = SpotifyApi.toggle_playback_shuffle(scope, false)
+    end
+  end
+
   describe "start_resume_playback/1" do
     setup do
       {:ok, album} = Album.create(album_fixture(%{album_id: "5ht7ItJgpBH7W6vJ5BqpPr"}))
