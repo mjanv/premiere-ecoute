@@ -36,7 +36,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         case handle(conn.body_params) do
           %SendChatCommand{} = command -> PremiereEcoute.apply(command)
           %MessageSent{} = event -> Sessions.publish_message(event)
-          event -> Sessions.publish_poll(event)
+          _ -> :ok
         end
 
         send_resp(conn, 202, "")
