@@ -44,6 +44,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:overlay_score_type, "streamer")
       |> assign(:vote_trends, nil)
       |> assign(:next_track_at, nil)
+      |> assign(:show_youtube_modal, false)
       |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
       |> assign_async(:vote_trends, fn ->
         vote_data = VoteTrends.rolling_average(String.to_integer(id), :minute)
@@ -150,6 +151,16 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_event("open_youtube_modal", _params, socket) do
+    {:noreply, assign(socket, :show_youtube_modal, true)}
+  end
+
+  @impl true
+  def handle_event("close_youtube_modal", _params, socket) do
+    {:noreply, assign(socket, :show_youtube_modal, false)}
+  end
+
+  @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, "Received event: #{event}")}
   end
@@ -204,6 +215,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_info({:flash, level, message}, socket) do
     {:noreply, put_flash(socket, level, message)}
+  end
+
+  @impl true
+  def handle_info({:youtube_chapters_modal_closed}, socket) do
+    {:noreply, assign(socket, :show_youtube_modal, false)}
   end
 
   @impl true
