@@ -12,6 +12,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.TrackMarker
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -46,6 +47,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     belongs_to :current_playlist_track, Playlist.Track, foreign_key: :current_playlist_track_id
 
     has_one :report, Report, foreign_key: :session_id
+    has_many :track_markers, TrackMarker, foreign_key: :listening_session_id
 
     timestamps(type: :utc_datetime)
   end
@@ -102,6 +104,39 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   def stop(%__MODULE__{} = _session) do
     {:error, :invalid_status}
+  end
+
+  @doc """
+  Creates a track marker recording when the current track started playing.
+
+  AIDEV-NOTE: Called from event handlers when tracks change during active session
+  """
+  def add_track_marker(%__MODULE__{source: :album, current_track: track} = session)
+      when not is_nil(track) do
+    %TrackMarker{}
+    |> TrackMarker.changeset(%{
+      listening_session_id: session.id,
+      track_id: track.id,
+      track_number: track.track_number,
+      started_at: DateTime.utc_now(:second)
+    })
+    |> Repo.insert()
+  end
+
+  def add_track_marker(%__MODULE__{source: :playlist, current_playlist_track: track} = session)
+      when not is_nil(track) do
+    %TrackMarker{}
+    |> TrackMarker.changeset(%{
+      listening_session_id: session.id,
+      track_id: track.id,
+      track_number: track.position,
+      started_at: DateTime.utc_now(:second)
+    })
+    |> Repo.insert()
+  end
+
+  def add_track_marker(%__MODULE__{} = _session) do
+    {:error, :no_current_track}
   end
 
   def next_track(%__MODULE__{source: :playlist} = session) do

@@ -5,7 +5,9 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.TrackMarker
 
   setup do
     user = user_fixture(%{role: :streamer})
@@ -392,6 +394,108 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       sessions = ListeningSession.active_sessions(viewer)
 
       assert sessions == []
+    end
+  end
+
+  describe "add_track_marker/1" do
+    test "can add a track marker for an album session with a current track", %{
+      user: user,
+      album: album
+    } do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.next_track(session)
+
+      {:ok, marker} = ListeningSession.add_track_marker(session)
+
+      assert marker.listening_session_id == session.id
+      assert marker.track_id == session.current_track.id
+      assert marker.track_number == 1
+      assert marker.started_at.__struct__ == DateTime
+    end
+
+    test "can add a track marker for a playlist session with a current track", %{
+      user: user,
+      playlist: playlist
+    } do
+      {:ok, track} =
+        PremiereEcoute.Discography.Playlist.Track.create(%{
+          playlist_id: playlist.id,
+          provider: :spotify,
+          track_id: "track001",
+          name: "Playlist Track",
+          position: 1,
+          duration_ms: 180_000
+        })
+
+      playlist = PremiereEcoute.Discography.Playlist.get(playlist.id)
+
+      {:ok, session} =
+        ListeningSession.create(%{source: :playlist, user_id: user.id, playlist_id: playlist.id})
+
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.current_track(session, track.id)
+
+      {:ok, marker} = ListeningSession.add_track_marker(session)
+
+      assert marker.listening_session_id == session.id
+      assert marker.track_id == track.id
+      assert marker.track_number == 1
+      assert marker.started_at.__struct__ == DateTime
+    end
+
+    test "returns error when trying to add marker without a current track", %{
+      user: user,
+      album: album
+    } do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+
+      {:error, reason} = ListeningSession.add_track_marker(session)
+
+      assert reason == :no_current_track
+    end
+
+    test "can add multiple markers when tracks change during a session", %{user: user, album: album} do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+
+      # Play first track
+      {:ok, session} = ListeningSession.next_track(session)
+      {:ok, marker1} = ListeningSession.add_track_marker(session)
+
+      # Play second track
+      {:ok, session} = ListeningSession.next_track(session)
+      {:ok, marker2} = ListeningSession.add_track_marker(session)
+
+      # Skip back to first track
+      {:ok, session} = ListeningSession.previous_track(session)
+      {:ok, marker3} = ListeningSession.add_track_marker(session)
+
+      # Verify all markers were created
+      assert marker1.track_number == 1
+      assert marker2.track_number == 2
+      assert marker3.track_number == 1
+
+      # Verify chronological order
+      assert DateTime.compare(marker1.started_at, marker2.started_at) in [:lt, :eq]
+      assert DateTime.compare(marker2.started_at, marker3.started_at) in [:lt, :eq]
+    end
+
+    test "track markers are deleted when session is deleted", %{user: user, album: album} do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.next_track(session)
+      {:ok, marker} = ListeningSession.add_track_marker(session)
+
+      # Verify marker exists
+      assert Repo.get(TrackMarker, marker.id) != nil
+
+      # Delete session
+      ListeningSession.delete(session)
+
+      # Verify marker is also deleted (cascade delete)
+      assert Repo.get(TrackMarker, marker.id) == nil
     end
   end
 end

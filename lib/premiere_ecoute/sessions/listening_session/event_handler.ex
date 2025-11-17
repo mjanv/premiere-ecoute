@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
 
   use PremiereEcouteCore.EventBus.Handler
 
+  alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.PreviousTrackStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
@@ -18,12 +19,18 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
   def dispatch(%SessionStarted{source: :album, session_id: session_id, user_id: user_id}) do
+    # AIDEV-NOTE: Record track marker when session starts with initial track
+    session_id |> ListeningSession.get() |> ListeningSession.add_track_marker()
+
     ListeningSessionWorker.in_minutes(%{action: "send_promo_message", user_id: user_id}, 1)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_started, session_id})
     :ok
   end
 
   def dispatch(%SessionStarted{source: :playlist, session_id: session_id, user_id: user_id}) do
+    # AIDEV-NOTE: Record track marker when session starts with initial track
+    session_id |> ListeningSession.get() |> ListeningSession.add_track_marker()
+
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session_id, user_id: user_id}, @cooldown)
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 25)
@@ -33,6 +40,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   SkipNextTrackListeningSession
 
   def dispatch(%NextTrackStarted{source: :album, session_id: session_id, user_id: user_id, track: track}) do
+    # AIDEV-NOTE: Record track marker when advancing to next track
+    session_id |> ListeningSession.get() |> ListeningSession.add_track_marker()
+
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, @cooldown)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, track})
@@ -40,12 +50,18 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   end
 
   def dispatch(%NextTrackStarted{source: :playlist, session_id: session_id, user_id: user_id}) do
+    # AIDEV-NOTE: Record track marker when advancing to next track
+    session_id |> ListeningSession.get() |> ListeningSession.add_track_marker()
+
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session_id, user_id: user_id}, @cooldown)
     :ok
   end
 
   def dispatch(%PreviousTrackStarted{session_id: session_id, user_id: user_id, track: track}) do
+    # AIDEV-NOTE: Record track marker when skipping to previous track
+    session_id |> ListeningSession.get() |> ListeningSession.add_track_marker()
+
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, @cooldown)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, track})
