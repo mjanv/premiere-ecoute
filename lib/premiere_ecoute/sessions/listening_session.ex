@@ -2,7 +2,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @moduledoc false
 
   use PremiereEcouteCore.Aggregate,
-    root: [user: [:twitch, :spotify], album: [:tracks], current_track: [], playlist: [:tracks], current_playlist_track: []],
+    root: [
+      user: [:twitch, :spotify],
+      album: [:tracks],
+      current_track: [],
+      playlist: [:tracks],
+      current_playlist_track: [],
+      track_markers: []
+    ],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist]
 
   alias PremiereEcoute.Accounts.Scope
@@ -11,8 +18,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.Retrospective.Report
-  alias PremiereEcoute.Sessions.TrackMarker
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -108,8 +115,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   @doc """
   Creates a track marker recording when the current track started playing.
-
-  AIDEV-NOTE: Called from event handlers when tracks change during active session
   """
   def add_track_marker(%__MODULE__{source: :album, current_track: track} = session)
       when not is_nil(track) do
@@ -123,13 +128,22 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.insert()
   end
 
-  def add_track_marker(%__MODULE__{source: :playlist, current_playlist_track: track} = session)
+  def add_track_marker(%__MODULE__{source: :playlist, current_playlist_track: track, playlist: playlist} = session)
       when not is_nil(track) do
+    # Calculate track position based on its order in the playlist
+    track_number =
+      playlist.tracks
+      |> Enum.find_index(&(&1.id == track.id))
+      |> case do
+        nil -> 1
+        index -> index + 1
+      end
+
     %TrackMarker{}
     |> TrackMarker.changeset(%{
       listening_session_id: session.id,
       track_id: track.id,
-      track_number: track.position,
+      track_number: track_number,
       started_at: DateTime.utc_now(:second)
     })
     |> Repo.insert()

@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.TrackMarker
+  alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
 
   setup do
     user = user_fixture(%{role: :streamer})
@@ -418,17 +418,24 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       user: user,
       playlist: playlist
     } do
-      {:ok, track} =
-        PremiereEcoute.Discography.Playlist.Track.create(%{
-          playlist_id: playlist.id,
-          provider: :spotify,
-          track_id: "track001",
-          name: "Playlist Track",
-          position: 1,
-          duration_ms: 180_000
-        })
+      track_attrs = %{
+        provider: :spotify,
+        track_id: "track001",
+        album_id: "album001",
+        user_id: "spotify_user_123",
+        name: "Playlist Track",
+        artist: "Test Artist",
+        duration_ms: 180_000,
+        added_at: NaiveDateTime.utc_now(),
+        release_date: ~D[2025-01-01]
+      }
 
-      playlist = PremiereEcoute.Discography.Playlist.get(playlist.id)
+      {:ok, track} =
+        %Playlist.Track{playlist_id: playlist.id}
+        |> Playlist.Track.changeset(track_attrs)
+        |> Repo.insert()
+
+      playlist = Playlist.get(playlist.id)
 
       {:ok, session} =
         ListeningSession.create(%{source: :playlist, user_id: user.id, playlist_id: playlist.id})
