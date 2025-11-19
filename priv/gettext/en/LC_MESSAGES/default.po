@@ -160,12 +160,12 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:188
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:163
 #, elixir-autogen, elixir-format
 msgid "End Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:323
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:337
 #, elixir-autogen, elixir-format
 msgid "My Score"
 msgstr ""
@@ -181,12 +181,12 @@ msgstr ""
 msgid "Released"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:316
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:330
 #, elixir-autogen, elixir-format
 msgid "Score"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:172
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:147
 #, elixir-autogen, elixir-format
 msgid "Start Session"
 msgstr ""
@@ -221,7 +221,7 @@ msgstr ""
 msgid "Unique Voters"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:307
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:321
 #, elixir-autogen, elixir-format
 msgid "Votes"
 msgstr ""
@@ -1484,6 +1484,7 @@ msgid "Billboard title updated successfully"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:45
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex:120
 #, elixir-autogen, elixir-format
 msgid "Copy"
 msgstr ""
@@ -2303,7 +2304,7 @@ msgstr ""
 msgid "Failed to load data"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:206
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:181
 #, elixir-autogen, elixir-format
 msgid "View Retrospective"
 msgstr ""
@@ -2460,7 +2461,7 @@ msgstr ""
 msgid "Are you sure you want to delete this session? This action cannot be undone."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:296
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:310
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Closed votes"
 msgstr ""
@@ -2476,7 +2477,7 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:294
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:308
 #, elixir-autogen, elixir-format
 msgid "Open votes"
 msgstr ""
@@ -2831,7 +2832,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:346
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:360
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No tracks found for this %{source}."
 msgstr ""
@@ -3000,7 +3001,7 @@ msgid_plural "artists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:182
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:186
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr ""
@@ -3011,7 +3012,7 @@ msgstr ""
 msgid "Votes are open !"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:95
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:97
 #, elixir-autogen, elixir-format
 msgid "Welcome to the premiere of %{name} by %{artist}"
 msgstr ""
@@ -3122,7 +3123,7 @@ msgstr ""
 msgid "Votes close in 30 seconds !"
 msgstr "Votes close in 30 seconds !"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:110
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:102
 #, elixir-autogen, elixir-format
 msgid "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account"
 msgstr ""
@@ -3498,4 +3499,29 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:127
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Retrospective visibility"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex:105
+#, elixir-autogen, elixir-format
+msgid "Chapters"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex:70
+#, elixir-autogen, elixir-format
+msgid "Copy and paste these timestamps into your YouTube video description"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:196
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Export to Youtube"
+msgstr "Export to Spotify"
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex:78
+#, elixir-autogen, elixir-format
+msgid "Time Bias"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex:67
+#, elixir-autogen, elixir-format
+msgid "Youtube chapters"
 msgstr ""
