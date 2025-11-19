@@ -50,17 +50,26 @@
   pointer-events: none;
 }
 
-/* Sidebar toggle button */
+/* Sidebar toggle button - AIDEV-NOTE: positioned absolute to save vertical space */
 .sidebar-toggle-btn {
   transition: all 200ms ease-in-out;
 }
 
-.sidebar-toggle-btn svg {
+/* AIDEV-NOTE: Icon is a span element, target it directly for rotation */
+.sidebar-toggle-btn .hero-chevron-left {
   transition: transform 200ms ease-in-out;
+  display: inline-block;
 }
 
-.sidebar-collapsed .sidebar-toggle-btn svg {
+/* AIDEV-NOTE: Rotate chevron 180° when collapsed to point right */
+.sidebar-collapsed .sidebar-toggle-btn .hero-chevron-left {
   transform: rotate(180deg);
+}
+
+/* AIDEV-NOTE: Center button horizontally when collapsed */
+.sidebar-collapsed .sidebar-toggle-btn {
+  right: 50%;
+  transform: translateX(50%);
 }
 
 /* Adjust padding when collapsed */

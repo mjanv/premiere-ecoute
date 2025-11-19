@@ -17,7 +17,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
     ~H"""
     <%= if @current_user do %>
       <aside
-        class="sidebar w-64 flex flex-col border-r"
+        class="sidebar w-64 flex flex-col border-r relative"
         style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);"
         phx-hook="SidebarCollapse"
         id="sidebar"
@@ -31,19 +31,17 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
             }
           })();
         </script>
-        <!-- AIDEV-NOTE: Toggle button for collapsing/expanding sidebar -->
-        <div class="flex items-center justify-end p-4 border-b" style="border-color: var(--color-dark-800);">
-          <button
-            data-sidebar-toggle
-            class="sidebar-toggle-btn p-2 rounded-lg hover:bg-gray-800 transition-colors"
-            title="Toggle sidebar"
-          >
-            <.icon name="hero-chevron-left" class="w-5 h-5 text-gray-400" />
-          </button>
-        </div>
+        <!-- AIDEV-NOTE: Toggle button for collapsing/expanding sidebar - positioned absolute to save space -->
+        <button
+          data-sidebar-toggle
+          class="sidebar-toggle-btn absolute top-2 right-2 p-1.5 rounded-md hover:bg-gray-800 transition-colors z-10"
+          title="Toggle sidebar"
+        >
+          <.icon name="hero-chevron-left" class="w-4 h-4 text-gray-400" />
+        </button>
         <!-- Scrollable content area -->
         <div class="flex-1 overflow-y-auto">
-          <div class="p-6">
+          <div class="p-6 pt-10">
             <!-- My Library section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
               <div class="mb-6">
