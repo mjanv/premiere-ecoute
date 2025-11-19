@@ -8,6 +8,7 @@ import { ClickOutside } from "./click_outside";
 import { AutoDismissFlash } from "./auto_dismiss_flash";
 import { NextTrackTimer } from "./next_track_timer";
 import { VisibilityDropdown } from "./visibility_dropdown";
+import { SidebarCollapse } from "./sidebar_collapse";
 
 
 
@@ -21,5 +22,6 @@ export const Hooks = {
   NoteGraph: NoteGraph,
   ClickOutside: ClickOutside,
   NextTrackTimer: NextTrackTimer,
-  VisibilityDropdown: VisibilityDropdown
+  VisibilityDropdown: VisibilityDropdown,
+  SidebarCollapse: SidebarCollapse
 };

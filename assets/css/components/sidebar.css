@@ -1,0 +1,101 @@
+/* AIDEV-NOTE: Sidebar collapse animations and transitions */
+
+/* Base sidebar styles with transition support */
+.sidebar {
+  width: 16rem; /* w-64 = 256px = 16rem */
+  transition: width 300ms ease-in-out;
+}
+
+.sidebar-collapsed {
+  width: 5rem; /* ~w-20 for icon-only display */
+}
+
+/* Section titles - hide with fade out when collapsed */
+.sidebar .sidebar-section-title {
+  opacity: 1;
+  transition: opacity 200ms ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-collapsed .sidebar-section-title {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Link text - hide with fade out when collapsed */
+.sidebar .sidebar-link-text {
+  opacity: 1;
+  transition: opacity 200ms ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-collapsed .sidebar-link-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Followed channels section - completely hidden when collapsed */
+.sidebar .sidebar-followed-channels {
+  max-height: 1000px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out;
+}
+
+.sidebar-collapsed .sidebar-followed-channels {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle-btn {
+  transition: all 200ms ease-in-out;
+}
+
+.sidebar-toggle-btn svg {
+  transition: transform 200ms ease-in-out;
+}
+
+.sidebar-collapsed .sidebar-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+/* Adjust padding when collapsed */
+.sidebar-collapsed .flex-1 > div {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+/* Icon positioning when collapsed - center the icons */
+.sidebar-collapsed .sidebar-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.sidebar-collapsed .sidebar-link .icon {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  flex-shrink: 0;
+}
+
+/* Center section title icons when collapsed */
+.sidebar-collapsed .sidebar-section-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar-collapsed .sidebar-section-title .icon {
+  margin-right: 0 !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  flex-shrink: 0;
+}
