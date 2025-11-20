@@ -204,6 +204,170 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
     end
   end
 
+  describe "handle/1 - SendChatCommand with premiereecoute" do
+    test "sends message in English when broadcaster language is en" do
+      broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "token"},
+          profile: %{language: :en}
+        })
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: "4145994",
+        message_id: "msg-123",
+        command: "premiereecoute",
+        args: [],
+        is_streamer: false
+      }
+
+      expect(TwitchApi, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+        assert scope.user.twitch.user_id == "1971641"
+
+        assert message ==
+                 "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
+
+        assert reply_to == "msg-123"
+        :ok
+      end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "sends message in French when broadcaster language is fr" do
+      broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "token"},
+          profile: %{language: :fr}
+        })
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: "4145994",
+        message_id: "msg-456",
+        command: "premiereecoute",
+        args: [],
+        is_streamer: false
+      }
+
+      expect(TwitchApi, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+        assert scope.user.profile.language == :fr
+
+        assert message ==
+                 "Première Écoute est une plateforme où les spectateurs peuvent voter pour la musique diffusée pendant le stream. Inscrivez-vous sur premiere-ecoute.fr pour consulter vos votes !"
+
+        assert reply_to == "msg-456"
+        :ok
+      end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "sends message in Italian when broadcaster language is it" do
+      broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "token"},
+          profile: %{language: :it}
+        })
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: "4145994",
+        message_id: "msg-789",
+        command: "premiereecoute",
+        args: [],
+        is_streamer: false
+      }
+
+      expect(TwitchApi, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+        assert scope.user.profile.language == :it
+
+        assert message ==
+                 "Premiere Ecoute è una piattaforma dove gli spettatori possono votare la musica suonata durante lo stream. Registrati su premiere-ecoute.fr per visualizzare i tuoi voti!"
+
+        assert reply_to == "msg-789"
+        :ok
+      end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "returns error when broadcaster not found" do
+      command = %SendChatCommand{
+        broadcaster_id: "nonexistent",
+        user_id: "4145994",
+        message_id: "msg-123",
+        command: "premiereecoute",
+        args: [],
+        is_streamer: false
+      }
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "ignores command arguments for premiereecoute command" do
+      broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "token"},
+          profile: %{language: :en}
+        })
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: "4145994",
+        message_id: "msg-123",
+        command: "premiereecoute",
+        args: ["extra", "arguments", "ignored"],
+        is_streamer: false
+      }
+
+      expect(TwitchApi, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+
+        assert message ==
+                 "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
+
+        assert reply_to == "msg-123"
+        :ok
+      end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "works with different broadcaster for premiereecoute command" do
+      broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "9999999", access_token: "token2"},
+          profile: %{language: :fr}
+        })
+
+      command = %SendChatCommand{
+        broadcaster_id: "9999999",
+        user_id: "1111111",
+        message_id: "another-msg-id",
+        command: "premiereecoute",
+        args: [],
+        is_streamer: false
+      }
+
+      expect(TwitchApi, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+        assert scope.user.twitch.user_id == "9999999"
+
+        assert message ==
+                 "Première Écoute est une plateforme où les spectateurs peuvent voter pour la musique diffusée pendant le stream. Inscrivez-vous sur premiere-ecoute.fr pour consulter vos votes !"
+
+        assert reply_to == "another-msg-id"
+        :ok
+      end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+  end
+
   describe "handle/1 - fallback" do
     test "returns ok for unhandled commands after validation fails" do
       # This tests the catch-all handle/1 clause

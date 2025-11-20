@@ -3525,3 +3525,8 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Youtube chapters"
 msgstr ""
+
+#: lib/premiere_ecoute/sessions/scores/command_handler.ex:96
+#, elixir-autogen, elixir-format
+msgid "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
+msgstr "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"

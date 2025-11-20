@@ -3525,3 +3525,8 @@ msgstr "Décalage temporel"
 #, elixir-autogen, elixir-format
 msgid "Youtube chapters"
 msgstr "Chapitres Youtube"
+
+#: lib/premiere_ecoute/sessions/scores/command_handler.ex:96
+#, elixir-autogen, elixir-format
+msgid "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
+msgstr "Première Écoute est une plateforme où les spectateurs peuvent voter pour la musique diffusée pendant le stream. Inscrivez-vous sur premiere-ecoute.fr pour consulter vos votes !"
