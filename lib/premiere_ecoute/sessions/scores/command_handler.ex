@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Commands.Chat.SendChatCommand
+  alias PremiereEcoute.Gettext
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
@@ -19,6 +20,17 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
 
   def handle(%SendChatCommand{command: "hello", broadcaster_id: broadcaster_id, message_id: message_id}) do
     send_chat_reply(broadcaster_id, message_id, "Hello!")
+  end
+
+  # AIDEV-NOTE: !premiereecoute command - Responds with information about Premiere Ecoute in streamer's language
+  def handle(%SendChatCommand{command: "premiereecoute", broadcaster_id: broadcaster_id, message_id: message_id}) do
+    with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
+         scope <- Scope.for_user(broadcaster),
+         message <- get_premiereecoute_message(scope) do
+      send_chat_reply(broadcaster_id, message_id, message)
+    else
+      _ -> {:ok, []}
+    end
   end
 
   def handle(%SendChatCommand{command: "vote", broadcaster_id: broadcaster_id, user_id: viewer_id, message_id: message_id}) do
@@ -76,5 +88,14 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
     |> Enum.max()
   rescue
     _ -> List.last(vote_options) || "10"
+  end
+
+  # AIDEV-NOTE: Get localized message for !premiereecoute command based on streamer's language
+  defp get_premiereecoute_message(scope) do
+    Gettext.t(scope, fn ->
+      gettext(
+        "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
+      )
+    end)
   end
 end
