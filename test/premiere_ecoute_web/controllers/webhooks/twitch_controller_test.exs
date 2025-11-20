@@ -42,6 +42,100 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
       assert response.resp_body == ""
     end
 
+    test "handles !premiereecoute command with English language", %{conn: conn} do
+      # AIDEV-NOTE: E2E test for !premiereecoute command - verifies full flow with English broadcaster
+      _broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "broadcaster_token"},
+          profile: %{language: :en}
+        })
+
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_premiereecoute_command.json")
+
+      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.twitch.user_id == "1971641"
+        assert scope.user.profile.language == :en
+
+        assert message ==
+                 "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
+
+        assert reply_to == "premiereecoute-msg-123"
+        :ok
+      end)
+
+      response =
+        conn
+        |> sign_conn(payload)
+        |> put_req_header("twitch-eventsub-message-type", "notification")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
+
+      assert response.status == 202
+      assert response.resp_body == ""
+    end
+
+    test "handles !premiereecoute command with French language", %{conn: conn} do
+      _broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "broadcaster_token"},
+          profile: %{language: :fr}
+        })
+
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_premiereecoute_command.json")
+
+      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.twitch.user_id == "1971641"
+        assert scope.user.profile.language == :fr
+
+        assert message ==
+                 "Première Écoute est une plateforme où les spectateurs peuvent voter pour la musique diffusée pendant le stream. Inscrivez-vous sur premiere-ecoute.fr pour consulter vos votes !"
+
+        assert reply_to == "premiereecoute-msg-123"
+        :ok
+      end)
+
+      response =
+        conn
+        |> sign_conn(payload)
+        |> put_req_header("twitch-eventsub-message-type", "notification")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
+
+      assert response.status == 202
+      assert response.resp_body == ""
+    end
+
+    test "handles !premiereecoute command with Italian language", %{conn: conn} do
+      _broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "broadcaster_token"},
+          profile: %{language: :it}
+        })
+
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_premiereecoute_command.json")
+
+      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.twitch.user_id == "1971641"
+        assert scope.user.profile.language == :it
+
+        assert message ==
+                 "Premiere Ecoute è una piattaforma dove gli spettatori possono votare la musica suonata durante lo stream. Registrati su premiere-ecoute.fr per visualizzare i tuoi voti!"
+
+        assert reply_to == "premiereecoute-msg-123"
+        :ok
+      end)
+
+      response =
+        conn
+        |> sign_conn(payload)
+        |> put_req_header("twitch-eventsub-message-type", "notification")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
+
+      assert response.status == 202
+      assert response.resp_body == ""
+    end
+
     test "handles !vote command with active session", %{conn: conn} do
       # AIDEV-NOTE: E2E test for !vote command - verifies full flow with votes in active session
       broadcaster = user_fixture(%{twitch: %{user_id: "1971641", access_token: "broadcaster_token"}})
@@ -233,6 +327,21 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
                user_id: "4145994",
                message_id: "cc106a89-1814-919d-454c-f4f2f970aae7",
                command: "hello",
+               args: [],
+               is_streamer: false
+             }
+    end
+
+    test "channel.chat.message - !premiereecoute command" do
+      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_premiereecoute_command.json")
+
+      event = TwitchController.handle(payload)
+
+      assert event == %SendChatCommand{
+               broadcaster_id: "1971641",
+               user_id: "4145994",
+               message_id: "premiereecoute-msg-123",
+               command: "premiereecoute",
                args: [],
                is_streamer: false
              }

@@ -18,7 +18,18 @@ defmodule PremiereEcoute.AccountsFixtures do
   def unique_user_email, do: "user-#{System.unique_integer([:positive])}@example.com"
   def valid_user_password, do: "hello world!"
 
-  def valid_user_attributes(attrs \\ %{}), do: Enum.into(attrs, %{email: unique_user_email(), username: unique_username()})
+  def valid_user_attributes(attrs \\ %{}) do
+    # AIDEV-NOTE: Extract profile separately to handle it via changeset. Convert keyword lists to maps first.
+    attrs_map = Map.new(attrs)
+    {profile_attrs, user_attrs} = Map.pop(attrs_map, :profile, %{})
+    user_attrs = Enum.into(user_attrs, %{email: unique_user_email(), username: unique_username()})
+
+    if profile_attrs == %{} do
+      user_attrs
+    else
+      Map.put(user_attrs, :profile, profile_attrs)
+    end
+  end
 
   def unconfirmed_user_fixture(attrs \\ %{}) do
     Repo.insert!(User.changeset(struct(User), valid_user_attributes(attrs)))
