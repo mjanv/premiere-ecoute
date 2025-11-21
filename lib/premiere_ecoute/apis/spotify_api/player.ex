@@ -163,17 +163,20 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
   def get_playback_state(%Scope{} = scope, state) do
     scope
     |> SpotifyApi.api()
-    |> Req.merge(url: "/me/player")
+    |> Req.merge(url: "/me/player", retry: false)
     |> Req.get()
     |> case do
       {:ok, %{status: 200, body: body}} ->
         {:ok, body}
 
+      {:ok, %{status: 204}} ->
+        {:ok, default()}
+
       {:ok, %{status: 400}} ->
         {:ok, state}
 
-      {:ok, %{status: 204}} ->
-        {:ok, default()}
+      {:ok, %{status: 429}} ->
+        {:error, "Spotify rate limit exceeded"}
 
       {:ok, %{status: status, body: body}} ->
         Logger.error("Spotify get playback state failed: #{status} - #{inspect(body)}")

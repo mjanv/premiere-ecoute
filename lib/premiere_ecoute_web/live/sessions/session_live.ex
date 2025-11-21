@@ -6,7 +6,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   import PremiereEcouteWeb.Sessions.Components.SessionComponents
   import PremiereEcouteWeb.Components.Backgrounds
 
-  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Events.Chat.MessageSent
@@ -47,8 +46,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:show_youtube_modal, false)
       |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
       |> assign_async(:vote_trends, fn ->
-        vote_data = VoteTrends.rolling_average(String.to_integer(id), :minute)
-        {:ok, %{vote_trends: vote_data}}
+        {:ok, %{vote_trends: VoteTrends.rolling_average(String.to_integer(id), :minute)}}
       end)
       |> then(fn socket -> {:ok, socket} end)
     else
@@ -195,7 +193,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
     socket
     |> assign(:open_vote, !is_nil(cached_session))
-    |> assign(:current_scope, Accounts.maybe_renew_token(socket, :spotify))
+    # |> assign(:current_scope, Accounts.maybe_renew_token(socket, :spotify))
     |> then(fn socket -> {:noreply, socket} end)
   end
 

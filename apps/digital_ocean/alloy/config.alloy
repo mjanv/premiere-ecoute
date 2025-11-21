@@ -1,0 +1,65 @@
+// AIDEV-NOTE: Grafana Alloy configuration to scrape Premiere Ecoute metrics and push to Grafana Cloud
+// This config collects Prometheus metrics from localhost:4000/metrics and forwards to Grafana Cloud
+
+// Logging configuration
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// Prometheus scrape configuration
+prometheus.scrape "premiere_ecoute" {
+  targets = [{
+    __address__ = "localhost:4000",
+  }]
+
+  forward_to = [prometheus.relabel.drop_labels.receiver]
+
+  scrape_interval = "15s"
+  scrape_timeout  = "10s"
+  metrics_path    = "/metrics"
+
+  // Add labels to all metrics
+  clustering {
+    enabled = false
+  }
+}
+
+// Drop instance and job labels
+prometheus.relabel "drop_labels" {
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  rule {
+    action       = "labeldrop"
+    regex        = "instance|job"
+  }
+}
+
+// Remote write to Grafana Cloud
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = env("GRAFANA_CLOUD_PROMETHEUS_URL")
+
+    basic_auth {
+      username = env("GRAFANA_CLOUD_PROMETHEUS_USERNAME")
+      password = env("GRAFANA_CLOUD_API_KEY")
+    }
+
+    // Queue configuration for reliability
+    // AIDEV-NOTE: Conservative settings for Grafana Cloud free tier (75 req/s limit)
+    queue_config {
+      capacity             = 10000
+      max_shards           = 1
+      min_shards           = 1
+      max_samples_per_send = 500
+      batch_send_deadline  = "15s"
+      min_backoff          = "2s"
+      max_backoff          = "60s"
+    }
+  }
+
+  // External labels to identify this instance
+  external_labels = {
+    environment = "production",
+  }
+}

@@ -90,5 +90,11 @@ if config_env() == :prod do
 
   config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
     manual_metrics_start_delay: :no_delay,
-    grafana: :disabled
+    grafana: [
+      host: env!("GRAFANA_HOST", :string, "https://premiere-ecoute.grafana.net"),
+      auth_token: env!("GRAFANA_API_TOKEN", :string?),
+      upload_dashboards_on_start: true,
+      folder_name: "Premiere Ecoute",
+      annotate_app_lifecycle: true
+    ]
 end

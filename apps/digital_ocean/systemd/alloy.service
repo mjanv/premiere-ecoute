@@ -1,0 +1,49 @@
+# AIDEV-NOTE: Systemd service for Grafana Alloy metrics collection agent
+[Unit]
+Description=Grafana Alloy
+Documentation=https://grafana.com/docs/alloy/latest/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=alloy
+Group=alloy
+Restart=on-failure
+RestartSec=5s
+
+# Environment file with Grafana Cloud credentials
+EnvironmentFile=/etc/alloy/env
+
+# Working directory and state path
+WorkingDirectory=/var/lib/alloy
+
+# Start Alloy with configuration file
+ExecStart=/usr/local/bin/alloy run \
+    --server.http.listen-addr=127.0.0.1:12345 \
+    --storage.path=/var/lib/alloy \
+    /etc/alloy/config.alloy
+
+# Reload configuration on SIGHUP
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=alloy
+
+# Resource limits
+# AIDEV-NOTE: Light resource limits - Alloy is lightweight (~50-100MB typical usage)
+MemoryMax=200M
+MemoryHigh=150M
+CPUQuota=20%
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/alloy
+
+[Install]
+WantedBy=multi-user.target

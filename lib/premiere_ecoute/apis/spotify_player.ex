@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
           {:error, _} -> %{}
         end
 
-      {:ok, %{scope: scope, phx_ref: phx_ref, state: state}}
+      {:ok, %{phx_ref: phx_ref, scope: scope, state: state}}
     end
   end
 
@@ -72,7 +72,7 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
   def handle(old_state, new_state) do
     case {progress(old_state), progress(new_state)} do
       {0, 1} -> {:ok, new_state, [:start_track]}
-      {97, 98} -> {:ok, new_state, [:end_track]}
+      {98, 99} -> {:ok, new_state, [:end_track]}
       {a, b} when abs(b - a) > 5 -> {:ok, new_state, [{:skip, b}]}
       {a, b} when b > a -> {:ok, new_state, [{:percent, b}]}
       _ -> {:ok, new_state, []}

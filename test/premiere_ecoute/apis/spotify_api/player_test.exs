@@ -277,6 +277,20 @@ defmodule PremiereEcoute.Apis.SpotifyApi.PlayerTest do
                "item" => nil
              }
     end
+
+    test "returns error when rate limited", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
+        response: %{"error" => %{"status" => 429, "message" => "Rate limit exceeded"}},
+        status: 429
+      )
+
+      {:error, error} = SpotifyApi.get_playback_state(scope, %{})
+
+      assert error == "Spotify rate limit exceeded"
+    end
   end
 
   describe "start_playback/1" do

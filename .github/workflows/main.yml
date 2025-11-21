@@ -139,6 +139,10 @@ jobs:
           # Feature Flags Auth
           AUTH_USERNAME=${AUTH_USERNAME}
           AUTH_PASSWORD=${AUTH_PASSWORD}
+
+          # Grafana Cloud - PromEx dashboard upload
+          GRAFANA_HOST=${GRAFANA_HOST}
+          GRAFANA_API_TOKEN=${GRAFANA_API_TOKEN}
           EOF
         env:
           PHX_HOST: ${{ secrets.PHX_HOST }}
@@ -165,6 +169,8 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+          GRAFANA_HOST: ${{ secrets.GRAFANA_HOST }}
+          GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
 
       - name: Deploy release to server
         run: |
