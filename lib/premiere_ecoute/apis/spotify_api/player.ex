@@ -187,8 +187,6 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Player do
         Logger.error("Spotify get playback state request failed: #{inspect(reason)}")
         {:error, "Network error during playback state"}
     end
-
-    {:error, "Spotify rate limit exceeded"}
   end
 
   def default, do: %{"is_playing" => false, "item" => nil, "device" => nil}
