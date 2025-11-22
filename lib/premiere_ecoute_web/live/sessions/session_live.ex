@@ -28,9 +28,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         Process.send_after(self(), :refresh, 100)
         {:ok, _} = Presence.join(current_scope.user.id)
         PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{id}"])
+        _ = PlayerSupervisor.start(current_scope.user.id)
       end
 
-      {:ok, _} = PlayerSupervisor.start(current_scope.user.id)
       {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
 
       socket
@@ -193,7 +193,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
     socket
     |> assign(:open_vote, !is_nil(cached_session))
-    # |> assign(:current_scope, Accounts.maybe_renew_token(socket, :spotify))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -268,13 +267,19 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       {:ok, job} =
         ListeningSessionWorker.in_seconds(%{action: action, session_id: session.id, user_id: scope.user.id}, next_track)
 
-      socket
-      |> assign(:next_track_at, job.scheduled_at)
-      |> put_flash(:info, "Next track in #{next_track} seconds")
+      assign(socket, :next_track_at, job.scheduled_at)
     else
       socket
     end
     |> assign(:player_state, state)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:player, {:error, reason}, _state}, socket) do
+    socket
+    |> clear_flash()
+    |> put_flash(:error, "Spotify down: #{inspect(reason)}")
     |> then(fn socket -> {:noreply, socket} end)
   end
 

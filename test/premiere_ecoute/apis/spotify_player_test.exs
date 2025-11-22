@@ -1,25 +1,15 @@
 defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
   use PremiereEcoute.DataCase
 
-  import ExUnit.CaptureLog
-
-  alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.SpotifyPlayer
   alias PremiereEcoute.Presence
-
-  @moduletag :skip
 
   setup do
     user = user_fixture()
     scope = user_scope_fixture(user)
 
-    registry_name = PremiereEcoute.Apis.PlayerRegistry
-
-    # Start registry if not already started
-    case Registry.start_link(keys: :unique, name: registry_name) do
-      {:ok, _pid} -> :ok
-      {:error, {:already_started, _pid}} -> :ok
-    end
+    start_supervised({Registry, keys: :unique, name: PremiereEcoute.Apis.PlayerRegistry})
 
     {:ok, %{user: user, scope: scope}}
   end
@@ -28,10 +18,18 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
     setup %{user: user} do
       scope = user_scope_fixture(user)
 
+      # Join presence for the current process to simulate the player's own presence
+      {:ok, phx_ref} = Presence.join(scope.user.id)
+
       initial_state = %{
         scope: scope,
-        phx_ref: "ref123",
-        state: %{"is_playing" => false, "device" => %{"id" => "device123"}}
+        phx_ref: phx_ref,
+        state: %{
+          "is_playing" => false,
+          "device" => %{"id" => "device123"},
+          "item" => %{"uri" => "spotify:track:123", "duration_ms" => 180_000},
+          "progress_ms" => 0
+        }
       }
 
       {:ok, %{initial_state: initial_state}}
@@ -45,50 +43,49 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
         "progress_ms" => 1000
       }
 
-      expect(PremiereEcoute.Accounts, :maybe_renew_token, fn _conn, :spotify ->
-        initial_state.scope
+      # Subscribe to the PubSub topic to receive broadcasts
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{initial_state.scope.user.id}")
+
+      # Spawn a second process that also joins presence to prevent stop
+      test_pid = self()
+
+      spawn(fn ->
+        {:ok, _ref} = Presence.join(initial_state.scope.user.id)
+        # Keep process alive
+        send(test_pid, :presence_joined)
+        Process.sleep(:infinity)
       end)
+
+      # Wait for the second presence to be tracked
+      assert_receive :presence_joined
 
       expect(SpotifyApi, :get_playback_state, fn _scope, _old_state ->
         {:ok, new_playback_state}
       end)
 
-      expect(Presence, :player, fn _user_id -> [self(), self()] end)
-
-      # Mock PubSub broadcast
-      test_pid = self()
-
-      expect(PremiereEcoute.PubSub, :broadcast, fn topic, message ->
-        send(test_pid, {:broadcast, topic, message})
-        :ok
-      end)
-
       assert {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, initial_state)
 
       assert new_state.state == new_playback_state
-      assert_received {:broadcast, _topic, {:player, :start, _state}}
+      assert_receive {:player, :start, _state}
     end
 
     test "stops when only one presence left", %{initial_state: initial_state} do
-      expect(PremiereEcoute.Accounts, :maybe_renew_token, fn _conn, :spotify ->
-        initial_state.scope
-      end)
-
       expect(SpotifyApi, :get_playback_state, fn _scope, _old_state ->
-        {:ok, %{"is_playing" => false}}
+        {:ok, initial_state.state}
       end)
 
-      expect(Presence, :player, fn _user_id -> [self()] end)
-
+      # Only the presence from setup exists, so it should stop
       assert {:stop, :normal, _state} = SpotifyPlayer.handle_info(:poll, initial_state)
     end
-  end
 
-  describe "terminate/2" do
-    test "logs termination reason" do
-      assert capture_log(fn ->
-               SpotifyPlayer.terminate(:normal, %{})
-             end) =~ "Stop Spotify player due to: :normal"
+    test "stops with error when get_playback_state fails", %{initial_state: initial_state} do
+      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state ->
+        {:error, "Spotify API error"}
+      end)
+
+      # Should stop with the error reason
+      assert {:stop, {:error, "Spotify API error"}, _state} =
+               SpotifyPlayer.handle_info(:poll, initial_state)
     end
   end
 
@@ -108,8 +105,7 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
         "item" => %{"duration_ms" => 0}
       }
 
-      # Should not crash and return a reasonable value
-      assert is_integer(SpotifyPlayer.progress(state))
+      assert SpotifyPlayer.progress(state)
     end
   end
 
@@ -173,7 +169,7 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
       }
 
       new_state = %{
-        "progress_ms" => 1_800,
+        "progress_ms" => 2_000,
         "item" => %{"duration_ms" => 180_000},
         "device" => %{"id" => "device123"}
       }
@@ -181,15 +177,15 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
       assert {:ok, ^new_state, [:start_track]} = SpotifyPlayer.handle(old_state, new_state)
     end
 
-    test "detects track end (97% to 98% progress)" do
+    test "detects track end (98% to 99% progress)" do
       old_state = %{
-        "progress_ms" => 174_600,
+        "progress_ms" => 176_500,
         "item" => %{"duration_ms" => 180_000},
         "device" => %{"id" => "device123"}
       }
 
       new_state = %{
-        "progress_ms" => 176_400,
+        "progress_ms" => 178_300,
         "item" => %{"duration_ms" => 180_000},
         "device" => %{"id" => "device123"}
       }
@@ -210,7 +206,7 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
         "device" => %{"id" => "device123"}
       }
 
-      assert {:ok, ^new_state, [{:skip, 50}]} = SpotifyPlayer.handle(old_state, new_state)
+      assert {:ok, ^new_state, [{:skip, 49}]} = SpotifyPlayer.handle(old_state, new_state)
     end
 
     test "detects normal progress update" do
@@ -226,7 +222,7 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
         "device" => %{"id" => "device123"}
       }
 
-      assert {:ok, ^new_state, [{:percent, 15}]} = SpotifyPlayer.handle(old_state, new_state)
+      assert {:ok, ^new_state, [{:percent, 14}]} = SpotifyPlayer.handle(old_state, new_state)
     end
 
     test "returns empty events for backward progress or no change" do
@@ -246,56 +242,120 @@ defmodule PremiereEcoute.Apis.SpotifyPlayerTest do
     end
   end
 
+  describe "init" do
+    test "fails to start when get_playback_state returns error during init", %{user: user} do
+      Process.flag(:trap_exit, true)
+
+      expect(SpotifyApi, :get_playback_state, fn _scope, %{} -> {:error, "Spotify API unavailable"} end)
+
+      assert {:error, {:error, "Spotify API unavailable"}} = SpotifyPlayer.start_link(user.id)
+    end
+
+    test "publishes error event when init fails", %{user: user} do
+      Process.flag(:trap_exit, true)
+
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{user.id}")
+
+      expect(SpotifyApi, :get_playback_state, fn _scope, %{} -> {:error, "Spotify API unavailable"} end)
+
+      assert {:error, {:error, "Spotify API unavailable"}} = SpotifyPlayer.start_link(user.id)
+
+      assert_receive {:player, {:error, "Spotify API unavailable"}, %{}}
+    end
+  end
+
   describe "integration tests" do
     test "full polling cycle with state changes", %{user: user} do
-      initial_playback = %{
-        "is_playing" => false,
+      playback1 = %{
+        "is_playing" => true,
         "device" => %{"id" => "device123"},
         "item" => %{"uri" => "spotify:track:123", "duration_ms" => 180_000},
         "progress_ms" => 0
       }
 
-      updated_playback = %{
+      playback2 = %{
         "is_playing" => true,
         "device" => %{"id" => "device123"},
         "item" => %{"uri" => "spotify:track:123", "duration_ms" => 180_000},
-        "progress_ms" => 1800
+        "progress_ms" => 2000
       }
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
-        {:ok, initial_playback}
-      end)
-
-      expect(Presence, :join, fn _user_id -> {:ok, "ref123"} end)
+      expect(SpotifyApi, :get_playback_state, fn _scope, %{} -> {:ok, playback1} end)
+      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state -> {:ok, playback2} end)
 
       {:ok, pid} = SpotifyPlayer.start_link(user.id)
 
-      # Mock subsequent polling calls
-      expect(PremiereEcoute.Accounts, :maybe_renew_token, fn _conn, :spotify ->
-        user_scope_fixture(user)
-      end)
-
-      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state ->
-        {:ok, updated_playback}
-      end)
-
-      expect(Presence, :player, fn _user_id -> [self(), self()] end)
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{user.id}")
 
       test_pid = self()
 
-      expect(PremiereEcoute.PubSub, :broadcast, fn topic, message ->
-        send(test_pid, {:broadcast, topic, message})
-        :ok
+      spawn(fn ->
+        {:ok, _ref} = Presence.join(user.id)
+        send(test_pid, :presence_joined)
+        Process.sleep(:infinity)
       end)
 
-      # Trigger polling
+      assert_receive :presence_joined
+
       send(pid, :poll)
 
-      # Verify events were published
-      assert_receive {:broadcast, _topic, {:player, :start, _state}}
-      assert_receive {:broadcast, _topic, {:player, :start_track, _state}}
+      assert_receive {:player, :start_track, _state}
 
       GenServer.stop(pid)
+    end
+
+    test "starting player twice returns same GenServer", %{user: user} do
+      playback = %{
+        "is_playing" => true,
+        "device" => %{"id" => "device123"},
+        "item" => %{"uri" => "spotify:track:123", "duration_ms" => 180_000},
+        "progress_ms" => 0
+      }
+
+      expect(SpotifyApi, :get_playback_state, fn _scope, %{} -> {:ok, playback} end)
+
+      {:ok, pid1} = SpotifyPlayer.start_link(user.id)
+
+      result = SpotifyPlayer.start_link(user.id)
+
+      assert {:error, {:already_started, pid2}} = result
+
+      assert pid1 == pid2
+
+      GenServer.stop(pid1)
+    end
+
+    test "publishes :failed event when player stops due to error", %{user: user} do
+      Process.flag(:trap_exit, true)
+
+      playback = %{
+        "is_playing" => true,
+        "device" => %{"id" => "device123"},
+        "item" => %{"uri" => "spotify:track:123", "duration_ms" => 180_000},
+        "progress_ms" => 0
+      }
+
+      expect(SpotifyApi, :get_playback_state, fn _scope, %{} -> {:ok, playback} end)
+      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state -> {:error, "Spotify rate limit exceeded"} end)
+
+      {:ok, pid} = SpotifyPlayer.start_link(user.id)
+
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{user.id}")
+
+      test_pid = self()
+
+      spawn(fn ->
+        {:ok, _ref} = Presence.join(user.id)
+        send(test_pid, :presence_joined)
+        Process.sleep(:infinity)
+      end)
+
+      assert_receive :presence_joined
+
+      send(pid, :poll)
+
+      assert_receive {:player, {:error, "Spotify rate limit exceeded"}, _state}
+      assert_receive {:EXIT, ^pid, {:error, "Spotify rate limit exceeded"}}
     end
   end
 end

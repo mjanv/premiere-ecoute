@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Apis.SpotifyPlayer do
   @moduledoc false
 
-  use GenServer, restart: :temporary
+  use GenServer, restart: :transient
 
   require Logger
 
@@ -20,21 +20,21 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
 
   @impl true
   def init(args) do
-    with _ <- Process.send_after(self(), :poll, @poll_interval),
-         scope <- Scope.for_user(User.get(args)),
-         {:ok, phx_ref} <- Presence.join(scope.user.id) do
-      state =
-        case Apis.spotify().get_playback_state(scope, %{}) do
-          {:ok, state} -> state
-          {:error, _} -> %{}
-        end
+    Process.send_after(self(), :poll, @poll_interval)
+    scope = Scope.for_user(User.get(args))
 
+    with {:ok, phx_ref} <- Presence.join(scope.user.id),
+         {:ok, state} <- Apis.spotify().get_playback_state(scope, %{}) do
       {:ok, %{phx_ref: phx_ref, scope: scope, state: state}}
+    else
+      {:error, reason} ->
+        publish(scope, {:error, reason}, %{})
+        {:stop, {:error, reason}}
     end
   end
 
   @impl true
-  def handle_info(:poll, %{scope: scope, state: old_state}) do
+  def handle_info(:poll, %{scope: scope, state: old_state} = data) do
     with _ <- Process.send_after(self(), :poll, @poll_interval),
          scope <- Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :spotify),
          {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
@@ -45,12 +45,22 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
       else
         {:stop, :normal, %{scope: scope, state: state}}
       end
+    else
+      {:error, reason} -> {:stop, {:error, reason}, data}
     end
   end
 
   @impl true
-  def terminate(reason, _state) do
-    Logger.info("Stop Spotify player due to: #{inspect(reason)}")
+  def terminate(reason, %{scope: scope, state: state}) do
+    case reason do
+      :normal ->
+        :ok
+
+      reason ->
+        Logger.warning("Stop Spotify player due to: #{inspect(reason)}")
+        publish(scope, reason, state)
+    end
+
     :ok
   end
 
