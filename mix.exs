@@ -76,7 +76,7 @@ defmodule PremiereEcoute.MixProject do
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:heroicons, github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
-      {:gettext, "~> 0.26"},
+      {:gettext, "~> 1.0", override: true},
       {:dns_cluster, "~> 0.2"},
       {:plug_content_security_policy, "~> 0.2.1"},
       {:cors_plug, "~> 3.0"},
