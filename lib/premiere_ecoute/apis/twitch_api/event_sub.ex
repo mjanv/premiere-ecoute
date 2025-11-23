@@ -45,7 +45,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
       {:ok, id} when is_binary(id) ->
         TwitchApi.api()
         |> TwitchApi.delete(url: "/eventsub/subscriptions", params: %{"id" => id})
-        |> TwitchApi.handle(204, fn _ -> id end)
+        |> TwitchApi.handle([204, 404], fn _ -> id end)
 
       _ ->
         {:error, "Unknown subscription"}
@@ -55,9 +55,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   def cancel_all_subscriptions(scope) do
     case get_event_subscriptions(scope) do
       {:ok, subscriptions} ->
-        results =
-          subscriptions
-          |> Enum.map(fn s -> unsubscribe(scope, s["type"]) end)
+        results = Enum.map(subscriptions, fn s -> unsubscribe(scope, s["type"]) end)
 
         case Enum.all?(results, fn {status, _} -> status == :ok end) do
           true -> {:ok, Enum.map(results, fn {_, id} -> id end)}

@@ -154,7 +154,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       assert id == "26b1c993-bfcf-44d9-b876-379dacafe75a"
     end
 
-    test "cannot unsubscribe from an unknown Twitch event" do
+    test "cannot unsubscribe from an unregistered Twitch event" do
       scope =
         user_scope_fixture(
           user_fixture(%{
@@ -165,6 +165,33 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       {:error, reason} = TwitchApi.unsubscribe(scope, "channel.follow")
 
       assert reason == "Unknown subscription"
+    end
+
+    test "cannot unsubscribe from an unknown Twitch event", %{scope: scope} do
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer token"},
+          {"content-type", "application/json"}
+        ],
+        request: "twitch_api/eventsub/create_event_subscription/request.json",
+        response: "twitch_api/eventsub/create_event_subscription/response.json",
+        status: 202
+      )
+
+      {:ok, _} = TwitchApi.subscribe(scope, "channel.follow")
+
+      ApiMock.expect(
+        TwitchApi,
+        path: {:delete, "/helix/eventsub/subscriptions"},
+        params: %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a"},
+        status: 404
+      )
+
+      {:ok, id} = TwitchApi.unsubscribe(scope, "channel.follow")
+
+      assert id == "26b1c993-bfcf-44d9-b876-379dacafe75a"
     end
   end
 
@@ -236,8 +263,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
           {"content-type", "application/json"}
         ],
         params: %{"id" => "35016908-41ff-33ce-7879-61b8dfc2ee16"},
-        response: %{"error" => "The subscription was not found."},
-        status: 404
+        status: 500
       )
 
       {:error, reason} = TwitchApi.cancel_all_subscriptions(scope)

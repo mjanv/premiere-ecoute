@@ -136,7 +136,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
       expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
@@ -195,7 +195,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       album = album_fixture()
 
       # First session setup - full expectations
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
       expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
       expect(SpotifyApi, :get_album, 2, fn _ -> {:ok, album} end)
@@ -214,7 +214,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       # Second session setup - partial expectations (fails before most API calls)
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
       expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
       # Prepare and start first session
@@ -247,7 +247,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       scope = user_scope_fixture(user)
       playlist = playlist_fixture()
 
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
       expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
       expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
@@ -306,7 +306,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
       expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
@@ -370,7 +370,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
       expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
@@ -446,9 +446,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       scope = user_scope_fixture(user)
       album = album_fixture()
 
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
       expect(TwitchApi, :subscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
-      expect(TwitchApi, :cancel_all_subscriptions, fn %Scope{user: ^user} -> {:ok, []} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
 
       expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
       expect(SpotifyApi, :devices, 2, fn _ -> {:ok, [%{"is_active" => true}]} end)
