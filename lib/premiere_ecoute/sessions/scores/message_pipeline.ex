@@ -14,12 +14,14 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcouteCore.Cache
 
+  @batch_timeout Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:batch_timeout]
+
   def start_link(_opts) do
     Broadway.start_link(__MODULE__,
       name: __MODULE__,
       producer: [module: {PremiereEcouteCore.BroadwayProducer, []}, concurrency: 1],
       processors: [session: [concurrency: 1]],
-      batchers: [writer: [concurrency: 1, batch_size: 5, batch_timeout: 1_000]]
+      batchers: [writer: [concurrency: 1, batch_size: 5, batch_timeout: @batch_timeout]]
     )
   end
 
@@ -31,11 +33,9 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   end
 
   def process(%MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: message, is_streamer: is_streamer}) do
-    with {:ok, %{current_track_id: track_id} = session} when not is_nil(track_id) <-
-           Cache.get(:sessions, broadcaster_id),
-         {:ok, value} <-
-           Vote.from_message(message, session.vote_options),
-         now <- DateTime.truncate(DateTime.utc_now(), :second),
+    with {:ok, %{current_track_id: track_id} = session} when not is_nil(track_id) <- Cache.get(:sessions, broadcaster_id),
+         {:ok, value} <- Vote.from_message(message, session.vote_options),
+         now <- DateTime.utc_now(),
          vote <- %{
            viewer_id: user_id,
            session_id: session.id,
@@ -52,7 +52,22 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   end
 
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
-    Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
+    messages
+    |> Enum.map(fn message -> message.data end)
+    |> Enum.group_by(fn vote -> {vote.viewer_id, vote.track_id} end)
+    |> Enum.map(fn {_key, votes} ->
+      latest_vote = Enum.max_by(votes, fn vote -> vote.updated_at end, DateTime)
+
+      %{
+        latest_vote
+        | updated_at: DateTime.truncate(latest_vote.updated_at, :second),
+          inserted_at: DateTime.truncate(latest_vote.inserted_at, :second)
+      }
+    end)
+    |> Vote.create_all(
+      on_conflict: {:replace, [:value, :updated_at]},
+      conflict_target: [:viewer_id, :session_id, :track_id]
+    )
 
     {:ok, report} = Report.generate(%ListeningSession{id: session_id})
 
