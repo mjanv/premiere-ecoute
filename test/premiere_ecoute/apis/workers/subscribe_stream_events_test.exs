@@ -16,10 +16,20 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEventsTest do
 
   describe "subscribe_streamer/1" do
     test "subscribes a streamer to stream events" do
-      # Create a streamer
       streamer = user_fixture(%{role: :streamer, twitch: %{user_id: "1234", username: "streamer1"}})
 
-      # Mock API calls for stream.online
+      ApiMock.expect(
+        TwitchApi,
+        path: {:get, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer token"},
+          {"content-type", "application/json"}
+        ],
+        response: %{"data" => [], "total" => 0, "total_cost" => 0, "max_total_cost" => 10000, "pagination" => %{}},
+        params: %{"user_id" => "1234"},
+        status: 200
+      )
+
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
@@ -31,7 +41,6 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEventsTest do
         status: 202
       )
 
-      # Mock API calls for stream.offline
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
@@ -43,24 +52,30 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEventsTest do
         status: 202
       )
 
-      assert {:ok, user_id} = SubscribeStreamEvents.subscribe_streamer(streamer)
-      assert user_id == streamer.id
+      assert :ok = SubscribeStreamEvents.subscribe_streamer(streamer)
     end
 
     test "returns error for streamers without Twitch OAuth tokens" do
-      # Create a streamer without Twitch connection
       streamer = user_fixture(%{role: :streamer})
 
-      # Should return error with appropriate message
-      assert {:error, {:no_twitch_token, user_id}} = SubscribeStreamEvents.subscribe_streamer(streamer)
-      assert user_id == streamer.id
+      assert :error = SubscribeStreamEvents.subscribe_streamer(streamer)
     end
 
     test "returns error for API failures" do
-      # Create a streamer
       streamer = user_fixture(%{role: :streamer, twitch: %{user_id: "1234", username: "streamer1"}})
 
-      # Mock API failure for stream.online
+      ApiMock.expect(
+        TwitchApi,
+        path: {:get, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer token"},
+          {"content-type", "application/json"}
+        ],
+        response: %{"data" => [], "total" => 0, "total_cost" => 0, "max_total_cost" => 10000, "pagination" => %{}},
+        params: %{"user_id" => "1234"},
+        status: 200
+      )
+
       ApiMock.expect(
         TwitchApi,
         path: {:post, "/helix/eventsub/subscriptions"},
@@ -72,9 +87,18 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEventsTest do
         status: 500
       )
 
-      # Should return error tuple with user id and reason
-      assert {:error, {user_id, _reason}} = SubscribeStreamEvents.subscribe_streamer(streamer)
-      assert user_id == streamer.id
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/eventsub/subscriptions"},
+        response: %{
+          "error" => "Internal Server Error",
+          "message" => "service unavailable",
+          "status" => 500
+        },
+        status: 500
+      )
+
+      assert :error = SubscribeStreamEvents.subscribe_streamer(streamer)
     end
   end
 end

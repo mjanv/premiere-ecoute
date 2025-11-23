@@ -5,8 +5,26 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.PlaylistRule
 
-  @test_secret_base64 Application.compile_env(:premiere_ecoute, :twitch_extension_secret)
-  @test_secret Base.decode64!(@test_secret_base64)
+  @test_secret "test_secret_key_for_twitch_extension"
+  @test_secret_base64 Base.encode64(@test_secret)
+
+  setup do
+    # Store original config value
+    original_secret = Application.get_env(:premiere_ecoute, :twitch_extension_secret)
+
+    Application.put_env(:premiere_ecoute, :twitch_extension_secret, @test_secret_base64)
+
+    on_exit(fn ->
+      # Restore original value
+      if original_secret do
+        Application.put_env(:premiere_ecoute, :twitch_extension_secret, original_secret)
+      else
+        Application.delete_env(:premiere_ecoute, :twitch_extension_secret)
+      end
+    end)
+
+    :ok
+  end
 
   describe "GET /extension/tracks/current/:broadcaster_id" do
     test "returns current track when broadcaster has active Spotify session", %{conn: conn} do

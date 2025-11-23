@@ -4,6 +4,8 @@ defmodule PremiereEcoute.Festivals.Model.OpenAi do
   alias PremiereEcoute.Festivals.Models.OpenAi
   alias PremiereEcoute.Festivals.Poster
 
+  @moduletag :skip
+
   setup do
     {:ok, base64} = Poster.read_base64_image("test/support/festivals/coachella.jpg")
 
@@ -11,7 +13,6 @@ defmodule PremiereEcoute.Festivals.Model.OpenAi do
   end
 
   describe "extract_festival/1" do
-    @tag :skip
     test "returns one concert", %{base64: base64} do
       base64
       |> OpenAi.extract_festival()

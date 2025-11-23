@@ -38,8 +38,26 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       {:ok, subscriptions} = TwitchApi.get_event_subscriptions(scope)
 
       assert subscriptions == [
-               %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a", "type" => "stream.online"},
-               %{"id" => "35016908-41ff-33ce-7879-61b8dfc2ee16", "type" => "user.update"}
+               %{
+                 "id" => "26b1c993-bfcf-44d9-b876-379dacafe75a",
+                 "type" => "stream.online",
+                 "condition" => %{"broadcaster_user_id" => "1234"},
+                 "cost" => 1,
+                 "created_at" => "2020-11-10T20:08:33.12345678Z",
+                 "status" => "enabled",
+                 "transport" => %{"callback" => "https://this-is-a-callback.com", "method" => "webhook"},
+                 "version" => "1"
+               },
+               %{
+                 "id" => "35016908-41ff-33ce-7879-61b8dfc2ee16",
+                 "type" => "user.update",
+                 "condition" => %{"user_id" => "1234"},
+                 "cost" => 0,
+                 "created_at" => "2020-11-10T14:32:18.730260295Z",
+                 "status" => "webhook_callback_verification_pending",
+                 "transport" => %{"callback" => "https://this-is-a-callback.com", "method" => "webhook"},
+                 "version" => "1"
+               }
              ]
     end
   end

@@ -261,7 +261,6 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
       assert response.resp_body == ""
     end
 
-    @tag :skip
     test "revokes message with wrong HMAC signature", %{conn: conn} do
       payload = ApiMock.payload("twitch_api/eventsub/channel_chat_message.json")
 

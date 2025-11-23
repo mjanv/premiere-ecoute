@@ -79,7 +79,9 @@ defmodule PremiereEcoute.Apis.TwitchQueueTest do
       RateLimit.hit("broadcaster:#{message1.user_id}", :timer.seconds(1), 1)
 
       TwitchQueue.push({:do_send_chat_message, message1})
-      :timer.sleep(100)
+
+      # Wait for circuit to open
+      wait_for_circuit_state(:open, 200)
 
       state = :sys.get_state(TwitchQueue)
       assert state.circuit == :open

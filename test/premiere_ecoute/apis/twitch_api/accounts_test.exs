@@ -7,6 +7,13 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
   setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
+  setup do
+    Application.put_env(:premiere_ecoute, :twitch_client_id, "client_id")
+    Application.put_env(:premiere_ecoute, :twitch_redirect_uri, "http://localhost:4000/auth/twitch/callback")
+
+    :ok
+  end
+
   describe "client_credentials/0" do
     test "can retrieve access token using client credentials flow" do
       ApiMock.expect(
@@ -28,7 +35,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
   end
 
   describe "authorization_code/1" do
-    @tag :skip
     test "can exchange authorization code for access token and user data" do
       # Mock the token exchange request
       ApiMock.expect(
@@ -39,10 +45,15 @@ defmodule PremiereEcoute.Apis.TwitchApi.AccountsTest do
         status: 200
       )
 
-      # Mock the user profile request (allowing any headers for debugging)
+      # Mock the user profile request
       ApiMock.expect(
         TwitchApi,
-        path: {:get, "/users"},
+        path: {:get, "/helix/users"},
+        headers: [
+          {"client-id", "client_id"},
+          {"authorization", "Bearer rfx2uswqe8l4g1mkagrvg5tv0ks3"},
+          {"content-type", "application/json"}
+        ],
         response: "twitch_api/users/get_users/response.json",
         status: 200
       )
