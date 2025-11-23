@@ -14,12 +14,8 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     TwitchApi.api()
     |> TwitchApi.get(url: "/eventsub/subscriptions", params: %{user_id: user_id})
     |> TwitchApi.handle(200, fn %{"data" => subscriptions} ->
+      Enum.each(subscriptions, fn s -> Cache.put(:subscriptions, {user_id, s["type"]}, s["id"]) end)
       subscriptions
-      |> Enum.map(fn s -> Map.take(s, ["id", "type"]) end)
-      |> Enum.map(fn s ->
-        Cache.put(:subscriptions, {user_id, s["type"]}, s["id"])
-        s
-      end)
     end)
   end
 

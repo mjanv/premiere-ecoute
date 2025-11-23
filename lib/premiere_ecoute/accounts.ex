@@ -24,6 +24,10 @@ defmodule PremiereEcoute.Accounts do
   defdelegate download_associated_data(scope), to: Services.AccountCompliance
   defdelegate delete_account(scope), to: Services.AccountCompliance
 
+  def admins, do: User.all(where: [role: :admin])
+  def bots, do: User.all(where: [role: :bot])
+  def streamers, do: User.all(where: [role: :streamer])
+
   ## User Token
   defdelegate generate_user_session_token(user), to: Token
   defdelegate get_user_by_session_token(token), to: Token

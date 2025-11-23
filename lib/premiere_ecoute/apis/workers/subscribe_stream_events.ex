@@ -1,48 +1,49 @@
 defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEvents do
   @moduledoc """
-  Oban worker that subscribes all streamers to stream.online and stream.offline events.
-
-  This worker is scheduled to run at application startup via Oban Cron (@reboot).
-  It queries all users with role :streamer and subscribes them to Twitch EventSub
-  notifications for stream status changes.
+  Subscribes all streamers to stream.online and stream.offline events.
   """
 
   use PremiereEcouteCore.Worker, queue: :twitch, max_attempts: 3
 
   require Logger
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Apis.TwitchApi.EventSub
 
+  @types ["stream.online", "stream.offline"]
+
   @impl true
-  def perform(%Oban.Job{attempt: attempt}) do
-    streamers = User.all(where: [role: :streamer])
-    Logger.info("Subscribing #{length(streamers)} streamers to stream events (attempt #{attempt}/3)")
-    Enum.each(streamers, &subscribe_streamer/1)
-
-    :ok
-  end
-
-  # AIDEV-NOTE: Made public for testing - tests functional methods directly
-  def subscribe_streamer(%User{twitch: %OauthToken{} = twitch} = user) do
-    scope = Scope.for_user(user)
-    username = twitch.username
-
-    with {:ok, _} <- EventSub.subscribe(scope, "stream.online"),
-         {:ok, _} <- EventSub.subscribe(scope, "stream.offline") do
-      Logger.info("Subscribed streamer: #{username} (ID: #{user.id})")
-      {:ok, user.id}
-    else
-      {:error, reason} ->
-        Logger.error("Failed to subscribe streamer #{username} (ID: #{user.id}): #{inspect(reason)}")
-        {:error, {user.id, reason}}
+  def perform(%Oban.Job{attempt: _attempt}) do
+    Accounts.streamers()
+    |> Enum.map(&subscribe_streamer/1)
+    |> Enum.all?(fn status -> status == :ok end)
+    |> case do
+      true -> :ok
+      false -> {:snooze, 30}
     end
   end
 
-  def subscribe_streamer(%User{} = user) do
-    Logger.warning("Skipping user #{user.id} - no Twitch OAuth token")
-    {:error, {:no_twitch_token, user.id}}
+  def subscribe_streamer(%User{twitch: %{username: username}} = user) do
+    with _ <- Logger.info("Subscribing to events for streamer #{username}"),
+         scope <- Scope.for_user(user),
+         {:ok, subscriptions} <- EventSub.get_event_subscriptions(scope),
+         types <- @types -- Enum.map(subscriptions, & &1["type"]),
+         events <- Enum.map(types, &EventSub.subscribe(scope, &1)),
+         true <- Enum.all?(events, fn {status, _} -> status == :ok end) do
+      Logger.info("Subscribed all events streamer for streamer #{username}")
+      :ok
+    else
+      {:error, reason} ->
+        Logger.error("Failed to fetch existing subscriptions for streamer #{username}: #{inspect(reason)}")
+        :error
+
+      false ->
+        Logger.error("Failed to subscribe to all events streamer for streamer #{username}")
+        :error
+    end
   end
+
+  def subscribe_streamer(%User{}), do: :error
 end
