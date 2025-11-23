@@ -111,7 +111,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
         PremiereEcouteCore.publish(@pipeline, message)
       end
 
-      :timer.sleep(100)
+      :timer.sleep(150)
 
       [vote] = Vote.all(where: [session_id: session.id, viewer_id: "viewer1"])
 

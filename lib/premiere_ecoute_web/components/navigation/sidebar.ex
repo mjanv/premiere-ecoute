@@ -22,7 +22,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
         phx-hook="SidebarCollapse"
         id="sidebar"
       >
-        <!-- AIDEV-NOTE: Restore sidebar state immediately on page load to prevent flash -->
         <script>
           (function() {
             const sidebar = document.getElementById('sidebar');
@@ -31,7 +30,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
             }
           })();
         </script>
-        <!-- AIDEV-NOTE: Toggle button for collapsing/expanding sidebar - positioned absolute to save space -->
         <button
           data-sidebar-toggle
           class="sidebar-toggle-btn absolute top-2 right-2 p-1.5 rounded-md hover:bg-gray-800 transition-colors z-10"
@@ -82,7 +80,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Sessions section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
               <div class="mb-6">
@@ -125,7 +123,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Billboards section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
               <div class="mb-6">
@@ -157,7 +155,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Festivals section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:festivals, for: @current_user) do %>
               <div class="mb-6">
@@ -180,7 +178,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Followed Channels section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:follow_channels, for: @current_user) do %>
               <%= if has_loaded_channels?(@current_user) && !Enum.empty?(@current_user.channels) do %>

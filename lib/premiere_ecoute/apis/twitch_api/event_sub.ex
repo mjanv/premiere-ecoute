@@ -85,7 +85,6 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.poll.progress"),
     do: %{broadcaster_user_id: user_id}
 
-  # AIDEV-NOTE: Stream status events - used to detect when streamer goes live/offline
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "stream.online"),
     do: %{broadcaster_user_id: user_id}
 

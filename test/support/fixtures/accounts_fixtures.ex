@@ -19,9 +19,7 @@ defmodule PremiereEcoute.AccountsFixtures do
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
-    # AIDEV-NOTE: Extract profile separately to handle it via changeset. Convert keyword lists to maps first.
-    attrs_map = Map.new(attrs)
-    {profile_attrs, user_attrs} = Map.pop(attrs_map, :profile, %{})
+    {profile_attrs, user_attrs} = Map.pop(Map.new(attrs), :profile, %{})
     user_attrs = Enum.into(user_attrs, %{email: unique_user_email(), username: unique_username()})
 
     if profile_attrs == %{} do

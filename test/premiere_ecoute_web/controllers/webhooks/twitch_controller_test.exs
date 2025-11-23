@@ -20,30 +20,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   end
 
   describe "POST /webhooks/twitch" do
-    test "handles !hello command", %{conn: conn} do
-      _broadcaster = user_fixture(%{twitch: %{user_id: "1971641", access_token: "broadcaster_token"}})
-      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_hello_command.json")
-
-      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
-        assert scope.user.twitch.user_id == "1971641"
-        assert message == "Hello!"
-        assert reply_to == "cc106a89-1814-919d-454c-f4f2f970aae7"
-        :ok
-      end)
-
-      response =
-        conn
-        |> sign_conn(payload)
-        |> put_req_header("twitch-eventsub-message-type", "notification")
-        |> put_req_header("content-type", "application/json")
-        |> post(~p"/webhooks/twitch", Jason.encode!(payload))
-
-      assert response.status == 202
-      assert response.resp_body == ""
-    end
-
     test "handles !premiereecoute command with English language", %{conn: conn} do
-      # AIDEV-NOTE: E2E test for !premiereecoute command - verifies full flow with English broadcaster
       _broadcaster =
         user_fixture(%{
           twitch: %{user_id: "1971641", access_token: "broadcaster_token"},
@@ -137,7 +114,6 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
     end
 
     test "handles !vote command with active session", %{conn: conn} do
-      # AIDEV-NOTE: E2E test for !vote command - verifies full flow with votes in active session
       broadcaster = user_fixture(%{twitch: %{user_id: "1971641", access_token: "broadcaster_token"}})
       viewer_id = "4145994"
 
@@ -312,21 +288,6 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
                message_id: "cc106a89-1814-919d-454c-f4f2f970aae7",
                command: "command",
                args: ["arg1", "arg2"],
-               is_streamer: false
-             }
-    end
-
-    test "channel.chat.message - !hello command" do
-      payload = ApiMock.payload("twitch_api/eventsub/channel_chat_hello_command.json")
-
-      event = TwitchController.handle(payload)
-
-      assert event == %SendChatCommand{
-               broadcaster_id: "1971641",
-               user_id: "4145994",
-               message_id: "cc106a89-1814-919d-454c-f4f2f970aae7",
-               command: "hello",
-               args: [],
                is_streamer: false
              }
     end

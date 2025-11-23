@@ -18,15 +18,15 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
 
   command(PremiereEcoute.Commands.Chat.SendChatCommand)
 
-  def handle(%SendChatCommand{command: "hello", broadcaster_id: broadcaster_id, message_id: message_id}) do
-    send_chat_reply(broadcaster_id, message_id, "Hello!")
-  end
-
-  # AIDEV-NOTE: !premiereecoute command - Responds with information about Premiere Ecoute in streamer's language
   def handle(%SendChatCommand{command: "premiereecoute", broadcaster_id: broadcaster_id, message_id: message_id}) do
     with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
          scope <- Scope.for_user(broadcaster),
-         message <- get_premiereecoute_message(scope) do
+         message <-
+           Gettext.t(scope, fn ->
+             gettext(
+               "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
+             )
+           end) do
       send_chat_reply(broadcaster_id, message_id, message)
     else
       _ -> {:ok, []}
@@ -78,24 +78,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
     |> Repo.one()
     |> case do
       nil -> nil
-      avg -> "#{Float.round(avg, 1)}/#{get_max_vote_option(vote_options)}"
+      avg -> "#{Float.round(avg, 1)}/#{List.last(vote_options)}"
     end
-  end
-
-  defp get_max_vote_option(vote_options) when is_list(vote_options) do
-    vote_options
-    |> Enum.map(&String.to_integer(&1))
-    |> Enum.max()
-  rescue
-    _ -> List.last(vote_options) || "10"
-  end
-
-  # AIDEV-NOTE: Get localized message for !premiereecoute command based on streamer's language
-  defp get_premiereecoute_message(scope) do
-    Gettext.t(scope, fn ->
-      gettext(
-        "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
-      )
-    end)
   end
 end

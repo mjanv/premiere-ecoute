@@ -17,7 +17,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     user = PremiereEcoute.Accounts.get_user!(user_id)
     listening_session = ListeningSession.get_active_session(user)
 
-    # AIDEV-NOTE: Always subscribe to playback topic to receive session start/stop events
     if connected?(socket) do
       PremiereEcoute.PubSub.subscribe("playback:#{user_id}")
     end
@@ -43,7 +42,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
           _ = PlayerSupervisor.start(session.user.id)
 
-          # AIDEV-NOTE: Check cache to determine if vote is currently open
           open_vote =
             case session.user.twitch do
               nil ->
@@ -143,7 +141,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   @impl true
   def handle_info(:vote_close, %{assigns: %{summary: summary}} = socket) do
-    # AIDEV-NOTE: When vote closes, reset scores to nil to show dashes until next vote
     summary =
       if summary.ok? do
         AsyncResult.ok(summary, Map.merge(summary.result, %{viewer_score: nil, streamer_score: nil}))
@@ -159,13 +156,11 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   @impl true
   def handle_info({:session_started, session_id}, %{assigns: %{user_id: user_id}} = socket) do
-    # AIDEV-NOTE: Subscribe to new session topic when session starts
     session = ListeningSession.get(session_id)
     PremiereEcoute.PubSub.subscribe("session:#{session_id}")
     _ = Presence.join(user_id)
     _ = PlayerSupervisor.start(user_id)
 
-    # AIDEV-NOTE: Check cache to determine if vote is currently open
     open_vote =
       case session.user.twitch do
         nil ->

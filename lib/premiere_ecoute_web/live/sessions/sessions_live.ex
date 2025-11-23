@@ -54,7 +54,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Use stream_delete to update UI without full reload (template uses phx-update="stream")
   @impl true
   def handle_event("confirm_delete", _params, %{assigns: %{session_to_delete: session_id}} = socket) do
     session = ListeningSession.get(session_id)

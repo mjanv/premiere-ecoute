@@ -1,10 +1,6 @@
 defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
   @moduledoc """
   LiveComponent for exporting track markers as YouTube chapter timestamps.
-
-  AIDEV-NOTE: Modal component that displays track markers in YouTube Studio chapter format
-  with an adjustable time bias slider. Time-adjusted markers are computed client-side and
-  NOT persisted to database.
   """
 
   use PremiereEcouteWeb, :live_component
@@ -58,7 +54,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
     >
       <!-- Background overlay -->
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" phx-click="close_modal" phx-target={@myself}></div>
-      
+
     <!-- Modal panel -->
       <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-gray-900 p-8 shadow-2xl transition-all border border-purple-500/30">
         <!-- Header -->
@@ -70,7 +66,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
             {gettext("Copy and paste these timestamps into your YouTube video description")}
           </p>
         </div>
-        
+
     <!-- Time Bias Slider -->
         <div class="mb-6">
           <div class="flex items-center justify-between mb-2">
@@ -97,7 +93,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
             <span>10:00</span>
           </div>
         </div>
-        
+
     <!-- YouTube Chapters Textbox -->
         <div>
           <div class="flex items-center justify-between mb-2">
