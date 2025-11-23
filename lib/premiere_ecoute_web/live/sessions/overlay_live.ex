@@ -95,6 +95,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   @impl true
   def handle_params(%{"score" => score}, _url, socket) do
+    IO.inspect("PARAMS!")
+    IO.inspect(socket.assigns.listening_session.id, label: "params")
     {:noreply, assign(socket, :score, parse_score(score))}
   end
 
@@ -225,11 +227,14 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp parse_score("viewer"), do: :viewer
   defp parse_score("streamer"), do: :streamer
   defp parse_score("viewer streamer"), do: :both
+  defp parse_score("large"), do: :large
   defp parse_score(_), do: :player
 
+  defp overlay_width(:large), do: 1300
   defp overlay_width(:player), do: 480 * 2.5
   defp overlay_width(:both), do: 480
   defp overlay_width(_), do: 240
 
+  defp overlay_height(:large), do: 1000
   defp overlay_height(_), do: 240
 end

@@ -287,7 +287,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def playing?(%__MODULE__{}), do: true
 
   def tracks(%__MODULE__{album: nil, playlist: nil}), do: []
-  def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks
+  def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks ++ tracks
   def tracks(%__MODULE__{album: nil, playlist: %{tracks: tracks}}), do: tracks
 
   def total_duration(%__MODULE__{} = listening_session) do
