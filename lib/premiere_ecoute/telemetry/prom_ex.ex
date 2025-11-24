@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Telemetry.PromEx do
       {:prom_ex, "beam.json"},
       {:prom_ex, "phoenix.json"},
       {:prom_ex, "ecto.json"},
-      {:prom_ex, "phoenix_live_view.json"}
+      {:prom_ex, "phoenix_live_view.json"},
       {:premiere_ecoute, "/dashboards/premiere_ecoute.json"}
     ]
   end
