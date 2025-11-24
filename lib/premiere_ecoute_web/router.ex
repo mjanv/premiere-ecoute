@@ -57,6 +57,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:browser]
 
     get "/health", HealthController, :index
+    oban_dashboard("/oban", resolver: PremiereEcouteWeb.ObanResolver)
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
@@ -242,7 +243,6 @@ defmodule PremiereEcouteWeb.Router do
       pipe_through [:browser]
 
       live_dashboard("/dashboard", metrics: PremiereEcouteWeb.Telemetry)
-      oban_dashboard("/oban")
       live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
       forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
