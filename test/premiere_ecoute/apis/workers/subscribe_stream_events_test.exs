@@ -25,7 +25,7 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEventsTest do
           {"authorization", "Bearer token"},
           {"content-type", "application/json"}
         ],
-        response: %{"data" => [], "total" => 0, "total_cost" => 0, "max_total_cost" => 10000, "pagination" => %{}},
+        response: %{"data" => [], "total" => 0, "total_cost" => 0, "max_total_cost" => 10_000, "pagination" => %{}},
         params: %{"user_id" => "1234"},
         status: 200
       )
@@ -71,7 +71,7 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEventsTest do
           {"authorization", "Bearer token"},
           {"content-type", "application/json"}
         ],
-        response: %{"data" => [], "total" => 0, "total_cost" => 0, "max_total_cost" => 10000, "pagination" => %{}},
+        response: %{"data" => [], "total" => 0, "total_cost" => 0, "max_total_cost" => 10_000, "pagination" => %{}},
         params: %{"user_id" => "1234"},
         status: 200
       )

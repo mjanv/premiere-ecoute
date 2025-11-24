@@ -80,7 +80,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-
+            
     <!-- Sessions section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
               <div class="mb-6">
@@ -123,7 +123,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-
+            
     <!-- Billboards section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
               <div class="mb-6">
@@ -155,7 +155,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-
+            
     <!-- Festivals section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:festivals, for: @current_user) do %>
               <div class="mb-6">
@@ -178,7 +178,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-
+            
     <!-- Followed Channels section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:follow_channels, for: @current_user) do %>
               <%= if has_loaded_channels?(@current_user) && !Enum.empty?(@current_user.channels) do %>

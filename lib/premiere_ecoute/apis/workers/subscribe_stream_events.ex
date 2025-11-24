@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEvents do
     |> Enum.all?(fn status -> status == :ok end)
     |> case do
       true -> :ok
-      false -> {:snooze, 30}
+      false -> {:error, "Cannot subscribe to all streamers"}
     end
   end
 
