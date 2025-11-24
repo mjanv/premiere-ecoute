@@ -2,7 +2,7 @@ import Config
 
 config :premiere_ecoute,
   sentry: "https://maxime-janvier.sentry.io/insights/projects/premiere-ecoute/?project=4509617392975872",
-  grafana: "https://fly-metrics.net/d/fly-app/fly-app?orgId=140881"
+  grafana: "https://mjanv.grafana.net/dashboards/f/B412468D664E3FDF89E566662E1950E3/?orgId=1"
 
 config :premiere_ecoute, PremiereEcoute.Repo,
   ssl: false,
