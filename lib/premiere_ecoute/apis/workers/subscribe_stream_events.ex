@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEvents do
   Subscribes all streamers to stream.online and stream.offline events.
   """
 
-  use PremiereEcouteCore.Worker, queue: :twitch, max_attempts: 3
+  use PremiereEcouteCore.Worker, queue: :twitch, max_attempts: 1
 
   require Logger
 
@@ -45,5 +45,5 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEvents do
     end
   end
 
-  def subscribe_streamer(%User{}), do: :error
+  def subscribe_streamer(%User{}), do: :ok
 end
