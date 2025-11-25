@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Telemetry do
-  @moduledoc false
+  @moduledoc """
+  Telemetry supervisor and metrics definitions.
+
+  Defines telemetry metrics for Phoenix endpoints, routers, channels, database queries, and VM statistics with periodic measurements collection.
+  """
 
   use Supervisor
 

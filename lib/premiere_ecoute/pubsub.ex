@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.PubSub do
-  @moduledoc false
+  @moduledoc """
+  PubSub utilities.
+
+  Provides convenience functions for subscribing, unsubscribing, broadcasting messages, and sending user notifications through Phoenix PubSub.
+  """
 
   @pubsub PremiereEcoute.PubSub
 

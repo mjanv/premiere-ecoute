@@ -1,5 +1,20 @@
 defmodule PremiereEcouteCore.CommandBus do
-  @moduledoc false
+  @moduledoc """
+  Command bus for CQRS pattern implementation.
+
+  Orchestrates command processing by validating commands, delegating to registered handlers, and dispatching resulting events to the EventBus. Handlers must be registered in the Registry for their command types.
+
+  ## Workflow
+
+  1. Command is validated through its registered handler
+  2. Valid commands are executed through the handler
+  3. Resulting events are dispatched to the EventBus
+  4. Returns either `{:ok, entity, events}`, `{:ok, events}`, or `{:error, reason}`
+
+  ## Usage
+
+      CommandBus.apply(%MyCommand{field: "value"})
+  """
 
   require Logger
 

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Changelog.Entry do
-  @moduledoc false
+  @moduledoc """
+  Changelog entry schema.
+
+  Represents a single changelog entry with id, title, date, and body content.
+  """
 
   @enforce_keys [:id, :title, :date, :body]
   defstruct [:id, :title, :date, :body]
@@ -11,7 +15,11 @@ defmodule PremiereEcoute.Changelog.Entry do
 end
 
 defmodule PremiereEcouteWeb.Static.Changelog do
-  @moduledoc false
+  @moduledoc """
+  Changelog publisher.
+
+  Publishes changelog entries from markdown files using NimblePublisher, providing access to application version history and release notes.
+  """
 
   use NimblePublisher,
     build: PremiereEcoute.Changelog.Entry,

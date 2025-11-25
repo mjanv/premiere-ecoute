@@ -1,5 +1,14 @@
 defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
-  @moduledoc false
+  @moduledoc """
+  Plug for validating Twitch EventSub HMAC signatures.
+
+  Validates webhook requests from Twitch EventSub by verifying the HMAC signature in the request headers to ensure authenticity.
+
+  ## Resources
+
+  - [Twitch EventSub Documentation](https://dev.twitch.tv/docs/eventsub/)
+  - [Verifying EventSub Signatures](https://dev.twitch.tv/docs/eventsub/handling-webhook-events/#verifying-the-event-message)
+  """
 
   import Plug.Conn
 

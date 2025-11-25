@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Telemetry.PromEx do
-  @moduledoc false
+  @moduledoc """
+  PromEx telemetry configuration.
+
+  Configures Prometheus metrics collection and Grafana dashboards for monitoring application, BEAM VM, Phoenix, Ecto, and LiveView metrics.
+  """
 
   use PromEx, otp_app: :premiere_ecoute
 

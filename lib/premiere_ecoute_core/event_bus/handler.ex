@@ -1,5 +1,23 @@
 defmodule PremiereEcouteCore.EventBus.Handler do
-  @moduledoc false
+  @moduledoc """
+  Base module for event handlers.
+
+  Provides event registration and default implementation for event dispatching. Handlers must declare which events they handle using the `event/1` macro and implement the `dispatch/1` callback.
+
+  ## Usage
+
+      defmodule MyEventHandler do
+        use PremiereEcouteCore.EventBus.Handler
+
+        event MyEvent
+
+        def dispatch(%MyEvent{} = evt) do
+          # Handle the event
+          IO.inspect(evt)
+          :ok
+        end
+      end
+  """
 
   defmacro __using__(_opts) do
     quote do

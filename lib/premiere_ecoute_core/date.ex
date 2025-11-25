@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Date do
-  @moduledoc false
+  @moduledoc """
+  Date and datetime formatting utilities.
+
+  Provides functions to format dates and datetimes into human-readable strings, handling Date, DateTime, NaiveDateTime, and ISO8601 string inputs.
+  """
 
   def date(%Date{} = date) do
     Calendar.strftime(date, "%b %d, %Y")

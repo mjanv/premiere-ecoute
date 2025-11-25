@@ -1,5 +1,14 @@
 defmodule PremiereEcouteCore.EventBus do
-  @moduledoc false
+  @moduledoc """
+  Event bus for event-driven architecture.
+
+  Dispatches domain events to registered handlers for processing. Handlers must be registered in the Registry for their event types. Supports dispatching single events or lists of events.
+
+  ## Usage
+
+      EventBus.dispatch(%MyEvent{field: "value"})
+      EventBus.dispatch([%Event1{}, %Event2{}])
+  """
 
   require Logger
 

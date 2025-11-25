@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Utils do
-  @moduledoc false
+  @moduledoc """
+  Core utility functions.
+
+  Provides string sanitization utilities for normalizing track names.
+  """
 
   def sanitize_track(value) when is_binary(value) do
     value

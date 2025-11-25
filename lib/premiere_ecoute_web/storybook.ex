@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Storybook do
-  @moduledoc false
+  @moduledoc """
+  Phoenix Storybook configuration.
+
+  Configures the Phoenix Storybook for component documentation and visual testing with custom styling and dark mode support.
+  """
 
   use PhoenixStorybook,
     otp_app: :premiere_ecoute,

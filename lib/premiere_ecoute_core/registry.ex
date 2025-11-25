@@ -1,5 +1,20 @@
 defmodule PremiereEcouteCore.Registry do
-  @moduledoc false
+  @moduledoc """
+  Handler registry for commands and events.
+
+  Maintains a compile-time registry of command and event handlers configured in the application. Handlers are looked up by matching command or event modules to their registered handlers.
+
+  ## Configuration
+
+  Handlers must be configured in application config:
+
+      config :premiere_ecoute, :handlers, [
+        MyApp.Handlers.UserHandler,
+        MyApp.Handlers.OrderHandler
+      ]
+
+  Each handler must implement `commands_or_events/0` returning a list of command/event modules it handles.
+  """
 
   require Logger
 

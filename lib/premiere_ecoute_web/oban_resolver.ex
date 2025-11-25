@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.ObanResolver do
-  @moduledoc false
+  @moduledoc """
+  Oban Web resolver.
+
+  Implements authentication and authorization for the Oban Web dashboard, restricting access to admin users only.
+  """
 
   @behaviour Oban.Web.Resolver
 
