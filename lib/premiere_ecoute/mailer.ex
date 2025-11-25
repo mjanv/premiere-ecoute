@@ -1,12 +1,16 @@
 defmodule PremiereEcoute.Mailer do
-  @moduledoc false
+  @moduledoc """
+  Email delivery service.
 
-  alias PremiereEcoute.Mailer.Email
+  Dispatch domain events as emails. Implementation can be swapped via the `:mailer` application config.
+  """
 
   use Swoosh.Mailer, otp_app: :premiere_ecoute
 
+  alias PremiereEcoute.Mailer.Email
+
   defmodule Behaviour do
-    @moduledoc false
+    @moduledoc "Mailer callback specifications."
 
     @callback dispatch(map()) :: any()
   end
@@ -18,7 +22,11 @@ defmodule PremiereEcoute.Mailer do
 end
 
 defmodule PremiereEcoute.Mailer.Email do
-  @moduledoc false
+  @moduledoc """
+  Email.
+
+  Emails can be converted from domain events to Swoosh emails.
+  """
 
   import Swoosh.Email
 
