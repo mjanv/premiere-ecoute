@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Premiere Ecoute backend service
+
+  Starts subservices for telemetry, database, event store, accounts, external APIs, billboards, and sessions.
+  """
 
   use Supervisor
 

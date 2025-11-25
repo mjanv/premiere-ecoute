@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Accounts subservice.
+
+  Manages the users cache and optional services.
+  """
 
   use Supervisor
 
@@ -15,12 +19,7 @@ defmodule PremiereEcoute.Accounts.Supervisor do
       {Cache, name: :users}
     ]
 
-    optionals =
-      case Application.get_env(:premiere_ecoute, :environment) do
-        :test -> []
-        # PremiereEcoute.Accounts.Notifier
-        _ -> []
-      end
+    optionals = []
 
     Supervisor.init(mandatory ++ optionals, strategy: :one_for_one)
   end

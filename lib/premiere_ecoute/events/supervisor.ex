@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Events.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Event sourcing subservice.
+
+  Manages the event store.
+  """
 
   use Supervisor
 
