@@ -1,5 +1,9 @@
 defmodule Storybook.CoreComponents.Button do
-  @moduledoc false
+  @moduledoc """
+  Storybook for button component.
+
+  Displays variations of the button component including default and disabled states.
+  """
 
   use PhoenixStorybook.Story, :component
 

@@ -1,5 +1,9 @@
 defmodule Storybook.Components.SkeletonElement do
-  @moduledoc false
+  @moduledoc """
+  Storybook for skeleton element component.
+
+  Displays variations of skeleton loading placeholders including different types, widths, avatar sizes, and custom heights.
+  """
 
   use PhoenixStorybook.Story, :component
 

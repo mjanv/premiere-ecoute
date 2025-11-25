@@ -1,5 +1,9 @@
 defmodule Storybook.Components.Cards.ActivityCard do
-  @moduledoc false
+  @moduledoc """
+  Storybook for activity card component.
+
+  Displays variations of activity cards for content display, action prompts, disabled states, status indicators, and custom icons.
+  """
 
   use PhoenixStorybook.Story, :component
 

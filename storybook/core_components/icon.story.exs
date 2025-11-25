@@ -1,5 +1,9 @@
 defmodule Storybook.CoreComponents.Icon do
-  @moduledoc false
+  @moduledoc """
+  Storybook for icon component.
+
+  Displays variations of the icon component including different sizes, colors, and motion effects.
+  """
 
   use PhoenixStorybook.Story, :component
 

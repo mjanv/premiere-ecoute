@@ -1,5 +1,9 @@
 defmodule Storybook.Components do
-  @moduledoc false
+  @moduledoc """
+  Storybook index for application components.
+
+  Organizes custom application components in the storybook with folder configuration.
+  """
 
   use PhoenixStorybook.Index
 

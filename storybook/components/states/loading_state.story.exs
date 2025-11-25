@@ -1,5 +1,9 @@
 defmodule Storybook.Components.LoadingState do
-  @moduledoc false
+  @moduledoc """
+  Storybook for loading skeleton component.
+
+  Displays variations of loading skeleton placeholders with different row counts and padding configurations.
+  """
 
   use PhoenixStorybook.Story, :component
 

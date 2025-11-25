@@ -1,5 +1,9 @@
 defmodule Storybook.Components.Cards.StatsCard do
-  @moduledoc false
+  @moduledoc """
+  Storybook for stats card component.
+
+  Displays variations of statistics cards with different colors, icons, value formats, and interactive states.
+  """
 
   use PhoenixStorybook.Story, :component
 

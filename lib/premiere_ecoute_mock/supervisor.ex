@@ -1,7 +1,7 @@
 defmodule PremiereEcouteMock.Supervisor do
   @moduledoc """
   Premiere Ecoute Mock service. 
-  
+
   Starts a fake Twitch API server on port 4001 with its backing state and a registry for simulated chat connections.
   """
 

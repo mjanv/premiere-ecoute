@@ -1,5 +1,9 @@
 defmodule Storybook.Components.Modal do
-  @moduledoc false
+  @moduledoc """
+  Storybook for modal component.
+
+  Displays variations of modal dialogs with backdrop and interactive close functionality.
+  """
 
   use PhoenixStorybook.Story, :component
 

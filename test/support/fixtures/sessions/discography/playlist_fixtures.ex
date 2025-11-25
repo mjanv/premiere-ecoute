@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Discography.PlaylistFixtures do
-  @moduledoc false
+  @moduledoc """
+  Playlist fixutres
+
+  Provides factory functions to generate test playlist structs with associated tracks for use in test suites.
+  """
 
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track

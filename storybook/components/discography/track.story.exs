@@ -1,5 +1,9 @@
 defmodule Storybook.Components.Track do
-  @moduledoc false
+  @moduledoc """
+  Storybook for track display component.
+
+  Displays variations of track display components showing track information including name, number, and duration.
+  """
 
   use PhoenixStorybook.Story, :component
 

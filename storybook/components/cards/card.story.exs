@@ -1,5 +1,9 @@
 defmodule Storybook.Components.Card do
-  @moduledoc false
+  @moduledoc """
+  Storybook for card component.
+
+  Displays variations of card components with different variants, content layouts, interactive states, and sizing options.
+  """
 
   use PhoenixStorybook.Story, :component
 

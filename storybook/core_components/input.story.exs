@@ -1,5 +1,9 @@
 defmodule Storybook.CoreComponents.Input do
-  @moduledoc false
+  @moduledoc """
+  Storybook for input component.
+
+  Displays variations of the input component including text inputs, selects, checkboxes, text areas, and various HTML5 input types.
+  """
 
   use PhoenixStorybook.Story, :component
 

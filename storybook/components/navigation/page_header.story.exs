@@ -1,5 +1,9 @@
 defmodule Storybook.Components.Navigation.PageHeader do
-  @moduledoc false
+  @moduledoc """
+  Storybook for page header component.
+
+  Displays variations of page headers with titles, subtitles, and action buttons.
+  """
 
   use PhoenixStorybook.Story, :component
 

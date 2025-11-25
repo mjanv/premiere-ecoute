@@ -1,5 +1,9 @@
 defmodule Storybook.Search.SearchBar do
-  @moduledoc false
+  @moduledoc """
+  Storybook for searchbar component.
+
+  Displays variations of the search bar component with different query and placeholder states.
+  """
 
   use PhoenixStorybook.Story, :component
 

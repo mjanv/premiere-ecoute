@@ -3,7 +3,7 @@ defmodule Mix.Tasks.Twitch.Extension do
   Bundle the Twitch extension for upload to Twitch Developer Console.
 
   This task:
-  
+
   1. Builds the extension for production with inlined JavaScript
   2. Updates the manifest.json to use index.html (required by Twitch)
   3. Creates a zip file ready for upload

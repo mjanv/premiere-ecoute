@@ -24,8 +24,8 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     field :provider, Ecto.Enum, values: [:twitch, :spotify]
     field :user_id, :string
     field :username, :string
-    field :access_token, PremiereEcoute.Repo.Encrypted, redact: true
-    field :refresh_token, PremiereEcoute.Repo.Encrypted, redact: true
+    field :access_token, PremiereEcoute.Repo.EncryptedField, redact: true
+    field :refresh_token, PremiereEcoute.Repo.EncryptedField, redact: true
     field :expires_at, :utc_datetime
 
     belongs_to :parent, User

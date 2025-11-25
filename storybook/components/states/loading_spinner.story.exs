@@ -1,5 +1,9 @@
 defmodule Storybook.Components.LoadingSpinner do
-  @moduledoc false
+  @moduledoc """
+  Storybook for loading spinner component.
+
+  Displays variations of loading spinners with different sizes and colors.
+  """
 
   use PhoenixStorybook.Story, :component
 

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Discography.AlbumFixtures do
-  @moduledoc false
+  @moduledoc """
+  Album fixtures.
+
+  Provides factory functions to generate test album structs with associated tracks for use in test suites.
+  """
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
