@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Premiere Ecoute Web service
+
+  Starts telemetry, DNS clustering, PubSub, presence tracking, and the Phoenix endpoint.
+  """
 
   use Supervisor
 
