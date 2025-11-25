@@ -1,5 +1,7 @@
 defmodule PremiereEcouteMix do
-  @moduledoc false
+  @moduledoc """
+  Premiere Ecoute Mix tasks
+  """
 
   use Boundary, deps: [PremiereEcoute], exports: []
 end
