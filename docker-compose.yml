@@ -14,7 +14,6 @@ services:
   prometheus:
     image: prom/prometheus:v3.7.2
     container_name: prometheus
-    network_mode: host
     volumes:
       - ./priv/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
@@ -25,7 +24,6 @@ services:
   grafana:
     image: grafana/grafana:12.2
     container_name: grafana
-    network_mode: host
     ports:
       - "3000:3000"
     volumes:
