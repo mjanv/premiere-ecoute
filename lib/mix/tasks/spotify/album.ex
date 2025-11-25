@@ -1,5 +1,13 @@
 defmodule Mix.Tasks.Spotify.Album do
-  @moduledoc false
+  @moduledoc """
+  Fetches and displays album details from the Spotify API.
+
+  ## Usage
+
+      mix spotify.album --id ALBUM_ID
+
+  Requires `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` environment variables.
+  """
 
   use Mix.Task
   use Boundary, classify_to: PremiereEcouteMix
@@ -7,9 +15,9 @@ defmodule Mix.Tasks.Spotify.Album do
   alias PremiereEcoute.Apis.SpotifyApi
 
   def run(args) do
-    Application.ensure_all_started(:req)
-
     {[id: id], [], []} = OptionParser.parse(args, strict: [id: :string])
+
+    Application.ensure_all_started(:req)
 
     Application.put_env(:premiere_ecoute, :spotify_client_id, System.get_env("SPOTIFY_CLIENT_ID"))
     Application.put_env(:premiere_ecoute, :spotify_client_secret, System.get_env("SPOTIFY_CLIENT_SECRET"))

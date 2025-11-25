@@ -1,5 +1,13 @@
 defmodule Mix.Tasks.Twitch.Url do
-  @moduledoc false
+  @moduledoc """
+  Generates the Twitch OAuth authorization URL.
+
+  ## Usage
+
+      mix twitch.url
+
+  Requires `TWITCH_CLIENT_ID` and `TWITCH_REDIRECT_URI` environment variables.
+  """
 
   use Mix.Task
   use Boundary, classify_to: PremiereEcouteMix

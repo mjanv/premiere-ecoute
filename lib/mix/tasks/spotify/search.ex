@@ -1,5 +1,13 @@
 defmodule Mix.Tasks.Spotify.Search do
-  @moduledoc false
+  @moduledoc """
+  Searches for albums on Spotify by query.
+
+  ## Usage
+
+      mix spotify.search --query "artist or album name"
+
+  Requires `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` environment variables.
+  """
 
   use Mix.Task
   use Boundary, classify_to: PremiereEcouteMix
