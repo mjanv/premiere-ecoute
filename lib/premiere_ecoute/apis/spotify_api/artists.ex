@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Artists do
-  @moduledoc false
+  @moduledoc """
+  Spotify artists API.
+
+  Fetches artist top tracks from Spotify API.
+  """
 
   require Logger
 

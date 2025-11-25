@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.BuyMeACoffeeApi.Supporters do
-  @moduledoc false
+  @moduledoc """
+  Buy Me a Coffee supporters API.
+
+  Fetches one-time supporters from the Buy Me a Coffee API and parses them into Donation events.
+  """
 
   require Logger
 

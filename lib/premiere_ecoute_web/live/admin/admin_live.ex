@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.AdminLive do
-  @moduledoc false
+  @moduledoc """
+  Admin dashboard LiveView.
+
+  Displays system statistics and event store browser with pagination for monitoring users, sessions, albums, billboards, and goals.
+  """
 
   use PremiereEcouteWeb, :live_view
 

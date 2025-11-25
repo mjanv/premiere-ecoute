@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
-  @moduledoc false
+  @moduledoc """
+  Listening session UI components.
+
+  Provides reusable Phoenix components for displaying session details including source information (album/playlist), statistics, voting interface, vote distribution graphs, progress tracking, and visibility controls.
+  """
 
   use Phoenix.Component
   use Gettext, backend: PremiereEcoute.Gettext

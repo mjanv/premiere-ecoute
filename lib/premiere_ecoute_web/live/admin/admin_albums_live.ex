@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
-  @moduledoc false
+  @moduledoc """
+  Admin albums management LiveView.
+
+  Provides paginated album listing with detailed view modal, deletion functionality, and album/track statistics for administrators.
+  """
 
   use PremiereEcouteWeb, :live_view
 

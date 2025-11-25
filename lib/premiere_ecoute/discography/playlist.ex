@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Discography.Playlist do
-  @moduledoc false
+  @moduledoc """
+  Playlist aggregate.
+
+  Stores playlists from Spotify and Deezer with owner information, tracks, and metadata for music catalog management.
+  """
 
   use PremiereEcouteCore.Aggregate,
     root: [:tracks],

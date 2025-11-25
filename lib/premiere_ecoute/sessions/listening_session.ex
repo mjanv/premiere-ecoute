@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.ListeningSession do
-  @moduledoc false
+  @moduledoc """
+  Listening session aggregate.
+
+  Manages album and playlist listening sessions with status transitions (preparing/active/stopped), track navigation and markers, visibility controls (private/protected/public), vote tracking, and retrospective access control.
+  """
 
   use PremiereEcouteCore.Aggregate,
     root: [

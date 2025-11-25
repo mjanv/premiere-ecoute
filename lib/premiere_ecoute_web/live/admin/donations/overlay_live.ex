@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.Donations.OverlayLive do
-  @moduledoc false
+  @moduledoc """
+  Donations overlay LiveView for streaming.
+
+  Displays current donation goal progress with real-time updates via PubSub, showing goal balance and last donation for OBS/streaming overlays.
+  """
 
   use PremiereEcouteWeb, :live_view
 

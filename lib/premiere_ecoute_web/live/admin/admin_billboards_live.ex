@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
-  @moduledoc false
+  @moduledoc """
+  Admin billboards management LiveView.
+
+  Provides billboard listing with detailed modal view, status management, submission moderation (review/remove), deletion functionality, and billboard statistics for administrators.
+  """
 
   use PremiereEcouteWeb, :live_view
 

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.DeezerApi.Playlists do
-  @moduledoc false
+  @moduledoc """
+  Deezer playlists API.
+
+  Fetches playlist data from Deezer API and parses into Playlist aggregates with tracks.
+  """
 
   require Logger
 

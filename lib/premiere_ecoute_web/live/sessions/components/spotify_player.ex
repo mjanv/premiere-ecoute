@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
-  @moduledoc false
+  @moduledoc """
+  Spotify player LiveView component.
+
+  Displays Spotify playback controls and status including current track, progress, device information, and play/pause/skip functionality for listening sessions.
+  """
 
   use PremiereEcouteWeb, :live_component
 

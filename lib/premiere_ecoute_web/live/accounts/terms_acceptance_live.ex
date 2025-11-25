@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Accounts.TermsAcceptanceLive do
-  @moduledoc false
+  @moduledoc """
+  Terms acceptance LiveView.
+
+  Displays legal documents (privacy policy, cookies policy, terms of service) and collects user consent during Twitch authentication flow.
+  """
 
   use PremiereEcouteWeb, :live_view
 

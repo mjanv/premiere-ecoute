@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
-  @moduledoc false
+  @moduledoc """
+  Event handler for listening session events.
+
+  Reacts to session lifecycle events by creating track markers, scheduling worker jobs for vote windows and promo messages, and broadcasting session state changes via PubSub.
+  """
 
   use PremiereEcouteCore.EventBus.Handler
 

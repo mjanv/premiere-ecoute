@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.HomeLive do
+  @moduledoc """
+  Home page LiveView.
+
+  Displays user's current listening session and latest billboard on the home page.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts.User

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Billboards do
-  @moduledoc false
+  @moduledoc """
+  Billboards context.
+
+  Manages music billboards where users submit track URLs with deletion tokens, toggle submission reviews, activate/deactivate billboards, and generate billboard content from playlists.
+  """
 
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Billboards.Services.BillboardCreation

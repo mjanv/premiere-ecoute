@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
-  @moduledoc false
+  @moduledoc """
+  Account compliance service.
+
+  Handles GDPR compliance including exporting user data with anonymization, deleting accounts with cascading cleanup of tokens/follows/votes/sessions, and publishing compliance events.
+  """
 
   import Ecto.Query
 

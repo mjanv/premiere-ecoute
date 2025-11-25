@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Discography.LibraryPlaylist do
-  @moduledoc false
+  @moduledoc """
+  User library playlist aggregate.
+
+  Stores user-created playlists with provider information, metadata, and track counts for personal music library management across Spotify and Deezer.
+  """
 
   use PremiereEcouteCore.Aggregate,
     identity: [:provider, :playlist_id]

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Discography.Playlist.Track do
-  @moduledoc false
+  @moduledoc """
+  Playlist track aggregate.
+
+  Stores individual tracks within playlists including track metadata, artist, duration, and when the track was added to the playlist.
+  """
 
   use PremiereEcouteCore.Aggregate,
     json: [:provider, :track_id, :album_id, :user_id, :name, :artist, :release_date, :duration_ms, :added_at]

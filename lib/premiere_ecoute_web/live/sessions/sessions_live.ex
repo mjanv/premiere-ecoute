@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Sessions.SessionsLive do
+  @moduledoc """
+  User sessions list LiveView.
+
+  Displays paginated list of user's listening sessions with status indicators, visibility badges, navigation to session details, and deletion with confirmation modal.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   require Logger

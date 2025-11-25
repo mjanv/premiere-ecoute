@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.PlaygroundLive do
-  @moduledoc false
+  @moduledoc """
+  Development playground LiveView.
+
+  Provides a sandbox environment for testing and developing UI components and features.
+  """
 
   use PremiereEcouteWeb, :live_view
 

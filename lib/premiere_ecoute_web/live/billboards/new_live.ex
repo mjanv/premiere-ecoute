@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Billboards.NewLive do
-  @moduledoc false
+  @moduledoc """
+  Billboard creation LiveView.
+
+  Provides form to create new billboards with title validation, real-time form validation feedback, and redirects to created billboard on successful submission.
+  """
 
   use PremiereEcouteWeb, :live_view
 

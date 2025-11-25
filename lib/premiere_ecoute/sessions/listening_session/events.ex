@@ -1,8 +1,12 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.Events do
-  @moduledoc false
+  @moduledoc """
+  Listening session events.
+  """
 
   defmodule SessionPrepared do
-    @moduledoc false
+    @moduledoc """
+    Event - Listening session prepared.
+    """
 
     defstruct [:session_id, :user_id, :album_id, :playlist_id]
 
@@ -15,7 +19,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   end
 
   defmodule SessionNotPrepared do
-    @moduledoc false
+    @moduledoc """
+    Event - Listening session not prepared.
+    """
 
     defstruct [:user_id]
 
@@ -23,7 +29,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   end
 
   defmodule SessionStarted do
-    @moduledoc false
+    @moduledoc """
+    Event - Listening session started.
+    """
 
     defstruct [:source, :session_id, :user_id]
 
@@ -31,7 +39,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   end
 
   defmodule NextTrackStarted do
-    @moduledoc false
+    @moduledoc """
+    Event - Next track started in session.
+    """
 
     defstruct [:source, :session_id, :user_id, :track]
 
@@ -39,7 +49,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   end
 
   defmodule PreviousTrackStarted do
-    @moduledoc false
+    @moduledoc """
+    Event - Previous track started in session.
+    """
 
     defstruct [:session_id, :user_id, :track]
 
@@ -47,7 +59,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   end
 
   defmodule SessionStopped do
-    @moduledoc false
+    @moduledoc """
+    Event - Listening session stopped.
+    """
 
     defstruct [:session_id, :user_id]
 

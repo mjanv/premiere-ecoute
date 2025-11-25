@@ -1,5 +1,9 @@
 defmodule PremiereEcouteMock.TwitchApi.Mock do
-  @moduledoc false
+  @moduledoc """
+  Mock Twitch API implementation for testing.
+
+  Provides no-op implementations of Twitch API methods that log actions instead of making real API calls. Used in development and test environments.
+  """
 
   require Logger
 

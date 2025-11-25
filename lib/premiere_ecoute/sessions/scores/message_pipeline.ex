@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
-  @moduledoc false
+  @moduledoc """
+  Broadway pipeline for processing chat votes.
+
+  Processes MessageSent events from chat, extracts vote values from messages, batches votes by session for bulk insertion, generates session summaries, and broadcasts real-time score updates via PubSub.
+  """
 
   use Broadway
 

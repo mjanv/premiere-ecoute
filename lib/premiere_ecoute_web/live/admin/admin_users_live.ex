@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
-  @moduledoc false
+  @moduledoc """
+  Admin users management LiveView.
+
+  Provides user listing with detailed modal view, role management, account deletion functionality, and user role statistics for administrators.
+  """
 
   use PremiereEcouteWeb, :live_view
 

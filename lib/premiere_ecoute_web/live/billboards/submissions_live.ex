@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Billboards.SubmissionsLive do
-  @moduledoc false
+  @moduledoc """
+  User billboard submissions LiveView.
+
+  Displays user's submitted billboard entries with deletion functionality, requires Twitch authentication, and redirects unauthenticated users to home page.
+  """
 
   use PremiereEcouteWeb, :live_view
 

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Telemetry.ReqPipeline do
-  @moduledoc false
+  @moduledoc """
+  Req telemetry pipeline.
+
+  Attaches telemetry callbacks to Req HTTP requests for monitoring API calls with custom response handling.
+  """
 
   alias Req.Request
 

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
-  @moduledoc false
+  @moduledoc """
+  Oban worker for listening session background tasks.
+
+  Handles scheduled tasks for opening/closing vote windows, track navigation, vote closing warnings, and promotional message sending with localized content.
+  """
 
   use PremiereEcouteCore.Worker,
     queue: :sessions,

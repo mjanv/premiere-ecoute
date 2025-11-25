@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Apis.FrankfurterApi do
   use PremiereEcouteCore.Api, api: :frankfurter
 
   defmodule Behaviour do
-    @moduledoc false
+    @moduledoc "Frankfurter API behaviour."
 
     @callback convert(params :: %{amount: number(), currency: String.t()}) ::
                 {:ok, %{amount: number(), currency: String.t()}} | {:error, term()}

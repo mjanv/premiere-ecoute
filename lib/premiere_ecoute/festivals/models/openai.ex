@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Festivals.Models.OpenAi do
-  @moduledoc false
+  @moduledoc """
+  OpenAI festival poster analyzer.
+
+  Uses GPT-4 Vision API via Instructor to extract festival name, dates, location, and complete artist lineup from poster images through OCR and structured output.
+  """
 
   @behaviour PremiereEcoute.Festivals.Models.Model
 

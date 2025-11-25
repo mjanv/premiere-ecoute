@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
-  @moduledoc false
+  @moduledoc """
+  Account registration service.
+
+  Registers users via Twitch or Spotify OAuth, creates or updates OAuth tokens, assigns roles based on broadcaster type and configured lists (admins/bots/streamers), and generates random passwords for passwordless accounts.
+  """
 
   require Logger
 

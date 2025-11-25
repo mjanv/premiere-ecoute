@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.Donations.GoalLive do
-  @moduledoc false
+  @moduledoc """
+  Admin donation goal details LiveView.
+
+  Displays individual donation goal with donations and expenses listing, expense creation modal with validation, balance computation, and donation/expense deletion functionality for detailed goal management.
+  """
 
   use PremiereEcouteWeb, :live_view
 

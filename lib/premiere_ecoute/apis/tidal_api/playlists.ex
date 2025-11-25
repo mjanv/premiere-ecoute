@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.TidalApi.Playlists do
-  @moduledoc false
+  @moduledoc """
+  Tidal playlists API.
+
+  Fetches playlist data from Tidal API and parses into Playlist aggregates.
+  """
 
   alias PremiereEcoute.Apis.TidalApi
   alias PremiereEcoute.Discography.Playlist

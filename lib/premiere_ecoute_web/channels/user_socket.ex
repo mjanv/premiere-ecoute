@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.UserSocket do
-  @moduledoc false
+  @moduledoc """
+  Phoenix Socket for user connections.
+
+  Manages WebSocket connections with session and lobby channels, assigns unique UUID to each connection on connect, and provides socket identification for broadcasting disconnect events to specific users.
+  """
 
   use Phoenix.Socket
 

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.Bot do
-  @moduledoc false
+  @moduledoc """
+  Bot user management.
+
+  Retrieves and caches the bot user configured in application settings, automatically renewing Twitch tokens when needed.
+  """
 
   require Logger
 

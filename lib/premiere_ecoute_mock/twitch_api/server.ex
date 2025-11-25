@@ -1,5 +1,9 @@
 defmodule PremiereEcouteMock.TwitchApi.Server do
-  @moduledoc false
+  @moduledoc """
+  Mock Twitch API server for development.
+
+  Implements Twitch Helix API endpoints including EventSub subscriptions, chat messages/announcements with WebSocket support, user data retrieval with token validation, webhook notifications, and chat interface serving for local testing without hitting real Twitch services.
+  """
 
   use Plug.Router
 

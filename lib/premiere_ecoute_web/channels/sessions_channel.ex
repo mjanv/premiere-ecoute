@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.SessionsChannel do
-  @moduledoc false
+  @moduledoc """
+  Phoenix Channel for sessions lobby.
+
+  Handles sessions:lobby channel joins and get_sessions requests, returning all active listening sessions as JSON-encoded payloads for real-time session discovery.
+  """
 
   use PremiereEcouteWeb, :channel
 

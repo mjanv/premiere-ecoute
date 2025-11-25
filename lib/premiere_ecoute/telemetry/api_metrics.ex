@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Telemetry.ApiMetrics do
-  @moduledoc false
+  @moduledoc """
+  PromEx plugin for API telemetry metrics.
+
+  Tracks API call counts and webhook event counts with detailed metadata including provider, HTTP method, URL path, and response status for monitoring external API usage.
+  """
 
   use PromEx.Plugin
 

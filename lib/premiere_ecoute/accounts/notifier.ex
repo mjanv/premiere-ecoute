@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.Notifier do
-  @moduledoc false
+  @moduledoc """
+  Account event notification subscriber.
+
+  Subscribes to the users event stream and dispatches email notifications for account creation and deletion events.
+  """
 
   use PremiereEcouteCore.Subscriber, stream: "users"
 

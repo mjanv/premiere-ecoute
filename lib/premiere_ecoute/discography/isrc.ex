@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Discography.Isrc do
-  @moduledoc false
+  @moduledoc """
+  ISRC (International Standard Recording Code) parser.
+
+  Parses ISRC codes into prefix, year, and designation components for music track identification.
+  """
 
   defstruct [:prefix, :year, :designation]
 

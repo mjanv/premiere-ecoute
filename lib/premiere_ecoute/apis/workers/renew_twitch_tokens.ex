@@ -1,7 +1,11 @@
 defmodule PremiereEcoute.Apis.Workers.RenewTwitchTokens do
-  @moduledoc false
+  @moduledoc """
+  Oban worker for automatic Twitch token renewal.
 
-  use PremiereEcouteCore.Worker, queue: :twitch, max_attempts: 20
+  Periodically refreshes Twitch API client credentials, schedules next renewal 5 minutes before expiration, and retries on failure with 10-second snooze intervals.
+  """
+
+  use PremiereEcouteCore.Worker, queue: :twitch, max_attempts: 5
 
   require Logger
 

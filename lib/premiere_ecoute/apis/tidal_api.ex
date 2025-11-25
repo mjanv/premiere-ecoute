@@ -1,12 +1,16 @@
 defmodule PremiereEcoute.Apis.TidalApi do
-  @moduledoc false
+  @moduledoc """
+  Tidal API client.
+
+  Provides access to Tidal Web API for fetching playlists. Supports both user token authentication and client credentials flow for OAuth.
+  """
 
   use PremiereEcouteCore.Api, api: :tidal
 
   alias PremiereEcoute.Accounts.Scope
 
   defmodule Behaviour do
-    @moduledoc "Deezer API Behaviour"
+    @moduledoc "Tidal API Behaviour"
 
     alias PremiereEcoute.Discography.Playlist
 

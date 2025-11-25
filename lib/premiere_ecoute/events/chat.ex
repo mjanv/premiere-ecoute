@@ -1,8 +1,12 @@
 defmodule PremiereEcoute.Events.Chat do
-  @moduledoc false
+  @moduledoc """
+  Chat-related events.
+  """
 
   defmodule MessageSent do
-    @moduledoc false
+    @moduledoc """
+    Event - Chat message sent.
+    """
 
     @type t :: %__MODULE__{
             broadcaster_id: String.t(),
@@ -15,7 +19,9 @@ defmodule PremiereEcoute.Events.Chat do
   end
 
   defmodule CommandSent do
-    @moduledoc false
+    @moduledoc """
+    Event - Chat command sent.
+    """
 
     @type t :: %__MODULE__{
             broadcaster_id: String.t(),
@@ -30,7 +36,9 @@ defmodule PremiereEcoute.Events.Chat do
   end
 
   defmodule PollEnded do
-    @moduledoc false
+    @moduledoc """
+    Event - Poll ended.
+    """
 
     @type t :: %__MODULE__{id: String.t(), title: String.t(), votes: map()}
 
@@ -38,7 +46,9 @@ defmodule PremiereEcoute.Events.Chat do
   end
 
   defmodule PollStarted do
-    @moduledoc false
+    @moduledoc """
+    Event - Poll started.
+    """
 
     @type t :: %__MODULE__{id: String.t(), votes: map()}
 
@@ -46,7 +56,9 @@ defmodule PremiereEcoute.Events.Chat do
   end
 
   defmodule PollUpdated do
-    @moduledoc false
+    @moduledoc """
+    Event - Poll updated.
+    """
 
     @type t :: %__MODULE__{id: String.t(), votes: map()}
 

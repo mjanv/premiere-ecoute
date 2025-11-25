@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Festivals.Festival do
-  @moduledoc false
+  @moduledoc """
+  Festival embedded schema.
+
+  Represents music festival with name, location, dates, and lineup concerts with associated Spotify tracks.
+  """
 
   use Ecto.Schema
 

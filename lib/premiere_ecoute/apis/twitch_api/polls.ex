@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.TwitchApi.Polls do
-  @moduledoc false
+  @moduledoc """
+  Twitch polls API.
+
+  Creates, ends, and retrieves Twitch channel polls for viewer voting.
+  """
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.TwitchApi

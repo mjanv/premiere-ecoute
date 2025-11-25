@@ -1,5 +1,9 @@
 defmodule PremiereEcouteMock.TwitchApi.Backend do
-  @moduledoc false
+  @moduledoc """
+  Mock Twitch API state backend.
+
+  GenServer maintaining in-memory state for mock Twitch API data like subscriptions and polls during development and testing.
+  """
 
   use GenServer
 

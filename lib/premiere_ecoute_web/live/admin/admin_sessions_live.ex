@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
-  @moduledoc false
+  @moduledoc """
+  Admin listening sessions management LiveView.
+
+  Provides paginated session listing with detailed modal view, deletion functionality with confirmation, session status tracking, and session/vote statistics for administrators.
+  """
 
   use PremiereEcouteWeb, :live_view
 

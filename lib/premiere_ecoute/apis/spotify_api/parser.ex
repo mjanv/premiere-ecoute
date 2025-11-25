@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Parser do
-  @moduledoc false
+  @moduledoc """
+  Spotify API response parser.
+
+  Parses Spotify API responses extracting artist names, release dates, and album cover URLs.
+  """
 
   def parse_primary_artist([%{"name" => name} | _]), do: name
   def parse_primary_artist(_), do: "Unknown Artist"

@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Plugs.SetLocale do
-  @moduledoc false
+  @moduledoc """
+  Plug for setting user locale based on browser preferences and profile.
+
+  Determines the locale from the Accept-Language header or authenticated user profile, sets it in Gettext, and stores it in session and cookies for supported locales.
+  """
 
   import Plug.Conn
 
