@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Application do
-  @moduledoc false
+  @moduledoc """
+  PremiereEcoute main OTP application
+
+  Starts the supervision tree with mandatory services (web and backend) and optional services (mocks).
+  """
 
   use Application
   use Boundary, top_level?: true, deps: [PremiereEcoute, PremiereEcouteWeb, PremiereEcouteMock, PremiereEcouteMix, Storybook]
