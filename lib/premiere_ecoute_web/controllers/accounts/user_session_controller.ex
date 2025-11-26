@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Accounts.UserSessionController do
+  @moduledoc """
+  User session management controller.
+
+  Handles user login via magic link or email/password, session creation and destruction, password updates with sudo mode protection, and automatic disconnection of expired sessions.
+  """
+
   use PremiereEcouteWeb, :controller
 
   alias PremiereEcoute.Accounts

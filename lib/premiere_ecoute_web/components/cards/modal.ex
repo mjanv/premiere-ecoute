@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Components.Modal do
   @moduledoc """
   Modal dialog components with consistent styling and behavior.
   """
+
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS

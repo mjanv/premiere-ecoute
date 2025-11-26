@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
+  @moduledoc """
+  Individual playlist detail and management LiveView.
+
+  Displays playlist tracks with provider integration (Spotify/Deezer), advanced filtering by search query, date, duplicates and submission count, bulk track selection and deletion, and playlist removal from library.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Apis

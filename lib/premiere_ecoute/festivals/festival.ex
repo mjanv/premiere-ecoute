@@ -16,10 +16,22 @@ defmodule PremiereEcoute.Festivals.Festival do
     field(:end_date, :date)
 
     embeds_many :concerts, Concert, primary_key: false do
+      @moduledoc """
+      Concert embedded schema.
+
+      Represents a festival concert with artist name, performance date, and associated track information.
+      """
+
       field(:artist, :string)
       field(:date, :date)
 
       embeds_one :track, Track, primary_key: false do
+        @moduledoc """
+        Track embedded schema.
+
+        Represents a music track with provider information (Spotify), track ID, and track name.
+        """
+
         field(:provider, :string)
         field(:track_id, :string)
         field(:name, :string)

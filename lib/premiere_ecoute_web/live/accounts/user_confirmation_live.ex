@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Accounts.UserConfirmationLive do
+  @moduledoc """
+  Magic link authentication confirmation LiveView.
+
+  Validates magic link tokens for passwordless authentication, handling token verification and automatic login submission with token expiration checks.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts

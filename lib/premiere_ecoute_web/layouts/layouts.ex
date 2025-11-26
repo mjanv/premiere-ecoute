@@ -7,6 +7,7 @@ defmodule PremiereEcouteWeb.Layouts do
   application router. The "app" layout is rendered as component
   in regular views and live views.
   """
+
   use PremiereEcouteWeb, :html
 
   import PremiereEcouteWeb.Components.Header

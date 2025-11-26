@@ -26,6 +26,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
       and `<.form>`, are defined there.
 
   """
+
   use Phoenix.Component
 
   alias Phoenix.HTML

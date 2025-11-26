@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
   @moduledoc """
   Loading state components with skeleton placeholders for consistent loading experiences.
   """
+
   use Phoenix.Component
 
   @doc """

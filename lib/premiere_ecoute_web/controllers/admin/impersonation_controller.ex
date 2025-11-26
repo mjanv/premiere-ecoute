@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Admin.ImpersonationController do
+  @moduledoc """
+  Admin user impersonation controller.
+
+  Allows administrators to impersonate other users for support and debugging, with session validation, impersonation state management, and safety checks preventing self-impersonation and nested impersonation.
+  """
+
   use PremiereEcouteWeb, :controller
 
   alias PremiereEcoute.Accounts

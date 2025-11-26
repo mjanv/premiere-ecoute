@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Components.Card do
   @moduledoc """
   Card components for consistent container styling.
   """
+
   use Phoenix.Component
 
   @doc """

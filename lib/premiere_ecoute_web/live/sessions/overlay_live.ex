@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Sessions.OverlayLive do
+  @moduledoc """
+  OBS streaming overlay LiveView for listening sessions.
+
+  Displays real-time session information with configurable score display modes (player, streamer, viewer, both), playback progress tracking, vote status integration, track summaries with viewer/streamer scores, and presence tracking for active sessions.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   require Logger

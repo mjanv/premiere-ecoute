@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Accounts.AuthController do
+  @moduledoc """
+  OAuth authentication controller for external providers.
+
+  Handles OAuth flows for Twitch and Spotify authentication, managing authorization requests and callbacks, user registration with provider data, terms acceptance for new users, and session management with automatic login.
+  """
+
   use PremiereEcouteWeb, :controller
 
   require Logger

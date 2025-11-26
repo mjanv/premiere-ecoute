@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Accounts.AccountLive do
+  @moduledoc """
+  User account management and profile settings LiveView.
+
+  Manages user profile editing with theme and language preferences, OAuth provider connections (Spotify/Twitch), account data export for GDPR compliance, and account deletion with confirmation modals.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts

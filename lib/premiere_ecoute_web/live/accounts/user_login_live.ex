@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Accounts.UserLoginLive do
+  @moduledoc """
+  User login LiveView with dual authentication methods.
+
+  Provides password-based and magic link passwordless authentication, with email pre-filling, magic link delivery via email, and form submission handling for both login methods.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts
