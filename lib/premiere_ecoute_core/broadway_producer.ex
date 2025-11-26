@@ -1,5 +1,39 @@
 defmodule PremiereEcouteCore.BroadwayProducer do
-  @moduledoc false
+  @moduledoc """
+  Broadway producer for event processing.
+
+  Implements a GenStage producer for Broadway pipelines using an in-memory queue with demand-driven event dispatch and load balancing across producer instances.
+
+  ## Usage
+
+  To publish events to a Broadway pipeline:
+
+      PremiereEcouteCore.BroadwayProducer.publish(MyPipeline, %MyEvent{})
+
+  Configure as a producer in your Broadway pipeline:
+
+      defmodule MyPipeline do
+        use Broadway
+
+        def start_link(_opts) do
+          Broadway.start_link(__MODULE__,
+            name: __MODULE__,
+            producer: [
+              module: {PremiereEcouteCore.BroadwayProducer, []},
+              concurrency: 1
+            ],
+            processors: [
+              default: [concurrency: 10]
+            ]
+          )
+        end
+
+        def handle_message(_processor, message, _context) do
+          # Process the event
+          message
+        end
+      end
+  """
 
   use GenStage
 

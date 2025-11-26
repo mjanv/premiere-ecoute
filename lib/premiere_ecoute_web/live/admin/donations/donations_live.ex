@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Admin.Donations.DonationsLive do
-  @moduledoc false
+  @moduledoc """
+  Admin donations goals management LiveView.
+
+  Provides donation goal listing with create/edit modal forms, activation/deactivation toggles, deletion functionality, and form validation for managing fundraising goals.
+  """
 
   use PremiereEcouteWeb, :live_view
 

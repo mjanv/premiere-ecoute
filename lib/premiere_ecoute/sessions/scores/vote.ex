@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.Scores.Vote do
-  @moduledoc false
+  @moduledoc """
+  Individual vote aggregate.
+
+  Stores viewer votes on tracks during listening sessions, parses vote values from chat messages against configured vote options, and enforces uniqueness per viewer-session-track combination.
+  """
 
   use PremiereEcouteCore.Aggregate,
     json: [:value, :track_id, :session_id, :viewer_id, :inserted_at]

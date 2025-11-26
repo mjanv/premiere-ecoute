@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.DeezerApi do
-  @moduledoc false
+  @moduledoc """
+  Deezer API client.
+
+  Provides access to Deezer Web API for fetching playlist data. No authentication required as the Deezer API is public.
+  """
 
   use PremiereEcouteCore.Api, api: :deezer
 

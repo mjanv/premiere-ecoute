@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Festivals.Services.PosterAnalyzer do
-  @moduledoc false
+  @moduledoc """
+  Festival poster analysis service.
+
+  Analyzes festival poster images using configured AI model, broadcasts partial results via PubSub for real-time UI updates, and returns complete festival data.
+  """
 
   alias PremiereEcoute.Festivals.Poster
   alias PremiereEcoute.PubSub

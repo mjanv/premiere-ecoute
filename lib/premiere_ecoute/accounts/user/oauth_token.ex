@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.User.OauthToken do
-  @moduledoc false
+  @moduledoc """
+  User OAuth tokens for external providers.
+
+  Stores encrypted access and refresh tokens for Twitch and Spotify providers, handles token creation/refresh/disconnection, and publishes AccountAssociated events when tokens are created.
+  """
 
   use PremiereEcouteCore.Aggregate.Entity,
     json: [:user_id, :username]
@@ -24,8 +28,8 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     field :provider, Ecto.Enum, values: [:twitch, :spotify]
     field :user_id, :string
     field :username, :string
-    field :access_token, PremiereEcoute.Repo.Encrypted, redact: true
-    field :refresh_token, PremiereEcoute.Repo.Encrypted, redact: true
+    field :access_token, PremiereEcoute.Repo.EncryptedField, redact: true
+    field :refresh_token, PremiereEcoute.Repo.EncryptedField, redact: true
     field :expires_at, :utc_datetime
 
     belongs_to :parent, User

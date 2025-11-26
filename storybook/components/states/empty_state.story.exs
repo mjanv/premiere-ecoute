@@ -1,5 +1,9 @@
 defmodule Storybook.Components.EmptyState do
-  @moduledoc false
+  @moduledoc """
+  Storybook for empty state component.
+
+  Displays variations of empty state components with different sizes, contexts, action buttons, error states, and icons.
+  """
 
   use PhoenixStorybook.Story, :component
 

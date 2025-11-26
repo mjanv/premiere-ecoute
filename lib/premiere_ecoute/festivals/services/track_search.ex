@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Festivals.Services.TrackSearch do
-  @moduledoc false
+  @moduledoc """
+  Festival track search service.
+
+  Searches Spotify for top tracks by festival lineup artists, creates playlists from found tracks, and broadcasts progress via PubSub for real-time updates.
+  """
 
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.LibraryPlaylist

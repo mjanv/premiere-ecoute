@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Search do
-  @moduledoc false
+  @moduledoc """
+  Search and filtering utilities.
+
+  Provides functions for fuzzy text search using Jaro distance, field-based filtering, and date-aware sorting of data collections.
+  """
 
   def filter(data, query, fields, threshold \\ 0.8)
 

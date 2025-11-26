@@ -1,5 +1,7 @@
 defmodule PremiereEcouteCore.Aggregate.Object do
-  @moduledoc false
+  @moduledoc """
+  Base module for aggregate objects.
+  """
 
   defmacro __using__(_opts) do
     quote do

@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Static.Legal.LegalController do
+  @moduledoc """
+  Legal documents controller.
+
+  Serves static legal documents including privacy policy, cookie policy, terms of service, and contact information pages.
+  """
+
   use PremiereEcouteWeb, :controller
 
   alias PremiereEcouteWeb.Static.Legal

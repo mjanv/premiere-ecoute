@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Components.Navigation.Back do
-  @moduledoc false
+  @moduledoc """
+  Back navigation component.
+
+  Renders a back link with a left arrow icon for navigating to previous pages.
+  """
 
   use Phoenix.Component
 

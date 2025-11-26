@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
-  @moduledoc false
+  @moduledoc """
+  Spotify albums API.
+
+  Fetches album data with tracks from Spotify API and parses into Album aggregates.
+  """
 
   require Logger
 

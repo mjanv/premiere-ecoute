@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Webhooks.TwilioController do
+  @moduledoc """
+  Twilio SMS webhook handler controller.
+
+  Processes incoming SMS messages from Twilio webhooks, parses message data with sender and country information, and responds with TwiML acknowledgment messages.
+  """
+
   use PremiereEcouteWeb, :controller
 
   require Logger

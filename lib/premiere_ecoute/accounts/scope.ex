@@ -35,6 +35,7 @@ defmodule PremiereEcoute.Accounts.Scope do
   def end_impersonation(%__MODULE__{admin: %User{} = admin}), do: for_user(admin)
   def end_impersonation(scope), do: scope
 
+  @doc "Checks if the scope has a valid user."
   def valid?(%{assigns: %{current_scope: current_scope}}), do: valid?(current_scope)
   def valid?(%__MODULE__{user: %User{}}), do: true
   def valid?(_), do: false

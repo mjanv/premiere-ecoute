@@ -1,5 +1,9 @@
 defmodule Storybook.Components.StatusBadge do
-  @moduledoc false
+  @moduledoc """
+  Storybook for status badge component.
+
+  Displays variations of status badges with different statuses, variants, sizes, icons, and custom content.
+  """
 
   use PhoenixStorybook.Story, :component
 

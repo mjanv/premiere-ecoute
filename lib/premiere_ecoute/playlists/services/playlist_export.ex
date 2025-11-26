@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Playlists.Services.PlaylistExport do
-  @moduledoc false
+  @moduledoc """
+  Playlist export service.
+
+  Exports tracks to Spotify playlists by clearing existing tracks and adding new ones.
+  """
 
   alias PremiereEcoute.Apis
 

@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
   @moduledoc """
   Empty state components for consistent empty data presentations.
   """
+
   use Phoenix.Component
 
   alias PremiereEcouteWeb.CoreComponents
@@ -95,7 +96,7 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
 
   ## Examples
 
-      <.empty_list 
+      <.empty_list
         message="No items found"
         icon="hero-inbox"
       />

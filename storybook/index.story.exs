@@ -1,5 +1,9 @@
 defmodule Storybook.Index do
-  @moduledoc false
+  @moduledoc """
+  Storybook welcome page.
+
+  Provides an introduction to the storybook with links to documentation and usage guides.
+  """
 
   use PhoenixStorybook.Story, :page
 

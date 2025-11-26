@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Endpoint do
+  @moduledoc """
+  Phoenix application endpoint.
+
+  Configures HTTP server with LiveView sockets, static file serving, CORS for extension API, session management, development tools (live reload, code reloader), telemetry with PromEx, and Twitch webhook HMAC validation.
+  """
+
   use Phoenix.Endpoint, otp_app: :premiere_ecoute
 
   @session_options [

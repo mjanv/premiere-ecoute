@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Static.Changelog.ChangelogController do
+  @moduledoc """
+  Changelog controller.
+
+  Serves changelog entries listing all release notes and individual changelog entry details.
+  """
+
   use PremiereEcouteWeb, :controller
 
   alias PremiereEcouteWeb.Static.Changelog

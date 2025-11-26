@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.TwitchApi.Chat do
-  @moduledoc false
+  @moduledoc """
+  Twitch chat API.
+
+  Sends chat messages, replies, and announcements to Twitch channels via TwitchQueue for rate limiting, using bot credentials to post on behalf of users.
+  """
 
   require Logger
 

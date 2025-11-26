@@ -1,5 +1,13 @@
 defmodule Mix.Tasks.Spotify.Url do
-  @moduledoc false
+  @moduledoc """
+  Generates the Spotify OAuth authorization URL.
+
+  ## Usage
+
+      mix spotify.url
+
+  Requires `SPOTIFY_CLIENT_ID` and `SPOTIFY_REDIRECT_URI` environment variables.
+  """
 
   use Mix.Task
   use Boundary, classify_to: PremiereEcouteMix

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Festivals.Poster do
-  @moduledoc false
+  @moduledoc """
+  Festival poster utilities.
+
+  Reads image files and converts them to base64-encoded data URLs with proper MIME types for AI analysis.
+  """
 
   def read_base64_image(image_path) do
     with {:ok, data} <- File.read(image_path),

@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Router do
+  @moduledoc """
+  Application router.
+
+  Defines HTTP routes and LiveView sessions with pipelines for browser/API/webhook requests, authentication requirements (viewer/streamer/admin), and integrates Oban dashboard, Storybook, LiveDashboard, and feature flags UI.
+  """
+
   use PremiereEcouteWeb, :router
 
   import Oban.Web.Router

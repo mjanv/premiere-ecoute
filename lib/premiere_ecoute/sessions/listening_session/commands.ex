@@ -1,8 +1,12 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
-  @moduledoc false
+  @moduledoc """
+  Listening session commands.
+  """
 
   defmodule PrepareListeningSession do
-    @moduledoc false
+    @moduledoc """
+    Command - Prepare a new listening session.
+    """
 
     @type t :: %__MODULE__{
             user_id: integer(),
@@ -16,7 +20,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   end
 
   defmodule StartListeningSession do
-    @moduledoc false
+    @moduledoc """
+    Command - Start a listening session.
+    """
 
     alias PremiereEcoute.Accounts.Scope
 
@@ -26,7 +32,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   end
 
   defmodule SkipNextTrackListeningSession do
-    @moduledoc false
+    @moduledoc """
+    Command - Skip to next track in listening session.
+    """
 
     alias PremiereEcoute.Accounts.Scope
 
@@ -36,7 +44,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   end
 
   defmodule SkipPreviousTrackListeningSession do
-    @moduledoc false
+    @moduledoc """
+    Command - Skip to previous track in listening session.
+    """
 
     alias PremiereEcoute.Accounts.Scope
 
@@ -46,7 +56,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
   end
 
   defmodule StopListeningSession do
-    @moduledoc false
+    @moduledoc """
+    Command - Stop a listening session.
+    """
 
     alias PremiereEcoute.Accounts.Scope
 

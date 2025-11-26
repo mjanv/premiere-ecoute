@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.User.Profile do
-  @moduledoc false
+  @moduledoc """
+  User profile settings.
+
+  Embedded schema for user preferences including color scheme (light/dark/system) and language (en/fr/it).
+  """
 
   use PremiereEcouteCore.Aggregate.Object
 

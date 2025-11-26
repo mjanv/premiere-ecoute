@@ -1,5 +1,9 @@
 defmodule Storybook.CoreComponents.Flash do
-  @moduledoc false
+  @moduledoc """
+  Storybook for flash component.
+
+  Displays variations of the flash message component including info and error messages.
+  """
 
   use PhoenixStorybook.Story, :component
 

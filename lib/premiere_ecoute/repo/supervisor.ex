@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Repo.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Repositories subservice.
+
+  Manages the Ecto repo, Ecto encryption vault, and Oban job processor.
+  """
 
   use Supervisor
 

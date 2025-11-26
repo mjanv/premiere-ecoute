@@ -1,5 +1,9 @@
 defmodule Storybook.CoreComponents.List do
-  @moduledoc false
+  @moduledoc """
+  Storybook for list component.
+
+  Displays variations of the list component with title-value item pairs.
+  """
 
   use PhoenixStorybook.Story, :component
 

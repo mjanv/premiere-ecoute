@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.Services.AccountFollow do
-  @moduledoc false
+  @moduledoc """
+  Account follow service.
+
+  Manages user follows for streamers by fetching follow status from Twitch API and creating follow records with background worker support for bulk operations.
+  """
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
@@ -8,7 +12,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
   alias PremiereEcoute.Apis
 
   defmodule Worker do
-    @moduledoc false
+    @moduledoc """
+    Oban worker for processing follow operations.
+
+    Fetches follow status from Twitch API and creates follow records asynchronously.
+    """
 
     use PremiereEcouteCore.Worker, queue: :twitch
 

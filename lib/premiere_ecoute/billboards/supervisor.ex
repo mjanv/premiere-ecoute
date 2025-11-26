@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Billboards.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Billboards subservice.
+
+  Manages the billboards cache.
+  """
 
   use Supervisor
 

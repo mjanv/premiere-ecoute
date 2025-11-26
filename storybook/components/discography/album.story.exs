@@ -1,5 +1,9 @@
 defmodule Storybook.Components.Album do
-  @moduledoc false
+  @moduledoc """
+  Storybook for album display component.
+
+  Displays variations of album display components showing album information including name, artist, and cover art.
+  """
 
   use PhoenixStorybook.Story, :component
 

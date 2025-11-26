@@ -1,5 +1,9 @@
 defmodule Storybook.Components.LoadingOverlay do
-  @moduledoc false
+  @moduledoc """
+  Storybook for loading overlay component.
+
+  Displays variations of loading overlays with different variants (modal/overlay) and custom messages.
+  """
 
   use PhoenixStorybook.Story, :component
 

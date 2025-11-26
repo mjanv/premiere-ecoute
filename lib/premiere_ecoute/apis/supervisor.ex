@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Apis subservice.
+
+  Manages caches for subscriptions and tokens, a player registry, and runtime services (player supervisor, Twitch queue, rate limiter)
+  """
 
   use Supervisor
 

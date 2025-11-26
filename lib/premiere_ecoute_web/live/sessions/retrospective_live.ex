@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   Retrospective view for ended listening sessions.
   Visibility is controlled by session.visibility setting (private/protected/public).
   """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Sessions

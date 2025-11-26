@@ -1,5 +1,9 @@
 defmodule PremiereEcoute do
-  @moduledoc false
+  @moduledoc """
+  PremiereEcoute domain layer public API.
+
+  Exposes core business modules (Apis, Accounts, Playlists, Sessions, etc.) and provides delegation to the underlying command and event infrastructure.
+  """
 
   use Boundary,
     deps: [PremiereEcouteCore],

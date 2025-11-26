@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Festivals do
-  @moduledoc false
+  @moduledoc """
+  Festivals context.
+
+  Analyzes festival posters to extract lineups, searches for artist tracks on Spotify, and creates festival playlists.
+  """
 
   alias PremiereEcoute.Festivals.Services
 

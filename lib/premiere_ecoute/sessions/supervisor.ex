@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Listening sessions service.
+
+  Manages the sessions cache and, outside of test, the Broadway pipelines for processing chat messages and poll results.
+  """
 
   use Supervisor
 

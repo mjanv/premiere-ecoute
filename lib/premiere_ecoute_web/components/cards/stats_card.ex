@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Components.StatsCard do
   @moduledoc """
   Statistics card component for dashboard displays.
   """
+
   use Phoenix.Component
 
   alias PremiereEcouteWeb.Components.Card

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Users do
-  @moduledoc false
+  @moduledoc """
+  Spotify users API.
+
+  Fetches Spotify user profile information including ID, display name, email, country, and product subscription.
+  """
 
   alias PremiereEcoute.Apis.SpotifyApi
 

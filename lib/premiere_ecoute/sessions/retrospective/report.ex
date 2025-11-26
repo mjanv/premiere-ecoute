@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.Retrospective.Report do
-  @moduledoc false
+  @moduledoc """
+  Session retrospective report aggregate.
+
+  Generates comprehensive reports aggregating individual votes and Twitch polls, calculating viewer and streamer scores per track and overall session, supporting both numeric averaging and text mode voting (smash/pass).
+  """
 
   use PremiereEcouteCore.Aggregate,
     root: [:votes, :polls]

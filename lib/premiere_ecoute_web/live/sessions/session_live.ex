@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Sessions.SessionLive do
+  @moduledoc """
+  Individual session management LiveView.
+
+  Manages listening session lifecycle with real-time Spotify player integration, vote window controls, track navigation, visibility settings, live statistics with vote trends charts, overlay configuration, and automatic track advancement with scheduled workers.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   require Logger

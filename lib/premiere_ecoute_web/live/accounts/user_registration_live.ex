@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Accounts.UserRegistrationLive do
+  @moduledoc """
+  User registration LiveView.
+
+  Handles new user account creation with email validation, delivers magic link login instructions, and redirects authenticated users to signed-in path.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts

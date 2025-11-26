@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Components.Search do
-  @moduledoc false
+  @moduledoc """
+  Search components.
+
+  Provides search bar components with real-time debounced search functionality and customizable placeholders.
+  """
 
   use Phoenix.Component
 

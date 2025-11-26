@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Components.Backgrounds do
-  @moduledoc false
+  @moduledoc """
+  Background components.
+
+  Provides gradient background components with conditional rendering based on status values.
+  """
 
   use Phoenix.Component
 

@@ -36,11 +36,19 @@ defmodule PremiereEcoute.Repo do
 end
 
 defmodule PremiereEcoute.Repo.Vault do
+  @moduledoc """
+  Encryption vault for sensitive database fields using Cloak.
+
+  Provides encryption and decryption capabilities for fields that need to be stored securely in the database, such as API tokens and credentials.
+  """
+
   use Cloak.Vault, otp_app: :premiere_ecoute
 end
 
-defmodule PremiereEcoute.Repo.Encrypted do
-  @moduledoc false
+defmodule PremiereEcoute.Repo.EncryptedField do
+  @moduledoc """
+  Ecto.Type to encrypt a binary field.
+  """
 
   use Cloak.Ecto.Binary, vault: PremiereEcoute.Repo.Vault
 end

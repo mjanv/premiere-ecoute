@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
-  @moduledoc false
+  @moduledoc """
+  Command handler for listening session commands.
+
+  Handles session lifecycle commands (prepare/start/stop) and playback navigation (next/previous track), coordinating between Spotify API, Twitch API, and session state management while publishing corresponding events.
+  """
 
   use PremiereEcouteCore.CommandBus.Handler
   use Gettext, backend: PremiereEcoute.Gettext

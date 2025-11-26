@@ -1,7 +1,9 @@
-# the same MyAppWeb.Flash module as earlier
-
 defmodule PremiereEcouteWeb.Hooks.Flash do
-  @moduledoc false
+  @moduledoc """
+  LiveView hook for flash messages.
+
+  Subscribes authenticated users to their PubSub channel and handles info and error flash messages broadcasted to the user.
+  """
 
   import Phoenix.LiveView
 

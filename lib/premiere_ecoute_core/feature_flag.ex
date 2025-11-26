@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.FeatureFlag do
-  @moduledoc false
+  @moduledoc """
+  Feature flag utilities.
+
+  Provides a wrapper around FunWithFlags for managing feature flags with user-based and role-based targeting.
+  """
 
   defdelegate enabled?(flag, opts \\ []), to: FunWithFlags
   def disabled?(flag, opts \\ []), do: not enabled?(flag, opts)

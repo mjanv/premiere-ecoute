@@ -3,6 +3,7 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
   Renders activity cards used on the home dashboard for displaying user activities,
   creating new content, or showing unavailable features.
   """
+
   use Phoenix.Component
 
   @doc """

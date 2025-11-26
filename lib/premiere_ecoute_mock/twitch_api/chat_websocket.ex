@@ -1,5 +1,9 @@
 defmodule PremiereEcouteMock.TwitchApi.ChatWebSocket do
-  @moduledoc false
+  @moduledoc """
+  Mock Twitch chat WebSocket handler.
+
+  Implements WebSock behavior for mock chat connections, registers with ChatRegistry on init, receives chat messages and announcements via PubSub, and pushes JSON-encoded events to connected WebSocket clients.
+  """
 
   require Logger
 

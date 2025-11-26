@@ -1,5 +1,7 @@
 defmodule Storybook do
-  @moduledoc false
+  @moduledoc """
+  Premiere Ecoute Storybook - Frontend workshop
+  """
 
   use Boundary, deps: [PremiereEcoute, PremiereEcouteWeb], exports: []
 end

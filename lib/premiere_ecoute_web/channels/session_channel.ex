@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.SessionChannel do
-  @moduledoc false
+  @moduledoc """
+  Phoenix Channel for individual listening sessions.
+
+  Handles session:* channel joins with session ID assignment, pushes retrospective report summary on join, and broadcasts real-time session updates including score summaries and track navigation events.
+  """
 
   use PremiereEcouteWeb, :channel
 

@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.HealthController do
+  @moduledoc """
+  Health check endpoint controller.
+
+  Provides a simple health check endpoint returning status and timestamp for monitoring and uptime verification.
+  """
+
   use PremiereEcouteWeb, :controller
 
   def index(conn, _params) do

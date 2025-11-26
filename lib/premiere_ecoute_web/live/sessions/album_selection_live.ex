@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
+  @moduledoc """
+  Album/playlist selection LiveView for session creation.
+
+  Provides interface to search Spotify albums or select user playlists asynchronously, configure vote options (0-10, 1-5, smash/pass), and create new listening sessions with selected content.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias Phoenix.LiveView.AsyncResult

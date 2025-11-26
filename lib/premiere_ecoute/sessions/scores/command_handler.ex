@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
-  @moduledoc false
+  @moduledoc """
+  Command handler for chat commands.
+
+  Handles !premiereecoute and !vote chat commands, sending information about the platform or user's current average vote via Twitch chat replies.
+  """
 
   use PremiereEcouteCore.CommandBus.Handler
 

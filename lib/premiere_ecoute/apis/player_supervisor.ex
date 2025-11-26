@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.PlayerSupervisor do
-  @moduledoc false
+  @moduledoc """
+  Dynamic supervisor for music player processes.
+
+  Manages Spotify player processes dynamically with a maximum of 10 concurrent players, handling player startup, shutdown, and deduplication.
+  """
 
   use DynamicSupervisor
 

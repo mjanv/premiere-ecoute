@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
-  @moduledoc false
+  @moduledoc """
+  Spotify playlists API.
+
+  Manages Spotify playlist operations including fetching playlists with tracks, creating user playlists, adding/removing/replacing tracks, and listing user's library playlists.
+  """
 
   require Logger
 

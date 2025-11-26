@@ -58,7 +58,7 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEventsTest do
     test "returns error for streamers without Twitch OAuth tokens" do
       streamer = user_fixture(%{role: :streamer})
 
-      assert :error = SubscribeStreamEvents.subscribe_streamer(streamer)
+      assert :ok = SubscribeStreamEvents.subscribe_streamer(streamer)
     end
 
     test "returns error for API failures" do

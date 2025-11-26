@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.User.Token do
-  @moduledoc false
+  @moduledoc """
+  User authentication tokens.
+
+  Manages session tokens, magic link tokens, and email change tokens with expiry, hashing, and verification for secure authentication flows.
+  """
 
   use PremiereEcouteCore.Aggregate.Entity
 

@@ -1,11 +1,12 @@
 defmodule Mix.Tasks.Gettext.Check do
+  @moduledoc """
+  Checks gettext extractions and translations statuses
+
+  Runs gettext.extract, gettext.merge, and display missing translations.
+  """
+
   use Mix.Task
   use Boundary, classify_to: PremiereEcouteMix
-
-  @shortdoc "Checks that all gettext strings are extracted and translated"
-  @moduledoc """
-  Runs gettext.extract, gettext.merge, and greps for missing translations.
-  """
 
   @locales Application.compile_env(:premiere_ecoute, [PremiereEcoute.Gettext, :locales])
 
@@ -17,7 +18,7 @@ defmodule Mix.Tasks.Gettext.Check do
       Mix.Task.run("gettext.merge", ["priv/gettext", "--locale", locale])
     end
 
-    for locale <- ["fr", "it"] do
+    for locale <- @locales do
       file = "priv/gettext/#{locale}/LC_MESSAGES/default.po"
       Mix.shell().info("🔍 Checking for missing #{locale} translations in #{file}...")
 

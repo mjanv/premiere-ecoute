@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyApi.Search do
-  @moduledoc false
+  @moduledoc """
+  Spotify search API.
+
+  Searches Spotify catalog for albums and artists with query string matching.
+  """
 
   require Logger
 

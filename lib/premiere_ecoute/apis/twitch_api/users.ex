@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.TwitchApi.Users do
-  @moduledoc false
+  @moduledoc """
+  Twitch users API.
+
+  Fetches Twitch user profile information from API.
+  """
 
   require Logger
 

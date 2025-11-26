@@ -1,5 +1,27 @@
 defmodule PremiereEcouteCore.CommandBus.Handler do
-  @moduledoc false
+  @moduledoc """
+  Base module for command handlers.
+
+  Provides command registration and default implementations for validation and handling. Handlers must declare which commands they handle using the `command/1` macro and implement `validate/1` and `handle/1` callbacks.
+
+  ## Usage
+
+      defmodule MyHandler do
+        use PremiereEcouteCore.CommandBus.Handler
+
+        command MyCommand
+
+        def validate(%MyCommand{} = cmd) do
+          # Validate the command
+          {:ok, cmd}
+        end
+
+        def handle(%MyCommand{} = cmd) do
+          # Execute the command and return events
+          {:ok, [%MyEvent{}]}
+        end
+      end
+  """
 
   defmacro __using__(_opts) do
     quote do

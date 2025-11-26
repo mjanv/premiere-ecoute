@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Errors.ErrorHTML do
 
   See config/config.exs.
   """
+
   use PremiereEcouteWeb, :html
 
   # If you want to customize your error pages,

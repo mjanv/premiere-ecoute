@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeController do
+  @moduledoc """
+  Buy Me a Coffee webhook handler controller.
+
+  Processes Buy Me a Coffee webhooks for donation events, handling donation creation and refund events, persisting donation records, and tracking donation metrics.
+  """
+
   use PremiereEcouteWeb, :controller
 
   require Logger

@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.Scores.PollPipeline do
-  @moduledoc false
+  @moduledoc """
+  Broadway pipeline for processing Twitch poll updates.
+
+  Processes PollUpdated events, transforms them into Poll aggregates, and upserts poll data for session retrospectives.
+  """
 
   use Broadway
 

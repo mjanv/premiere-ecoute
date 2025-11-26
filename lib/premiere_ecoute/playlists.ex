@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Playlists do
-  @moduledoc false
+  @moduledoc """
+  Playlists context.
+
+  Manages user playlist libraries including creation, export to music platforms, and automatic track saving rules.
+  """
 
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.PlaylistRule

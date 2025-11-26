@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Static.Legal do
-  @moduledoc false
+  @moduledoc """
+  Legal document publisher.
+
+  Publishes legal documents from markdown files using NimblePublisher, providing access to terms of service, privacy policy, and other legal content.
+  """
 
   use NimblePublisher,
     build: PremiereEcoute.Accounts.LegalDocument,

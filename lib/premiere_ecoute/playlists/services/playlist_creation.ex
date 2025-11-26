@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Playlists.Services.PlaylistCreation do
-  @moduledoc false
+  @moduledoc """
+  Playlist creation service.
+
+  Creates playlists on Spotify and stores them in user's library playlist collection.
+  """
 
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.LibraryPlaylist

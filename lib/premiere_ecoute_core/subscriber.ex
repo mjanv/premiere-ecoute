@@ -1,5 +1,23 @@
 defmodule PremiereEcouteCore.Subscriber do
-  @moduledoc false
+  @moduledoc """
+  Base module for EventStore subscribers.
+
+  Provides a GenServer-based subscriber that automatically subscribes to an EventStore stream and processes events through a `handle/1` callback function. Modules using this must implement their own event handling logic.
+
+  ## Options
+
+  - `:stream` - Required. The UUID of the EventStore stream to subscribe to
+
+  ## Usage
+
+      defmodule MySubscriber do
+        use PremiereEcouteCore.Subscriber, stream: "my-stream-uuid"
+
+        def handle(%RecordedEvent{event_type: "MyEvent", data: data}) do
+          # Process the event
+        end
+      end
+  """
 
   defmacro __using__(opts) do
     stream_uuid = Keyword.fetch!(opts, :stream)

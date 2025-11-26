@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions do
-  @moduledoc false
+  @moduledoc """
+  Sessions context.
+
+  Manages listening session lifecycle, vote processing via Broadway pipelines, and retrospective reports with historical views of albums and votes.
+  """
 
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective

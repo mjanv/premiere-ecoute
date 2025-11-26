@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Components.Header do
   @moduledoc """
   Provides header component for navigation and user menu.
   """
+
   use PremiereEcouteWeb, :html
 
   @doc """

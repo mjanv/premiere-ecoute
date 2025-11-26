@@ -1,5 +1,9 @@
 defmodule Storybook.CoreComponents.Table do
-  @moduledoc false
+  @moduledoc """
+  Storybook for table component.
+
+  Displays variations of the table component including default tables, tables with row functions, and tables with action slots.
+  """
 
   use PhoenixStorybook.Story, :component
 

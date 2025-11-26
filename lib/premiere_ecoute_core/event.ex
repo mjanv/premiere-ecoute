@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Event do
-  @moduledoc false
+  @moduledoc """
+  Base module for domain events.
+
+  Provides struct definition, JSON encoding, and string representation for event sourcing. Events are automatically configured with an ID field and custom fields specified in options.
+  """
 
   def name(event), do: event.__struct__ |> Module.split() |> List.last()
 

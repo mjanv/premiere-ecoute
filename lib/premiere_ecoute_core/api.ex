@@ -1,5 +1,20 @@
 defmodule PremiereEcouteCore.Api do
-  @moduledoc false
+  @moduledoc """
+  Base module for API client implementations.
+
+  Provides a common interface for HTTP API clients using Req, including configuration management, request helpers, response handling with status validation, telemetry integration, and automatic token caching with client credentials flow. Modules using this behavior must implement their API-specific methods defined in the corresponding Behaviour module.
+
+  ## Available Methods
+
+  - `env/0` - Retrieves the entire API configuration
+  - `env/1` - Retrieves a specific configuration key
+  - `impl/0` - Returns the API implementation module
+  - `url/1` - Retrieves a URL by key from the configuration
+  - `new/1` - Creates a new Req request with telemetry attached
+  - `get/2`, `post/2`, `put/2`, `patch/2`, `delete/2` - HTTP request methods
+  - `handle/3` - Handles API responses with status validation and error handling
+  - `token/1` - Retrieves or refreshes access tokens with caching
+  """
 
   defmacro __using__(opts) do
     app = Keyword.get(opts, :app, :premiere_ecoute)

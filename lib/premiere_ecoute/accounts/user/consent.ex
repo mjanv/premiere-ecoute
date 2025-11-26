@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Accounts.User.Consent do
-  @moduledoc false
+  @moduledoc """
+  User consent entity.
+
+  Tracks user acceptance or refusal of legal documents (privacy/cookies/terms) with version tracking, publishes ConsentGiven events, and validates user compliance with required documents.
+  """
 
   use PremiereEcouteCore.Aggregate.Entity,
     identity: [:document, :user_id]

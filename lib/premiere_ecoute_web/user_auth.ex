@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.UserAuth do
-  @moduledoc false
+  @moduledoc """
+  User authentication and authorization.
+
+  Provides comprehensive authentication including login/logout, remember-me functionality, session token management with automatic reissuing, admin impersonation support, LiveView on_mount callbacks for authentication and role-based authorization (viewer/streamer/bot/admin), and plugs for protecting routes requiring authenticated or Spotify-connected users.
+  """
 
   use PremiereEcouteWeb, :verified_routes
 

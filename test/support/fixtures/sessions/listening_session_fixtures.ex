@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.ListeningSessionFixtures do
-  @moduledoc false
+  @moduledoc """
+  Listening session fixtures.
+
+  Provides factory functions to generate test listening session and track data for use in test suites.
+  """
 
   import PremiereEcoute.Discography.AlbumFixtures
 

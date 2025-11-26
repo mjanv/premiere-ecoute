@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Accounts.UserSettingsLive do
+  @moduledoc """
+  User account settings management LiveView.
+
+  Manages email and password updates with sudo mode protection, email confirmation flow, form validation, and secure password changes requiring current password verification.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   on_mount {PremiereEcouteWeb.UserAuth, :sudo_mode}

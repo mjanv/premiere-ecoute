@@ -1,5 +1,7 @@
 defmodule PremiereEcouteMock do
-  @moduledoc false
+  @moduledoc """
+  Premiere Ecoute Mock service
+  """
 
   use Boundary, deps: [PremiereEcoute], exports: []
 end

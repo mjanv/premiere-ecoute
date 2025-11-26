@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Telemetry.Supervisor do
-  @moduledoc false
+  @moduledoc """
+  Telemetry subservice.
+
+  Manages PromEx for Prometheus metrics export.
+  """
 
   use Supervisor
 

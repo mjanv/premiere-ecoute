@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Webhooks.TwitchController do
+  @moduledoc """
+  Twitch EventSub webhook handler controller.
+
+  Processes Twitch EventSub webhooks with HMAC validation, handling chat messages and commands, poll events (start, progress, end), stream online/offline notifications, and webhook verification challenges.
+  """
+
   use PremiereEcouteWeb, :controller
 
   require Logger

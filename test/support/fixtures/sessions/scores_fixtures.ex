@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Sessions.ScoresFixtures do
-  @moduledoc false
+  @moduledoc """
+  Scores fixtures.
+
+  Provides factory functions to generate test vote data for listening sessions.
+  """
 
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.Scores.Vote

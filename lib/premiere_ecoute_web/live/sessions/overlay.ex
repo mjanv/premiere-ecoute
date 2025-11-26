@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Sessions.Overlay do
-  @moduledoc false
+  @moduledoc """
+  Session overlay components for streaming.
+
+  Provides Phoenix components for displaying listening session scores in OBS overlays, including score value extraction and label formatting for viewer and streamer scores.
+  """
 
   use Phoenix.Component
 

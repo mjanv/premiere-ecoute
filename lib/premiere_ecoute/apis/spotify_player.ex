@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.SpotifyPlayer do
-  @moduledoc false
+  @moduledoc """
+  Spotify playback state monitoring GenServer.
+
+  Polls the Spotify API every second to track playback state changes and broadcasts events for play/pause, track changes, and playback progress to user-specific PubSub channels.
+  """
 
   use GenServer, restart: :transient
 

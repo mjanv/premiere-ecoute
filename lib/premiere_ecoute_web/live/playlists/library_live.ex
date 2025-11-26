@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Playlists.LibraryLive do
+  @moduledoc """
+  User playlist library management LiveView.
+
+  Displays user's registered playlists with Spotify library integration, paginated playlist browsing, playlist selection and registration to library, and playlist creation with metadata management.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   require Logger

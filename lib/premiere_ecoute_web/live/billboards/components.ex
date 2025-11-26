@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Billboards.Components do
-  @moduledoc false
+  @moduledoc """
+  Billboard UI components.
+
+  Provides synthwave-themed Phoenix components including ASCII art billboard header, tab navigation with active state styling, and podium display for top 3 ranked entries with clickable interactions.
+  """
 
   use Phoenix.Component
 

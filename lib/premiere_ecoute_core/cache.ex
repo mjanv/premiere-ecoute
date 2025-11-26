@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Cache do
-  @moduledoc false
+  @moduledoc """
+  Cache utilities.
+
+  Provides a wrapper around Cachex for managing application caches with operations for clearing, deleting, getting, and putting values.
+  """
 
   require Logger
 

@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Worker do
-  @moduledoc false
+  @moduledoc """
+  Base module for Oban workers.
+
+  Provides convenience functions for scheduling background jobs with various timing options including immediate execution, delays, and specific datetime scheduling.
+  """
 
   defmacro __using__(opts) do
     quote do

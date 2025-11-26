@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Festivals.Models.Static do
-  @moduledoc false
+  @moduledoc """
+  Static festival poster analyzer for testing.
+
+  Returns hardcoded festival data streams for testing poster analysis without calling external AI APIs.
+  """
 
   @behaviour PremiereEcoute.Festivals.Models.Model
 

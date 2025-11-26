@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Billboards.BillboardLive do
+  @moduledoc """
+  Billboard generation and visualization LiveView.
+
+  Generates music billboards from playlist URLs with async processing and progress tracking, displaying ranked tracks, artists, years and playlists with similarity analysis, multiple display modes, and detailed modal views for each item.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Billboards

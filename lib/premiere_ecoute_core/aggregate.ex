@@ -1,5 +1,51 @@
 defmodule PremiereEcouteCore.Aggregate do
-  @moduledoc false
+  @moduledoc """
+  Base module for aggregate roots and entities.
+
+  Provides comprehensive CRUD operations, pagination, preloading, statistics, and JSON encoding for domain aggregates using Ecto. Aggregates are configured with root associations for preloading, identity fields for uniqueness checks, and JSON fields for serialization.
+
+  ## Options
+
+  - `:root` - List of associations to preload automatically
+  - `:identity` - Fields used to uniquely identify entities
+  - `:json` - Fields to include in JSON encoding
+
+  ## Available Operations
+
+  ### Forms
+
+  - `form/2` - Create a changeset form
+
+  ### Create
+
+  - `create/1` - Insert new entity with preload
+  - `create_if_not_exists/1` - Insert only if not already exists
+  - `create_all/2` - Bulk insert entities
+
+  ### Read
+
+  - `get/1` - Fetch by ID with preload
+  - `get_by/2` - Fetch by clauses with preload
+  - `exists?/1` - Check if entity exists
+  - `all/1` - Fetch all with optional filtering
+  - `all_by/2` - Fetch all matching clauses
+  - `page/3` - Paginated query
+  - `next_page/2` - Fetch next page in pagination
+
+  ### Update
+
+  - `update/2` - Update entity with preload
+  - `upsert/2` - Insert or update entity
+
+  ### Delete
+
+  - `delete/1` - Delete entity
+  - `delete_all/1` - Delete all matching query
+
+  ### Statistics
+
+  - `average/2`, `count/2`, `max/2`, `min/2`, `sum/2` - Aggregate functions
+  """
 
   defmacro __using__(opts) do
     root = Keyword.get(opts, :root, [])

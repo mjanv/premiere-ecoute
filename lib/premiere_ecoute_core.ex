@@ -1,6 +1,6 @@
 defmodule PremiereEcouteCore do
   @moduledoc """
-  Core system facade module
+  Premiere Ecoute core library
 
   Provides centralized access to the application's command and event processing systems. This module acts as the primary interface for executing commands through the command bus and dispatching events through the event bus.
   """

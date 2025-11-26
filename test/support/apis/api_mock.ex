@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.ApiMock do
-  @moduledoc false
+  @moduledoc """
+  API mocking utilities for tests.
+
+  Provides helpers to mock HTTP API responses using Req.Test, with support for request validation and response stubbing.
+  """
 
   import ExUnit.Assertions
 

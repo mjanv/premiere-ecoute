@@ -1,5 +1,9 @@
 defmodule PremiereEcoute.Apis.TwitchApi.Channels do
-  @moduledoc false
+  @moduledoc """
+  Twitch channels API.
+
+  Fetches followed channels for users from Twitch API.
+  """
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User

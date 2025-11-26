@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.Hooks.RestoreLocale do
-  @moduledoc false
+  @moduledoc """
+  LiveView hook for locale restoration.
+
+  Restores user's preferred locale on LiveView mount by checking browser locale from session first, then user profile language for authenticated users, validating against supported locales before setting Gettext locale.
+  """
 
   @supported_locales Gettext.known_locales(PremiereEcoute.Gettext)
 

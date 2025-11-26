@@ -1,5 +1,9 @@
 defmodule PremiereEcouteWeb.HomepageLive do
-  @moduledoc false
+  @moduledoc """
+  Public homepage LiveView.
+
+  Displays the landing page for non-authenticated users and redirects authenticated users to their home dashboard.
+  """
 
   use PremiereEcouteWeb, :live_view
 

@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Playlists.RulesLive do
+  @moduledoc """
+  Playlist automation rules configuration LiveView.
+
+  Manages save tracks rule configuration, allowing users to select a target playlist for automatically saving tracks and activate or deactivate the rule.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Accounts.User

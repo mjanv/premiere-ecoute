@@ -1,5 +1,9 @@
 defmodule Storybook.CoreComponents do
-  @moduledoc false
+  @moduledoc """
+  Storybook index for core components.
+
+  Organizes core UI components in the storybook with custom icons and folder configuration.
+  """
 
   use PhoenixStorybook.Index
 

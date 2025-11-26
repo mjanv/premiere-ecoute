@@ -1,4 +1,10 @@
 defmodule PremiereEcouteWeb.Festivals.PosterLive do
+  @moduledoc """
+  Festival poster upload and analysis LiveView.
+
+  Uploads festival poster images, analyzes them with AI to extract lineup, searches Spotify for artist tracks asynchronously with real-time progress updates via PubSub, and creates playlists from found tracks.
+  """
+
   use PremiereEcouteWeb, :live_view
 
   require Logger

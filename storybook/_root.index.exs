@@ -1,5 +1,9 @@
 defmodule Storybook.Root do
-  @moduledoc false
+  @moduledoc """
+  Storybook root index.
+
+  Configures the root level storybook navigation with folder icons and entry points.
+  """
 
   use PhoenixStorybook.Index
 
