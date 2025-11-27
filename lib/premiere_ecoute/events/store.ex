@@ -7,6 +7,11 @@ defmodule PremiereEcoute.Events.Store do
 
   use EventStore, otp_app: :premiere_ecoute, enable_hard_deletes: false
 
+  @doc """
+  Reads events from a stream.
+
+  Returns event data (`:event` mode) or raw RecordedEvent structs (`:raw` mode). Returns empty list if stream doesn't exist.
+  """
   @spec read(String.t(), :event | :raw) :: [any()]
   def read(stream_uuid, type \\ :event)
 
@@ -24,6 +29,11 @@ defmodule PremiereEcoute.Events.Store do
     end
   end
 
+  @doc """
+  Retrieves the last N events from a stream.
+
+  Returns a single event for n=1, a list of events for n>1, or nil if stream doesn't exist. Events are returned in chronological order.
+  """
   @spec last(String.t(), integer()) :: any()
   def last(stream_uuid, n \\ 1) do
     case __MODULE__.read_stream_backward(stream_uuid, -1, n) do
@@ -38,6 +48,11 @@ defmodule PremiereEcoute.Events.Store do
     end
   end
 
+  @doc """
+  Paginates through events in a stream.
+
+  Returns a page of RecordedEvent structs as maps. Defaults to page 1 with 10 events per page.
+  """
   @spec paginate(String.t(), Keyword.t()) :: [EventStore.RecordedEvent.t()]
   def paginate(stream_uuid, opts \\ [page: 1, size: 10]) do
     case __MODULE__.read_stream_forward(stream_uuid, (opts[:page] - 1) * opts[:size] + 1, opts[:size]) do
@@ -46,6 +61,11 @@ defmodule PremiereEcoute.Events.Store do
     end
   end
 
+  @doc """
+  Appends an event to the event store.
+
+  Wraps the event in EventData with UUID and metadata. If stream option is provided, appends to both singular and plural stream names.
+  """
   @spec append(map(), Keyword.t()) :: :ok
   def append(event, opts \\ []) do
     event = %EventData{
@@ -66,6 +86,11 @@ defmodule PremiereEcoute.Events.Store do
   defp singular(stream), do: stream <> "-"
   defp plural(stream), do: stream <> "s"
 
+  @doc """
+  Conditionally appends an event on successful operations.
+
+  Appends the result of calling function f on success data, then returns the original success tuple. Passes through other patterns unchanged.
+  """
   @spec ok({:ok, any()} | any(), String.t() | nil, (any() -> any())) :: {:ok, any()} | any()
   def ok(pattern, stream \\ nil, f)
 
@@ -76,6 +101,11 @@ defmodule PremiereEcoute.Events.Store do
 
   def ok(pattern, _stream, _f), do: pattern
 
+  @doc """
+  Conditionally appends an event on error operations.
+
+  Appends the result of calling function g on error data, then returns the original error tuple. Passes through other patterns unchanged.
+  """
   @spec error({:error, any()} | any(), String.t() | nil, (any() -> any())) :: {:error, any()} | any()
   def error(pattern, stream \\ nil, g)
 
@@ -86,7 +116,12 @@ defmodule PremiereEcoute.Events.Store do
 
   def error(pattern, _stream, _g), do: pattern
 
-  @spec error({:ok, any()} | {:error, any()} | any(), String.t() | nil, (any() -> any())) ::
+  @doc """
+  Unconditionally appends an event for any operation result.
+
+  Appends the result of calling function h on the data regardless of success or failure, then returns the original data unchanged.
+  """
+  @spec any({:ok, any()} | {:error, any()} | any(), String.t() | nil, (any() -> any())) ::
           {:ok, any()} | {:error, any()} | any()
   def any(data, stream, h) do
     append(h.(data), stream: stream)

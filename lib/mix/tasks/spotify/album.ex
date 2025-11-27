@@ -14,6 +14,7 @@ defmodule Mix.Tasks.Spotify.Album do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
+  @impl true
   def run(args) do
     {[id: id], [], []} = OptionParser.parse(args, strict: [id: :string])
 

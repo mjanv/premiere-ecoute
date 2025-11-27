@@ -8,6 +8,12 @@ defmodule PremiereEcoute.Apis.TidalApi.Playlists do
   alias PremiereEcoute.Apis.TidalApi
   alias PremiereEcoute.Discography.Playlist
 
+  @doc """
+  Fetches a Tidal playlist by ID.
+
+  Retrieves playlist metadata and track IDs from Tidal API for French country code. Obtains client credentials token before fetching playlist data.
+  """
+  @spec get_playlist(String.t()) :: {:ok, Playlist.t()} | {:error, term()}
   def get_playlist(playlist_id) when is_binary(playlist_id) do
     {:ok, %{"access_token" => token}} = TidalApi.client_credentials()
 

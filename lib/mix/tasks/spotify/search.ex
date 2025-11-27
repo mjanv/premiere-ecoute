@@ -14,6 +14,7 @@ defmodule Mix.Tasks.Spotify.Search do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
+  @impl true
   def run(args) do
     Application.ensure_all_started(:req)
 

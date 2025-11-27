@@ -43,6 +43,12 @@ defmodule PremiereEcoute.Discography.Album do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Creates changeset for album validation.
+
+  Validates required fields, track count, provider type, and uniqueness constraints. Casts associated tracks.
+  """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(album, attrs) do
     album
     |> cast(attrs, [:provider, :album_id, :name, :artist, :release_date, :cover_url, :total_tracks])
@@ -57,6 +63,12 @@ defmodule PremiereEcoute.Discography.Album do
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
   end
 
+  @doc """
+  Inserts album with tracks into database.
+
+  Overrides default create to handle track association conversion before insertion.
+  """
+  @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(%__MODULE__{} = album) do
     album
     |> Map.from_struct()
@@ -64,6 +76,12 @@ defmodule PremiereEcoute.Discography.Album do
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
 
+  @doc """
+  Calculates total album duration in milliseconds.
+
+  Sums duration of all tracks, treating nil durations as zero.
+  """
+  @spec total_duration(t()) :: integer()
   def total_duration(%__MODULE__{tracks: tracks}) do
     tracks
     |> Enum.map(&(&1.duration_ms || 0))

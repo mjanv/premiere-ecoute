@@ -7,6 +7,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Users do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
+  @doc """
+  Fetches Spotify user profile.
+
+  Retrieves authenticated user's profile information including ID, display name, email, country, and product subscription tier.
+  """
+  @spec get_user_profile(String.t()) :: {:ok, map()} | {:error, term()}
   def get_user_profile(access_token) do
     SpotifyApi.api(access_token)
     |> SpotifyApi.get(url: "/me")

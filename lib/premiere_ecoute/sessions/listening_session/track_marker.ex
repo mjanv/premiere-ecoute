@@ -14,6 +14,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
 
   alias PremiereEcoute.Sessions.ListeningSession
 
+  @type t :: %__MODULE__{
+          id: integer() | nil,
+          track_id: integer(),
+          track_number: integer(),
+          started_at: DateTime.t(),
+          listening_session_id: integer()
+        }
+
   @primary_key {:id, :id, autogenerate: true}
   schema "track_markers" do
     field :track_id, :integer
@@ -23,12 +31,20 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
     belongs_to :listening_session, ListeningSession
   end
 
+  @doc "Track marker changeset."
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(marker, attrs) do
     marker
     |> cast(attrs, [:track_id, :track_number, :started_at, :listening_session_id])
     |> validate_required([:track_id, :track_number, :started_at, :listening_session_id])
   end
 
+  @doc """
+  Formats track markers as YouTube chapter timestamps.
+
+  Generates timestamped chapter list with track names for YouTube video descriptions. Adds optional Introduction chapter if bias > 0, and Conclusion chapter if session has ended. Returns empty string for sessions without markers.
+  """
+  @spec format_youtube_chapters(ListeningSession.t(), integer()) :: String.t()
   def format_youtube_chapters(%ListeningSession{track_markers: []}, _bias), do: ""
 
   def format_youtube_chapters(%ListeningSession{track_markers: markers} = session, bias) do

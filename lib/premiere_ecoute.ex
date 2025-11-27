@@ -35,8 +35,11 @@ defmodule PremiereEcoute do
   defdelegate apply(command), to: PremiereEcouteCore
   defdelegate paginate(stream, opts), to: Store
 
+  @doc "Returns mailer"
+  @spec mailer() :: atom()
   def mailer, do: Mailer.impl()
 
   @doc "Returns the full version string in the format version-commit."
+  @spec version() :: String.t()
   def version, do: Enum.join([@version, @commit], "-")
 end

@@ -14,6 +14,12 @@ defmodule PremiereEcouteCore.EventBus do
 
   alias PremiereEcouteCore.Registry
 
+  @doc """
+  Dispatches events to their registered handlers.
+
+  Accepts a single event struct, a list of events, or an empty list. Recursively processes lists. Returns error if no handler is registered for an event type.
+  """
+  @spec dispatch(struct() | list(struct())) :: :ok | {:error, :not_registered}
   def dispatch([]), do: :ok
 
   def dispatch([event | events]) do

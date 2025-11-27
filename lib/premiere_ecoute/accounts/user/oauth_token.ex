@@ -37,6 +37,8 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     timestamps()
   end
 
+  @doc "OAuth token changeset."
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(token, attrs) do
     token
     |> cast(attrs, [:provider, :user_id, :username, :access_token, :refresh_token, :expires_at, :parent_id])
@@ -45,12 +47,22 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> unique_constraint([:user_id, :provider], name: :unique_user_provider_tokens)
   end
 
+  @doc "OAuth token refresh changeset."
+  @spec refresh_changeset(t(), map()) :: Ecto.Changeset.t()
   def refresh_changeset(user, attrs) do
     user
     |> cast(attrs, [:access_token, :refresh_token, :expires_at])
     |> validate_required([])
   end
 
+  @doc """
+  Creates or updates OAuth tokens for a user and provider.
+
+  Checks if tokens already exist for the provider and user_id combination. If found, updates the existing record, otherwise creates a new one. Calculates expiration timestamp from expires_in value.
+
+  Publishes an AccountAssociated event upon success.
+  """
+  @spec create(User.t(), atom(), map()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def create(%User{id: id} = user, provider, %{user_id: user_id, expires_in: expires_in} = attrs) do
     case get_by(provider: provider, user_id: user_id) do
       nil -> %__MODULE__{}
@@ -64,6 +76,12 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 
+  @doc """
+  Refreshes OAuth tokens for a user and provider.
+
+  Looks up existing tokens by parent_id and provider, then updates them with new credentials and expiration. Returns error if no tokens exist for the provider.
+  """
+  @spec refresh(User.t(), atom(), map()) :: {:ok, User.t()} | {:error, nil | Ecto.Changeset.t()}
   def refresh(%User{id: id} = user, provider, %{expires_in: expires_in} = attrs) do
     case Repo.get_by(__MODULE__, parent_id: id, provider: provider) do
       nil ->
@@ -77,6 +95,12 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 
+  @doc """
+  Disconnects a provider by deleting its OAuth tokens.
+
+  Removes the OAuth token record for the specified provider. Returns success even if no tokens exist for the provider.
+  """
+  @spec disconnect(User.t(), atom()) :: {:ok, User.t() | nil}
   def disconnect(%User{id: id} = user, provider) do
     case Repo.get_by(__MODULE__, parent_id: id, provider: provider) do
       nil -> {:ok, nil}
@@ -85,6 +109,12 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
     |> then(fn {status, _token} -> {status, User.preload(user)} end)
   end
 
+  @doc """
+  Deletes all OAuth tokens for a user.
+
+  Removes all provider token records associated with the user. Used for cleanup operations like account deletion.
+  """
+  @spec delete_all_tokens(User.t()) :: {:ok, User.t()}
   def delete_all_tokens(%User{id: id} = user) do
     from(t in __MODULE__, where: t.parent_id == ^id)
     |> Repo.delete_all()

@@ -12,10 +12,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Search do
   alias PremiereEcoute.Discography.Album
 
   @doc """
-  Search for Album
+  Searches Spotify catalog for albums.
 
-  Reference: https://developer.spotify.com/documentation/web-api/reference/search
+  Queries Spotify for albums matching the search string. Returns up to 20 albums with metadata but without tracks.
   """
+  @spec search_albums(String.t()) :: {:ok, list(Album.t())} | {:error, term()}
   def search_albums(query) when is_binary(query) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/search?q=#{URI.encode(query)}&type=album&limit=20")
@@ -36,10 +37,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Search do
   end
 
   @doc """
-  Search for Artist
+  Searches Spotify catalog for an artist.
 
-  Reference: https://developer.spotify.com/documentation/web-api/reference/search
+  Queries Spotify for artists matching the search string. Returns first matching artist's ID or nil if none found.
   """
+  @spec search_artist(String.t()) :: {:ok, map() | nil} | {:error, term()}
   def search_artist(query) when is_binary(query) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/search?q=#{URI.encode(query)}&type=artist&limit=1")

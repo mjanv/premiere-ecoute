@@ -47,6 +47,11 @@ defmodule PremiereEcouteCore.Aggregate do
   - `average/2`, `count/2`, `max/2`, `min/2`, `sum/2` - Aggregate functions
   """
 
+  @doc """
+  Injects aggregate functionality into the using module.
+
+  Generates CRUD operations, pagination, statistics, and JSON encoding. Accepts :root for preloading associations, :identity for uniqueness checks, and :json for serialization fields.
+  """
   defmacro __using__(opts) do
     root = Keyword.get(opts, :root, [])
     identity = Keyword.get(opts, :identity, [])

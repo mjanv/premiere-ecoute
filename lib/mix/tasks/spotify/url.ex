@@ -14,6 +14,7 @@ defmodule Mix.Tasks.Spotify.Url do
 
   alias PremiereEcoute.Apis.SpotifyApi
 
+  @impl true
   def run(_) do
     Application.put_env(:premiere_ecoute, :spotify_client_id, System.get_env("SPOTIFY_CLIENT_ID"))
 

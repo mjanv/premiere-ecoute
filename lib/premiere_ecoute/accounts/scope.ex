@@ -22,20 +22,24 @@ defmodule PremiereEcoute.Accounts.Scope do
   defstruct user: nil, admin: nil, impersonating?: false
 
   @doc "Creates a scope for the given user."
+  @spec for_user(User.t() | {:ok, User.t()} | nil) :: t() | nil
   def for_user(%User{} = user), do: %__MODULE__{user: user}
   def for_user({:ok, %User{} = user}), do: %__MODULE__{user: user}
   def for_user(nil), do: nil
 
   @doc "Creates an impersonation scope where an admin is impersonating another user."
+  @spec for_impersonation(User.t(), User.t()) :: t()
   def for_impersonation(%User{role: :admin} = admin, %User{} = user) do
     %__MODULE__{user: user, admin: admin, impersonating?: true}
   end
 
   @doc "Ends impersonation and returns to the original admin scope."
+  @spec end_impersonation(t()) :: t()
   def end_impersonation(%__MODULE__{admin: %User{} = admin}), do: for_user(admin)
   def end_impersonation(scope), do: scope
 
   @doc "Checks if the scope has a valid user."
+  @spec valid?(t() | map()) :: boolean()
   def valid?(%{assigns: %{current_scope: current_scope}}), do: valid?(current_scope)
   def valid?(%__MODULE__{user: %User{}}), do: true
   def valid?(_), do: false

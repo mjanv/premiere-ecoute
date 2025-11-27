@@ -15,12 +15,24 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
 
   @limit 10
 
+  @doc """
+  Fetches a Spotify playlist by ID.
+
+  Retrieves playlist metadata and tracks from Spotify API. Parses response into Playlist aggregate with tracks.
+  """
+  @spec get_playlist(String.t()) :: {:ok, Playlist.t()} | {:error, term()}
   def get_playlist(playlist_id) when is_binary(playlist_id) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/playlists/#{playlist_id}")
     |> SpotifyApi.handle(200, &parse_playlist/1)
   end
 
+  @doc """
+  Fetches user's library playlists.
+
+  Retrieves paginated list of playlists from authenticated user's library. Returns 10 playlists per page.
+  """
+  @spec get_library_playlists(Scope.t(), integer()) :: {:ok, list(LibraryPlaylist.t())} | {:error, term()}
   def get_library_playlists(scope, page \\ 1) do
     scope
     |> SpotifyApi.api()
@@ -28,6 +40,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_library_playlist/1) end)
   end
 
+  @doc """
+  Creates a new playlist in user's Spotify library.
+
+  Creates playlist with specified title, description, and public/private setting. Returns created playlist metadata.
+  """
+  @spec create_playlist(Scope.t(), LibraryPlaylist.t()) :: {:ok, LibraryPlaylist.t()} | {:error, term()}
   def create_playlist(scope, %LibraryPlaylist{} = playlist) do
     scope
     |> SpotifyApi.api()
@@ -50,6 +68,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     end)
   end
 
+  @doc """
+  Adds tracks to a playlist.
+
+  Inserts tracks at the beginning of the playlist. Tracks are added in the order provided.
+  """
+  @spec add_items_to_playlist(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def add_items_to_playlist(scope, id, tracks) do
     scope
     |> SpotifyApi.api()
@@ -60,6 +84,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(201, fn body -> body end)
   end
 
+  @doc """
+  Replaces all tracks in a playlist.
+
+  Removes all existing tracks and replaces them with the provided tracks.
+  """
+  @spec replace_items_to_playlist(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def replace_items_to_playlist(scope, id, tracks) do
     scope
     |> SpotifyApi.api()
@@ -70,6 +100,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn body -> body end)
   end
 
+  @doc """
+  Removes tracks from a playlist.
+
+  Deletes specified tracks from the playlist by their track IDs.
+  """
+  @spec remove_playlist_items(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def remove_playlist_items(scope, id, tracks) do
     scope
     |> SpotifyApi.api()

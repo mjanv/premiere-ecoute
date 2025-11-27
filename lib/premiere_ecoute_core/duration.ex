@@ -42,6 +42,12 @@ defmodule PremiereEcouteCore.Duration do
 
   def timer(_, _), do: "-"
 
+  @doc """
+  Formats millisecond duration as human-readable hours and minutes.
+
+  Returns formatted string showing hours and minutes, minutes only, or "< 1m" for durations under one minute.
+  """
+  @spec duration(integer()) :: String.t()
   def duration(duration_ms) do
     total_seconds = div(duration_ms, 1000)
     hours = div(total_seconds, 3600)
@@ -54,6 +60,12 @@ defmodule PremiereEcouteCore.Duration do
     end
   end
 
+  @doc """
+  Displays relative time from now to a past datetime.
+
+  Returns human-readable relative time like "Just now", "5 min ago", "3 hours ago", or "2 days ago". Falls back to "--" for invalid input.
+  """
+  @spec ago(DateTime.t() | any()) :: String.t()
   def ago(%DateTime{} = datetime) do
     diff = DateTime.diff(DateTime.utc_now(), datetime, :second)
 

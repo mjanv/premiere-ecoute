@@ -12,6 +12,12 @@ defmodule PremiereEcoute.Billboards.Services.BillboardCreation do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcouteCore.Utils
 
+  @doc """
+  Generates music billboard from playlist URLs.
+
+  Fetches playlists from Spotify and Deezer, ranks tracks by frequency, and groups by track, artist, and year. Supports progress callback for UI updates.
+  """
+  @spec generate_billboard(list(String.t()), keyword()) :: {:ok, map()} | {:error, String.t()}
   def generate_billboard(playlist_urls, opts \\ []) when is_list(playlist_urls) do
     callback = Keyword.get(opts, :callback, fn _, _ -> :ok end)
 
@@ -38,6 +44,12 @@ defmodule PremiereEcoute.Billboards.Services.BillboardCreation do
     end
   end
 
+  @doc """
+  Extracts playlist IDs and providers from URLs.
+
+  Parses Spotify and Deezer playlist URLs, extracting provider type and playlist ID for fetching.
+  """
+  @spec extract_playlist_ids(list(String.t())) :: list({:spotify | :deezer, String.t()})
   def extract_playlist_ids(urls) do
     urls
     |> Enum.map(&String.trim/1)

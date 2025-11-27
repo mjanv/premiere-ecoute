@@ -20,6 +20,12 @@ defmodule PremiereEcouteCore.Registry do
 
   @handlers Application.compile_env(:premiere_ecoute, :handlers, [])
 
+  @doc """
+  Retrieves the handler module for a command or event.
+
+  Searches the configured handlers for one that handles the given command or event module. Returns nil if no handler is registered.
+  """
+  @spec get(module()) :: module() | nil
   def get(command_or_event) do
     Enum.find(@handlers, fn h ->
       {status, _} = Code.ensure_compiled(h)

@@ -35,8 +35,11 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   @doc """
   Creates and validates a follow relationship changeset.
 
-  Validates the follow relationship by ensuring both user_id and streamer_id are present, verifying that the target user has the streamer role, and enforcing uniqueness constraints to prevent duplicate follows. The changeset includes custom validation to check the streamer_role attribute passed in the attrs map.
+  Validates the follow relationship by ensuring both user_id and streamer_id are present, verifying that the target user has the streamer role, and enforcing uniqueness constraints to prevent duplicate follows.
+
+  The changeset includes custom validation to check the streamer_role attribute passed in the attrs map.
   """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(follow, attrs) do
     follow
     |> cast(attrs, [:user_id, :streamer_id, :followed_at])
@@ -53,8 +56,11 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   @doc """
   Creates a follow relationship between a user and a streamer.
 
-  Establishes a follow connection by creating a new Follow record with the provided user and streamer entities. The function automatically extracts the necessary IDs and role information to create the relationship through the changeset validation process.
+  Establishes a follow connection by creating a new Follow record with the provided user and streamer entities, automatically extracting the necessary IDs and role information.
+
+  Publishes a ChannelFollowed event upon success. Optional followed_at timestamp can be provided in opts.
   """
+  @spec follow(User.t(), User.t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def follow(user, streamer, opts \\ %{}) do
     %{user_id: user.id, streamer_id: streamer.id, streamer_role: streamer.role, followed_at: opts[:followed_at]}
     |> create()
@@ -64,8 +70,11 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   @doc """
   Removes an existing follow relationship between a user and a streamer.
 
-  Attempts to find and delete the follow relationship between the specified user and streamer. If the relationship doesn't exist, returns an error changeset with an appropriate message. Successfully removes the follow record when found, effectively unfollowing the streamer.
+  Attempts to find and delete the follow relationship between the specified user and streamer. Returns an error changeset if the relationship doesn't exist.
+
+  Publishes a ChannelUnfollowed event upon successful deletion.
   """
+  @spec unfollow(User.t(), User.t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def unfollow(%User{} = user, %User{} = streamer) do
     case get_by(user_id: user.id, streamer_id: streamer.id) do
       nil ->
@@ -80,6 +89,12 @@ defmodule PremiereEcoute.Accounts.User.Follow do
     |> Store.ok("user", fn unfollow -> %ChannelUnfollowed{id: unfollow.user_id, streamer_id: unfollow.streamer_id} end)
   end
 
+  @doc """
+  Discovers streamers that a user is not currently following.
+
+  Returns all users with streamer role that the given user is not following, excluding the user themselves. Results are preloaded with Twitch data and ordered by ID.
+  """
+  @spec discover_follows(User.t()) :: list(User.t())
   def discover_follows(%User{id: id}) do
     from(u in User,
       where: u.role == :streamer,

@@ -14,6 +14,7 @@ defmodule Mix.Tasks.Twitch.Url do
 
   alias PremiereEcoute.Apis.TwitchApi
 
+  @impl true
   def run(_) do
     Application.put_env(:premiere_ecoute, :twitch_client_id, System.get_env("TWITCH_CLIENT_ID"))
 

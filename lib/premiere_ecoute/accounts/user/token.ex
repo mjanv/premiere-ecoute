@@ -9,6 +9,16 @@ defmodule PremiereEcoute.Accounts.User.Token do
 
   alias PremiereEcoute.Accounts.User
 
+  @type t :: %__MODULE__{
+          id: integer() | nil,
+          token: binary(),
+          context: String.t(),
+          sent_to: String.t() | nil,
+          authenticated_at: DateTime.t() | nil,
+          user_id: integer(),
+          inserted_at: DateTime.t() | nil
+        }
+
   @hash_algorithm :sha256
   @rand_size 32
 
@@ -29,6 +39,8 @@ defmodule PremiereEcoute.Accounts.User.Token do
     timestamps(type: :utc_datetime, updated_at: false)
   end
 
+  @doc "User token changeset."
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(token, _attrs) do
     token
     |> Ecto.Changeset.change()

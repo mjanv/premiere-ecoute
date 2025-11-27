@@ -35,6 +35,8 @@ defmodule PremiereEcoute.Billboards.Billboard do
     timestamps(type: :utc_datetime)
   end
 
+  @doc "Billboard changeset."
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(billboard, attrs) do
     billboard
     |> cast(attrs, [:billboard_id, :title, :submissions, :status, :user_id])
@@ -46,6 +48,12 @@ defmodule PremiereEcoute.Billboards.Billboard do
     |> foreign_key_constraint(:user_id)
   end
 
+  @doc """
+  Creates a billboard with a generated billboard_id.
+
+  Generates a random 8-character hexadecimal identifier for the billboard before insertion.
+  """
+  @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(%__MODULE__{} = billboard) do
     billboard
     |> Map.from_struct()
@@ -53,6 +61,12 @@ defmodule PremiereEcoute.Billboards.Billboard do
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
 
+  @doc """
+  Finds billboards containing submissions from a specific pseudo.
+
+  Queries billboards using JSONB array filtering and returns only the submissions matching the given pseudo. Each submission includes its index in the original array.
+  """
+  @spec submissions(String.t()) :: list(t())
   def submissions(pseudo) do
     query =
       from b in __MODULE__,

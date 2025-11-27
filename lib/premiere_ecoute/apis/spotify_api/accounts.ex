@@ -11,12 +11,24 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
 
   @scope "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private"
 
+  @doc """
+  Obtains client credentials access token.
+
+  Uses client credentials OAuth flow to get access token for public Spotify API operations.
+  """
+  @spec client_credentials() :: {:ok, map()} | {:error, term()}
   def client_credentials do
     SpotifyApi.accounts()
     |> SpotifyApi.post(url: "/token", body: "grant_type=client_credentials")
     |> SpotifyApi.handle(200, fn %{"access_token" => _} = body -> body end)
   end
 
+  @doc """
+  Generates Spotify OAuth authorization URL.
+
+  Creates authorization URL with specified scope and state. Uses default scope for user operations if not provided. Generates random state if not specified.
+  """
+  @spec authorization_url(String.t() | nil, String.t() | nil) :: String.t()
   def authorization_url(scope \\ nil, state \\ nil) do
     SpotifyApi.url(:accounts)
     |> URI.parse()
@@ -34,6 +46,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
     |> URI.to_string()
   end
 
+  @doc """
+  Exchanges authorization code for access tokens.
+
+  Completes OAuth authorization code flow by exchanging code for access and refresh tokens. Fetches user profile and returns user data with tokens.
+  """
+  @spec authorization_code(String.t(), String.t() | nil) :: {:ok, map()} | {:error, term()}
   def authorization_code(code, _state) do
     SpotifyApi.accounts()
     |> SpotifyApi.post(
@@ -62,6 +80,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Accounts do
     end)
   end
 
+  @doc """
+  Refreshes expired access token.
+
+  Uses refresh token to obtain new access token. Returns new access token and updated refresh token if provided by Spotify.
+  """
+  @spec renew_token(String.t()) :: {:ok, map()} | {:error, term()}
   def renew_token(refresh_token) do
     SpotifyApi.accounts()
     |> Req.post(

@@ -109,6 +109,7 @@ defmodule PremiereEcouteCore.GoofyWords do
       "banana"
 
   """
+  @spec generate() :: String.t()
   def generate do
     Enum.random(@goofy_words)
   end
@@ -124,6 +125,7 @@ defmodule PremiereEcouteCore.GoofyWords do
       "banana42"
 
   """
+  @spec generate_with_number() :: String.t()
   def generate_with_number do
     word = generate()
     number = Enum.random(1..999)

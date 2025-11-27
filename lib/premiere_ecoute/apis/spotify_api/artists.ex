@@ -10,6 +10,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Artists do
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Discography.Playlist
 
+  @doc """
+  Fetches an artist's top track.
+
+  Retrieves the top tracks for a Spotify artist and returns the first one. Returns nil if no tracks found.
+  """
+  @spec get_artist_top_track(String.t()) :: {:ok, Playlist.Track.t() | nil} | {:error, term()}
   def get_artist_top_track(artist_id) when is_binary(artist_id) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/artists/#{artist_id}/top-tracks")

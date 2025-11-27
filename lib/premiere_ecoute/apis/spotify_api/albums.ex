@@ -12,6 +12,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
 
+  @doc """
+  Fetches a Spotify album by ID.
+
+  Retrieves album metadata and tracks from Spotify API. Parses response into Album aggregate with associated tracks.
+  """
+  @spec get_album(String.t()) :: {:ok, Album.t()} | {:error, term()}
   def get_album(album_id) when is_binary(album_id) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/albums/#{album_id}")

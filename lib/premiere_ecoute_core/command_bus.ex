@@ -21,6 +21,12 @@ defmodule PremiereEcouteCore.CommandBus do
   alias PremiereEcouteCore.EventBus
   alias PremiereEcouteCore.Registry
 
+  @doc """
+  Processes a command through the CQRS pipeline.
+
+  Validates the command, executes it through the registered handler, and dispatches resulting events. Returns entity and events on success, or error reason on failure.
+  """
+  @spec apply(struct()) :: {:ok, struct(), list(struct())} | {:ok, list(struct())} | {:error, term()}
   def apply(command) do
     command
     |> tap(fn command -> Logger.debug("command: #{inspect(command)}") end)
@@ -45,6 +51,12 @@ defmodule PremiereEcouteCore.CommandBus do
     |> tap(fn result -> Logger.debug("result: #{inspect(result)}") end)
   end
 
+  @doc """
+  Validates a command using its registered handler.
+
+  Looks up the command handler in the Registry and calls its validate callback. Returns error if no handler is registered.
+  """
+  @spec validate(struct()) :: {:ok, struct()} | {:error, term()}
   def validate(command) do
     case Registry.get(command.__struct__) do
       nil ->
@@ -56,6 +68,12 @@ defmodule PremiereEcouteCore.CommandBus do
     end
   end
 
+  @doc """
+  Executes a validated command using its registered handler.
+
+  Processes successful validation results by calling the handler's handle callback. Passes through error results unchanged.
+  """
+  @spec handle({:ok, struct()} | {:error, term()}) :: {:ok, struct(), list(struct())} | {:ok, list(struct())} | {:error, term()}
   def handle({:ok, command}) do
     case Registry.get(command.__struct__) do
       nil ->

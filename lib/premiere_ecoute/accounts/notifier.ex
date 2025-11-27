@@ -10,6 +10,10 @@ defmodule PremiereEcoute.Accounts.Notifier do
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.AccountDeleted
 
+  @doc """
+  Handles account events and dispatches email notifications.
+  """
+  @spec handle(EventStore.RecordedEvent.t()) :: :ok
   def handle(%RecordedEvent{data: event}) do
     case event do
       %AccountCreated{} = event -> PremiereEcoute.mailer().dispatch(event)

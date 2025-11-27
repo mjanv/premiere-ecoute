@@ -61,6 +61,11 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
+  @doc """
+  Creates Twitch API request client with application credentials.
+
+  Configures request client with application access token for server-to-server API calls without user context.
+  """
   @spec api :: Req.Request.t()
   def api do
     [
@@ -74,6 +79,11 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     |> new()
   end
 
+  @doc """
+  Creates Twitch API request client with user or token authentication.
+
+  Configures request client with user access token from scope or provided token string for authenticated API calls.
+  """
   @spec api(Scope.t() | binary()) :: Req.Request.t()
   def api(%Scope{user: %{twitch: %{access_token: access_token}}}) do
     [
@@ -99,6 +109,11 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     |> new()
   end
 
+  @doc """
+  Creates Twitch OAuth2 accounts request client.
+
+  Configures request client for OAuth2 token operations with client credentials automatically injected into request body.
+  """
   @spec accounts :: Req.Request.t()
   def accounts do
     id = Application.get_env(:premiere_ecoute, :twitch_client_id)

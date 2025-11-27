@@ -21,6 +21,13 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
 
+  @doc """
+  Exports user data for GDPR compliance as JSON.
+
+  Generates a complete data export including user profile, follows, votes, and event history.
+  Sensitive fields are anonymized by filtering to only essential attributes. Publishes a
+  `PersonalDataRequested` event upon completion.
+  """
   @spec download_associated_data(Scope.t()) :: {:ok, binary()} | {:error, term()}
   def download_associated_data(scope) do
     try do
@@ -55,6 +62,13 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     update_in(data, path, fn channels -> channels |> Enum.map(&Map.take(&1, keys)) end)
   end
 
+  @doc """
+  Permanently deletes a user account and all associated data.
+
+  Performs cascading deletion of tokens, follows (as viewer and streamer), votes, and listening
+  sessions. The entire operation runs in a database transaction and publishes an `AccountDeleted`
+  event. Rollback occurs if any step fails.
+  """
   @spec delete_account(Scope.t()) :: {:ok, User.t()} | {:error, term()}
   def delete_account(scope) do
     user = scope.user

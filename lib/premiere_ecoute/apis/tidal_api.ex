@@ -18,6 +18,11 @@ defmodule PremiereEcoute.Apis.TidalApi do
     @callback get_playlist(playlist_id :: String.t()) :: {:ok, Playlist.t()} | {:error, term()}
   end
 
+  @doc """
+  Creates a Req client for Tidal Web API with authentication.
+
+  Accepts either a Scope struct with user access token or a raw access token string. Configures base URL and authorization header.
+  """
   @spec api(Scope.t() | binary()) :: Req.Request.t()
   def api(%Scope{user: %{tidal: %{access_token: access_token}}}) do
     [
@@ -41,6 +46,11 @@ defmodule PremiereEcoute.Apis.TidalApi do
     |> new()
   end
 
+  @doc """
+  Creates a Req client for Tidal Accounts API.
+
+  Configures basic authentication with client ID and secret for OAuth token operations.
+  """
   @spec accounts :: Req.Request.t()
   def accounts do
     id = Application.get_env(:premiere_ecoute, :tidal_client_id)

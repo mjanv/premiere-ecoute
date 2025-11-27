@@ -24,6 +24,11 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApi do
     @callback get_supporters() :: {:ok, [Donation.t()]} | {:error, term()}
   end
 
+  @doc """
+  Creates a Req client for BuyMeACoffee API.
+
+  Configures base URL and authorization header with API key from application config.
+  """
   @spec api :: Req.Request.t()
   def api do
     api_key = Application.get_env(:premiere_ecoute, :buymeacoffee_api_key)
@@ -38,6 +43,11 @@ defmodule PremiereEcoute.Apis.BuyMeACoffeeApi do
     |> new()
   end
 
+  @doc """
+  Returns empty client credentials.
+
+  BuyMeACoffee uses API key authentication instead of OAuth, so this returns empty credentials for compatibility with the API base module.
+  """
   @spec client_credentials() :: {:ok, %{String.t() => String.t() | integer()}}
   def client_credentials, do: {:ok, %{"access_token" => "", "expires_in" => 0}}
 
