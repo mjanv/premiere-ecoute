@@ -43,6 +43,12 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Creates changeset for playlist track validation.
+
+  Validates required fields, duration, and provider type. Ensures uniqueness of track within playlist per provider.
+  """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(track, attrs) do
     track
     |> cast(attrs, [:provider, :track_id, :album_id, :user_id, :name, :artist, :release_date, :duration_ms, :added_at])
@@ -52,6 +58,12 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
     |> unique_constraint([:provider, :playlist_id, :track_id], name: :playlist_tracks_playlist_id_track_id_provider_index)
   end
 
+  @doc """
+  Generates public URL for track on streaming platform.
+
+  Returns Spotify or Deezer track URL based on provider.
+  """
+  @spec url(t()) :: String.t()
   def url(%{provider: :spotify, track_id: id}), do: "https://open.spotify.com/track/#{id}"
   def url(%{provider: :deezer, track_id: id}), do: "https://www.deezer.com/track/#{id}"
 end

@@ -5,6 +5,12 @@ defmodule PremiereEcoute.Festivals.Poster do
   Reads image files and converts them to base64-encoded data URLs with proper MIME types for AI analysis.
   """
 
+  @doc """
+  Converts image file to base64 data URL.
+
+  Reads image file and encodes as base64 data URL with appropriate MIME type (JPEG or PNG) for AI vision APIs.
+  """
+  @spec read_base64_image(String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def read_base64_image(image_path) do
     with {:ok, data} <- File.read(image_path),
          mime_type <- image_path |> Path.extname() |> String.downcase() |> mime_type() do

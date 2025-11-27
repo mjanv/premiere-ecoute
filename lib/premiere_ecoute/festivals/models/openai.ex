@@ -33,6 +33,12 @@ defmodule PremiereEcoute.Festivals.Models.OpenAi do
   - If uncertain about a word (due to small text), still include it as best-effort.
   """
 
+  @doc """
+  Extracts festival data from poster image using GPT-4 Vision.
+
+  Analyzes base64-encoded image to extract festival name, dates, location, and complete artist lineup using streaming response.
+  """
+  @spec extract_festival(String.t()) :: Enumerable.t()
   def extract_festival(base64_image) do
     Instructor.chat_completion(
       model: "gpt-4o",

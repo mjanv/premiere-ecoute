@@ -23,6 +23,11 @@ defmodule PremiereEcouteCore.CommandBus.Handler do
       end
   """
 
+  @doc """
+  Injects command handler functionality into using module.
+
+  Registers command attributes, provides default validate/handle implementations, and sets up Gettext integration.
+  """
   defmacro __using__(_opts) do
     quote do
       use Gettext, backend: PremiereEcoute.Gettext
@@ -40,12 +45,22 @@ defmodule PremiereEcouteCore.CommandBus.Handler do
     end
   end
 
+  @doc """
+  Finalizes command handler compilation.
+
+  Generates commands_or_events function returning registered command modules.
+  """
   defmacro __before_compile__(_env) do
     quote do
       def commands_or_events, do: @commands
     end
   end
 
+  @doc """
+  Registers command module for handler.
+
+  Declares which command this handler processes. Can be called multiple times for multiple commands.
+  """
   defmacro command(command) do
     quote do
       @commands unquote(command)

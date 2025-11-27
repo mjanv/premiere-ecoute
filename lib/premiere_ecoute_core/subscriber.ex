@@ -19,6 +19,11 @@ defmodule PremiereEcouteCore.Subscriber do
       end
   """
 
+  @doc """
+  Injects EventStore subscriber functionality into using module.
+
+  Creates GenServer that subscribes to EventStore stream on init and processes events via handle/1 callback. Stream UUID required in options.
+  """
   defmacro __using__(opts) do
     stream_uuid = Keyword.fetch!(opts, :stream)
 

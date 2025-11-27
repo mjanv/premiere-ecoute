@@ -34,6 +34,12 @@ defmodule PremiereEcoute.Discography.Album.Track do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Creates changeset for track validation.
+
+  Validates required fields, track number, duration, and provider type. Ensures uniqueness of track ID per provider.
+  """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(track, attrs) do
     track
     |> cast(attrs, [:provider, :track_id, :name, :track_number, :duration_ms])
