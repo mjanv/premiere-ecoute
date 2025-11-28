@@ -8,19 +8,18 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
   use PremiereEcouteCore.Aggregate,
     identity: [:provider, :playlist_id]
 
-  import Ecto.Query
   alias PremiereEcoute.Accounts.User
 
   @type t :: %__MODULE__{
           id: integer() | nil,
           provider: :spotify | :deezer,
-          playlist_id: String.t(),
+          playlist_id: String.t() | nil,
           title: String.t() | nil,
           description: String.t() | nil,
           url: String.t() | nil,
           cover_url: String.t() | nil,
           public: boolean(),
-          track_count: integer(),
+          track_count: integer() | nil,
           metadata: map() | nil,
           user: User.t() | Ecto.Association.NotLoaded.t() | nil,
           user_id: binary() | nil,

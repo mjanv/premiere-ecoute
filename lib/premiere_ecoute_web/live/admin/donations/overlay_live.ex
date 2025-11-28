@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.OverlayLive do
 
   Loads current active donation goal with balance and last donation, subscribes to PubSub for real-time donation updates for streaming overlay display.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(_params, _session, socket) do
     Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "donations")
 
@@ -36,7 +36,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.OverlayLive do
 
   Refreshes goal data with updated balance and last donation when new donations are added, ignoring other messages.
   """
-  @spec handle_info(map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_info(%{event: "donation_added", goal_id: goal_id}, socket) do
     # Refresh goal when a donation is added
     # The balance is already updated in the database by the donation service

@@ -277,10 +277,6 @@ defmodule PremiereEcoute.Accounts.User.Token do
         user
         |> Ecto.Changeset.change(confirmed_at: DateTime.utc_now(:second))
         |> User.update_user_and_delete_all_tokens()
-        |> case do
-          {:ok, user, tokens} -> {:ok, user, tokens}
-          other -> other
-        end
 
       {user, token} ->
         Repo.delete!(token)

@@ -15,7 +15,7 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
 
   Loads all billboards sorted by most recently updated, calculates status distribution and submission statistics, and initializes modal state for detail viewing.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(_params, _session, socket) do
     billboards = Billboard.all(order_by: [desc: :updated_at])
 
@@ -32,7 +32,7 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
 
   Opens or closes detail modals, updates billboard status, manages submission review status, removes submissions, deletes billboards, and refreshes list with statistics and appropriate flash messages.
   """
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_event("show_billboard_modal", %{"billboard_id" => billboard_id}, socket) do
     billboard =
       socket.assigns.billboards

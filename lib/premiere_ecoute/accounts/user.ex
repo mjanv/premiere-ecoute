@@ -281,8 +281,8 @@ defmodule PremiereEcoute.Accounts.User do
     |> password_changeset(attrs)
     |> update_user_and_delete_all_tokens()
     |> case do
-      {:ok, user, expired_tokens} -> {:ok, user, expired_tokens}
-      {:error, :user, changeset, _} -> {:error, changeset}
+      {:ok, user, tokens} -> {:ok, user, tokens}
+      {:error, :user, changeset, _changes} -> {:error, changeset}
     end
   end
 
@@ -309,7 +309,8 @@ defmodule PremiereEcoute.Accounts.User do
   end
 
   @doc "Updates user and deletes all tokens in a transaction."
-  @spec update_user_and_delete_all_tokens(Ecto.Changeset.t()) :: {:ok, t(), list(Token.t())}
+  @spec update_user_and_delete_all_tokens(Ecto.Changeset.t()) ::
+          {:ok, t(), list(Token.t())} | {:error, atom(), any(), map()}
   def update_user_and_delete_all_tokens(changeset) do
     %{data: %__MODULE__{} = user} = changeset
 

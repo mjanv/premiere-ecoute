@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Accounts.UserLoginLive do
 
   Pre-fills email from flash or current user session, initializes login form for both password-based and magic link authentication methods.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(_params, _session, socket) do
     email =
       Phoenix.Flash.get(socket.assigns.flash, :email) ||
@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.Accounts.UserLoginLive do
 
   Triggers password form submission for traditional login, or sends magic link email for passwordless authentication with user enumeration protection.
   """
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_event("submit_password", _params, socket) do
     {:noreply, assign(socket, :trigger_submit, true)}
   end

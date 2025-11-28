@@ -16,7 +16,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.DonationsLive do
 
   Loads all donation goals sorted by start date in descending order and initializes modal state for goal creation and editing.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(_params, _session, socket) do
     goals = Donations.all_goals(order_by: [desc: :start_date])
 
@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.DonationsLive do
 
   Opens create or edit modals with forms, validates form input, saves new or updated goals, enables or disables goals, deletes goals with confirmation, and refreshes goal list with appropriate flash messages.
   """
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_event("show_goal_modal", _params, socket) do
     socket
     |> assign(:modal_action, :create)

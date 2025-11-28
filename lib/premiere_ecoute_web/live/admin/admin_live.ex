@@ -18,7 +18,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
 
   Loads aggregate counts for users, sessions, albums, billboards, and goals, and initializes paginated event store view starting with users stream.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(_params, _session, socket) do
     socket
     |> assign(:stats, %{
@@ -42,7 +42,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
 
   Switches between different event streams or navigates to specific page within current stream, updating event list accordingly.
   """
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_event("change_stream", %{"stream" => stream}, socket) do
     events = PremiereEcoute.paginate(stream, page: 1, size: socket.assigns.event_store.size)
     event_store = %{socket.assigns.event_store | stream: stream, page: 1, events: events}

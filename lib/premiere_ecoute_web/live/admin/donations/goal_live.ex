@@ -15,7 +15,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.GoalLive do
 
   Loads goal with preloaded donations and expenses, calculates current balance, and initializes expense modal state for adding new expenses.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(%{"id" => goal_id}, _session, socket) do
     goal = Donations.get_goal(goal_id) |> Repo.preload([:donations, :expenses])
     balance = Donations.compute_balance(goal)
@@ -33,7 +33,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.GoalLive do
 
   Opens or closes expense creation modal with form validation, saves new expenses with date conversion and currency matching, deletes expenses or revokes donations, and updates balance with appropriate flash messages.
   """
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_event("show_expense_modal", _params, socket) do
     changeset = Donations.Expense.changeset(%Donations.Expense{}, %{})
 

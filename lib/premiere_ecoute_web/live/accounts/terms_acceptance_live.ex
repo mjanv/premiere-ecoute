@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Accounts.TermsAcceptanceLive do
 
   Validates pending authentication session, loads privacy policy, cookies policy, and terms of service documents, and initializes consent form state.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(_params, %{"pending_twitch_auth" => pending_auth}, socket) do
     if pending_auth do
       socket
@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Accounts.TermsAcceptanceLive do
 
   Validates complete consent acceptance and redirects to registration completion, or shows error if any required terms are not accepted, or handles registration decline.
   """
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_event(
         "accept_terms",
         %{"consent" => %{"privacy" => "true", "cookies" => "true", "terms" => "true"} = consent},

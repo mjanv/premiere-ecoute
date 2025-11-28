@@ -16,7 +16,7 @@ defmodule PremiereEcouteWeb.Accounts.UserSettingsLive do
 
   Confirms email change from token if present, or loads current user settings with separate forms for email and password updates under sudo mode protection.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @impl true
   def mount(%{"token" => token}, _session, socket) do
     socket.assigns.current_scope.user
     |> Accounts.update_user_email(token)
@@ -49,7 +49,7 @@ defmodule PremiereEcouteWeb.Accounts.UserSettingsLive do
 
   Validates and updates email with confirmation link delivery, or validates and updates password with current password verification, maintaining separate form states and sudo mode protection.
   """
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
+  @impl true
   def handle_event("validate_email", params, socket) do
     %{"user" => user_params} = params
 
