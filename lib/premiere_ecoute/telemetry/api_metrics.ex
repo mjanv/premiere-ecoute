@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Telemetry.ApiMetrics do
 
   Records webhook event metrics including provider and event type.
   """
-  @spec webhook_event(atom(), atom()) :: :ok
+  @spec webhook_event(atom(), binary()) :: :ok
   def webhook_event(provider, type) do
     :telemetry.execute(@webhook_event, %{}, %{provider: provider, type: type})
   end

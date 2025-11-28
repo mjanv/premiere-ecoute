@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Playlists.PlaylistRule do
 
   Validates rule_type (save_tracks), user_id, library_playlist_id, and enforces unique constraint ensuring only one active rule per user per rule type.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(playlist_rule, attrs) do
     playlist_rule
     |> cast(attrs, [:rule_type, :active, :user_id, :library_playlist_id])

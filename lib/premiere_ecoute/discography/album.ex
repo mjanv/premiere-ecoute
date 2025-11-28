@@ -48,7 +48,7 @@ defmodule PremiereEcoute.Discography.Album do
 
   Validates required fields, track count, provider type, and uniqueness constraints. Casts associated tracks.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(album, attrs) do
     album
     |> cast(attrs, [:provider, :album_id, :name, :artist, :release_date, :cover_url, :total_tracks])

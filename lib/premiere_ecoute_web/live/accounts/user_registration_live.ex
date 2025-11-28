@@ -15,7 +15,8 @@ defmodule PremiereEcouteWeb.Accounts.UserRegistrationLive do
 
   Redirects already authenticated users to home page, or initializes empty registration form for new users with email validation.
   """
-  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
+  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) ::
+          {:ok, Phoenix.LiveView.Socket.t()} | {:ok, Phoenix.LiveView.Socket.t(), keyword()}
   def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket) when not is_nil(user) do
     {:ok, redirect(socket, to: PremiereEcouteWeb.UserAuth.signed_in_path(socket))}
   end

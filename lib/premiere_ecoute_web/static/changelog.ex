@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Changelog.Entry do
   @type t :: %__MODULE__{
           id: String.t(),
           title: String.t(),
-          date: Date.t(),
+          date: String.t(),
           body: String.t()
         }
 

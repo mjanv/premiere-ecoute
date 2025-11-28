@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
 
   require Logger
 
+  alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
   alias PremiereEcoute.Discography.LibraryPlaylist
@@ -168,7 +169,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
   Transforms raw library playlist JSON into structured LibraryPlaylist with metadata, visibility settings, and cover image.
   """
   @spec parse_library_playlist(map()) :: LibraryPlaylist.t()
-  def parse_library_playlist(data) do
+  def parse_library_playlist(data) when is_map(data) do
     %LibraryPlaylist{
       provider: :spotify,
       playlist_id: data["id"],

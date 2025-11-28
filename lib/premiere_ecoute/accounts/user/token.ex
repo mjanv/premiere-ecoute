@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Accounts.User.Token do
   end
 
   @doc "User token changeset."
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(token, _attrs) do
     token
     |> Ecto.Changeset.change()

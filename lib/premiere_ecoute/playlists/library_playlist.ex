@@ -23,6 +23,7 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
           track_count: integer(),
           metadata: map() | nil,
           user: User.t() | Ecto.Association.NotLoaded.t() | nil,
+          user_id: binary() | nil,
           inserted_at: NaiveDateTime.t() | nil,
           updated_at: NaiveDateTime.t() | nil
         }
@@ -50,7 +51,7 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
 
   Validates required fields, provider type, and uniqueness constraints for user's playlists.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(playlist, attrs) do
     playlist
     |> cast(attrs, [:provider, :playlist_id, :title, :description, :url, :cover_url, :public, :track_count, :metadata, :user_id])

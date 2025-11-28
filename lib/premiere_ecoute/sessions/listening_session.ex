@@ -68,7 +68,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   Validates and casts session attributes including status, source, visibility, options, vote options, timestamps, and foreign keys.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(listening_session, attrs) do
     listening_session
     |> cast(attrs, [

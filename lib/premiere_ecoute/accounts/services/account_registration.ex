@@ -72,7 +72,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
 
   Requires the user to already exist in the system. Creates Spotify OAuth tokens for the specified user, enabling Spotify API integration.
   """
-  @spec register_spotify_user(spotify_data(), String.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  @spec register_spotify_user(spotify_data(), binary() | integer()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t() | nil}
   def register_spotify_user(payload, id) do
     with %User{} = user <- Accounts.get_user!(id),
          {:ok, user} <- User.create_token(user, :spotify, payload) do

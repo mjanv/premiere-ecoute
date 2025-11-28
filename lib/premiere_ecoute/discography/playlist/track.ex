@@ -48,7 +48,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
 
   Validates required fields, duration, and provider type. Ensures uniqueness of track within playlist per provider.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(track, attrs) do
     track
     |> cast(attrs, [:provider, :track_id, :album_id, :user_id, :name, :artist, :release_date, :duration_ms, :added_at])

@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Donations.Balance do
 
   Casts collected_amount, spent_amount, remaining_amount, and progress fields for updating balance state.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(balance, attrs) do
     balance
     |> cast(attrs, [:collected_amount, :spent_amount, :remaining_amount, :progress])

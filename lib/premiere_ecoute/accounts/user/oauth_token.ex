@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
   end
 
   @doc "OAuth token changeset."
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(token, attrs) do
     token
     |> cast(attrs, [:provider, :user_id, :username, :access_token, :refresh_token, :expires_at, :parent_id])

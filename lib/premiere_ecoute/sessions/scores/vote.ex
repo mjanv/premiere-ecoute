@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
 
   Validates required fields and enforces uniqueness per viewer-session-track combination.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(vote, attrs) do
     vote
     |> cast(attrs, [:viewer_id, :session_id, :track_id, :is_streamer, :value])

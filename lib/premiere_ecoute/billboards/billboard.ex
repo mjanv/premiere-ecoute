@@ -36,7 +36,7 @@ defmodule PremiereEcoute.Billboards.Billboard do
   end
 
   @doc "Billboard changeset."
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(billboard, attrs) do
     billboard
     |> cast(attrs, [:billboard_id, :title, :submissions, :status, :user_id])

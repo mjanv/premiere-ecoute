@@ -46,7 +46,7 @@ defmodule PremiereEcoute.Donations.Expense do
 
   Validates expense data including amount, currency, and ensures currency matches the associated goal's currency.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(expense, attrs) do
     expense
     |> cast(attrs, [

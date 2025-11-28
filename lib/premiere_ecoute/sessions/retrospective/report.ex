@@ -61,7 +61,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
 
   Casts session_summary map, track_summaries list, and session_id with foreign key validation ensuring report links to valid listening session.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(report, attrs) do
     report
     |> cast(attrs, [

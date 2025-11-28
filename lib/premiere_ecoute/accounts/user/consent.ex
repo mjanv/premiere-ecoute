@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Accounts.User.Consent do
   end
 
   @doc "User consent changeset."
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(entity, attrs) do
     entity
     |> cast(attrs, [:document, :version, :accepted, :user_id])

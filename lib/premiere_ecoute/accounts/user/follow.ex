@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Accounts.User.Follow do
 
   The changeset includes custom validation to check the streamer_role attribute passed in the attrs map.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(follow, attrs) do
     follow
     |> cast(attrs, [:user_id, :streamer_id, :followed_at])

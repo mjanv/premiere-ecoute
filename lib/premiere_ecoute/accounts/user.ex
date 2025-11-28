@@ -53,7 +53,7 @@ defmodule PremiereEcoute.Accounts.User do
   end
 
   @doc "User changeset."
-  @spec changeset(t(), map(), keyword()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map(), keyword()) :: Ecto.Changeset.t()
   def changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :username, :role])

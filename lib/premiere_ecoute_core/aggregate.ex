@@ -76,15 +76,12 @@ defmodule PremiereEcouteCore.Aggregate do
       def form(entity, attrs \\ %{}), do: changeset(entity, attrs)
 
       # Preload
+      @type entity() :: [Ecto.Schema.t()] | Ecto.Schema.t() | nil
+
       @doc false
-      @spec preload({:ok, t()} | {:error, any()}) :: {:ok, t()} | {:error, any()}
+      @spec preload(entity() | {:ok, entity()} | {:error, any()}) :: entity() | {:ok, entity()} | {:error, any()}
       def preload({:ok, entity}), do: {:ok, preload(entity)}
-
-      @doc false
       def preload({:error, reason}), do: {:error, reason}
-
-      @doc false
-      @spec preload(t()) :: t()
       def preload(entity), do: Repo.preload(entity, unquote(root), force: true)
 
       # Create operations
@@ -115,32 +112,26 @@ defmodule PremiereEcouteCore.Aggregate do
 
       # Read operations
       @doc "Fetches entity by ID with preloaded associations"
-      @spec get(integer()) :: t() | nil
       def get(id), do: preload(Repo.get(__MODULE__, id))
 
       @doc "Fetches entity by query clauses with preloaded associations"
-      @spec get_by(Ecto.Queryable.t(), keyword()) :: t() | nil
       def get_by(query \\ __MODULE__, clauses), do: preload(Repo.get_by(query, clauses))
 
       @doc "Checks if entity exists based on identity fields"
-      @spec exists?(map()) :: boolean()
       def exists?(entity), do: !is_nil(get_by(Map.take(entity, unquote(identity))))
 
       @doc "Fetches all entities matching clauses"
-      @spec all(keyword()) :: [t()]
       def all(clauses \\ []), do: Repo.all(all_query(clauses))
 
       @doc "Fetches all entities matching query and clauses"
-      @spec all_by(Ecto.Queryable.t(), keyword()) :: [t()]
+
       def all_by(query \\ __MODULE__, clauses), do: preload(Repo.all_by(query, clauses))
 
       @doc "Fetches paginated entities"
-      @spec page(keyword(), integer(), integer()) :: Scrivener.Page.t()
       def page(clauses \\ [], page, page_size \\ 1),
         do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
 
       @doc "Fetches next page of results"
-      @spec next_page(keyword(), Scrivener.Page.t() | Phoenix.LiveView.AsyncResult.t()) :: Scrivener.Page.t()
       def next_page(clauses \\ [], page)
 
       @doc false
@@ -163,41 +154,32 @@ defmodule PremiereEcouteCore.Aggregate do
 
       # Update operations
       @doc "Updates entity with attributes"
-      @spec update(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
       def update(entity, attrs), do: preload(Repo.update(changeset(entity, attrs)))
 
       @doc "Inserts or updates entity"
-      @spec upsert(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
       def upsert(entity, attrs), do: preload(Repo.insert_or_update(changeset(entity, attrs)))
 
       # Delete operations
       @doc "Deletes entity"
-      @spec delete(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
       def delete(entity), do: Repo.delete(changeset(entity, %{}), allow_stale: true)
 
       @doc "Deletes all entities matching query"
-      @spec delete_all(Ecto.Queryable.t()) :: {integer(), nil | [term()]}
       def delete_all(query \\ __MODULE__), do: Repo.delete_all(query)
 
       # Statistics
       @doc "Calculates average of field across query results"
-      @spec average(Ecto.Queryable.t(), atom()) :: any()
       def average(query \\ __MODULE__, field), do: Repo.aggregate(query, :avg, field)
 
       @doc "Counts entities matching query"
-      @spec count(Ecto.Queryable.t(), atom()) :: integer()
       def count(query \\ __MODULE__, field), do: Repo.aggregate(query, :count, field)
 
       @doc "Finds maximum value of field across query results"
-      @spec max(Ecto.Queryable.t(), atom()) :: any()
       def max(query \\ __MODULE__, field), do: Repo.aggregate(query, :max, field)
 
       @doc "Finds minimum value of field across query results"
-      @spec min(Ecto.Queryable.t(), atom()) :: any()
       def min(query \\ __MODULE__, field), do: Repo.aggregate(query, :min, field)
 
       @doc "Calculates sum of field across query results"
-      @spec sum(Ecto.Queryable.t(), atom()) :: any()
       def sum(query \\ __MODULE__, field), do: Repo.aggregate(query, :sum, field)
 
       defoverridable create: 1, get: 1, update: 2, upsert: 2, delete: 1, delete_all: 1

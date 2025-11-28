@@ -42,7 +42,7 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
 
   Validates poll_id, total_votes, votes map, session and track references, ensuring votes sum equals total_votes and poll_id uniqueness per session-track combination.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(poll, attrs) do
     poll
     |> cast(attrs, [:poll_id, :title, :total_votes, :votes, :ended_at, :session_id, :track_id])

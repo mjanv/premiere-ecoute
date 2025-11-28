@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Festivals.Festival do
           country: String.t() | nil,
           start_date: Date.t() | nil,
           end_date: Date.t() | nil,
-          concerts: [Concert.t()]
+          concerts: [PremiereEcoute.Festivals.Festival.Concert.t()]
         }
 
   @primary_key false
@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Festivals.Festival do
       @type t :: %__MODULE__{
               artist: String.t() | nil,
               date: Date.t() | nil,
-              track: Track.t() | nil
+              track: PremiereEcoute.Festivals.Festival.Concert.Track.t() | nil
             }
 
       field(:artist, :string)

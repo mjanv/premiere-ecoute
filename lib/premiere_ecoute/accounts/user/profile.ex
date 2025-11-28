@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
   end
 
   @doc "User profile changeset."
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(profile, attrs \\ %{}) do
     profile
     |> cast(attrs, [:color_scheme, :language])

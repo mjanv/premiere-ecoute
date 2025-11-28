@@ -48,7 +48,7 @@ defmodule PremiereEcoute.Donations.Donation do
 
   Validates amount is positive, currency is 3 characters, and currency matches associated goal if specified.
   """
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(donation, attrs) do
     donation
     |> cast(attrs, [

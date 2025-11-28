@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
   end
 
   @doc "Track marker changeset."
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(marker, attrs) do
     marker
     |> cast(attrs, [:track_id, :track_number, :started_at, :listening_session_id])

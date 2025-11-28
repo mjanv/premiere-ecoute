@@ -10,7 +10,7 @@ defmodule PremiereEcouteCore.Search do
 
   Searches fields using Jaro distance algorithm with configurable similarity threshold. Returns results sorted by relevance score descending. Empty queries return all data.
   """
-  @spec filter(list(struct()), String.t(), list(atom()), float()) :: list(struct())
+  @spec filter(list(struct()), String.t(), list(atom() | String.t()), float()) :: list(struct())
   def filter(data, query, fields, threshold \\ 0.8)
 
   def filter(data, "", _, _), do: data
@@ -38,7 +38,7 @@ defmodule PremiereEcouteCore.Search do
 
   Accepts a keyword list of field-value pairs and returns only structs where all non-nil values match exactly. Nil values are ignored in filtering.
   """
-  @spec flag(list(struct()), keyword()) :: list(struct())
+  @spec flag(list(struct()), list(tuple())) :: list(struct())
   def flag(data, fields) do
     data
     |> Enum.map(fn struct ->

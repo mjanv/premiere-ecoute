@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Accounts.LegalDocument do
   @type t :: %__MODULE__{
           id: String.t(),
           version: String.t(),
-          date: Date.t(),
+          date: String.t(),
           language: String.t(),
           title: String.t(),
           body: String.t()

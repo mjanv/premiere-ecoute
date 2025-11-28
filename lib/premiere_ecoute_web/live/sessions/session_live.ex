@@ -28,12 +28,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
+    session_id = String.to_integer(id)
+
     with spotify when not is_nil(spotify) <- current_scope && current_scope.user && current_scope.user.spotify,
-         listening_session when not is_nil(listening_session) <- ListeningSession.get(id) do
+         listening_session when not is_nil(listening_session) <- ListeningSession.get(session_id) do
       if connected?(socket) do
         Process.send_after(self(), :refresh, 100)
         {:ok, _} = Presence.join(current_scope.user.id)
-        PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{id}"])
+        PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{session_id}"])
         _ = PlayerSupervisor.start(current_scope.user.id)
       end
 
@@ -43,16 +45,16 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:listening_session, listening_session)
       |> assign(:open_vote, !is_nil(cached_session))
       |> assign(:player_state, nil)
-      |> assign(:session_id, id)
+      |> assign(:session_id, session_id)
       |> assign(:user_current_rating, nil)
       |> assign(:report, nil)
       |> assign(:overlay_score_type, "streamer")
       |> assign(:vote_trends, nil)
       |> assign(:next_track_at, nil)
       |> assign(:show_youtube_modal, false)
-      |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: id)}} end)
+      |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
       |> assign_async(:vote_trends, fn ->
-        {:ok, %{vote_trends: VoteTrends.rolling_average(String.to_integer(id), :minute)}}
+        {:ok, %{vote_trends: VoteTrends.rolling_average(session_id, :minute)}}
       end)
       |> then(fn socket -> {:ok, socket} end)
     else

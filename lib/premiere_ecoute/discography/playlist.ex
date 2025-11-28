@@ -49,7 +49,7 @@ defmodule PremiereEcoute.Discography.Playlist do
   end
 
   @doc "Playlist changeset."
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(playlist, attrs) do
     playlist
     |> cast(attrs, [:provider, :playlist_id, :owner_id, :owner_name, :title, :description, :url, :cover_url, :public])

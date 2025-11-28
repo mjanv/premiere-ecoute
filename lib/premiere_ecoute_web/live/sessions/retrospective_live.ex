@@ -15,10 +15,21 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   def mount(%{"id" => id}, _session, socket) do
     current_scope = socket.assigns[:current_scope]
 
-    with listening_session when not is_nil(listening_session) <- ListeningSession.get(id),
+    with %ListeningSession{} = listening_session <- ListeningSession.get(id),
          :ok <- validate_session_stopped(listening_session),
          :ok <- validate_authorization(listening_session, current_scope) do
-      mount_retrospective(socket, listening_session)
+      socket
+      |> assign(:listening_session, listening_session)
+      |> assign_async(:report, fn ->
+        case Report.generate(listening_session) do
+          {:ok, report} -> {:ok, %{report: report}}
+          error -> {:error, error}
+        end
+      end)
+      |> assign_async([:most_liked, :least_liked], fn ->
+        calculate_track_extremes(listening_session.id)
+      end)
+      |> then(fn socket -> {:ok, socket} end)
     else
       nil ->
         redirect_with_error(socket, "Session not found")
@@ -47,21 +58,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     socket
     |> put_flash(:error, message)
     |> redirect(to: ~p"/")
-    |> then(fn socket -> {:ok, socket} end)
-  end
-
-  defp mount_retrospective(socket, listening_session) do
-    socket
-    |> assign(:listening_session, listening_session)
-    |> assign_async(:report, fn ->
-      case Report.generate(listening_session) do
-        {:ok, report} -> {:ok, %{report: report}}
-        error -> {:error, error}
-      end
-    end)
-    |> assign_async([:most_liked, :least_liked], fn ->
-      calculate_track_extremes(listening_session.id)
-    end)
     |> then(fn socket -> {:ok, socket} end)
   end
 

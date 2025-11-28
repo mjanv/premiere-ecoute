@@ -1,6 +1,7 @@
 %Doctor.Config{
   ignore_modules: [],
   ignore_paths: [
+    "lib/premiere_ecoute_core/aggregate.ex",
     "lib/premiere_ecoute_core/command_bus/handler.ex",
     "lib/premiere_ecoute_core/event_bus/handler.ex"
   ],
