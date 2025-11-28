@@ -22,6 +22,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
 
   command(PremiereEcoute.Commands.Chat.SendChatCommand)
 
+  @doc false
   def handle(%SendChatCommand{command: "premiereecoute", broadcaster_id: broadcaster_id, message_id: message_id}) do
     with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
          scope <- Scope.for_user(broadcaster),

@@ -99,7 +99,9 @@ defmodule PremiereEcouteWeb.Billboards.ShowLive do
     case Billboards.remove_submission(socket.assigns.billboard, index) do
       {:ok, billboard} ->
         submissions = sort_submissions_by_date(billboard.submissions || [])
-        filtered_submissions = filter_submissions(submissions, socket.assigns.search_query, socket.assigns.review_filter)
+
+        filtered_submissions =
+          filter_submissions(submissions, to_string(socket.assigns.search_query), socket.assigns.review_filter)
 
         socket
         |> assign(:billboard, billboard)

@@ -10,6 +10,12 @@ defmodule PremiereEcoute.Repo.Release do
 
   @app :premiere_ecoute
 
+  @doc """
+  Runs database migrations in production.
+
+  Creates and initializes EventStore then runs all Ecto migrations. Used for release deployments without Mix.
+  """
+  @spec migrate :: :ok
   def migrate do
     load_app()
 
@@ -20,8 +26,16 @@ defmodule PremiereEcoute.Repo.Release do
     for repo <- Application.fetch_env!(@app, :ecto_repos) do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
     end
+
+    :ok
   end
 
+  @doc """
+  Rolls back database to specific version.
+
+  Reverts Ecto migrations down to specified version for given repository.
+  """
+  @spec rollback(module(), integer()) :: {:ok, term(), term()}
   def rollback(repo, version) do
     load_app()
 

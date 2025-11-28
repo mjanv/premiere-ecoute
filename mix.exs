@@ -165,6 +165,7 @@ defmodule PremiereEcoute.MixProject do
         "format --check-formatted",
         "credo --strict",
         "dialyzer --format short",
+        "doctor",
         "gettext.check"
       ],
       # Audit
@@ -190,7 +191,7 @@ defmodule PremiereEcoute.MixProject do
         "cmd firefox cover/excoveralls.html"
       ],
       # Deployment
-      dos: ["doctor", "docs --output priv/docs"],
+      doc: ["doctor", "docs --output priv/docs"],
       ready: ["format", "quality", "cmd mix test --color", "docs"],
       deploy: ["cmd fly deploy"],
       # CI/CD

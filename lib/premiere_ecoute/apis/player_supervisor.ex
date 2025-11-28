@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Apis.PlayerSupervisor do
 
   use DynamicSupervisor
 
+  @doc "Starts the player supervisor."
+  @spec start_link(term()) :: Supervisor.on_start()
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
@@ -16,6 +18,12 @@ defmodule PremiereEcoute.Apis.PlayerSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one, max_children: 10)
   end
 
+  @doc """
+  Starts a Spotify player process.
+
+  Starts a new player child process or returns existing process if already started. Handles deduplication automatically.
+  """
+  @spec start(term()) :: {:ok, pid()} | {:error, term()}
   def start(args) do
     case DynamicSupervisor.start_child(__MODULE__, {PremiereEcoute.Apis.SpotifyPlayer, args}) do
       {:ok, pid} -> {:ok, pid}
@@ -24,6 +32,12 @@ defmodule PremiereEcoute.Apis.PlayerSupervisor do
     end
   end
 
+  @doc """
+  Stops a Spotify player process.
+
+  Terminates the player child process identified by PID.
+  """
+  @spec stop(pid()) :: :ok | {:error, :not_found}
   def stop(pid) do
     DynamicSupervisor.terminate_child(__MODULE__, pid)
   end

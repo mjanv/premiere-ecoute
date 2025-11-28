@@ -16,6 +16,12 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
 
   plug PremiereEcouteWeb.Plugs.TwitchExtensionAuth
 
+  @doc """
+  Retrieves currently playing track for a broadcaster's session.
+
+  Returns track data from the active listening session or appropriate error response if broadcaster is not found, not connected to Spotify, or has no track playing.
+  """
+  @spec current_track(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def current_track(conn, %{"broadcaster_id" => broadcaster_id}) do
     case Extension.get_current_track(broadcaster_id) do
       {:ok, track_data} ->
@@ -56,6 +62,12 @@ defmodule PremiereEcouteWeb.Extension.TrackController do
     end
   end
 
+  @doc """
+  Adds track to user's Spotify playlist based on configured playlist rule.
+
+  Validates user Spotify connection and playlist rule configuration, then adds the specified track to the user's designated playlist with success confirmation or detailed error response.
+  """
+  @spec like_track(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def like_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
     case Extension.like_track(user_id, spotify_track_id) do
       {:ok, playlist_name} ->

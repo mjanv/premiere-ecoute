@@ -7,6 +7,12 @@ defmodule PremiereEcoute.Playlists.Services.PlaylistExport do
 
   alias PremiereEcoute.Apis
 
+  @doc """
+  Exports tracks to existing Spotify playlist.
+
+  Clears all existing tracks from playlist then adds new tracks (up to 100).
+  """
+  @spec export_tracks_to_playlist(PremiereEcoute.Accounts.Scope.t(), String.t(), list(map())) :: {:ok, map()} | {:error, term()}
   def export_tracks_to_playlist(scope, playlist_id, tracks) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
          {:ok, _} <- remove_all_playlist_tracks(scope, playlist_id, playlist),

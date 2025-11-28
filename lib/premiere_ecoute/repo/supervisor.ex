@@ -7,6 +7,12 @@ defmodule PremiereEcoute.Repo.Supervisor do
 
   use Supervisor
 
+  @doc """
+  Starts repository supervisor with database and job processing.
+
+  Initializes supervisor process for Ecto repo, encryption vault, and Oban background job processor.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end

@@ -38,6 +38,11 @@ defmodule PremiereEcoute.Apis.DiscordApi do
                 {:ok, map()} | {:error, term()}
   end
 
+  @doc """
+  Creates a Req client for Discord API.
+
+  Configures base URL and bot token authentication from application config.
+  """
   @spec api :: Req.Request.t()
   def api do
     token = Application.get_env(:premiere_ecoute, :discord_bot_token)
@@ -52,11 +57,21 @@ defmodule PremiereEcoute.Apis.DiscordApi do
     |> new()
   end
 
+  @doc """
+  Retrieves a Discord channel ID by its configured key.
+
+  Looks up channel IDs from application configuration using predefined keys. Returns nil if channel key is not configured.
+  """
   @spec channel(atom()) :: String.t() | nil
   def channel(channel_key) do
     get_in(env(), [:channels, channel_key])
   end
 
+  @doc """
+  Returns empty client credentials.
+
+  Discord uses bot token authentication instead of OAuth, so this returns empty credentials for compatibility with the API base module.
+  """
   @spec client_credentials() :: {:ok, %{String.t() => String.t() | integer()}}
   def client_credentials, do: {:ok, %{"access_token" => "", "expires_in" => 0}}
 

@@ -5,6 +5,12 @@ defmodule PremiereEcouteCore.Utils do
   Provides string sanitization utilities for normalizing track names.
   """
 
+  @doc """
+  Sanitizes track names for comparison and matching.
+
+  Normalizes track names by removing parenthetical text, brackets, dashes, diacritical marks, and special characters. Applies Unicode NFD normalization and converts to lowercase for consistent matching.
+  """
+  @spec sanitize_track(String.t()) :: String.t()
   def sanitize_track(value) when is_binary(value) do
     value
     # Remove text enclosed in (), [] or located after -

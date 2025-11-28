@@ -9,6 +9,12 @@ defmodule PremiereEcouteWeb.Accounts.UserConfirmationLive do
 
   alias PremiereEcoute.Accounts
 
+  @doc """
+  Validates magic link token and initializes confirmation page.
+
+  Verifies magic link token validity, retrieves associated user, prepares auto-submit form, or redirects to login with error if token is invalid or expired.
+  """
+  @impl true
   def mount(%{"token" => token}, _session, socket) do
     if user = Accounts.get_user_by_magic_link_token(token) do
       form = to_form(%{"token" => token}, as: "user")
@@ -22,6 +28,12 @@ defmodule PremiereEcouteWeb.Accounts.UserConfirmationLive do
     end
   end
 
+  @doc """
+  Handles form submission with magic link token.
+
+  Triggers automatic form submission to complete passwordless authentication flow and log user in.
+  """
+  @impl true
   def handle_event("submit", %{"user" => params}, socket) do
     {:noreply, assign(socket, form: to_form(params, as: "user"), trigger_submit: true)}
   end

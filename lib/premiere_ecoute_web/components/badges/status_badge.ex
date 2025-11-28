@@ -22,6 +22,7 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
         Completed
       </.status_badge>
   """
+  @spec status_badge(map()) :: Phoenix.LiveView.Rendered.t()
   attr :status, :string,
     default: "info",
     values: ~w(active preparing completed stopped success warning error info),

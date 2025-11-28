@@ -52,6 +52,8 @@ defmodule PremiereEcoute.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  @doc "User changeset."
+  @spec changeset(Ecto.Schema.t(), map(), keyword()) :: Ecto.Changeset.t()
   def changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :username, :role])
@@ -60,6 +62,8 @@ defmodule PremiereEcoute.Accounts.User do
     |> cast_embed(:profile, required: false, with: &Profile.changeset/2)
   end
 
+  @doc "Email changeset."
+  @spec email_changeset(t(), map(), keyword()) :: Ecto.Changeset.t()
   def email_changeset(user, attrs \\ %{}, opts \\ []) do
     user
     |> cast(attrs, [:email])
@@ -106,6 +110,7 @@ defmodule PremiereEcoute.Accounts.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
+  @spec password_changeset(t(), map(), keyword()) :: Ecto.Changeset.t()
   def password_changeset(user, attrs \\ %{}, opts \\ []) do
     user
     |> cast(attrs, [:password])
@@ -138,6 +143,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   If there is no user or the user doesn't have a password, we call `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
+  @spec valid_password?(t() | any(), String.t()) :: boolean()
   def valid_password?(%__MODULE__{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
@@ -148,11 +154,14 @@ defmodule PremiereEcoute.Accounts.User do
     false
   end
 
+  @doc "Gets a user by ID."
+  @spec get!(integer()) :: t()
   def get!(id), do: Repo.get!(__MODULE__, id)
 
   @doc """
   Gets a user by their Twitch user ID.
   """
+  @spec get_user_by_twitch_id(String.t()) :: t() | nil
   def get_user_by_twitch_id(twitch_user_id) do
     from(u in __MODULE__,
       join: t in assoc(u, :twitch),
@@ -174,6 +183,7 @@ defmodule PremiereEcoute.Accounts.User do
       nil
 
   """
+  @spec get_user_by_email_and_password(String.t(), String.t()) :: t() | nil
   def get_user_by_email_and_password(email, password) do
     user = Repo.get_by(__MODULE__, email: email)
     if valid_password?(user, password), do: user
@@ -191,8 +201,11 @@ defmodule PremiereEcoute.Accounts.User do
       nil
 
   """
+  @spec get_user_by_email(String.t()) :: t() | nil
   def get_user_by_email(email), do: get_by(email: email)
 
+  @doc "Creates a user and publishes AccountCreated event."
+  @spec create(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(attrs) do
     attrs
     |> super()
@@ -215,6 +228,7 @@ defmodule PremiereEcoute.Accounts.User do
   The user is in sudo mode when the last authentication was done no further
   than 20 minutes ago. The limit can be given as second argument in minutes.
   """
+  @spec sudo_mode?(t() | any(), integer()) :: boolean()
   def sudo_mode?(user, minutes \\ -20)
 
   def sudo_mode?(%__MODULE__{authenticated_at: %DateTime{} = ts}, minutes) do
@@ -228,6 +242,7 @@ defmodule PremiereEcoute.Accounts.User do
 
   If the token matches, the user email is updated and the token is deleted.
   """
+  @spec update_user_email(t(), String.t()) :: :ok | :error
   def update_user_email(user, token) do
     context = "change:#{user.email}"
 
@@ -260,13 +275,14 @@ defmodule PremiereEcoute.Accounts.User do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_user_password(t(), map()) :: {:ok, t(), list(Token.t())} | {:error, Ecto.Changeset.t()}
   def update_user_password(user, attrs) do
     user
     |> password_changeset(attrs)
     |> update_user_and_delete_all_tokens()
     |> case do
-      {:ok, user, expired_tokens} -> {:ok, user, expired_tokens}
-      {:error, :user, changeset, _} -> {:error, changeset}
+      {:ok, user, tokens} -> {:ok, user, tokens}
+      {:error, :user, changeset, _changes} -> {:error, changeset}
     end
   end
 
@@ -284,6 +300,7 @@ defmodule PremiereEcoute.Accounts.User do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_user_role(t(), atom()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def update_user_role(user, role) do
     user
     |> Ecto.Changeset.cast(%{role: role}, [:role])
@@ -291,6 +308,9 @@ defmodule PremiereEcoute.Accounts.User do
     |> Repo.update()
   end
 
+  @doc "Updates user and deletes all tokens in a transaction."
+  @spec update_user_and_delete_all_tokens(Ecto.Changeset.t()) ::
+          {:ok, t(), list(Token.t())} | {:error, atom(), any(), map()}
   def update_user_and_delete_all_tokens(changeset) do
     %{data: %__MODULE__{} = user} = changeset
 
@@ -306,6 +326,8 @@ defmodule PremiereEcoute.Accounts.User do
     end
   end
 
+  @doc "Updates user profile."
+  @spec edit_user_profile(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def edit_user_profile(user, profile) do
     user
     |> cast(%{profile: profile}, [])

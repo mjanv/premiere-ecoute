@@ -17,7 +17,16 @@ defmodule PremiereEcoute.Mailer do
 
   @behaviour __MODULE__.Behaviour
 
+  @doc "Returns configured mailer implementation module"
+  @spec impl :: module()
   def impl, do: Application.get_env(:premiere_ecoute, :mailer, __MODULE__)
+
+  @doc """
+  Dispatches domain event as email.
+
+  Converts event to email and delivers via configured mailer implementation.
+  """
+  @spec dispatch(map()) :: any()
   def dispatch(event), do: deliver(Email.from_event(event))
 end
 
@@ -32,6 +41,12 @@ defmodule PremiereEcoute.Mailer.Email do
 
   alias PremiereEcouteCore.Event
 
+  @doc """
+  Converts domain event to Swoosh email.
+
+  Creates email with event name as subject and event inspection as body for debugging purposes.
+  """
+  @spec from_event(map()) :: Swoosh.Email.t()
   def from_event(event) do
     new()
     |> to({"Maxime Janvier", "maxime.janvier@gmail.com"})

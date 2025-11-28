@@ -9,6 +9,12 @@ defmodule PremiereEcoute.Festivals.Models.Static do
 
   alias PremiereEcoute.Festivals.Festival
 
+  @doc """
+  Extracts hardcoded festival data for testing.
+
+  Returns stream of partial and final festival data structures without calling external APIs. Input "1" returns simplified data, others return full festival data.
+  """
+  @spec extract_festival(String.t()) :: Enumerable.t()
   def extract_festival("1") do
     [
       {:partial, %Festival{}},

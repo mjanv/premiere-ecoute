@@ -37,6 +37,12 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
     timestamps()
   end
 
+  @doc """
+  Creates changeset for poll with vote validation.
+
+  Validates poll_id, total_votes, votes map, session and track references, ensuring votes sum equals total_votes and poll_id uniqueness per session-track combination.
+  """
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(poll, attrs) do
     poll
     |> cast(attrs, [:poll_id, :title, :total_votes, :votes, :ended_at, :session_id, :track_id])
@@ -65,6 +71,11 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
     end
   end
 
+  @doc """
+  Creates or updates poll by poll_id.
+
+  Inserts new poll if poll_id doesn't exist, otherwise updates existing poll with new total_votes and votes counts.
+  """
   @spec upsert(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def upsert(%__MODULE__{poll_id: poll_id} = poll) when not is_nil(poll_id) do
     case Repo.get_by(__MODULE__, poll_id: poll_id) do

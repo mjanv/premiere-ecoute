@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
   require Logger
 
   @doc false
+  @spec init(any()) :: any()
   def init(opts), do: opts
 
   @doc """
@@ -18,10 +19,11 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuth do
 
   The JWT token contains:
   - user_id: Twitch user ID (for authenticated users) or anonymous ID
-  - channel_id: Broadcaster's Twitch channel ID  
+  - channel_id: Broadcaster's Twitch channel ID
   - role: "broadcaster", "moderator", or "viewer"
   - exp: Token expiration
   """
+  @spec call(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def call(conn, _opts) do
     case get_req_header(conn, "authorization") do
       ["Bearer " <> token] ->

@@ -10,6 +10,12 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionController do
   alias PremiereEcoute.Accounts
   alias PremiereEcouteWeb.UserAuth
 
+  @doc """
+  Creates user session via email/password or magic link authentication.
+
+  Authenticates user credentials, validates magic links, disconnects expired sessions, and establishes new authenticated session with appropriate flash messages.
+  """
+  @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(conn, %{"_action" => "confirmed"} = params) do
     create(conn, params, "User confirmed successfully.")
   end
@@ -52,6 +58,12 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionController do
     end
   end
 
+  @doc """
+  Updates user password with sudo mode protection.
+
+  Requires sudo mode verification, updates password, invalidates all existing sessions including active LiveView connections, and re-authenticates user with new credentials.
+  """
+  @spec update_password(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def update_password(conn, %{"user" => user_params} = params) do
     user = conn.assigns.current_scope.user
     true = Accounts.sudo_mode?(user)
@@ -65,6 +77,12 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionController do
     |> create(params, "Password updated successfully!")
   end
 
+  @doc """
+  Terminates user session and logs out.
+
+  Clears session data, invalidates authentication tokens, and redirects to login page with logout confirmation message.
+  """
+  @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "Logged out successfully.")

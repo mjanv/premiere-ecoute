@@ -7,7 +7,12 @@ defmodule Storybook.Components do
 
   use PhoenixStorybook.Index
 
+  @spec folder_name() :: String.t()
   def folder_name, do: "Components"
+
+  @spec folder_index() :: integer()
   def folder_index, do: 1
+
+  @spec folder_open?() :: boolean()
   def folder_open?, do: true
 end

@@ -25,13 +25,14 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
     * `show_metadata` - Whether to show additional metadata like track count, year (default: false)
     * `clickable` - Whether the album display should be clickable (default: false)
     * `class` - Additional CSS classes
-    
+
   ## Examples
 
       <.album_display album={%{name: "Album Name", artist: "Artist", cover_url: "..."}} />
       <.album_display album={@album} size="lg" orientation="vertical" />
       <.album_display album={@album} show_metadata={true} clickable={true} />
   """
+  @spec album_display(map()) :: Phoenix.LiveView.Rendered.t()
   attr :album, :map, required: true
   attr :size, :string, default: "md", values: ~w(sm md lg xl)
   attr :orientation, :string, default: "horizontal", values: ~w(horizontal vertical)
@@ -116,14 +117,15 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
 
     * `track` - Track data structure with name and optional duration_ms
     * `show_duration` - Whether to show track duration (default: true)
-    * `size` - Size variant: "sm", "md" (default: "md")  
+    * `size` - Size variant: "sm", "md" (default: "md")
     * `clickable` - Whether the track should be clickable (default: false)
     * `class` - Additional CSS classes
-    
+
   ## Examples
 
     <.track_display track={@track} size="sm" />
   """
+  @spec track_display(map()) :: Phoenix.LiveView.Rendered.t()
   attr :track, :map, required: true
   attr :show_duration, :boolean, default: true
   attr :size, :string, default: "md", values: ~w(sm md)
@@ -174,13 +176,14 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
     * `show_provider` - Whether to show provider badge (default: false)
     * `clickable` - Whether the playlist should be clickable (default: false)
     * `class` - Additional CSS classes
-    
+
   ## Examples
 
       <.playlist_display playlist={%{title: "Playlist Name", owner_name: "Creator", cover_url: "..."}} />
       <.playlist_display playlist={@playlist} size="lg" orientation="vertical" />
       <.playlist_display playlist={@playlist} show_metadata={true} show_provider={true} />
   """
+  @spec playlist_display(map()) :: Phoenix.LiveView.Rendered.t()
   attr :playlist, :map, required: true
   attr :size, :string, default: "md", values: ~w(sm md lg xl)
   attr :orientation, :string, default: "horizontal", values: ~w(horizontal vertical)

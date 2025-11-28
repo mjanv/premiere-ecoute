@@ -11,12 +11,24 @@ defmodule PremiereEcoute.Apis.DeezerApi.Playlists do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
 
+  @doc """
+  Fetches a Deezer playlist by ID.
+
+  Retrieves playlist metadata and tracks from Deezer API. Parses response into Playlist aggregate with tracks.
+  """
+  @spec get_playlist(String.t()) :: {:ok, Playlist.t()} | {:error, term()}
   def get_playlist(playlist_id) when is_binary(playlist_id) do
     DeezerApi.api()
     |> DeezerApi.get(url: "/playlist/#{playlist_id}")
     |> DeezerApi.handle(200, &parse_playlist/1)
   end
 
+  @doc """
+  Parses Deezer API playlist response into Playlist aggregate.
+
+  Extracts playlist metadata (ID, title, owner, cover) and maps tracks array into Track structs with Deezer provider and album associations.
+  """
+  @spec parse_playlist(map()) :: Playlist.t()
   def parse_playlist(data) do
     %Playlist{
       provider: :deezer,

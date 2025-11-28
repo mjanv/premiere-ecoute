@@ -40,13 +40,29 @@ defmodule PremiereEcouteCore.BroadwayProducer do
   alias Broadway.Message
   alias Broadway.NoopAcknowledger
 
+  @doc """
+  Publishes an event to a Broadway pipeline.
+
+  Randomly selects a producer from the pipeline and casts the event as a Broadway message. Uses NoopAcknowledger for message acknowledgment.
+  """
+  @spec publish(atom(), struct()) :: :ok
   def publish(pipeline, event) do
     producer = Enum.random(Broadway.producer_names(pipeline))
     GenStage.cast(producer, %Message{acknowledger: NoopAcknowledger.init(), data: event})
   end
 
+  @doc "Initializes the GenStage producer with an empty queue and zero demand."
+  @spec init(term()) :: {:producer, {:queue.queue(), non_neg_integer()}}
   def init(_args), do: {:producer, {:queue.new(), 0}}
+
+  @doc "Handles incoming event casts by adding them to the queue."
+  @spec handle_cast(Message.t(), {:queue.queue(), non_neg_integer()}) ::
+          {:noreply, list(Message.t()), {:queue.queue(), non_neg_integer()}}
   def handle_cast(%Message{} = event, {queue, demand}), do: dispatch(:queue.in(event, queue), demand, [])
+
+  @doc "Handles demand from consumers by dispatching events from the queue."
+  @spec handle_demand(non_neg_integer(), {:queue.queue(), non_neg_integer()}) ::
+          {:noreply, list(Message.t()), {:queue.queue(), non_neg_integer()}}
   def handle_demand(consumer_demand, {queue, demand}), do: dispatch(queue, demand + consumer_demand, [])
 
   defp dispatch(queue, demand, events) when demand > 0 do

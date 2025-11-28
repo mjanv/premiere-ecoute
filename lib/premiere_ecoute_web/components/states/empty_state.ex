@@ -30,6 +30,7 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
         </:action>
       </.empty_state>
   """
+  @spec empty_state(map()) :: Phoenix.LiveView.Rendered.t()
   attr :icon, :string, required: true, doc: "Heroicon name for the empty state"
   attr :title, :string, required: true, doc: "Main title for the empty state"
   attr :description, :string, required: true, doc: "Description text explaining the empty state"
@@ -109,6 +110,7 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
         </:action>
       </.empty_list>
   """
+  @spec empty_list(map()) :: Phoenix.LiveView.Rendered.t()
   attr :message, :string, required: true, doc: "Empty list message"
   attr :icon, :string, default: "hero-inbox", doc: "Heroicon name"
   attr :class, :string, default: nil

@@ -233,6 +233,12 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  @doc """
+  Returns vote options list based on preset configuration.
+
+  Maps preset identifiers (0-10, 1-5, smash-pass) to their corresponding vote option arrays for session configuration.
+  """
+  @spec get_vote_options(map()) :: [String.t()]
   def get_vote_options(%{vote_options_preset: "0-10"}), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   def get_vote_options(%{vote_options_preset: "1-5"}), do: ["1", "2", "3", "4", "5"]
   def get_vote_options(%{vote_options_preset: "smash-pass"}), do: ["smash", "pass"]

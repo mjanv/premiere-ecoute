@@ -11,6 +11,12 @@ defmodule PremiereEcouteWeb.Accounts.UserSettingsLive do
 
   alias PremiereEcoute.Accounts
 
+  @doc """
+  Initializes user settings page with email and password forms.
+
+  Confirms email change from token if present, or loads current user settings with separate forms for email and password updates under sudo mode protection.
+  """
+  @impl true
   def mount(%{"token" => token}, _session, socket) do
     socket.assigns.current_scope.user
     |> Accounts.update_user_email(token)
@@ -38,6 +44,12 @@ defmodule PremiereEcouteWeb.Accounts.UserSettingsLive do
     |> then(fn socket -> {:ok, socket} end)
   end
 
+  @doc """
+  Handles settings form events for email and password updates.
+
+  Validates and updates email with confirmation link delivery, or validates and updates password with current password verification, maintaining separate form states and sudo mode protection.
+  """
+  @impl true
   def handle_event("validate_email", params, socket) do
     %{"user" => user_params} = params
 

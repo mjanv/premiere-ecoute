@@ -60,6 +60,7 @@ defmodule PremiereEcouteWeb.ConnCase do
   It stores an updated connection and a registered user in the
   test context.
   """
+  @spec register_and_log_in_user(map()) :: map()
   def register_and_log_in_user(%{conn: conn} = context) do
     user = AccountsFixtures.user_fixture()
     scope = Accounts.Scope.for_user(user)
@@ -77,6 +78,7 @@ defmodule PremiereEcouteWeb.ConnCase do
 
   It returns an updated `conn`.
   """
+  @spec log_in_user(Plug.Conn.t(), PremiereEcoute.Accounts.User.t(), keyword()) :: Plug.Conn.t()
   def log_in_user(conn, user, opts \\ []) do
     token = PremiereEcoute.Accounts.generate_user_session_token(user)
 

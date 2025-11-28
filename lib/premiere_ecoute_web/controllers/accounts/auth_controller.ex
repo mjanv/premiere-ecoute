@@ -17,6 +17,12 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   alias PremiereEcouteWeb.Static.Legal
   alias PremiereEcouteWeb.UserAuth
 
+  @doc """
+  Initiates OAuth authorization flow for external providers.
+
+  Redirects users to provider authorization page with appropriate scopes based on provider type and role, or shows error if provider credentials are not configured.
+  """
+  @spec request(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def request(conn, %{"provider" => "twitch", "role" => role}) do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
@@ -52,6 +58,12 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     end
   end
 
+  @doc """
+  Handles OAuth provider callback with authorization code.
+
+  Exchanges authorization code for access tokens, registers or updates user with provider data, creates session, and handles terms acceptance flow for new users.
+  """
+  @spec callback(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def callback(conn, %{"provider" => "twitch", "code" => code}) do
     with {:ok, auth_data} <- TwitchApi.authorization_code(code),
          {user, auth_data} when not is_nil(user) <- {User.get_user_by_email(auth_data.email), auth_data},
@@ -98,6 +110,12 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     |> redirect(to: ~p"/")
   end
 
+  @doc """
+  Completes registration after terms acceptance for new users.
+
+  Validates legal document acceptance, creates user account with provider data from session, records consent, cleans up temporary session data, and logs user in automatically.
+  """
+  @spec complete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def complete(conn, %{} = params) do
     with data <- Map.take(params, ["privacy", "cookies", "terms"]),
          true <- Enum.all?(["privacy", "cookies", "terms"], fn k -> data[k] == "true" end),

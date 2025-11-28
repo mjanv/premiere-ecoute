@@ -9,6 +9,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Channels do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.TwitchApi
 
+  @doc """
+  Retrieves all channels followed by the user.
+
+  Fetches list of Twitch channels the authenticated user follows.
+  """
+  @spec get_followed_channels(Scope.t()) :: {:ok, list(map())} | {:error, term()}
   def get_followed_channels(%Scope{user: %{twitch: %{user_id: user_id}}} = scope) do
     scope
     |> TwitchApi.api()
@@ -16,6 +22,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Channels do
     |> TwitchApi.handle(200, fn %{"data" => data} -> data end)
   end
 
+  @doc """
+  Checks if user follows specific channel.
+
+  Returns channel data if user follows the specified broadcaster, nil otherwise.
+  """
+  @spec get_followed_channel(Scope.t(), User.t()) :: {:ok, map() | nil} | {:error, term()}
   def get_followed_channel(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, %User{
         twitch: %{user_id: streamer_id}
       }) do

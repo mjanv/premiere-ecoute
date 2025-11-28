@@ -34,6 +34,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession)
 
+  @doc false
   def handle(%PrepareListeningSession{source: :album, user_id: user_id, album_id: album_id, vote_options: vote_options}) do
     with {:ok, album} <- Apis.spotify().get_album(album_id),
          {:ok, album} <- Album.create_if_not_exists(album),

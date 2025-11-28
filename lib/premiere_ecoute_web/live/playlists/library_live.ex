@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
 
   require Logger
 
+  alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Discography
@@ -101,7 +102,11 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
   end
 
   @impl true
-  def handle_event("create_playlist", %{"playlist" => playlist_params}, %{assigns: %{current_scope: current_scope}} = socket) do
+  def handle_event(
+        "create_playlist",
+        %{"playlist" => playlist_params},
+        %{assigns: %{current_scope: %Scope{} = current_scope}} = socket
+      ) do
     playlist = %Discography.LibraryPlaylist{
       title: playlist_params["title"],
       description: playlist_params["description"],
@@ -164,6 +169,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
     end
   end
 
+  @impl true
   def handle_info(:fetch_playlists, %{assigns: %{current_scope: scope}} = socket) do
     case SpotifyApi.get_library_playlists(scope, 1) do
       {:ok, playlists} ->

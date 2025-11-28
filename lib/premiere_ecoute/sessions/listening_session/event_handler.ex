@@ -22,6 +22,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
 
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
+  @impl true
   def dispatch(%SessionStarted{source: :album, session_id: session_id, user_id: user_id}) do
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)

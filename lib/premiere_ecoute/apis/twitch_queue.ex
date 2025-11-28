@@ -11,10 +11,18 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
   alias PremiereEcoute.Apis.RateLimit
   alias PremiereEcoute.Apis.TwitchApi.Chat
 
+  @doc """
+  Starts the Twitch message queue GenServer.
+
+  Links a GenServer process for managing Twitch chat message queueing with circuit breaker protection.
+  """
+  @spec start_link(keyword()) :: GenServer.on_start()
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
+  @doc false
+  @spec init(term()) :: {:ok, map()} | :ignore
   def init(_args) do
     case Bot.get() do
       {:ok, bot} -> {:ok, %{circuit: :closed, bot: bot, timer: nil, messages: []}}
@@ -22,11 +30,17 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
     end
   end
 
-  # API
+  @doc """
+  Pushes message(s) to the Twitch queue for sending.
+
+  Queues messages for delivery through circuit-breaker protected rate-limited sending to Twitch chat.
+  """
+  @spec push([{atom(), map()}] | {atom(), map()}) :: :ok
   def push(messages) when is_list(messages), do: Enum.each(messages, &push/1)
   def push({action, message}), do: GenServer.cast(__MODULE__, {action, message})
 
   # Handlers
+  @spec handle_cast({atom(), map()}, map()) :: {:noreply, map()}
   def handle_cast({action, message}, %{circuit: :closed, bot: bot, messages: messages} = state) do
     {:ok, bot} = maybe_refresh_bot(bot)
 
@@ -43,6 +57,7 @@ defmodule PremiereEcoute.Apis.TwitchQueue do
     {:noreply, %{state | messages: messages ++ [{action, message}]}}
   end
 
+  @spec handle_info(atom(), map()) :: {:noreply, map()}
   def handle_info(:retry, %{messages: []} = state) do
     {:noreply, %{state | circuit: :closed}}
   end

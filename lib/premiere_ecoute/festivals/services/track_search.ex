@@ -10,6 +10,12 @@ defmodule PremiereEcoute.Festivals.Services.TrackSearch do
   alias PremiereEcoute.Festivals.Festival
   alias PremiereEcoute.Festivals.Festival.Concert
 
+  @doc """
+  Creates Spotify playlist from festival tracks.
+
+  Creates playlist with festival name containing up to 100 tracks from provided track list.
+  """
+  @spec create_festival_playlist(PremiereEcoute.Accounts.Scope.t(), Festival.t(), list(map())) :: {:ok, map()} | {:error, term()}
   def create_festival_playlist(scope, %Festival{name: name}, tracks) do
     with playlist <- %LibraryPlaylist{title: name, description: "", public: false, provider: :spotify},
          {:ok, playlist} <- Apis.spotify().create_playlist(scope, playlist) do
@@ -17,6 +23,12 @@ defmodule PremiereEcoute.Festivals.Services.TrackSearch do
     end
   end
 
+  @doc """
+  Searches Spotify for top tracks by festival artists.
+
+  Iterates through festival concerts, finds top track for each artist on Spotify, updates concert with track info, and broadcasts progress.
+  """
+  @spec find_tracks(PremiereEcoute.Accounts.Scope.t(), Festival.t()) :: Festival.t()
   def find_tracks(scope, %Festival{} = festival) do
     Enum.reduce(festival.concerts, festival, fn concert, festival ->
       artist = concert.artist
@@ -35,6 +47,12 @@ defmodule PremiereEcoute.Festivals.Services.TrackSearch do
     end)
   end
 
+  @doc """
+  Finds top Spotify track for concert artist.
+
+  Searches Spotify for artist and retrieves their top track. Returns track info or nil if not found.
+  """
+  @spec find_track(Concert.t()) :: Concert.Track.t() | nil
   def find_track(%Concert{artist: artist}) do
     with {:ok, %{id: id}} <- Apis.spotify().search_artist(artist),
          {:ok, track} <- Apis.spotify().get_artist_top_track(id) do

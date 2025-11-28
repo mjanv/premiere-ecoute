@@ -49,6 +49,12 @@ defmodule PremiereEcoute.Donations.Goal do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Creates changeset for goal with validation on dates and amounts.
+
+  Validates title, target_amount, currency (3-char ISO code), start_date and end_date with end after start, and optionally casts embedded balance.
+  """
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(goal, attrs) do
     goal
     |> cast(attrs, [

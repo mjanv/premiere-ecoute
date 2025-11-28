@@ -48,6 +48,8 @@ defmodule PremiereEcoute.Discography.Playlist do
     timestamps(type: :utc_datetime)
   end
 
+  @doc "Playlist changeset."
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(playlist, attrs) do
     playlist
     |> cast(attrs, [:provider, :playlist_id, :owner_id, :owner_name, :title, :description, :url, :cover_url, :public])
@@ -57,6 +59,12 @@ defmodule PremiereEcoute.Discography.Playlist do
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: false)
   end
 
+  @doc """
+  Creates a playlist with tracks.
+
+  Converts playlist and tracks from structs to maps and inserts with associated tracks in a single transaction.
+  """
+  @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(%__MODULE__{} = playlist) do
     playlist
     |> Map.from_struct()
@@ -64,6 +72,12 @@ defmodule PremiereEcoute.Discography.Playlist do
     |> then(fn attrs -> Repo.insert(changeset(%__MODULE__{}, attrs)) end)
   end
 
+  @doc """
+  Adds a track to a playlist.
+
+  Parses track data from Spotify API response and appends to playlist's tracks. Updates playlist in database with new track.
+  """
+  @spec add_track_to_playlist(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def add_track_to_playlist(%__MODULE__{} = playlist, %{"item" => track}) do
     track = %{
       provider: :spotify,
@@ -83,6 +97,12 @@ defmodule PremiereEcoute.Discography.Playlist do
     |> Repo.update()
   end
 
+  @doc """
+  Generates the external URL for a playlist.
+
+  Returns the appropriate URL based on provider (Spotify or Deezer) and playlist ID.
+  """
+  @spec url(t()) :: String.t()
   def url(%{provider: :spotify, playlist_id: id}), do: "https://open.spotify.com/playlist/#{id}"
   def url(%{provider: :deezer, playlist_id: id}), do: "https://www.deezer.com/playlist/#{id}"
 end

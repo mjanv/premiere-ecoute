@@ -19,6 +19,12 @@ defmodule PremiereEcouteCore.EventBus.Handler do
       end
   """
 
+  @doc """
+  Injects event handler functionality into using module.
+
+  Registers event attributes, provides default dispatch implementation, and sets up Gettext integration.
+  """
+  @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(_opts) do
     quote do
       use Gettext, backend: PremiereEcoute.Gettext
@@ -29,18 +35,34 @@ defmodule PremiereEcouteCore.EventBus.Handler do
 
       Module.register_attribute(__MODULE__, :events, accumulate: true)
 
+      @doc "Event dispatch."
+      @spec dispatch(struct()) :: :ok | {:error, any()}
       def dispatch(_event), do: :ok
 
       defoverridable dispatch: 1
     end
   end
 
+  @doc """
+  Finalizes event handler compilation.
+
+  Generates commands_or_events function returning registered event modules.
+  """
+  @spec __before_compile__(Macro.Env.t()) :: Macro.t()
   defmacro __before_compile__(_env) do
     quote do
+      @doc "Returns registered events."
+      @spec commands_or_events() :: [module()]
       def commands_or_events, do: @events
     end
   end
 
+  @doc """
+  Registers event module for handler.
+
+  Declares which event this handler processes. Can be called multiple times for multiple events.
+  """
+  @spec event(module()) :: Macro.t()
   defmacro event(event) do
     quote do
       @events unquote(event)

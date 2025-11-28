@@ -14,6 +14,12 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeController do
   alias PremiereEcoute.Events.BuyMeACoffee.DonationRefunded
   alias PremiereEcoute.Telemetry.ApiMetrics
 
+  @doc """
+  Processes Buy Me a Coffee webhook events for donations.
+
+  Handles donation creation and refund events by parsing the webhook payload, recording telemetry metrics, persisting donation data to the database, and responding with appropriate HTTP status codes.
+  """
+  @spec handle(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def handle(conn, _params) do
     event_type = get_in(conn.body_params, ["type"])
     ApiMetrics.webhook_event(:buymeacoffee, event_type)

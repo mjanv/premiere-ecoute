@@ -34,6 +34,12 @@ defmodule PremiereEcoute.Playlists.PlaylistRule do
     timestamps()
   end
 
+  @doc """
+  Creates changeset for playlist rule with user and playlist validation.
+
+  Validates rule_type (save_tracks), user_id, library_playlist_id, and enforces unique constraint ensuring only one active rule per user per rule type.
+  """
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(playlist_rule, attrs) do
     playlist_rule
     |> cast(attrs, [:rule_type, :active, :user_id, :library_playlist_id])
@@ -52,6 +58,7 @@ defmodule PremiereEcoute.Playlists.PlaylistRule do
 
   Deactivates any existing save_tracks rule and creates a new active one.
   """
+  @spec set_save_tracks_playlist(User.t(), LibraryPlaylist.t()) :: {:ok, t()} | {:error, term()}
   def set_save_tracks_playlist(%User{id: user_id}, %LibraryPlaylist{id: playlist_id}) do
     Repo.transaction(fn ->
       # Deactivate any existing active save_tracks rules for this user
@@ -77,6 +84,7 @@ defmodule PremiereEcoute.Playlists.PlaylistRule do
 
   Returns the LibraryPlaylist if an active rule exists, nil otherwise.
   """
+  @spec get_save_tracks_playlist(User.t()) :: LibraryPlaylist.t() | nil
   def get_save_tracks_playlist(%User{id: user_id}) do
     query =
       from pr in __MODULE__,
@@ -92,6 +100,7 @@ defmodule PremiereEcoute.Playlists.PlaylistRule do
 
   Sets the active flag to false for any active save_tracks rules.
   """
+  @spec deactivate_save_tracks_playlist(User.t()) :: {integer(), nil | [term()]}
   def deactivate_save_tracks_playlist(%User{id: user_id}) do
     from(pr in __MODULE__,
       where: pr.user_id == ^user_id and pr.rule_type == :save_tracks and pr.active == true
@@ -104,6 +113,7 @@ defmodule PremiereEcoute.Playlists.PlaylistRule do
 
   Returns the PlaylistRule struct with preloaded library_playlist if exists, nil otherwise.
   """
+  @spec get_save_tracks_rule(User.t()) :: t() | nil
   def get_save_tracks_rule(%User{id: user_id}) do
     from(pr in __MODULE__,
       where: pr.user_id == ^user_id and pr.rule_type == :save_tracks and pr.active == true,

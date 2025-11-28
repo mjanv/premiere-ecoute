@@ -10,6 +10,12 @@ defmodule PremiereEcoute.Telemetry.ApiMetrics do
   @api_call [:premiere_ecoute, :apis, :api_call]
   @webhook_event [:premiere_ecoute, :apis, :webhook_event]
 
+  @doc """
+  Emits telemetry event for API call.
+
+  Records API call metrics including provider, HTTP method, URL path, and response status code.
+  """
+  @spec api_call(atom(), {Req.Request.t(), Req.Response.t()}) :: :ok
   def api_call(provider, {%Req.Request{} = request, %Req.Response{} = response}) do
     :telemetry.execute(
       @api_call,
@@ -23,6 +29,12 @@ defmodule PremiereEcoute.Telemetry.ApiMetrics do
     )
   end
 
+  @doc """
+  Emits telemetry event for webhook.
+
+  Records webhook event metrics including provider and event type.
+  """
+  @spec webhook_event(atom(), binary()) :: :ok
   def webhook_event(provider, type) do
     :telemetry.execute(@webhook_event, %{}, %{provider: provider, type: type})
   end

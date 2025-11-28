@@ -14,6 +14,12 @@ defmodule PremiereEcoute.Accounts.Bot do
 
   @bot Application.compile_env(:premiere_ecoute, PremiereEcoute.Accounts)[:bot]
 
+  @doc """
+  Returns the current bot
+
+  The bot is cached for 5 minutes to avoid useless database transactions. If needed, bot access tokens will be renewed.
+  """
+  @spec get() :: {:ok, User.t()} | {:error, nil}
   def get do
     with {:ok, nil} <- Cache.get(:users, :bot),
          %User{} = user <- Accounts.get_user_by_email(@bot),

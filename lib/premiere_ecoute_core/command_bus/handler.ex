@@ -23,6 +23,12 @@ defmodule PremiereEcouteCore.CommandBus.Handler do
       end
   """
 
+  @doc """
+  Injects command handler functionality into using module.
+
+  Registers command attributes, provides default validate/handle implementations, and sets up Gettext integration.
+  """
+  @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(_opts) do
     quote do
       use Gettext, backend: PremiereEcoute.Gettext
@@ -33,19 +39,38 @@ defmodule PremiereEcouteCore.CommandBus.Handler do
 
       Module.register_attribute(__MODULE__, :commands, accumulate: true)
 
+      @doc "Command validation"
+      @spec validate(struct()) :: {:ok, struct()} | {:error, any()}
       def validate(command), do: {:ok, command}
+
+      @doc "Command handling"
+      @spec handle(struct()) :: {:ok, [struct()]} | {:error, any()}
       def handle(_command), do: {:ok, []}
 
       defoverridable validate: 1, handle: 1
     end
   end
 
+  @doc """
+  Finalizes command handler compilation.
+
+  Generates commands_or_events function returning registered command modules.
+  """
+  @spec __before_compile__(Macro.Env.t()) :: Macro.t()
   defmacro __before_compile__(_env) do
     quote do
+      @doc "Returns registered commands."
+      @spec commands_or_events() :: [module()]
       def commands_or_events, do: @commands
     end
   end
 
+  @doc """
+  Registers command module for handler.
+
+  Declares which command this handler processes. Can be called multiple times for multiple commands.
+  """
+  @spec command(module()) :: Macro.t()
   defmacro command(command) do
     quote do
       @commands unquote(command)

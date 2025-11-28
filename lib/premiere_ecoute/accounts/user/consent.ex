@@ -13,6 +13,16 @@ defmodule PremiereEcoute.Accounts.User.Consent do
   alias PremiereEcoute.Events.ConsentGiven
   alias PremiereEcoute.Events.Store
 
+  @type t :: %__MODULE__{
+          id: integer() | nil,
+          document: :privacy | :cookies | :terms,
+          version: String.t(),
+          accepted: boolean(),
+          user_id: integer(),
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
+        }
+
   schema "user_consents" do
     field :document, Ecto.Enum, values: [:privacy, :cookies, :terms]
     field :version, :string
@@ -23,6 +33,8 @@ defmodule PremiereEcoute.Accounts.User.Consent do
     timestamps(type: :utc_datetime)
   end
 
+  @doc "User consent changeset."
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(entity, attrs) do
     entity
     |> cast(attrs, [:document, :version, :accepted, :user_id])
@@ -31,7 +43,15 @@ defmodule PremiereEcoute.Accounts.User.Consent do
     |> unique_constraint([:user_id, :document])
   end
 
-  @doc "Accept legal document(s) for a user. Creates new consent or updates existing one to accepted."
+  @doc """
+  Accept legal document(s) for a user.
+
+  Accepts a single LegalDocument or a map of multiple documents. For single documents, creates new consent or updates existing one to accepted. For multiple documents, processes all in a single transaction.
+
+  Publishes ConsentGiven event(s) upon success.
+  """
+  @spec accept(User.t(), LegalDocument.t()) :: {:ok, __MODULE__.t()} | {:error, Ecto.Changeset.t()}
+  @spec accept(User.t(), map()) :: {:ok, map()} | {:error, term()}
   def accept(%User{id: id}, %LegalDocument{id: document, version: version}) do
     case get_by(user_id: id, document: document) do
       nil -> create(%{user_id: id, document: String.to_existing_atom(document), version: version, accepted: true})
@@ -67,8 +87,11 @@ defmodule PremiereEcoute.Accounts.User.Consent do
   end
 
   @doc """
-  Refuse a legal document for a user. Creates new consent or updates existing one to refused.
+  Refuse a legal document for a user.
+
+  Creates new consent or updates existing one to refused. Publishes a ConsentGiven event with accepted=false.
   """
+  @spec refuse(User.t(), LegalDocument.t()) :: {:ok, __MODULE__.t()} | {:error, Ecto.Changeset.t()}
   def refuse(%User{id: id}, %LegalDocument{id: document, version: version}) do
     case get_by(user_id: id, document: document) do
       nil -> create(%{user_id: id, document: String.to_existing_atom(document), version: version, accepted: false})
@@ -81,8 +104,10 @@ defmodule PremiereEcoute.Accounts.User.Consent do
 
   @doc """
   Check if user has approved all required legal documents with correct versions.
-  Returns true if all documents are accepted with matching versions, false otherwise.
+
+  Queries the database to verify that all provided documents have been accepted by the user with matching versions.
   """
+  @spec approval(User.t(), map()) :: boolean()
   def approval(%User{id: user_id}, documents) when is_map(documents) do
     Repo.one(
       from c in __MODULE__,

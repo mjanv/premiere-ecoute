@@ -46,6 +46,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:info} phx-mounted={show("#flash")}>Welcome Back!</.flash>
   """
+  @spec flash(map()) :: Phoenix.LiveView.Rendered.t()
   attr :id, :string, doc: "the optional id of flash container"
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
@@ -96,6 +97,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
       <.button phx-click="go" variant="primary">Send!</.button>
       <.button navigate={~p"/"}>Home</.button>
   """
+  @spec button(map()) :: Phoenix.LiveView.Rendered.t()
   attr :rest, :global, include: ~w(href navigate patch method)
   attr :variant, :string, values: ~w(primary)
   slot :inner_block, required: true
@@ -168,6 +170,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
   attr :rest, :global, include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                 multiple pattern placeholder readonly required rows size step)
 
+  @spec input(map()) :: Phoenix.LiveView.Rendered.t()
   def input(%{field: %HTML.FormField{} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
 
@@ -283,6 +286,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
   @doc """
   Renders a header with title.
   """
+  @spec header(map()) :: Phoenix.LiveView.Rendered.t()
   attr :class, :string, default: nil
 
   slot :inner_block, required: true
@@ -315,6 +319,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
         <:col :let={user} label="username">{user.username}</:col>
       </.table>
   """
+  @spec table(map()) :: Phoenix.LiveView.Rendered.t()
   attr :id, :string, required: true
   attr :rows, :list, required: true
   attr :row_id, :any, default: nil, doc: "the function for generating the row id"
@@ -374,6 +379,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
         <:item title="Views">{@post.views}</:item>
       </.list>
   """
+  @spec list(map()) :: Phoenix.LiveView.Rendered.t()
   slot :item, required: true do
     attr :title, :string, required: true
   end
@@ -409,6 +415,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
       <.icon name="hero-x-mark" />
       <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
   """
+  @spec icon(map()) :: Phoenix.LiveView.Rendered.t()
   attr :name, :string, required: true
   attr :class, :string, default: "size-4"
 
@@ -420,6 +427,12 @@ defmodule PremiereEcouteWeb.CoreComponents do
 
   ## JS Commands
 
+  @doc """
+  Shows element with transition animation.
+
+  Displays element using Phoenix LiveView JS commands with fade and scale transition effects.
+  """
+  @spec show(JS.t(), String.t()) :: JS.t()
   def show(js \\ %JS{}, selector) do
     JS.show(js,
       to: selector,
@@ -430,6 +443,12 @@ defmodule PremiereEcouteWeb.CoreComponents do
     )
   end
 
+  @doc """
+  Hides element with transition animation.
+
+  Conceals element using Phoenix LiveView JS commands with fade and scale transition effects.
+  """
+  @spec hide(JS.t(), String.t()) :: JS.t()
   def hide(js \\ %JS{}, selector) do
     JS.hide(js,
       to: selector,
@@ -443,6 +462,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
   @doc """
   Translates an error message using gettext.
   """
+  @spec translate_error({String.t(), keyword()}) :: String.t()
   def translate_error({msg, opts}) do
     # if count = opts[:count] do
     #   Gettext.dngettext(PremiereEcoute.Gettext, "errors", msg, msg, count, opts)
@@ -456,6 +476,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
   end
 
   @doc "Translates the errors for a field from a keyword list of errors."
+  @spec translate_errors(keyword(), atom()) :: [String.t()]
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end

@@ -15,6 +15,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
     viewer: "user:read:email user:read:follows"
   ]
 
+  @doc """
+  Obtains Twitch application access token using client credentials flow.
+
+  Uses OAuth2 client credentials grant for server-to-server API authentication without user authorization.
+  """
+  @spec client_credentials() :: {:ok, map()} | {:error, term()}
   def client_credentials do
     TwitchApi.accounts()
     |> TwitchApi.post(
@@ -25,6 +31,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
     |> TwitchApi.handle(200, fn body -> body end)
   end
 
+  @doc """
+  Generates Twitch OAuth2 authorization URL for user authentication.
+
+  Supports role-based scope selection (:streamer, :viewer) or custom scope string. Includes CSRF protection via state parameter.
+  """
+  @spec authorization_url(atom() | String.t() | nil, String.t() | nil) :: String.t()
   def authorization_url(role_or_scope, state \\ nil) do
     scope =
       case role_or_scope do
@@ -49,6 +61,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
     |> URI.to_string()
   end
 
+  @doc """
+  Exchanges authorization code for user access tokens and profile data.
+
+  Completes OAuth2 authorization code flow by exchanging code for access/refresh tokens. Fetches user profile and returns combined authentication data.
+  """
+  @spec authorization_code(String.t()) :: {:ok, map()} | {:error, term()}
   def authorization_code(code) when is_binary(code) do
     TwitchApi.accounts()
     |> TwitchApi.post(
@@ -77,6 +95,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Accounts do
     end)
   end
 
+  @doc """
+  Refreshes expired access token using refresh token.
+
+  Obtains new access and refresh tokens from Twitch OAuth2 refresh token grant. Returns updated token credentials with expiration time.
+  """
+  @spec renew_token(String.t()) :: {:ok, map()} | {:error, term()}
   def renew_token(refresh_token) do
     TwitchApi.accounts()
     |> TwitchApi.post(

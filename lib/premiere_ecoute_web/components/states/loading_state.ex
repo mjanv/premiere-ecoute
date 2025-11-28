@@ -20,6 +20,7 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
         <.skeleton_element type="avatar" />
       </.loading_skeleton>
   """
+  @spec loading_skeleton(map()) :: Phoenix.LiveView.Rendered.t()
   attr :rows, :integer, default: 3, doc: "Number of skeleton rows to display"
   attr :class, :string, default: nil
   attr :rest, :global
@@ -56,6 +57,7 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
       <.skeleton_element type="avatar" size="lg" />
       <.skeleton_element type="card" height="20" />
   """
+  @spec skeleton_element(map()) :: Phoenix.LiveView.Rendered.t()
   attr :type, :string, default: "text", values: ~w(text title avatar button card image), doc: "Type of skeleton element"
   attr :width, :string, default: "full", doc: "Width class (e.g., '1/2', '3/4', 'full')"
   attr :height, :string, default: nil, doc: "Height in rem units or Tailwind class"
@@ -92,6 +94,7 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
         </:item>
       </.loading_list>
   """
+  @spec loading_list(map()) :: Phoenix.LiveView.Rendered.t()
   attr :count, :integer, default: 3, doc: "Number of skeleton items"
   attr :class, :string, default: "space-y-4"
   attr :rest, :global
@@ -124,6 +127,7 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
       <.loading_spinner />
       <.loading_spinner size="sm" class="text-blue-500" />
   """
+  @spec loading_spinner(map()) :: Phoenix.LiveView.Rendered.t()
   attr :size, :string, default: "md", values: ~w(xs sm md lg xl)
   attr :class, :string, default: "text-surface-muted"
   attr :rest, :global
@@ -202,6 +206,7 @@ defmodule PremiereEcouteWeb.Components.LoadingState do
       <.loading_overlay message="Loading..." />
       <.loading_overlay variant="overlay" message="Searching albums..." />
   """
+  @spec loading_overlay(map()) :: Phoenix.LiveView.Rendered.t()
   attr :message, :string, default: "Loading..."
   attr :variant, :string, default: "modal", values: ~w(modal overlay), doc: "Overlay style variant"
   attr :class, :string, default: nil

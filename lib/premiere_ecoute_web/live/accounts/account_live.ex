@@ -55,16 +55,11 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
         |> put_flash(:error, "User not found")
 
       user ->
-        case Accounts.User.disconnect_provider(user, :spotify) do
-          {:ok, user} ->
-            socket
-            |> assign(:current_user, user)
-            |> put_flash(:info, "Spotify disconnected successfully")
+        {:ok, user} = Accounts.User.disconnect_provider(user, :spotify)
 
-          {:error, _changeset} ->
-            socket
-            |> put_flash(:error, "Failed to disconnect Spotify")
-        end
+        socket
+        |> assign(:current_user, user)
+        |> put_flash(:info, "Spotify disconnected successfully")
     end
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -77,16 +72,11 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
         |> put_flash(:error, "User not found")
 
       user ->
-        case Accounts.User.disconnect_provider(user, :twitch) do
-          {:ok, user} ->
-            socket
-            |> assign(:current_user, user)
-            |> put_flash(:info, "Twitch tokens revoked successfully")
+        {:ok, user} = Accounts.User.disconnect_provider(user, :twitch)
 
-          {:error, _changeset} ->
-            socket
-            |> put_flash(:error, "Failed to disconnect Twitch")
-        end
+        socket
+        |> assign(:current_user, user)
+        |> put_flash(:info, "Twitch tokens revoked successfully")
     end
     |> then(fn socket -> {:noreply, socket} end)
   end

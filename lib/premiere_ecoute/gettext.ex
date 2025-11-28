@@ -36,8 +36,20 @@ defmodule PremiereEcoute.Gettext do
 
   alias PremiereEcoute.Accounts.Scope
 
+  @doc """
+  Translates a message using the current locale.
+
+  Wrapper around Gettext.gettext for convenient translation access.
+  """
+  @spec gettext(String.t()) :: String.t()
   def gettext(msgid), do: Gettext.gettext(__MODULE__, msgid)
 
+  @doc """
+  Executes a function with the user's preferred language locale.
+
+  Sets the locale based on the user's profile language preference, executes the function, then restores the previous locale.
+  """
+  @spec t(Scope.t(), function()) :: any()
   def t(%Scope{user: %{profile: %{language: language}}}, f), do: Gettext.with_locale(Atom.to_string(language), f)
 
   @doc "Gets the locale for the current process"

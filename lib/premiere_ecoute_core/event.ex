@@ -5,8 +5,19 @@ defmodule PremiereEcouteCore.Event do
   Provides struct definition, JSON encoding, and string representation for event sourcing. Events are automatically configured with an ID field and custom fields specified in options.
   """
 
+  @doc """
+  Extracts event name from event struct.
+
+  Returns last segment of module name as event identifier.
+  """
+  @spec name(struct()) :: String.t()
   def name(event), do: event.__struct__ |> Module.split() |> List.last()
 
+  @doc """
+  Injects event functionality into using module.
+
+  Generates struct with ID and custom fields, plus Jason encoder and String.Chars protocol implementations.
+  """
   defmacro __using__(opts) do
     fields = Keyword.get(opts, :fields, [])
 

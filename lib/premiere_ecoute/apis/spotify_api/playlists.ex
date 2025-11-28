@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
 
   require Logger
 
+  alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.SpotifyApi
   alias PremiereEcoute.Apis.SpotifyApi.Parser
   alias PremiereEcoute.Discography.LibraryPlaylist
@@ -15,12 +16,24 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
 
   @limit 10
 
+  @doc """
+  Fetches a Spotify playlist by ID.
+
+  Retrieves playlist metadata and tracks from Spotify API. Parses response into Playlist aggregate with tracks.
+  """
+  @spec get_playlist(String.t()) :: {:ok, Playlist.t()} | {:error, term()}
   def get_playlist(playlist_id) when is_binary(playlist_id) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/playlists/#{playlist_id}")
     |> SpotifyApi.handle(200, &parse_playlist/1)
   end
 
+  @doc """
+  Fetches user's library playlists.
+
+  Retrieves paginated list of playlists from authenticated user's library. Returns 10 playlists per page.
+  """
+  @spec get_library_playlists(Scope.t(), integer()) :: {:ok, list(LibraryPlaylist.t())} | {:error, term()}
   def get_library_playlists(scope, page \\ 1) do
     scope
     |> SpotifyApi.api()
@@ -28,6 +41,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_library_playlist/1) end)
   end
 
+  @doc """
+  Creates a new playlist in user's Spotify library.
+
+  Creates playlist with specified title, description, and public/private setting. Returns created playlist metadata.
+  """
+  @spec create_playlist(Scope.t(), LibraryPlaylist.t()) :: {:ok, LibraryPlaylist.t()} | {:error, term()}
   def create_playlist(scope, %LibraryPlaylist{} = playlist) do
     scope
     |> SpotifyApi.api()
@@ -50,6 +69,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     end)
   end
 
+  @doc """
+  Adds tracks to a playlist.
+
+  Inserts tracks at the beginning of the playlist. Tracks are added in the order provided.
+  """
+  @spec add_items_to_playlist(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def add_items_to_playlist(scope, id, tracks) do
     scope
     |> SpotifyApi.api()
@@ -60,6 +85,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(201, fn body -> body end)
   end
 
+  @doc """
+  Replaces all tracks in a playlist.
+
+  Removes all existing tracks and replaces them with the provided tracks.
+  """
+  @spec replace_items_to_playlist(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def replace_items_to_playlist(scope, id, tracks) do
     scope
     |> SpotifyApi.api()
@@ -70,6 +101,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn body -> body end)
   end
 
+  @doc """
+  Removes tracks from a playlist.
+
+  Deletes specified tracks from the playlist by their track IDs.
+  """
+  @spec remove_playlist_items(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def remove_playlist_items(scope, id, tracks) do
     scope
     |> SpotifyApi.api()
@@ -82,6 +119,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn body -> body end)
   end
 
+  @doc """
+  Parses Spotify API playlist response into Playlist aggregate.
+
+  Transforms raw Spotify playlist JSON into structured Playlist with tracks, metadata, and owner information.
+  """
+  @spec parse_playlist(map()) :: Playlist.t()
   def parse_playlist(data) do
     %Playlist{
       provider: :spotify,
@@ -99,6 +142,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     }
   end
 
+  @doc """
+  Parses Spotify API track item into Track struct.
+
+  Transforms raw track JSON from playlist response into structured Track with metadata, artist, and timing information.
+  """
+  @spec parse_track(map(), String.t()) :: Track.t()
   def parse_track(data, playlist_id) do
     %Track{
       provider: :spotify,
@@ -114,7 +163,13 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     }
   end
 
-  def parse_library_playlist(data) do
+  @doc """
+  Parses Spotify API library playlist into LibraryPlaylist struct.
+
+  Transforms raw library playlist JSON into structured LibraryPlaylist with metadata, visibility settings, and cover image.
+  """
+  @spec parse_library_playlist(map()) :: LibraryPlaylist.t()
+  def parse_library_playlist(data) when is_map(data) do
     %LibraryPlaylist{
       provider: :spotify,
       playlist_id: data["id"],

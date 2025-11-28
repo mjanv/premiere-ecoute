@@ -15,6 +15,12 @@ defmodule PremiereEcouteWeb.Errors.ErrorJSON do
   # By default, Phoenix returns the status message from
   # the template name. For example, "404.json" becomes
   # "Not Found".
+  @doc """
+  Renders error template as JSON with status message detail.
+
+  Converts the template name to a JSON error response containing the HTTP status message in standard error format.
+  """
+  @spec render(String.t(), map()) :: %{errors: %{detail: String.t()}}
   def render(template, _assigns) do
     %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
   end

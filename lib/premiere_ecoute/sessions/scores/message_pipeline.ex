@@ -18,6 +18,12 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcouteCore.Cache
 
+  @doc """
+  Starts the Broadway pipeline for chat vote processing.
+
+  Initializes the pipeline with a single producer, processor, and batcher for handling vote messages with batching support.
+  """
+  @spec start_link(keyword()) :: GenServer.on_start()
   def start_link(_opts) do
     Broadway.start_link(__MODULE__,
       name: __MODULE__,
@@ -27,6 +33,12 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
     )
   end
 
+  @doc """
+  Processes individual chat messages to extract votes.
+
+  Transforms MessageSent events into vote data and assigns them to batchers grouped by session ID for efficient bulk insertion.
+  """
+  @spec handle_message(atom(), Message.t(), any()) :: Message.t()
   def handle_message(:session, message, _) do
     case process(message.data) do
       {:ok, vote} -> message |> Message.put_data(vote) |> Message.put_batch_key(vote.session_id) |> Message.put_batcher(:writer)
@@ -34,6 +46,12 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
     end
   end
 
+  @doc """
+  Extracts vote data from chat message event.
+
+  Validates that the session has an active track, parses the vote value from the message text, and constructs a vote map with all required fields including timestamps.
+  """
+  @spec process(MessageSent.t()) :: {:ok, map()} | {:error, term()}
   def process(%MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: message, is_streamer: is_streamer}) do
     with {:ok, %{current_track_id: track_id} = session} when not is_nil(track_id) <-
            Cache.get(:sessions, broadcaster_id),
@@ -55,6 +73,12 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
     end
   end
 
+  @doc """
+  Processes batched votes for bulk insertion and broadcasts session summaries.
+
+  Inserts all votes in the batch, generates an updated session report, extracts the relevant track summary, and broadcasts it via PubSub for real-time UI updates.
+  """
+  @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
     Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
 
@@ -70,5 +94,11 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
     messages
   end
 
+  @doc """
+  Handles failed message processing.
+
+  Returns failed messages without further processing to allow Broadway to manage failure tracking and retries.
+  """
+  @spec handle_failed([Message.t()], any()) :: [Message.t()]
   def handle_failed(messages, _context), do: messages
 end

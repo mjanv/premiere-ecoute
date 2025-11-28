@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.Hooks.RestoreLocale do
 
   @supported_locales Gettext.known_locales(PremiereEcoute.Gettext)
 
+  @doc """
+  Restores user locale from session or profile during LiveView mount.
+
+  Retrieves the locale from browser session or authenticated user profile, validates it against supported locales, and sets it in Gettext for request localization.
+  """
+  @spec on_mount(atom(), map(), map(), Phoenix.LiveView.Socket.t()) :: {:cont, Phoenix.LiveView.Socket.t()}
   def on_mount(_, _params, session, socket) do
     locale = get_locale_from_browser_or_profile(socket, session)
 

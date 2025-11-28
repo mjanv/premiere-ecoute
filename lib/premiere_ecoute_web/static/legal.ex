@@ -11,6 +11,21 @@ defmodule PremiereEcouteWeb.Static.Legal do
     as: :documents,
     highlighters: [:makeup_elixir, :makeup_erlang]
 
+  alias PremiereEcoute.Accounts.LegalDocument
+
+  @doc """
+  Returns all legal documents.
+
+  Retrieves the complete list of legal documents parsed from markdown files at compile time.
+  """
+  @spec documents() :: [LegalDocument.t()]
   def documents, do: @documents
+
+  @doc """
+  Retrieves a specific legal document by its ID.
+
+  Returns the legal document matching the given atom ID or nil if not found.
+  """
+  @spec document(atom()) :: LegalDocument.t() | nil
   def document(id), do: Enum.find(documents(), &(&1.id == Atom.to_string(id)))
 end

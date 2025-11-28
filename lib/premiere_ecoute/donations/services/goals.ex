@@ -24,6 +24,7 @@ defmodule PremiereEcoute.Donations.Services.Goals do
       iex> create_goal(%{title: "", target_amount: -10})
       {:error, %Ecto.Changeset{}}
   """
+  @spec create_goal(map()) :: {:ok, Goal.t()} | {:error, Ecto.Changeset.t()}
   def create_goal(attrs) do
     Goal.create(attrs)
   end
@@ -37,6 +38,7 @@ defmodule PremiereEcoute.Donations.Services.Goals do
       iex> enable_goal(goal)
       {:ok, %Goal{active: true}}
   """
+  @spec enable_goal(Goal.t()) :: {:ok, Goal.t()} | {:error, Ecto.Changeset.t()}
   def enable_goal(%Goal{} = goal) do
     Ecto.Multi.new()
     |> Ecto.Multi.update_all(:disable_all, Goal, set: [active: false])
@@ -56,6 +58,7 @@ defmodule PremiereEcoute.Donations.Services.Goals do
       iex> disable_goal(goal)
       {:ok, %Goal{active: false}}
   """
+  @spec disable_goal(Goal.t()) :: {:ok, Goal.t()} | {:error, Ecto.Changeset.t()}
   def disable_goal(%Goal{} = goal) do
     Goal.update(goal, %{active: false})
   end
@@ -72,6 +75,7 @@ defmodule PremiereEcoute.Donations.Services.Goals do
       iex> get_current_goal()
       nil
   """
+  @spec get_current_goal() :: Goal.t() | nil
   def get_current_goal do
     today = Date.utc_today()
 

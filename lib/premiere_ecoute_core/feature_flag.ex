@@ -6,7 +6,11 @@ defmodule PremiereEcouteCore.FeatureFlag do
   """
 
   defdelegate enabled?(flag, opts \\ []), to: FunWithFlags
+
+  @doc "Checks if a feature flag is disabled."
+  @spec disabled?(atom(), keyword()) :: boolean()
   def disabled?(flag, opts \\ []), do: not enabled?(flag, opts)
+
   defdelegate enable(flag, opts \\ []), to: FunWithFlags
   defdelegate disable(flag, opts \\ []), to: FunWithFlags
   defdelegate clear(flag, opts \\ []), to: FunWithFlags

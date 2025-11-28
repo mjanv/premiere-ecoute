@@ -5,6 +5,12 @@ defmodule PremiereEcouteCore.Search do
   Provides functions for fuzzy text search using Jaro distance, field-based filtering, and date-aware sorting of data collections.
   """
 
+  @doc """
+  Filters data using fuzzy text search across specified fields.
+
+  Searches fields using Jaro distance algorithm with configurable similarity threshold. Returns results sorted by relevance score descending. Empty queries return all data.
+  """
+  @spec filter(list(struct()), String.t(), list(atom() | String.t()), float()) :: list(struct())
   def filter(data, query, fields, threshold \\ 0.8)
 
   def filter(data, "", _, _), do: data
@@ -27,6 +33,12 @@ defmodule PremiereEcouteCore.Search do
     |> Enum.map(fn {_score, struct} -> struct end)
   end
 
+  @doc """
+  Filters data by exact field value matches.
+
+  Accepts a keyword list of field-value pairs and returns only structs where all non-nil values match exactly. Nil values are ignored in filtering.
+  """
+  @spec flag(list(struct()), list(tuple())) :: list(struct())
   def flag(data, fields) do
     data
     |> Enum.map(fn struct ->
@@ -40,6 +52,12 @@ defmodule PremiereEcouteCore.Search do
     |> Enum.map(fn {_flag, struct} -> struct end)
   end
 
+  @doc """
+  Sorts data by a field value with date awareness.
+
+  Sorts data by the specified field in ascending or descending order. Handles ISO 8601 date strings by parsing them for proper date-based sorting.
+  """
+  @spec sort(list(struct()), atom(), :asc | :desc) :: list(struct())
   def sort(data, field, order \\ :asc) do
     sign = if order == :asc, do: :lt, else: :gt
     Enum.sort(data, fn a, b -> compare_dates(Map.get(a, field), Map.get(b, field)) == sign end)

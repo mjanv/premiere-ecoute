@@ -85,6 +85,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
+  @doc """
+  Creates a Req client for Spotify Web API with client credentials.
+
+  Uses client credentials OAuth token for public API access.
+  """
   @spec api :: Req.Request.t()
   def api do
     [
@@ -97,6 +102,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     |> new()
   end
 
+  @doc """
+  Creates a Req client for Spotify Web API with user authentication.
+
+  Accepts either a Scope struct with user access token or a raw access token string. Enables user-specific operations like playback control and playlist management.
+  """
   @spec api(Scope.t() | binary()) :: Req.Request.t()
   def api(%Scope{user: %{spotify: %{access_token: access_token}}}) do
     [
@@ -120,6 +130,11 @@ defmodule PremiereEcoute.Apis.SpotifyApi do
     |> new()
   end
 
+  @doc """
+  Creates a Req client for Spotify Accounts API.
+
+  Configures basic authentication with client ID and secret for OAuth token operations.
+  """
   @spec accounts :: Req.Request.t()
   def accounts do
     id = Application.get_env(:premiere_ecoute, :spotify_client_id)

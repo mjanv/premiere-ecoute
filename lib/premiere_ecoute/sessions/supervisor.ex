@@ -9,6 +9,12 @@ defmodule PremiereEcoute.Sessions.Supervisor do
 
   alias PremiereEcouteCore.Cache
 
+  @doc """
+  Starts sessions supervisor with cache and Broadway pipelines.
+
+  Initializes supervisor process for sessions cache and, outside test environment, Broadway pipelines for processing chat messages and poll results.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end

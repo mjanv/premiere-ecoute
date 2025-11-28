@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.Components.Header do
   @doc """
   Renders the application header with navigation and user menu.
   """
+  @spec app_header(map()) :: Phoenix.LiveView.Rendered.t()
   attr :current_user, :any, default: nil, doc: "the current authenticated user"
   attr :current_scope, :any, default: nil, doc: "the current user scope (including impersonation context)"
   attr :current_page, :string, default: nil, doc: "the current page identifier"

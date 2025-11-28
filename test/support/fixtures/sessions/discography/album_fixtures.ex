@@ -8,6 +8,12 @@ defmodule PremiereEcoute.Discography.AlbumFixtures do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
 
+  @doc """
+  Generates test album struct with default attributes and tracks.
+
+  Creates a generic album fixture with sample track data, merging provided attributes to override defaults for testing.
+  """
+  @spec album_fixture(map()) :: Album.t()
   def album_fixture(attrs \\ %{}) do
     %{
       provider: :spotify,
@@ -26,6 +32,12 @@ defmodule PremiereEcoute.Discography.AlbumFixtures do
     |> then(fn attrs -> struct(Album, attrs) end)
   end
 
+  @doc """
+  Returns Billie Eilish "HIT ME HARD AND SOFT" album fixture for testing.
+
+  Provides complete Spotify album fixture with 10 tracks and real metadata from the 2024 album for integration tests.
+  """
+  @spec spotify_album_fixture(String.t()) :: Album.t()
   def spotify_album_fixture("7aJuG4TFXa2hmE4z1yxc3n") do
     %Album{
       provider: :spotify,

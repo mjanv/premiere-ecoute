@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.Hooks.Flash do
 
   import Phoenix.LiveView
 
+  @doc """
+  Subscribes authenticated users to flash message broadcasts and attaches flash handling hook.
+
+  Sets up PubSub subscription for the authenticated user's channel and registers a LiveView hook to process incoming flash messages during the mount lifecycle.
+  """
+  @spec on_mount(atom(), map(), map(), Phoenix.LiveView.Socket.t()) :: {:cont, Phoenix.LiveView.Socket.t()}
   def on_mount(_name, _params, _session, socket) do
     if connected?(socket) do
       if socket.assigns.current_scope && socket.assigns.current_scope.user do

@@ -31,6 +31,7 @@ defmodule PremiereEcoute.Donations.Services.Donations do
       iex> create_donation(%{amount: -10})
       {:error, %Ecto.Changeset{}}
   """
+  @spec create_donation(map()) :: {:ok, Donation.t()} | {:error, Ecto.Changeset.t()}
   def create_donation(attrs) do
     # Ensure defaults are set
     attrs =
@@ -139,6 +140,7 @@ defmodule PremiereEcoute.Donations.Services.Donations do
       iex> add_donation(goal, %{amount: -10})
       {:error, %Ecto.Changeset{}}
   """
+  @spec add_donation(Goal.t(), map()) :: {:ok, Donation.t()} | {:error, Ecto.Changeset.t() | term()}
   def add_donation(%Goal{} = goal, attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(
@@ -173,6 +175,7 @@ defmodule PremiereEcoute.Donations.Services.Donations do
       iex> revoke_donation(donation)
       {:ok, %Donation{status: :refunded}}
   """
+  @spec revoke_donation(Donation.t()) :: {:ok, Donation.t()} | {:error, Ecto.Changeset.t() | term()}
   def revoke_donation(%Donation{goal_id: nil} = donation) do
     # Donation not attached to a goal - just update status
     donation

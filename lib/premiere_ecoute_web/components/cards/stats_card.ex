@@ -17,6 +17,7 @@ defmodule PremiereEcouteWeb.Components.StatsCard do
 
       <.stats_card icon="hero-chart-bar" value="87%" label="Success Rate" color="green" navigate={~p"/admin/stats"} />
   """
+  @spec stats_card(map()) :: Phoenix.LiveView.Rendered.t()
   attr :icon, :string, required: true, doc: "Heroicon name for the stats icon"
   attr :value, :string, required: true, doc: "The main statistic value to display"
   attr :label, :string, required: true, doc: "The label describing the statistic"

@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.Components.Search do
 
   use Phoenix.Component
 
+  @doc """
+  Renders a search bar with debounced input.
+
+  Displays a search input field with icon that triggers search events on input with 300ms debounce for real-time filtering.
+  """
+  @spec searchbar(map()) :: Phoenix.LiveView.Rendered.t()
   attr :query, :string, required: true
   attr :placeholder, :string, required: false, default: "..."
 

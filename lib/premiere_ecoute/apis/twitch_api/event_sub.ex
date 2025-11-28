@@ -14,6 +14,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
 
   @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
 
+  @doc """
+  Retrieves all EventSub subscriptions for user.
+
+  Fetches active webhook subscriptions and caches subscription IDs for efficient cancellation.
+  """
+  @spec get_event_subscriptions(Scope.t()) :: {:ok, list(map())} | {:error, term()}
   def get_event_subscriptions(%Scope{user: %{twitch: %{user_id: user_id}}}) do
     TwitchApi.api()
     |> TwitchApi.get(url: "/eventsub/subscriptions", params: %{user_id: user_id})
@@ -23,6 +29,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end)
   end
 
+  @doc """
+  Creates EventSub webhook subscription for event type.
+
+  Subscribes to Twitch event notifications (chat messages, follows, polls, streams) with appropriate conditions. Caches subscription ID.
+  """
+  @spec subscribe(Scope.t(), String.t()) :: {:ok, map()} | {:error, term()}
   def subscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
     TwitchApi.api()
     |> TwitchApi.post(
@@ -44,6 +56,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end)
   end
 
+  @doc """
+  Cancels EventSub subscription for event type.
+
+  Removes webhook subscription using cached subscription ID. Returns subscription ID on success.
+  """
+  @spec unsubscribe(Scope.t(), String.t()) :: {:ok, String.t()} | {:error, term()}
   def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}}, type) do
     case Cache.get(:subscriptions, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
@@ -56,6 +74,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end
   end
 
+  @doc """
+  Cancels all EventSub subscriptions for user.
+
+  Fetches and cancels all active webhook subscriptions. Returns list of cancelled subscription IDs on success.
+  """
+  @spec cancel_all_subscriptions(Scope.t()) :: {:ok, list(String.t())} | {:error, term()}
   def cancel_all_subscriptions(scope) do
     case get_event_subscriptions(scope) do
       {:ok, subscriptions} ->

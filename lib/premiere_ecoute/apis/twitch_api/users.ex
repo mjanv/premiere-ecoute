@@ -9,6 +9,12 @@ defmodule PremiereEcoute.Apis.TwitchApi.Users do
 
   alias PremiereEcoute.Apis.TwitchApi
 
+  @doc """
+  Fetches Twitch user profile data.
+
+  Retrieves authenticated user's profile information including ID, login name, display name, email, and broadcaster type.
+  """
+  @spec get_user_profile(String.t()) :: {:ok, map()} | {:error, term()}
   def get_user_profile(access_token) do
     access_token
     |> TwitchApi.api()

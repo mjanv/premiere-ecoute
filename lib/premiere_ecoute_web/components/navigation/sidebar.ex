@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
   Renders the left sidebar with navigation sections.
   Only visible for authenticated users with appropriate permissions.
   """
+  @spec left_sidebar(map()) :: Phoenix.LiveView.Rendered.t()
   attr :current_user, :any, default: nil, doc: "the current authenticated user"
   attr :current_scope, :any, default: nil, doc: "the current user scope"
   attr :current_page, :string, default: nil, doc: "current page identifier for highlighting active nav items"
@@ -234,6 +235,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
   @doc """
   Renders a sidebar navigation link with icon and active state.
   """
+  @spec sidebar_link(map()) :: Phoenix.LiveView.Rendered.t()
   attr :href, :string, required: true
   attr :current_page, :string, default: nil
   attr :page_id, :string, required: true

@@ -18,6 +18,7 @@ defmodule PremiereEcouteWeb.Components.Card do
         <h3>Primary card with custom margin</h3>
       </.card>
   """
+  @spec card(map()) :: Phoenix.LiveView.Rendered.t()
   attr :variant, :string, default: "default", values: ~w(default primary success warning danger)
   attr :class, :string, default: nil
   attr :rest, :global

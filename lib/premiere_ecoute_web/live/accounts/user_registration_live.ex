@@ -10,6 +10,12 @@ defmodule PremiereEcouteWeb.Accounts.UserRegistrationLive do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
 
+  @doc """
+  Initializes user registration page or redirects authenticated users.
+
+  Redirects already authenticated users to home page, or initializes empty registration form for new users with email validation.
+  """
+  @impl true
   def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket) when not is_nil(user) do
     {:ok, redirect(socket, to: PremiereEcouteWeb.UserAuth.signed_in_path(socket))}
   end
@@ -18,6 +24,12 @@ defmodule PremiereEcouteWeb.Accounts.UserRegistrationLive do
     {:ok, assign_form(socket, Accounts.User.email_changeset(%User{})), temporary_assigns: [form: nil]}
   end
 
+  @doc """
+  Handles registration form events for account creation and validation.
+
+  Creates new user account and sends magic link login instructions, or validates form input and displays errors for save and validate events respectively.
+  """
+  @impl true
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.User.create(user_params) do
       {:ok, user} ->

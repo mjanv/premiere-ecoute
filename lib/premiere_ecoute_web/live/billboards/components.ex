@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.Billboards.Components do
 
   use Phoenix.Component
 
+  @doc """
+  Renders ASCII art billboard header with optional title.
+
+  Displays a colorful ASCII art "BILLBOARD" text in synthwave gradient colors with optional subtitle text below.
+  """
+  @spec billboard(map()) :: Phoenix.LiveView.Rendered.t()
   attr :title, :string, required: false, default: nil
 
   def billboard(assigns) do
@@ -30,6 +36,12 @@ defmodule PremiereEcouteWeb.Billboards.Components do
     """
   end
 
+  @doc """
+  Renders a tab button with active state styling.
+
+  Displays a mode-switching tab button with purple theme and active border highlight for billboard navigation.
+  """
+  @spec tab(map()) :: Phoenix.LiveView.Rendered.t()
   attr :active, :atom, required: true
   attr :mode, :string, required: true
   slot :inner_block
@@ -46,6 +58,12 @@ defmodule PremiereEcouteWeb.Billboards.Components do
     """
   end
 
+  @doc """
+  Renders a container for tab buttons.
+
+  Displays a horizontal tab bar with purple border styling for organizing multiple tab components.
+  """
+  @spec tabs(map()) :: Phoenix.LiveView.Rendered.t()
   slot :inner_block
 
   def tabs(assigns) do
@@ -56,6 +74,12 @@ defmodule PremiereEcouteWeb.Billboards.Components do
     """
   end
 
+  @doc """
+  Renders a podium display for top 3 entries.
+
+  Displays a three-tiered podium with gold, silver, and bronze styling showing top 3 ranked entries with emoji medals and clickable interactions.
+  """
+  @spec podium(map()) :: Phoenix.LiveView.Rendered.t()
   attr :action, :string, required: true
   attr :entries, :list, default: []
   slot :inner_block

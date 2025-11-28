@@ -14,6 +14,7 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
   Starts impersonation of a target user.
   Only admins can impersonate other users.
   """
+  @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(conn, %{"user_id" => user_id}) do
     current_scope = conn.assigns.current_scope
 
@@ -62,6 +63,7 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
   @doc """
   Ends the current impersonation and returns to admin context.
   """
+  @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(conn, _params) do
     current_scope = conn.assigns.current_scope
 

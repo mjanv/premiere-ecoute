@@ -36,6 +36,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
   @bots Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :bots])
   @streamers Application.compile_env(:premiere_ecoute, [PremiereEcoute.Accounts, :streamers])
 
+  @doc """
+  Registers or updates a user via Twitch OAuth.
+
+  Creates a new user account with OAuth tokens if the email is new, or refreshes/creates tokens for existing users. Automatically assigns role based on broadcaster type and configured lists. Generates random password if not provided.
+  """
   @spec register_twitch_user(twitch_data(), String.t() | nil) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def register_twitch_user(%{email: email, username: username} = payload, password \\ nil) do
     with nil <- User.get_user_by_email(email),
@@ -62,7 +67,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
     end
   end
 
-  @spec register_spotify_user(spotify_data(), String.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  @doc """
+  Associates Spotify OAuth credentials with an existing user account.
+
+  Requires the user to already exist in the system. Creates Spotify OAuth tokens for the specified user, enabling Spotify API integration.
+  """
+  @spec register_spotify_user(spotify_data(), binary() | integer()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t() | nil}
   def register_spotify_user(payload, id) do
     with %User{} = user <- Accounts.get_user!(id),
          {:ok, user} <- User.create_token(user, :spotify, payload) do
@@ -77,6 +87,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
     end
   end
 
+  @doc """
+  Determines user role based on Twitch authentication data.
+
+  Checks username against configured admin, bot, and streamer lists first. Falls back
+  to broadcaster type: partners become streamers, affiliates and others become viewers.
+  """
   @spec role(map()) :: :admin | :bot | :streamer | :viewer
   def role(auth_data) do
     case {auth_data.broadcaster_type, auth_data.username} do

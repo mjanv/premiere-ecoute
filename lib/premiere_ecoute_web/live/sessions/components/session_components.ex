@@ -11,6 +11,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
 
+  @doc """
+  Renders source details for a listening session.
+
+  Displays album or playlist metadata including cover image, artist/owner, release date, track count, and duration.
+  """
+  @spec source_details(map()) :: Phoenix.LiveView.Rendered.t()
   def source_details(%{listening_session: %{source: :album, album: album}} = assigns) do
     assigns = assign(assigns, :album, album)
 
@@ -115,6 +121,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   attr :base, :string, required: false, default: nil
   attr :show, :boolean, required: false, default: true
 
+  @spec session_stat(map()) :: Phoenix.LiveView.Rendered.t()
   def session_stat(assigns) do
     ~H"""
     <%= if @show do %>
@@ -141,6 +148,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
+  @doc """
+  Retrieves session average score for a metric.
+
+  Returns the score value from session summary for the specified key, or "-" if unavailable.
+  """
+  @spec session_average_score2(map() | nil, String.t()) :: String.t() | number()
   def session_average_score2(nil, _), do: "-"
 
   def session_average_score2(%{session_summary: summary}, key) do
@@ -154,6 +167,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   attr :legend, :string, required: true
   attr :rest, :global
 
+  @spec session_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def session_toggle(assigns) do
     ~H"""
     <div class="flex items-center">
@@ -181,6 +195,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   attr :at, :any, required: true
   attr :rest, :global
 
+  @spec next_track(map()) :: Phoenix.LiveView.Rendered.t()
   def next_track(assigns) do
     ~H"""
     <div class="pt-2">
@@ -267,6 +282,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   attr :user_current_rating, :string, required: true
   attr :open_vote, :boolean, required: true
 
+  @spec vote_bar(map()) :: Phoenix.LiveView.Rendered.t()
   def vote_bar(assigns) do
     ~H"""
     <%= if @listening_session.status == :active do %>
@@ -307,6 +323,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   attr :trends, :any, required: true
   attr :class, :string, default: ""
 
+  @spec note_graph(map()) :: Phoenix.LiveView.Rendered.t()
   def note_graph(assigns) do
     ~H"""
     <.async_result :let={trends} assign={@trends}>
@@ -338,6 +355,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
+  @doc """
+  Renders vote distribution bar chart for a track.
+
+  Displays vote counts for each rating option as vertical bars with heights proportional to vote counts.
+  """
+  @spec distribution_graph(map()) :: Phoenix.LiveView.Rendered.t()
   def distribution_graph(assigns) do
     ~H"""
     <.async_result :let={report} assign={@report}>
@@ -373,6 +396,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
+  @doc """
+  Calculates vote distribution for a track.
+
+  Returns list of tuples mapping each rating option to its vote count for the specified track.
+  """
+  @spec track_vote_distribution(String.t(), map() | nil, map()) :: [{String.t(), integer()}]
   def track_vote_distribution(_track_id, nil, session),
     do: for(rating <- session.vote_options, do: {rating, 0})
 
@@ -396,6 +425,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     end
   end
 
+  @doc """
+  Returns color class for vote option.
+
+  Maps vote options to Tailwind color classes for visual representation in charts.
+  """
+  @spec vote_option_color(String.t(), map()) :: String.t()
   def vote_option_color(vote_option, session) do
     index = Enum.find_index(session.vote_options, &(&1 == vote_option)) || 0
 
@@ -422,6 +457,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     end
   end
 
+  @doc """
+  Renders track statistic display.
+
+  Shows track score metric with async loading states and color-coded formatting.
+  """
+  @spec session_track_stat(map()) :: Phoenix.LiveView.Rendered.t()
   def session_track_stat(assigns) do
     ~H"""
     <div class="text-center">
@@ -442,6 +483,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
+  @doc """
+  Retrieves score for a specific track.
+
+  Returns the score value for the track from the report's track summaries, or "-" if unavailable.
+  """
+  @spec track_score(String.t(), map() | nil, String.t()) :: String.t() | number()
   def track_score(_track_id, nil, _), do: "-"
 
   def track_score(track_id, report, key) do
@@ -454,6 +501,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
   attr :current_visibility, :atom, required: true
   attr :visibility_options, :list, required: true
 
+  @spec visibility_dropdown(map()) :: Phoenix.LiveView.Rendered.t()
   def visibility_dropdown(assigns) do
     ~H"""
     <div class="relative" id="visibility-dropdown" phx-hook="VisibilityDropdown">

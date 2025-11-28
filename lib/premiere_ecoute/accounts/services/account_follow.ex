@@ -27,6 +27,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
     alias PremiereEcoute.Apis
 
     @impl Oban.Worker
+    @doc """
+    Processes a follow operation by fetching status from Twitch API.
+
+    Queries Twitch to determine if the user follows the streamer and records the follow relationship with the timestamp. Job fails if the follow relationship doesn't exist.
+    """
+    @spec perform(Oban.Job.t()) :: {:ok, Follow.t()} | {:error, :no_follow}
     def perform(%Oban.Job{args: %{"streamer_id" => streamer_id, "user_id" => user_id}}) do
       with scope <- Scope.for_user(Accounts.get_user!(user_id)),
            streamer <- Accounts.get_user!(streamer_id),
@@ -38,6 +44,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
     end
   end
 
+  @doc """
+  Creates a follow relationship after verifying with Twitch API.
+
+  Fetches the follow timestamp from Twitch and creates the follow record. Falls back to creating a follow without timestamp if Twitch lookup fails.
+  """
   @spec follow_streamer(Scope.t(), User.t()) :: {:ok, Follow.t()} | {:error, term()}
   def follow_streamer(scope, streamer) do
     with {:ok, %{"followed_at" => followed_at}} <- Apis.twitch().get_followed_channel(scope, streamer),
@@ -49,6 +60,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
     end
   end
 
+  @doc """
+  Enqueues background jobs to follow all streamers.
+
+  Schedules Oban jobs for each streamer to asynchronously verify and create follow relationships via Twitch API. Jobs are delayed by 10 seconds.
+  """
   @spec follow_streamers(Scope.t()) :: :ok
   def follow_streamers(scope) do
     User.all(where: [role: :streamer])

@@ -10,6 +10,13 @@ defmodule PremiereEcoute.Festivals.Services.PosterAnalyzer do
 
   @model Application.compile_env(:premiere_ecoute, [PremiereEcoute.Festivals, :model])
 
+  @doc """
+  Analyzes festival poster image and extracts data.
+
+  Reads image, extracts festival data using AI model, broadcasts partial results to user via PubSub, and returns final festival data.
+  """
+  @spec analyze_poster(PremiereEcoute.Accounts.Scope.t(), String.t()) ::
+          {:ok, PremiereEcoute.Festivals.Festival.t()} | {:error, String.t()}
   def analyze_poster(scope, image_path) do
     with {:ok, base64} <- Poster.read_base64_image(image_path),
          stream <- @model.extract_festival(base64),
