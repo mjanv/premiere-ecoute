@@ -11,6 +11,12 @@ defmodule PremiereEcouteWeb.Webhooks.TwilioController do
 
   alias PremiereEcoute.Events.Phone.SmsMessageSent
 
+  @doc """
+  Processes Twilio SMS webhook requests and responds with TwiML.
+
+  Parses incoming SMS message data, creates SmsMessageSent event, and responds with XML acknowledgment message using TwiML format.
+  """
+  @spec handle(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def handle(conn, params) do
     case handle(params) do
       %SmsMessageSent{} -> :ok
@@ -29,6 +35,12 @@ defmodule PremiereEcouteWeb.Webhooks.TwilioController do
     |> send_resp(200, XmlBuilder.generate(document))
   end
 
+  @doc """
+  Parses Twilio webhook parameters into SmsMessageSent event.
+
+  Extracts sender phone number, country, and message body from Twilio webhook parameters to create application event structure.
+  """
+  @spec handle(map()) :: SmsMessageSent.t() | nil
   def handle(%{"From" => from, "FromCountry" => country, "Body" => message}) do
     %SmsMessageSent{from: from, country: country, message: message}
   end

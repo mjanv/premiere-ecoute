@@ -45,6 +45,12 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     timestamps()
   end
 
+  @doc """
+  Creates changeset for library playlist validation.
+
+  Validates required fields, provider type, and uniqueness constraints for user's playlists.
+  """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(playlist, attrs) do
     playlist
     |> cast(attrs, [:provider, :playlist_id, :title, :description, :url, :cover_url, :public, :track_count, :metadata, :user_id])
@@ -54,12 +60,24 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     |> foreign_key_constraint(:user_id)
   end
 
+  @doc """
+  Creates library playlist for user.
+
+  Inserts playlist record with user association and validates constraints.
+  """
+  @spec create(User.t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(%User{id: id}, attrs) do
     %__MODULE__{}
     |> changeset(Map.put(attrs, :user_id, id))
     |> Repo.insert()
   end
 
+  @doc """
+  Checks if playlist exists in user's library.
+
+  Queries database to determine if user already has playlist from provider in their library.
+  """
+  @spec exists?(User.t(), t()) :: boolean()
   def exists?(%User{id: id}, %__MODULE__{playlist_id: playlist_id, provider: provider}) do
     from(p in __MODULE__,
       where: p.user_id == ^id and p.playlist_id == ^playlist_id and p.provider == ^provider
@@ -67,6 +85,12 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     |> Repo.exists?()
   end
 
+  @doc """
+  Retrieves all playlists for user.
+
+  Fetches user's library playlists ordered by most recently updated.
+  """
+  @spec all_for_user(User.t()) :: list(t())
   def all_for_user(%User{id: id}) do
     from(p in __MODULE__,
       where: p.user_id == ^id,

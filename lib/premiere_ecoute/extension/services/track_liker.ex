@@ -18,20 +18,21 @@ defmodule PremiereEcoute.Extension.Services.TrackLiker do
   @doc """
   Likes a track to a user's designated playlist.
 
-  Uses playlist rules to determine the target playlist. If no rule is 
+  Uses playlist rules to determine the target playlist. If no rule is
   configured, the track will not be liked.
 
   ## Examples
 
       iex> like_track("user123", "spotify_track_id")
       {:ok, "My Configured Playlist"}
-      
+
       iex> like_track("user_no_rule", "track_id")
       {:error, :no_playlist_rule}
-      
+
       iex> like_track("nonexistent", "track_id")
       {:error, :no_user}
   """
+  @spec like_track(String.t(), String.t()) :: {:ok, String.t()} | {:error, atom()}
   def like_track(user_id, spotify_track_id) do
     with {:ok, user} <- get_user(user_id),
          {:ok, spotify_scope} <- get_spotify_scope(user),

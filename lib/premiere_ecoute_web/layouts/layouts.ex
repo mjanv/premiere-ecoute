@@ -25,6 +25,7 @@ defmodule PremiereEcouteWeb.Layouts do
       </Layouts.app>
 
   """
+  @spec app(map()) :: Phoenix.LiveView.Rendered.t()
   attr :flash, :map, required: true, doc: "the map of flash messages"
 
   attr :current_scope, :map,
@@ -137,6 +138,12 @@ defmodule PremiereEcouteWeb.Layouts do
   defp needs_spotify_connection?(nil), do: false
   defp needs_spotify_connection?(user), do: user.spotify == nil
 
+  @doc """
+  Retrieves user's preferred theme from their profile settings.
+
+  Returns "light", "dark", or nil (for system preference) based on user profile color scheme configuration with dark as fallback.
+  """
+  @spec get_user_theme(map()) :: String.t() | nil
   def get_user_theme(assigns) do
     with %{current_scope: scope} when not is_nil(scope) <- assigns,
          %{user: user} when not is_nil(user) <- scope,
@@ -163,6 +170,7 @@ defmodule PremiereEcouteWeb.Layouts do
 
       <.flash_group flash={@flash} />
   """
+  @spec flash_group(map()) :: Phoenix.LiveView.Rendered.t()
   attr :flash, :map, required: true, doc: "the map of flash messages"
   attr :id, :string, default: "flash-group", doc: "the optional id of flash container"
 

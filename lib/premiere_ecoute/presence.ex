@@ -11,9 +11,20 @@ defmodule PremiereEcoute.Presence do
 
   @topic "presence"
 
+  @doc "Registers process as present for key"
+  @spec join(term()) :: {:ok, binary()} | {:error, term()}
   def join(key), do: __MODULE__.track(self(), @topic, key, %{})
+
+  @doc "Unregisters process presence for key"
+  @spec unjoin(term()) :: :ok
   def unjoin(key), do: __MODULE__.untrack(self(), @topic, key)
 
+  @doc """
+  Retrieves presence metadata for player.
+
+  Returns list of presence metas for given player key.
+  """
+  @spec player(integer()) :: list(map())
   def player(key) do
     @topic
     |> __MODULE__.list()

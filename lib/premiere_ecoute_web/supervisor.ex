@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.Supervisor do
 
   use Supervisor
 
+  @doc """
+  Starts web supervisor with telemetry, clustering, and endpoint.
+
+  Initializes supervisor process for telemetry, DNS cluster discovery, PubSub messaging, presence tracking, and Phoenix endpoint services.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end

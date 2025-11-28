@@ -38,6 +38,7 @@ defmodule PremiereEcouteWeb.Components.Modal do
   slot :inner_block, required: true, doc: "Modal body content"
   slot :footer, doc: "Modal footer content"
 
+  @spec modal(map()) :: Phoenix.LiveView.Rendered.t()
   def modal(assigns) do
     assigns = assign(assigns, :on_cancel, assigns.on_cancel || hide_modal(assigns.id))
 
@@ -89,6 +90,12 @@ defmodule PremiereEcouteWeb.Components.Modal do
     end
   end
 
+  @doc """
+  Shows a modal dialog with transition effects.
+
+  Displays the modal with fade-in animation, prevents body scrolling, and focuses the first interactive element.
+  """
+  @spec show_modal(Phoenix.LiveView.JS.t(), String.t()) :: Phoenix.LiveView.JS.t()
   def show_modal(js \\ %JS{}, id) when is_binary(id) do
     js
     |> JS.show(
@@ -100,6 +107,12 @@ defmodule PremiereEcouteWeb.Components.Modal do
     |> JS.focus_first(to: "##{id}-content")
   end
 
+  @doc """
+  Hides a modal dialog with transition effects.
+
+  Dismisses the modal with fade-out animation, restores body scrolling, and returns focus to the previously focused element.
+  """
+  @spec hide_modal(Phoenix.LiveView.JS.t(), String.t()) :: Phoenix.LiveView.JS.t()
   def hide_modal(js \\ %JS{}, id) when is_binary(id) do
     js
     |> JS.hide(

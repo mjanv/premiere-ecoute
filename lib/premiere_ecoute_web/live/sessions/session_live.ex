@@ -321,6 +321,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     {:noreply, socket}
   end
 
+  @doc """
+  Returns CSS classes for session status badge.
+
+  Maps session status (preparing/active/stopped) to corresponding gradient background and styling classes.
+  """
+  @spec session_status_class(atom()) :: String.t()
   def session_status_class(:preparing),
     do: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
 
@@ -330,9 +336,21 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def session_status_class(:stopped),
     do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"
 
+  @doc """
+  Returns number of tracks rated in session.
+
+  Extracts rated track count from session report, or 0 if report unavailable.
+  """
+  @spec session_tracks_rated(map() | nil) :: integer()
   def session_tracks_rated(nil), do: 0
   def session_tracks_rated(report), do: report.session_summary["tracks_rated"]
 
+  @doc """
+  Returns display label for vote type.
+
+  Converts vote options array to human-readable format (0-10, 1-5, Smash or Pass, or custom).
+  """
+  @spec vote_type_display(ListeningSession.t() | nil) :: String.t()
   def vote_type_display(nil), do: "0-10"
 
   def vote_type_display(%{vote_options: vote_options}) when is_list(vote_options) do
@@ -346,6 +364,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   def vote_type_display(_), do: "0-10"
 
+  @doc """
+  Returns session's overall streamer score.
+
+  Extracts and formats streamer score from session report, or "N/A" if unavailable.
+  """
+  @spec session_streamer_score(map() | nil) :: String.t() | float()
   def session_streamer_score(nil), do: "N/A"
 
   def session_streamer_score(report) do
@@ -356,6 +380,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
+  @doc """
+  Returns streamer score for a specific track.
+
+  Finds track in report and extracts formatted streamer score, or "N/A" if unavailable.
+  """
+  @spec track_streamer_score(String.t(), map() | nil) :: String.t() | float()
   def track_streamer_score(_track_id, nil), do: "N/A"
 
   def track_streamer_score(track_id, report) do
@@ -372,6 +402,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
+  @doc """
+  Returns maximum vote count for any rating option on a track.
+
+  Calculates the highest vote count among all rating options for the specified track.
+  """
+  @spec track_max_votes(String.t(), map() | nil, ListeningSession.t()) :: integer()
   def track_max_votes(_track_id, nil, _session), do: 0
 
   def track_max_votes(track_id, report, session) do
@@ -380,6 +416,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> Enum.max(fn -> 0 end)
   end
 
+  @doc """
+  Returns Tailwind color class for vote option.
+
+  Maps vote options to color gradient based on position and total options, with special handling for smash/pass.
+  """
+  @spec vote_option_color(String.t(), ListeningSession.t()) :: String.t()
   def vote_option_color(vote_option, session) do
     vote_options = session.vote_options
     total_options = length(vote_options)
@@ -455,10 +497,22 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
+  @doc """
+  Returns human-readable label for visibility level.
+
+  Converts visibility atom (private/protected/public) to capitalized display string.
+  """
+  @spec visibility_label(atom()) :: String.t()
   def visibility_label(:private), do: "Private"
   def visibility_label(:protected), do: "Protected"
   def visibility_label(:public), do: "Public"
 
+  @doc """
+  Returns SVG icon for visibility level.
+
+  Provides appropriate lock/shield/globe icon based on visibility setting.
+  """
+  @spec visibility_icon(atom()) :: String.t()
   def visibility_icon(:private) do
     ~S"""
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -483,6 +537,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     """
   end
 
+  @doc """
+  Returns description text for visibility level.
+
+  Explains who can view the session retrospective based on visibility setting.
+  """
+  @spec visibility_description(atom()) :: String.t()
   def visibility_description(:private), do: "Only you can view the retrospective"
   def visibility_description(:protected), do: "Authenticated users can view the retrospective"
   def visibility_description(:public), do: "Anyone with the link can view the retrospective"

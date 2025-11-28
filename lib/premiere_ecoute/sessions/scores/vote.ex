@@ -33,6 +33,12 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Creates changeset for vote validation.
+
+  Validates required fields and enforces uniqueness per viewer-session-track combination.
+  """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(vote, attrs) do
     vote
     |> cast(attrs, [:viewer_id, :session_id, :track_id, :is_streamer, :value])
@@ -41,6 +47,12 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     |> foreign_key_constraint(:session_id)
   end
 
+  @doc """
+  Parses vote value from chat message against vote options.
+
+  Matches exact vote option or message ending with vote option pattern. Returns error if multiple vote options detected.
+  """
+  @spec from_message(String.t(), list(String.t())) :: {:ok, String.t()} | {:error, String.t()}
   def from_message(message, vote_options) do
     # Check if message is exactly a vote option
     if message in vote_options do
@@ -63,6 +75,12 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     end
   end
 
+  @doc """
+  Parses vote value from chat message using default vote options 0-10.
+
+  Convenience function using standard vote scale.
+  """
+  @spec from_message(String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def from_message(message) do
     from_message(message, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
   end

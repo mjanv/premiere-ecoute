@@ -33,16 +33,22 @@ defmodule PremiereEcouteCore.Subscriber do
       alias EventStore.RecordedEvent
       alias PremiereEcoute.Events.Store
 
+      @doc "Starts subscriber GenServer"
+      @spec start_link(term()) :: GenServer.on_start()
       def start_link(args) do
         GenServer.start_link(__MODULE__, args)
       end
 
+      @doc false
+      @spec init(term()) :: {:ok, map()}
       def init(_args) do
         :ok = Store.subscribe(unquote(stream_uuid))
 
         {:ok, %{}}
       end
 
+      @doc false
+      @spec handle_info({:events, list(EventStore.RecordedEvent.t())}, map()) :: {:noreply, map()}
       def handle_info({:events, events}, state) do
         Enum.each(events, &handle/1)
         {:noreply, state}

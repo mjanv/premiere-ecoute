@@ -13,6 +13,12 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Donations.Goal
   alias PremiereEcoute.Sessions.ListeningSession
 
+  @doc """
+  Initializes admin dashboard with system statistics and event store browser.
+
+  Loads aggregate counts for users, sessions, albums, billboards, and goals, and initializes paginated event store view starting with users stream.
+  """
+  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
     socket
     |> assign(:stats, %{
@@ -31,6 +37,12 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
     |> then(fn socket -> {:ok, socket} end)
   end
 
+  @doc """
+  Handles event store navigation events for stream switching and pagination.
+
+  Switches between different event streams or navigates to specific page within current stream, updating event list accordingly.
+  """
+  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("change_stream", %{"stream" => stream}, socket) do
     events = PremiereEcoute.paginate(stream, page: 1, size: socket.assigns.event_store.size)
     event_store = %{socket.assigns.event_store | stream: stream, page: 1, events: events}

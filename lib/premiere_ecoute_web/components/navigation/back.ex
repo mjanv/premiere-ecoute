@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.Components.Navigation.Back do
 
   use Phoenix.Component
 
+  @doc """
+  Renders a back navigation link with left arrow icon.
+
+  Displays a clickable link with left-pointing chevron icon for navigating to previous pages with hover effects.
+  """
+  @spec back(map()) :: Phoenix.LiveView.Rendered.t()
   attr :href, :string, required: true
   slot :inner_block, required: true
 

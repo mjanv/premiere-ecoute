@@ -118,6 +118,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn body -> body end)
   end
 
+  @doc """
+  Parses Spotify API playlist response into Playlist aggregate.
+
+  Transforms raw Spotify playlist JSON into structured Playlist with tracks, metadata, and owner information.
+  """
+  @spec parse_playlist(map()) :: Playlist.t()
   def parse_playlist(data) do
     %Playlist{
       provider: :spotify,
@@ -135,6 +141,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     }
   end
 
+  @doc """
+  Parses Spotify API track item into Track struct.
+
+  Transforms raw track JSON from playlist response into structured Track with metadata, artist, and timing information.
+  """
+  @spec parse_track(map(), String.t()) :: Track.t()
   def parse_track(data, playlist_id) do
     %Track{
       provider: :spotify,
@@ -150,6 +162,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Playlists do
     }
   end
 
+  @doc """
+  Parses Spotify API library playlist into LibraryPlaylist struct.
+
+  Transforms raw library playlist JSON into structured LibraryPlaylist with metadata, visibility settings, and cover image.
+  """
+  @spec parse_library_playlist(map()) :: LibraryPlaylist.t()
   def parse_library_playlist(data) do
     %LibraryPlaylist{
       provider: :spotify,

@@ -29,8 +29,20 @@ defmodule PremiereEcouteWeb do
       Components.StatusBadge
     ]
 
+  @doc """
+  Returns list of static file paths served by the application.
+
+  These paths are publicly accessible without authentication and include documentation, assets, fonts, images, uploads, and standard web files.
+  """
+  @spec static_paths() :: [String.t()]
   def static_paths, do: ~w(doc assets fonts images uploads favicon.ico robots.txt)
 
+  @doc """
+  Defines router configuration for Phoenix routes.
+
+  Injects Phoenix.Router with helper-free routing and standard web imports for connection and controller handling.
+  """
+  @spec router() :: Macro.t()
   def router do
     quote do
       use Phoenix.Router, helpers: false
@@ -41,12 +53,24 @@ defmodule PremiereEcouteWeb do
     end
   end
 
+  @doc """
+  Defines channel configuration for Phoenix channels.
+
+  Injects Phoenix.Channel functionality for real-time bidirectional communication with clients.
+  """
+  @spec channel() :: Macro.t()
   def channel do
     quote do
       use Phoenix.Channel
     end
   end
 
+  @doc """
+  Defines controller configuration for Phoenix controllers.
+
+  Injects Phoenix.Controller with HTML and JSON format support, Plug.Conn utilities, and verified routes.
+  """
+  @spec controller() :: Macro.t()
   def controller do
     quote do
       use Phoenix.Controller, formats: [:html, :json]
@@ -57,6 +81,12 @@ defmodule PremiereEcouteWeb do
     end
   end
 
+  @doc """
+  Defines LiveView configuration for Phoenix LiveView modules.
+
+  Injects Phoenix.LiveView with locale restoration and flash message hooks, plus HTML helpers for component rendering.
+  """
+  @spec live_view() :: Macro.t()
   def live_view do
     quote do
       use Phoenix.LiveView
@@ -68,6 +98,12 @@ defmodule PremiereEcouteWeb do
     end
   end
 
+  @doc """
+  Defines LiveComponent configuration for Phoenix LiveComponent modules.
+
+  Injects Phoenix.LiveComponent functionality with HTML helpers for building reusable stateful components within LiveViews.
+  """
+  @spec live_component() :: Macro.t()
   def live_component do
     quote do
       use Phoenix.LiveComponent
@@ -76,6 +112,12 @@ defmodule PremiereEcouteWeb do
     end
   end
 
+  @doc """
+  Defines HTML configuration for Phoenix Component modules.
+
+  Injects Phoenix.Component with controller helpers for CSRF tokens and view metadata, plus standard HTML helpers and component imports.
+  """
+  @spec html() :: Macro.t()
   def html do
     quote do
       use Phoenix.Component
@@ -102,6 +144,12 @@ defmodule PremiereEcouteWeb do
     end
   end
 
+  @doc """
+  Defines verified routes configuration for compile-time route verification.
+
+  Injects Phoenix.VerifiedRoutes with endpoint, router, and static paths for type-safe routing with compile-time path validation.
+  """
+  @spec verified_routes() :: Macro.t()
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,

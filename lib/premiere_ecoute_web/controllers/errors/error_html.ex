@@ -19,6 +19,12 @@ defmodule PremiereEcouteWeb.Errors.ErrorHTML do
   # The default is to render a plain text page based on
   # the template name. For example, "404.html" becomes
   # "Not Found".
+  @doc """
+  Renders error page template as plain text status message.
+
+  Converts the template name to a human-readable HTTP status message for HTML error responses.
+  """
+  @spec render(String.t(), map()) :: String.t()
   def render(template, _assigns) do
     Phoenix.Controller.status_message_from_template(template)
   end

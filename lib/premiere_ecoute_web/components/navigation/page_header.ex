@@ -10,7 +10,7 @@ defmodule PremiereEcouteWeb.Components.PageHeader do
 
   ## Examples
 
-      <.page_header 
+      <.page_header
         title="My Sessions"
         subtitle="Manage your listening sessions and track your music discoveries"
       />
@@ -24,6 +24,7 @@ defmodule PremiereEcouteWeb.Components.PageHeader do
         </:action>
       </.page_header>
   """
+  @spec page_header(map()) :: Phoenix.LiveView.Rendered.t()
   attr :title, :string, required: true, doc: "The main page title"
   attr :subtitle, :string, default: nil, doc: "Optional subtitle description"
   attr :class, :string, default: "mb-8", doc: "Additional CSS classes"

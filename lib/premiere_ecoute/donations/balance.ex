@@ -25,6 +25,12 @@ defmodule PremiereEcoute.Donations.Balance do
     field :progress, :float
   end
 
+  @doc """
+  Creates changeset for balance with financial amounts and progress.
+
+  Casts collected_amount, spent_amount, remaining_amount, and progress fields for updating balance state.
+  """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(balance, attrs) do
     balance
     |> cast(attrs, [:collected_amount, :spent_amount, :remaining_amount, :progress])
@@ -33,6 +39,7 @@ defmodule PremiereEcoute.Donations.Balance do
   @doc """
   Creates a balance struct from collected and spent amounts with target.
   """
+  @spec new(Decimal.t(), Decimal.t(), Decimal.t() | nil) :: t()
   def new(collected, spent, target) do
     remaining = Decimal.sub(collected, spent)
     progress = calculate_progress(collected, target)

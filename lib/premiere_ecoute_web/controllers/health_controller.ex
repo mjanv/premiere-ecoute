@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.HealthController do
 
   use PremiereEcouteWeb, :controller
 
+  @doc """
+  Returns health check status with current timestamp.
+
+  Responds with 200 OK status and JSON containing service health status and current UTC timestamp for monitoring systems.
+  """
+  @spec index(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def index(conn, _params) do
     # Simple health check - returns 200 OK with basic status
     conn

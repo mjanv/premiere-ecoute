@@ -11,6 +11,12 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
 
+  @doc """
+  Initializes admin users page with user list and role statistics.
+
+  Loads all users, calculates role distribution statistics, and initializes modal state for user detail viewing.
+  """
+  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
     users = User.all()
 
@@ -22,6 +28,12 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
     |> then(fn socket -> {:ok, socket} end)
   end
 
+  @doc """
+  Handles user management events for modal display, role changes, and deletion.
+
+  Opens or closes user detail modal, updates user roles with list refresh, or deletes user accounts with appropriate confirmation and error handling.
+  """
+  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("show_user_modal", %{"user_id" => user_id}, socket) do
     socket
     |> assign(:selected_user, User.get(user_id))
@@ -81,6 +93,12 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
     end
   end
 
+  @doc """
+  Calculates user statistics grouped by role.
+
+  Groups users by their role and counts users in each role category for dashboard statistics display.
+  """
+  @spec user_stats([User.t()]) :: map()
   def user_stats(users) do
     users
     |> Enum.group_by(& &1.role)

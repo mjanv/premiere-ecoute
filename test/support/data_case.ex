@@ -53,6 +53,7 @@ defmodule PremiereEcoute.DataCase do
   @doc """
   Setup the Request test environment
   """
+  @spec setup_req_test() :: :ok
   def setup_req_test do
     Req.Test.set_req_test_to_shared()
     Req.Test.verify_on_exit!()
@@ -61,6 +62,7 @@ defmodule PremiereEcoute.DataCase do
   @doc """
   Sets up the sandbox based on the test tags.
   """
+  @spec setup_sandbox(map()) :: :ok
   def setup_sandbox(tags) do
     pid = SQL.Sandbox.start_owner!(PremiereEcoute.Repo, shared: not tags[:async])
     on_exit(fn -> SQL.Sandbox.stop_owner(pid) end)
@@ -74,6 +76,7 @@ defmodule PremiereEcoute.DataCase do
       assert %{password: ["password is too short"]} = errors_on(changeset)
 
   """
+  @spec errors_on(Ecto.Changeset.t()) :: map()
   def errors_on(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
       Regex.replace(~r"%{(\w+)}", message, fn _, key ->

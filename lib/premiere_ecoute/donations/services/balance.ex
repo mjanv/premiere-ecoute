@@ -23,6 +23,7 @@ defmodule PremiereEcoute.Donations.Services.Balance do
       iex> compute_balance(goal)
       %Balance{collected_amount: Decimal.new(100), spent_amount: Decimal.new(25), remaining_amount: Decimal.new(75), progress: 50.0}
   """
+  @spec compute_balance(Goal.t()) :: Balance.t()
   def compute_balance(%Goal{} = goal) do
     goal = Repo.preload(goal, [:donations, :expenses], force: true)
 

@@ -8,6 +8,12 @@ defmodule PremiereEcoute.Discography.PlaylistFixtures do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
 
+  @doc """
+  Generates test playlist struct with default attributes and tracks.
+
+  Creates a Spotify playlist fixture with sample track data, merging provided attributes to override defaults for testing.
+  """
+  @spec playlist_fixture(map()) :: Playlist.t()
   def playlist_fixture(attrs \\ %{}) do
     %{
       provider: :spotify,

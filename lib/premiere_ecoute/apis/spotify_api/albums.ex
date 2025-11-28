@@ -24,6 +24,12 @@ defmodule PremiereEcoute.Apis.SpotifyApi.Albums do
     |> SpotifyApi.handle(200, &parse_album_with_tracks/1)
   end
 
+  @doc """
+  Parses Spotify API album response into Album aggregate.
+
+  Extracts album metadata (ID, name, artist, release date, cover) and maps tracks array into Track structs with album association.
+  """
+  @spec parse_album_with_tracks(map()) :: Album.t()
   def parse_album_with_tracks(data) do
     %Album{
       provider: :spotify,

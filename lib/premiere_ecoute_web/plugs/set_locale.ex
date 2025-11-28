@@ -9,8 +9,16 @@ defmodule PremiereEcouteWeb.Plugs.SetLocale do
 
   @supported_locales Gettext.known_locales(PremiereEcoute.Gettext)
 
+  @doc false
+  @spec init(any()) :: nil
   def init(_options), do: nil
 
+  @doc """
+  Sets user locale based on browser preferences and profile settings.
+
+  Determines the locale from the Accept-Language header for unauthenticated users or from the user profile for authenticated users. Sets the locale in Gettext and stores it in session and cookies if the locale is supported.
+  """
+  @spec call(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def call(conn, _options) do
     case get_locale_from_browser_or_profile(conn) do
       locale when locale in @supported_locales ->

@@ -22,6 +22,7 @@ defmodule PremiereEcoute.Donations.Services.Expenses do
       iex> add_expense(goal, %{amount: -5})
       {:error, %Ecto.Changeset{}}
   """
+  @spec add_expense(Goal.t(), map()) :: {:ok, Expense.t()} | {:error, Ecto.Changeset.t() | term()}
   def add_expense(%Goal{} = goal, attrs) do
     attrs = stringify_keys(attrs)
 
@@ -54,6 +55,7 @@ defmodule PremiereEcoute.Donations.Services.Expenses do
       iex> revoke_expense(expense)
       {:ok, %Expense{status: :refunded}}
   """
+  @spec revoke_expense(Expense.t()) :: {:ok, Expense.t()} | {:error, Ecto.Changeset.t() | term()}
   def revoke_expense(%Expense{} = expense) do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:expense, Expense.changeset(expense, %{status: :refunded}))

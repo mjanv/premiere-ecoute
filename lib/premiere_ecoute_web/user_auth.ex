@@ -39,6 +39,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   Redirects to the session's `:user_return_to` path
   or falls back to the `signed_in_path/1`.
   """
+  @spec log_in_user(Plug.Conn.t(), User.t(), map()) :: Plug.Conn.t()
   def log_in_user(conn, user, params \\ %{}) do
     user_return_to = get_session(conn, :user_return_to)
 
@@ -52,6 +53,7 @@ defmodule PremiereEcouteWeb.UserAuth do
 
   It clears all session data for safety. See renew_session.
   """
+  @spec log_out_user(Plug.Conn.t()) :: Plug.Conn.t()
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
     user_token && Accounts.delete_user_session_token(user_token)
@@ -76,6 +78,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   Generates a session token for the target user and stores it in the session
   under :impersonated_token. Only admin users can impersonate other users.
   """
+  @spec start_impersonation(Plug.Conn.t(), User.t(), User.t()) :: Plug.Conn.t()
   def start_impersonation(conn, %User{role: :admin} = _admin_user, %User{} = target_user) do
     impersonation_token = Accounts.generate_user_session_token(target_user)
     put_session(conn, :impersonated_token, impersonation_token)
@@ -89,6 +92,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   @doc """
   Ends user impersonation by clearing the impersonated token from the session.
   """
+  @spec end_impersonation(Plug.Conn.t()) :: Plug.Conn.t()
   def end_impersonation(conn) do
     delete_session(conn, :impersonated_token)
   end
@@ -99,6 +103,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   Will reissue the session token if it is older than the configured age.
   Handles impersonation context if an impersonated token is present.
   """
+  @spec fetch_current_scope_for_user(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
   def fetch_current_scope_for_user(conn, _opts) do
     with {token, conn} <- ensure_user_token(conn),
          {user, token_inserted_at} <- Accounts.get_user_by_session_token(token) do
@@ -225,6 +230,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   @doc """
   Disconnects existing sockets for the given tokens.
   """
+  @spec disconnect_sessions(list()) :: :ok
   def disconnect_sessions(tokens) do
     Enum.each(tokens, fn %{token: token} ->
       PremiereEcouteWeb.Endpoint.broadcast(user_session_topic(token), "disconnect", %{})
@@ -274,6 +280,7 @@ defmodule PremiereEcouteWeb.UserAuth do
         live "/admin", AdminLive, :index
       end
   """
+  @spec on_mount(atom(), map(), map(), Phoenix.LiveView.Socket.t()) :: {:cont | :halt, Phoenix.LiveView.Socket.t()}
   def on_mount(:current_scope, _params, session, socket) do
     {:cont, mount_current_scope(socket, session)}
   end
@@ -363,7 +370,12 @@ defmodule PremiereEcouteWeb.UserAuth do
     end)
   end
 
-  @doc "Returns the path to redirect to after log in."
+  @doc """
+  Returns the path to redirect to after log in.
+
+  Redirects authenticated users to settings page, otherwise to home page for first-time login.
+  """
+  @spec signed_in_path(Plug.Conn.t()) :: String.t()
   # the user was already logged in, redirect to settings
   def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{user: %Accounts.User{}}}}) do
     ~p"/users/settings"
@@ -374,6 +386,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   @doc """
   Plug for routes that require the user to be authenticated.
   """
+  @spec require_authenticated_user(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
   def require_authenticated_user(conn, _opts) do
     if conn.assigns.current_scope && conn.assigns.current_scope.user do
       conn
@@ -386,6 +399,12 @@ defmodule PremiereEcouteWeb.UserAuth do
     end
   end
 
+  @doc """
+  Plug for routes that require user to be authenticated with Spotify.
+
+  Validates current user has Spotify OAuth token, otherwise redirects to home with error flash requiring Spotify connection.
+  """
+  @spec require_spotify_user(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
   def require_spotify_user(conn, _opts) do
     if conn.assigns.current_scope && conn.assigns.current_scope.user && conn.assigns.current_scope.user.spotify do
       conn

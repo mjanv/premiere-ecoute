@@ -85,22 +85,52 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  @doc """
+  Returns Tailwind CSS classes for session status badge.
+
+  Maps session status atoms to appropriate color scheme classes for visual status indicators (yellow for preparing, green for active, gray for stopped).
+  """
+  @spec session_status_class(atom()) :: String.t()
   def session_status_class(:preparing), do: "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
   def session_status_class(:active), do: "bg-green-600/20 text-green-400 border-green-500/30"
   def session_status_class(:stopped), do: "bg-gray-600/20 text-gray-400 border-gray-500/30"
 
+  @doc """
+  Returns emoji icon for session status.
+
+  Maps session status atoms to emoji icons for visual representation (hourglass for preparing, musical note for active, stop button for stopped).
+  """
+  @spec session_status_icon(atom()) :: String.t()
   def session_status_icon(:preparing), do: "⏳"
   def session_status_icon(:active), do: "🎵"
   def session_status_icon(:stopped), do: "⏹️"
 
+  @doc """
+  Returns Tailwind CSS classes for session visibility badge.
+
+  Maps visibility atoms to appropriate color scheme classes for visual indicators (red for private, blue for protected, green for public).
+  """
+  @spec visibility_class(atom()) :: String.t()
   def visibility_class(:private), do: "bg-red-600/20 text-red-400 border-red-500/30"
   def visibility_class(:protected), do: "bg-blue-600/20 text-blue-400 border-blue-500/30"
   def visibility_class(:public), do: "bg-green-600/20 text-green-400 border-green-500/30"
 
+  @doc """
+  Returns emoji icon for session visibility level.
+
+  Maps visibility atoms to emoji icons for visual representation (lock for private, shield for protected, globe for public).
+  """
+  @spec visibility_icon(atom()) :: String.t()
   def visibility_icon(:private), do: "🔒"
   def visibility_icon(:protected), do: "🛡️"
   def visibility_icon(:public), do: "🌐"
 
+  @doc """
+  Returns human-readable label for session visibility level.
+
+  Maps visibility atoms to capitalized string labels for display (Private, Protected, Public).
+  """
+  @spec visibility_label(atom()) :: String.t()
   def visibility_label(:private), do: "Private"
   def visibility_label(:protected), do: "Protected"
   def visibility_label(:public), do: "Public"

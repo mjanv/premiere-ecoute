@@ -9,10 +9,18 @@ defmodule PremiereEcouteMock.Supervisor do
 
   alias PremiereEcouteMock.TwitchApi
 
+  @doc """
+  Starts the mock service supervisor.
+
+  Launches supervisor for mock Twitch API server, registry, and backend state management.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
+  @doc false
+  @spec init(term()) :: {:ok, {:supervisor.sup_flags(), [:supervisor.child_spec()]}}
   @impl true
   def init(_args) do
     children = [

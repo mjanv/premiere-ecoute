@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Discography.Playlist.Similarity do
   Returns a percentage (0-100) representing how similar the playlists are
   based on their track overlap.
   """
+  @spec calculate_similarity(map(), map()) :: integer()
   def calculate_similarity(playlist1, playlist2) do
     tracks1 = normalize_playlist_tracks(playlist1.tracks)
     tracks2 = normalize_playlist_tracks(playlist2.tracks)
@@ -39,6 +40,7 @@ defmodule PremiereEcoute.Discography.Playlist.Similarity do
 
   Returns a list of playlists with similarity scores, sorted by similarity descending.
   """
+  @spec find_most_similar(map(), [map()], integer()) :: [map()]
   def find_most_similar(target_playlist, all_playlists, n \\ 3) do
     all_playlists
     |> Enum.reject(&(&1.playlist_id == target_playlist.playlist_id))
@@ -54,6 +56,7 @@ defmodule PremiereEcoute.Discography.Playlist.Similarity do
   @doc """
   Calculate the mean release year for a list of tracks.
   """
+  @spec calculate_mean_year([map()]) :: integer() | nil
   def calculate_mean_year(tracks) when is_list(tracks) do
     if length(tracks) > 0 do
       total_years = tracks |> Enum.map(& &1.release_date.year) |> Enum.sum()

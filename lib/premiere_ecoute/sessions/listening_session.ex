@@ -63,6 +63,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Creates changeset for listening session.
+
+  Validates and casts session attributes including status, source, visibility, options, vote options, timestamps, and foreign keys.
+  """
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(listening_session, attrs) do
     listening_session
     |> cast(attrs, [
@@ -86,6 +92,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> foreign_key_constraint(:current_playlist_track_id)
   end
 
+  @doc """
+  Starts a listening session.
+
+  Transitions session from preparing to active status, sets started timestamp, and ensures user has no other active sessions.
+  """
+  @spec start(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
   def start(%__MODULE__{id: session_id, user_id: user_id} = session) do
     case has_active_session?(user_id, session_id) do
       true ->
@@ -100,6 +112,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     end
   end
 
+  @doc """
+  Stops an active listening session.
+
+  Transitions session to stopped status, sets ended timestamp, and clears current track. Returns error if session is not active.
+  """
+  @spec stop(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
   def stop(%__MODULE__{status: :active} = session) do
     session
     |> change()
@@ -120,6 +138,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @doc """
   Creates a track marker recording when the current track started playing.
   """
+  @spec add_track_marker(t()) :: {:ok, TrackMarker.t()} | {:error, Ecto.Changeset.t() | atom()}
   def add_track_marker(%__MODULE__{source: :album, current_track: track} = session)
       when not is_nil(track) do
     %TrackMarker{}
@@ -157,6 +176,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     {:error, :no_current_track}
   end
 
+  @doc """
+  Advances to the next track in the session.
+
+  For albums, moves to the next track by track number. For playlists, uses track order. Returns error if no more tracks available.
+  """
+  @spec next_track(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
   def next_track(%__MODULE__{source: :playlist} = session) do
     %{playlist: %{tracks: tracks}} = Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
     current_track(session, hd(Enum.reverse(tracks)).id)
@@ -186,6 +211,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     end
   end
 
+  @doc """
+  Returns to the previous track in the album session.
+
+  Moves to the previous track by track number. Returns error if at first track or no previous track available.
+  """
+  @spec previous_track(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
   def previous_track(%__MODULE__{source: :album} = session) do
     session = Repo.preload(session, album: [:tracks], current_track: [])
     tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
@@ -210,6 +241,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     end
   end
 
+  @doc """
+  Sets the current track for the session.
+
+  Updates the current track ID for album or playlist sessions and reloads associations.
+  """
+  @spec current_track(t(), integer()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def current_track(%__MODULE__{source: :album} = session, track_id) do
     session
     |> change()
@@ -232,6 +269,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     end
   end
 
+  @doc """
+  Retrieves active sessions from followed streamers.
+
+  Returns all active listening sessions for streamers that the user follows.
+  """
+  @spec active_sessions(User.t()) :: [t()]
   def active_sessions(user) do
     from(s in __MODULE__,
       where: s.status == :active,
@@ -243,6 +286,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> preload()
   end
 
+  @doc """
+  Retrieves user's current session.
+
+  Returns the most recent active or preparing session for the user, prioritizing active sessions.
+  """
+  @spec current_session(User.t() | nil) :: t() | nil
   def current_session(nil), do: nil
 
   def current_session(user) do
@@ -262,6 +311,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> preload()
   end
 
+  @doc """
+  Retrieves user's active session.
+
+  Returns the most recent active session for the user, or nil if no active session exists.
+  """
+  @spec get_active_session(User.t() | nil) :: t() | nil
   def get_active_session(nil), do: nil
 
   def get_active_session(%User{id: user_id}) do
@@ -274,26 +329,62 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> preload()
   end
 
+  @doc """
+  Returns the session's title.
+
+  Extracts title from album name or playlist title depending on session source.
+  """
+  @spec title(t()) :: String.t()
   def title(%__MODULE__{album: nil, playlist: nil}), do: ""
   def title(%__MODULE__{album: %{name: name}, playlist: nil}), do: name
   def title(%__MODULE__{album: nil, playlist: %{title: title}}), do: title
 
+  @doc """
+  Returns the current track being played.
+
+  Retrieves the current track from either album or playlist source.
+  """
+  @spec current_track(t()) :: Album.Track.t() | Playlist.Track.t() | nil
   def current_track(%__MODULE__{current_track: nil, current_playlist_track: nil}), do: nil
   def current_track(%__MODULE__{current_track: track, current_playlist_track: nil}), do: track
   def current_track(%__MODULE__{current_track: nil, current_playlist_track: track}), do: track
 
+  @doc """
+  Checks if track is currently playing in session.
+
+  Compares track ID with session's current track ID for either album or playlist source.
+  """
+  @spec current?(t(), Album.Track.t() | Playlist.Track.t()) :: boolean()
   def current?(%__MODULE__{source: :album, current_track: %{id: id}}, %{id: id}), do: true
   def current?(%__MODULE__{source: :playlist, current_playlist_track: %{id: id}}, %{id: id}), do: true
   def current?(_, _), do: false
 
+  @doc """
+  Checks if session has a track currently playing.
+
+  Returns true if session has a current track set for either album or playlist source.
+  """
+  @spec playing?(t()) :: boolean()
   def playing?(%__MODULE__{source: :album, current_track: nil}), do: false
   def playing?(%__MODULE__{source: :playlist, current_playlist_track: nil}), do: false
   def playing?(%__MODULE__{}), do: true
 
+  @doc """
+  Returns all tracks in the session.
+
+  Retrieves track list from either album or playlist depending on session source.
+  """
+  @spec tracks(t()) :: [Album.Track.t()] | [Playlist.Track.t()]
   def tracks(%__MODULE__{album: nil, playlist: nil}), do: []
   def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks
   def tracks(%__MODULE__{album: nil, playlist: %{tracks: tracks}}), do: tracks
 
+  @doc """
+  Calculates total duration of session in minutes.
+
+  Sums duration of all tracks in the session and converts from milliseconds to minutes.
+  """
+  @spec total_duration(t()) :: integer()
   def total_duration(%__MODULE__{} = listening_session) do
     listening_session
     |> tracks()
@@ -313,6 +404,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   Returns `false` otherwise.
   """
+  @spec can_view_retrospective?(t(), Scope.t()) :: boolean()
   def can_view_retrospective?(%__MODULE__{visibility: :public}, _scope), do: true
 
   def can_view_retrospective?(%__MODULE__{}, %Scope{user: %User{role: :admin}}), do: true

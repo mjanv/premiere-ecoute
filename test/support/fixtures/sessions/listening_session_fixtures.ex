@@ -11,6 +11,12 @@ defmodule PremiereEcoute.Sessions.ListeningSessionFixtures do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
 
+  @doc """
+  Creates listening session fixture with album for testing.
+
+  Generates album fixture, inserts listening session with default preparing status and protected visibility merged with custom attributes, and preloads album and user associations.
+  """
+  @spec session_fixture(map()) :: ListeningSession.t()
   def session_fixture(attrs \\ %{}) do
     album = album_fixture()
 
@@ -31,6 +37,12 @@ defmodule PremiereEcoute.Sessions.ListeningSessionFixtures do
     Repo.preload(session, [:album, :user])
   end
 
+  @doc """
+  Creates track fixture for existing or new album in database.
+
+  Inserts track with unique track_id for provided album_id, or creates new album and inserts first track from template if album_id not provided.
+  """
+  @spec track_fixture(map()) :: Track.t()
   def track_fixture(attrs \\ %{}) do
     album_id = Map.get(attrs, :album_id)
 

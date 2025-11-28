@@ -7,6 +7,12 @@ defmodule PremiereEcoute.Events.Supervisor do
 
   use Supervisor
 
+  @doc """
+  Starts event sourcing supervisor with event store.
+
+  Initializes supervisor process for event store managing domain events persistence and retrieval.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end

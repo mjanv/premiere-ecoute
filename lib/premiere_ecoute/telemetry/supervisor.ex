@@ -7,6 +7,12 @@ defmodule PremiereEcoute.Telemetry.Supervisor do
 
   use Supervisor
 
+  @doc """
+  Starts telemetry supervisor with PromEx metrics.
+
+  Initializes supervisor process for PromEx Prometheus metrics exporter for application observability.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end

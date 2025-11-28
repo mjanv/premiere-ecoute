@@ -45,6 +45,7 @@ defmodule PremiereEcouteWeb.Components.ActivityCard do
         title="Sessions not available"
       />
   """
+  @spec activity_card(map()) :: Phoenix.LiveView.Rendered.t()
   attr :type, :string, required: true, values: ~w(content action disabled), doc: "Card type"
   attr :label, :string, default: nil, doc: "Card label/category"
   attr :title, :string, required: true, doc: "Main title"

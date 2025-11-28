@@ -18,6 +18,12 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   alias PremiereEcoute.Telemetry.ApiMetrics
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
 
+  @doc """
+  Processes Twitch EventSub webhook requests with HMAC validation.
+
+  Validates webhook signatures, handles verification challenges, processes notification events (chat messages, polls, stream status), records telemetry metrics, and dispatches events to appropriate handlers with proper HTTP responses.
+  """
+  @spec handle(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def handle(conn, _params) do
     conn
     |> put_resp_content_type("text/plain")
@@ -49,6 +55,12 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
     end
   end
 
+  @doc """
+  Parses Twitch EventSub webhook payloads into application events.
+
+  Transforms various EventSub notification types into corresponding application events and commands for chat messages, polls, and stream status updates.
+  """
+  @spec handle(map()) :: struct() | nil
   def handle(%{
         "subscription" => %{"type" => "channel.chat.message"},
         "event" => %{

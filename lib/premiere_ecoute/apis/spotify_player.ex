@@ -18,10 +18,18 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
   @registry PremiereEcoute.Apis.PlayerRegistry
   @poll_interval 1_000
 
+  @doc """
+  Starts the Spotify player monitoring GenServer.
+
+  Launches a GenServer registered via Registry to monitor Spotify playback state for a specific user.
+  """
+  @spec start_link(integer()) :: GenServer.on_start()
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: {:via, Registry, {@registry, args}})
   end
 
+  @doc false
+  @spec init(integer()) :: {:ok, map()} | {:stop, {:error, term()}}
   @impl true
   def init(args) do
     Process.send_after(self(), :poll, @poll_interval)
@@ -72,8 +80,20 @@ defmodule PremiereEcoute.Apis.SpotifyPlayer do
     PremiereEcoute.PubSub.broadcast("playback:#{scope.user.id}", {:player, event, state})
   end
 
+  @doc """
+  Calculates playback progress as a percentage.
+
+  Returns playback progress percentage (0-100) from current position and total track duration in playback state.
+  """
+  @spec progress(map()) :: integer()
   def progress(state), do: trunc(100 * (state["progress_ms"] / (state["item"]["duration_ms"] + 1)))
 
+  @doc """
+  Detects playback state changes and generates events.
+
+  Compares old and new playback states to identify transitions (play/pause, track changes, progress updates) and returns the new state with corresponding event list.
+  """
+  @spec handle(map(), map()) :: {:ok, map(), list()}
   def handle(old_state, new_state) when old_state == %{}, do: {:ok, new_state, []}
   def handle(%{"device" => nil}, new_state), do: {:ok, new_state, []}
   def handle(_old_state, %{"device" => nil} = new_state), do: {:ok, new_state, [:no_device]}

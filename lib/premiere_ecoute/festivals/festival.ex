@@ -7,6 +7,15 @@ defmodule PremiereEcoute.Festivals.Festival do
 
   use Ecto.Schema
 
+  @type t :: %__MODULE__{
+          name: String.t() | nil,
+          location: String.t() | nil,
+          country: String.t() | nil,
+          start_date: Date.t() | nil,
+          end_date: Date.t() | nil,
+          concerts: [Concert.t()]
+        }
+
   @primary_key false
   embedded_schema do
     field(:name, :string)
@@ -22,6 +31,12 @@ defmodule PremiereEcoute.Festivals.Festival do
       Represents a festival concert with artist name, performance date, and associated track information.
       """
 
+      @type t :: %__MODULE__{
+              artist: String.t() | nil,
+              date: Date.t() | nil,
+              track: Track.t() | nil
+            }
+
       field(:artist, :string)
       field(:date, :date)
 
@@ -31,6 +46,12 @@ defmodule PremiereEcoute.Festivals.Festival do
 
         Represents a music track with provider information (Spotify), track ID, and track name.
         """
+
+        @type t :: %__MODULE__{
+                provider: String.t() | nil,
+                track_id: String.t() | nil,
+                name: String.t() | nil
+              }
 
         field(:provider, :string)
         field(:track_id, :string)

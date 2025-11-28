@@ -7,6 +7,12 @@ defmodule PremiereEcouteWeb.Components.Backgrounds do
 
   use Phoenix.Component
 
+  @doc """
+  Renders a gradient background with conditional display based on status.
+
+  Displays a purple-to-pink gradient background that conditionally renders based on status value matching provided statuses list.
+  """
+  @spec gradient_bg(map()) :: Phoenix.LiveView.Rendered.t()
   attr :class, :string, default: ""
   attr :status, :any, default: nil
   attr :statutes, :list, default: []

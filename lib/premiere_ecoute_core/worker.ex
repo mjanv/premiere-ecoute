@@ -5,6 +5,12 @@ defmodule PremiereEcouteCore.Worker do
   Provides convenience functions for scheduling background jobs with various timing options including immediate execution, delays, and specific datetime scheduling.
   """
 
+  @doc """
+  Injects Oban worker functionality into the using module.
+
+  Generates job scheduling functions with various timing options (now, in seconds/minutes/hours/days/weeks, at specific datetime) and default timeout configuration.
+  """
+  @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(opts) do
     quote do
       use Oban.Worker, unquote(opts)
@@ -44,6 +50,8 @@ defmodule PremiereEcouteCore.Worker do
       @spec at(map() | list(map()), DateTime.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
       def at(args, %DateTime{} = at), do: start(args, scheduled_at: DateTime.shift_zone!(at, "Etc/UTC"))
 
+      @doc "Returns the default job timeout in milliseconds."
+      @spec timeout(Oban.Job.t()) :: integer()
       @impl Oban.Worker
       def timeout(_job), do: :timer.seconds(300)
     end

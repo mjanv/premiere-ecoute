@@ -10,6 +10,12 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
 
+  @doc """
+  Initializes admin sessions page with paginated list and statistics.
+
+  Loads first page of listening sessions with default pagination, calculates session status distribution and vote statistics, and initializes modal states for detail viewing and deletion confirmation.
+  """
+  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
     sessions = ListeningSession.all([])
 
@@ -23,6 +29,12 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
     |> then(fn socket -> {:ok, socket} end)
   end
 
+  @doc """
+  Updates pagination based on URL parameters.
+
+  Parses page number and page size from URL parameters and reloads session list with requested pagination settings.
+  """
+  @spec handle_params(map(), String.t(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_params(params, _url, socket) do
     page_number = String.to_integer(params["page"] || "1")
     page_size = String.to_integer(params["per_page"] || "10")
@@ -32,6 +44,12 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  @doc """
+  Handles session management events for modal display and deletion.
+
+  Opens detail modal for selected session, closes modals, initiates deletion with confirmation dialog, or confirms and executes session deletion with list refresh and appropriate flash messages.
+  """
+  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("show_session_modal", %{"session_id" => session_id}, socket) do
     socket
     |> assign(:selected_session, ListeningSession.get(session_id))

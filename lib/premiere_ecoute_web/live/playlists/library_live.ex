@@ -164,6 +164,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
     end
   end
 
+  @impl true
   def handle_info(:fetch_playlists, %{assigns: %{current_scope: scope}} = socket) do
     case SpotifyApi.get_library_playlists(scope, 1) do
       {:ok, playlists} ->

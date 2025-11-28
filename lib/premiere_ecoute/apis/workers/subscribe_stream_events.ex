@@ -25,6 +25,12 @@ defmodule PremiereEcoute.Apis.Workers.SubscribeStreamEvents do
     end
   end
 
+  @doc """
+  Subscribes streamer to stream online/offline EventSub events.
+
+  Fetches existing EventSub subscriptions, determines missing event types (stream.online/offline), and subscribes streamer to remaining events via Twitch API.
+  """
+  @spec subscribe_streamer(User.t()) :: :ok | :error
   def subscribe_streamer(%User{twitch: %{username: username}} = user) do
     with _ <- Logger.info("Subscribing to events for streamer #{username}"),
          scope <- Scope.for_user(user),

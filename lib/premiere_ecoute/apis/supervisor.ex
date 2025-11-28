@@ -9,6 +9,12 @@ defmodule PremiereEcoute.Apis.Supervisor do
 
   alias PremiereEcouteCore.Cache
 
+  @doc """
+  Starts APIs supervisor with caches, registry and external service clients.
+
+  Initializes supervisor process for subscription and token caches, player registry, and optionally player supervisor, Twitch queue, and rate limiter outside test environment.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end

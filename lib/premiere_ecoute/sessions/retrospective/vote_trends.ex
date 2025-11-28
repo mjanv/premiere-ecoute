@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.VoteTrends do
   Returns a list of {value, count} tuples.
   Example: [{1, 3}, {2, 10}, {3, 5}]
   """
+  @spec distribution(integer()) :: [{String.t(), integer()}]
   def distribution(session_id) do
     """
     SELECT value, COUNT(*) as count
@@ -37,6 +38,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.VoteTrends do
         102 => [{1, 1}, {4, 7}]
       }
   """
+  @spec track_distribution(integer()) :: %{integer() => [{String.t(), integer()}]}
   def track_distribution(session_id) do
     """
     SELECT track_id, value, COUNT(*) as count
@@ -76,7 +78,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.VoteTrends do
 
   Tracks are sorted by consensus score and returned as a map keyed by track_id.
   """
-
+  @spec consensus([{String.t(), integer()}] | %{String.t() => [{String.t(), integer()}]}) :: map()
   def consensus(distribution) when is_list(distribution) do
     %{"1" => consensus} = consensus(%{"1" => distribution})
     consensus
@@ -125,6 +127,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.VoteTrends do
   Returns a list of {timestamp, average} tuples where each average
   is computed from all votes up to that point in time.
   """
+  @spec rolling_average(integer(), :vote | :minute) :: [{DateTime.t(), float()}]
   def rolling_average(session_id, aggregation \\ :vote)
 
   def rolling_average(session_id, :vote) do

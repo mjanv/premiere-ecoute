@@ -9,6 +9,12 @@ defmodule PremiereEcouteWeb.Accounts.TermsAcceptanceLive do
 
   alias PremiereEcouteWeb.Static.Legal
 
+  @doc """
+  Initializes terms acceptance page with legal documents.
+
+  Validates pending authentication session, loads privacy policy, cookies policy, and terms of service documents, and initializes consent form state.
+  """
+  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, %{"pending_twitch_auth" => pending_auth}, socket) do
     if pending_auth do
       socket
@@ -26,6 +32,12 @@ defmodule PremiereEcouteWeb.Accounts.TermsAcceptanceLive do
     end
   end
 
+  @doc """
+  Handles user consent events for legal document acceptance.
+
+  Validates complete consent acceptance and redirects to registration completion, or shows error if any required terms are not accepted, or handles registration decline.
+  """
+  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event(
         "accept_terms",
         %{"consent" => %{"privacy" => "true", "cookies" => "true", "terms" => "true"} = consent},

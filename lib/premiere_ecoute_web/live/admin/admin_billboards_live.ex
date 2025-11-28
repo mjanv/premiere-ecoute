@@ -10,6 +10,12 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard
 
+  @doc """
+  Initializes admin billboards page with billboard list and statistics.
+
+  Loads all billboards sorted by most recently updated, calculates status distribution and submission statistics, and initializes modal state for detail viewing.
+  """
+  @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
     billboards = Billboard.all(order_by: [desc: :updated_at])
 
@@ -21,6 +27,12 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
     |> then(fn socket -> {:ok, socket} end)
   end
 
+  @doc """
+  Handles billboard management events for moderation and CRUD operations.
+
+  Opens or closes detail modals, updates billboard status, manages submission review status, removes submissions, deletes billboards, and refreshes list with statistics and appropriate flash messages.
+  """
+  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) :: {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("show_billboard_modal", %{"billboard_id" => billboard_id}, socket) do
     billboard =
       socket.assigns.billboards
@@ -126,6 +138,12 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
     end
   end
 
+  @doc """
+  Calculates billboard statistics grouped by status with total submissions.
+
+  Groups billboards by status, counts billboards in each status category, and sums total submissions across all billboards for dashboard display.
+  """
+  @spec billboard_stats([Billboard.t()]) :: map()
   def billboard_stats(billboards) do
     status_stats =
       billboards
@@ -140,16 +158,34 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
     Map.put(status_stats, :total_submissions, total_submissions)
   end
 
+  @doc """
+  Formats DateTime to European format with timezone conversion.
+
+  Converts UTC datetime to Europe/Paris timezone and formats as DD/MM/YYYY HH:MM for display.
+  """
+  @spec format_datetime(DateTime.t()) :: String.t()
   def format_datetime(datetime) do
     datetime
     |> DateTime.shift_zone!("Europe/Paris")
     |> Calendar.strftime("%d/%m/%Y %H:%M")
   end
 
+  @doc """
+  Checks if submission has been reviewed.
+
+  Extracts reviewed status from submission map with atom or string keys, defaulting to false if not present.
+  """
+  @spec submission_reviewed?(map()) :: boolean()
   def submission_reviewed?(%{"reviewed" => reviewed}) when is_boolean(reviewed), do: reviewed
   def submission_reviewed?(%{reviewed: reviewed}) when is_boolean(reviewed), do: reviewed
   def submission_reviewed?(_), do: false
 
+  @doc """
+  Returns Tailwind CSS classes for billboard status badge colors.
+
+  Maps billboard status atoms to appropriate background and text color classes for visual status indication.
+  """
+  @spec status_color(atom()) :: String.t()
   def status_color(:created), do: "bg-yellow-100 text-yellow-800"
   def status_color(:active), do: "bg-green-100 text-green-800"
   def status_color(:stopped), do: "bg-red-100 text-red-800"

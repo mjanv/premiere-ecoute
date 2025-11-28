@@ -22,10 +22,11 @@ defmodule PremiereEcoute.Extension.TrackReader do
 
       iex> get_current_track("broadcaster123")
       {:ok, %{name: "Song Name", artist: "Artist Name", ...}}
-      
+
       iex> get_current_track("nonexistent")
       {:error, :no_user}
   """
+  @spec get_current_track(String.t()) :: {:ok, map()} | {:error, atom()}
   def get_current_track(broadcaster_id) do
     with {:ok, user} <- get_broadcaster_user(broadcaster_id),
          {:ok, spotify_scope} <- get_spotify_scope(user),

@@ -7,16 +7,34 @@ defmodule PremiereEcoute.ApiMock do
 
   import ExUnit.Assertions
 
+  @doc """
+  Sets up expectation for mock HTTP request with validation.
+
+  Configures Req.Test to expect a specific number of requests with path, method, headers, params, and body validation, returning stubbed response.
+  """
+  @spec expect(atom(), keyword()) :: :ok
   def expect(module, opts \\ []) do
     Req.Test.expect(module, Keyword.get(opts, :n, 1), fn conn ->
       fun(conn, opts)
     end)
   end
 
+  @doc """
+  Sets up persistent stub for mock HTTP requests with validation.
+
+  Configures Req.Test to stub all matching requests with path, method, headers, params, and body validation, returning stubbed response for unlimited calls.
+  """
+  @spec stub(atom(), keyword()) :: :ok
   def stub(module, opts \\ []) do
     Req.Test.stub(module, fn conn -> fun(conn, opts) end)
   end
 
+  @doc """
+  Validates mock HTTP request and returns stubbed response.
+
+  Asserts request path, method, headers, query params, and body match expected values, then returns JSON response with specified status code.
+  """
+  @spec fun(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
   def fun(conn, opts) do
     {method, path} = opts[:path]
 
@@ -42,6 +60,12 @@ defmodule PremiereEcoute.ApiMock do
     |> Req.Test.json(payload(opts[:response]))
   end
 
+  @doc """
+  Converts payload specification to actual data for mock responses.
+
+  Returns empty string for nil, passes through maps unchanged, or loads and decodes JSON from file path for test fixtures.
+  """
+  @spec payload(nil | map() | String.t()) :: String.t() | map()
   def payload(nil), do: ""
   def payload(map) when is_map(map), do: map
   def payload(path), do: JSON.decode!(File.read!(Path.join("test/support/apis", path)))

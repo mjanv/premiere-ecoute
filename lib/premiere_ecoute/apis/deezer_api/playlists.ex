@@ -23,6 +23,12 @@ defmodule PremiereEcoute.Apis.DeezerApi.Playlists do
     |> DeezerApi.handle(200, &parse_playlist/1)
   end
 
+  @doc """
+  Parses Deezer API playlist response into Playlist aggregate.
+
+  Extracts playlist metadata (ID, title, owner, cover) and maps tracks array into Track structs with Deezer provider and album associations.
+  """
+  @spec parse_playlist(map()) :: Playlist.t()
   def parse_playlist(data) do
     %Playlist{
       provider: :deezer,
