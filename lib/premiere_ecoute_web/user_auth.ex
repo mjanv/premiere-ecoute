@@ -373,14 +373,9 @@ defmodule PremiereEcouteWeb.UserAuth do
   @doc """
   Returns the path to redirect to after log in.
 
-  Redirects authenticated users to settings page, otherwise to home page for first-time login.
+  Redirects authenticated users to home page.
   """
-  @spec signed_in_path(Plug.Conn.t()) :: String.t()
-  # the user was already logged in, redirect to settings
-  def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{user: %Accounts.User{}}}}) do
-    ~p"/users/settings"
-  end
-
+  @spec signed_in_path(any()) :: String.t()
   def signed_in_path(_), do: ~p"/home"
 
   @doc """

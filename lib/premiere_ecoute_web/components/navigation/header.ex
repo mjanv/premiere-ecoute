@@ -74,7 +74,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              
+
     <!-- Dropdown Menu -->
               <div
                 x-show="open"
@@ -121,10 +121,10 @@ defmodule PremiereEcouteWeb.Components.Header do
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                         />
                       </svg>
-                      {gettext("Oban Jobs")}
+                      {"Oban"}
                     </.link>
                   <% end %>
-                  
+
     <!-- Dev mode fake Twitch link for testing -->
                   <%= if Application.get_env(:premiere_ecoute, :environment) == :dev and @current_user.twitch do %>
                     <!-- Divider -->
@@ -140,10 +140,10 @@ defmodule PremiereEcouteWeb.Components.Header do
                       Fake Twitch Chat
                     </a>
                   <% end %>
-                  
+
     <!-- Divider -->
                   <div class="border-t border-gray-600 my-1"></div>
-                  
+
     <!-- Account -->
                   <.link
                     href={~p"/users/account"}
@@ -159,7 +159,7 @@ defmodule PremiereEcouteWeb.Components.Header do
                     </svg>
                     {gettext("Account")}
                   </.link>
-                  
+
     <!-- Log Out -->
                   <.link
                     href={~p"/users/log-out"}

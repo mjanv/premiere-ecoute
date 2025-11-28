@@ -18,7 +18,7 @@ defmodule Mix.Tasks.Gettext.Check do
       Mix.Task.run("gettext.merge", ["priv/gettext", "--locale", locale])
     end
 
-    for locale <- @locales do
+    for locale <- tl(@locales) do
       file = "priv/gettext/#{locale}/LC_MESSAGES/default.po"
       Mix.shell().info("🔍 Checking for missing #{locale} translations in #{file}...")
 

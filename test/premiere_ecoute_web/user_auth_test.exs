@@ -72,13 +72,13 @@ defmodule PremiereEcouteWeb.UserAuthTest do
       assert max_age == @remember_me_cookie_max_age
     end
 
-    test "redirects to settings when user is already logged in", %{conn: conn, user: user} do
+    test "redirects to home when user is already logged in", %{conn: conn, user: user} do
       conn =
         conn
         |> assign(:current_scope, Scope.for_user(user))
         |> UserAuth.log_in_user(user)
 
-      assert redirected_to(conn) == "/users/settings"
+      assert redirected_to(conn) == "/home"
     end
 
     test "writes a cookie if remember_me was set in previous session", %{conn: conn, user: user} do
