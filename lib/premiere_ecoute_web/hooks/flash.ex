@@ -15,8 +15,10 @@ defmodule PremiereEcouteWeb.Hooks.Flash do
   @spec on_mount(atom(), map(), map(), Phoenix.LiveView.Socket.t()) :: {:cont, Phoenix.LiveView.Socket.t()}
   def on_mount(_name, _params, _session, socket) do
     if connected?(socket) do
-      if socket.assigns.current_scope && socket.assigns.current_scope.user do
-        PremiereEcoute.PubSub.subscribe("user:#{socket.assigns.current_scope.user.id}")
+      current_scope = Map.get(socket.assigns, :current_scope)
+
+      if current_scope && current_scope.user do
+        PremiereEcoute.PubSub.subscribe("user:#{current_scope.user.id}")
       end
     end
 

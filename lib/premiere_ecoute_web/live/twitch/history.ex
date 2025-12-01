@@ -1,5 +1,10 @@
 defmodule PremiereEcouteWeb.Twitch.HistoryLive do
-  @moduledoc false
+  @moduledoc """
+  Landing page for uploading and viewing Twitch history data.
+
+  This is an unauthenticated page where users can drop a Twitch data export zip file
+  to view their chat history information without creating an account.
+  """
 
   use PremiereEcouteWeb, :live_view
 
@@ -9,7 +14,8 @@ defmodule PremiereEcouteWeb.Twitch.HistoryLive do
   def mount(_params, _session, socket) do
     socket
     |> allow_upload(:request, accept: ~w(.zip), max_file_size: 999_000_000, max_entries: 1)
-    |> assign(:histories, [])
+    |> assign(:history, nil)
+    |> assign(:upload_error, nil)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -24,22 +30,23 @@ defmodule PremiereEcouteWeb.Twitch.HistoryLive do
   end
 
   @impl true
-  def handle_event("save", _params, %{assigns: %{current_user: current_user}} = socket) do
+  def handle_event("save", _params, socket) do
     socket
     |> consume_uploaded_entries(:request, fn %{path: path}, _entry ->
-      {:ok, Twitch.create_history(path, current_user)}
+      # Parse history without storing to database
+      Twitch.History.read(path)
     end)
     |> List.first()
     |> case do
-      {:ok, _id} ->
+      %Twitch.History{} = history ->
         socket
-        |> put_flash(:info, "History uploaded")
-        |> push_navigate(to: ~p"/")
+        |> assign(:history, history)
+        |> assign(:upload_error, nil)
 
-      {:error, reason} ->
+      nil ->
         socket
-        |> put_flash(:error, reason)
-        |> push_navigate(to: ~p"/")
+        |> assign(:history, nil)
+        |> assign(:upload_error, "Invalid Twitch data export format")
     end
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -51,35 +58,55 @@ defmodule PremiereEcouteWeb.Twitch.HistoryLive do
     |> List.first()
     |> case do
       nil ->
-        socket
+        assign(socket, :upload_error, nil)
 
       entry ->
         socket.assigns.uploads.request
         |> upload_errors(entry)
-        |> Enum.reduce(socket, fn error, socket ->
-          put_flash(socket, :error, error_to_string(error))
-        end)
+        |> case do
+          [] ->
+            assign(socket, :upload_error, nil)
+
+          errors ->
+            Enum.reduce(errors, socket, fn error, socket ->
+              assign(socket, :upload_error, error_to_string(error))
+            end)
+        end
     end
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, %{assigns: %{current_user: current_user}} = socket) do
-    case Twitch.delete_history(id, current_user) do
-      {:ok, _} ->
-        socket
-        |> put_flash(:info, "History deleted")
-        |> push_navigate(to: ~p"/")
-
-      {:error, reason} ->
-        socket
-        |> put_flash(:error, reason)
-        |> push_navigate(to: ~p"/")
-    end
-    |> then(fn socket -> {:noreply, socket} end)
+  def handle_event("reset", _params, socket) do
+    {:noreply, assign(socket, history: nil, upload_error: nil)}
   end
 
-  def error_to_string(:too_large), do: "Too large"
-  def error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
-  def error_to_string(:external_client_failure), do: "Something went terribly wrong"
+  def error_to_string(:too_large), do: "File is too large (max 999 MB)"
+  def error_to_string(:not_accepted), do: "Please select a valid .zip file"
+  def error_to_string(:external_client_failure), do: "Something went wrong during upload"
+
+  # AIDEV-NOTE: helper functions for template formatting
+  def format_date(datetime) do
+    datetime
+    |> Timex.format!("{Mshortname} {D}, {YYYY} at {H}:{m}")
+  end
+
+  def calculate_duration(start_time, end_time) do
+    case Timex.diff(end_time, start_time, :days) do
+      days when days >= 1 ->
+        "#{days} day#{if days > 1, do: "s", else: ""} of chat history"
+
+      _ ->
+        hours = Timex.diff(end_time, start_time, :hours)
+
+        case hours do
+          hours when hours >= 1 ->
+            "#{hours} hour#{if hours > 1, do: "s", else: ""} of chat history"
+
+          _ ->
+            minutes = Timex.diff(end_time, start_time, :minutes)
+            "#{minutes} minute#{if minutes > 1, do: "s", else: ""} of chat history"
+        end
+    end
+  end
 end

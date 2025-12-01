@@ -239,7 +239,7 @@ defmodule PremiereEcouteWeb.Router do
   scope "/twitch", PremiereEcouteWeb.Twitch do
     pipe_through [:browser]
 
-    live_session :twitch do
+    live_session :twitch, on_mount: [{UserAuth, :current_scope}] do
       live "/history", HistoryLive, :index
     end
   end
