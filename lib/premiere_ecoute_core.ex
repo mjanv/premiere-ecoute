@@ -15,6 +15,9 @@ defmodule PremiereEcouteCore do
       Cache,
       CommandBus.Handler,
       Date,
+      Dataflow.Filters,
+      Dataflow.Sink,
+      Dataflow.Statistics,
       Duration,
       Event,
       EventBus.Handler,
@@ -23,7 +26,8 @@ defmodule PremiereEcouteCore do
       Search,
       Subscriber,
       Utils,
-      Worker
+      Worker,
+      Zipfile
     ]
 
   alias PremiereEcouteCore.BroadwayProducer

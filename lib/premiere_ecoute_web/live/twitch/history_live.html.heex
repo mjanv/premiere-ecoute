@@ -1,0 +1,54 @@
+<div class="mx-auto px-4 py-16 sm:px-6 lg:px-8">
+  <.table id="histories" rows={@histories}>
+    <:col :let={history} label="Id">{history.history_id}</:col>
+    <:col :let={history} label="Start">{history.start_time}</:col>
+    <:col :let={history} label="End">{history.end_time}</:col>
+    <:action :let={_history}>
+      <.link href={~p"/"}>
+        Overview
+      </.link>
+    </:action>
+    <:action :let={history}>
+      <.link phx-click="delete" phx-value-id={history.history_id}>
+        Delete
+      </.link>
+    </:action>
+  </.table>
+
+  <.modal id="upload-history">
+    <form id="upload-form" phx-submit="save" phx-change="validate">
+      <.live_file_input
+        upload={@uploads.request}
+        class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      />
+      <!-- Button take all the widtth of the modal -->
+      <div class="mt-6 flex w-full items-center justify-end gap-x-6">
+        <%= for entry <- @uploads.request.entries do %>
+          <progress value={entry.progress} max="100" class="w-full h-6 bg-gray-200 rounded-full">
+            {entry.progress}%
+          </progress>
+          <p>{entry.progress}%</p>
+        <% end %>
+
+        <.button
+          type="submit"
+          phx-disable-with="Uploading..."
+          class="rounded-md bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+        >
+          Upload
+        </.button>
+        <%= for entry <- @uploads.request.entries do %>
+          <.button
+            type="button"
+            phx-click="cancel-upload"
+            phx-value-ref={entry.ref}
+            aria-label="cancel"
+            class="rounded-md bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+          >
+            Cancel
+          </.button>
+        <% end %>
+      </div>
+    </form>
+  </.modal>
+</div>
