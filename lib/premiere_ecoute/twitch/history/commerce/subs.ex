@@ -33,11 +33,7 @@ defmodule PremiereEcoute.Twitch.History.Commerce.Subscriptions do
         "promotion_name"
       ],
       nil_values: [""],
-      dtypes: [
-        {"access_start", {:naive_datetime, :microsecond}},
-        {"access_end", {:naive_datetime, :microsecond}},
-        {"subscription_cancelled_at", {:naive_datetime, :millisecond}}
-      ]
+      infer_schema_length: 10_000
     )
     |> DataFrame.mutate_with(
       &[
@@ -52,7 +48,8 @@ defmodule PremiereEcoute.Twitch.History.Commerce.Subscriptions do
         is_cancelled_early: Series.equal(&1["is_cancelled_early"], "t"),
         is_prime_to_paid: Series.equal(&1["is_prime_to_paid"], "t"),
         is_gift_to_paid: Series.equal(&1["is_gift_to_paid"], "t"),
-        is_tier_upgrade: Series.equal(&1["is_tier_upgrade"], "t")
+        is_tier_upgrade: Series.equal(&1["is_tier_upgrade"], "t"),
+        access_start: Series.strptime(&1["access_start"], "%Y-%m-%d %H:%M:%S%.f")
       ]
     )
     |> Sink.preprocess("access_start")

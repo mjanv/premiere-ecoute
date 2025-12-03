@@ -33,6 +33,7 @@ defmodule PremiereEcouteCore.Dataflow.Sink do
       &[
         year: Series.year(&1[column]),
         month: Series.month(&1[column]),
+        week: Series.week_of_year(&1[column]),
         day: Series.day_of_year(&1[column]),
         weekday: Series.day_of_week(&1[column]),
         hour: Series.hour(&1[column])

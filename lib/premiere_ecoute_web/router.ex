@@ -241,6 +241,7 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :twitch, on_mount: [{UserAuth, :current_scope}] do
       live "/history", HistoryLive, :index
+      live "/history/:id", HistoryViewLive, :show
     end
   end
 
