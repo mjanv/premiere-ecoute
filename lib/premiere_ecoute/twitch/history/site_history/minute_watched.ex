@@ -16,8 +16,14 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
       columns: ["day", "channel_name", "minutes_watched_unadjusted", "game_name"],
       dtypes: [{"day", :date}]
     )
-
-    # |> Sink.preprocess()
+    |> DataFrame.mutate_with(
+      &[
+        year: Series.year(&1["day"]),
+        month: Series.month(&1["day"]),
+        week: Series.week_of_year(&1["day"]),
+        day: Series.day_of_year(&1["day"])
+      ]
+    )
   end
 
   def remove_unwatched_channels(df, threshold) do

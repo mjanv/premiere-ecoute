@@ -7,81 +7,35 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
 
   use PremiereEcouteWeb, :live_view
 
+  require Explorer.DataFrame, as: DataFrame
+
+  alias Explorer.Series
   alias PremiereEcoute.Twitch
+  alias PremiereEcoute.Twitch.History
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     file_path = Path.join("priv/static/uploads", id)
 
-    {:ok,
      socket
      |> assign(:filename, id)
      |> assign(:file_path, file_path)
-     |> assign(:follows_period, "month")
-     |> assign(:messages_period, "month")
-     |> assign(:minutes_period, "month")
-     |> assign(:subscriptions_period, "month")
+     |> assign(:periods, %{follows: "month", messages: "month", minutes: "month", subscriptions: "month"})
      |> assign_async([:history, :follows, :messages, :minutes, :subscriptions], fn ->
-       history =
-         if File.exists?(file_path) do
-           Twitch.History.read(file_path)
-         else
-           nil
-         end
-
-       follows =
-         if File.exists?(file_path) do
-           try do
-             Twitch.History.Community.Follows.read(file_path)
-           rescue
-             _ -> nil
-           end
-         else
-           nil
-         end
-
-       messages =
-         if File.exists?(file_path) do
-           try do
-             Twitch.History.SiteHistory.ChatMessages.read(file_path)
-           rescue
-             _ -> nil
-           end
-         else
-           nil
-         end
-
-       minutes =
-         if File.exists?(file_path) do
-           try do
-             Twitch.History.SiteHistory.MinuteWatched.read(file_path)
-           rescue
-             _ -> nil
-           end
-         else
-           nil
-         end
-
-       subscriptions =
-         if File.exists?(file_path) do
-           try do
-             Twitch.History.Commerce.Subscriptions.read(file_path)
-           rescue
-             _ -> nil
-           end
-         else
-           nil
-         end
-
-       {:ok,
-        %{
-          history: history,
-          follows: follows,
-          messages: messages,
-          minutes: minutes,
-          subscriptions: subscriptions
-        }}
-     end)}
+        if File.exists?(file_path) do
+        {:ok,
+          %{
+            history: History.read(file_path),
+            follows: History.Community.Follows.read(file_path),
+            messages: History.SiteHistory.ChatMessages.read(file_path),
+            minutes: History.SiteHistory.MinuteWatched.read(file_path),
+            subscriptions: History.Commerce.Subscriptions.read(file_path)
+          }}
+        else
+          {:error, "No file"}
+        end
+     end)
+     |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
@@ -90,199 +44,62 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
   end
 
   @impl true
-  def handle_event("change_follows_period", %{"period" => period}, socket) do
-    {:noreply, assign(socket, :follows_period, period)}
+  def handle_event("change_period", %{"graph" => graph, "period" => period}, %{assigns: %{periods: periods}} = socket) do
+    {:noreply, assign(socket, :periods, Map.put(periods, String.to_existing_atom(graph), period))}
   end
 
-  @impl true
-  def handle_event("change_messages_period", %{"period" => period}, socket) do
-    {:noreply, assign(socket, :messages_period, period)}
-  end
+  defp graph_data(nil, _periods, _period), do: []
 
-  @impl true
-  def handle_event("change_minutes_period", %{"period" => period}, socket) do
-    {:noreply, assign(socket, :minutes_period, period)}
-  end
+  defp graph_data(follows, %{follows: period}, :follows) do
+    {groups, label} = params(period)
 
-  @impl true
-  def handle_event("change_subscriptions_period", %{"period" => period}, socket) do
-    {:noreply, assign(socket, :subscriptions_period, period)}
-  end
-
-  # AIDEV-NOTE: helper function for template date formatting
-  def format_date(datetime) do
-    datetime
-    |> to_string()
-  end
-
-  # AIDEV-NOTE: prepare follows DataFrame for VegaLite graph - groups by selected period and counts follows
-  def prepare_follows_graph_data(nil, _period), do: []
-
-  def prepare_follows_graph_data(follows_df, period) do
-    require Explorer.DataFrame, as: DataFrame
-    alias Explorer.Series
-
-    {group_by_cols, sort_fn, format_fn} =
-      case period do
-        "week" ->
-          {[:year, :week], fn %{"year" => year, "week" => week} -> {year, week} end,
-           fn %{"year" => year, "week" => week} ->
-             week_str = if week < 10, do: "0#{week}", else: "#{week}"
-             "#{year}-W#{week_str}"
-           end}
-
-        "month" ->
-          {[:year, :month], fn %{"year" => year, "month" => month} -> {year, month} end,
-           fn %{"year" => year, "month" => month} ->
-             month_str = if month < 10, do: "0#{month}", else: "#{month}"
-             "#{year}-#{month_str}"
-           end}
-
-        "year" ->
-          {[:year], fn %{"year" => year} -> year end, fn %{"year" => year} -> "#{year}" end}
-      end
-
-    follows_df
-    |> DataFrame.group_by(group_by_cols)
+    follows
+    |> DataFrame.group_by(groups)
     |> DataFrame.summarise(follows: Series.n_distinct(channel))
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
-    |> Enum.sort_by(sort_fn)
-    |> Enum.map(fn row ->
-      %{"date" => format_fn.(row), "follows" => row["follows"]}
-    end)
+    |> Enum.map(fn row -> %{"date" => label.(row), "follows" => row["follows"]} end)
   end
 
-  # AIDEV-NOTE: prepare messages DataFrame for VegaLite graph - groups by selected period and counts messages
-  def prepare_messages_graph_data(nil, _period), do: []
+  defp graph_data(messages, %{messages: period}, :messages) do
+    {groups, label} = params(period)
 
-  def prepare_messages_graph_data(messages_df, period) do
-    require Explorer.DataFrame, as: DataFrame
-    alias Explorer.Series
-
-    {group_by_cols, sort_fn, format_fn} =
-      case period do
-        "day" ->
-          {[:year, :day], fn %{"year" => year, "day" => day} -> {year, day} end,
-           fn %{"year" => year, "day" => day} ->
-             day_str = if day < 10, do: "00#{day}", else: if(day < 100, do: "0#{day}", else: "#{day}")
-             "#{year}-#{day_str}"
-           end}
-
-        "week" ->
-          {[:year, :week], fn %{"year" => year, "week" => week} -> {year, week} end,
-           fn %{"year" => year, "week" => week} ->
-             week_str = if week < 10, do: "0#{week}", else: "#{week}"
-             "#{year}-W#{week_str}"
-           end}
-
-        "month" ->
-          {[:year, :month], fn %{"year" => year, "month" => month} -> {year, month} end,
-           fn %{"year" => year, "month" => month} ->
-             month_str = if month < 10, do: "0#{month}", else: "#{month}"
-             "#{year}-#{month_str}"
-           end}
-
-        "year" ->
-          {[:year], fn %{"year" => year} -> year end, fn %{"year" => year} -> "#{year}" end}
-      end
-
-    messages_df
-    |> DataFrame.group_by(group_by_cols)
+    messages
+    |> DataFrame.group_by(groups)
     |> DataFrame.summarise(messages: Series.count(body))
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
-    |> Enum.sort_by(sort_fn)
-    |> Enum.map(fn row ->
-      %{"date" => format_fn.(row), "messages" => row["messages"]}
-    end)
+    |> Enum.map(fn row -> %{"date" => label.(row), "messages" => row["messages"]} end)
   end
 
-  # AIDEV-NOTE: prepare minutes watched DataFrame for VegaLite graph - groups by selected period and sums minutes
-  def prepare_minutes_graph_data(nil, _period), do: []
+  defp graph_data(minutes, %{minutes: period}, :minutes) do
+    {groups, label} = params(period)
 
-  def prepare_minutes_graph_data(minutes_df, period) do
-    require Explorer.DataFrame, as: DataFrame
-    alias Explorer.Series
-
-    # Extract year, month, week from day column
-    minutes_with_time =
-      minutes_df
-      |> DataFrame.mutate_with(
-        &[
-          year: Series.year(&1["day"]),
-          month: Series.month(&1["day"]),
-          week: Series.week_of_year(&1["day"]),
-          day_of_year: Series.day_of_year(&1["day"])
-        ]
-      )
-
-    {group_by_cols, sort_fn, format_fn} =
-      case period do
-        "day" ->
-          {[:year, :day_of_year], fn %{"year" => year, "day_of_year" => day} -> {year, day} end,
-           fn %{"year" => year, "day_of_year" => day} ->
-             day_str = if day < 10, do: "00#{day}", else: if(day < 100, do: "0#{day}", else: "#{day}")
-             "#{year}-#{day_str}"
-           end}
-
-        "week" ->
-          {[:year, :week], fn %{"year" => year, "week" => week} -> {year, week} end,
-           fn %{"year" => year, "week" => week} ->
-             week_str = if week < 10, do: "0#{week}", else: "#{week}"
-             "#{year}-W#{week_str}"
-           end}
-
-        "month" ->
-          {[:year, :month], fn %{"year" => year, "month" => month} -> {year, month} end,
-           fn %{"year" => year, "month" => month} ->
-             month_str = if month < 10, do: "0#{month}", else: "#{month}"
-             "#{year}-#{month_str}"
-           end}
-
-        "year" ->
-          {[:year], fn %{"year" => year} -> year end, fn %{"year" => year} -> "#{year}" end}
-      end
-
-    minutes_with_time
-    |> DataFrame.group_by(group_by_cols)
+    minutes
+    |> DataFrame.group_by(groups)
     |> DataFrame.summarise(minutes: Series.sum(minutes_watched_unadjusted))
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
-    |> Enum.sort_by(sort_fn)
-    |> Enum.map(fn row ->
-      %{"date" => format_fn.(row), "minutes" => row["minutes"]}
-    end)
+    |> Enum.map(fn row -> %{"date" => label.(row), "minutes" => row["minutes"]} end)
   end
 
-  # AIDEV-NOTE: prepare subscriptions DataFrame for VegaLite graph - groups by selected period and counts subscriptions
-  def prepare_subscriptions_graph_data(nil, _period), do: []
+  defp graph_data(subscriptions, %{subscriptions: period}, :subscriptions) do
+    {groups, label} = params(period)
 
-  def prepare_subscriptions_graph_data(subscriptions_df, period) do
-    require Explorer.DataFrame, as: DataFrame
-    alias Explorer.Series
-
-    {group_by_cols, sort_fn, format_fn} =
-      case period do
-        "month" ->
-          {[:year, :month], fn %{"year" => year, "month" => month} -> {year, month} end,
-           fn %{"year" => year, "month" => month} ->
-             month_str = if month < 10, do: "0#{month}", else: "#{month}"
-             "#{year}-#{month_str}"
-           end}
-
-        "year" ->
-          {[:year], fn %{"year" => year} -> year end, fn %{"year" => year} -> "#{year}" end}
-      end
-
-    subscriptions_df
-    |> DataFrame.group_by(group_by_cols)
+    subscriptions
+    |> DataFrame.group_by(groups)
     |> DataFrame.summarise(subscriptions: Series.count(channel_login))
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
-    |> Enum.sort_by(sort_fn)
-    |> Enum.map(fn row ->
-      %{"date" => format_fn.(row), "subscriptions" => row["subscriptions"]}
-    end)
+    |> Enum.map(fn row -> %{"date" => label.(row), "subscriptions" => row["subscriptions"]} end)
+  end
+
+  defp params(period) do
+    case period do
+      "day" -> {[:year, :month, :day], fn %{"year" => y, "month" => m, "day" => d} -> "#{y}-#{String.pad_leading(to_string(m), 2, "0")}-#{String.pad_leading(to_string(d), 2, "0")}" end}
+      "week" -> {[:year, :week], fn %{"year" => y, "week" => w} -> "#{y}-W#{String.pad_leading(to_string(w), 2, "0")}" end}
+      "month" -> {[:year, :month], fn %{"year" => y, "month" => m} -> "#{y}-#{String.pad_leading(to_string(m), 2, "0")}" end}
+      "year" -> {[:year], fn %{"year" => y} -> "#{y}" end}
+    end
   end
 end
