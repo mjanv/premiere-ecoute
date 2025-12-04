@@ -247,6 +247,8 @@ defmodule PremiereEcouteWeb.Router do
       live "/history/:id/messages", History.MessagesLive, :show
       live "/history/:id/minutes", History.MinutesLive, :show
       live "/history/:id/subscriptions", History.SubscriptionsLive, :show
+      live "/history/:id/games", History.GamesLive, :show
+      live "/history/:id/ads", History.AdsLive, :show
     end
   end
 

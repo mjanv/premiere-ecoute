@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
     file
     |> Zipfile.csv(
       "request/site_history/minute_watched.csv",
-      columns: ["day", "channel_name", "minutes_watched_unadjusted", "platform", "player", "game_name"],
+      columns: ["day", "channel_name", "minutes_watched_unadjusted", "platform", "player", "game_name", "content_mode"],
       dtypes: [{"day", :date}]
     )
     |> DataFrame.mutate_with(
@@ -61,4 +61,30 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
       &[desc: &1["hours"]]
     )
   end
+
+  def group_by_platform_and_period(df, period) do
+    groups = period_groups(period)
+
+    df
+    |> DataFrame.group_by([:platform | groups])
+    |> DataFrame.summarise(minutes: Series.sum(minutes_watched_unadjusted))
+    |> apply_period_sort(period)
+  end
+
+  def group_by_content_mode_and_period(df, period) do
+    groups = period_groups(period)
+
+    df
+    |> DataFrame.group_by([:content_mode | groups])
+    |> DataFrame.summarise(minutes: Series.sum(minutes_watched_unadjusted))
+    |> apply_period_sort(period)
+  end
+
+  defp period_groups("week"), do: [:year, :week]
+  defp period_groups("month"), do: [:year, :month]
+  defp period_groups("year"), do: [:year]
+
+  defp apply_period_sort(df, "week"), do: DataFrame.sort_by(df, asc: year, asc: week)
+  defp apply_period_sort(df, "month"), do: DataFrame.sort_by(df, asc: year, asc: month)
+  defp apply_period_sort(df, "year"), do: DataFrame.sort_by(df, asc: year)
 end

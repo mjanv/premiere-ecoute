@@ -74,8 +74,8 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
               <div class="text-center">
-                <p class="text-sm font-medium text-orange-400 uppercase tracking-wider mb-2">Total Minutes</p>
-                <p class="text-5xl font-bold text-white">{minutes.total}</p>
+                <p class="text-sm font-medium text-orange-400 uppercase tracking-wider mb-2">Total Watch Time</p>
+                <p class="text-5xl font-bold text-white">{format_minutes(minutes.total)}</p>
               </div>
             </div>
 
@@ -84,7 +84,7 @@
                 <div class="text-center">
                   <p class="text-sm font-medium text-yellow-400 uppercase tracking-wider mb-2">Most Watched Channel</p>
                   <p class="text-3xl font-bold text-white">{List.first(minutes.by_channel)["channel_name"]}</p>
-                  <p class="text-sm text-slate-400 mt-2">{List.first(minutes.by_channel)["minutes"]} minutes</p>
+                  <p class="text-sm text-slate-400 mt-2">{format_minutes(List.first(minutes.by_channel)["minutes"])}</p>
                 </div>
               </div>
             <% end %>
@@ -93,18 +93,38 @@
 <!-- Minutes per Channel Graph -->
           <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-700/50">
-              <h3 class="text-lg font-semibold text-white">Minutes per Channel</h3>
-              <p class="text-sm text-slate-400 mt-1">Sorted by watch time (descending)</p>
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes per Channel</h3>
+                  <p class="text-sm text-slate-400 mt-1">Top {@top_n_channels} channels sorted by watch time (descending)</p>
+                </div>
+                <div class="flex items-center gap-3 w-full max-w-2xl">
+                  <label class="text-sm text-slate-300 whitespace-nowrap">
+                    Show top: <span class="font-semibold text-white">{@top_n_channels}</span>
+                  </label>
+                  <form phx-change="update_top_n" class="flex-1">
+                    <input
+                      type="range"
+                      min="1"
+                      max={length(minutes.by_channel)}
+                      value={@top_n_channels}
+                      name="value"
+                      class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                    />
+                  </form>
+                </div>
+              </div>
             </div>
             <div class="p-6">
               <.live_component
                 module={PremiereEcouteWeb.Components.Live.Graph}
                 id="minutes-by-channel-graph"
                 title=""
-                data={graph_data(minutes.by_channel)}
+                data={graph_data(top_n_channels(minutes.by_channel, @top_n_channels))}
                 x="channel"
                 y="minutes"
                 sort="none"
+                format_type="duration"
               />
             </div>
           </div>
@@ -115,23 +135,10 @@
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h3 class="text-lg font-semibold text-white">Minutes Over Time</h3>
-                  <p class="text-sm text-slate-400 mt-1">Select a channel to view watch history</p>
+                  <p class="text-sm text-slate-400 mt-1">Select channels to compare watch history</p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-3">
-                  <form phx-change="select_channel" class="flex-1">
-                    <select
-                      name="channel"
-                      class="block w-full px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    >
-                      <option value="">Select channel...</option>
-                      <%= for channel <- minutes.by_channel do %>
-                        <option value={channel["channel_name"]} selected={@selected_channel == channel["channel_name"]}>
-                          {channel["channel_name"]}
-                        </option>
-                      <% end %>
-                    </select>
-                  </form>
-                  <%= if @selected_channel do %>
+                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                  <%= if length(@selected_channels) > 0 do %>
                     <div class="flex gap-2">
                       <button
                         phx-click="select_period"
@@ -163,18 +170,58 @@
                       </button>
                     </div>
                   <% end %>
+                  <!-- Custom Multi-Select Dropdown -->
+                  <div class="relative" phx-click-away={JS.push("toggle_dropdown") |> JS.hide(to: "#minutes-channel-dropdown")}>
+                    <button
+                      type="button"
+                      phx-click="toggle_dropdown"
+                      class="block w-full sm:w-64 px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-left flex items-center justify-between"
+                    >
+                      <span class="truncate">
+                        <%= if length(@selected_channels) == 0 do %>
+                          Select channels...
+                        <% else %>
+                          {length(@selected_channels)} selected
+                        <% end %>
+                      </span>
+                      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
+                    <%= if @dropdown_open do %>
+                      <div
+                        id="minutes-channel-dropdown"
+                        class="absolute z-10 mt-1 w-full sm:w-64 max-h-60 overflow-y-auto bg-slate-900 border border-slate-600/50 rounded-lg shadow-lg"
+                      >
+                        <%= for channel <- minutes.by_channel do %>
+                          <label class="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 cursor-pointer transition-colors">
+                            <input
+                              type="checkbox"
+                              phx-click="toggle_channel"
+                              phx-value-channel={channel["channel_name"]}
+                              checked={channel["channel_name"] in @selected_channels}
+                              class="w-4 h-4 text-orange-600 bg-slate-700 border-slate-600 rounded focus:ring-orange-500 focus:ring-2"
+                            />
+                            <span class="text-sm text-white">{channel["channel_name"]}</span>
+                          </label>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
                 </div>
               </div>
             </div>
-            <%= if @selected_channel do %>
+            <%= if length(@selected_channels) > 0 do %>
               <div class="p-6">
                 <.live_component
                   module={PremiereEcouteWeb.Components.Live.Graph}
                   id="channel-timeline-graph"
                   title=""
-                  data={channel_timeline_data(@selected_channel, @selected_period, minutes.df)}
+                  data={channel_timeline_data(@selected_channels, @selected_period, minutes.df)}
                   x="date"
                   y="minutes"
+                  stack_by="channel"
+                  format_type="duration"
                 />
               </div>
             <% else %>
@@ -188,9 +235,135 @@
                   >
                   </path>
                 </svg>
-                <p class="text-slate-400 text-lg">Select a channel to view its watch time timeline</p>
+                <p class="text-slate-400 text-lg">Select one or more channels to view watch time timeline</p>
               </div>
             <% end %>
+          </div>
+          
+<!-- Platform Breakdown Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes by Platform</h3>
+                  <p class="text-sm text-slate-400 mt-1">Watch time breakdown by platform over time</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <div class="flex gap-2">
+                    <button
+                      phx-click="select_platform_period"
+                      phx-value-period="week"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @platform_period == "week", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Week
+                    </button>
+                    <button
+                      phx-click="select_platform_period"
+                      phx-value-period="month"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @platform_period == "month", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Month
+                    </button>
+                    <button
+                      phx-click="select_platform_period"
+                      phx-value-period="year"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @platform_period == "year", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Year
+                    </button>
+                  </div>
+                  <button
+                    phx-click="toggle_platform_display_mode"
+                    class="px-4 py-2 text-xs font-medium rounded-lg transition-all duration-200 bg-yellow-600 hover:bg-yellow-700 text-white flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                      >
+                      </path>
+                    </svg>
+                    {if @platform_display_mode == "absolute", do: "Show %", else: "Show Absolute"}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <.live_component
+                module={PremiereEcouteWeb.Components.Live.Graph}
+                id="platform-breakdown-graph"
+                title=""
+                data={platform_breakdown_data(minutes.df, @platform_period, @platform_display_mode)}
+                x="date"
+                y="minutes"
+                stack_by="platform"
+              />
+            </div>
+          </div>
+          
+<!-- Content Mode Breakdown Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes by Content Mode</h3>
+                  <p class="text-sm text-slate-400 mt-1">Watch time breakdown by content type over time</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <div class="flex gap-2">
+                    <button
+                      phx-click="select_content_mode_period"
+                      phx-value-period="week"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @content_mode_period == "week", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Week
+                    </button>
+                    <button
+                      phx-click="select_content_mode_period"
+                      phx-value-period="month"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @content_mode_period == "month", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Month
+                    </button>
+                    <button
+                      phx-click="select_content_mode_period"
+                      phx-value-period="year"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @content_mode_period == "year", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Year
+                    </button>
+                  </div>
+                  <button
+                    phx-click="toggle_content_mode_display_mode"
+                    class="px-4 py-2 text-xs font-medium rounded-lg transition-all duration-200 bg-yellow-600 hover:bg-yellow-700 text-white flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                      >
+                      </path>
+                    </svg>
+                    {if @content_mode_display_mode == "absolute", do: "Show %", else: "Show Absolute"}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <.live_component
+                module={PremiereEcouteWeb.Components.Live.Graph}
+                id="content-mode-breakdown-graph"
+                title=""
+                data={content_mode_breakdown_data(minutes.df, @content_mode_period, @content_mode_display_mode)}
+                x="date"
+                y="minutes"
+                stack_by="content_mode"
+              />
+            </div>
           </div>
         </.async_result>
       </div>

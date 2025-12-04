@@ -93,15 +93,34 @@
 <!-- Messages per Channel Graph -->
           <div class="rounded-xl border border-blue-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-700/50">
-              <h3 class="text-lg font-semibold text-white">Messages per Channel</h3>
-              <p class="text-sm text-slate-400 mt-1">Sorted by message count (descending)</p>
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Messages per Channel</h3>
+                  <p class="text-sm text-slate-400 mt-1">Top {@top_n_channels} channels sorted by message count (descending)</p>
+                </div>
+                <div class="flex items-center gap-3 w-full max-w-2xl">
+                  <label class="text-sm text-slate-300 whitespace-nowrap">
+                    Show top: <span class="font-semibold text-white">{@top_n_channels}</span>
+                  </label>
+                  <form phx-change="update_top_n" class="flex-1">
+                    <input
+                      type="range"
+                      min="1"
+                      max={length(messages.by_channel)}
+                      value={@top_n_channels}
+                      name="value"
+                      class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    />
+                  </form>
+                </div>
+              </div>
             </div>
             <div class="p-6">
               <.live_component
                 module={PremiereEcouteWeb.Components.Live.Graph}
                 id="messages-by-channel-graph"
                 title=""
-                data={graph_data(messages.by_channel)}
+                data={graph_data(top_n_channels(messages.by_channel, @top_n_channels))}
                 x="channel"
                 y="messages"
                 sort="none"
@@ -115,23 +134,10 @@
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h3 class="text-lg font-semibold text-white">Messages Over Time</h3>
-                  <p class="text-sm text-slate-400 mt-1">Select a channel to view message history</p>
+                  <p class="text-sm text-slate-400 mt-1">Select channels to compare message history</p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-3">
-                  <form phx-change="select_channel" class="flex-1">
-                    <select
-                      name="channel"
-                      class="block w-full px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select channel...</option>
-                      <%= for channel <- messages.by_channel do %>
-                        <option value={channel["channel"]} selected={@selected_channel == channel["channel"]}>
-                          {channel["channel"]}
-                        </option>
-                      <% end %>
-                    </select>
-                  </form>
-                  <%= if @selected_channel do %>
+                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                  <%= if length(@selected_channels) > 0 do %>
                     <div class="flex gap-2">
                       <button
                         phx-click="select_period"
@@ -163,18 +169,57 @@
                       </button>
                     </div>
                   <% end %>
+                  <!-- Custom Multi-Select Dropdown -->
+                  <div class="relative" phx-click-away={JS.push("toggle_dropdown") |> JS.hide(to: "#channel-dropdown")}>
+                    <button
+                      type="button"
+                      phx-click="toggle_dropdown"
+                      class="block w-full sm:w-64 px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center justify-between"
+                    >
+                      <span class="truncate">
+                        <%= if length(@selected_channels) == 0 do %>
+                          Select channels...
+                        <% else %>
+                          {length(@selected_channels)} selected
+                        <% end %>
+                      </span>
+                      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
+                    <%= if @dropdown_open do %>
+                      <div
+                        id="channel-dropdown"
+                        class="absolute z-10 mt-1 w-full sm:w-64 max-h-60 overflow-y-auto bg-slate-900 border border-slate-600/50 rounded-lg shadow-lg"
+                      >
+                        <%= for channel <- messages.by_channel do %>
+                          <label class="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 cursor-pointer transition-colors">
+                            <input
+                              type="checkbox"
+                              phx-click="toggle_channel"
+                              phx-value-channel={channel["channel"]}
+                              checked={channel["channel"] in @selected_channels}
+                              class="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                            <span class="text-sm text-white">{channel["channel"]}</span>
+                          </label>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
                 </div>
               </div>
             </div>
-            <%= if @selected_channel do %>
+            <%= if length(@selected_channels) > 0 do %>
               <div class="p-6">
                 <.live_component
                   module={PremiereEcouteWeb.Components.Live.Graph}
                   id="channel-timeline-graph"
                   title=""
-                  data={channel_timeline_data(@selected_channel, @selected_period, messages.df)}
+                  data={channel_timeline_data(@selected_channels, @selected_period, messages.df)}
                   x="date"
                   y="messages"
+                  stack_by="channel"
                 />
               </div>
             <% else %>
@@ -188,9 +233,66 @@
                   >
                   </path>
                 </svg>
-                <p class="text-slate-400 text-lg">Select a channel to view its message timeline</p>
+                <p class="text-slate-400 text-lg">Select one or more channels to view message timeline</p>
               </div>
             <% end %>
+          </div>
+          
+<!-- Activity Heatmap -->
+          <div class="rounded-xl border border-blue-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <h3 class="text-lg font-semibold text-white">Activity Heatmap</h3>
+              <p class="text-sm text-slate-400 mt-1">Message activity by day of week and hour of day (UTC time)</p>
+            </div>
+            <div class="p-6">
+              <div class="w-full">
+                <!-- Hour labels -->
+                <div class="grid grid-cols-[auto_1fr] gap-2 mb-2">
+                  <div class="w-16"></div>
+                  <div class="grid grid-cols-24 gap-1">
+                    <%= for hour <- 0..23 do %>
+                      <div class="text-center text-xs text-slate-400">
+                        {hour}
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- Heatmap grid -->
+                <%= for weekday <- 1..7 do %>
+                  <div class="grid grid-cols-[auto_1fr] gap-2 mb-1">
+                    <div class="w-16 text-xs text-slate-400 flex items-center justify-end pr-2">
+                      {weekday_name(weekday)}
+                    </div>
+                    <div class="grid grid-cols-24 gap-1">
+                      <%= for hour <- 0..23 do %>
+                        <% cell =
+                          Enum.find(format_heatmap_data(messages.heatmap), fn c ->
+                            c["weekday"] == weekday and c["hour"] == hour
+                          end) %>
+                        <div
+                          class="aspect-square rounded-sm transition-all duration-200 hover:ring-2 hover:ring-blue-400 cursor-pointer"
+                          style={"background-color: rgba(59, 130, 246, #{cell["intensity"] * 0.8})"}
+                          title={"#{weekday_name(weekday)} #{hour}:00 - #{cell["messages"]} messages"}
+                        >
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+                
+<!-- Legend -->
+                <div class="flex items-center gap-2 mt-4 text-xs text-slate-400">
+                  <span>Less</span>
+                  <div class="flex gap-1">
+                    <%= for intensity <- [0, 0.25, 0.5, 0.75, 1.0] do %>
+                      <div class="w-4 h-4 rounded-sm" style={"background-color: rgba(59, 130, 246, #{intensity * 0.8})"}></div>
+                    <% end %>
+                  </div>
+                  <span>More</span>
+                </div>
+              </div>
+            </div>
           </div>
         </.async_result>
       </div>

@@ -41,4 +41,13 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.ChatMessages do
       &[desc: &1["messages"]]
     )
   end
+
+  def activity_heatmap(df) do
+    require Explorer.DataFrame, as: DataFrame
+
+    df
+    |> DataFrame.group_by([:weekday, :hour])
+    |> DataFrame.summarise(messages: Series.count(body))
+    |> DataFrame.to_rows()
+  end
 end

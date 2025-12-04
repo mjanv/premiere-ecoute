@@ -19,8 +19,8 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     socket
     |> assign(:filename, id)
     |> assign(:file_path, file_path)
-    |> assign(:periods, %{follows: "month", messages: "month", minutes: "month", subscriptions: "month"})
-    |> assign_async([:history, :follows, :messages, :minutes, :subscriptions], fn ->
+    |> assign(:periods, %{follows: "month", messages: "month", minutes: "month", subscriptions: "month", ads: "month"})
+    |> assign_async([:history, :follows, :messages, :minutes, :subscriptions, :ads], fn ->
       if File.exists?(file_path) do
         {:ok,
          %{
@@ -28,7 +28,8 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
            follows: History.Community.Follows.read(file_path),
            messages: History.SiteHistory.ChatMessages.read(file_path),
            minutes: History.SiteHistory.MinuteWatched.read(file_path),
-           subscriptions: History.Commerce.Subscriptions.read(file_path)
+           subscriptions: History.Commerce.Subscriptions.read(file_path),
+           ads: History.Ads.VideoAdImpression.read(file_path)
          }}
       else
         {:error, "No file"}
@@ -91,6 +92,17 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "subscriptions" => row["subscriptions"]} end)
+  end
+
+  defp graph_data(ads, %{ads: period}, :ads) do
+    {groups, label} = params(period)
+
+    ads
+    |> DataFrame.group_by(groups)
+    |> DataFrame.summarise(impressions: Series.count(roll_type))
+    |> DataFrame.ungroup()
+    |> DataFrame.to_rows()
+    |> Enum.map(fn row -> %{"date" => label.(row), "impressions" => row["impressions"]} end)
   end
 
   defp params(period) do

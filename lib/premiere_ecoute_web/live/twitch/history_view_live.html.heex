@@ -296,6 +296,21 @@
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                           </.link>
+                          <.link
+                            navigate={~p"/twitch/history/#{@filename}/messages/search"}
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-600/10 text-cyan-300 hover:bg-cyan-600/20 transition-all duration-200 border border-cyan-500/30 hover:border-cyan-500/50 group"
+                          >
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                              >
+                              </path>
+                            </svg>
+                            <span>Search</span>
+                          </.link>
                         </div>
                         <div class="flex gap-2">
                           <button
@@ -343,21 +358,6 @@
                         />
                       </div>
                     </div>
-
-                    <.link
-                      navigate={~p"/twitch/history/#{@filename}/messages/search"}
-                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600/10 text-blue-300 hover:bg-blue-600/20 transition-all duration-200 border border-blue-500/30 hover:border-blue-500/50"
-                    >
-                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fill-rule="evenodd"
-                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                          clip-rule="evenodd"
-                        >
-                        </path>
-                      </svg>
-                      <span class="font-medium">Search Messages</span>
-                    </.link>
                   </div>
                 <% else %>
                   <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-6">
@@ -540,12 +540,25 @@
                   <div class="space-y-6">
                     <!-- Subscriptions per Period Graph -->
                     <div class="rounded-xl border border-pink-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
-                      <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
-                        <div>
-                          <h3 class="text-lg font-semibold text-white">
+                      <div class="px-6 py-3 border-b border-slate-700/50 flex items-center justify-between">
+                        <div class="flex gap-3 items-center">
+                          <h3 class="text-base font-semibold text-white">
                             Subscriptions per {@periods[:subscriptions]}
                           </h3>
-                          <p class="text-sm text-slate-400 mt-1">Channel subscriptions over time</p>
+                          <.link
+                            navigate={~p"/twitch/history/#{@filename}/subscriptions"}
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-pink-600/10 text-pink-300 hover:bg-pink-600/20 transition-all duration-200 border border-pink-500/30 hover:border-pink-500/50 group"
+                          >
+                            <span>Details</span>
+                            <svg
+                              class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                          </.link>
                         </div>
                         <div class="flex gap-2">
                           <button
@@ -594,6 +607,129 @@
                   </div>
                 <% end %>
               </.async_result>
+            </div>
+            
+<!-- Ad Impressions -->
+            <div class="space-y-6 mt-8">
+              <.async_result :let={ads} assign={@ads}>
+                <:loading></:loading>
+                <:failed></:failed>
+
+                <%= if ads do %>
+                  <div class="space-y-6">
+                    <!-- Ad Impressions per Period Graph -->
+                    <div class="rounded-xl border border-amber-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+                      <div class="px-6 py-3 border-b border-slate-700/50 flex items-center justify-between">
+                        <div class="flex gap-3 items-center">
+                          <h3 class="text-base font-semibold text-white">Ad Impressions per {@periods[:ads]}</h3>
+                          <.link
+                            navigate={~p"/twitch/history/#{@filename}/ads"}
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-600/10 text-amber-300 hover:bg-amber-600/20 transition-all duration-200 border border-amber-500/30 hover:border-amber-500/50 group"
+                          >
+                            <span>Details</span>
+                            <svg
+                              class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                          </.link>
+                        </div>
+                        <div class="flex gap-2">
+                          <button
+                            phx-click="change_period"
+                            phx-value-graph="ads"
+                            phx-value-period="day"
+                            class={"px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 #{if @periods[:ads] == "day", do: "bg-amber-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                          >
+                            Day
+                          </button>
+                          <button
+                            phx-click="change_period"
+                            phx-value-graph="ads"
+                            phx-value-period="week"
+                            class={"px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 #{if @periods[:ads] == "week", do: "bg-amber-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                          >
+                            Week
+                          </button>
+                          <button
+                            phx-click="change_period"
+                            phx-value-graph="ads"
+                            phx-value-period="month"
+                            class={"px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 #{if @periods[:ads] == "month", do: "bg-amber-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                          >
+                            Month
+                          </button>
+                          <button
+                            phx-click="change_period"
+                            phx-value-graph="ads"
+                            phx-value-period="year"
+                            class={"px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 #{if @periods[:ads] == "year", do: "bg-amber-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                          >
+                            Year
+                          </button>
+                        </div>
+                      </div>
+                      <div class="p-6">
+                        <.live_component
+                          module={PremiereEcouteWeb.Components.Live.Graph}
+                          id="ads-graph"
+                          title=""
+                          data={graph_data(ads, @periods, :ads)}
+                          x="date"
+                          y="impressions"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                <% else %>
+                  <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-6">
+                    <div class="flex items-start gap-3">
+                      <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clip-rule="evenodd"
+                        >
+                        </path>
+                      </svg>
+                      <p class="text-sm font-medium text-slate-300">No ads data found in this export</p>
+                    </div>
+                  </div>
+                <% end %>
+              </.async_result>
+            </div>
+            
+<!-- Games Section -->
+            <div class="space-y-6 mt-8">
+              <div class="rounded-xl border border-purple-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+                <div class="px-6 py-3 border-b border-slate-700/50 flex items-center justify-between">
+                  <div class="flex gap-3 items-center">
+                    <h3 class="text-base font-semibold text-white">
+                      Games
+                    </h3>
+                    <.link
+                      navigate={~p"/twitch/history/#{@filename}/games"}
+                      class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-600/10 text-purple-300 hover:bg-purple-600/20 transition-all duration-200 border border-purple-500/30 hover:border-purple-500/50 group"
+                    >
+                      <span>Details</span>
+                      <svg
+                        class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </.link>
+                  </div>
+                </div>
+                <div class="p-6">
+                  <p class="text-sm text-slate-400">View detailed analytics about games you watched</p>
+                </div>
+              </div>
             </div>
           <% else %>
             <!-- Error State - File Not Found -->
