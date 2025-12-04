@@ -1,34 +1,38 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 relative overflow-hidden">
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-orange-950 to-slate-900 relative overflow-hidden">
   <!-- Animated background elements -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
     </div>
-    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
     </div>
-    <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
+    <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
     </div>
   </div>
   
 <!-- Main content -->
   <div class="relative z-10 flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="border-b border-purple-500/20 backdrop-blur-md bg-slate-950/40">
+    <header class="border-b border-orange-500/20 backdrop-blur-md bg-slate-950/40">
       <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <.link navigate={~p"/twitch/history/#{@filename}"} class="text-purple-400 hover:text-purple-300 transition-colors">
+          <.link navigate={~p"/twitch/history/#{@filename}"} class="text-orange-400 hover:text-orange-300 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
           </.link>
-          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center">
             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                clip-rule="evenodd"
+              >
               </path>
             </svg>
           </div>
           <div>
             <h1 class="text-xl font-bold text-white">Minutes Details</h1>
-            <p class="text-xs text-slate-400">Detailed analysis of minutes watched</p>
+            <p class="text-xs text-slate-400">Watch time across channels</p>
           </div>
         </div>
       </div>
@@ -36,10 +40,159 @@
     
 <!-- Main content area -->
     <main class="flex-1 flex flex-col px-4 py-8">
-      <div class="w-full max-w-7xl mx-auto">
-        <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-8 text-center">
-          <p class="text-slate-300">Follows details coming soon...</p>
-        </div>
+      <div class="w-full max-w-7xl mx-auto space-y-6">
+        <.async_result :let={minutes} assign={@minutes}>
+          <:loading>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 shadow-lg shadow-orange-500/50 animate-pulse">
+                <svg class="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  >
+                  </path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Loading minutes data...</h2>
+            </div>
+          </:loading>
+          <:failed :let={_failure}>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/50">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Failed to Load</h2>
+              <p class="text-slate-300">Could not load minutes data</p>
+            </div>
+          </:failed>
+          
+<!-- Stats Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
+              <div class="text-center">
+                <p class="text-sm font-medium text-orange-400 uppercase tracking-wider mb-2">Total Minutes</p>
+                <p class="text-5xl font-bold text-white">{minutes.total}</p>
+              </div>
+            </div>
+
+            <%= if length(minutes.by_channel) > 0 do %>
+              <div class="rounded-xl border border-yellow-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
+                <div class="text-center">
+                  <p class="text-sm font-medium text-yellow-400 uppercase tracking-wider mb-2">Most Watched Channel</p>
+                  <p class="text-3xl font-bold text-white">{List.first(minutes.by_channel)["channel_name"]}</p>
+                  <p class="text-sm text-slate-400 mt-2">{List.first(minutes.by_channel)["minutes"]} minutes</p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+<!-- Minutes per Channel Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <h3 class="text-lg font-semibold text-white">Minutes per Channel</h3>
+              <p class="text-sm text-slate-400 mt-1">Sorted by watch time (descending)</p>
+            </div>
+            <div class="p-6">
+              <.live_component
+                module={PremiereEcouteWeb.Components.Live.Graph}
+                id="minutes-by-channel-graph"
+                title=""
+                data={graph_data(minutes.by_channel)}
+                x="channel"
+                y="minutes"
+                sort="none"
+              />
+            </div>
+          </div>
+          
+<!-- Minutes Over Time Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes Over Time</h3>
+                  <p class="text-sm text-slate-400 mt-1">Select a channel to view watch history</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <form phx-change="select_channel" class="flex-1">
+                    <select
+                      name="channel"
+                      class="block w-full px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                      <option value="">Select channel...</option>
+                      <%= for channel <- minutes.by_channel do %>
+                        <option value={channel["channel_name"]} selected={@selected_channel == channel["channel_name"]}>
+                          {channel["channel_name"]}
+                        </option>
+                      <% end %>
+                    </select>
+                  </form>
+                  <%= if @selected_channel do %>
+                    <div class="flex gap-2">
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="day"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "day", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Day
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="week"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "week", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Week
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="month"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "month", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Month
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="year"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "year", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Year
+                      </button>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <%= if @selected_channel do %>
+              <div class="p-6">
+                <.live_component
+                  module={PremiereEcouteWeb.Components.Live.Graph}
+                  id="channel-timeline-graph"
+                  title=""
+                  data={channel_timeline_data(@selected_channel, @selected_period, minutes.df)}
+                  x="date"
+                  y="minutes"
+                />
+              </div>
+            <% else %>
+              <div class="p-12 text-center">
+                <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  >
+                  </path>
+                </svg>
+                <p class="text-slate-400 text-lg">Select a channel to view its watch time timeline</p>
+              </div>
+            <% end %>
+          </div>
+        </.async_result>
       </div>
     </main>
     

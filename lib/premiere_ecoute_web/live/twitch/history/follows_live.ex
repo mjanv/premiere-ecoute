@@ -5,15 +5,83 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
 
   use PremiereEcouteWeb, :live_view
 
+  require Explorer.DataFrame, as: DataFrame
+
+  alias PremiereEcoute.Twitch.History
+
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:filename, id)}
+    file_path = Path.join("priv/static/uploads", id)
+
+    socket
+    |> assign(:filename, id)
+    |> assign(:file_path, file_path)
+    |> assign(:search, "")
+    |> assign(:sort_by, :time)
+    |> assign(:sort_order, :desc)
+    |> assign_async(:follows, fn ->
+      if File.exists?(file_path) do
+        follows_df =
+          file_path
+          |> History.Community.Follows.read()
+          |> DataFrame.sort_by(desc: time)
+
+        total = DataFrame.n_rows(follows_df)
+
+        {:ok, %{follows: %{total: total, df: follows_df}}}
+      else
+        {:error, "No file"}
+      end
+    end)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("search", %{"search" => search}, socket) do
+    {:noreply, assign(socket, :search, search)}
+  end
+
+  @impl true
+  def handle_event("sort", %{"column" => column}, socket) do
+    column_atom = String.to_existing_atom(column)
+
+    sort_order =
+      if socket.assigns.sort_by == column_atom do
+        toggle_sort_order(socket.assigns.sort_order)
+      else
+        :asc
+      end
+
+    {:noreply, socket |> assign(:sort_by, column_atom) |> assign(:sort_order, sort_order)}
+  end
+
+  defp toggle_sort_order(:asc), do: :desc
+  defp toggle_sort_order(:desc), do: :asc
+
+  defp get_follows_list(df, search, sort_by, sort_order) do
+    df
+    |> apply_sort(sort_by, sort_order)
+    |> DataFrame.to_rows()
+    |> apply_search_filter(search)
+  end
+
+  defp apply_sort(df, :channel, :asc), do: DataFrame.sort_by(df, asc: channel)
+  defp apply_sort(df, :channel, :desc), do: DataFrame.sort_by(df, desc: channel)
+  defp apply_sort(df, :time, :asc), do: DataFrame.sort_by(df, asc: time)
+  defp apply_sort(df, :time, :desc), do: DataFrame.sort_by(df, desc: time)
+
+  defp apply_search_filter(rows, search) when search == "" or is_nil(search), do: rows
+
+  defp apply_search_filter(rows, search) do
+    search_lower = String.downcase(search)
+
+    Enum.filter(rows, fn follow ->
+      String.contains?(String.downcase(follow["channel"]), search_lower)
+    end)
   end
 end

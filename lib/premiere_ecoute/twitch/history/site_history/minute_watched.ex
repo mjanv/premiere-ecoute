@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
     file
     |> Zipfile.csv(
       "request/site_history/minute_watched.csv",
-      columns: ["day", "channel_name", "minutes_watched_unadjusted", "game_name"],
+      columns: ["day", "channel_name", "minutes_watched_unadjusted", "platform", "player", "game_name"],
       dtypes: [{"day", :date}]
     )
     |> DataFrame.mutate_with(
@@ -42,11 +42,11 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
   def group_channel(df) do
     df
     |> Filters.group(
-      [:channel],
+      [:channel_name],
       &[
-        hours: Series.count(&1["minutes_logged"]) |> Series.divide(60) |> Series.cast(:integer)
+        minutes: Series.sum(&1["minutes_watched_unadjusted"]) |> Series.cast(:integer)
       ],
-      &[desc: &1["hours"]]
+      &[desc: &1["minutes"]]
     )
   end
 

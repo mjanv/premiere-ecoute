@@ -243,6 +243,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/history", HistoryLive, :index
       live "/history/:id", HistoryViewLive, :show
       live "/history/:id/follows", History.FollowsLive, :show
+      live "/history/:id/messages/search", History.MessagesSearchLive, :show
       live "/history/:id/messages", History.MessagesLive, :show
       live "/history/:id/minutes", History.MinutesLive, :show
       live "/history/:id/subscriptions", History.SubscriptionsLive, :show

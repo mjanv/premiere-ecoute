@@ -10,32 +10,31 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
-  alias PremiereEcoute.Twitch
   alias PremiereEcoute.Twitch.History
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     file_path = Path.join("priv/static/uploads", id)
 
-     socket
-     |> assign(:filename, id)
-     |> assign(:file_path, file_path)
-     |> assign(:periods, %{follows: "month", messages: "month", minutes: "month", subscriptions: "month"})
-     |> assign_async([:history, :follows, :messages, :minutes, :subscriptions], fn ->
-        if File.exists?(file_path) do
+    socket
+    |> assign(:filename, id)
+    |> assign(:file_path, file_path)
+    |> assign(:periods, %{follows: "month", messages: "month", minutes: "month", subscriptions: "month"})
+    |> assign_async([:history, :follows, :messages, :minutes, :subscriptions], fn ->
+      if File.exists?(file_path) do
         {:ok,
-          %{
-            history: History.read(file_path),
-            follows: History.Community.Follows.read(file_path),
-            messages: History.SiteHistory.ChatMessages.read(file_path),
-            minutes: History.SiteHistory.MinuteWatched.read(file_path),
-            subscriptions: History.Commerce.Subscriptions.read(file_path)
-          }}
-        else
-          {:error, "No file"}
-        end
-     end)
-     |> then(fn socket -> {:ok, socket} end)
+         %{
+           history: History.read(file_path),
+           follows: History.Community.Follows.read(file_path),
+           messages: History.SiteHistory.ChatMessages.read(file_path),
+           minutes: History.SiteHistory.MinuteWatched.read(file_path),
+           subscriptions: History.Commerce.Subscriptions.read(file_path)
+         }}
+      else
+        {:error, "No file"}
+      end
+    end)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
@@ -96,10 +95,20 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
 
   defp params(period) do
     case period do
-      "day" -> {[:year, :month, :day], fn %{"year" => y, "month" => m, "day" => d} -> "#{y}-#{String.pad_leading(to_string(m), 2, "0")}-#{String.pad_leading(to_string(d), 2, "0")}" end}
-      "week" -> {[:year, :week], fn %{"year" => y, "week" => w} -> "#{y}-W#{String.pad_leading(to_string(w), 2, "0")}" end}
-      "month" -> {[:year, :month], fn %{"year" => y, "month" => m} -> "#{y}-#{String.pad_leading(to_string(m), 2, "0")}" end}
-      "year" -> {[:year], fn %{"year" => y} -> "#{y}" end}
+      "day" ->
+        {[:year, :month, :day],
+         fn %{"year" => y, "month" => m, "day" => d} ->
+           "#{y}-#{String.pad_leading(to_string(m), 2, "0")}-#{String.pad_leading(to_string(d), 2, "0")}"
+         end}
+
+      "week" ->
+        {[:year, :week], fn %{"year" => y, "week" => w} -> "#{y}-W#{String.pad_leading(to_string(w), 2, "0")}" end}
+
+      "month" ->
+        {[:year, :month], fn %{"year" => y, "month" => m} -> "#{y}-#{String.pad_leading(to_string(m), 2, "0")}" end}
+
+      "year" ->
+        {[:year], fn %{"year" => y} -> "#{y}" end}
     end
   end
 end
