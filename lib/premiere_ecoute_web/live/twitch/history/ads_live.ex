@@ -19,9 +19,10 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
     |> assign(:file_path, file_path)
     |> assign(:selected_period, "month")
     |> assign(:top_n_channels, 20)
-    |> assign_async(:ads, fn ->
+    |> assign_async([:ads, :minutes], fn ->
       if File.exists?(file_path) do
         ads_df = History.Ads.VideoAdImpression.read(file_path)
+        minutes_df = History.SiteHistory.MinuteWatched.read(file_path)
         total = DataFrame.n_rows(ads_df)
 
         by_roll_type =
@@ -34,7 +35,7 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
           |> History.Ads.VideoAdImpression.group_by_channel()
           |> DataFrame.to_rows()
 
-        {:ok, %{ads: %{total: total, by_roll_type: by_roll_type, by_channel: by_channel, df: ads_df}}}
+        {:ok, %{ads: %{total: total, by_roll_type: by_roll_type, by_channel: by_channel, df: ads_df}, minutes: minutes_df}}
       else
         {:error, "No file"}
       end
@@ -63,12 +64,12 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
 
     ads_df
     |> DataFrame.group_by([:roll_type | groups])
-    |> DataFrame.summarise(impressions: Series.count(roll_type))
+    |> DataFrame.summarise(count: Series.count(roll_type))
     |> apply_period_sort(period)
     |> DataFrame.to_rows()
     |> Enum.map(fn row ->
       date = label.(row)
-      %{"date" => date, "roll_type" => row["roll_type"] || "unknown", "impressions" => row["impressions"]}
+      %{"date" => date, "roll_type" => row["roll_type"] || "unknown", "count" => row["count"]}
     end)
   end
 
@@ -98,5 +99,39 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
 
   defp top_channels(by_channel, n) do
     Enum.take(by_channel, n)
+  end
+
+  defp ads_per_hour_data(ads_df, minutes_df, period) do
+    {groups, label} = period_params(period)
+
+    # Group ads by period
+    ads_by_period =
+      ads_df
+      |> DataFrame.group_by(groups)
+      |> DataFrame.summarise(ad_count: Series.count(roll_type))
+      |> DataFrame.to_rows()
+      |> Map.new(fn row -> {label.(row), row["ad_count"]} end)
+
+    # Group minutes watched by period
+    minutes_by_period =
+      minutes_df
+      |> DataFrame.group_by(groups)
+      |> DataFrame.summarise(total_minutes: Series.sum(minutes_watched_unadjusted))
+      |> DataFrame.to_rows()
+      |> Map.new(fn row -> {label.(row), row["total_minutes"]} end)
+
+    # Combine and calculate ads per hour
+    all_periods = MapSet.union(MapSet.new(Map.keys(ads_by_period)), MapSet.new(Map.keys(minutes_by_period)))
+
+    all_periods
+    |> Enum.map(fn date ->
+      ad_count = Map.get(ads_by_period, date, 0)
+      total_minutes = Map.get(minutes_by_period, date, 0)
+      hours = total_minutes / 60.0
+      ads_per_hour = if hours > 0, do: ad_count / hours, else: 0.0
+
+      %{"date" => date, "ads_per_hour" => Float.round(ads_per_hour, 2)}
+    end)
+    |> Enum.sort_by(& &1["date"])
   end
 end

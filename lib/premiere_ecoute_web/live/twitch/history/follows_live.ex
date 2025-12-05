@@ -7,6 +7,7 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
 
   require Explorer.DataFrame, as: DataFrame
 
+  alias Explorer.Series
   alias PremiereEcoute.Twitch.History
 
   @impl true
@@ -19,16 +20,20 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
     |> assign(:search, "")
     |> assign(:sort_by, :time)
     |> assign(:sort_order, :desc)
-    |> assign_async(:follows, fn ->
+    |> assign(:selected_channel, nil)
+    |> assign_async([:follows, :minutes, :messages], fn ->
       if File.exists?(file_path) do
         follows_df =
           file_path
           |> History.Community.Follows.read()
           |> DataFrame.sort_by(desc: time)
 
+        minutes_df = History.SiteHistory.MinuteWatched.read(file_path)
+        messages_df = History.SiteHistory.ChatMessages.read(file_path)
+
         total = DataFrame.n_rows(follows_df)
 
-        {:ok, %{follows: %{total: total, df: follows_df}}}
+        {:ok, %{follows: %{total: total, df: follows_df}, minutes: minutes_df, messages: messages_df}}
       else
         {:error, "No file"}
       end
@@ -60,6 +65,11 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
     {:noreply, socket |> assign(:sort_by, column_atom) |> assign(:sort_order, sort_order)}
   end
 
+  @impl true
+  def handle_event("select_channel", %{"channel" => channel}, socket) do
+    {:noreply, assign(socket, :selected_channel, channel)}
+  end
+
   defp toggle_sort_order(:asc), do: :desc
   defp toggle_sort_order(:desc), do: :asc
 
@@ -83,5 +93,37 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
     Enum.filter(rows, fn follow ->
       String.contains?(String.downcase(follow["channel"]), search_lower)
     end)
+  end
+
+  defp get_channel_follow_date(follows_df, channel) do
+    follows_df
+    |> DataFrame.filter_with(fn df -> Series.equal(df["channel"], channel) end)
+    |> DataFrame.pull("time")
+    |> Series.first()
+  end
+
+  defp get_first_streams(minutes_df, channel) do
+    minutes_df
+    |> DataFrame.filter_with(fn df -> Series.equal(df["channel_name"], channel) end)
+    |> DataFrame.sort_by(asc: year, asc: month, asc: day)
+    |> DataFrame.select([
+      "channel_name",
+      "game_name",
+      "minutes_watched_unadjusted",
+      "year",
+      "month",
+      "day"
+    ])
+    |> DataFrame.head(3)
+    |> DataFrame.to_rows()
+  end
+
+  defp get_first_messages(messages_df, channel) do
+    messages_df
+    |> DataFrame.filter_with(fn df -> Series.equal(df["channel"], channel) end)
+    |> DataFrame.sort_by(asc: time)
+    |> DataFrame.select(["channel", "body", "time"])
+    |> DataFrame.head(5)
+    |> DataFrame.to_rows()
   end
 end

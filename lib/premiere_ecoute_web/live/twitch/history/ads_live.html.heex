@@ -91,8 +91,8 @@
             <div class="px-6 py-4 border-b border-slate-700/50">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h3 class="text-lg font-semibold text-white">Ad Impressions Over Time</h3>
-                  <p class="text-sm text-slate-400 mt-1">Number of ads displayed per {@selected_period}</p>
+                  <h3 class="text-lg font-semibold text-white">Ad Count Over Time</h3>
+                  <p class="text-sm text-slate-400 mt-1">Number of ads (preroll/midroll) per {@selected_period}</p>
                 </div>
                 <div class="flex gap-2">
                   <button
@@ -133,11 +133,70 @@
                 title=""
                 data={timeline_stacked_data(ads.df, @selected_period)}
                 x="date"
-                y="impressions"
+                y="count"
                 stack_by="roll_type"
               />
             </div>
           </div>
+          
+<!-- Ads Per Hour Graph -->
+          <.async_result :let={minutes} assign={@minutes}>
+            <:loading></:loading>
+            <:failed></:failed>
+
+            <%= if minutes do %>
+              <div class="rounded-xl border border-green-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-700/50">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <h3 class="text-lg font-semibold text-white">Advertising Frequency</h3>
+                      <p class="text-sm text-slate-400 mt-1">Average ads per hour of watch time</p>
+                    </div>
+                    <div class="flex gap-2">
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="day"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "day", do: "bg-green-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Day
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="week"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "week", do: "bg-green-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Week
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="month"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "month", do: "bg-green-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Month
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="year"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "year", do: "bg-green-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Year
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-6">
+                  <.live_component
+                    module={PremiereEcouteWeb.Components.Live.Graph}
+                    id="ads-per-hour-graph"
+                    title=""
+                    data={ads_per_hour_data(ads.df, minutes, @selected_period)}
+                    x="date"
+                    y="ads_per_hour"
+                  />
+                </div>
+              </div>
+            <% end %>
+          </.async_result>
           
 <!-- Top Channels by Ads -->
           <div class="rounded-xl border border-amber-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
