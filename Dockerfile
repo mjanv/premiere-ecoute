@@ -57,6 +57,7 @@ COPY assets assets
 COPY storybook storybook
 
 # compile assets
+RUN cd assets/ && npm install
 RUN mix assets.deploy
 
 # Compile the release
