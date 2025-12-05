@@ -8,11 +8,12 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
-  alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.Community
+  alias PremiereEcoute.Twitch.History.SiteHistory
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -25,11 +26,11 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
       if File.exists?(file_path) do
         follows_df =
           file_path
-          |> History.Community.Follows.read()
+          |> Community.Follows.read()
           |> DataFrame.sort_by(desc: time)
 
-        minutes_df = History.SiteHistory.MinuteWatched.read(file_path)
-        messages_df = History.SiteHistory.ChatMessages.read(file_path)
+        minutes_df = SiteHistory.MinuteWatched.read(file_path)
+        messages_df = SiteHistory.ChatMessages.read(file_path)
 
         total = DataFrame.n_rows(follows_df)
 

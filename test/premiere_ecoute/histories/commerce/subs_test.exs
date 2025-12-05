@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Twitch.History.Commerce.SubscriptionsTest do
 
   @moduletag :skip
 
-  alias PremiereEcoute.Twitch.History.Commerce.Subscriptions
   alias PremiereEcoute.ExplorerCase
+  alias PremiereEcoute.Twitch.History.Commerce.Subscriptions
 
   @zip "priv/request-1.zip"
 

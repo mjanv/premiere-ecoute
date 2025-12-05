@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.ChatMessagesTest do
 
   @moduletag :skip
 
-  alias PremiereEcoute.Twitch.History.SiteHistory.ChatMessages
   alias PremiereEcoute.ExplorerCase
+  alias PremiereEcoute.Twitch.History.SiteHistory.ChatMessages
 
   @zip "priv/request-1.zip"
 

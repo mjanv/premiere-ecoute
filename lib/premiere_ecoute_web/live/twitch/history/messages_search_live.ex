@@ -7,11 +7,11 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesSearchLive do
 
   require Explorer.DataFrame, as: DataFrame
 
-  alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.SiteHistory
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -22,7 +22,7 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesSearchLive do
     |> assign(:searching, false)
     |> assign_async(:messages, fn ->
       if File.exists?(file_path) do
-        messages_df = History.SiteHistory.ChatMessages.read(file_path)
+        messages_df = SiteHistory.ChatMessages.read(file_path)
         {:ok, %{messages: %{df: messages_df}}}
       else
         {:error, "No file"}

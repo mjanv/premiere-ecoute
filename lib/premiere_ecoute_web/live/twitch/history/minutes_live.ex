@@ -9,11 +9,12 @@ defmodule PremiereEcouteWeb.Twitch.History.MinutesLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.SiteHistory
   alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -28,12 +29,12 @@ defmodule PremiereEcouteWeb.Twitch.History.MinutesLive do
     |> assign(:top_n_channels, 20)
     |> assign_async(:minutes, fn ->
       if File.exists?(file_path) do
-        minutes_df = History.SiteHistory.MinuteWatched.read(file_path)
+        minutes_df = SiteHistory.MinuteWatched.read(file_path)
         total = minutes_df["minutes_watched_unadjusted"] |> Series.sum() |> round()
 
         minutes_by_channel =
           minutes_df
-          |> History.SiteHistory.MinuteWatched.group_channel()
+          |> SiteHistory.MinuteWatched.group_channel()
           |> DataFrame.filter_with(fn df -> Series.greater(df["minutes"], 0) end)
           |> DataFrame.sort_by(desc: minutes)
           |> DataFrame.to_rows()

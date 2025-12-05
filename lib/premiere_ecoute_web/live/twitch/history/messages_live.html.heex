@@ -141,13 +141,6 @@
                     <div class="flex gap-2">
                       <button
                         phx-click="select_period"
-                        phx-value-period="day"
-                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "day", do: "bg-blue-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
-                      >
-                        Day
-                      </button>
-                      <button
-                        phx-click="select_period"
                         phx-value-period="week"
                         class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "week", do: "bg-blue-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
                       >

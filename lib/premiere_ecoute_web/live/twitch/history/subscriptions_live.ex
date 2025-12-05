@@ -8,12 +8,12 @@ defmodule PremiereEcouteWeb.Twitch.History.SubscriptionsLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
-  alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.Commerce
   alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -22,7 +22,7 @@ defmodule PremiereEcouteWeb.Twitch.History.SubscriptionsLive do
     |> assign(:selected_type, "all")
     |> assign_async(:subscriptions, fn ->
       if File.exists?(file_path) do
-        subs_df = History.Commerce.Subscriptions.read(file_path)
+        subs_df = Commerce.Subscriptions.read(file_path)
         total = DataFrame.n_rows(subs_df)
 
         total_paid =

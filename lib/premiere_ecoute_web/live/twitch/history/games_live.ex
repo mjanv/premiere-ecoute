@@ -8,12 +8,12 @@ defmodule PremiereEcouteWeb.Twitch.History.GamesLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
-  alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.SiteHistory
   alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -24,7 +24,7 @@ defmodule PremiereEcouteWeb.Twitch.History.GamesLive do
     |> assign(:top_n_games, 20)
     |> assign_async(:games, fn ->
       if File.exists?(file_path) do
-        minutes_df = History.SiteHistory.MinuteWatched.read(file_path)
+        minutes_df = SiteHistory.MinuteWatched.read(file_path)
 
         games_by_minutes =
           minutes_df

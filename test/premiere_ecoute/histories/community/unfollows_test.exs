@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Twitch.History.Community.UnfollowsTest do
 
   @moduletag :skip
 
-  alias PremiereEcoute.Twitch.History.Community.Unfollows
   alias PremiereEcoute.ExplorerCase
+  alias PremiereEcoute.Twitch.History.Community.Unfollows
 
   @zip "priv/request-1.zip"
 

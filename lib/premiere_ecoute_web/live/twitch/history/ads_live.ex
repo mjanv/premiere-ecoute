@@ -8,12 +8,13 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
-  alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.Ads
+  alias PremiereEcoute.Twitch.History.SiteHistory
   alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -22,18 +23,18 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
     |> assign(:top_n_channels, 20)
     |> assign_async([:ads, :minutes], fn ->
       if File.exists?(file_path) do
-        ads_df = History.Ads.VideoAdImpression.read(file_path)
-        minutes_df = History.SiteHistory.MinuteWatched.read(file_path)
+        ads_df = Ads.VideoAdImpression.read(file_path)
+        minutes_df = SiteHistory.MinuteWatched.read(file_path)
         total = DataFrame.n_rows(ads_df)
 
         by_roll_type =
           ads_df
-          |> History.Ads.VideoAdImpression.group_by_roll_type()
+          |> Ads.VideoAdImpression.group_by_roll_type()
           |> DataFrame.to_rows()
 
         by_channel =
           ads_df
-          |> History.Ads.VideoAdImpression.group_by_channel()
+          |> Ads.VideoAdImpression.group_by_channel()
           |> DataFrame.to_rows()
 
         {:ok, %{ads: %{total: total, by_roll_type: by_roll_type, by_channel: by_channel, df: ads_df}, minutes: minutes_df}}

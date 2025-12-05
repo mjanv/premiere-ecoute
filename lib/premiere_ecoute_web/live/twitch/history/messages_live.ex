@@ -8,12 +8,12 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
-  alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.SiteHistory
   alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -24,17 +24,17 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesLive do
     |> assign(:top_n_channels, 20)
     |> assign_async(:messages, fn ->
       if File.exists?(file_path) do
-        messages_df = History.SiteHistory.ChatMessages.read(file_path)
+        messages_df = SiteHistory.ChatMessages.read(file_path)
         total = DataFrame.n_rows(messages_df)
 
         messages_by_channel =
           messages_df
-          |> History.SiteHistory.ChatMessages.group_channel()
+          |> SiteHistory.ChatMessages.group_channel()
           |> DataFrame.filter_with(fn df -> Series.greater(df["messages"], 10) end)
           |> DataFrame.sort_by(desc: messages)
           |> DataFrame.to_rows()
 
-        heatmap_data = History.SiteHistory.ChatMessages.activity_heatmap(messages_df)
+        heatmap_data = SiteHistory.ChatMessages.activity_heatmap(messages_df)
 
         {:ok, %{messages: %{total: total, by_channel: messages_by_channel, heatmap: heatmap_data, df: messages_df}}}
       else

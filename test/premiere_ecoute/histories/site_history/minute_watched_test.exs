@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatchedTest do
 
   @moduletag :skip
 
-  alias PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched
   alias PremiereEcoute.ExplorerCase
+  alias PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched
 
   @zip "priv/request-1.zip"
 

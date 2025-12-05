@@ -8,12 +8,12 @@ defmodule PremiereEcouteWeb.Twitch.History.BitsLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
-  alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.Commerce
   alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -21,7 +21,7 @@ defmodule PremiereEcouteWeb.Twitch.History.BitsLive do
     |> assign(:selected_period, "month")
     |> assign_async(:bits, fn ->
       if File.exists?(file_path) do
-        bits_df = History.Commerce.BitsCheered.read(file_path)
+        bits_df = Commerce.BitsCheered.read(file_path)
         total = DataFrame.n_rows(bits_df)
 
         total_bits =

@@ -11,11 +11,15 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.Ads
+  alias PremiereEcoute.Twitch.History.Commerce
+  alias PremiereEcoute.Twitch.History.Community
+  alias PremiereEcoute.Twitch.History.SiteHistory
   alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", id)
+    file_path = Path.join("priv/static/uploads", "#{id}.zip")
 
     socket
     |> assign(:filename, id)
@@ -33,12 +37,12 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
         {:ok,
          %{
            history: History.read(file_path),
-           follows: History.Community.Follows.read(file_path),
-           messages: History.SiteHistory.ChatMessages.read(file_path),
-           minutes: History.SiteHistory.MinuteWatched.read(file_path),
-           subscriptions: History.Commerce.Subscriptions.read(file_path),
-           bits: History.Commerce.BitsCheered.read(file_path),
-           ads: History.Ads.VideoAdImpression.read(file_path)
+           follows: Community.Follows.read(file_path),
+           messages: SiteHistory.ChatMessages.read(file_path),
+           minutes: SiteHistory.MinuteWatched.read(file_path),
+           subscriptions: Commerce.Subscriptions.read(file_path),
+           bits: Commerce.BitsCheered.read(file_path),
+           ads: Ads.VideoAdImpression.read(file_path)
          }}
       else
         {:error, "No file"}
