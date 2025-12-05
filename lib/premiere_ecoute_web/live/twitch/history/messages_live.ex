@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -93,17 +94,22 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesLive do
   defp channel_timeline_data(channels, period, messages_df) when is_list(channels) do
     {groups, label} = period_params(period)
 
-    # Get data and preserve selection order in the result
+    # Process each channel separately to fill missing periods
     data =
-      messages_df
-      |> DataFrame.filter_with(fn df -> Series.in(df["channel"], channels) end)
-      |> DataFrame.group_by([:channel | groups])
-      |> DataFrame.summarise(messages: Series.count(body))
-      |> apply_period_sort(period)
-      |> DataFrame.to_rows()
-      |> Enum.map(fn row ->
-        date = label.(row)
-        %{"date" => date, "channel" => row["channel"], "messages" => row["messages"]}
+      channels
+      |> Enum.flat_map(fn channel ->
+        messages_df
+        |> DataFrame.filter_with(fn df -> Series.equal(df["channel"], channel) end)
+        |> DataFrame.group_by(groups)
+        |> DataFrame.summarise(messages: Series.count(body))
+        |> apply_period_sort(period)
+        |> DataFrame.to_rows()
+        |> Enum.map(fn row ->
+          date = label.(row)
+          %{"date" => date, "channel" => channel, "messages" => row["messages"]}
+        end)
+        |> TimelineHelper.fill_missing_periods("messages", period)
+        |> Enum.map(&Map.put(&1, "channel", channel))
       end)
 
     # Sort data by selection order to preserve it in the legend

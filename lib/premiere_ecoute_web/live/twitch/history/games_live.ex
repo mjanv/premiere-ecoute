@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Twitch.History.GamesLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -92,16 +93,22 @@ defmodule PremiereEcouteWeb.Twitch.History.GamesLive do
   defp game_timeline_data(games, period, minutes_df) when is_list(games) do
     {groups, label} = period_params(period)
 
+    # Process each game separately to fill missing periods
     data =
-      minutes_df
-      |> DataFrame.filter_with(fn df -> Series.in(df["game_name"], games) end)
-      |> DataFrame.group_by([:game_name | groups])
-      |> DataFrame.summarise(minutes: Series.sum(minutes_watched_unadjusted))
-      |> apply_period_sort(period)
-      |> DataFrame.to_rows()
-      |> Enum.map(fn row ->
-        date = label.(row)
-        %{"date" => date, "game" => row["game_name"], "minutes" => row["minutes"]}
+      games
+      |> Enum.flat_map(fn game ->
+        minutes_df
+        |> DataFrame.filter_with(fn df -> Series.equal(df["game_name"], game) end)
+        |> DataFrame.group_by(groups)
+        |> DataFrame.summarise(minutes: Series.sum(minutes_watched_unadjusted))
+        |> apply_period_sort(period)
+        |> DataFrame.to_rows()
+        |> Enum.map(fn row ->
+          date = label.(row)
+          %{"date" => date, "game" => game, "minutes" => row["minutes"]}
+        end)
+        |> TimelineHelper.fill_missing_periods("minutes", period)
+        |> Enum.map(&Map.put(&1, "game", game))
       end)
 
     sort_by_selection_order(data, games, "game")

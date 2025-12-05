@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Twitch.History.BitsLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -62,6 +63,7 @@ defmodule PremiereEcouteWeb.Twitch.History.BitsLive do
     |> apply_period_sort(period)
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "count" => row["count"], "bits" => row["bits"]} end)
+    |> TimelineHelper.fill_missing_periods("bits", period)
   end
 
   defp apply_period_sort(df, "month"), do: DataFrame.sort_by(df, asc: year, asc: month)

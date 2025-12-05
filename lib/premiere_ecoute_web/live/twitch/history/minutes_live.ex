@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Twitch.History.MinutesLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -117,16 +118,22 @@ defmodule PremiereEcouteWeb.Twitch.History.MinutesLive do
   defp channel_timeline_data(channels, period, minutes_df) when is_list(channels) do
     {groups, label} = period_params(period)
 
+    # Process each channel separately to fill missing periods
     data =
-      minutes_df
-      |> DataFrame.filter_with(fn df -> Series.in(df["channel_name"], channels) end)
-      |> DataFrame.group_by([:channel_name | groups])
-      |> DataFrame.summarise(minutes: Series.sum(minutes_watched_unadjusted))
-      |> apply_period_sort(period)
-      |> DataFrame.to_rows()
-      |> Enum.map(fn row ->
-        date = label.(row)
-        %{"date" => date, "channel" => row["channel_name"], "minutes" => row["minutes"]}
+      channels
+      |> Enum.flat_map(fn channel ->
+        minutes_df
+        |> DataFrame.filter_with(fn df -> Series.equal(df["channel_name"], channel) end)
+        |> DataFrame.group_by(groups)
+        |> DataFrame.summarise(minutes: Series.sum(minutes_watched_unadjusted))
+        |> apply_period_sort(period)
+        |> DataFrame.to_rows()
+        |> Enum.map(fn row ->
+          date = label.(row)
+          %{"date" => date, "channel" => channel, "minutes" => row["minutes"]}
+        end)
+        |> TimelineHelper.fill_missing_periods("minutes", period)
+        |> Enum.map(&Map.put(&1, "channel", channel))
       end)
 
     # Sort data by selection order to preserve it in the legend
@@ -168,13 +175,27 @@ defmodule PremiereEcouteWeb.Twitch.History.MinutesLive do
   end
 
   defp platform_breakdown_data(minutes_df, period, display_mode) do
-    raw_data =
+    # Get all unique platforms
+    platforms =
       minutes_df
-      |> History.SiteHistory.MinuteWatched.group_by_platform_and_period(period)
-      |> DataFrame.to_rows()
-      |> Enum.map(fn row ->
-        date = format_period_label(row, period)
-        %{"date" => date, "platform" => row["platform"] || "unknown", "minutes" => row["minutes"]}
+      |> DataFrame.pull("platform")
+      |> Series.distinct()
+      |> Series.to_list()
+
+    # Group and fill missing periods for each platform
+    raw_data =
+      platforms
+      |> Enum.flat_map(fn platform ->
+        minutes_df
+        |> DataFrame.filter_with(fn df -> Series.equal(df["platform"], platform) end)
+        |> History.SiteHistory.MinuteWatched.group_by_platform_and_period(period)
+        |> DataFrame.to_rows()
+        |> Enum.map(fn row ->
+          date = format_period_label(row, period)
+          %{"date" => date, "platform" => row["platform"] || "unknown", "minutes" => row["minutes"]}
+        end)
+        |> TimelineHelper.fill_missing_periods("minutes", period)
+        |> Enum.map(&Map.put(&1, "platform", platform || "unknown"))
       end)
 
     if display_mode == "percentage" do
@@ -185,13 +206,27 @@ defmodule PremiereEcouteWeb.Twitch.History.MinutesLive do
   end
 
   defp content_mode_breakdown_data(minutes_df, period, display_mode) do
-    raw_data =
+    # Get all unique content modes
+    content_modes =
       minutes_df
-      |> History.SiteHistory.MinuteWatched.group_by_content_mode_and_period(period)
-      |> DataFrame.to_rows()
-      |> Enum.map(fn row ->
-        date = format_period_label(row, period)
-        %{"date" => date, "content_mode" => row["content_mode"] || "unknown", "minutes" => row["minutes"]}
+      |> DataFrame.pull("content_mode")
+      |> Series.distinct()
+      |> Series.to_list()
+
+    # Group and fill missing periods for each content mode
+    raw_data =
+      content_modes
+      |> Enum.flat_map(fn content_mode ->
+        minutes_df
+        |> DataFrame.filter_with(fn df -> Series.equal(df["content_mode"], content_mode) end)
+        |> History.SiteHistory.MinuteWatched.group_by_content_mode_and_period(period)
+        |> DataFrame.to_rows()
+        |> Enum.map(fn row ->
+          date = format_period_label(row, period)
+          %{"date" => date, "content_mode" => row["content_mode"] || "unknown", "minutes" => row["minutes"]}
+        end)
+        |> TimelineHelper.fill_missing_periods("minutes", period)
+        |> Enum.map(&Map.put(&1, "content_mode", content_mode || "unknown"))
       end)
 
     if display_mode == "percentage" do

@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -62,15 +63,35 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
   defp timeline_stacked_data(ads_df, period) do
     {groups, label} = period_params(period)
 
-    ads_df
-    |> DataFrame.group_by([:roll_type | groups])
-    |> DataFrame.summarise(count: Series.count(roll_type))
-    |> apply_period_sort(period)
-    |> DataFrame.to_rows()
-    |> Enum.map(fn row ->
-      date = label.(row)
-      %{"date" => date, "roll_type" => row["roll_type"] || "unknown", "count" => row["count"]}
+    # Get all unique roll types
+    roll_types =
+      ads_df
+      |> DataFrame.pull("roll_type")
+      |> Series.distinct()
+      |> Series.to_list()
+
+    # Group and aggregate data
+    grouped_data =
+      ads_df
+      |> DataFrame.group_by([:roll_type | groups])
+      |> DataFrame.summarise(count: Series.count(roll_type))
+      |> apply_period_sort(period)
+      |> DataFrame.to_rows()
+      |> Enum.map(fn row ->
+        date = label.(row)
+        %{"date" => date, "roll_type" => row["roll_type"] || "unknown", "count" => row["count"]}
+      end)
+
+    # For stacked data, we need to fill missing periods for each roll_type separately
+    # then recombine them
+    roll_types
+    |> Enum.flat_map(fn roll_type ->
+      grouped_data
+      |> Enum.filter(&(&1["roll_type"] == roll_type))
+      |> TimelineHelper.fill_missing_periods("count", period)
+      |> Enum.map(&Map.put(&1, "roll_type", roll_type))
     end)
+    |> Enum.sort_by(&{&1["date"], &1["roll_type"]})
   end
 
   defp period_params(period) do
@@ -133,5 +154,6 @@ defmodule PremiereEcouteWeb.Twitch.History.AdsLive do
       %{"date" => date, "ads_per_hour" => Float.round(ads_per_hour, 2)}
     end)
     |> Enum.sort_by(& &1["date"])
+    |> TimelineHelper.fill_missing_periods("ads_per_hour", period)
   end
 end

@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Twitch.History.SubscriptionsLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -82,6 +83,8 @@ defmodule PremiereEcouteWeb.Twitch.History.SubscriptionsLive do
       |> apply_period_sort(period)
       |> DataFrame.to_rows()
       |> Enum.map(fn row -> %{"date" => label.(row), "count" => row["count"], "type" => "Paid"} end)
+      |> TimelineHelper.fill_missing_periods("count", period)
+      |> Enum.map(&Map.put(&1, "type", "Paid"))
 
     gift_data =
       subs_df
@@ -91,6 +94,8 @@ defmodule PremiereEcouteWeb.Twitch.History.SubscriptionsLive do
       |> apply_period_sort(period)
       |> DataFrame.to_rows()
       |> Enum.map(fn row -> %{"date" => label.(row), "count" => row["count"], "type" => "Gift"} end)
+      |> TimelineHelper.fill_missing_periods("count", period)
+      |> Enum.map(&Map.put(&1, "type", "Gift"))
 
     prime_data =
       subs_df
@@ -100,6 +105,8 @@ defmodule PremiereEcouteWeb.Twitch.History.SubscriptionsLive do
       |> apply_period_sort(period)
       |> DataFrame.to_rows()
       |> Enum.map(fn row -> %{"date" => label.(row), "count" => row["count"], "type" => "Prime"} end)
+      |> TimelineHelper.fill_missing_periods("count", period)
+      |> Enum.map(&Map.put(&1, "type", "Prime"))
 
     paid_data ++ gift_data ++ prime_data
   end

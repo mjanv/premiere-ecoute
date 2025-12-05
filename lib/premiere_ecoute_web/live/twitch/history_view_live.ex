@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
 
   alias Explorer.Series
   alias PremiereEcoute.Twitch.History
+  alias PremiereEcoute.Twitch.History.TimelineHelper
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -67,6 +68,7 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "follows" => row["follows"]} end)
+    |> TimelineHelper.fill_missing_periods("follows", period)
   end
 
   defp graph_data(messages, %{messages: period}, :messages) do
@@ -78,6 +80,7 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "messages" => row["messages"]} end)
+    |> TimelineHelper.fill_missing_periods("messages", period)
   end
 
   defp graph_data(minutes, %{minutes: period}, :minutes) do
@@ -89,6 +92,7 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "minutes" => row["minutes"]} end)
+    |> TimelineHelper.fill_missing_periods("minutes", period)
   end
 
   defp graph_data(subscriptions, %{subscriptions: period}, :subscriptions) do
@@ -100,6 +104,7 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "subscriptions" => row["subscriptions"]} end)
+    |> TimelineHelper.fill_missing_periods("subscriptions", period)
   end
 
   defp graph_data(ads, %{ads: period}, :ads) do
@@ -111,6 +116,7 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "impressions" => row["impressions"]} end)
+    |> TimelineHelper.fill_missing_periods("impressions", period)
   end
 
   defp graph_data(bits, %{bits: period}, :bits) do
@@ -122,6 +128,7 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.ungroup()
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "bits" => row["bits"]} end)
+    |> TimelineHelper.fill_missing_periods("bits", period)
   end
 
   defp params(period) do
