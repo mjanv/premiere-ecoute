@@ -150,6 +150,7 @@ defmodule PremiereEcoute.MixProject do
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind premiere_ecoute", "esbuild premiere_ecoute"],
       "assets.deploy": [
+        "cmd npm install --prefix assets",
         "tailwind premiere_ecoute --minify",
         "esbuild premiere_ecoute --minify",
         "tailwind storybook --minify",
