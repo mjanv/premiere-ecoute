@@ -1,0 +1,398 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-orange-950 to-slate-900 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
+    </div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
+    </div>
+    <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
+    </div>
+  </div>
+  
+<!-- Main content -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-orange-500/20 backdrop-blur-md bg-slate-950/40">
+      <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <.link navigate={~p"/twitch/history/#{@filename}"} class="text-orange-400 hover:text-orange-300 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </.link>
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                clip-rule="evenodd"
+              >
+              </path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white">Minutes Details</h1>
+            <p class="text-xs text-slate-400">Watch time across channels</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+<!-- Main content area -->
+    <main class="flex-1 flex flex-col px-4 py-8">
+      <div class="w-full max-w-7xl mx-auto space-y-6">
+        <.async_result :let={minutes} assign={@minutes}>
+          <:loading>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 shadow-lg shadow-orange-500/50 animate-pulse">
+                <svg class="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  >
+                  </path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Loading minutes data...</h2>
+            </div>
+          </:loading>
+          <:failed :let={_failure}>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/50">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Failed to Load</h2>
+              <p class="text-slate-300">Could not load minutes data</p>
+            </div>
+          </:failed>
+          
+<!-- Stats Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
+              <div class="text-center">
+                <p class="text-sm font-medium text-orange-400 uppercase tracking-wider mb-2">Total Watch Time</p>
+                <p class="text-5xl font-bold text-white">{format_minutes(minutes.total)}</p>
+              </div>
+            </div>
+
+            <%= if length(minutes.by_channel) > 0 do %>
+              <div class="rounded-xl border border-yellow-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
+                <div class="text-center">
+                  <p class="text-sm font-medium text-yellow-400 uppercase tracking-wider mb-2">Most Watched Channel</p>
+                  <p class="text-3xl font-bold text-white">{List.first(minutes.by_channel)["channel_name"]}</p>
+                  <p class="text-sm text-slate-400 mt-2">{format_minutes(List.first(minutes.by_channel)["minutes"])}</p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+<!-- Minutes per Channel Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes per Channel</h3>
+                  <p class="text-sm text-slate-400 mt-1">Top {@top_n_channels} channels sorted by watch time (descending)</p>
+                </div>
+                <div class="flex items-center gap-3 w-full max-w-2xl">
+                  <label class="text-sm text-slate-300 whitespace-nowrap">
+                    Show top: <span class="font-semibold text-white">{@top_n_channels}</span>
+                  </label>
+                  <form phx-change="update_top_n" class="flex-1">
+                    <input
+                      type="range"
+                      min="1"
+                      max={length(minutes.by_channel)}
+                      value={@top_n_channels}
+                      name="value"
+                      class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                    />
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <.live_component
+                module={PremiereEcouteWeb.Components.Live.Graph}
+                id="minutes-by-channel-graph"
+                title=""
+                data={graph_data(top_n_channels(minutes.by_channel, @top_n_channels))}
+                x="channel"
+                y="minutes"
+                sort="none"
+                format_type="duration"
+              />
+            </div>
+          </div>
+          
+<!-- Minutes Over Time Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes Over Time</h3>
+                  <p class="text-sm text-slate-400 mt-1">Select channels to compare watch history</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                  <%= if length(@selected_channels) > 0 do %>
+                    <div class="flex gap-2">
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="week"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "week", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Week
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="month"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "month", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Month
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="year"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "year", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Year
+                      </button>
+                    </div>
+                  <% end %>
+                  <!-- Custom Multi-Select Dropdown -->
+                  <div class="relative" phx-click-away={JS.push("toggle_dropdown") |> JS.hide(to: "#minutes-channel-dropdown")}>
+                    <button
+                      type="button"
+                      phx-click="toggle_dropdown"
+                      class="block w-full sm:w-64 px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-left flex items-center justify-between"
+                    >
+                      <span class="truncate">
+                        <%= if length(@selected_channels) == 0 do %>
+                          Select channels...
+                        <% else %>
+                          {length(@selected_channels)} selected
+                        <% end %>
+                      </span>
+                      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
+                    <%= if @dropdown_open do %>
+                      <div
+                        id="minutes-channel-dropdown"
+                        class="absolute z-10 mt-1 w-full sm:w-64 max-h-60 overflow-y-auto bg-slate-900 border border-slate-600/50 rounded-lg shadow-lg"
+                      >
+                        <%= for channel <- minutes.by_channel do %>
+                          <label class="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 cursor-pointer transition-colors">
+                            <input
+                              type="checkbox"
+                              phx-click="toggle_channel"
+                              phx-value-channel={channel["channel_name"]}
+                              checked={channel["channel_name"] in @selected_channels}
+                              class="w-4 h-4 text-orange-600 bg-slate-700 border-slate-600 rounded focus:ring-orange-500 focus:ring-2"
+                            />
+                            <span class="text-sm text-white">{channel["channel_name"]}</span>
+                          </label>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <%= if length(@selected_channels) > 0 do %>
+              <div class="p-6">
+                <.live_component
+                  module={PremiereEcouteWeb.Components.Live.Graph}
+                  id="channel-timeline-graph"
+                  title=""
+                  data={channel_timeline_data(@selected_channels, @selected_period, minutes.df)}
+                  x="date"
+                  y="minutes"
+                  stack_by="channel"
+                  format_type="duration"
+                />
+              </div>
+            <% else %>
+              <div class="p-12 text-center">
+                <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  >
+                  </path>
+                </svg>
+                <p class="text-slate-400 text-lg">Select one or more channels to view watch time timeline</p>
+              </div>
+            <% end %>
+          </div>
+          
+<!-- Platform Breakdown Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes by Platform</h3>
+                  <p class="text-sm text-slate-400 mt-1">Watch time breakdown by platform over time</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <div class="flex gap-2">
+                    <button
+                      phx-click="select_platform_period"
+                      phx-value-period="week"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @platform_period == "week", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Week
+                    </button>
+                    <button
+                      phx-click="select_platform_period"
+                      phx-value-period="month"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @platform_period == "month", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Month
+                    </button>
+                    <button
+                      phx-click="select_platform_period"
+                      phx-value-period="year"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @platform_period == "year", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Year
+                    </button>
+                  </div>
+                  <button
+                    phx-click="toggle_platform_display_mode"
+                    class="px-4 py-2 text-xs font-medium rounded-lg transition-all duration-200 bg-yellow-600 hover:bg-yellow-700 text-white flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                      >
+                      </path>
+                    </svg>
+                    {if @platform_display_mode == "absolute", do: "Show %", else: "Show Absolute"}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <.live_component
+                module={PremiereEcouteWeb.Components.Live.Graph}
+                id="platform-breakdown-graph"
+                title=""
+                data={platform_breakdown_data(minutes.df, @platform_period, @platform_display_mode)}
+                x="date"
+                y="minutes"
+                stack_by="platform"
+              />
+            </div>
+          </div>
+          
+<!-- Content Mode Breakdown Graph -->
+          <div class="rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Minutes by Content Mode</h3>
+                  <p class="text-sm text-slate-400 mt-1">Watch time breakdown by content type over time</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <div class="flex gap-2">
+                    <button
+                      phx-click="select_content_mode_period"
+                      phx-value-period="week"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @content_mode_period == "week", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Week
+                    </button>
+                    <button
+                      phx-click="select_content_mode_period"
+                      phx-value-period="month"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @content_mode_period == "month", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Month
+                    </button>
+                    <button
+                      phx-click="select_content_mode_period"
+                      phx-value-period="year"
+                      class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @content_mode_period == "year", do: "bg-orange-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                    >
+                      Year
+                    </button>
+                  </div>
+                  <button
+                    phx-click="toggle_content_mode_display_mode"
+                    class="px-4 py-2 text-xs font-medium rounded-lg transition-all duration-200 bg-yellow-600 hover:bg-yellow-700 text-white flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                      >
+                      </path>
+                    </svg>
+                    {if @content_mode_display_mode == "absolute", do: "Show %", else: "Show Absolute"}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <.live_component
+                module={PremiereEcouteWeb.Components.Live.Graph}
+                id="content-mode-breakdown-graph"
+                title=""
+                data={content_mode_breakdown_data(minutes.df, @content_mode_period, @content_mode_display_mode)}
+                x="date"
+                y="minutes"
+                stack_by="content_mode"
+              />
+            </div>
+          </div>
+        </.async_result>
+      </div>
+    </main>
+    
+<!-- Footer -->
+    <footer class="border-t border-slate-800 backdrop-blur-md bg-slate-950/40 text-center py-6">
+      <p class="text-sm text-slate-500">
+        No data is stored. Your file is processed and discarded immediately.
+      </p>
+    </footer>
+  </div>
+
+  <style>
+    @keyframes blob {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(30px, -50px) scale(1.1);
+      }
+      66% {
+        transform: translate(-20px, 20px) scale(0.9);
+      }
+    }
+
+    .animate-blob {
+      animation: blob 7s infinite;
+    }
+
+    .animation-delay-2000 {
+      animation-delay: 2s;
+    }
+
+    .animation-delay-4000 {
+      animation-delay: 4s;
+    }
+  </style>
+</div>

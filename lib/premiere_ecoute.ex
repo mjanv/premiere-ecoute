@@ -20,10 +20,12 @@ defmodule PremiereEcoute do
       {Playlists, except: []},
       {Sessions, except: []},
       {Telemetry, except: []},
+      {Twitch, except: []},
       PubSub,
       Presence,
       Repo,
-      DataCase
+      DataCase,
+      ExplorerCase
     ]
 
   alias PremiereEcoute.Events.Store

@@ -1,0 +1,436 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
+    </div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
+    </div>
+    <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
+    </div>
+  </div>
+  
+<!-- Main content -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-purple-500/20 backdrop-blur-md bg-slate-950/40">
+      <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <.link navigate={~p"/twitch/history/#{@filename}"} class="text-purple-400 hover:text-purple-300 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </.link>
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white">Follows Details</h1>
+            <p class="text-xs text-slate-400">All channels you followed</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+<!-- Main content area -->
+    <main class="flex-1 flex flex-col px-4 py-8">
+      <div class="w-full max-w-7xl mx-auto space-y-6">
+        <.async_result :let={follows} assign={@follows}>
+          <:loading>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/50 animate-pulse">
+                <svg class="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  >
+                  </path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Loading follows data...</h2>
+            </div>
+          </:loading>
+          <:failed :let={_failure}>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/50">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Failed to Load</h2>
+              <p class="text-slate-300">Could not load follows data</p>
+            </div>
+          </:failed>
+          
+<!-- Stats Card -->
+          <div class="rounded-xl border border-purple-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
+            <div class="text-center">
+              <p class="text-sm font-medium text-purple-400 uppercase tracking-wider mb-2">Total Follows</p>
+              <p class="text-5xl font-bold text-white">{follows.total}</p>
+            </div>
+          </div>
+          
+<!-- Search and List -->
+          <div class="rounded-xl border border-purple-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <!-- Search Header -->
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <form phx-change="search">
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      >
+                      </path>
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    name="search"
+                    value={@search}
+                    placeholder="Search channels..."
+                    phx-debounce="300"
+                    class="block w-full pl-10 pr-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+              </form>
+            </div>
+            
+<!-- Follows Table -->
+            <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+              <table class="w-full">
+                <thead class="bg-slate-900/50 border-b border-slate-700/50 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider w-16">
+                      Avatar
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      <button
+                        phx-click="sort"
+                        phx-value-column="channel"
+                        class="flex items-center gap-2 hover:text-purple-300 transition-colors group"
+                      >
+                        <span>Channel Name</span>
+                        <%= if @sort_by == :channel do %>
+                          <%= if @sort_order == :asc do %>
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                            </svg>
+                          <% else %>
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                          <% end %>
+                        <% else %>
+                          <svg
+                            class="w-4 h-4 text-slate-600 group-hover:text-slate-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                            >
+                            </path>
+                          </svg>
+                        <% end %>
+                      </button>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      <button
+                        phx-click="sort"
+                        phx-value-column="time"
+                        class="flex items-center gap-2 hover:text-purple-300 transition-colors group"
+                      >
+                        <span>Follow Date</span>
+                        <%= if @sort_by == :time do %>
+                          <%= if @sort_order == :asc do %>
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                            </svg>
+                          <% else %>
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                          <% end %>
+                        <% else %>
+                          <svg
+                            class="w-4 h-4 text-slate-600 group-hover:text-slate-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                            >
+                            </path>
+                          </svg>
+                        <% end %>
+                      </button>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider w-24">
+                      Link
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider w-24">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50">
+                  <%= for follow <- get_follows_list(follows.df, @search, @sort_by, @sort_order) do %>
+                    <tr class="hover:bg-slate-700/20 transition-colors">
+                      <td class="px-6 py-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                          <span class="text-white font-semibold text-sm">
+                            {String.first(follow["channel"]) |> String.upcase()}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4">
+                        <p class="text-white font-medium">{follow["channel"]}</p>
+                      </td>
+                      <td class="px-6 py-4">
+                        <p class="text-sm text-slate-300">
+                          {Calendar.strftime(follow["time"], "%B %d, %Y")}
+                        </p>
+                      </td>
+                      <td class="px-6 py-4">
+                        <a
+                          href={"https://twitch.tv/#{follow["channel"]}"}
+                          target="_blank"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-600/10 text-purple-300 hover:bg-purple-600/20 transition-all duration-200 border border-purple-500/30 hover:border-purple-500/50"
+                        >
+                          <span>Visit</span>
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            >
+                            </path>
+                          </svg>
+                        </a>
+                      </td>
+                      <td class="px-6 py-4">
+                        <button
+                          phx-click={
+                            JS.push("select_channel", value: %{channel: follow["channel"]})
+                            |> PremiereEcouteWeb.Components.Modal.show_modal("channel-details-modal")
+                          }
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-600/10 text-cyan-300 hover:bg-cyan-600/20 transition-all duration-200 border border-cyan-500/30 hover:border-cyan-500/50"
+                        >
+                          <span>Details</span>
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            >
+                            </path>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  <% end %>
+
+                  <%= if get_follows_list(follows.df, @search, @sort_by, @sort_order) == [] do %>
+                    <tr>
+                      <td colspan="5" class="px-6 py-12 text-center">
+                        <svg class="w-12 h-12 text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          >
+                          </path>
+                        </svg>
+                        <p class="text-slate-400">No channels found matching "{@search}"</p>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </.async_result>
+      </div>
+    </main>
+    
+<!-- Footer -->
+    <footer class="border-t border-slate-800 backdrop-blur-md bg-slate-950/40 text-center py-6">
+      <p class="text-sm text-slate-500">
+        No data is stored. Your file is processed and discarded immediately.
+      </p>
+    </footer>
+  </div>
+
+  <style>
+    @keyframes blob {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(30px, -50px) scale(1.1);
+      }
+      66% {
+        transform: translate(-20px, 20px) scale(0.9);
+      }
+    }
+
+    .animate-blob {
+      animation: blob 7s infinite;
+    }
+
+    .animation-delay-2000 {
+      animation-delay: 2s;
+    }
+
+    .animation-delay-4000 {
+      animation-delay: 4s;
+    }
+  </style>
+  
+<!-- Channel Details Modal -->
+  <%= if @selected_channel do %>
+    <.async_result :let={minutes_data} assign={@minutes}>
+      <:loading></:loading>
+      <:failed></:failed>
+
+      <.async_result :let={messages_data} assign={@messages}>
+        <:loading></:loading>
+        <:failed></:failed>
+
+        <.async_result :let={follows_data} assign={@follows}>
+          <:loading></:loading>
+          <:failed></:failed>
+
+          <PremiereEcouteWeb.Components.Modal.modal
+            id="channel-details-modal"
+            size="xl"
+            on_cancel={PremiereEcouteWeb.Components.Modal.hide_modal("channel-details-modal")}
+          >
+            <div class="space-y-6 max-h-[70vh] overflow-y-auto">
+              <!-- Modal Header -->
+              <div class="flex items-center gap-3 pb-4 border-b border-slate-700">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                  <span class="text-white font-semibold text-lg">
+                    {String.first(@selected_channel) |> String.upcase()}
+                  </span>
+                </div>
+                <div>
+                  <h2 class="text-2xl font-bold text-white">{@selected_channel}</h2>
+                  <p class="text-sm text-slate-400">Channel Details</p>
+                </div>
+              </div>
+              
+<!-- Follow Date -->
+              <div class="rounded-xl border border-cyan-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6">
+                <h3 class="text-lg font-semibold text-white mb-3">Follow Information</h3>
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                      clip-rule="evenodd"
+                    >
+                    </path>
+                  </svg>
+                  <div>
+                    <p class="text-sm text-slate-400">Followed on</p>
+                    <p class="text-white font-medium">
+                      {Calendar.strftime(
+                        get_channel_follow_date(follows_data.df, @selected_channel),
+                        "%B %d, %Y at %H:%M"
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+<!-- First Streams -->
+              <%= if minutes_data do %>
+                <div class="rounded-xl border border-green-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 overflow-hidden">
+                  <div class="px-6 py-4 border-b border-slate-700/50">
+                    <h3 class="text-lg font-semibold text-white">First 3 Streams Watched</h3>
+                    <p class="text-sm text-slate-400 mt-1">Earliest viewing sessions</p>
+                  </div>
+                  <div class="p-6">
+                    <% first_streams = get_first_streams(minutes_data, @selected_channel) %>
+                    <%= if length(first_streams) > 0 do %>
+                      <div class="space-y-3">
+                        <%= for stream <- first_streams do %>
+                          <div class="p-4 rounded-lg bg-slate-800/30 border border-green-500/20">
+                            <div class="flex items-start justify-between">
+                              <div class="flex-1">
+                                <p class="text-white font-medium">{stream["game_name"] || "Unknown Game"}</p>
+                                <p class="text-sm text-slate-400 mt-1">
+                                  {stream["year"]}-{String.pad_leading(to_string(stream["month"]), 2, "0")}-{String.pad_leading(
+                                    to_string(stream["day"]),
+                                    2,
+                                    "0"
+                                  )}
+                                </p>
+                              </div>
+                              <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-600/10 text-green-300 border border-green-500/30">
+                                {stream["minutes_watched_unadjusted"]} min
+                              </span>
+                            </div>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% else %>
+                      <p class="text-slate-400 text-center py-4">No stream data found for this channel</p>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+              
+<!-- First Messages -->
+              <%= if messages_data do %>
+                <div class="rounded-xl border border-pink-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 overflow-hidden">
+                  <div class="px-6 py-4 border-b border-slate-700/50">
+                    <h3 class="text-lg font-semibold text-white">First 5 Messages in Chat</h3>
+                    <p class="text-sm text-slate-400 mt-1">Earliest chat messages</p>
+                  </div>
+                  <div class="p-6">
+                    <% first_messages = get_first_messages(messages_data, @selected_channel) %>
+                    <%= if length(first_messages) > 0 do %>
+                      <div class="space-y-3">
+                        <%= for message <- first_messages do %>
+                          <div class="p-4 rounded-lg bg-slate-800/30 border border-pink-500/20">
+                            <p class="text-white">{message["body"]}</p>
+                            <p class="text-xs text-slate-400 mt-2">
+                              {Calendar.strftime(message["time"], "%B %d, %Y at %H:%M")}
+                            </p>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% else %>
+                      <p class="text-slate-400 text-center py-4">No messages found for this channel</p>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </PremiereEcouteWeb.Components.Modal.modal>
+        </.async_result>
+      </.async_result>
+    </.async_result>
+  <% end %>
+</div>

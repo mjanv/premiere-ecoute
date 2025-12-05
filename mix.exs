@@ -82,6 +82,7 @@ defmodule PremiereEcoute.MixProject do
       {:cors_plug, "~> 3.0"},
       {:fun_with_flags, "~> 1.13"},
       {:fun_with_flags_ui, "~> 1.1"},
+      {:vega_lite, "~> 0.1"},
       # Backend
       {:dotenvy, "~> 1.0"},
       {:boundary, "~> 0.10"},
@@ -114,6 +115,7 @@ defmodule PremiereEcoute.MixProject do
       {:instructor, "~> 0.1.0"},
       {:jose, "~> 1.11"},
       {:hammer, "~> 7.0"},
+      {:explorer, "~> 0.9"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},

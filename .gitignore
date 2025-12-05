@@ -49,3 +49,6 @@ priv/docs/
 dist/
 node_modules/
 *.zip
+
+# Data files
+priv/request/

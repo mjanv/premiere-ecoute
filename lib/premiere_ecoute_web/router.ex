@@ -236,6 +236,23 @@ defmodule PremiereEcouteWeb.Router do
     get "/contact", LegalController, :contact
   end
 
+  scope "/twitch", PremiereEcouteWeb.Twitch do
+    pipe_through [:browser]
+
+    live_session :twitch, on_mount: [{UserAuth, :current_scope}] do
+      live "/history", HistoryLive, :index
+      live "/history/:id", HistoryViewLive, :show
+      live "/history/:id/follows", History.FollowsLive, :show
+      live "/history/:id/messages/search", History.MessagesSearchLive, :show
+      live "/history/:id/messages", History.MessagesLive, :show
+      live "/history/:id/minutes", History.MinutesLive, :show
+      live "/history/:id/subscriptions", History.SubscriptionsLive, :show
+      live "/history/:id/bits", History.BitsLive, :show
+      live "/history/:id/games", History.GamesLive, :show
+      live "/history/:id/ads", History.AdsLive, :show
+    end
+  end
+
   scope "/feature-flags" do
     pipe_through [:app]
 

@@ -1,0 +1,327 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
+    </div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
+    </div>
+    <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
+    </div>
+  </div>
+  
+<!-- Main content -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-blue-500/20 backdrop-blur-md bg-slate-950/40">
+      <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <.link navigate={~p"/twitch/history/#{@filename}"} class="text-blue-400 hover:text-blue-300 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </.link>
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                clip-rule="evenodd"
+              >
+              </path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white">Messages Details</h1>
+            <p class="text-xs text-slate-400">Chat activity across channels</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+<!-- Main content area -->
+    <main class="flex-1 flex flex-col px-4 py-8">
+      <div class="w-full max-w-7xl mx-auto space-y-6">
+        <.async_result :let={messages} assign={@messages}>
+          <:loading>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/50 animate-pulse">
+                <svg class="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  >
+                  </path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Loading messages data...</h2>
+            </div>
+          </:loading>
+          <:failed :let={_failure}>
+            <div class="text-center space-y-4">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/50">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Failed to Load</h2>
+              <p class="text-slate-300">Could not load messages data</p>
+            </div>
+          </:failed>
+          
+<!-- Stats Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-blue-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
+              <div class="text-center">
+                <p class="text-sm font-medium text-blue-400 uppercase tracking-wider mb-2">Total Messages</p>
+                <p class="text-5xl font-bold text-white">{messages.total}</p>
+              </div>
+            </div>
+
+            <%= if length(messages.by_channel) > 0 do %>
+              <div class="rounded-xl border border-cyan-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
+                <div class="text-center">
+                  <p class="text-sm font-medium text-cyan-400 uppercase tracking-wider mb-2">Most Active Channel</p>
+                  <p class="text-3xl font-bold text-white">{List.first(messages.by_channel)["channel"]}</p>
+                  <p class="text-sm text-slate-400 mt-2">{List.first(messages.by_channel)["messages"]} messages</p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+<!-- Messages per Channel Graph -->
+          <div class="rounded-xl border border-blue-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Messages per Channel</h3>
+                  <p class="text-sm text-slate-400 mt-1">Top {@top_n_channels} channels sorted by message count (descending)</p>
+                </div>
+                <div class="flex items-center gap-3 w-full max-w-2xl">
+                  <label class="text-sm text-slate-300 whitespace-nowrap">
+                    Show top: <span class="font-semibold text-white">{@top_n_channels}</span>
+                  </label>
+                  <form phx-change="update_top_n" class="flex-1">
+                    <input
+                      type="range"
+                      min="1"
+                      max={length(messages.by_channel)}
+                      value={@top_n_channels}
+                      name="value"
+                      class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    />
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <.live_component
+                module={PremiereEcouteWeb.Components.Live.Graph}
+                id="messages-by-channel-graph"
+                title=""
+                data={graph_data(top_n_channels(messages.by_channel, @top_n_channels))}
+                x="channel"
+                y="messages"
+                sort="none"
+              />
+            </div>
+          </div>
+          
+<!-- Messages Over Time Graph -->
+          <div class="rounded-xl border border-blue-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Messages Over Time</h3>
+                  <p class="text-sm text-slate-400 mt-1">Select channels to compare message history</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                  <%= if length(@selected_channels) > 0 do %>
+                    <div class="flex gap-2">
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="week"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "week", do: "bg-blue-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Week
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="month"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "month", do: "bg-blue-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Month
+                      </button>
+                      <button
+                        phx-click="select_period"
+                        phx-value-period="year"
+                        class={"px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 #{if @selected_period == "year", do: "bg-blue-600 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                      >
+                        Year
+                      </button>
+                    </div>
+                  <% end %>
+                  <!-- Custom Multi-Select Dropdown -->
+                  <div class="relative" phx-click-away={JS.push("toggle_dropdown") |> JS.hide(to: "#channel-dropdown")}>
+                    <button
+                      type="button"
+                      phx-click="toggle_dropdown"
+                      class="block w-full sm:w-64 px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center justify-between"
+                    >
+                      <span class="truncate">
+                        <%= if length(@selected_channels) == 0 do %>
+                          Select channels...
+                        <% else %>
+                          {length(@selected_channels)} selected
+                        <% end %>
+                      </span>
+                      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
+                    <%= if @dropdown_open do %>
+                      <div
+                        id="channel-dropdown"
+                        class="absolute z-10 mt-1 w-full sm:w-64 max-h-60 overflow-y-auto bg-slate-900 border border-slate-600/50 rounded-lg shadow-lg"
+                      >
+                        <%= for channel <- messages.by_channel do %>
+                          <label class="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 cursor-pointer transition-colors">
+                            <input
+                              type="checkbox"
+                              phx-click="toggle_channel"
+                              phx-value-channel={channel["channel"]}
+                              checked={channel["channel"] in @selected_channels}
+                              class="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                            <span class="text-sm text-white">{channel["channel"]}</span>
+                          </label>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <%= if length(@selected_channels) > 0 do %>
+              <div class="p-6">
+                <.live_component
+                  module={PremiereEcouteWeb.Components.Live.Graph}
+                  id="channel-timeline-graph"
+                  title=""
+                  data={channel_timeline_data(@selected_channels, @selected_period, messages.df)}
+                  x="date"
+                  y="messages"
+                  stack_by="channel"
+                />
+              </div>
+            <% else %>
+              <div class="p-12 text-center">
+                <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  >
+                  </path>
+                </svg>
+                <p class="text-slate-400 text-lg">Select one or more channels to view message timeline</p>
+              </div>
+            <% end %>
+          </div>
+          
+<!-- Activity Heatmap -->
+          <div class="rounded-xl border border-blue-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <h3 class="text-lg font-semibold text-white">Activity Heatmap</h3>
+              <p class="text-sm text-slate-400 mt-1">Message activity by day of week and hour of day (UTC time)</p>
+            </div>
+            <div class="p-6">
+              <div class="w-full">
+                <!-- Hour labels -->
+                <div class="grid grid-cols-[auto_1fr] gap-2 mb-2">
+                  <div class="w-16"></div>
+                  <div class="grid grid-cols-24 gap-1">
+                    <%= for hour <- 0..23 do %>
+                      <div class="text-center text-xs text-slate-400">
+                        {hour}
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                
+<!-- Heatmap grid -->
+                <%= for weekday <- 1..7 do %>
+                  <div class="grid grid-cols-[auto_1fr] gap-2 mb-1">
+                    <div class="w-16 text-xs text-slate-400 flex items-center justify-end pr-2">
+                      {weekday_name(weekday)}
+                    </div>
+                    <div class="grid grid-cols-24 gap-1">
+                      <%= for hour <- 0..23 do %>
+                        <% cell =
+                          Enum.find(format_heatmap_data(messages.heatmap), fn c ->
+                            c["weekday"] == weekday and c["hour"] == hour
+                          end) %>
+                        <div
+                          class="aspect-square rounded-sm transition-all duration-200 hover:ring-2 hover:ring-blue-400 cursor-pointer"
+                          style={"background-color: rgba(59, 130, 246, #{cell["intensity"] * 0.8})"}
+                          title={"#{weekday_name(weekday)} #{hour}:00 - #{cell["messages"]} messages"}
+                        >
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+                
+<!-- Legend -->
+                <div class="flex items-center gap-2 mt-4 text-xs text-slate-400">
+                  <span>Less</span>
+                  <div class="flex gap-1">
+                    <%= for intensity <- [0, 0.25, 0.5, 0.75, 1.0] do %>
+                      <div class="w-4 h-4 rounded-sm" style={"background-color: rgba(59, 130, 246, #{intensity * 0.8})"}></div>
+                    <% end %>
+                  </div>
+                  <span>More</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </.async_result>
+      </div>
+    </main>
+    
+<!-- Footer -->
+    <footer class="border-t border-slate-800 backdrop-blur-md bg-slate-950/40 text-center py-6">
+      <p class="text-sm text-slate-500">
+        No data is stored. Your file is processed and discarded immediately.
+      </p>
+    </footer>
+  </div>
+
+  <style>
+    @keyframes blob {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(30px, -50px) scale(1.1);
+      }
+      66% {
+        transform: translate(-20px, 20px) scale(0.9);
+      }
+    }
+
+    .animate-blob {
+      animation: blob 7s infinite;
+    }
+
+    .animation-delay-2000 {
+      animation-delay: 2s;
+    }
+
+    .animation-delay-4000 {
+      animation-delay: 4s;
+    }
+  </style>
+</div>
