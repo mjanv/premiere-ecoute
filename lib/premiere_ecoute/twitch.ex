@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Twitch do
   @spec create_history(String.t(), History.t()) :: {:ok, History.t()} | {:error, String.t()}
   def create_history(path, user) do
     with %History{} = history <- History.read(path),
-         destination <- Path.join(user.id, history.history_id <> ".zip"),
+         destination <- Path.join(user.id, history.request_id <> ".zip"),
          :ok <- Twitch.file_storage().create(path, destination) do
       {:ok, history}
     else
@@ -21,10 +21,10 @@ defmodule PremiereEcoute.Twitch do
 
   @doc "Delete a history"
   @spec delete_history(String.t(), User.t()) :: {:ok, String.t()} | {:error, String.t()}
-  def delete_history(history_id, user) do
-    with origin <- Path.join(user.id, history_id <> ".zip"),
+  def delete_history(request_id, user) do
+    with origin <- Path.join(user.id, request_id <> ".zip"),
          :ok <- Twitch.file_storage().delete(origin) do
-      {:ok, history_id}
+      {:ok, request_id}
     else
       _ -> {:error, "Cannot delete history"}
     end

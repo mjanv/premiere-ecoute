@@ -44,4 +44,14 @@ defmodule PremiereEcoute do
   @doc "Returns the full version string in the format version-commit."
   @spec version() :: String.t()
   def version, do: Enum.join([@version, @commit], "-")
+
+  @doc "Returns the upload directory"
+  def uploads_dir, do: Path.join([:code.priv_dir(:premiere_ecoute), "uploads"])
+
+  @doc """
+  Returns the absolute path to a specific uploaded file by ID.
+  """
+  def file_path(id) when is_binary(id) do
+    Path.join(uploads_dir(), "#{id}.zip")
+  end
 end

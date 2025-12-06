@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Twitch.History.MinutesLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", "#{id}.zip")
+    file_path = History.file_path(id)
 
     socket
     |> assign(:filename, id)

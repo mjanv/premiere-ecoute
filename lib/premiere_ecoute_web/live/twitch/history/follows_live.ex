@@ -8,12 +8,13 @@ defmodule PremiereEcouteWeb.Twitch.History.FollowsLive do
   require Explorer.DataFrame, as: DataFrame
 
   alias Explorer.Series
+  alias PremiereEcoute.Twitch.History
   alias PremiereEcoute.Twitch.History.Community
   alias PremiereEcoute.Twitch.History.SiteHistory
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = Path.join("priv/static/uploads", "#{id}.zip")
+    file_path = History.file_path(id)
 
     socket
     |> assign(:filename, id)

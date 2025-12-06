@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Twitch.HistoryTest do
     assert metadata == %History{
              user_id: "441903922",
              username: "lanfeust313",
-             history_id: "MYCoARYOyQp7Kcwajqn3CmIo9PoFOQ8n",
+             request_id: "MYCoARYOyQp7Kcwajqn3CmIo9PoFOQ8n",
              start_time: ~U[2019-06-14 22:01:14.843812Z],
              end_time: ~U[2024-01-06 23:00:00Z]
            }

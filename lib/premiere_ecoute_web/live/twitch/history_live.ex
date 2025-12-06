@@ -30,36 +30,24 @@ defmodule PremiereEcouteWeb.Twitch.HistoryLive do
 
   @impl true
   def handle_event("save", _params, socket) do
-    uploaded_request_ids =
-      consume_uploaded_entries(socket, :request, fn %{path: path}, _entry ->
-        # First, copy to a temporary location
-        temp_dest = Path.join("priv/static/uploads", Path.basename(path))
-        File.cp!(path, temp_dest)
+    socket
+    |> consume_uploaded_entries(:request, fn %{path: path}, _entry ->
+      File.mkdir_p!(PremiereEcoute.uploads_dir())
 
-        # Extract the request ID from the zip file
-        case History.read(temp_dest) do
-          %{history_id: request_id} when is_binary(request_id) ->
-            # Rename the file to use the request ID
-            final_dest = Path.join("priv/static/uploads", "#{request_id}.zip")
-            File.rename!(temp_dest, final_dest)
-            {:ok, request_id}
+      case History.read(path) do
+        %History{request_id: request_id} ->
+          File.cp!(path, History.file_path(request_id))
+          {:ok, request_id}
 
-          _ ->
-            # If we can't extract the request ID, clean up and return error
-            File.rm(temp_dest)
-            {:ok, nil}
-        end
-      end)
-
-    case uploaded_request_ids do
-      [request_id] when is_binary(request_id) ->
-        {:noreply, push_navigate(socket, to: ~p"/twitch/history/#{request_id}")}
-
-      [nil] ->
-        {:noreply, assign(socket, upload_error: "Invalid Twitch data export file")}
-
-      [] ->
-        {:noreply, assign(socket, upload_error: "Failed to upload file")}
+        _ ->
+          File.rm(path)
+          {:ok, nil}
+      end
+    end)
+    |> case do
+      [id] when is_binary(id) -> {:noreply, push_navigate(socket, to: ~p"/twitch/history/#{id}")}
+      [nil] -> {:noreply, assign(socket, upload_error: "Invalid Twitch data export file")}
+      [] -> {:noreply, assign(socket, upload_error: "Failed to upload file")}
     end
   end
 
