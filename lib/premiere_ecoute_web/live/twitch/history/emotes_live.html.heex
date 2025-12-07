@@ -1,0 +1,338 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950 to-slate-900">
+  <!-- Animated background -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-violet-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
+    </div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
+    </div>
+    <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-fuchsia-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
+    </div>
+  </div>
+  
+<!-- Header -->
+  <header class="border-b border-violet-500/20 backdrop-blur-md bg-slate-950/40 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <.link
+          navigate={~p"/twitch/history/#{@filename}"}
+          class="text-violet-400 hover:text-violet-300 transition-colors"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+        </.link>
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/30">
+            <svg class="w-6 h-6 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white">Emotes</h1>
+            <p class="text-sm text-slate-400">Track emote usage across channels</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+<!-- Main content -->
+  <main class="flex-1 flex flex-col px-4 py-8">
+    <div class="w-full max-w-7xl mx-auto space-y-6">
+      <.async_result :let={data} assign={@emotes_data}>
+        <:loading>
+          <div class="flex items-center justify-center h-64">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
+          </div>
+        </:loading>
+        <:failed :let={_failure}>
+          <div class="rounded-xl border border-red-500/30 bg-gradient-to-br from-red-900/20 to-slate-900/50 p-6">
+            <p class="text-red-400">Failed to load emotes data. Please try again.</p>
+          </div>
+        </:failed>
+        <!-- Stats cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur p-6">
+            <p class="text-xs font-medium text-violet-400 uppercase tracking-wider mb-2">
+              Total Emotes
+            </p>
+            <p class="text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+              {data.total}
+            </p>
+          </div>
+
+          <%= if @filter_text != "" do %>
+            <% stats = filtered_stats(data.df, @filter_text, @filter_mode) %>
+            <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur p-6">
+              <p class="text-xs font-medium text-violet-400 uppercase tracking-wider mb-2">
+                Filtered Count
+              </p>
+              <p class="text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                {stats.total}
+              </p>
+            </div>
+
+            <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur p-6">
+              <p class="text-xs font-medium text-violet-400 uppercase tracking-wider mb-2">
+                Unique Emotes
+              </p>
+              <p class="text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                {stats.unique_emotes}
+              </p>
+            </div>
+          <% else %>
+            <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur p-6">
+              <p class="text-xs font-medium text-violet-400 uppercase tracking-wider mb-2">
+                Unique Emotes
+              </p>
+              <p class="text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                {length(data.top_emotes)}
+              </p>
+            </div>
+          <% end %>
+        </div>
+        <!-- Filter input -->
+        <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur p-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-violet-400 mb-2">
+                Filter Emotes
+              </label>
+              <div class="flex gap-2">
+                <div class="relative flex-1">
+                  <form phx-change="update_filter">
+                    <input
+                      type="text"
+                      name="filter"
+                      value={@filter_text}
+                      placeholder="Enter prefix (e.g., 'angled') or emote name (e.g., 'angledPepog')"
+                      class="w-full px-4 py-2 bg-slate-900/50 border border-violet-500/30 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    />
+                  </form>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg
+                      class="w-5 h-5 text-slate-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <%= if @filter_text != "" do %>
+                  <button
+                    phx-click="clear_filter"
+                    class="px-4 py-2 bg-violet-500/20 border border-violet-500/30 rounded-lg text-violet-300 hover:bg-violet-500/30 transition-colors"
+                  >
+                    Clear
+                  </button>
+                <% end %>
+              </div>
+              <%= if @filter_text != "" do %>
+                <p class="text-xs text-slate-400 mt-2">
+                  Filtering by {if @filter_mode == "prefix",
+                    do: "prefix",
+                    else: "specific emote"}: <span class="text-violet-400 font-mono">{@filter_text}</span>
+                </p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <!-- Graph card -->
+        <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur">
+          <div class="px-6 py-4 border-b border-slate-700/50">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h3 class="text-lg font-semibold text-white">Emote Usage Over Time</h3>
+                <p class="text-sm text-slate-400">
+                  <%= if @filter_text != "" do %>
+                    Showing usage for: <span class="text-violet-400 font-mono">{@filter_text}</span>
+                  <% else %>
+                    All emotes combined
+                  <% end %>
+                </p>
+              </div>
+              <div class="flex gap-2">
+                <button
+                  phx-click="select_period"
+                  phx-value-period="day"
+                  class={"px-4 py-2 rounded-lg text-sm font-medium transition-colors #{if @selected_period == "day", do: "bg-violet-500 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                >
+                  Day
+                </button>
+                <button
+                  phx-click="select_period"
+                  phx-value-period="week"
+                  class={"px-4 py-2 rounded-lg text-sm font-medium transition-colors #{if @selected_period == "week", do: "bg-violet-500 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                >
+                  Week
+                </button>
+                <button
+                  phx-click="select_period"
+                  phx-value-period="month"
+                  class={"px-4 py-2 rounded-lg text-sm font-medium transition-colors #{if @selected_period == "month", do: "bg-violet-500 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                >
+                  Month
+                </button>
+                <button
+                  phx-click="select_period"
+                  phx-value-period="year"
+                  class={"px-4 py-2 rounded-lg text-sm font-medium transition-colors #{if @selected_period == "year", do: "bg-violet-500 text-white", else: "bg-slate-700/50 text-slate-300 hover:bg-slate-700"}"}
+                >
+                  Year
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <.live_component
+              module={PremiereEcouteWeb.Components.Live.Graph}
+              id="emotes-graph"
+              title=""
+              data={graph_data(data.df, @selected_period, @filter_text, @filter_mode)}
+              x="date"
+              y="count"
+            />
+          </div>
+        </div>
+        <!-- Top emotes table (only shown when no filter) -->
+        <%= if @filter_text == "" do %>
+          <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <h3 class="text-lg font-semibold text-white">All Emotes</h3>
+              <p class="text-sm text-slate-400">All emotes ranked by usage across all channels</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-slate-900/50 border-b border-slate-700/50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Rank
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Emote
+                    </th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Count
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50">
+                  <%= for {emote, idx} <- Enum.with_index(data.top_emotes, 1) do %>
+                    <tr class="hover:bg-slate-700/20 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class={"inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold #{if idx <= 3, do: "bg-gradient-to-br from-violet-500/20 to-purple-500/20 text-violet-300", else: "text-slate-500"}"}>
+                          {idx}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="font-mono text-white font-medium">{emote["emote"]}</span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <span class="text-violet-300 font-semibold">{emote["count"]}</span>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <% end %>
+        <!-- Message history (shown when filter is active) -->
+        <%= if @filter_text != "" do %>
+          <div class="rounded-xl border border-violet-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur">
+            <div class="px-6 py-4 border-b border-slate-700/50">
+              <h3 class="text-lg font-semibold text-white">Recent Messages</h3>
+              <p class="text-sm text-slate-400">Latest 100 messages containing the filtered emote(s)</p>
+            </div>
+            <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+              <table class="w-full">
+                <thead class="bg-slate-900/50 border-b border-slate-700/50 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Time
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Channel
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Emote
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      Message
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50">
+                  <%= for msg <- filtered_emotes_list(data.df, @filter_text, @filter_mode) do %>
+                    <tr class="hover:bg-slate-700/20 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {format_datetime(msg["time"])}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-500/20 text-violet-300">
+                          {msg["channel"]}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-br from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/30">
+                          {msg["emote"]}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-slate-300">
+                        {msg["body"]}
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <% end %>
+      </.async_result>
+    </div>
+  </main>
+  
+<!-- Footer -->
+  <footer class="border-t border-slate-800 backdrop-blur-md bg-slate-950/40 mt-auto">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <p class="text-sm text-slate-500 text-center">
+        No data is stored on our servers. All analysis is performed client-side.
+      </p>
+    </div>
+  </footer>
+</div>
+
+<style>
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+</style>
