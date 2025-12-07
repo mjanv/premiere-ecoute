@@ -14,33 +14,21 @@ defmodule PremiereEcouteWeb.Twitch.History.BitsLive do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    file_path = History.file_path(id)
-
     socket
-    |> assign(:filename, id)
-    |> assign(:file_path, file_path)
-    |> assign(:selected_period, "month")
+    |> assign(:id, id)
+    |> assign(:periods, %{bits: "month"})
     |> assign_async(:bits, fn ->
-      if File.exists?(file_path) do
-        bits_df = Commerce.BitsCheered.read(file_path)
-        total = DataFrame.n_rows(bits_df)
+      bits = Commerce.BitsCheered.read(History.file_path(id))
 
-        total_bits =
-          bits_df
-          |> DataFrame.pull("used_total")
-          |> Series.sum()
+      bits = %{
+        df: bits,
+        stats: %{
+          total: DataFrame.n_rows(bits),
+          total_bits: Series.sum(DataFrame.pull(bits, "used_total"))
+        }
+      }
 
-        {:ok,
-         %{
-           bits: %{
-             total: total,
-             total_bits: total_bits,
-             df: bits_df
-           }
-         }}
-      else
-        {:error, "No file"}
-      end
+      {:ok, %{bits: bits}}
     end)
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -51,38 +39,18 @@ defmodule PremiereEcouteWeb.Twitch.History.BitsLive do
   end
 
   @impl true
-  def handle_event("select_period", %{"period" => period}, socket) do
-    {:noreply, assign(socket, :selected_period, period)}
+  def handle_event("change_period", %{"graph" => graph, "period" => period}, %{assigns: %{periods: periods}} = socket) do
+    {:noreply, assign(socket, :periods, Map.put(periods, String.to_existing_atom(graph), period))}
   end
 
   defp graph_data(bits_df, period) do
-    {groups, label} = period_params(period)
+    {groups, label} = TimelineHelper.period_params(period)
 
     bits_df
     |> DataFrame.group_by(groups)
-    |> DataFrame.summarise(count: Series.count(channel_login), bits: Series.sum(used_total))
-    |> apply_period_sort(period)
+    |> DataFrame.summarise(count: Series.count(used_total), bits: Series.sum(used_total))
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "count" => row["count"], "bits" => row["bits"]} end)
     |> TimelineHelper.fill_missing_periods("bits", period)
-  end
-
-  defp apply_period_sort(df, "month"), do: DataFrame.sort_by(df, asc: year, asc: month)
-  defp apply_period_sort(df, "year"), do: DataFrame.sort_by(df, asc: year)
-
-  defp period_params(period) do
-    case period do
-      "month" ->
-        {[:year, :month], fn %{"year" => y, "month" => m} -> "#{y}-#{String.pad_leading(to_string(m), 2, "0")}" end}
-
-      "year" ->
-        {[:year], fn %{"year" => y} -> "#{y}" end}
-    end
-  end
-
-  defp get_bits_list(bits_df) do
-    bits_df
-    |> DataFrame.sort_by(desc: time)
-    |> DataFrame.to_rows()
   end
 end

@@ -3,6 +3,25 @@ defmodule PremiereEcoute.Twitch.History.TimelineHelper do
   Helper functions for filling gaps in timeline data to ensure continuous date ranges in graphs.
   """
 
+  def period_params(period) do
+    case period do
+      "day" ->
+        {[:year, :month, :day],
+         fn %{"year" => y, "month" => m, "day" => d} ->
+           "#{y}-#{String.pad_leading(to_string(m), 2, "0")}-#{String.pad_leading(to_string(d), 2, "0")}"
+         end}
+
+      "week" ->
+        {[:year, :week], fn %{"year" => y, "week" => w} -> "#{y}-W#{String.pad_leading(to_string(w), 2, "0")}" end}
+
+      "month" ->
+        {[:year, :month], fn %{"year" => y, "month" => m} -> "#{y}-#{String.pad_leading(to_string(m), 2, "0")}" end}
+
+      "year" ->
+        {[:year], fn %{"year" => y} -> "#{y}" end}
+    end
+  end
+
   @doc """
   Fills missing periods in a list of data points to create a continuous timeline.
 

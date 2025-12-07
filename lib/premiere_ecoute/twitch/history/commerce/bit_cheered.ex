@@ -1,7 +1,9 @@
 defmodule PremiereEcoute.Twitch.History.Commerce.BitsCheered do
   @moduledoc false
 
-  alias Explorer.{DataFrame, Series}
+  require Explorer.DataFrame, as: DataFrame
+
+  alias Explorer.Series
   alias PremiereEcouteCore.Dataflow.Sink
   alias PremiereEcouteCore.Zipfile
 
@@ -18,5 +20,6 @@ defmodule PremiereEcoute.Twitch.History.Commerce.BitsCheered do
       ]
     )
     |> Sink.preprocess("time")
+    |> DataFrame.sort_by(asc: time)
   end
 end
