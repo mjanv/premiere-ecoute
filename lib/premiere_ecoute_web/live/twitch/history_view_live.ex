@@ -27,18 +27,20 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> assign(:periods, %{
       follows: "month",
       messages: "month",
+      emotes: "month",
       minutes: "month",
       subscriptions: "month",
       bits: "month",
       ads: "month"
     })
-    |> assign_async([:history, :follows, :messages, :minutes, :subscriptions, :bits, :ads], fn ->
+    |> assign_async([:history, :follows, :messages, :emotes, :minutes, :subscriptions, :bits, :ads], fn ->
       if File.exists?(file_path) do
         {:ok,
          %{
            history: History.read(file_path),
            follows: Community.Follows.read(file_path),
            messages: SiteHistory.ChatMessages.read(file_path),
+           emotes: SiteHistory.Emotes.read(file_path),
            minutes: SiteHistory.MinuteWatched.read(file_path),
            subscriptions: Commerce.Subscriptions.read(file_path),
            bits: Commerce.BitsCheered.read(file_path),
@@ -85,6 +87,18 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     |> DataFrame.to_rows()
     |> Enum.map(fn row -> %{"date" => label.(row), "messages" => row["messages"]} end)
     |> TimelineHelper.fill_missing_periods("messages", period)
+  end
+
+  defp graph_data(emotes, %{emotes: period}, :emotes) do
+    {groups, label} = params(period)
+
+    emotes
+    |> DataFrame.group_by(groups)
+    |> DataFrame.summarise(emotes: Series.count(emote))
+    |> DataFrame.ungroup()
+    |> DataFrame.to_rows()
+    |> Enum.map(fn row -> %{"date" => label.(row), "emotes" => row["emotes"]} end)
+    |> TimelineHelper.fill_missing_periods("emotes", period)
   end
 
   defp graph_data(minutes, %{minutes: period}, :minutes) do

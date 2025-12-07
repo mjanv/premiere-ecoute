@@ -250,6 +250,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/history/:id/bits", History.BitsLive, :show
       live "/history/:id/games", History.GamesLive, :show
       live "/history/:id/ads", History.AdsLive, :show
+      live "/history/:id/emotes", History.EmotesLive, :show
     end
   end
 
