@@ -46,11 +46,13 @@ defmodule PremiereEcoute do
   def version, do: Enum.join([@version, @commit], "-")
 
   @doc "Returns the upload directory"
+  @spec uploads_dir() :: String.t()
   def uploads_dir, do: Path.join([:code.priv_dir(:premiere_ecoute), "uploads"])
 
   @doc """
   Returns the absolute path to a specific uploaded file by ID.
   """
+  @spec file_path(binary()) :: String.t()
   def file_path(id) when is_binary(id) do
     Path.join(uploads_dir(), "#{id}.zip")
   end

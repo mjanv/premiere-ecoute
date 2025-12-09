@@ -38,6 +38,8 @@ defmodule PremiereEcouteWeb.Components.Live.Graph do
     """
   end
 
+  @doc "Creates a bar chart VegaLite specification."
+  @spec bar(list(map()), String.t(), String.t(), String.t(), String.t(), String.t() | nil) :: map()
   def bar(data, title \\ "", x \\ "date", y \\ "total", sort \\ "ascending", format_type \\ nil) do
     x_sort = if sort == "none", do: nil, else: sort
 
@@ -66,6 +68,8 @@ defmodule PremiereEcouteWeb.Components.Live.Graph do
     |> Vl.to_spec()
   end
 
+  @doc "Creates a stacked bar chart VegaLite specification."
+  @spec stacked_bar(list(map()), String.t(), String.t(), String.t(), String.t(), String.t(), String.t() | nil) :: map()
   def stacked_bar(data, title \\ "", x \\ "date", y \\ "count", stack_by \\ "type", sort \\ "ascending", format_type \\ nil) do
     x_sort = if sort == "none", do: nil, else: sort
 

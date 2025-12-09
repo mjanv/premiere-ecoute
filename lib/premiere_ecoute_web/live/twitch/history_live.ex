@@ -76,6 +76,8 @@ defmodule PremiereEcouteWeb.Twitch.HistoryLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  @doc "Converts upload error atoms to user-friendly error messages."
+  @spec error_to_string(atom()) :: String.t()
   def error_to_string(:too_large), do: "File is too large (max 999 MB)"
   def error_to_string(:not_accepted), do: "Please select a valid .zip file"
   def error_to_string(:external_client_failure), do: "Something went wrong during upload"

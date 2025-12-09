@@ -17,6 +17,8 @@ defmodule PremiereEcouteCore.Dataflow.Sink do
       alias PremiereEcoute.Zipfile
 
       @impl true
+      @doc "Default read operation"
+      @spec read(String.t()) :: Explorer.DataFrame.t()
       def read(file) do
         Zipfile.csv(
           unquote(file),
@@ -27,6 +29,9 @@ defmodule PremiereEcouteCore.Dataflow.Sink do
     end
   end
 
+  @doc "Preprocesses a DataFrame by adding time-based columns (year, month, week, day, weekday, hour)."
+  @spec preprocess(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
+  @spec preprocess(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def preprocess(df, column \\ "time") do
     df
     |> DF.mutate_with(
@@ -41,6 +46,9 @@ defmodule PremiereEcouteCore.Dataflow.Sink do
     )
   end
 
+  @doc "Converts a time column to a nominal date column in YYYY-MM format."
+  @spec nominal_date_column(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
+  @spec nominal_date_column(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def nominal_date_column(df, column \\ "time") do
     {df["year"], df["month"]}
     |> then(fn {y, m} -> Enum.zip(as_string(y), as_string(m)) end)

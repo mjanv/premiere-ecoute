@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Twitch.History.TimelineHelper do
   Helper functions for filling gaps in timeline data to ensure continuous date ranges in graphs.
   """
 
+  @doc "Returns period keys and formatter function for a given period type."
+  @spec period_params(String.t()) :: {list(atom()), (map() -> String.t())}
   def period_params(period) do
     case period do
       "day" ->
@@ -42,6 +44,7 @@ defmodule PremiereEcoute.Twitch.History.TimelineHelper do
         %{"date" => "2024-03", "follows" => 3}
       ]
   """
+  @spec fill_missing_periods(list(map()), String.t(), String.t()) :: list(map())
   def fill_missing_periods([], _value_key, _period), do: []
 
   def fill_missing_periods(data, value_key, period) do

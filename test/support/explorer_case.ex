@@ -3,6 +3,8 @@ defmodule PremiereEcoute.ExplorerCase do
 
   alias Explorer.{DataFrame, Series}
 
+  @doc "Compares a DataFrame against a golden master file or creates one if GOLDEN_MASTER env var is set."
+  @spec equal_master?(DataFrame.t(), String.t()) :: boolean() | DataFrame.t()
   def equal_master?(df, name) do
     case System.get_env("GOLDEN_MASTER", "false") do
       "false" ->

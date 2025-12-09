@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Twitch.History.Commerce.BitsCheered do
   alias PremiereEcouteCore.Dataflow.Sink
   alias PremiereEcouteCore.Zipfile
 
+  @doc "Reads bits cheered data from a zip file."
+  @spec read(String.t()) :: Explorer.DataFrame.t()
   def read(file) do
     file
     |> Zipfile.csv(

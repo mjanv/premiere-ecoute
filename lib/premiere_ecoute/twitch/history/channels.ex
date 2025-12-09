@@ -4,6 +4,8 @@ defmodule PremiereEcoute.Twitch.History.Channels do
   alias PremiereEcoute.Twitch.History.Community
   alias PremiereEcoute.Twitch.History.SiteHistory
 
+  @doc "Aggregates channel data from multiple history sources."
+  @spec channels(String.t()) :: Explorer.DataFrame.t()
   def channels(file) do
     a =
       file

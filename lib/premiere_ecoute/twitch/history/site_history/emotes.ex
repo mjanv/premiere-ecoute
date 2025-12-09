@@ -14,6 +14,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
   alias PremiereEcouteCore.Dataflow.Sink
   alias PremiereEcouteCore.Zipfile
 
+  @doc "Reads and extracts emote data from chat messages in a zip file."
+  @spec read(String.t()) :: Explorer.DataFrame.t()
   def read(file) do
     file
     |> Zipfile.csv(
@@ -75,6 +77,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
     length >= 3 and length <= 25 and String.match?(word, ~r/^[a-zA-Z0-9]+$/) and String.match?(word, ~r/[A-Z]/)
   end
 
+  @doc "Groups emotes by name with count."
+  @spec group_by_emote(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_by_emote(df) do
     df
     |> Filters.group(
@@ -84,6 +88,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
     )
   end
 
+  @doc "Filters emotes by prefix."
+  @spec group_by_prefix(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def group_by_prefix(df, prefix) do
     # AIDEV-NOTE: prefix-filter; cannot use Series.transform in filter_with, so we use to_rows
     df
@@ -113,6 +119,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
     end)
   end
 
+  @doc "Filters emotes by specific emote name."
+  @spec group_by_emote_name(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def group_by_emote_name(df, emote_name) do
     df
     |> DataFrame.filter_with(fn data ->
@@ -120,6 +128,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
     end)
   end
 
+  @doc "Groups emotes by time period."
+  @spec group_by_period(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def group_by_period(df, period) do
     groups = period_groups(period)
 

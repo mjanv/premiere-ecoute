@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
 
   @dialyzer {:nowarn_function, remove_unwatched_channels: 2}
 
+  @doc "Reads minute watched data from a zip file."
+  @spec read(String.t()) :: Explorer.DataFrame.t()
   def read(file) do
     file
     |> Zipfile.csv(
@@ -26,6 +28,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
     )
   end
 
+  @doc "Removes channels with watch count below threshold."
+  @spec remove_unwatched_channels(Explorer.DataFrame.t(), non_neg_integer()) :: Explorer.DataFrame.t()
   def remove_unwatched_channels(df, threshold) do
     df
     |> DataFrame.group_by([:channel])
@@ -33,12 +37,16 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
     |> DataFrame.ungroup()
   end
 
+  @doc "Groups watch data by day."
+  @spec group_day(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_day(df) do
     df
     |> DataFrame.group_by([:day])
     |> DataFrame.summarise_with(&[minutes: Series.sum(&1["minutes_watched_unadjusted"])])
   end
 
+  @doc "Groups watch data by channel name."
+  @spec group_channel(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_channel(df) do
     df
     |> Filters.group(
@@ -50,6 +58,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
     )
   end
 
+  @doc "Groups watch data by channel, month, and year."
+  @spec group_month_year(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_month_year(df) do
     df
     |> Filters.group(
@@ -62,6 +72,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
     )
   end
 
+  @doc "Groups watch data by platform and time period."
+  @spec group_by_platform_and_period(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def group_by_platform_and_period(df, period) do
     groups = period_groups(period)
 
@@ -71,6 +83,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched do
     |> apply_period_sort(period)
   end
 
+  @doc "Groups watch data by content mode and time period."
+  @spec group_by_content_mode_and_period(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def group_by_content_mode_and_period(df, period) do
     groups = period_groups(period)
 

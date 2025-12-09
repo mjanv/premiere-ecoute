@@ -6,6 +6,8 @@ defmodule PremiereEcoute.Twitch.History.Ads.VideoAdImpression do
   alias Explorer.Series
   alias PremiereEcouteCore.Zipfile
 
+  @doc "Reads video ad impression data from a zip file."
+  @spec read(String.t()) :: Explorer.DataFrame.t()
   def read(file) do
     file
     |> Zipfile.csv(
@@ -25,6 +27,8 @@ defmodule PremiereEcoute.Twitch.History.Ads.VideoAdImpression do
     )
   end
 
+  @doc "Groups video ad impressions by time period."
+  @spec group_by_period(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def group_by_period(df, period) do
     groups = period_groups(period)
 
@@ -34,6 +38,8 @@ defmodule PremiereEcoute.Twitch.History.Ads.VideoAdImpression do
     |> apply_period_sort(period)
   end
 
+  @doc "Groups video ad impressions by roll type (pre-roll, mid-roll, etc.)."
+  @spec group_by_roll_type(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_by_roll_type(df) do
     df
     |> DataFrame.group_by([:roll_type])
@@ -41,6 +47,8 @@ defmodule PremiereEcoute.Twitch.History.Ads.VideoAdImpression do
     |> DataFrame.sort_by(desc: impressions)
   end
 
+  @doc "Groups video ad impressions by channel."
+  @spec group_by_channel(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_by_channel(df) do
     df
     |> DataFrame.group_by([:channel])

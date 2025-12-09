@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Twitch do
   alias PremiereEcoute.Twitch
   alias PremiereEcoute.Twitch.History
 
+  @doc "Returns the file storage module implementation"
+  @spec file_storage() :: module()
   def file_storage, do: PremiereEcouteCore.FileStorage.Filesystem
 
   @doc "Create a new history"

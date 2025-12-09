@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Twitch.History.Commerce.Subscriptions do
   alias PremiereEcouteCore.Dataflow.Statistics
   alias PremiereEcouteCore.Zipfile
 
+  @doc "Reads subscription data from a zip file."
+  @spec read(String.t()) :: Explorer.DataFrame.t()
   def read(file) do
     file
     |> Zipfile.csv(
@@ -55,12 +57,16 @@ defmodule PremiereEcoute.Twitch.History.Commerce.Subscriptions do
     |> Sink.preprocess("access_start")
   end
 
+  @doc "Returns the number of subscription rows in the file."
+  @spec n(String.t()) :: non_neg_integer()
   def n(file) do
     file
     |> read()
     |> Statistics.n_rows()
   end
 
+  @doc "Groups subscriptions by month and year."
+  @spec group_month_year(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_month_year(df) do
     df
     |> Filters.group(

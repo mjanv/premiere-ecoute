@@ -6,6 +6,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.ChatMessages do
   alias PremiereEcouteCore.Dataflow.Sink
   alias PremiereEcouteCore.Zipfile
 
+  @doc "Reads chat message data from a zip file."
+  @spec read(String.t()) :: Explorer.DataFrame.t()
   def read(file) do
     file
     |> Zipfile.csv(
@@ -24,6 +26,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.ChatMessages do
     |> Sink.preprocess()
   end
 
+  @doc "Groups chat messages by channel."
+  @spec group_channel(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_channel(df) do
     df
     |> Filters.group(
@@ -33,6 +37,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.ChatMessages do
     )
   end
 
+  @doc "Groups chat messages by channel, month, and year."
+  @spec group_month_year(Explorer.DataFrame.t()) :: Explorer.DataFrame.t()
   def group_month_year(df) do
     df
     |> Filters.group(
@@ -42,6 +48,8 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.ChatMessages do
     )
   end
 
+  @doc "Generates activity heatmap data by weekday and hour."
+  @spec activity_heatmap(Explorer.DataFrame.t()) :: list(map())
   def activity_heatmap(df) do
     require Explorer.DataFrame, as: DataFrame
 

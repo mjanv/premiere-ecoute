@@ -14,9 +14,12 @@ defmodule PremiereEcoute.Twitch.History do
   alias PremiereEcouteCore.Zipfile
 
   @doc "Returns the absolute path to a specific uploaded file by ID."
+  @spec file_path(t() | String.t()) :: String.t()
   def file_path(%__MODULE__{request_id: request_id}), do: file_path(request_id)
   def file_path(id), do: Path.join([PremiereEcoute.uploads_dir(), "#{id}.zip"])
 
+  @doc "Reads and parses a Twitch history from a zip file."
+  @spec read(String.t()) :: t() | nil
   def read(file) do
     file
     |> Zipfile.json("request/metadata.json")

@@ -48,6 +48,7 @@ defmodule PremiereEcouteCore.FileStorage.Filesystem do
     end
   end
 
+  @doc "Returns the full filesystem path for a history file."
   @spec bucket(String.t()) :: String.t()
   def bucket(history) do
     :twitch_story
