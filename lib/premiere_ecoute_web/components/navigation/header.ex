@@ -17,7 +17,7 @@ defmodule PremiereEcouteWeb.Components.Header do
     ~H"""
     <!-- Impersonation banner - shown when admin is impersonating another user -->
     <%= if @current_scope && Map.get(@current_scope, :impersonating?, false) do %>
-      <div class="bg-yellow-600 px-6 py-2">
+      <div class="bg-red-600 px-6 py-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.Components.Header do
           <.link
             href={~p"/admin/impersonation"}
             method="delete"
-            class="bg-white text-yellow-600 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
+            class="bg-white text-red-600 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100 transition-colors"
           >
             Switch Back to Admin
           </.link>
