@@ -376,7 +376,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   """
   @spec tracks(t()) :: [Album.Track.t()] | [Playlist.Track.t()]
   def tracks(%__MODULE__{album: nil, playlist: nil}), do: []
-  def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks
+  def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks ++ tracks
   def tracks(%__MODULE__{album: nil, playlist: %{tracks: tracks}}), do: tracks
 
   @doc """
