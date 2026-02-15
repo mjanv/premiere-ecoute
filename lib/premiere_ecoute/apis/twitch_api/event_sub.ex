@@ -59,19 +59,29 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
   @doc """
   Cancels EventSub subscription for event type.
 
-  Removes webhook subscription using cached subscription ID. Returns subscription ID on success.
+  Removes webhook subscription using cached subscription ID. If subscription is not in cache, fetches current subscriptions from Twitch to sync cache, then attempts unsubscribe. Returns subscription ID on success, or :no_subscription if no subscription exists (idempotent).
   """
-  @spec unsubscribe(Scope.t(), String.t()) :: {:ok, String.t()} | {:error, term()}
-  def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}}, type) do
+  @spec unsubscribe(Scope.t(), String.t()) :: {:ok, String.t() | :no_subscription} | {:error, term()}
+  def unsubscribe(%Scope{user: %{twitch: %{user_id: user_id}}} = scope, type) do
     case Cache.get(:subscriptions, {user_id, type}) do
       {:ok, id} when is_binary(id) ->
-        TwitchApi.api()
-        |> TwitchApi.delete(url: "/eventsub/subscriptions", params: %{"id" => id})
-        |> TwitchApi.handle([204, 404], fn _ -> id end)
+        delete_subscription(id)
 
       _ ->
-        {:error, "Unknown subscription"}
+        with {:ok, _subscriptions} <- get_event_subscriptions(scope),
+             {:ok, id} when is_binary(id) <- Cache.get(:subscriptions, {user_id, type}) do
+          delete_subscription(id)
+        else
+          _ ->
+            {:ok, :no_subscription}
+        end
     end
+  end
+
+  defp delete_subscription(id) do
+    TwitchApi.api()
+    |> TwitchApi.delete(url: "/eventsub/subscriptions", params: %{"id" => id})
+    |> TwitchApi.handle([204, 404], fn _ -> id end)
   end
 
   @doc """
