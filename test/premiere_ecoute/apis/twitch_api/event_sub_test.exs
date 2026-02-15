@@ -154,7 +154,7 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       assert id == "26b1c993-bfcf-44d9-b876-379dacafe75a"
     end
 
-    test "cannot unsubscribe from an unregistered Twitch event" do
+    test "unsubscribing when not in cache but subscription exists on Twitch" do
       scope =
         user_scope_fixture(
           user_fixture(%{
@@ -162,9 +162,77 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
           })
         )
 
-      {:error, reason} = TwitchApi.unsubscribe(scope, "channel.follow")
+      # Cache miss, so it will fetch from Twitch API
+      ApiMock.expect(
+        TwitchApi,
+        path: {:get, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer token"},
+          {"content-type", "application/json"}
+        ],
+        response: %{
+          "data" => [
+            %{
+              "id" => "abc-123-def",
+              "type" => "channel.follow",
+              "condition" => %{"user_id" => "5678"},
+              "cost" => 1,
+              "created_at" => "2020-11-10T20:08:33.12345678Z",
+              "status" => "enabled",
+              "transport" => %{"callback" => "https://this-is-a-callback.com", "method" => "webhook"},
+              "version" => "2"
+            }
+          ],
+          "total" => 1,
+          "total_cost" => 1,
+          "max_total_cost" => 10_000
+        },
+        params: %{"user_id" => "5678"},
+        status: 200
+      )
 
-      assert reason == "Unknown subscription"
+      # Then it will delete the found subscription
+      ApiMock.expect(
+        TwitchApi,
+        path: {:delete, "/helix/eventsub/subscriptions"},
+        params: %{"id" => "abc-123-def"},
+        status: 204
+      )
+
+      {:ok, id} = TwitchApi.unsubscribe(scope, "channel.follow")
+
+      assert id == "abc-123-def"
+    end
+
+    test "unsubscribing when not in cache and subscription does not exist on Twitch (idempotent)" do
+      scope =
+        user_scope_fixture(
+          user_fixture(%{
+            twitch: %{user_id: "9999", access_token: "2gbdx6oar67tqtcmt49t3wpcgycthx"}
+          })
+        )
+
+      # Cache miss, fetch from Twitch API returns no subscriptions
+      ApiMock.expect(
+        TwitchApi,
+        path: {:get, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer token"},
+          {"content-type", "application/json"}
+        ],
+        response: %{
+          "data" => [],
+          "total" => 0,
+          "total_cost" => 0,
+          "max_total_cost" => 10_000
+        },
+        params: %{"user_id" => "9999"},
+        status: 200
+      )
+
+      {:ok, result} = TwitchApi.unsubscribe(scope, "channel.follow")
+
+      assert result == :no_subscription
     end
 
     test "cannot unsubscribe from an unknown Twitch event", %{scope: scope} do
