@@ -90,8 +90,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%StartListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with {:ok, devices} <- Apis.spotify().devices(scope),
          true <- Enum.any?(devices, fn device -> device["is_active"] end),
-         {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
-         {:ok, _} <- Apis.twitch().subscribe(scope, "channel.chat.message"),
+         {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, %{album: album}} <- ListeningSession.start(session),
@@ -119,8 +118,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%StartListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with {:ok, devices} <- Apis.spotify().devices(scope),
          true <- Enum.any?(devices, fn device -> device["is_active"] end),
-         {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
-         {:ok, _} <- Apis.twitch().subscribe(scope, "channel.chat.message"),
+         {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.start(session),

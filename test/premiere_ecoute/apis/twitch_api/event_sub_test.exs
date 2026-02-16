@@ -339,4 +339,59 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSubTest do
       assert reason == "Cannot cancel all subscriptions"
     end
   end
+
+  describe "resubscribe/2" do
+    test "unsubscribes then subscribes to a Twitch event", %{scope: scope} do
+      # First, create a subscription to have something in cache
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer token"},
+          {"content-type", "application/json"}
+        ],
+        request: "twitch_api/eventsub/create_event_subscription/request.json",
+        response: "twitch_api/eventsub/create_event_subscription/response.json",
+        status: 202
+      )
+
+      {:ok, _} = TwitchApi.subscribe(scope, "channel.follow")
+
+      # Now resubscribe: should unsubscribe then subscribe
+      ApiMock.expect(
+        TwitchApi,
+        path: {:delete, "/helix/eventsub/subscriptions"},
+        params: %{"id" => "26b1c993-bfcf-44d9-b876-379dacafe75a"},
+        status: 204
+      )
+
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/helix/eventsub/subscriptions"},
+        headers: [
+          {"authorization", "Bearer token"},
+          {"content-type", "application/json"}
+        ],
+        request: "twitch_api/eventsub/create_event_subscription/request.json",
+        response: "twitch_api/eventsub/create_event_subscription/response.json",
+        status: 202
+      )
+
+      {:ok, subscription} = TwitchApi.resubscribe(scope, "channel.follow")
+
+      assert subscription == %{
+               "condition" => %{"user_id" => "1234"},
+               "cost" => 1,
+               "created_at" => "2020-11-10T14:32:18.730260295Z",
+               "id" => "26b1c993-bfcf-44d9-b876-379dacafe75a",
+               "status" => "webhook_callback_verification_pending",
+               "transport" => %{
+                 "callback" => "https://this-is-a-callback.com",
+                 "method" => "webhook"
+               },
+               "type" => "user.update",
+               "version" => "1"
+             }
+    end
+  end
 end

@@ -46,6 +46,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
     @callback get_event_subscriptions(scope :: Scope.t()) :: {:ok, [map()]} | {:error, term()}
     @callback subscribe(scope :: Scope.t(), type :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback unsubscribe(scope :: Scope.t(), type :: String.t()) :: {:ok, String.t()} | {:error, term()}
+    @callback resubscribe(scope :: Scope.t(), type :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback cancel_all_subscriptions(scope :: Scope.t()) :: {:ok, [String.t()]} | {:error, term()}
 
     # Polls
@@ -147,6 +148,7 @@ defmodule PremiereEcoute.Apis.TwitchApi do
   defdelegate get_event_subscriptions(scope), to: __MODULE__.EventSub
   defdelegate subscribe(scope, type), to: __MODULE__.EventSub
   defdelegate unsubscribe(scope, type), to: __MODULE__.EventSub
+  defdelegate resubscribe(scope, type), to: __MODULE__.EventSub
   defdelegate cancel_all_subscriptions(scope), to: __MODULE__.EventSub
 
   # Polls

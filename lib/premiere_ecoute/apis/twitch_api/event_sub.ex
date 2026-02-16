@@ -78,6 +78,18 @@ defmodule PremiereEcoute.Apis.TwitchApi.EventSub do
     end
   end
 
+  @doc """
+  Resubscribes to EventSub event type.
+
+  Unsubscribes from an existing subscription and then creates a new subscription for the same event type. This is useful when subscription parameters need to be refreshed.
+  """
+  @spec resubscribe(Scope.t(), String.t()) :: {:ok, map()} | {:error, term()}
+  def resubscribe(scope, type) do
+    with {:ok, _} <- unsubscribe(scope, type) do
+      subscribe(scope, type)
+    end
+  end
+
   defp delete_subscription(id) do
     TwitchApi.api()
     |> TwitchApi.delete(url: "/eventsub/subscriptions", params: %{"id" => id})

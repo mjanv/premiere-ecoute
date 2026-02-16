@@ -54,6 +54,14 @@ defmodule PremiereEcouteMock.TwitchApi.Mock do
   def unsubscribe(_, _), do: {:ok, ""}
 
   @doc """
+  Resubscribes to mock EventSub event type.
+
+  Simulates EventSub resubscription without actual API calls, returning empty map for testing.
+  """
+  @spec resubscribe(any(), any()) :: {:ok, map()}
+  def resubscribe(_, _), do: {:ok, %{}}
+
+  @doc """
   Cancels all mock EventSub subscriptions.
 
   Simulates bulk EventSub subscription cancellation without actual API calls, returning empty list for testing.
