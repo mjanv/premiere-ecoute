@@ -52,3 +52,7 @@ node_modules/
 
 # Data files
 priv/request/
+*.excalidraw
+
+# Agents
+.claude/settings.local.json
