@@ -12,8 +12,8 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Consent
-  alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi
   alias PremiereEcouteWeb.Static.Legal
   alias PremiereEcouteWeb.UserAuth
 

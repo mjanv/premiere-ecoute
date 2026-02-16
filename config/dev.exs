@@ -2,7 +2,7 @@ import Config
 
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [
-    api: PremiereEcoute.Apis.TwitchApi,
+    api: PremiereEcoute.Apis.Streaming.TwitchApi,
     urls: [
       api: "http://localhost:4001",
       # api: "https://api.twitch.tv/helix",
@@ -10,14 +10,14 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     ]
   ],
   spotify: [
-    api: PremiereEcoute.Apis.SpotifyApi,
+    api: PremiereEcoute.Apis.MusicProvider.SpotifyApi,
     urls: [
       api: "https://api.spotify.com/v1",
       accounts: "https://accounts.spotify.com/api"
     ]
   ],
   deezer: [
-    api: PremiereEcoute.Apis.DeezerApi,
+    api: PremiereEcoute.Apis.MusicProvider.DeezerApi,
     urls: [
       api: "https://api.deezer.com/"
     ]

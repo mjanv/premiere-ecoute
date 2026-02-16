@@ -4,7 +4,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
   import ExUnit.CaptureLog
 
   alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Apis.FrankfurterApi
+  alias PremiereEcoute.Apis.Payments.FrankfurterApi
   alias PremiereEcoute.Donations
 
   setup {Req.Test, :set_req_test_to_shared}

@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Donations.Services.Donations do
   - Revoke donations and update goal balance
   """
 
-  alias PremiereEcoute.Apis.FrankfurterApi
+  alias PremiereEcoute.Apis.Payments.FrankfurterApi
   alias PremiereEcoute.Donations.{Donation, Goal}
   alias PremiereEcoute.Donations.Services.{Balance, Goals}
   alias PremiereEcoute.Repo

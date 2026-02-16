@@ -29,7 +29,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       payload = ApiMock.payload("twitch_api/eventsub/channel_chat_premiereecoute_command.json")
 
-      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+      expect(PremiereEcoute.Apis.Streaming.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
         assert scope.user.twitch.user_id == "1971641"
         assert scope.user.profile.language == :en
 
@@ -60,7 +60,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       payload = ApiMock.payload("twitch_api/eventsub/channel_chat_premiereecoute_command.json")
 
-      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+      expect(PremiereEcoute.Apis.Streaming.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
         assert scope.user.twitch.user_id == "1971641"
         assert scope.user.profile.language == :fr
 
@@ -91,7 +91,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       payload = ApiMock.payload("twitch_api/eventsub/channel_chat_premiereecoute_command.json")
 
-      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+      expect(PremiereEcoute.Apis.Streaming.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
         assert scope.user.twitch.user_id == "1971641"
         assert scope.user.profile.language == :it
 
@@ -143,7 +143,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
         }
       }
 
-      expect(PremiereEcoute.Apis.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
+      expect(PremiereEcoute.Apis.Streaming.TwitchApi.Mock, :send_reply_message, fn scope, message, reply_to ->
         assert scope.user.id == broadcaster.id
         assert message == "9.0/10"
         assert reply_to == "vote-msg-123"

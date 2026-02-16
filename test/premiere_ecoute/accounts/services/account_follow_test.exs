@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
 
-  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
 
   describe "follow_streamer/2" do
     test "add the followed at information to a follow" do

@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.ExtensionTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Extension
   alias PremiereEcoute.Playlists.PlaylistRule

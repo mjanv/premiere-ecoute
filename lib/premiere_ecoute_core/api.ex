@@ -25,6 +25,7 @@ defmodule PremiereEcouteCore.Api do
   defmacro __using__(opts) do
     app = Keyword.get(opts, :app, :premiere_ecoute)
     api = Keyword.get(opts, :api)
+    behaviours = Keyword.get(opts, :behaviours, [])
     name = String.capitalize(Atom.to_string(api))
 
     quote do
@@ -33,7 +34,9 @@ defmodule PremiereEcouteCore.Api do
       alias PremiereEcoute.Telemetry
       alias PremiereEcouteCore.Cache
 
-      @behaviour __MODULE__.Behaviour
+      for behaviour <- unquote(behaviours) ++ [__MODULE__.Behaviour] do
+        @behaviour behaviour
+      end
 
       @doc "Retrieves entire API configuration"
       @spec env() :: keyword()

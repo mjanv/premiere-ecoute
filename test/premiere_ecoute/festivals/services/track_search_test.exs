@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Festivals.Services.TrackSearchTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApiMock
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApiMock
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack

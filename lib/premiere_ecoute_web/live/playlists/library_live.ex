@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Playlists
 

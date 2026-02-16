@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Accounts.BotTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Accounts.Bot
-  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
   alias PremiereEcouteCore.Cache
 
   @email "maxime.janvier+premiereecoute@gmail.com"

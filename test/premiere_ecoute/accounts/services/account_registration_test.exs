@@ -4,7 +4,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
   alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.OauthToken
-  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
   alias PremiereEcoute.Events.AccountAssociated
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.Store

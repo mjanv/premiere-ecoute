@@ -21,32 +21,32 @@ config :premiere_ecoute,
 
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [
-    api: PremiereEcoute.Apis.TwitchApi.Mock,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.TwitchApi}]
+    api: PremiereEcoute.Apis.Streaming.TwitchApi.Mock,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.Streaming.TwitchApi}]
   ],
   spotify: [
-    api: PremiereEcoute.Apis.SpotifyApi.Mock,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.SpotifyApi}]
+    api: PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.SpotifyApi}]
   ],
   deezer: [
-    api: PremiereEcoute.Apis.DeezerApi,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.DeezerApi}]
+    api: PremiereEcoute.Apis.MusicProvider.DeezerApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.DeezerApi}]
   ],
   tidal: [
-    api: PremiereEcoute.Apis.TidalApi,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.TidalApi}]
+    api: PremiereEcoute.Apis.MusicProvider.TidalApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.TidalApi}]
   ],
   frankfurter: [
-    api: PremiereEcoute.Apis.FrankfurterApi,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.FrankfurterApi}]
+    api: PremiereEcoute.Apis.Payments.FrankfurterApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.Payments.FrankfurterApi}]
   ],
   discord: [
     api: PremiereEcoute.Apis.DiscordApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.DiscordApi}]
   ],
   buymeacoffee: [
-    api: PremiereEcoute.Apis.BuyMeACoffeeApi,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.BuyMeACoffeeApi}]
+    api: PremiereEcoute.Apis.Payments.BuyMeACoffeeApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.Payments.BuyMeACoffeeApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

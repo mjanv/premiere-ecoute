@@ -4,7 +4,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
   import Phoenix.LiveViewTest
   import Hammox
 
-  alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
 

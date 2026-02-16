@@ -9,7 +9,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
   require Logger
 
-  alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
 

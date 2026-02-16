@@ -1,7 +1,7 @@
 defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
-  alias PremiereEcoute.Apis.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.PlaylistRule
 

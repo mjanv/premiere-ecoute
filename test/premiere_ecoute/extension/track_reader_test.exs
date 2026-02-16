@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.Accounts.Scope
-  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Extension.TrackReader
 
   describe "get_current_track/1" do

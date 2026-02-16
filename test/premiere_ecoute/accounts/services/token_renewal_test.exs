@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
   alias PremiereEcoute.Accounts.Services.TokenRenewal
   alias PremiereEcoute.Accounts.User.OauthToken
 
-  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
-  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
 
   setup do
     stub(SpotifyApi, :renew_token, fn _refresh_token ->

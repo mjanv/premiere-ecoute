@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Discography.Playlist do
     identity: [:playlist_id],
     json: [:id, :title, :cover_url]
 
-  alias PremiereEcoute.Apis.SpotifyApi.Parser
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser
   alias PremiereEcoute.Discography.Playlist.Track
   alias PremiereEcoute.Repo
 

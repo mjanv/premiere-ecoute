@@ -34,34 +34,34 @@ config :premiere_ecoute, PremiereEcoute.Accounts,
 
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [
-    api: PremiereEcoute.Apis.TwitchApi,
+    api: PremiereEcoute.Apis.Streaming.TwitchApi,
     urls: [
       api: "https://api.twitch.tv/helix",
       accounts: "https://id.twitch.tv/oauth2"
     ]
   ],
   spotify: [
-    api: PremiereEcoute.Apis.SpotifyApi,
+    api: PremiereEcoute.Apis.MusicProvider.SpotifyApi,
     urls: [
       api: "https://api.spotify.com/v1",
       accounts: "https://accounts.spotify.com/api"
     ]
   ],
   deezer: [
-    api: PremiereEcoute.Apis.DeezerApi,
+    api: PremiereEcoute.Apis.MusicProvider.DeezerApi,
     urls: [
       api: "https://api.deezer.com/"
     ]
   ],
   tidal: [
-    api: PremiereEcoute.Apis.TidalApi,
+    api: PremiereEcoute.Apis.MusicProvider.TidalApi,
     urls: [
       api: "https://openapi.tidal.com/v2",
       accounts: "https://auth.tidal.com/v1"
     ]
   ],
   frankfurter: [
-    api: PremiereEcoute.Apis.FrankfurterApi,
+    api: PremiereEcoute.Apis.Payments.FrankfurterApi,
     urls: [
       api: "https://api.frankfurter.app"
     ]
@@ -77,7 +77,7 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     ]
   ],
   buymeacoffee: [
-    api: PremiereEcoute.Apis.BuyMeACoffeeApi,
+    api: PremiereEcoute.Apis.Payments.BuyMeACoffeeApi,
     urls: [
       api: "https://developers.buymeacoffee.com"
     ]
@@ -120,9 +120,9 @@ config :premiere_ecoute, Oban,
     Oban.Plugins.Reindexer,
     {Oban.Plugins.Cron,
      crontab: [
-       {"@reboot", PremiereEcoute.Apis.Workers.RenewTwitchTokens},
-       {"@reboot", PremiereEcoute.Apis.Workers.RenewSpotifyTokens},
-       {"@reboot", PremiereEcoute.Apis.Workers.SubscribeStreamEvents}
+       {"@reboot", PremiereEcoute.Accounts.Workers.RenewTwitchTokens},
+       {"@reboot", PremiereEcoute.Accounts.Workers.RenewSpotifyTokens},
+       {"@reboot", PremiereEcoute.Accounts.Workers.SubscribeStreamEvents}
      ]}
   ]
 

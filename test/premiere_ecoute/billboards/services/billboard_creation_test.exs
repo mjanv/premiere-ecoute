@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Billboards.Services.BillboardCreationTest do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track
 
-  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
 
   describe "generate_billboard/1" do
     test "generate a billboard from a list of playlist URLs" do

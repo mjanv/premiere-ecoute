@@ -18,8 +18,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcouteCore.CommandBus
 
-  alias PremiereEcoute.Apis.SpotifyApi.Mock, as: SpotifyApi
-  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
 
   describe "handle/1 - PrepareListeningSession" do
     test "successfully creates album session and returns SessionPrepared event" do

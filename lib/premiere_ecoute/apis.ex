@@ -5,10 +5,10 @@ defmodule PremiereEcoute.Apis do
   Provides convenient access to external API implementations. This module acts as a centralized entry point for retrieving configured API client instances.
   """
 
-  alias PremiereEcoute.Apis.DeezerApi
-  alias PremiereEcoute.Apis.FrankfurterApi
-  alias PremiereEcoute.Apis.SpotifyApi
-  alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Apis.MusicProvider.DeezerApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.Payments.FrankfurterApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi
 
   @doc "Returns the API client module for the specified provider."
   @spec provider(:deezer | :frankfurter | :spotify | :twitch) :: module()

@@ -12,7 +12,7 @@ defmodule Mix.Tasks.Twitch.Url do
   use Mix.Task
   use Boundary, classify_to: PremiereEcouteMix
 
-  alias PremiereEcoute.Apis.TwitchApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi
 
   @impl true
   def run(_) do

@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
   alias PremiereEcoute.Sessions.Scores.CommandHandler
   alias PremiereEcouteCore.CommandBus
 
-  alias PremiereEcoute.Apis.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
 
   describe "handle/1 - SendChatCommand with vote" do
     test "sends average score when viewer has votes in active session" do
