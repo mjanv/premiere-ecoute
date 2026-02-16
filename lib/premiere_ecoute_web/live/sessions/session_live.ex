@@ -230,7 +230,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_info({:player, :start_track, state}, %{assigns: %{listening_session: session}} = socket) do
     case state do
-      %{"context" => %{"type" => "playlist", "uri" => "spotify:playlist:" <> _playlist_id}} = payload ->
+      %{"context" => %{"type" => "playlist", "uri" => "spotify:playlist:" <> _playlist_id}} = payload
+      when not is_nil(session.playlist) ->
         case Playlist.add_track_to_playlist(session.playlist, payload) do
           {:ok, _} ->
             session = ListeningSession.get(session.id)
