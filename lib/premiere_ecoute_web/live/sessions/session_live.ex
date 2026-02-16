@@ -211,7 +211,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     socket
     |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
     |> assign_async(:vote_trends, fn ->
-      vote_data = VoteTrends.rolling_average(String.to_integer(session_id), :minute)
+      vote_data = VoteTrends.rolling_average(session_id, :minute)
       {:ok, %{vote_trends: vote_data}}
     end)
     |> then(fn socket -> {:noreply, socket} end)
