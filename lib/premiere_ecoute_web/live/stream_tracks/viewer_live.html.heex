@@ -1,0 +1,28 @@
+<div class="max-w-4xl mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-6">
+    {@user.username}'s Stream Tracks - {@date}
+  </h1>
+
+  <%= if Enum.empty?(@tracks) do %>
+    <p class="text-gray-500">No tracks played on this date.</p>
+  <% else %>
+    <div class="space-y-2">
+      <%= for track <- @tracks do %>
+        <div class="border rounded-lg p-4 hover:bg-gray-50">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-semibold text-lg">{track.name}</h3>
+              <p class="text-gray-600">{track.artist}</p>
+              <%= if track.album do %>
+                <p class="text-gray-500 text-sm">{track.album}</p>
+              <% end %>
+            </div>
+            <div class="text-right text-sm text-gray-500">
+              {Calendar.strftime(track.started_at, "%H:%M:%S")}
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

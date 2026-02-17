@@ -146,6 +146,16 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
       "Stream started: #{broadcaster_name} (ID: #{broadcaster_id}) - #{inspect(Map.take(event, ["type", "started_at"]))}"
     )
 
+    # Start tracking stream playback if user has the feature enabled
+    case PremiereEcoute.Accounts.User.get_user_by_twitch_id(broadcaster_id) do
+      %{profile: %{stream_track_settings: %{enabled: true}}} = user ->
+        Logger.info("Starting stream track polling for user #{user.id}")
+        PremiereEcoute.StreamTracks.Workers.TrackSpotifyPlayback.now(%{user_id: user.id})
+
+      _ ->
+        :ok
+    end
+
     nil
   end
 
@@ -157,6 +167,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         }
       }) do
     Logger.info("Stream ended: #{broadcaster_name} (ID: #{broadcaster_id})")
+    # Polling worker will stop on next iteration when feature check fails or stream is offline
     nil
   end
 
