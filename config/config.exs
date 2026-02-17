@@ -122,7 +122,8 @@ config :premiere_ecoute, Oban,
      crontab: [
        {"@reboot", PremiereEcoute.Accounts.Workers.RenewTwitchTokens},
        {"@reboot", PremiereEcoute.Accounts.Workers.RenewSpotifyTokens},
-       {"@reboot", PremiereEcoute.Accounts.Workers.SubscribeStreamEvents}
+       {"@reboot", PremiereEcoute.Accounts.Workers.SubscribeStreamEvents},
+       {"0 0,12 * * *", PremiereEcoute.Radio.Workers.CleanupOldTracks}
      ]}
   ]
 

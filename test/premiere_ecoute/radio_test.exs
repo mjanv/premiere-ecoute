@@ -1,8 +1,8 @@
-defmodule PremiereEcoute.StreamTracksTest do
+defmodule PremiereEcoute.RadioTest do
   use PremiereEcoute.DataCase
 
-  alias PremiereEcoute.StreamTracks
-  alias PremiereEcoute.StreamTracks.StreamTrack
+  alias PremiereEcoute.Radio
+  alias PremiereEcoute.Radio.RadioTrack
 
   describe "insert_track/2" do
     test "stores a track for a user" do
@@ -17,7 +17,7 @@ defmodule PremiereEcoute.StreamTracksTest do
         started_at: DateTime.utc_now()
       }
 
-      assert {:ok, %StreamTrack{} = track} = StreamTracks.insert_track(user.id, track_data)
+      assert {:ok, %RadioTrack{} = track} = Radio.insert_track(user.id, track_data)
       assert track.user_id == user.id
       assert track.provider_id == "spotify:track:123"
       assert track.name == "Test Song"
@@ -32,18 +32,16 @@ defmodule PremiereEcoute.StreamTracksTest do
       user = user_fixture()
       date = ~D[2026-02-17]
 
-      # Track on the target date
       {:ok, _track1} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:1",
           name: "Song 1",
           artist: "Artist 1",
           started_at: DateTime.new!(date, ~T[10:00:00], "Etc/UTC")
         })
 
-      # Another track on the target date (later)
       {:ok, _track2} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:2",
           name: "Song 2",
           artist: "Artist 2",
@@ -52,14 +50,14 @@ defmodule PremiereEcoute.StreamTracksTest do
 
       # Track on a different date (should be excluded)
       {:ok, _track3} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:3",
           name: "Song 3",
           artist: "Artist 3",
           started_at: DateTime.new!(~D[2026-02-18], ~T[10:00:00], "Etc/UTC")
         })
 
-      tracks = StreamTracks.get_tracks(user.id, date)
+      tracks = Radio.get_tracks(user.id, date)
 
       assert length(tracks) == 2
       assert Enum.at(tracks, 0).provider_id == "spotify:track:1"
@@ -72,16 +70,15 @@ defmodule PremiereEcoute.StreamTracksTest do
       user = user_fixture()
 
       {:ok, _track1} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:123",
           name: "Same Song",
           artist: "Same Artist",
           started_at: DateTime.utc_now()
         })
 
-      # Try to insert the same track again (consecutive)
       assert {:error, :consecutive_duplicate} =
-               StreamTracks.insert_track(user.id, %{
+               Radio.insert_track(user.id, %{
                  provider_id: "spotify:track:123",
                  name: "Same Song",
                  artist: "Same Artist",
@@ -94,7 +91,7 @@ defmodule PremiereEcoute.StreamTracksTest do
       now = DateTime.utc_now()
 
       {:ok, _track1} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:123",
           name: "Song A",
           artist: "Artist A",
@@ -102,16 +99,15 @@ defmodule PremiereEcoute.StreamTracksTest do
         })
 
       {:ok, _track2} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:456",
           name: "Song B",
           artist: "Artist B",
           started_at: DateTime.add(now, 1, :second)
         })
 
-      # Now insert track 123 again (not consecutive)
       assert {:ok, _track3} =
-               StreamTracks.insert_track(user.id, %{
+               Radio.insert_track(user.id, %{
                  provider_id: "spotify:track:123",
                  name: "Song A",
                  artist: "Artist A",
@@ -125,32 +121,28 @@ defmodule PremiereEcoute.StreamTracksTest do
       user = user_fixture()
       cutoff = DateTime.utc_now()
 
-      # Old track (before cutoff)
       {:ok, _old_track} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:old",
           name: "Old Song",
           artist: "Old Artist",
           started_at: DateTime.add(cutoff, -1, :day)
         })
 
-      # Recent track (after cutoff)
       {:ok, recent_track} =
-        StreamTracks.insert_track(user.id, %{
+        Radio.insert_track(user.id, %{
           provider_id: "spotify:track:recent",
           name: "Recent Song",
           artist: "Recent Artist",
           started_at: DateTime.add(cutoff, 1, :hour)
         })
 
-      # Delete old tracks
-      {deleted_count, _} = StreamTracks.delete_tracks_before(user.id, cutoff)
+      {deleted_count, _} = Radio.delete_tracks_before(user.id, cutoff)
 
       assert deleted_count == 1
 
-      # Verify recent track still exists
       date = DateTime.to_date(recent_track.started_at)
-      tracks = StreamTracks.get_tracks(user.id, date)
+      tracks = Radio.get_tracks(user.id, date)
       assert length(tracks) == 1
       assert Enum.at(tracks, 0).provider_id == "spotify:track:recent"
     end

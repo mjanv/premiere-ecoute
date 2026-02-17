@@ -58,15 +58,17 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   >
                     {gettext("My Library")}
                   </.sidebar_link>
-                  <.sidebar_link
-                    href={~p"/playlists/rules"}
-                    current_page={@current_page}
-                    page_id="rules"
-                    icon="hero-adjustments-horizontal"
-                    title={gettext("Rules")}
-                  >
-                    {gettext("Rules")}
-                  </.sidebar_link>
+                  <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_rules, for: @current_user) do %>
+                    <.sidebar_link
+                      href={~p"/playlists/rules"}
+                      current_page={@current_page}
+                      page_id="rules"
+                      icon="hero-adjustments-horizontal"
+                      title={gettext("Rules")}
+                    >
+                      {gettext("Rules")}
+                    </.sidebar_link>
+                  <% end %>
                   <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_workflows, for: @current_user) do %>
                     <.sidebar_link
                       href={~p"/playlists/workflows"}
@@ -76,6 +78,17 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                       icon="hero-cog-6-tooth"
                     >
                       {gettext("Workflows")}
+                    </.sidebar_link>
+                  <% end %>
+                  <%= if @current_user.role in [:streamer, :admin] and PremiereEcouteCore.FeatureFlag.enabled?(:radio, for: @current_user) do %>
+                    <.sidebar_link
+                      href={~p"/radio/#{@current_user.username}"}
+                      current_page={@current_page}
+                      page_id="radio"
+                      title={gettext("My Radio")}
+                      icon="hero-radio"
+                    >
+                      {gettext("My Radio")}
                     </.sidebar_link>
                   <% end %>
                 </nav>

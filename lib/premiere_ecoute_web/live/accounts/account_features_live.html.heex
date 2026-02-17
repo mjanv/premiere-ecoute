@@ -1,0 +1,88 @@
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <div class="min-h-screen text-white" style="background-color: var(--color-dark-950);">
+    <div class="max-w-6xl mx-auto px-6 py-8">
+      <div class="mb-8">
+        <.link navigate={~p"/users/account"} class="text-gray-400 hover:text-white transition-colors text-sm">
+          &larr; {gettext("Account Settings")}
+        </.link>
+        <h1 class="text-3xl font-bold text-white mt-3 mb-1">{gettext("Features")}</h1>
+        <p class="text-gray-400">{gettext("Manage streamer features and integrations")}</p>
+      </div>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-8 h-8 bg-gradient-to-br from-pink-600 to-purple-700 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+          </svg>
+        </div>
+        <h2 class="text-lg font-semibold text-white">{gettext("Radio")}</h2>
+      </div>
+
+      <div class="max-w-md">
+        <div
+          class="rounded-xl border border-gray-700/30 divide-y divide-gray-700/30"
+          style="background-color: var(--color-dark-850);"
+        >
+          <.form for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
+            <.inputs_for :let={rs} field={@profile_form[:radio_settings]}>
+              <div class="flex items-center justify-between px-5 py-3">
+                <div>
+                  <p class="text-white text-sm font-medium">{gettext("Enable")}</p>
+                  <p class="text-gray-400 text-xs mt-0.5">{gettext("Record tracks played during streams")}</p>
+                </div>
+                <input type="hidden" name={rs[:enabled].name} value="false" />
+                <input
+                  type="checkbox"
+                  id={rs[:enabled].id}
+                  name={rs[:enabled].name}
+                  value="true"
+                  checked={rs[:enabled].value}
+                  class="w-4 h-4 accent-purple-500"
+                />
+              </div>
+
+              <div class="flex items-center justify-between px-5 py-3">
+                <div>
+                  <p class="text-white text-sm font-medium">{gettext("Visibility")}</p>
+                  <p class="text-gray-400 text-xs mt-0.5">{gettext("Who can see your daily track list")}</p>
+                </div>
+                <select
+                  id={rs[:visibility].id}
+                  name={rs[:visibility].name}
+                  class="px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
+                >
+                  <option value="public" selected={rs[:visibility].value == :public}>{gettext("Public")}</option>
+                  <option value="private" selected={rs[:visibility].value == :private}>{gettext("Private")}</option>
+                </select>
+              </div>
+
+              <div class="flex items-center justify-between px-5 py-3">
+                <div>
+                  <p class="text-white text-sm font-medium">{gettext("Retention")}</p>
+                  <p class="text-gray-400 text-xs mt-0.5">{gettext("Days before tracks are deleted")}</p>
+                </div>
+                <input
+                  type="number"
+                  id={rs[:retention_days].id}
+                  name={rs[:retention_days].name}
+                  value={rs[:retention_days].value}
+                  min="1"
+                  class="w-20 px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white text-center focus:border-purple-500 focus:outline-none"
+                />
+              </div>
+            </.inputs_for>
+
+            <div class="flex justify-end px-5 py-3">
+              <.button
+                type="submit"
+                class="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg font-medium transition-colors"
+              >
+                {gettext("Save")}
+              </.button>
+            </div>
+          </.form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

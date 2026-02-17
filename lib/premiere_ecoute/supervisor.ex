@@ -26,7 +26,8 @@ defmodule PremiereEcoute.Supervisor do
       PremiereEcoute.Accounts.Supervisor,
       PremiereEcoute.Apis.Supervisor,
       PremiereEcoute.Billboards.Supervisor,
-      PremiereEcoute.Sessions.Supervisor
+      PremiereEcoute.Sessions.Supervisor,
+      PremiereEcoute.Radio.EventHandler
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

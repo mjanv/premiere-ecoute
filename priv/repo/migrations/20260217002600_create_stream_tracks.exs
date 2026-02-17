@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateStreamTracks do
   use Ecto.Migration
 
   def change do
-    create table(:stream_tracks) do
+    create table(:radio_tracks) do
       add :user_id, references(:users, on_delete: :delete_all), null: false
 
       # Track metadata (denormalized from Spotify API)
@@ -18,7 +18,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateStreamTracks do
       timestamps()
     end
 
-    create index(:stream_tracks, [:user_id, :started_at])
-    create index(:stream_tracks, [:started_at])
+    create index(:radio_tracks, [:user_id, :started_at])
+    create index(:radio_tracks, [:started_at])
   end
 end

@@ -7,6 +7,8 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   alias PremiereEcoute.Events.Chat.PollEnded
   alias PremiereEcoute.Events.Chat.PollStarted
   alias PremiereEcoute.Events.Chat.PollUpdated
+  alias PremiereEcoute.Events.Twitch.StreamEnded
+  alias PremiereEcoute.Events.Twitch.StreamStarted
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
   alias PremiereEcouteWeb.Webhooks.TwitchController
 
@@ -346,8 +348,11 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       event = TwitchController.handle(payload)
 
-      # stream.online handler returns nil as it only logs the event
-      assert event == nil
+      assert event == %StreamStarted{
+               broadcaster_id: "1337",
+               broadcaster_name: "Cool_User",
+               started_at: "2020-10-11T10:11:12.123Z"
+             }
     end
 
     test "stream.offline" do
@@ -355,8 +360,10 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       event = TwitchController.handle(payload)
 
-      # stream.offline handler returns nil as it only logs the event
-      assert event == nil
+      assert event == %StreamEnded{
+               broadcaster_id: "1337",
+               broadcaster_name: "Cool_User"
+             }
     end
   end
 end
