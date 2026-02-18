@@ -68,6 +68,9 @@ defmodule PremiereEcouteWeb.Router do
     live_session :main, on_mount: [{UserAuth, :current_scope}] do
       live "/", HomepageLive, :index
       live "/playground", PlaygroundLive, :index
+      live "/radio/:username", Radio.ViewerLive, :today
+      live "/radio/:username/today", Radio.ViewerLive, :today
+      live "/radio/:username/:date", Radio.ViewerLive, :index
     end
 
     pipe_through [:require_authenticated_user]
@@ -98,6 +101,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/settings", UserSettingsLive, :edit
       live "/settings/confirm-email/:token", UserSettingsLive, :confirm_email
       live "/account", AccountLive, :index
+      live "/account/features", AccountFeaturesLive, :index
       live "/follows", FollowsLive, :index
     end
 

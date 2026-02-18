@@ -18,6 +18,7 @@ defmodule PremiereEcoute do
       {Extension, except: []},
       {Festivals, except: []},
       {Playlists, except: []},
+      {Radio, except: []},
       {Sessions, except: []},
       {Telemetry, except: []},
       {Twitch, except: []},

@@ -32,6 +32,20 @@
           </div>
         </div>
       </div>
+
+      <%= if @current_user.role in [:streamer, :admin] and PremiereEcouteCore.FeatureFlag.enabled?(:radio, for: @current_user) do %>
+        <div class="mb-6">
+          <.link
+            navigate={~p"/users/account/features"}
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-purple-700/50 bg-purple-600/10 text-purple-300 hover:bg-purple-600/20 hover:text-purple-200 transition-colors text-sm font-medium"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+            </svg>
+            {gettext("Streamer Features")}
+          </.link>
+        </div>
+      <% end %>
       
 <!-- Profile Section -->
       <div class="mt-12">

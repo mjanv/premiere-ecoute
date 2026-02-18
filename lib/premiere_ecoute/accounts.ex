@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Accounts do
   defdelegate get_user_by_email(email), to: User
   defdelegate get_user_by_email_and_password(email, password), to: User
   defdelegate get_user_by_twitch_id(twitch_user_id), to: User
+  defdelegate get_user_by_username(username), to: User
   defdelegate get_user!(id), to: User, as: :get
   defdelegate sudo_mode?(user, minutes \\ -20), to: User
   defdelegate create_user(attrs), to: User, as: :create

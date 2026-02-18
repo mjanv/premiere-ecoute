@@ -204,6 +204,9 @@ defmodule PremiereEcoute.Accounts.User do
   @spec get_user_by_email(String.t()) :: t() | nil
   def get_user_by_email(email), do: get_by(email: email)
 
+  @spec get_user_by_username(String.t()) :: t() | nil
+  def get_user_by_username(username), do: get_by(username: username)
+
   @doc "Creates a user and publishes AccountCreated event."
   @spec create(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(attrs) do

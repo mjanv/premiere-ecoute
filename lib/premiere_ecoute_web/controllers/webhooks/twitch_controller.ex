@@ -14,6 +14,8 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   alias PremiereEcoute.Events.Chat.PollEnded
   alias PremiereEcoute.Events.Chat.PollStarted
   alias PremiereEcoute.Events.Chat.PollUpdated
+  alias PremiereEcoute.Events.Twitch.StreamEnded
+  alias PremiereEcoute.Events.Twitch.StreamStarted
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Telemetry.ApiMetrics
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
@@ -48,6 +50,8 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         case handle(conn.body_params) do
           %SendChatCommand{} = command -> PremiereEcoute.apply(command)
           %MessageSent{} = event -> Sessions.publish_message(event)
+          %StreamStarted{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", {:stream_event, event})
+          %StreamEnded{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", {:stream_event, event})
           _ -> :ok
         end
 
@@ -146,7 +150,11 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
       "Stream started: #{broadcaster_name} (ID: #{broadcaster_id}) - #{inspect(Map.take(event, ["type", "started_at"]))}"
     )
 
-    nil
+    %StreamStarted{
+      broadcaster_id: broadcaster_id,
+      broadcaster_name: broadcaster_name,
+      started_at: event["started_at"]
+    }
   end
 
   def handle(%{
@@ -157,7 +165,11 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         }
       }) do
     Logger.info("Stream ended: #{broadcaster_name} (ID: #{broadcaster_id})")
-    nil
+
+    %StreamEnded{
+      broadcaster_id: broadcaster_id,
+      broadcaster_name: broadcaster_name
+    }
   end
 
   def handle(_), do: nil
