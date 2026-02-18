@@ -15,11 +15,22 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
   require Logger
 
   alias PremiereEcoute.Accounts
+  import Ecto.Query, only: [where: 3]
+
+  alias Oban.Job
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player
   alias PremiereEcoute.Radio
+
+  def cancel_all(user_id) do
+    worker = to_string(__MODULE__)
+
+    Job
+    |> where([j], j.worker == ^worker and fragment("args->>'user_id' = ?", ^to_string(user_id)))
+    |> Oban.cancel_all_jobs()
+  end
 
   @impl true
   def perform(%Oban.Job{args: %{"user_id" => user_id}}) do

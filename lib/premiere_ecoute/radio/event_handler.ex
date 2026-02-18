@@ -38,9 +38,17 @@ defmodule PremiereEcoute.Radio.EventHandler do
   end
 
   @impl true
-  def handle_info({:stream_event, %StreamEnded{}}, state) do
-    # Polling stops naturally on next iteration when feature_enabled? returns false
-    # or when the stream is no longer active (no-op here)
+  def handle_info({:stream_event, %StreamEnded{broadcaster_id: broadcaster_id}}, state) do
+    case Accounts.get_user_by_twitch_id(broadcaster_id) do
+      %{id: user_id} ->
+        Logger.info("Radio: stopping playback polling for user #{user_id}")
+
+        TrackSpotifyPlayback.cancel_all(user_id)
+
+      _ ->
+        :ok
+    end
+
     {:noreply, state}
   end
 end

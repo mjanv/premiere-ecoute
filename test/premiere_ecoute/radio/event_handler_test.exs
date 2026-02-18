@@ -47,8 +47,8 @@ defmodule PremiereEcoute.Radio.EventHandlerTest do
   end
 
   describe "handle_info/2 - StreamEnded" do
-    test "is a no-op" do
-      event = %StreamEnded{broadcaster_id: "1337", broadcaster_name: "cool_user"}
+    test "is a no-op when broadcaster is unknown" do
+      event = %StreamEnded{broadcaster_id: "unknown_id", broadcaster_name: "unknown"}
 
       assert {:noreply, %{}} = EventHandler.handle_info({:stream_event, event}, %{})
     end
