@@ -16,7 +16,7 @@ defmodule PremiereEcoute.Radio.EventHandlerTest do
       event = %StreamStarted{broadcaster_id: user.twitch.user_id, broadcaster_name: user.username}
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        assert {:noreply, %{}} = EventHandler.handle_info({:stream_event, event}, %{})
+        assert {:noreply, %{}} = EventHandler.handle_info(event, %{})
 
         assert_enqueued worker: TrackSpotifyPlayback, args: %{user_id: user.id}
       end)
@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Radio.EventHandlerTest do
       event = %StreamStarted{broadcaster_id: user.twitch.user_id, broadcaster_name: user.username}
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        assert {:noreply, %{}} = EventHandler.handle_info({:stream_event, event}, %{})
+        assert {:noreply, %{}} = EventHandler.handle_info(event, %{})
 
         refute_enqueued worker: TrackSpotifyPlayback
       end)
@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Radio.EventHandlerTest do
       event = %StreamStarted{broadcaster_id: "unknown_id", broadcaster_name: "unknown"}
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        assert {:noreply, %{}} = EventHandler.handle_info({:stream_event, event}, %{})
+        assert {:noreply, %{}} = EventHandler.handle_info(event, %{})
 
         refute_enqueued worker: TrackSpotifyPlayback
       end)
@@ -50,7 +50,7 @@ defmodule PremiereEcoute.Radio.EventHandlerTest do
     test "is a no-op when broadcaster is unknown" do
       event = %StreamEnded{broadcaster_id: "unknown_id", broadcaster_name: "unknown"}
 
-      assert {:noreply, %{}} = EventHandler.handle_info({:stream_event, event}, %{})
+      assert {:noreply, %{}} = EventHandler.handle_info(event, %{})
     end
   end
 end

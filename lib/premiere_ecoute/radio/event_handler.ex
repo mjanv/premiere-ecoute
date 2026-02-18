@@ -24,7 +24,7 @@ defmodule PremiereEcoute.Radio.EventHandler do
   end
 
   @impl true
-  def handle_info({:stream_event, %StreamStarted{broadcaster_id: broadcaster_id}}, state) do
+  def handle_info(%StreamStarted{broadcaster_id: broadcaster_id}, state) do
     case Accounts.get_user_by_twitch_id(broadcaster_id) do
       %{profile: %{radio_settings: %{enabled: true}}} = user ->
         Logger.info("Radio: starting playback polling for user #{user.id}")
@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Radio.EventHandler do
   end
 
   @impl true
-  def handle_info({:stream_event, %StreamEnded{broadcaster_id: broadcaster_id}}, state) do
+  def handle_info(%StreamEnded{broadcaster_id: broadcaster_id}, state) do
     case Accounts.get_user_by_twitch_id(broadcaster_id) do
       %{id: user_id} ->
         Logger.info("Radio: stopping playback polling for user #{user_id}")

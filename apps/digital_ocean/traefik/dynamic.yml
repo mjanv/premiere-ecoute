@@ -9,6 +9,7 @@ http:
         - websecure
       tls:
         certResolver: letsencrypt
+        options: no-h2
 
     app-ip:
       rule: "Host(`68.183.219.251`)"
@@ -22,3 +23,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://localhost:4000"
+
+# AIDEV-NOTE: HTTP/2 disabled via ALPN — HTTP/2 strips Connection/Upgrade headers, breaking Phoenix LiveView WebSocket upgrades
+tls:
+  options:
+    no-h2:
+      alpnProtocols:
+        - http/1.1

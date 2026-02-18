@@ -50,8 +50,8 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         case handle(conn.body_params) do
           %SendChatCommand{} = command -> PremiereEcoute.apply(command)
           %MessageSent{} = event -> Sessions.publish_message(event)
-          %StreamStarted{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", {:stream_event, event})
-          %StreamEnded{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", {:stream_event, event})
+          %StreamStarted{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
+          %StreamEnded{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
           _ -> :ok
         end
 
