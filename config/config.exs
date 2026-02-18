@@ -111,8 +111,8 @@ config :premiere_ecoute, Oban,
   notifier: Oban.Notifiers.Postgres,
   queues: [
     sessions: 1,
-    twitch: 1
-    # spotify: 1
+    twitch: 1,
+    spotify: 1
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},
