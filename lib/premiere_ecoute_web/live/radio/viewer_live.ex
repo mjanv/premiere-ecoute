@@ -5,6 +5,8 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Components.Navigation.DayNav
+
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Radio
 
@@ -26,12 +28,16 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
          user when not is_nil(user) <- Accounts.get_user_by_username(username),
          true <- tracks_visible?(user) do
       # AIDEV-NOTE: tracks/date assigned here for initial render; handle_params refreshes on patch
+      retention_days = user.profile.radio_settings.retention_days
+      today = Date.utc_today()
+
       {:ok,
        assign(socket,
          user: user,
          date: date,
          tracks: [],
-         today: Date.utc_today(),
+         today: today,
+         oldest_date: Date.add(today, -(retention_days - 1)),
          page_title: "#{username}'s tracks"
        )}
     else

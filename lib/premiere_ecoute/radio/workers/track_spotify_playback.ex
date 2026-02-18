@@ -7,28 +7,25 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
   successful execution.
   """
 
-  # AIDEV-NOTE: Self-scheduling worker - starts on stream.online, stops when feature disabled or stream offline
-  # AIDEV-NOTE: Handles rate limits (5-min backoff), consecutive duplicates, and graceful degradation
-
   use PremiereEcouteCore.Worker, queue: :spotify, max_attempts: 3
 
   require Logger
 
-  alias PremiereEcoute.Accounts
   import Ecto.Query, only: [where: 3]
 
   alias Oban.Job
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player
   alias PremiereEcoute.Radio
+  alias PremiereEcoute.Repo
+
+  @worker "PremiereEcoute.Radio.Workers.TrackSpotifyPlayback"
 
   def cancel_all(user_id) do
-    worker = to_string(__MODULE__)
-
     Job
-    |> where([j], j.worker == ^worker and fragment("args->>'user_id' = ?", ^to_string(user_id)))
+    |> where([j], j.worker == @worker and fragment("args->>'user_id' = ?", ^to_string(user_id)))
     |> Oban.cancel_all_jobs()
   end
 
@@ -37,7 +34,9 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
     user = user_id |> Accounts.User.get!() |> Repo.preload(:spotify)
     scope = user |> Scope.for_user() |> then(&Accounts.maybe_renew_token(%{assigns: %{current_scope: &1}}, :spotify))
 
-    with true <- feature_enabled?(user),
+    schedule_next_poll(user_id)
+
+    with 1 <- feature_enabled?(user),
          {:ok, playback} <- Apis.spotify().get_playback_state(scope, Player.default()),
          {:ok, _track} <- store_track_if_new(user_id, playback),
          :ok <- schedule_next_poll(user_id, playback) do
