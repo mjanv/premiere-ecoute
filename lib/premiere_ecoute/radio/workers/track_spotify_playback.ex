@@ -17,13 +17,14 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player
   alias PremiereEcoute.Radio
 
   @impl true
   def perform(%Oban.Job{args: %{"user_id" => user_id}}) do
-    user = Accounts.User.get!(user_id)
-    scope = Scope.for_user(user)
+    user = user_id |> Accounts.User.get!() |> Repo.preload(:spotify)
+    scope = user |> Scope.for_user() |> then(&Accounts.maybe_renew_token(%{assigns: %{current_scope: &1}}, :spotify))
 
     with true <- feature_enabled?(user),
          {:ok, playback} <- Apis.spotify().get_playback_state(scope, Player.default()),

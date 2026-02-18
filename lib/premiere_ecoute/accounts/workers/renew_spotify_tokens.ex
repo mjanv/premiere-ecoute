@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Accounts.Workers.RenewSpotifyTokens do
   Periodically refreshes Spotify API client credentials, schedules next renewal 5 minutes before expiration, and retries on failure with 10-second snooze intervals.
   """
 
-  use PremiereEcouteCore.Worker, queue: :spotify, max_attempts: 5
+  use PremiereEcouteCore.Worker, queue: :tokens, max_attempts: 5
 
   require Logger
 
