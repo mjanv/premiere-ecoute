@@ -16,24 +16,28 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
   @impl true
   def update(assigns, socket) do
     session = assigns.listening_session
+    report = assigns[:report]
     time_bias = socket.assigns[:time_bias] || 0
 
     socket
     |> assign(assigns)
     |> assign(:listening_session, session)
+    |> assign(:report, report)
     |> assign(:time_bias, time_bias)
-    |> assign(:youtube_chapters, TrackMarker.format_youtube_chapters(session, time_bias))
+    |> assign(:youtube_chapters, build_export_text(session, report, time_bias))
     |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
   def handle_event("update_bias", %{"bias" => bias}, socket) do
     bias_value = String.to_integer(bias)
-    chapters = TrackMarker.format_youtube_chapters(socket.assigns.listening_session, bias_value)
+
+    export_text =
+      build_export_text(socket.assigns.listening_session, socket.assigns.report, bias_value)
 
     socket
     |> assign(:time_bias, bias_value)
-    |> assign(:youtube_chapters, chapters)
+    |> assign(:youtube_chapters, export_text)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -54,7 +58,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
     >
       <!-- Background overlay -->
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" phx-click="close_modal" phx-target={@myself}></div>
-      
+
     <!-- Modal panel -->
       <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-gray-900 p-8 shadow-2xl transition-all border border-purple-500/30">
         <!-- Header -->
@@ -66,7 +70,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
             {gettext("Copy and paste these timestamps into your YouTube video description")}
           </p>
         </div>
-        
+
     <!-- Time Bias Slider -->
         <div class="mb-6">
           <div class="flex items-center justify-between mb-2">
@@ -93,7 +97,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
             <span>10:00</span>
           </div>
         </div>
-        
+
     <!-- YouTube Chapters Textbox -->
         <div>
           <div class="flex items-center justify-between mb-2">
@@ -127,6 +131,73 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
     </div>
     """
   end
+
+  # AIDEV-NOTE: assembles full YouTube export text; scores section is conditional on
+  # numeric vote mode and a non-nil report with numeric scores.
+  defp build_export_text(session, report, time_bias) do
+    chapters = TrackMarker.format_youtube_chapters(session, time_bias)
+    chapters_header = gettext("Track chapters:")
+    scores_header = build_scores_header(session, report)
+
+    case scores_header do
+      nil -> "#{chapters_header}\n\n#{chapters}"
+      scores -> "#{scores}\n\n#{chapters_header}\n\n#{chapters}"
+    end
+  end
+
+  defp build_scores_header(_session, report) when not is_map(report), do: nil
+
+  defp build_scores_header(%{vote_options: vote_options} = _session, %{session_summary: summary})
+       when is_map(summary) do
+    if numeric_vote_mode?(vote_options) do
+      viewer_score = summary["viewer_score"]
+      streamer_score = summary["streamer_score"]
+
+      if is_number(viewer_score) or is_number(streamer_score) do
+        denominator = vote_denominator(vote_options)
+        locale = Gettext.get_locale(PremiereEcoute.Gettext)
+
+        [
+          format_score_line(gettext("Chat note"), viewer_score, denominator, locale),
+          format_score_line(gettext("Streamer note"), streamer_score, denominator, locale)
+        ]
+        |> Enum.reject(&is_nil/1)
+        |> case do
+          [] -> nil
+          lines -> Enum.join(lines, "\n")
+        end
+      else
+        nil
+      end
+    else
+      nil
+    end
+  end
+
+  defp build_scores_header(_session, _report), do: nil
+
+  defp numeric_vote_mode?(["0" | _]), do: true
+  defp numeric_vote_mode?(["1" | _]), do: true
+  defp numeric_vote_mode?(_), do: false
+
+  # AIDEV-NOTE: max of vote_options gives the denominator (e.g. 10 for 0-10, 5 for 1-5).
+  defp vote_denominator(vote_options) do
+    vote_options |> Enum.map(&String.to_integer/1) |> Enum.max()
+  end
+
+  defp format_score_line(_label, nil, _denom, _locale), do: nil
+  defp format_score_line(_label, score, _denom, _locale) when not is_number(score), do: nil
+
+  defp format_score_line(label, score, denominator, locale) do
+    formatted = score |> Float.round(1) |> format_decimal(locale)
+    "#{label} : #{formatted}/#{denominator}"
+  end
+
+  # AIDEV-NOTE: French locale uses comma as decimal separator per spec.
+  defp format_decimal(value, "fr") when is_float(value),
+    do: value |> to_string() |> String.replace(".", ",")
+
+  defp format_decimal(value, _locale) when is_float(value), do: to_string(value)
 
   defp format_bias_display(bias_seconds) do
     "#{div(bias_seconds, 60)}:#{String.pad_leading(to_string(rem(bias_seconds, 60)), 2, "0")}"

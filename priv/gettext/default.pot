@@ -3538,6 +3538,21 @@ msgstr ""
 msgid "Youtube chapters"
 msgstr ""
 
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex
+#, elixir-autogen, elixir-format
+msgid "Chat note"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex
+#, elixir-autogen, elixir-format
+msgid "Streamer note"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex
+#, elixir-autogen, elixir-format
+msgid "Track chapters:"
+msgstr ""
+
 #: lib/premiere_ecoute/sessions/scores/command_handler.ex:31
 #, elixir-autogen, elixir-format
 msgid "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"

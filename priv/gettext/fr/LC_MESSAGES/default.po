@@ -3539,6 +3539,21 @@ msgstr "Décalage temporel"
 msgid "Youtube chapters"
 msgstr "Chapitres Youtube"
 
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex
+#, elixir-autogen, elixir-format
+msgid "Chat note"
+msgstr "Note du chat"
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex
+#, elixir-autogen, elixir-format
+msgid "Streamer note"
+msgstr "Note du streamer"
+
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters_modal.ex
+#, elixir-autogen, elixir-format
+msgid "Track chapters:"
+msgstr "Chapitrage des morceaux :"
+
 #: lib/premiere_ecoute/sessions/scores/command_handler.ex:31
 #, elixir-autogen, elixir-format
 msgid "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
