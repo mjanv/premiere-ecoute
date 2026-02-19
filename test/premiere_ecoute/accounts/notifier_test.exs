@@ -1,11 +1,11 @@
 defmodule PremiereEcoute.Accounts.NotifierTest do
   use PremiereEcoute.DataCase
 
+  alias PremiereEcoute.Accounts.Mailer.Mock, as: Mailer
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.ChannelFollowed
   alias PremiereEcoute.Events.Store
-  alias PremiereEcoute.Accounts.Mailer.Mock, as: Mailer
 
   setup do
     {:ok, pid} = start_supervised(PremiereEcoute.Accounts.Notifier)

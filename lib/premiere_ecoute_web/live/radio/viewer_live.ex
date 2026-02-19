@@ -30,6 +30,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
       # AIDEV-NOTE: tracks/date assigned here for initial render; handle_params refreshes on patch
       retention_days = user.profile.radio_settings.retention_days
       today = Date.utc_today()
+      timezone = user.profile.timezone || "UTC"
 
       {:ok,
        assign(socket,
@@ -38,6 +39,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
          tracks: [],
          today: today,
          oldest_date: Date.add(today, -(retention_days - 1)),
+         timezone: timezone,
          page_title: "#{username}'s tracks"
        )}
     else

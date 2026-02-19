@@ -29,8 +29,8 @@ defmodule PremiereEcoute do
       ExplorerCase
     ]
 
-  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Accounts.Mailer
+  alias PremiereEcoute.Events.Store
 
   @version Mix.Project.config()[:version]
   @commit System.cmd("git", ["rev-parse", "--short", "HEAD"], stderr_to_stdout: true) |> elem(0) |> String.trim()
