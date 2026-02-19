@@ -2,18 +2,21 @@ defmodule PremiereEcoute.Accounts.User.Profile do
   @moduledoc """
   User profile settings.
 
-  Embedded schema for user preferences including color scheme (light/dark/system) and language (en/fr/it).
+  Embedded schema for user preferences including color scheme (light/dark/system), language (en/fr/it),
+  and widget color settings (hex strings) used in OBS overlay displays.
   """
 
   use PremiereEcouteCore.Aggregate.Object
 
   @schemes [:light, :dark, :system]
   @languages [:en, :fr, :it]
+  @hex_color_regex ~r/^#[0-9A-Fa-f]{6}$/
 
   @type t :: %__MODULE__{
           color_scheme: :light | :dark | :system,
           language: :en | :fr | :it,
           timezone: String.t(),
+          widget_settings: map() | nil,
           radio_settings: map() | nil
         }
 
@@ -21,6 +24,11 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     field :color_scheme, Ecto.Enum, values: @schemes, default: :system
     field :language, Ecto.Enum, values: @languages, default: :en
     field :timezone, :string, default: "UTC"
+
+    embeds_one :widget_settings, WidgetSettings, on_replace: :update, primary_key: false do
+      field :color_primary, :string, default: "#5b21b6"
+      field :color_secondary, :string, default: "#be123c"
+    end
 
     embeds_one :radio_settings, RadioSettings, on_replace: :update, primary_key: false do
       field :enabled, :boolean, default: false
@@ -41,15 +49,23 @@ defmodule PremiereEcoute.Accounts.User.Profile do
   @doc "User profile changeset."
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(profile, attrs \\ %{}) do
-    profile = %{profile | radio_settings: profile.radio_settings || %__MODULE__.RadioSettings{}}
-
     profile
+    |> Map.put(:radio_settings, Map.get(profile, :radio_settings) || %__MODULE__.RadioSettings{})
+    |> Map.put(:widget_settings, Map.get(profile, :widget_settings) || %__MODULE__.WidgetSettings{})
     |> cast(attrs, [:color_scheme, :language, :timezone])
+    |> cast_embed(:widget_settings, with: &widget_settings_changeset/2)
     |> cast_embed(:radio_settings, with: &radio_settings_changeset/2)
     |> validate_required([:color_scheme, :language])
     |> validate_inclusion(:color_scheme, @schemes)
     |> validate_inclusion(:language, @languages)
     |> validate_timezone()
+  end
+
+  defp widget_settings_changeset(settings, attrs) do
+    settings
+    |> cast(attrs, [:color_primary, :color_secondary])
+    |> validate_format(:color_primary, @hex_color_regex, message: "must be a valid hex color (e.g. #a1b2c3)")
+    |> validate_format(:color_secondary, @hex_color_regex, message: "must be a valid hex color (e.g. #a1b2c3)")
   end
 
   defp radio_settings_changeset(settings, attrs) do

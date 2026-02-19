@@ -192,6 +192,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
     |> SpotifyApi.circuit_breaker()
     |> Req.merge(url: "/me/player", retry: false)
     |> Req.get()
+    |> IO.inspect()
     |> case do
       {:ok, %{status: 200, body: body}} ->
         {:ok, body}

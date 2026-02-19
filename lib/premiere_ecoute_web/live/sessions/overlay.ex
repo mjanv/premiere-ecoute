@@ -27,4 +27,17 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
 
   defp score_label(:viewer), do: "Chat"
   defp score_label(:streamer), do: "Streamer"
+
+  def widget_bg(:idle, _c1, _c2), do: "#000000"
+  def widget_bg(:closed, c1, _c2), do: c1
+  def widget_bg(:open, _c1, _c2), do: "#000000"
+  def widget_bg(:ended, _c1, _c2), do: "#000000"
+
+  def widget_text_color(:idle, c1, _c2), do: c1
+  def widget_text_color(:closed, _c1, _c2), do: "#000000"
+  def widget_text_color(:open, c1, _c2), do: c1
+  def widget_text_color(:ended, c1, _c2), do: c1
+
+  def bar_played_color(_state, _c1, c2), do: c2
+  def bar_remaining_color(_state, _c1, _c2), do: "rgba(255,255,255,0.3)"
 end

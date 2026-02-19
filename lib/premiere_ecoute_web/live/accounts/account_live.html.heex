@@ -170,6 +170,42 @@
                 />
               </div>
               
+<!-- Widget Colors -->
+              <div class="mt-8">
+                <h3 class="text-base font-semibold text-gray-200 mb-1">{gettext("Widget Colors")}</h3>
+                <p class="text-sm text-gray-400 mb-4">{gettext("Primary and secondary colors used in OBS overlay widgets")}</p>
+                <.inputs_for :let={ws} field={@profile_form[:widget_settings]}>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Primary Color")}</label>
+                      <div class="flex items-center gap-3">
+                        <.input
+                          field={ws[:color_primary]}
+                          type="color"
+                          class="h-12 w-20 rounded-lg border border-gray-600 bg-gray-900/60 cursor-pointer p-1"
+                        />
+                        <span class="text-sm text-gray-400 font-mono">
+                          {Phoenix.HTML.Form.input_value(ws, :color_primary)}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Secondary Color")}</label>
+                      <div class="flex items-center gap-3">
+                        <.input
+                          field={ws[:color_secondary]}
+                          type="color"
+                          class="h-12 w-20 rounded-lg border border-gray-600 bg-gray-900/60 cursor-pointer p-1"
+                        />
+                        <span class="text-sm text-gray-400 font-mono">
+                          {Phoenix.HTML.Form.input_value(ws, :color_secondary)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </.inputs_for>
+              </div>
+              
 <!-- Save Button -->
               <div class="mt-8 flex justify-end">
                 <.button
