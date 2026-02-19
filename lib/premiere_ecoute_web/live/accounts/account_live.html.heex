@@ -165,46 +165,7 @@
                 <.input
                   field={@profile_form[:timezone]}
                   type="select"
-                  options={[
-                    {"UTC", "UTC"},
-                    {"Europe/Paris (UTC+1/+2)", "Europe/Paris"},
-                    {"Europe/London (UTC+0/+1)", "Europe/London"},
-                    {"Europe/Berlin (UTC+1/+2)", "Europe/Berlin"},
-                    {"Europe/Madrid (UTC+1/+2)", "Europe/Madrid"},
-                    {"Europe/Rome (UTC+1/+2)", "Europe/Rome"},
-                    {"Europe/Amsterdam (UTC+1/+2)", "Europe/Amsterdam"},
-                    {"Europe/Brussels (UTC+1/+2)", "Europe/Brussels"},
-                    {"Europe/Warsaw (UTC+1/+2)", "Europe/Warsaw"},
-                    {"Europe/Stockholm (UTC+1/+2)", "Europe/Stockholm"},
-                    {"Europe/Helsinki (UTC+2/+3)", "Europe/Helsinki"},
-                    {"Europe/Athens (UTC+2/+3)", "Europe/Athens"},
-                    {"Europe/Moscow (UTC+3)", "Europe/Moscow"},
-                    {"America/New_York (UTC-5/-4)", "America/New_York"},
-                    {"America/Chicago (UTC-6/-5)", "America/Chicago"},
-                    {"America/Denver (UTC-7/-6)", "America/Denver"},
-                    {"America/Los_Angeles (UTC-8/-7)", "America/Los_Angeles"},
-                    {"America/Sao_Paulo (UTC-3)", "America/Sao_Paulo"},
-                    {"America/Toronto (UTC-5/-4)", "America/Toronto"},
-                    {"America/Vancouver (UTC-8/-7)", "America/Vancouver"},
-                    {"America/Mexico_City (UTC-6/-5)", "America/Mexico_City"},
-                    {"America/Buenos_Aires (UTC-3)", "America/Argentina/Buenos_Aires"},
-                    {"Asia/Tokyo (UTC+9)", "Asia/Tokyo"},
-                    {"Asia/Shanghai (UTC+8)", "Asia/Shanghai"},
-                    {"Asia/Seoul (UTC+9)", "Asia/Seoul"},
-                    {"Asia/Singapore (UTC+8)", "Asia/Singapore"},
-                    {"Asia/Kolkata (UTC+5:30)", "Asia/Kolkata"},
-                    {"Asia/Dubai (UTC+4)", "Asia/Dubai"},
-                    {"Asia/Istanbul (UTC+3)", "Asia/Istanbul"},
-                    {"Asia/Bangkok (UTC+7)", "Asia/Bangkok"},
-                    {"Asia/Jakarta (UTC+7)", "Asia/Jakarta"},
-                    {"Australia/Sydney (UTC+10/+11)", "Australia/Sydney"},
-                    {"Australia/Melbourne (UTC+10/+11)", "Australia/Melbourne"},
-                    {"Pacific/Auckland (UTC+12/+13)", "Pacific/Auckland"},
-                    {"Pacific/Honolulu (UTC-10)", "Pacific/Honolulu"},
-                    {"Africa/Cairo (UTC+2)", "Africa/Cairo"},
-                    {"Africa/Johannesburg (UTC+2)", "Africa/Johannesburg"},
-                    {"Africa/Lagos (UTC+1)", "Africa/Lagos"}
-                  ]}
+                  options={@timezones}
                   class="w-full px-4 py-4 text-base rounded-xl bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 shadow-lg hover:bg-gray-900/80"
                 />
               </div>

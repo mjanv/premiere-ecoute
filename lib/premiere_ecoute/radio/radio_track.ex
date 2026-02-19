@@ -1,11 +1,7 @@
 defmodule PremiereEcoute.Radio.RadioTrack do
   @moduledoc """
   Schema for tracks played during a Twitch stream.
-  Completely decoupled from discography - only related to users.
   """
-
-  # AIDEV-NOTE: Core schema for daily playlist feature - one row per detected track
-  # AIDEV-NOTE: Consecutive duplicate prevention happens at insert time, not DB constraint
 
   use PremiereEcouteCore.Aggregate
 

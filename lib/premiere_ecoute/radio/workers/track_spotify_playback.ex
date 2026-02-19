@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
     user = user_id |> Accounts.User.get!() |> Repo.preload(:spotify)
     scope = user |> Scope.for_user() |> then(&Accounts.maybe_renew_token(%{assigns: %{current_scope: &1}}, :spotify))
 
-    with true <- feature_enabled?(user),
+    with true <- Accounts.profile(user, [:radio_settings, :enabled], false),
          {:ok, playback} <- Apis.spotify().get_playback_state(scope, Player.default()),
          {:ok, _track} <- store_track_if_new(user_id, playback),
          :ok <- schedule_next_poll(user_id, playback) do
@@ -60,13 +60,6 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
       {:error, reason} ->
         Logger.error("Playback tracking failed for user #{user_id}: #{inspect(reason)}")
         :ok
-    end
-  end
-
-  defp feature_enabled?(user) do
-    case user.profile.radio_settings do
-      %{enabled: true} -> true
-      _ -> false
     end
   end
 

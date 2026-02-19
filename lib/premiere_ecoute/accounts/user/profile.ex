@@ -29,6 +29,15 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     end
   end
 
+  def get(user, path, default \\ nil) do
+    Enum.reduce_while(path, user.profile, fn key, acc ->
+      case acc do
+        nil -> {:halt, default}
+        _ -> {:cont, Map.get(acc, key, default)}
+      end
+    end)
+  end
+
   @doc "User profile changeset."
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(profile, attrs \\ %{}) do
@@ -51,7 +60,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
 
   defp validate_timezone(changeset) do
     validate_change(changeset, :timezone, fn :timezone, tz ->
-      if Timex.Timezone.exists?(tz), do: [], else: [timezone: "is not a valid timezone"]
+      if PremiereEcouteCore.Timezone.exists?(tz), do: [], else: [timezone: "is not a valid timezone"]
     end)
   end
 end
