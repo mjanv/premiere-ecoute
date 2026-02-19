@@ -38,4 +38,19 @@ defmodule PremiereEcoute.Accounts.User.ProfileTest do
       assert %Profile{id: _, color_scheme: :dark, language: :en} = user.profile
     end
   end
+
+  describe "get/1" do
+    test "can get" do
+      {:ok, user} =
+        User.create(%{
+          email: "user@email.com",
+          username: "username",
+          profile: %{color_scheme: :light, language: :it, radio_settings: %{visibility: :private}}
+        })
+
+      assert Profile.get(user, [:language]) == :it
+      assert Profile.get(user, [:radio_settings, :unknown]) == nil
+      assert Profile.get(user, [:radio_settings, :unknown], :default) == :default
+    end
+  end
 end

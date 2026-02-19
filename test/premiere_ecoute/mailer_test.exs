@@ -1,10 +1,10 @@
-defmodule PremiereEcoute.MailerTest do
+defmodule PremiereEcoute.Accounts.MailerTest do
   use PremiereEcoute.DataCase
 
   import Swoosh.TestAssertions
 
+  alias PremiereEcoute.Accounts.Mailer
   alias PremiereEcoute.Events.AccountCreated
-  alias PremiereEcoute.Mailer
 
   describe "dispatch/1" do
     test "send an email from an event" do

@@ -25,6 +25,7 @@ defmodule PremiereEcouteCore do
       GoofyWords,
       Search,
       Subscriber,
+      Timezone,
       Utils,
       Worker,
       Zipfile

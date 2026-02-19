@@ -159,6 +159,51 @@
                 </div>
               </div>
               
+<!-- Timezone Selection -->
+              <div class="md:col-span-2">
+                <label class="block text-base font-semibold text-gray-200 mb-4">{gettext("Timezone")}</label>
+                <.input
+                  field={@profile_form[:timezone]}
+                  type="select"
+                  options={@timezones}
+                  class="w-full px-4 py-4 text-base rounded-xl bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 shadow-lg hover:bg-gray-900/80"
+                />
+              </div>
+              
+<!-- Widget Colors -->
+              <div class="mt-8">
+                <h3 class="text-base font-semibold text-gray-200 mb-1">{gettext("Widget Colors")}</h3>
+                <p class="text-sm text-gray-400 mb-4">{gettext("Primary and secondary colors used in OBS overlay widgets")}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Primary Color")}</label>
+                    <div class="flex items-center gap-3">
+                      <.input
+                        field={@profile_form[:widget_color1]}
+                        type="color"
+                        class="h-12 w-20 rounded-lg border border-gray-600 bg-gray-900/60 cursor-pointer p-1"
+                      />
+                      <span class="text-sm text-gray-400 font-mono">
+                        {Phoenix.HTML.Form.input_value(@profile_form, :widget_color1)}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Secondary Color")}</label>
+                    <div class="flex items-center gap-3">
+                      <.input
+                        field={@profile_form[:widget_color2]}
+                        type="color"
+                        class="h-12 w-20 rounded-lg border border-gray-600 bg-gray-900/60 cursor-pointer p-1"
+                      />
+                      <span class="text-sm text-gray-400 font-mono">
+                        {Phoenix.HTML.Form.input_value(@profile_form, :widget_color2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
 <!-- Save Button -->
               <div class="mt-8 flex justify-end">
                 <.button

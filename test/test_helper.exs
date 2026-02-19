@@ -1,4 +1,4 @@
-apis = [PremiereEcoute.Apis.Streaming.TwitchApi, PremiereEcoute.Apis.MusicProvider.SpotifyApi, PremiereEcoute.Mailer]
+apis = [PremiereEcoute.Apis.Streaming.TwitchApi, PremiereEcoute.Apis.MusicProvider.SpotifyApi, PremiereEcoute.Accounts.Mailer]
 
 for api <- apis do
   Mox.defmock(Module.concat([api, Mock]), for: Module.concat([api, Behaviour]))

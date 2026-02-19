@@ -29,6 +29,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
     |> assign(:show_download_modal, false)
     |> assign(:show_delete_modal, false)
     |> assign(:profile_form, profile_form)
+    |> assign(:timezones, PremiereEcouteCore.Timezone.list())
     |> then(fn socket -> {:ok, socket} end)
   end
 

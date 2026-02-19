@@ -26,9 +26,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
 
     with false <- is_nil(date),
          user when not is_nil(user) <- Accounts.get_user_by_username(username),
-         true <- tracks_visible?(user) do
-      # AIDEV-NOTE: tracks/date assigned here for initial render; handle_params refreshes on patch
-      retention_days = user.profile.radio_settings.retention_days
+         true <- Accounts.profile(user, [:radio_settings, :visibility]) do
       today = Date.utc_today()
 
       {:ok,
@@ -37,7 +35,8 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
          date: date,
          tracks: [],
          today: today,
-         oldest_date: Date.add(today, -(retention_days - 1)),
+         oldest_date: Date.add(today, -Accounts.profile(user, [:radio_settings, :retention_days])),
+         timezone: Accounts.profile(user, [:timezone], "UTC"),
          page_title: "#{username}'s tracks"
        )}
     else
@@ -61,12 +60,5 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
     date = Date.utc_today()
     tracks = Radio.get_tracks(socket.assigns.user.id, date)
     {:noreply, assign(socket, date: date, tracks: tracks)}
-  end
-
-  defp tracks_visible?(user) do
-    case user.profile.radio_settings do
-      %{visibility: :public} -> true
-      _ -> false
-    end
   end
 end

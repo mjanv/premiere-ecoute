@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Mailer do
+defmodule PremiereEcoute.Accounts.Mailer do
   @moduledoc """
   Email delivery service.
 
@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Mailer do
 
   use Swoosh.Mailer, otp_app: :premiere_ecoute
 
-  alias PremiereEcoute.Mailer.Email
+  alias PremiereEcoute.Accounts.Mailer.Email
 
   defmodule Behaviour do
     @moduledoc "Mailer callback specifications."
@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Mailer do
   def dispatch(event), do: deliver(Email.from_event(event))
 end
 
-defmodule PremiereEcoute.Mailer.Email do
+defmodule PremiereEcoute.Accounts.Mailer.Email do
   @moduledoc """
   Email.
 

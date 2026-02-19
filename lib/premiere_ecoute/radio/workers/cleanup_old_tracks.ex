@@ -15,22 +15,10 @@ defmodule PremiereEcoute.Radio.Workers.CleanupOldTracks do
 
   @impl true
   def perform(%Oban.Job{}) do
-    Logger.info("Starting cleanup of old radio tracks")
-
     Accounts.streamers()
-    |> Enum.filter(fn user ->
-      case user.profile.radio_settings do
-        %{enabled: true} -> true
-        _ -> false
-      end
-    end)
+    |> Enum.filter(fn user -> Accounts.profile(user, [:radio_settings, :enabled], false) end)
     |> Enum.each(fn user ->
-      retention_days =
-        case user.profile.radio_settings do
-          %{retention_days: days} when is_integer(days) -> days
-          _ -> 7
-        end
-
+      retention_days = Accounts.profile(user, [:radio_settings, :retention_days], 7)
       cutoff_datetime = DateTime.add(DateTime.utc_now(), -retention_days, :day)
 
       {deleted_count, _} = Radio.delete_tracks_before(user.id, cutoff_datetime)
@@ -40,7 +28,6 @@ defmodule PremiereEcoute.Radio.Workers.CleanupOldTracks do
       end
     end)
 
-    Logger.info("Completed cleanup of old radio tracks")
     :ok
   end
 end

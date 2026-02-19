@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Accounts do
   alias PremiereEcoute.Accounts.Services
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
+  alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Accounts.User.Token
 
@@ -36,6 +37,9 @@ defmodule PremiereEcoute.Accounts do
   @doc "Returns the list of streamers."
   @spec streamers() :: list(User.t())
   def streamers, do: User.all(where: [role: :streamer])
+
+  ## User Profile
+  defdelegate profile(user, path, default \\ nil), to: Profile, as: :get
 
   ## User Token
   defdelegate generate_user_session_token(user), to: Token

@@ -20,7 +20,7 @@
           >
             <div class="flex-1 min-w-0">
               <div class="text-purple-400 text-2xl font-semibold mb-3 group-hover:text-purple-300 transition-colors duration-300">
-                {Calendar.strftime(track.started_at, "%H:%M")}
+                {track.started_at |> DateTime.shift_zone!(@timezone) |> Calendar.strftime("%H:%M")}
               </div>
               <div class="text-white uppercase font-black text-5xl leading-tight tracking-wide mb-3 transition-colors duration-300">
                 {track.name}
