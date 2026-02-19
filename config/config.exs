@@ -138,7 +138,7 @@ config :premiere_ecoute, PremiereEcoute.Gettext,
   locales: ~w(en fr it),
   default_locale: "en"
 
-config :premiere_ecoute, PremiereEcoute.Mailer, adapter: Resend.Swoosh.Adapter
+config :premiere_ecoute, PremiereEcoute.Accounts.Mailer, adapter: Resend.Swoosh.Adapter
 
 config :esbuild,
   version: "0.17.11",

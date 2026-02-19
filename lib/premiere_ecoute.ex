@@ -30,7 +30,7 @@ defmodule PremiereEcoute do
     ]
 
   alias PremiereEcoute.Events.Store
-  alias PremiereEcoute.Mailer
+  alias PremiereEcoute.Accounts.Mailer
 
   @version Mix.Project.config()[:version]
   @commit System.cmd("git", ["rev-parse", "--short", "HEAD"], stderr_to_stdout: true) |> elem(0) |> String.trim()

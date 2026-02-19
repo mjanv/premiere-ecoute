@@ -5,13 +5,13 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.ChannelFollowed
   alias PremiereEcoute.Events.Store
-  alias PremiereEcoute.Mailer.Mock, as: Mailer
+  alias PremiereEcoute.Accounts.Mailer.Mock, as: Mailer
 
   setup do
     {:ok, pid} = start_supervised(PremiereEcoute.Accounts.Notifier)
     ref = Process.monitor(pid)
 
-    Application.put_env(:premiere_ecoute, :mailer, PremiereEcoute.Mailer.Mock)
+    Application.put_env(:premiere_ecoute, :mailer, PremiereEcoute.Accounts.Mailer.Mock)
 
     {:ok, %{ref: ref, pid: pid}}
   end
