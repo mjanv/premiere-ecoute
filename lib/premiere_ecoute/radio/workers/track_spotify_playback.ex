@@ -34,9 +34,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
     user = user_id |> Accounts.User.get!() |> Repo.preload(:spotify)
     scope = user |> Scope.for_user() |> then(&Accounts.maybe_renew_token(%{assigns: %{current_scope: &1}}, :spotify))
 
-    schedule_next_poll(user_id)
-
-    with 1 <- feature_enabled?(user),
+    with true <- feature_enabled?(user),
          {:ok, playback} <- Apis.spotify().get_playback_state(scope, Player.default()),
          {:ok, _track} <- store_track_if_new(user_id, playback),
          :ok <- schedule_next_poll(user_id, playback) do
