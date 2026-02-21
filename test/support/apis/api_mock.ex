@@ -73,12 +73,10 @@ defmodule PremiereEcoute.ApiMock do
         conn
       end
 
-    if opts[:response] do
-      conn
-      |> Req.Test.json(payload(opts[:response]))
-    else
-      conn
-      |> Req.Test.text(opts[:body])
+    cond do
+      opts[:response] -> Req.Test.json(conn, payload(opts[:response]))
+      is_map(opts[:body]) -> Req.Test.json(conn, opts[:body])
+      true -> Req.Test.text(conn, opts[:body] || "")
     end
   end
 

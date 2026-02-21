@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.ChatTest do
     scope = user_scope_fixture(user)
     Cache.put(:users, :bot, bot)
 
-    start_supervised(PremiereEcoute.Apis.RateLimit)
+    start_supervised(PremiereEcoute.Apis.RateLimit.RateLimiter)
     start_supervised(PremiereEcoute.Apis.Streaming.TwitchQueue)
 
     :timer.sleep(500)

@@ -24,6 +24,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       initial_state = %{
         scope: scope,
         phx_ref: phx_ref,
+        polls: 100,
         state: %{
           "is_playing" => false,
           "device" => %{"id" => "device123"},
@@ -67,6 +68,12 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
 
       assert new_state.state == new_playback_state
       assert_receive {:player, :start, _state}
+    end
+
+    test "stops normally when poll budget is exhausted", %{initial_state: initial_state} do
+      exhausted_state = Map.put(initial_state, :polls, 0)
+
+      assert {:stop, :normal, _state} = SpotifyPlayer.handle_info(:poll, exhausted_state)
     end
 
     test "stops when only one presence left", %{initial_state: initial_state} do

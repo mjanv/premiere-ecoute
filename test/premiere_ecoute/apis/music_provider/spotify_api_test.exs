@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApiTest do
   setup {Req.Test, :verify_on_exit!}
 
   setup do
+    start_supervised({Cache, name: :rate_limits})
+
     scope =
       user_scope_fixture(
         user_fixture(%{
@@ -17,7 +19,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApiTest do
       )
 
     Cache.put(:tokens, :spotify, "token")
-    Cache.clear(:rate_limits)
 
     {:ok, scope: scope}
   end
@@ -60,7 +61,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApiTest do
       assert {:error, "Network error during playback state"} = SpotifyApi.get_playback_state(scope, %{})
     end
 
-    test "activate the circuit breaker on 429 HTTP status code responses2", %{scope: scope} do
+    test "activate the circuit breaker on 429 HTTP status code responses without defined retry-after", %{scope: scope} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/me/player"},

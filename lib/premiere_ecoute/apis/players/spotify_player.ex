@@ -17,6 +17,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
   @poll_interval 1_500
+  @poll_max_hours 3
+  @polls trunc(@poll_max_hours * 3_600_000 / @poll_interval)
 
   @doc """
   Starts the Spotify player monitoring GenServer.
@@ -37,7 +39,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
     with {:ok, phx_ref} <- Presence.join(scope.user.id),
          {:ok, state} <- Apis.spotify().get_playback_state(scope, %{}) do
-      {:ok, %{phx_ref: phx_ref, scope: scope, state: state}}
+      {:ok, %{phx_ref: phx_ref, scope: scope, state: state, polls: @polls}}
     else
       {:error, reason} ->
         publish(scope, {:error, reason}, %{})
@@ -46,16 +48,23 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   end
 
   @impl true
-  def handle_info(:poll, %{scope: scope, state: old_state} = data) do
+  def handle_info(:poll, %{scope: scope, polls: 0} = data) do
+    Logger.warning("Spotify player budget exhausted for user #{scope.user.id}, stopping normally")
+    {:stop, :normal, data}
+  end
+
+  def handle_info(:poll, %{scope: scope, state: old_state, polls: polls} = data) do
     with _ <- Process.send_after(self(), :poll, @poll_interval),
          scope <- Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :spotify),
          {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
          {:ok, state, events} <- handle(old_state, new_state),
          :ok <- Enum.each(events, fn event -> publish(scope, event, state) end) do
+      data = %{scope: scope, state: state, polls: polls - 1}
+
       if length(PremiereEcoute.Presence.player(scope.user.id)) > 1 do
-        {:noreply, %{scope: scope, state: state}}
+        {:noreply, data}
       else
-        {:stop, :normal, %{scope: scope, state: state}}
+        {:stop, :normal, data}
       end
     else
       {:error, reason} -> {:stop, {:error, reason}, data}

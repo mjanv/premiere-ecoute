@@ -18,14 +18,18 @@ defmodule PremiereEcoute.Apis.RateLimit.Supervisor do
 
   @impl true
   def init(_args) do
-    mandatory = [
-      {Cache, name: :rate_limits, hooks: [hook(module: RateLimit.CircuitBreakerMonitor)]}
-    ]
+    mandatory = []
 
     optionals =
       case Application.get_env(:premiere_ecoute, :environment) do
-        :test -> []
-        _ -> [RateLimit.RateLimiter]
+        :test ->
+          []
+
+        _ ->
+          [
+            {Cache, name: :rate_limits, hooks: [hook(module: RateLimit.CircuitBreakerMonitor)]},
+            RateLimit.RateLimiter
+          ]
       end
 
     Supervisor.init(mandatory ++ optionals, strategy: :one_for_one)
