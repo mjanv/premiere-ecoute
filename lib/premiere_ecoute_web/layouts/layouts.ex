@@ -36,6 +36,8 @@ defmodule PremiereEcouteWeb.Layouts do
 
   attr :show_modal, :boolean, default: false, doc: "whether a modal is currently open"
 
+  attr :banners, :list, default: [], doc: "list of currently rate-limited API atoms"
+
   slot :inner_block, required: true
 
   def app(assigns) do
@@ -61,6 +63,36 @@ defmodule PremiereEcouteWeb.Layouts do
             >
               {gettext("Connect Spotify")}
             </.link>
+          </div>
+        </div>
+      <% end %>
+      
+    <!-- Rate limit banners for circuit-broken APIs -->
+      <%= for {api, message, expires_at} <- @banners do %>
+        <div class="bg-yellow-600 px-6 py-2">
+          <div class="flex items-center space-x-3">
+            <svg
+              class="w-5 h-5 text-white flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+              />
+            </svg>
+            <span class="text-white font-medium">
+              {gettext("%{api} API rate-limited", api: api |> to_string() |> String.capitalize())}
+              {" — "}
+              <span class="font-normal">{inspect(message)}</span>
+              <%= if expires_at do %>
+                {" — "}
+                {gettext("retrying at %{time}", time: Calendar.strftime(expires_at, "%H:%M:%S UTC"))}
+              <% end %>
+            </span>
           </div>
         </div>
       <% end %>

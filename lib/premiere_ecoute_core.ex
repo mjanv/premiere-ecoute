@@ -12,6 +12,7 @@ defmodule PremiereEcouteCore do
       Aggregate.Entity,
       Aggregate.Object,
       Api,
+      Api.CircuitBreaker,
       Cache,
       CommandBus.Handler,
       Date,

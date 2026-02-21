@@ -1,4 +1,9 @@
-<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="my_sessions">
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="my_sessions"
+>
   <div class="synthwave-bg min-h-screen text-white">
     
 <!-- Delete Confirmation Modal -->

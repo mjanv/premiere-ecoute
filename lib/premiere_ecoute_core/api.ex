@@ -32,6 +32,7 @@ defmodule PremiereEcouteCore.Api do
       require Logger
 
       alias PremiereEcoute.Telemetry
+      alias PremiereEcouteCore.Api.CircuitBreaker
       alias PremiereEcouteCore.Cache
 
       for behaviour <- unquote(behaviours) ++ [__MODULE__.Behaviour] do
@@ -124,6 +125,10 @@ defmodule PremiereEcouteCore.Api do
             ""
         end
       end
+
+      @doc "Pass the request through the circuit breaker"
+      @spec token(Req.Request.t()) :: Req.Request.t()
+      def circuit_breaker(request), do: CircuitBreaker.run(request, api: unquote(api))
     end
   end
 end

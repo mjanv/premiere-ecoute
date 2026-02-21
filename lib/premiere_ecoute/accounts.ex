@@ -6,8 +6,8 @@ defmodule PremiereEcoute.Accounts do
   alias PremiereEcoute.Accounts.Services
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
-  alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.OauthToken
+  alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.Token
 
   ## User

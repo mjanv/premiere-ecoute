@@ -1,4 +1,9 @@
-<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="votes">
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="votes"
+>
   <div class="min-h-screen synthwave-bg text-white">
     <!-- Header -->
     <div class="bg-gray-900 border-b border-gray-800">

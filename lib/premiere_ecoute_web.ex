@@ -93,6 +93,7 @@ defmodule PremiereEcouteWeb do
 
       on_mount PremiereEcouteWeb.Hooks.RestoreLocale
       on_mount PremiereEcouteWeb.Hooks.Flash
+      on_mount PremiereEcouteWeb.Hooks.RateLimits
 
       unquote(html_helpers())
     end

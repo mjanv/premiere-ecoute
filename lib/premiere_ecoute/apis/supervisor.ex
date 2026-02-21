@@ -21,19 +21,14 @@ defmodule PremiereEcoute.Apis.Supervisor do
 
   @impl true
   def init(_args) do
-    mandatory = [
+    children = [
       {Cache, name: :subscriptions},
       {Cache, name: :tokens},
       PremiereEcoute.Apis.Players.Supervisor,
-      PremiereEcoute.Apis.Streaming.Supervisor
+      PremiereEcoute.Apis.Streaming.Supervisor,
+      PremiereEcoute.Apis.RateLimit.Supervisor
     ]
 
-    optionals =
-      case Application.get_env(:premiere_ecoute, :environment) do
-        :test -> []
-        _ -> [PremiereEcoute.Apis.RateLimit]
-      end
-
-    Supervisor.init(mandatory ++ optionals, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

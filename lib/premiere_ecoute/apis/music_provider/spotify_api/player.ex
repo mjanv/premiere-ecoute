@@ -189,6 +189,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   def get_playback_state(%Scope{} = scope, state) do
     scope
     |> SpotifyApi.api()
+    |> SpotifyApi.circuit_breaker()
     |> Req.merge(url: "/me/player", retry: false)
     |> Req.get()
     |> case do

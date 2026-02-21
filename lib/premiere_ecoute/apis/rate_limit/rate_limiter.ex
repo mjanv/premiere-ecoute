@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Apis.RateLimit do
+defmodule PremiereEcoute.Apis.RateLimit.RateLimiter do
   @moduledoc """
   Rate limiting for API requests.
 

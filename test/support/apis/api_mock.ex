@@ -55,9 +55,31 @@ defmodule PremiereEcoute.ApiMock do
       assert conn.body_params == payload(opts[:request])
     end
 
-    conn
-    |> Plug.Conn.put_status(Keyword.get(opts, :status, 200))
-    |> Req.Test.json(payload(opts[:response]))
+    conn =
+      conn
+      |> Plug.Conn.put_status(Keyword.get(opts, :status, 200))
+      |> Plug.Conn.put_resp_header("test", "value")
+
+    conn =
+      if opts[:resp_headers] do
+        Enum.reduce(opts[:resp_headers], conn, fn {k, v}, conn ->
+          if is_list(v) do
+            Plug.Conn.put_resp_header(conn, k, hd(v))
+          else
+            Plug.Conn.put_resp_header(conn, k, v)
+          end
+        end)
+      else
+        conn
+      end
+
+    if opts[:response] do
+      conn
+      |> Req.Test.json(payload(opts[:response]))
+    else
+      conn
+      |> Req.Test.text(opts[:body])
+    end
   end
 
   @doc """

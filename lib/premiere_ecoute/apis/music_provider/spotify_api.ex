@@ -116,6 +116,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
       ]
     ]
     |> new()
+    |> circuit_breaker()
   end
 
   def api(token) when is_binary(token) do

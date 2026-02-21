@@ -1,4 +1,9 @@
-<Layouts.app flash={@flash} current_scope={assigns[:current_scope] || %{}} current_page="library">
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="library"
+>
   <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
     <!-- My Library page with playlists grid and management -->
     <div class="flex-1 py-12">

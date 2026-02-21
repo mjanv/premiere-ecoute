@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueue do
   use GenServer
 
   alias PremiereEcoute.Accounts.Bot
-  alias PremiereEcoute.Apis.RateLimit
+  alias PremiereEcoute.Apis.RateLimit.RateLimiter
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Chat
 
   @doc """
@@ -104,7 +104,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueue do
 
   defp hit(message, rates) do
     rates
-    |> Enum.map(fn {k, t, h} -> RateLimit.hit(k, t, h) end)
+    |> Enum.map(fn {k, t, h} -> RateLimiter.hit(k, t, h) end)
     |> Enum.filter(fn {result, _} -> result == :deny end)
     |> case do
       [] -> {:allow, message}

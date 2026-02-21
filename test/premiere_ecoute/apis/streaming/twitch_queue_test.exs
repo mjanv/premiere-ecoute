@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
   use PremiereEcoute.DataCase
 
   alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Apis.RateLimit
+  alias PremiereEcoute.Apis.RateLimit.RateLimiter
   alias PremiereEcoute.Apis.Streaming.TwitchApi
   alias PremiereEcoute.Apis.Streaming.TwitchQueue
   alias PremiereEcouteCore.Cache
@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
     bot = user_fixture(%{twitch: %{user_id: "467189141", access_token: "bot_token"}})
     Cache.put(:users, :bot, bot)
 
-    start_supervised!(RateLimit)
+    start_supervised!(RateLimiter)
     {:ok, pid} = start_supervised(TwitchQueue)
 
     :timer.sleep(100)
@@ -56,7 +56,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
       message = %{user_id: "141981764", message: "test"}
 
       # Pre-hit the broadcaster rate limit (1 message per second)
-      RateLimit.hit("broadcaster:#{message.user_id}", :timer.seconds(1), 1)
+      RateLimiter.hit("broadcaster:#{message.user_id}", :timer.seconds(1), 1)
 
       # Push message which should be denied and circuit should open
       TwitchQueue.push({:do_send_chat_message, message})
@@ -76,7 +76,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
       message2 = %{user_id: "141981764", message: "test2"}
 
       # Pre-hit the broadcaster rate limit
-      RateLimit.hit("broadcaster:#{message1.user_id}", :timer.seconds(1), 1)
+      RateLimiter.hit("broadcaster:#{message1.user_id}", :timer.seconds(1), 1)
 
       TwitchQueue.push({:do_send_chat_message, message1})
 
@@ -110,7 +110,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
       )
 
       # Pre-hit the broadcaster rate limit
-      RateLimit.hit("broadcaster:#{message.user_id}", :timer.seconds(1), 1)
+      RateLimiter.hit("broadcaster:#{message.user_id}", :timer.seconds(1), 1)
 
       TwitchQueue.push({:do_send_chat_message, message})
 

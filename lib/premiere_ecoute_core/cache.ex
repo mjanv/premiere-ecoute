@@ -14,9 +14,11 @@ defmodule PremiereEcouteCore.Cache do
   """
   @spec child_spec(keyword()) :: Supervisor.child_spec()
   def child_spec(opts) do
+    {name, cachex_opts} = Keyword.pop!(opts, :name)
+
     %{
-      id: opts[:name],
-      start: {Cachex, :start_link, [opts[:name]]}
+      id: name,
+      start: {Cachex, :start_link, [name, cachex_opts]}
     }
   end
 
@@ -48,4 +50,8 @@ defmodule PremiereEcouteCore.Cache do
   @doc "Retrieves value from cache by key"
   @spec get(atom(), term()) :: {:ok, term()} | {:error, term()}
   def get(cache, key), do: Cachex.get(cache, key)
+
+  @doc "Retrieves value from cache by key"
+  @spec ttl(atom(), term()) :: {:ok, term()} | {:error, term()}
+  def ttl(cache, key), do: Cachex.ttl(cache, key)
 end
