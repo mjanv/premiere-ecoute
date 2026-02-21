@@ -24,6 +24,6 @@
       text_color={widget_text_color(@widget_state, @color_primary, @color_secondary)}
     />
   <% end %>
-  <div style={"position: absolute; bottom: 0; left: 0; width: 100%; height: 8px; background: linear-gradient(to right, #{bar_played_color(@widget_state, @color_primary, @color_secondary)} 0%, #{bar_played_color(@widget_state, @color_primary, @color_secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color_primary, @color_secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color_primary, @color_secondary)} 100%);"}>
+  <div style={"position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; background: linear-gradient(to right, #{bar_played_color(@widget_state, @color_primary, @color_secondary)} 0%, #{bar_played_color(@widget_state, @color_primary, @color_secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color_primary, @color_secondary)} #{@percent}%, #{bar_remaining_color(@widget_state, @color_primary, @color_secondary)} 100%);"}>
   </div>
 </div>

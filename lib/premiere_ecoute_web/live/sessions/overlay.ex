@@ -25,6 +25,10 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
     end
   end
 
+  defp score_nil?(nil, _), do: true
+  defp score_nil?(summary, :viewer), do: is_nil(summary["viewer_score"] || Map.get(summary, :viewer_score))
+  defp score_nil?(summary, :streamer), do: is_nil(summary["streamer_score"] || Map.get(summary, :streamer_score))
+
   defp score_label(:viewer), do: "Chat"
   defp score_label(:streamer), do: "Streamer"
 

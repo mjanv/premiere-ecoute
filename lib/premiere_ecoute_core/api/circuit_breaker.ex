@@ -1,5 +1,9 @@
 defmodule PremiereEcouteCore.Api.CircuitBreaker do
-  @moduledoc false
+  @moduledoc """
+  Circuit breaker for outbound API requests.
+
+  Integrates as a pair of Req steps: a pre-request step that halts the request when the target API is currently rate-limited, and a post-response step that opens the circuit on HTTP 429 by storing the response body in the `:rate_limits` cache with a TTL derived from the `retry-after` header (defaulting to 60 seconds). Once the TTL expires the circuit closes automatically and requests resume.
+  """
 
   alias PremiereEcouteCore.Cache
 
