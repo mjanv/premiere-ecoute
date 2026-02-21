@@ -16,7 +16,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   alias PremiereEcoute.Presence
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
-  @poll_interval 1_000
+  @poll_interval 1_500
 
   @doc """
   Starts the Spotify player monitoring GenServer.

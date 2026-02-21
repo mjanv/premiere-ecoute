@@ -1,20 +1,48 @@
 <.async_result :let={summary} assign={@summary}>
   <:loading>
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <span style={"font-size: 128px; font-weight: 700; color: #{if @open_vote, do: "white", else: "rgba(229, 231, 235, 1)"}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
+      <span style={"font-size: 128px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
         --
       </span>
-      <div style={"font-size: 32px; color: #{if @open_vote, do: "rgba(255, 255, 255, 0.8)", else: "rgba(229, 231, 235, 0.8)"}; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;"}>
+      <div style={"font-size: 32px; color: #{@text_color}; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;"}>
         {@score}
       </div>
     </div>
   </:loading>
 
   <div style="display: flex; flex-direction: column; align-items: center;">
-    <span style={"font-size: 128px; font-weight: 700; color: #{if @open_vote, do: "white", else: "rgba(229, 231, 235, 1)"}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
-      {score_value(summary, @score)}
-    </span>
-    <div style={"font-size: 32px; color: #{if @open_vote, do: "rgba(255, 255, 255, 0.8)", else: "rgba(229, 231, 235, 0.8)"}; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;"}>
+    <%= if @widget_state == :closed do %>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill={@text_color}
+        aria-hidden="true"
+        style="width: 128px; height: 128px;"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    <% else %>
+      <%= if @widget_state == :open and score_nil?(summary, @score) do %>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill={@text_color}
+          aria-hidden="true"
+          style="width: 128px; height: 128px;"
+        >
+          <path d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 0 1-1.5 0V6.75a3.75 3.75 0 1 0-7.5 0v3a3 3 0 0 1 3 3v6.75a3 3 0 0 1-3 3H3.75a3 3 0 0 1-3-3v-6.75a3 3 0 0 1 3-3h9v-3c0-2.9 2.35-5.25 5.25-5.25Z" />
+        </svg>
+      <% else %>
+        <span style={"font-size: 128px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
+          {score_value(summary, @score)}
+        </span>
+      <% end %>
+    <% end %>
+    <div style={"font-size: 32px; color: #{@text_color}; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;"}>
       {score_label(@score)}
     </div>
   </div>

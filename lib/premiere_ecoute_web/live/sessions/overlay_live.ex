@@ -12,6 +12,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   import PremiereEcouteWeb.Sessions.Overlay
 
   alias Phoenix.LiveView.AsyncResult
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Presence
   alias PremiereEcoute.Sessions.ListeningSession
@@ -22,6 +23,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   def mount(%{"id" => user_id}, _session, socket) do
     user = PremiereEcoute.Accounts.get_user!(user_id)
     listening_session = ListeningSession.get_active_session(user)
+
+    color_primary = Accounts.profile(user, [:widget_settings, :color_primary])
+    color_secondary = Accounts.profile(user, [:widget_settings, :color_secondary])
 
     if connected?(socket) do
       PremiereEcoute.PubSub.subscribe("playback:#{user_id}")
@@ -36,7 +40,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
           |> assign(:progress, AsyncResult.loading())
-          |> assign(:open_vote, false)
+          |> assign(:widget_state, :idle)
+          |> assign(:color_primary, color_primary)
+          |> assign(:color_secondary, color_secondary)
           |> assign(:listening_session, nil)
           |> assign(:summary, AsyncResult.loading())
 
@@ -48,15 +54,15 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
           _ = PlayerSupervisor.start(session.user.id)
 
-          open_vote =
+          widget_state =
             case session.user.twitch do
               nil ->
-                false
+                :closed
 
               twitch ->
                 case Cache.get(:sessions, twitch.user_id) do
-                  {:ok, cached_session} when not is_nil(cached_session) -> true
-                  _ -> false
+                  {:ok, cached_session} when not is_nil(cached_session) -> :open
+                  _ -> :closed
                 end
             end
 
@@ -81,7 +87,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
           |> assign(:progress, AsyncResult.loading())
-          |> assign(:open_vote, open_vote)
+          |> assign(:widget_state, widget_state)
+          |> assign(:color_primary, color_primary)
+          |> assign(:color_secondary, color_secondary)
           |> assign(:listening_session, session)
           |> assign(:summary, summary_result)
       end
@@ -140,7 +148,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   @impl true
   def handle_info(:vote_open, %{assigns: %{summary: summary}} = socket) do
     socket
-    |> assign(:open_vote, true)
+    |> assign(:widget_state, :open)
     |> assign(:summary, AsyncResult.ok(summary, %{viewer_score: nil, streamer_score: nil}))
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -155,7 +163,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       end
 
     socket
-    |> assign(:open_vote, false)
+    |> assign(:widget_state, :closed)
     |> assign(:summary, summary)
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -167,15 +175,15 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     _ = Presence.join(user_id)
     _ = PlayerSupervisor.start(user_id)
 
-    open_vote =
+    widget_state =
       case session.user.twitch do
         nil ->
-          false
+          :closed
 
         twitch ->
           case Cache.get(:sessions, twitch.user_id) do
-            {:ok, cached_session} when not is_nil(cached_session) -> true
-            _ -> false
+            {:ok, cached_session} when not is_nil(cached_session) -> :open
+            _ -> :closed
           end
       end
 
@@ -184,7 +192,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       |> assign(:id, session.id)
       |> assign(:listening_session, session)
       |> assign(:summary, AsyncResult.ok(%{viewer_score: nil, streamer_score: nil}))
-      |> assign(:open_vote, open_vote)
+      |> assign(:widget_state, widget_state)
       |> assign(:progress, AsyncResult.loading())
       |> assign(:percent, 0)
 
@@ -202,7 +210,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       |> assign(:id, nil)
       |> assign(:listening_session, nil)
       |> assign(:summary, AsyncResult.loading())
-      |> assign(:open_vote, false)
+      |> assign(:widget_state, :ended)
       |> assign(:progress, AsyncResult.loading())
       |> assign(:percent, 0)
 
@@ -216,7 +224,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       |> assign(:id, nil)
       |> assign(:listening_session, nil)
       |> assign(:summary, AsyncResult.loading())
-      |> assign(:open_vote, false)
+      |> assign(:widget_state, :ended)
       |> assign(:progress, AsyncResult.loading())
       |> assign(:percent, 0)
 
