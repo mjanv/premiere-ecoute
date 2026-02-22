@@ -185,6 +185,28 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     end
   end
 
+  describe "count_by_status/0" do
+    test "returns empty map when no sessions exist" do
+      assert ListeningSession.count_by_status() == %{}
+    end
+
+    test "counts sessions in preparing status", %{user: user, album: album} do
+      {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      assert ListeningSession.count_by_status() == %{preparing: 1}
+    end
+
+    test "counts sessions across multiple statuses", %{user: user, album: album} do
+      {:ok, s1} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, s2} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, active} = ListeningSession.start(s1)
+      {:ok, _} = ListeningSession.stop(active)
+      _ = s2
+
+      assert ListeningSession.count_by_status() == %{preparing: 1, stopped: 1}
+    end
+  end
+
   describe "start/1" do
     test "can mark an existing listening to be started", %{user: user, album: album} do
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})

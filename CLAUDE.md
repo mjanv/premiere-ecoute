@@ -1,4 +1,4 @@
-# CLAUDE.md
+# CLAUDE
 
 > **Purpose** – This file is the onboarding manual for every Claude AI assistant who edits this repository.
 > It encodes coding standards, guard-rails, and workflow tricks so the *human 30 %* (architecture, tests, domain judgment) stays in human hands.
@@ -8,7 +8,7 @@
 
 Read those documents before working on the codebase:
 
-- Application summary: @docs/README.md
+- Application summary: README.md
 - Coding standards: @docs/coding_standards.md
 - Development guide: @docs/guides/development.md
 
@@ -40,7 +40,7 @@ AI assistant MUST NOT do:
 
 Add specially formatted comments throughout the codebase, where appropriate, whenever a file or piece of code is too long, too complex, very important, confusing, or could have a bug unrelated to the task you are currently working on. for yourself as inline knowledge that can be easily `grep`ped for.
 
-1. Use concise (≤ 120 chars) `AIDEV-NOTE:`, `AIDEV-TODO:`, or `AIDEV-QUESTION:` (all-caps prefix) for comments aimed at AI and developers.
+1. Use concise (≤ 120 chars) `AIDEV-NOTE:` (all-caps prefix) for comments aimed at AI and developers.
 2. Do not remove `AIDEV-NOTE`s without explicit human instruction.
 3. Important: Before scanning files, always first try to locate existing anchors `AIDEV-*` in relevant subdirectories.
 4. Update relevant anchors when modifying associated code.
@@ -62,8 +62,5 @@ When responding to user instructions, the AI assistant should follow this proces
 3. **Break Down & Plan**: Break down the task at hand and chalk out a rough plan for carrying it out, referencing project conventions and best practices.
 4. **Trivial Tasks**: If the plan/request is trivial, go ahead and get started immediately.
 5. **Non-Trivial Tasks**: Otherwise, present the plan to the user for review and iterate based on their feedback.
-6. **Track Progress**: Use a to-do list (internally, or optionally in a `TODOS.md` file) to keep track of your progress on multi-step or complex tasks.
-7. **If Stuck, Re-plan**: If you get stuck or blocked, return to step 3 to re-evaluate and adjust your plan.
-8. **Update Documentation**: Once the user's request is fulfilled, update relevant anchor comments (`AIDEV-NOTE`, etc.) and `AGENTS.md` files in the files and directories you touched.
-9. **User Review**: After completing the task, ask the user to review what you've done, and repeat the process as needed.
-10. **Session Boundaries**: If the user's request isn't directly related to the current context and can be safely started in a fresh session, suggest starting from scratch to avoid context confusion.
+6. **User Review**: After completing the task, ask the user to review what you've done, and repeat the process as needed.
+7. **Session Boundaries**: If the user's request isn't directly related to the current context and can be safely started in a fresh session, suggest starting from scratch to avoid context confusion.

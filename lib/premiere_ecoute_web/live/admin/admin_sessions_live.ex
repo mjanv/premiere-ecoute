@@ -17,11 +17,9 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   """
   @impl true
   def mount(_params, _session, socket) do
-    sessions = ListeningSession.all([])
-
     socket
     |> assign(:page, ListeningSession.page([], 1, 10))
-    |> assign(:session_stats, session_stats(sessions))
+    |> assign(:session_stats, session_stats())
     |> assign(:selected_session, nil)
     |> assign(:show_modal, false)
     |> assign(:show_delete_modal, false)
@@ -129,14 +127,9 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
     end
   end
 
-  defp session_stats(sessions) do
-    status_stats =
-      sessions
-      |> Enum.group_by(& &1.status)
-      |> Enum.into(%{}, fn {status, sessions} -> {status, length(sessions)} end)
-
+  defp session_stats do
+    status_counts = ListeningSession.count_by_status()
     total_votes = Vote.count(:id)
-
-    Map.put(status_stats, :total_votes, total_votes)
+    Map.put(status_counts, :total_votes, total_votes)
   end
 end

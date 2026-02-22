@@ -418,6 +418,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   def can_view_retrospective?(%__MODULE__{}, _scope), do: false
 
+  @doc """
+  Returns session counts grouped by status.
+
+  Issues a single `COUNT ... GROUP BY status` query instead of loading all sessions into memory.
+  Returns a map like `%{preparing: 2, active: 1, stopped: 5}`.
+  """
+  @spec count_by_status() :: %{atom() => non_neg_integer()}
+  def count_by_status do
+    from(s in __MODULE__, group_by: s.status, select: {s.status, count(s.id)})
+    |> Repo.all()
+    |> Map.new()
+  end
+
   defp has_active_session?(user_id, exclude_session_id) do
     from(s in __MODULE__,
       where: s.user_id == ^user_id and s.status == :active and s.id != ^exclude_session_id
