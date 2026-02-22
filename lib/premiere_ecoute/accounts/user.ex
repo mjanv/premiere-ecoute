@@ -228,16 +228,6 @@ defmodule PremiereEcoute.Accounts.User do
     |> Store.ok("user", fn user -> %AccountCreated{id: user.id} end)
   end
 
-  # def update_spotify_tokens(user, attrs) do
-  # %{user_id: user_id, display_name: username, access_token: access_token, refresh_token: refresh_token, expires_in: expires_in}
-  # %{access_token: access_token, refresh_token: refresh_token, expires_in: expires_in}
-  # def disconnect_spotify(user) do
-
-  # def update_twitch_auth(user, attrs) do
-  # %{user_id: user_id, access_token: access_token, refresh_token: refresh_token, expires_in: expires_in, username: username}
-  # %{access_token: access_token, refresh_token: refresh_token, expires_in: expires_in}
-  # def disconnect_twitch(user)
-
   @doc """
   Checks whether the user is in sudo mode.
 

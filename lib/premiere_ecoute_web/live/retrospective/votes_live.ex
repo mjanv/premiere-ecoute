@@ -6,11 +6,9 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Discography.Album
-  alias PremiereEcoute.Repo
+  alias PremiereEcoute.Discography
   alias PremiereEcoute.Sessions
 
-  import Ecto.Query
   import PremiereEcouteCore.Duration, only: [timer: 1]
 
   @impl true
@@ -132,33 +130,17 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
 
   # Private helper functions
   defp load_modal_data(album_id, user_id) do
-    case Repo.get(Album, album_id) |> Repo.preload(:tracks) do
+    case Discography.get_album(album_id) do
       nil ->
         {:ok, %{modal_data: nil}}
 
       album ->
-        # Get all track IDs for this album
         track_ids = Enum.map(album.tracks, & &1.id)
-
-        # Get all votes for these tracks by the current user in one query
-        votes = get_all_track_votes_for_user(track_ids, user_id)
-
-        # Group votes by track_id for easy lookup
+        votes = Sessions.get_track_votes_for_user(track_ids, user_id)
         votes_by_track = Enum.group_by(votes, & &1.track_id)
 
         {:ok, %{modal_data: %{album: album, votes_by_track: votes_by_track}}}
     end
-  end
-
-  defp get_all_track_votes_for_user(track_ids, user_id) do
-    alias PremiereEcoute.Sessions.Scores.Vote
-
-    from(v in Vote,
-      where: v.track_id in ^track_ids and v.viewer_id == ^user_id,
-      select: %{track_id: v.track_id, score: v.value, inserted_at: v.inserted_at},
-      order_by: [v.track_id, desc: v.inserted_at]
-    )
-    |> Repo.all()
   end
 
   defp get_track_votes(_user_id, track_id, votes_by_track) when is_map(votes_by_track) do

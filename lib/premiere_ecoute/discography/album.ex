@@ -77,6 +77,16 @@ defmodule PremiereEcoute.Discography.Album do
   end
 
   @doc """
+  Fetches an album by id with tracks preloaded. Returns nil if not found.
+  """
+  @spec get(integer()) :: t() | nil
+  def get(id) do
+    __MODULE__
+    |> Repo.get(id)
+    |> Repo.preload(:tracks)
+  end
+
+  @doc """
   Calculates total album duration in milliseconds.
 
   Sums duration of all tracks, treating nil durations as zero.

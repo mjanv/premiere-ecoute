@@ -76,6 +76,21 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
   end
 
   @doc """
+  Fetches all votes cast by a viewer for a list of track ids.
+
+  Returns a list of maps with track_id, score, and inserted_at, ordered by track_id then most recent first.
+  """
+  @spec for_tracks_and_viewer(list(integer()), String.t()) :: list(map())
+  def for_tracks_and_viewer(track_ids, viewer_id) do
+    from(v in __MODULE__,
+      where: v.track_id in ^track_ids and v.viewer_id == ^viewer_id,
+      select: %{track_id: v.track_id, score: v.value, inserted_at: v.inserted_at},
+      order_by: [v.track_id, desc: v.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
   Parses vote value from chat message using default vote options 0-10.
 
   Convenience function using standard vote scale.

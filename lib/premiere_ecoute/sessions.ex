@@ -32,6 +32,7 @@ defmodule PremiereEcoute.Sessions do
   @spec viewer_votes(PremiereEcoute.Accounts.User.t()) :: list(Scores.Vote.t())
   def viewer_votes(user), do: Scores.Vote.all(where: [viewer_id: user.twitch.user_id])
   defdelegate create_vote(vote), to: Scores.Vote, as: :create
+  defdelegate get_track_votes_for_user(track_ids, viewer_id), to: Scores.Vote, as: :for_tracks_and_viewer
 
   # Retrospective
   defdelegate get_albums_by_period(user, period, opts \\ %{}), to: Retrospective.History

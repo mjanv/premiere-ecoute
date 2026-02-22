@@ -30,29 +30,9 @@ Both clauses in `ListeningSessionWorker` do the same thing (load user+session, w
 
 ## 2. Potential Bugs
 
-### `Report.generate/1` — non-exhaustive `case` on `vote_options`
-A session with custom options (e.g. `["A", "B", "C"]`) will crash with `CaseClauseError` at runtime. Add a fallback clause.
-- `lib/premiere_ecoute/sessions/retrospective/report.ex:98-103`
-
-### `Store.append/2` silently discards write errors
-`append_to_stream` and `link_to_stream` return `{:ok, ...}` or `{:error, ...}`, but results are ignored. The function always returns `:ok`, swallowing event store failures.
-- `lib/premiere_ecoute/events/store.ex:78-83`
-
-### `ListeningSessionWorker` — `next_track` missing `:ok` return
-The `next_track` clause has no explicit `:ok` after the `with` block. A failing command will cause Oban to mark the job failed instead of discarding it. Compare with `next_playlist_track` which does return `:ok`.
-- `lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:80-86`
-
-### `Account.delete_account/1` — nil Twitch association causes mid-transaction crash
-`v.viewer_id == ^user.twitch.user_id` will raise if the user never connected Twitch. Add a guard for a nil association before constructing the query.
-- `lib/premiere_ecoute/accounts/services/account_compliance.ex:80`
-
 ### `VoteTrends.rolling_average/2` — SQL `CAST AS NUMERIC` fails on text votes
 For smash/pass sessions, casting `"smash"` or `"pass"` to numeric raises a PostgreSQL error. Add a type guard before executing the query.
 - `lib/premiere_ecoute/sessions/retrospective/vote_trends.ex:133-149`
-
-### `SpotifyPlayer` — end-of-track detection is brittle
-`{98, 99}` exact match will miss the end of track if the polling interval skips those specific percentages. Use `b >= 99` instead.
-- `lib/premiere_ecoute/apis/players/spotify_player.ex:117-121`
 
 ### `Retrospective.History` — hardcoded `smash/pass` exclusion in vote query
 `where: v.value not in ["smash", "pass"]` will silently include future text-mode options in numeric averages. Tie exclusion to session vote type instead.
@@ -61,14 +41,6 @@ For smash/pass sessions, casting `"smash"` or `"pass"` to numeric raises a Postg
 ---
 
 ## 3. Performance Issues
-
-### `AdminSessionsLive` — loads all sessions into memory for stats
-Fetches every session record to compute status distribution. Replace with a single `COUNT ... GROUP BY status` query.
-- `lib/premiere_ecoute_web/live/admin/admin_sessions_live.ex:20-21`
-
-### `AdminUsersLive` — loads all users into memory, no pagination
-Same pattern as above. Add pagination and use `COUNT ... GROUP BY role` for stats.
-- `lib/premiere_ecoute_web/live/admin/admin_users_live.ex:21-22`
 
 ### `Balance.compute_balance/1` — `force: true` preload inside a pure function
 Always re-fetches from DB even on repeated calls. Move preloading to the caller; keep this function pure.
@@ -88,18 +60,6 @@ Subscribe to presence change events via PubSub instead of calling `Presence.play
 
 ---
 
-## 4. Ecto Queries Outside Context Modules
-
-### `VotesLive` — raw Ecto queries in a LiveView
-`Repo.get(Album, ...)` and `get_all_track_votes_for_user/2` belong in `Discography` or `Sessions` context.
-- `lib/premiere_ecoute_web/live/retrospective/votes_live.ex:135, 153-162`
-
-### `DonationsLive` — calls `Repo.delete/1` directly
-Bypasses the `Donations` context entirely. Add a `Donations.delete_goal/1` function.
-- `lib/premiere_ecoute_web/live/admin/donations/donations_live.ex:132`
-
----
-
 ## 5. OTP Issues
 
 ### `SpotifyPlayer` — double Presence join, no GenServer-side unjoin
@@ -115,14 +75,6 @@ The GenServer calls `Presence.join` in `init/1`, and the LiveView also calls it 
 A failed donation insert returns `202 Accepted` to the webhook provider, preventing retries. The donation is silently lost. Return a `5xx` status so the provider retries.
 - `lib/premiere_ecoute_web/controllers/webhooks/buy_me_a_coffee_controller.ex:46-48`
 
-### `CommandBus` — events dispatched on the error path
-`{:error, events}` still calls `EventBus.dispatch(events)`, causing side effects to fire for failed commands. Evaluate whether error-path events should be dispatched or suppressed.
-- `lib/premiere_ecoute_core/command_bus.ex:44-48`
-
-### `EventBus.dispatch/1` — no early exit on unregistered handler
-Processing continues even when an event has no registered handler. Errors are logged but not surfaced or accumulated.
-- `lib/premiere_ecoute_core/event_bus.ex:25-28`
-
 ---
 
 ## 7. LiveView Anti-Patterns
@@ -135,14 +87,6 @@ On initial load, the async task starts twice. Move all param-driven data loading
 ---
 
 ## 8. Dead Code
-
-### Commented-out functions in `User` schema
-Four commented-out function stubs below line 218. Remove them — the implementations live in `OauthToken` and are exposed via `defdelegate`.
-- `lib/premiere_ecoute/accounts/user.ex:218-227`
-
-### `Retrospective.History.get_tracks_by_period/4` — no call site
-Function is defined but never delegated or called from the web layer.
-- `lib/premiere_ecoute/sessions/retrospective/history.ex:129-171`
 
 ### `Sessions.start_session/1` and `stop_session/1` delegates may be vestigial
 All call sites invoke commands through `PremiereEcoute.apply/1` directly; these context-level delegates appear unused.
