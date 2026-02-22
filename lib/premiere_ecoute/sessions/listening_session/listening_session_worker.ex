@@ -83,6 +83,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
            PremiereEcoute.apply(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
       PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_updated, session})
     end
+
+    :ok
   end
 
   @impl Oban.Worker
