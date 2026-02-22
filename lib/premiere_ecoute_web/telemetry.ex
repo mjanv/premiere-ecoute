@@ -1,32 +1,14 @@
 defmodule PremiereEcouteWeb.Telemetry do
   @moduledoc """
   Telemetry supervisor and metrics definitions.
-
-  Defines telemetry metrics for Phoenix endpoints, routers, channels, database queries, and VM statistics with periodic measurements collection.
   """
-
-  use Supervisor
 
   import Telemetry.Metrics
 
-  @doc """
-  Starts telemetry supervisor with periodic measurements collector.
-
-  Initializes supervisor process for telemetry poller that collects Phoenix, database, and VM metrics at configured intervals.
-  """
-  @spec start_link(keyword()) :: Supervisor.on_start()
-  def start_link(args) do
-    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
-  end
-
-  @impl true
-  def init(_args) do
-    children = [
+  use PremiereEcouteCore.Supervisor,
+    children: [
       {:telemetry_poller, measurements: periodic_measurements(), period: 10_000}
     ]
-
-    Supervisor.init(children, strategy: :one_for_one)
-  end
 
   @doc """
   Returns list of telemetry metrics for monitoring application performance.

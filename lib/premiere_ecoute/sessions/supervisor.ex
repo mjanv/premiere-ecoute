@@ -1,42 +1,14 @@
 defmodule PremiereEcoute.Sessions.Supervisor do
   @moduledoc """
   Listening sessions service.
-
-  Manages the sessions cache and, outside of test, the Broadway pipelines for processing chat messages and poll results.
   """
 
-  use Supervisor
-
-  alias PremiereEcouteCore.Cache
-
-  @doc """
-  Starts sessions supervisor with cache and Broadway pipelines.
-
-  Initializes supervisor process for sessions cache and, outside test environment, Broadway pipelines for processing chat messages and poll results.
-  """
-  @spec start_link(keyword()) :: Supervisor.on_start()
-  def start_link(args) do
-    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
-  end
-
-  @impl true
-  def init(_args) do
-    mandatory = [
-      {Cache, name: :sessions}
+  use PremiereEcouteCore.Supervisor,
+    mandatory: [
+      {PremiereEcouteCore.Cache, name: :sessions}
+    ],
+    optionals: [
+      {PremiereEcoute.Sessions.Scores.MessagePipeline, []},
+      {PremiereEcoute.Sessions.Scores.PollPipeline, []}
     ]
-
-    optionals =
-      case Application.get_env(:premiere_ecoute, :environment) do
-        :test ->
-          []
-
-        _ ->
-          [
-            {PremiereEcoute.Sessions.Scores.MessagePipeline, []},
-            {PremiereEcoute.Sessions.Scores.PollPipeline, []}
-          ]
-      end
-
-    Supervisor.init(mandatory ++ optionals, strategy: :one_for_one)
-  end
 end
