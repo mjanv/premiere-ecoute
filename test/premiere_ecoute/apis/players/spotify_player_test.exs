@@ -184,6 +184,22 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       assert {:ok, ^new_state, [:start_track]} = SpotifyPlayer.handle(old_state, new_state)
     end
 
+    test "detects track start on a short track when poll skips from 0% directly to 2%" do
+      old_state = %{
+        "progress_ms" => 0,
+        "item" => %{"duration_ms" => 90_000},
+        "device" => %{"id" => "device123"}
+      }
+
+      new_state = %{
+        "progress_ms" => 2_700,
+        "item" => %{"duration_ms" => 90_000},
+        "device" => %{"id" => "device123"}
+      }
+
+      assert {:ok, ^new_state, [:start_track]} = SpotifyPlayer.handle(old_state, new_state)
+    end
+
     test "detects track end (98% to 99% progress)" do
       old_state = %{
         "progress_ms" => 176_500,
@@ -194,6 +210,38 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       new_state = %{
         "progress_ms" => 178_300,
         "item" => %{"duration_ms" => 180_000},
+        "device" => %{"id" => "device123"}
+      }
+
+      assert {:ok, ^new_state, [:end_track]} = SpotifyPlayer.handle(old_state, new_state)
+    end
+
+    test "detects track end on a short track when poll skips from <98% directly to 100%" do
+      old_state = %{
+        "progress_ms" => 87_300,
+        "item" => %{"duration_ms" => 90_000},
+        "device" => %{"id" => "device123"}
+      }
+
+      new_state = %{
+        "progress_ms" => 90_000,
+        "item" => %{"duration_ms" => 90_000},
+        "device" => %{"id" => "device123"}
+      }
+
+      assert {:ok, ^new_state, [:end_track]} = SpotifyPlayer.handle(old_state, new_state)
+    end
+
+    test "detects track end on a short track when poll skips from <98% directly to 99%" do
+      old_state = %{
+        "progress_ms" => 88_200,
+        "item" => %{"duration_ms" => 90_000},
+        "device" => %{"id" => "device123"}
+      }
+
+      new_state = %{
+        "progress_ms" => 89_200,
+        "item" => %{"duration_ms" => 90_000},
         "device" => %{"id" => "device123"}
       }
 
