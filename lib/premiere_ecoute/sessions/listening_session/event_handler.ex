@@ -44,16 +44,18 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
-    ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, @cooldown)
+    open_delay = if track.duration_ms <= @cooldown * 2 * 1000, do: 5, else: @cooldown
+    ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, open_delay)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, track})
     :ok
   end
 
-  def dispatch(%NextTrackStarted{source: :playlist, session_id: session_id, user_id: user_id}) do
+  def dispatch(%NextTrackStarted{source: :playlist, session_id: session_id, user_id: user_id, track: track}) do
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
-    ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session_id, user_id: user_id}, @cooldown)
+    open_delay = if track.duration_ms <= @cooldown * 2 * 1000, do: 5, else: @cooldown
+    ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session_id, user_id: user_id}, open_delay)
     :ok
   end
 
@@ -61,7 +63,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
-    ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, @cooldown)
+    open_delay = if track.duration_ms <= @cooldown * 2 * 1000, do: 5, else: @cooldown
+    ListeningSessionWorker.in_seconds(%{action: "open_album", session_id: session_id, user_id: user_id}, open_delay)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:previous_track, track})
     :ok
   end

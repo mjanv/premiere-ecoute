@@ -100,7 +100,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            PremiereEcoute.Gettext.t(scope, fn ->
              gettext("Welcome to the premiere of %{name} by %{artist}", name: album.name, artist: album.artist)
            end),
-         :ok <- Apis.twitch().send_chat_message(scope, message) do
+         :ok <- Apis.twitch().send_chat_message(scope, message),
+         :ok <- :timer.sleep(1_000) do
       {:ok, session, [%SessionStarted{source: :album, session_id: session.id, user_id: scope.user.id}]}
     else
       false ->

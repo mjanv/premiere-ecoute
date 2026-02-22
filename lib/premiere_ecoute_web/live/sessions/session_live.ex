@@ -118,6 +118,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_event("update_next_track", %{"next_track" => value}, %{assigns: assigns} = socket) do
     {value, _} = Integer.parse(value)
+    value = if value in 1..4, do: 0, else: value
     options = Map.update(assigns.listening_session.options, "next_track", 0, fn _ -> value end)
     {:ok, listening_session} = ListeningSession.update(assigns.listening_session, %{options: options})
     {:noreply, assign(socket, :listening_session, listening_session)}
@@ -256,7 +257,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         {:player, {:percent, percent}, state},
         %{assigns: %{listening_session: %ListeningSession{status: :active}, current_scope: scope}} = socket
       ) do
-    if percent == round(100 * (1 - 30_000 / state["item"]["duration_ms"])) do
+    duration_ms = state["item"]["duration_ms"]
+    threshold = round(100 * (1 - 30_000 / duration_ms))
+
+    if duration_ms >= 60_000 and abs(percent - threshold) <= 1 do
       ListeningSessionWorker.in_seconds(%{action: "votes_closing", user_id: scope.user.id}, 0)
     end
 

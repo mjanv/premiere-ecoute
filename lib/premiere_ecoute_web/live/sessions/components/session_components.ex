@@ -228,7 +228,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
                 type="range"
                 name="next_track"
                 min="0"
-                max="60"
+                max="30"
                 value={@value}
                 id="next-track-slider"
                 class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-white/20 slider-purple"
