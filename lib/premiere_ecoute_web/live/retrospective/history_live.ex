@@ -23,17 +23,7 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
       |> assign(:show_modal, false)
       |> assign(:modal_session_id, nil)
 
-    user = socket.assigns.current_user
-    period = :month
-    year = current_date.year
-    month = current_date.month
-
-    socket
-    |> assign_async(:albums_data, fn ->
-      albums = Sessions.get_albums_by_period(user, period, %{year: year, month: month})
-      {:ok, %{albums_data: albums}}
-    end)
-    |> then(fn socket -> {:ok, socket} end)
+    {:ok, socket}
   end
 
   @impl true
