@@ -207,6 +207,19 @@ defmodule PremiereEcoute.Accounts.User do
   @spec get_user_by_username(String.t()) :: t() | nil
   def get_user_by_username(username), do: get_by(username: username)
 
+  @doc """
+  Returns user counts grouped by role.
+
+  Issues a single `COUNT ... GROUP BY role` query instead of loading all users into memory.
+  Returns a map like `%{viewer: 42, streamer: 5, admin: 2, bot: 1}`.
+  """
+  @spec count_by_role() :: %{atom() => non_neg_integer()}
+  def count_by_role do
+    from(u in __MODULE__, group_by: u.role, select: {u.role, count(u.id)})
+    |> Repo.all()
+    |> Map.new()
+  end
+
   @doc "Creates a user and publishes AccountCreated event."
   @spec create(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(attrs) do

@@ -5,6 +5,32 @@ defmodule PremiereEcoute.Accounts.UserTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Token
 
+  describe "count_by_role/0" do
+    test "returns a map keyed by role atoms" do
+      user_fixture(%{role: :viewer})
+      user_fixture(%{role: :streamer})
+
+      result = User.count_by_role()
+
+      assert is_map(result)
+      assert Map.keys(result) |> Enum.all?(&is_atom/1)
+      assert Map.values(result) |> Enum.all?(&is_integer/1)
+    end
+
+    test "counts users across multiple roles" do
+      before = User.count_by_role()
+
+      user_fixture(%{role: :viewer})
+      user_fixture(%{role: :viewer})
+      user_fixture(%{role: :streamer})
+
+      after_ = User.count_by_role()
+
+      assert Map.get(after_, :viewer, 0) - Map.get(before, :viewer, 0) == 2
+      assert Map.get(after_, :streamer, 0) - Map.get(before, :streamer, 0) == 1
+    end
+  end
+
   describe "inspect/2 for the User module" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
