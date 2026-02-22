@@ -58,6 +58,14 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     |> Store.any("user", fn {result, _} -> %PersonalDataRequested{id: scope.user.id, result: result} end)
   end
 
+  defp maybe_delete_votes(multi, %{twitch: %{user_id: twitch_user_id}}) do
+    Ecto.Multi.delete_all(multi, :votes, from(v in Vote, where: v.viewer_id == ^twitch_user_id))
+  end
+
+  defp maybe_delete_votes(multi, _user) do
+    Ecto.Multi.put(multi, :votes, [])
+  end
+
   defp anonym(data, path, keys) do
     update_in(data, path, fn channels -> channels |> Enum.map(&Map.take(&1, keys)) end)
   end
@@ -77,7 +85,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     |> Ecto.Multi.delete_all(:tokens, Token.by_user_and_contexts_query(user, :all))
     |> Ecto.Multi.delete_all(:viewer_follows, from(f in Follow, where: f.user_id == ^user.id))
     |> Ecto.Multi.delete_all(:streamer_follows, from(f in Follow, where: f.streamer_id == ^user.id))
-    |> Ecto.Multi.delete_all(:votes, from(v in Vote, where: v.viewer_id == ^user.twitch.user_id))
+    |> maybe_delete_votes(user)
     |> Ecto.Multi.delete_all(:sessions, from(s in ListeningSession, where: s.user_id == ^user.id))
     |> Ecto.Multi.delete(:user, user)
     |> Ecto.Multi.run(:event, fn _, _ ->

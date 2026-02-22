@@ -164,6 +164,15 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert %AccountDeleted{} = Store.last("user-#{streamer.id}")
     end
 
+    test "delete account succeeds when user has no Twitch connection" do
+      user = user_fixture(%{role: :viewer})
+      scope = Scope.for_user(user)
+
+      assert {:ok, deleted_user} = Accounts.delete_account(scope)
+      assert deleted_user.id == user.id
+      assert is_nil(User.get(user.id))
+    end
+
     test "deleting non-existent user raises appropriate error" do
       user = user_fixture(%{role: :viewer, twitch: %{user_id: "test123"}})
 
