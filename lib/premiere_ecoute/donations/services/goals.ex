@@ -64,6 +64,22 @@ defmodule PremiereEcoute.Donations.Services.Goals do
   end
 
   @doc """
+  Deletes a goal.
+
+  ## Examples
+
+      iex> delete_goal(goal)
+      {:ok, %Goal{}}
+
+      iex> delete_goal(goal)
+      {:error, %Ecto.Changeset{}}
+  """
+  @spec delete_goal(Goal.t()) :: {:ok, Goal.t()} | {:error, Ecto.Changeset.t()}
+  def delete_goal(%Goal{} = goal) do
+    Repo.delete(goal)
+  end
+
+  @doc """
   Retrieves the currently active goal based on the active flag and today's date.
   Returns nil if no active goal is found within the current date range.
 

@@ -9,7 +9,6 @@ defmodule PremiereEcouteWeb.Admin.Donations.DonationsLive do
 
   alias PremiereEcoute.Donations
   alias PremiereEcoute.Donations.Goal
-  alias PremiereEcoute.Repo
 
   @doc """
   Initializes admin donations goals page with goal listing.
@@ -129,7 +128,7 @@ defmodule PremiereEcouteWeb.Admin.Donations.DonationsLive do
   def handle_event("confirm_delete_goal", %{"goal_id" => goal_id}, socket) do
     goal = Donations.get_goal(goal_id)
 
-    case Repo.delete(goal) do
+    case Donations.delete_goal(goal) do
       {:ok, _} ->
         goals = fetch_goals()
 
