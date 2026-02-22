@@ -7,6 +7,8 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
 
   alias PremiereEcoute.Sessions
 
+  import PremiereEcouteWeb.Retrospective.PeriodHelpers
+
   @impl true
   def mount(_params, _session, socket) do
     current_date = DateTime.utc_now()
@@ -122,39 +124,5 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
       {:error, :not_found} ->
         {:ok, %{modal_data: nil}}
     end
-  end
-
-  defp parse_year(year_str) when is_binary(year_str) do
-    case Date.from_iso8601("#{year_str}-01-01") do
-      {:ok, %Date{year: year}} when year >= 2020 and year <= 2030 -> year
-      _ -> nil
-    end
-  end
-
-  defp parse_year(_), do: nil
-
-  defp parse_month(month_str) when is_binary(month_str) do
-    case Date.from_iso8601("2024-#{String.pad_leading(month_str, 2, "0")}-01") do
-      {:ok, %Date{month: month}} when month >= 1 and month <= 12 -> month
-      _ -> nil
-    end
-  end
-
-  defp parse_month(_), do: nil
-
-  defp build_params(period, year, month) do
-    params = %{"period" => Atom.to_string(period), "year" => Integer.to_string(year)}
-
-    if period == :month do
-      Map.put(params, "month", Integer.to_string(month))
-    else
-      params
-    end
-  end
-
-  defp get_available_years do
-    # Generate years from 2020 to current year + 1
-    current_year = DateTime.utc_now().year
-    2020..current_year |> Enum.to_list() |> Enum.reverse()
   end
 end

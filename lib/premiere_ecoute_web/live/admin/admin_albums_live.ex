@@ -10,6 +10,8 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
 
+  import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
+
   @doc """
   Initializes admin albums page with paginated list and statistics.
 
@@ -75,22 +77,6 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
         |> put_flash(:error, gettext("Cannot delete album"))
     end
     |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  defp pagination_range(current_page, total_pages) do
-    cond do
-      total_pages <= 7 ->
-        1..total_pages |> Enum.to_list()
-
-      current_page <= 4 ->
-        [1, 2, 3, 4, 5, :ellipsis, total_pages]
-
-      current_page >= total_pages - 3 ->
-        [1, :ellipsis, total_pages - 4, total_pages - 3, total_pages - 2, total_pages - 1, total_pages]
-
-      true ->
-        [1, :ellipsis, current_page - 1, current_page, current_page + 1, :ellipsis, total_pages]
-    end
   end
 
   defp album_stats do

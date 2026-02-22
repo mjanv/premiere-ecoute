@@ -8,6 +8,6 @@ defmodule PremiereEcoute.Apis.Players.Supervisor do
       {Registry, keys: :unique, name: PremiereEcoute.Apis.Players.PlayerRegistry}
     ],
     optionals: [
-      [PremiereEcoute.Apis.PlayerSupervisor]
+      PremiereEcoute.Apis.PlayerSupervisor
     ]
 end
