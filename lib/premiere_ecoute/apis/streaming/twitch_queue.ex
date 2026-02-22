@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueue do
   use GenServer
 
   alias PremiereEcoute.Accounts.Bot
+  alias PremiereEcoute.Accounts.Services.TokenRenewal
   alias PremiereEcoute.Apis.RateLimit.RateLimiter
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Chat
 
@@ -80,11 +81,8 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueue do
 
   # Private
   defp maybe_refresh_bot(%{twitch: %{expires_at: expires_at}} = bot) do
-    if token_expired?(expires_at), do: Bot.get(), else: {:ok, bot}
+    if TokenRenewal.token_expired?(expires_at), do: Bot.get(), else: {:ok, bot}
   end
-
-  defp token_expired?(nil), do: false
-  defp token_expired?(at), do: DateTime.compare(DateTime.utc_now(), DateTime.add(at, -300, :second)) == :gt
 
   defp try_send(bot, action, message) do
     message
