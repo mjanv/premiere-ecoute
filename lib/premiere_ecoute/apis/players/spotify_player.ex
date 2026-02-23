@@ -95,7 +95,16 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   Returns playback progress percentage (0-100) from current position and total track duration in playback state.
   """
   @spec progress(map()) :: integer()
-  def progress(state), do: trunc(100 * (state["progress_ms"] / (state["item"]["duration_ms"] + 1)))
+  def progress(state) do
+    duration_ms = state["item"]["duration_ms"]
+    progress_ms = state["progress_ms"]
+
+    if duration_ms - progress_ms <= @poll_interval do
+      100
+    else
+      trunc(100 * (progress_ms / (duration_ms + 1)))
+    end
+  end
 
   @doc """
   Detects playback state changes and generates events.

@@ -36,7 +36,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         Process.send_after(self(), :refresh, 100)
         {:ok, _} = Presence.join(current_scope.user.id)
         PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{session_id}"])
-        _ = PlayerSupervisor.start(current_scope.user.id)
+
+        if listening_session.status != :stopped do
+          PlayerSupervisor.start(current_scope.user.id)
+        end
       end
 
       {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
@@ -99,6 +102,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         _params,
         %{assigns: %{listening_session: session, current_scope: scope}} = socket
       ) do
+    PremiereEcoute.PubSub.unsubscribe("playback:#{scope.user.id}")
+
     %StopListeningSession{session_id: session.id, scope: scope}
     |> PremiereEcoute.apply()
     |> case do

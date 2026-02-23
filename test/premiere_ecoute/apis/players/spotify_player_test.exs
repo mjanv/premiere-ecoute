@@ -114,6 +114,18 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
 
       assert SpotifyPlayer.progress(state)
     end
+
+    test "returns 100 when remaining time is within one poll interval" do
+      for {duration_ms, progress_ms} <- [{29_000, 28_200}, {29_000, 28_999}, {45_000, 44_100}] do
+        state = %{"progress_ms" => progress_ms, "item" => %{"duration_ms" => duration_ms}}
+        assert SpotifyPlayer.progress(state) == 100
+      end
+    end
+
+    test "does not clamp when remaining time exceeds one poll interval" do
+      state = %{"progress_ms" => 27_000, "item" => %{"duration_ms" => 29_000}}
+      assert SpotifyPlayer.progress(state) < 100
+    end
   end
 
   describe "handle/2" do
@@ -246,6 +258,37 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       }
 
       assert {:ok, ^new_state, [:end_track]} = SpotifyPlayer.handle(old_state, new_state)
+    end
+
+    test "detects track end when progress crosses into the last poll interval" do
+      # progress/1 clamps to 100 within the poll interval, so crossing from <99 to 100
+      # fires :end_track via the existing {a, b} when a < 99 and b >= 99 clause.
+      scenarios = [
+        # {duration_ms, old_progress_ms, new_progress_ms}
+        # 29s track — old outside window (>1000ms remaining), new inside (≤1000ms remaining)
+        {29_637, 27_800, 28_800},
+        # 29s track — jitter on the crossing poll
+        {29_637, 28_400, 28_900},
+        # 45s track
+        {45_000, 43_800, 44_200}
+      ]
+
+      for {duration_ms, old_ms, new_ms} <- scenarios do
+        old_state = %{
+          "progress_ms" => old_ms,
+          "item" => %{"duration_ms" => duration_ms, "uri" => "spotify:track:abc"},
+          "device" => %{"id" => "device123"}
+        }
+
+        new_state = %{
+          "progress_ms" => new_ms,
+          "item" => %{"duration_ms" => duration_ms, "uri" => "spotify:track:abc"},
+          "device" => %{"id" => "device123"}
+        }
+
+        assert {:ok, ^new_state, [:end_track]} = SpotifyPlayer.handle(old_state, new_state),
+               "expected :end_track for duration=#{duration_ms} old=#{old_ms} new=#{new_ms}"
+      end
     end
 
     test "detects large skip (progress change > 5%)" do
