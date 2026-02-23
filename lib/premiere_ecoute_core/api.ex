@@ -51,6 +51,10 @@ defmodule PremiereEcouteCore.Api do
       @spec impl() :: module()
       def impl, do: env()[unquote(api)][:api]
 
+      @doc "Returns the list of implemented behaviours"
+      @spec behaviours() :: [module()]
+      def behaviours, do: unquote(behaviours) ++ [__MODULE__.Behaviour]
+
       @doc "Retrieves URL by key from configuration"
       @spec url(atom()) :: String.t()
       def url(key), do: env()[unquote(api)][:urls][key]

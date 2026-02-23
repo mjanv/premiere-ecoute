@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.TidalApi do
 
   use PremiereEcouteCore.Api,
     api: :tidal,
-    behaviours: [PremiereEcoute.Apis.MusicProvider]
+    behaviours: []
 
   alias PremiereEcoute.Accounts.Scope
 

@@ -23,7 +23,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
 
   use PremiereEcouteCore.Api,
     api: :spotify,
-    behaviours: [PremiereEcoute.Apis.MusicProvider]
+    behaviours: [
+      PremiereEcoute.Apis.MusicProvider.Oauth,
+      PremiereEcoute.Apis.MusicProvider.Albums,
+      PremiereEcoute.Apis.MusicProvider.Playlists
+    ]
 
   alias PremiereEcoute.Accounts.Scope
 
@@ -37,14 +41,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     alias PremiereEcoute.Discography.Album.Track
     alias PremiereEcoute.Discography.LibraryPlaylist
     alias PremiereEcoute.Discography.Playlist
-
-    # Accounts
-    @callback client_credentials() :: {:ok, map()} | {:error, any()}
-    @callback authorization_url(scope :: String.t() | nil, state :: String.t() | nil) :: String.t()
-    @callback renew_token(refresh_token :: String.t()) :: {:ok, map()} | {:error, any()}
-
-    # Albums
-    @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}
 
     # Artists
     @callback get_artist_top_track(artist_id :: String.t()) :: {:ok, Playlist.Track.t()} | {:error, term()}
@@ -66,7 +62,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
                 {:ok, String.t() | [String.t()]} | {:error, term()}
 
     # Playlists
-    @callback get_playlist(playlist_id :: String.t()) :: {:ok, Playlist.t()} | {:error, term()}
     @callback get_library_playlists(scope :: Scope.t()) :: {:ok, [LibraryPlaylist.t()]} | {:error, term()}
     @callback create_playlist(scope :: Scope.t(), library :: map()) :: {:ok, LibraryPlaylist.t()} | {:error, term()}
     @callback add_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::

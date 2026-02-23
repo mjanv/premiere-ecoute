@@ -7,15 +7,16 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
 
   use PremiereEcouteCore.Api,
     api: :deezer,
-    behaviours: [PremiereEcoute.Apis.MusicProvider]
+    behaviours: [
+      PremiereEcoute.Apis.MusicProvider.Albums,
+      PremiereEcoute.Apis.MusicProvider.Playlists
+    ]
 
   defmodule Behaviour do
     @moduledoc "Deezer API Behaviour"
 
-    alias PremiereEcoute.Discography.Playlist
-
-    # Playlists
-    @callback get_playlist(playlist_id :: String.t()) :: {:ok, Playlist.t()} | {:error, term()}
+    @callback placeholder() :: any()
+    @optional_callbacks placeholder: 0
   end
 
   @doc """
@@ -37,8 +38,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
 
   Deezer API is public and requires no authentication, so this returns empty credentials for compatibility with the API base module.
   """
-  @spec client_credentials() :: {:ok, %{String.t() => String.t() | integer()}}
+  @spec client_credentials() :: {:ok, map()}
   def client_credentials, do: {:ok, %{"access_token" => "", "expires_in" => 0}}
+
+  # Albums
+  defdelegate get_album(album_id), to: __MODULE__.Albums
 
   # Playlists
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists

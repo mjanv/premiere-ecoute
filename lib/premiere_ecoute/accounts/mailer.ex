@@ -21,6 +21,10 @@ defmodule PremiereEcoute.Accounts.Mailer do
   @spec impl :: module()
   def impl, do: Application.get_env(:premiere_ecoute, :mailer, __MODULE__)
 
+  @doc "Returns the list of implemented behaviours"
+  @spec behaviours() :: [module()]
+  def behaviours, do: [__MODULE__.Behaviour]
+
   @doc """
   Dispatches domain event as email.
 
