@@ -10,19 +10,25 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
 
   @impl true
   def mount(socket) do
-    {:ok, assign(socket, time_bias: 0)}
+    {:ok, assign(socket, time_bias: 0, chat_note: "", streamer_note: "")}
   end
 
   @impl true
   def update(assigns, socket) do
     session = assigns.listening_session
     time_bias = socket.assigns[:time_bias] || 0
+    chat_note = socket.assigns[:chat_note] || ""
+    streamer_note = socket.assigns[:streamer_note] || ""
+    chapters = TrackMarker.format_youtube_chapters(session, time_bias)
 
     socket
     |> assign(assigns)
     |> assign(:listening_session, session)
     |> assign(:time_bias, time_bias)
-    |> assign(:youtube_chapters, TrackMarker.format_youtube_chapters(session, time_bias))
+    |> assign(:chat_note, chat_note)
+    |> assign(:streamer_note, streamer_note)
+    |> assign(:youtube_chapters, chapters)
+    |> assign(:export_text, build_export_text(chapters, chat_note, streamer_note))
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -34,6 +40,17 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
     socket
     |> assign(:time_bias, bias_value)
     |> assign(:youtube_chapters, chapters)
+    |> assign(:export_text, build_export_text(chapters, socket.assigns.chat_note, socket.assigns.streamer_note))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  # AIDEV-NOTE: updates chat_note and streamer_note and rebuilds the export text shown in the readonly textarea
+  def handle_event("update_notes", %{"chat_note" => chat_note, "streamer_note" => streamer_note}, socket) do
+    socket
+    |> assign(:chat_note, chat_note)
+    |> assign(:streamer_note, streamer_note)
+    |> assign(:export_text, build_export_text(socket.assigns.youtube_chapters, chat_note, streamer_note))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -94,6 +111,32 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
           </div>
         </div>
         
+    <!-- Optional Chat Note and Streamer Note inputs -->
+        <form phx-change="update_notes" phx-target={@myself} class="mb-6 space-y-4">
+          <div>
+            <label class="text-sm font-medium text-purple-300 block mb-1">
+              {gettext("Chat note")}
+            </label>
+            <textarea
+              name="chat_note"
+              rows="2"
+              placeholder={gettext("Message to post in chat (optional)")}
+              class="w-full bg-black/50 border border-gray-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none placeholder-gray-500"
+            >{@chat_note}</textarea>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-purple-300 block mb-1">
+              {gettext("Streamer note")}
+            </label>
+            <textarea
+              name="streamer_note"
+              rows="2"
+              placeholder={gettext("Personal note for the description (optional)")}
+              class="w-full bg-black/50 border border-gray-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none placeholder-gray-500"
+            >{@streamer_note}</textarea>
+          </div>
+        </form>
+
     <!-- YouTube Chapters Textbox -->
         <div>
           <div class="flex items-center justify-between mb-2">
@@ -121,7 +164,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
             readonly
             rows="12"
             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-          >{@youtube_chapters}</textarea>
+          >{@export_text}</textarea>
         </div>
       </div>
     </div>
@@ -130,5 +173,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal do
 
   defp format_bias_display(bias_seconds) do
     "#{div(bias_seconds, 60)}:#{String.pad_leading(to_string(rem(bias_seconds, 60)), 2, "0")}"
+  end
+
+  # AIDEV-NOTE: combines optional chat_note and streamer_note above the chapters; blank notes are omitted
+  defp build_export_text(chapters, chat_note, streamer_note) do
+    [chat_note, streamer_note, chapters]
+    |> Enum.map(&String.trim/1)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.join("\n\n")
   end
 end
