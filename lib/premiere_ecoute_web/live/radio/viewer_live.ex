@@ -26,7 +26,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
 
     with false <- is_nil(date),
          user when not is_nil(user) <- Accounts.get_user_by_username(username),
-         true <- Accounts.profile(user, [:radio_settings, :visibility]) do
+         :public <- Accounts.profile(user, [:radio_settings, :visibility]) do
       today = Date.utc_today()
 
       {:ok,
