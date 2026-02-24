@@ -26,4 +26,12 @@ defmodule PremiereEcoute.Apis.MusicProvider do
 
     @callback get_playlist(playlist_id :: String.t()) :: {:ok, Playlist.t()} | {:error, term()}
   end
+
+  defmodule Search do
+    @moduledoc false
+
+    alias PremiereEcoute.Discography.Album.Track
+
+    @callback search_tracks(query :: Keyword.t()) :: {:ok, [Track.t()]} | {:error, term()}
+  end
 end

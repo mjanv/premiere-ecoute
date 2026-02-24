@@ -26,7 +26,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     behaviours: [
       PremiereEcoute.Apis.MusicProvider.Oauth,
       PremiereEcoute.Apis.MusicProvider.Albums,
-      PremiereEcoute.Apis.MusicProvider.Playlists
+      PremiereEcoute.Apis.MusicProvider.Playlists,
+      PremiereEcoute.Apis.MusicProvider.Search
     ]
 
   alias PremiereEcoute.Accounts.Scope
@@ -180,6 +181,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
   # Search
   defdelegate search_albums(query), to: __MODULE__.Search
   defdelegate search_artist(query), to: __MODULE__.Search
+  defdelegate search_tracks(query), to: __MODULE__.Search
 
   # Users
   defdelegate get_user_profile(access_token), to: __MODULE__.Users

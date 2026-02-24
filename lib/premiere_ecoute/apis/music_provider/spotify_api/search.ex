@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   @moduledoc """
   Spotify search API.
 
-  Searches Spotify catalog for albums and artists with query string matching.
+  Searches Spotify catalog for albums, artists, and tracks with query string matching and field filters.
   """
 
   require Logger
@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track
 
   @doc """
   Searches Spotify catalog for albums.
@@ -49,5 +50,43 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
       %{"artists" => %{"items" => [%{"uri" => "spotify:artist:" <> id}]}} -> %{id: id}
       _ -> nil
     end)
+  end
+
+  @doc """
+  Searches Spotify catalog for tracks.
+
+  Accepts a keyword list with one of: query, artist, track, album.
+  Builds the appropriate Spotify field filter query and returns a list of Track structs.
+  """
+  @spec search_tracks(Keyword.t()) :: {:ok, [Track.t()]} | {:error, term()}
+  def search_tracks(query) when is_list(query) do
+    q = build_track_query(query)
+
+    SpotifyApi.api()
+    |> SpotifyApi.get(url: "/search", params: [q: q, type: "track", limit: 20])
+    |> SpotifyApi.handle(200, fn %{"items" => items} ->
+      Enum.map(items, &parse_track/1)
+    end)
+  end
+
+  @spec build_track_query(Keyword.t()) :: String.t()
+  defp build_track_query(query) do
+    cond do
+      q = query[:query] -> q
+      q = query[:artist] -> "artist:#{q}"
+      q = query[:track] -> "track:#{q}"
+      q = query[:album] -> "album:#{q}"
+    end
+  end
+
+  @spec parse_track(map()) :: Track.t()
+  defp parse_track(data) do
+    %Track{
+      provider: :spotify,
+      track_id: data["id"],
+      name: data["name"],
+      track_number: data["track_number"] || 0,
+      duration_ms: data["duration_ms"] || 0
+    }
   end
 end

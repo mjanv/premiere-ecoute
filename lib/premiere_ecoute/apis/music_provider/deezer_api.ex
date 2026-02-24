@@ -9,7 +9,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
     api: :deezer,
     behaviours: [
       PremiereEcoute.Apis.MusicProvider.Albums,
-      PremiereEcoute.Apis.MusicProvider.Playlists
+      PremiereEcoute.Apis.MusicProvider.Playlists,
+      PremiereEcoute.Apis.MusicProvider.Search
     ]
 
   defmodule Behaviour do
@@ -47,4 +48,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
 
   # Playlists
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists
+
+  # Search
+  defdelegate search_tracks(query), to: __MODULE__.Search
 end
