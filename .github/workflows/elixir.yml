@@ -1,9 +1,8 @@
 name: Generate and Deploy Docs
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 4 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -22,8 +21,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.18.4'
-          otp-version: '28.0.1'
+          elixir-version: '1.19.0-otp-28'
+          otp-version: '28.1'
 
       - name: Install dependencies
         run: mix deps.get

@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build-release:
@@ -196,42 +194,3 @@ jobs:
         run: |
           ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
 
-  deploy-docs:
-    name: Deploy Documentation
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Elixir and Erlang
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: '1.19.0-otp-28'
-          otp-version: '28.1'
-
-      - name: Restore dependencies and build cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            deps
-            _build
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-
-
-      - name: Install dependencies
-        run: mix deps.get
-
-      - name: Generate ExDoc
-        run: mix ci.docs
-
-      - name: Upload documentation artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./doc
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v3
-
-      - name: Deploy to GitHub Pages
-        id: deploy-to-pages
-        uses: actions/deploy-pages@v4
