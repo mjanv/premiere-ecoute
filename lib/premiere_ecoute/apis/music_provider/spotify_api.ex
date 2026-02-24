@@ -152,6 +152,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
 
   # Albums
   defdelegate get_album(album_id), to: __MODULE__.Albums
+  defdelegate get_track(track_id), to: __MODULE__.Tracks
 
   # Artists
   defdelegate get_artist_top_track(artist_id), to: __MODULE__.Artists

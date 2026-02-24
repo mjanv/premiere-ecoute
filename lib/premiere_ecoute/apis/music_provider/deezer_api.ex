@@ -43,6 +43,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
 
   # Albums
   defdelegate get_album(album_id), to: __MODULE__.Albums
+  defdelegate get_track(track_id), to: __MODULE__.Tracks
 
   # Playlists
   defdelegate get_playlist(playlist_id), to: __MODULE__.Playlists

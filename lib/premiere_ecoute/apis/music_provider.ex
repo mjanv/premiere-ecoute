@@ -13,8 +13,10 @@ defmodule PremiereEcoute.Apis.MusicProvider do
     @moduledoc false
 
     alias PremiereEcoute.Discography.Album
+    alias PremiereEcoute.Discography.Album.Track
 
     @callback get_album(album_id :: String.t()) :: {:ok, Album.t()} | {:error, term()}
+    @callback get_track(track_id :: String.t()) :: {:ok, Track.t()} | {:error, term()}
   end
 
   defmodule Playlists do
