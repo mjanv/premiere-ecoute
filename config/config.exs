@@ -112,7 +112,8 @@ config :premiere_ecoute, Oban,
   queues: [
     sessions: 1,
     twitch: 1,
-    spotify: 1
+    spotify: 1,
+    radio: 1
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},

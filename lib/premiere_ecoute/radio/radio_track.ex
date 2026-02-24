@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Radio.RadioTrack do
   @type t :: %__MODULE__{
           id: integer() | nil,
           user_id: integer() | nil,
-          provider_id: String.t() | nil,
+          provider_ids: %{atom() => String.t()},
           name: String.t() | nil,
           artist: String.t() | nil,
           album: String.t() | nil,
@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Radio.RadioTrack do
   schema "radio_tracks" do
     belongs_to :user, User
 
-    field :provider_id, :string
+    field :provider_ids, :map, default: %{}
     field :name, :string
     field :artist, :string
     field :album, :string
@@ -34,57 +34,64 @@ defmodule PremiereEcoute.Radio.RadioTrack do
   @doc false
   def changeset(radio_track, attrs) do
     radio_track
-    |> cast(attrs, [:user_id, :provider_id, :name, :artist, :album, :duration_ms, :started_at])
-    |> validate_required([:user_id, :provider_id, :name, :artist, :started_at])
+    |> cast(attrs, [:user_id, :provider_ids, :name, :artist, :album, :duration_ms, :started_at])
+    |> validate_required([:user_id, :provider_ids, :name, :artist, :started_at])
   end
 
   @doc """
   Insert a new track for a user.
-  Prevents consecutive duplicates (same provider_id as last track for that user).
+  Prevents consecutive duplicates: a duplicate is when the last track shares at least
+  one provider ID with the incoming track.
 
   ## Examples
 
-      iex> insert(user_id, %{provider_id: "spotify:track:123", ...})
+      iex> insert(user_id, %{provider_ids: %{spotify: "abc123"}, ...})
       {:ok, %RadioTrack{}}
 
-      iex> insert(user_id, %{provider_id: "same_as_last", ...})
+      iex> insert(user_id, %{provider_ids: %{spotify: "abc123"}, ...})
       {:error, :consecutive_duplicate}
 
   """
   @spec insert(integer(), map()) ::
           {:ok, t()} | {:error, :consecutive_duplicate | Ecto.Changeset.t()}
   def insert(user_id, track_data) do
-    case last_for_user(user_id) do
-      %__MODULE__{provider_id: same} when same == track_data.provider_id ->
-        {:error, :consecutive_duplicate}
+    last =
+      from(t in __MODULE__, where: t.user_id == ^user_id, order_by: [desc: t.started_at], limit: 1)
+      |> Repo.one()
+      |> atomize_provider_ids()
+
+    incoming_ids = track_data[:provider_ids] || track_data["provider_ids"] || %{}
+
+    case last do
+      %__MODULE__{provider_ids: last_ids} when is_map(last_ids) ->
+        if consecutive_duplicate?(last_ids, incoming_ids) do
+          {:error, :consecutive_duplicate}
+        else
+          do_insert(user_id, track_data)
+        end
 
       _ ->
-        %__MODULE__{}
-        |> changeset(Map.put(track_data, :user_id, user_id))
-        |> Repo.insert()
+        do_insert(user_id, track_data)
     end
   end
 
   @doc """
-  Get the most recently started track for a user.
-
-  ## Examples
-
-      iex> last_for_user(user_id)
-      %RadioTrack{}
-
-      iex> last_for_user(user_id_with_no_tracks)
-      nil
-
+  Get a radio track by id.
   """
-  @spec last_for_user(integer()) :: t() | nil
-  def last_for_user(user_id) do
-    from(t in __MODULE__,
-      where: t.user_id == ^user_id,
-      order_by: [desc: t.started_at],
-      limit: 1
-    )
-    |> Repo.one()
+  @spec get(integer()) :: t() | nil
+  def get(id), do: Repo.get(__MODULE__, id) |> atomize_provider_ids()
+
+  @doc """
+  Update the provider_ids map for a radio track.
+  Merges new_ids into the existing provider_ids map.
+  """
+  @spec update_provider_ids(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def update_provider_ids(%__MODULE__{provider_ids: existing} = track, new_ids) do
+    merged = Map.merge(existing, atomize_keys(new_ids))
+
+    with {:ok, updated} <- track |> changeset(%{provider_ids: merged}) |> Repo.update() do
+      {:ok, atomize_provider_ids(updated)}
+    end
   end
 
   @doc """
@@ -106,6 +113,7 @@ defmodule PremiereEcoute.Radio.RadioTrack do
       order_by: [asc: t.started_at]
     )
     |> Repo.all()
+    |> Enum.map(&atomize_provider_ids/1)
   end
 
   @doc """
@@ -124,4 +132,30 @@ defmodule PremiereEcoute.Radio.RadioTrack do
     )
     |> Repo.delete_all()
   end
+
+  # AIDEV-NOTE: two tracks are consecutive duplicates if they share at least one provider+id pair
+  defp consecutive_duplicate?(last_ids, incoming_ids) do
+    Enum.any?(incoming_ids, fn {provider, id} ->
+      Map.get(last_ids, to_atom(provider)) == id
+    end)
+  end
+
+  defp do_insert(user_id, track_data) do
+    with {:ok, track} <-
+           %__MODULE__{}
+           |> changeset(Map.put(track_data, :user_id, user_id))
+           |> Repo.insert() do
+      {:ok, atomize_provider_ids(track)}
+    end
+  end
+
+  defp atomize_provider_ids(nil), do: nil
+
+  defp atomize_provider_ids(%__MODULE__{provider_ids: ids} = track),
+    do: %{track | provider_ids: atomize_keys(ids)}
+
+  defp atomize_keys(map), do: Map.new(map, fn {k, v} -> {to_atom(k), v} end)
+
+  defp to_atom(k) when is_atom(k), do: k
+  defp to_atom(k) when is_binary(k), do: String.to_existing_atom(k)
 end

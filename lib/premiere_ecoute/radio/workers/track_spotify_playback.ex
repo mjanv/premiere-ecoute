@@ -72,8 +72,8 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
         _ -> DateTime.utc_now()
       end
 
-    Radio.insert_track(user_id, %{
-      provider_id: provider_id,
+    Radio.insert_track(user_id, "spotify", %{
+      provider_ids: %{spotify: provider_id},
       name: get_in(playback, ["item", "name"]),
       artist: get_in(playback, ["item", "artists"]) |> List.first() |> Map.get("name"),
       album: get_in(playback, ["item", "album", "name"]),

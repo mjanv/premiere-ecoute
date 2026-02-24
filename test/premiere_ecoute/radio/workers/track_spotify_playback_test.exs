@@ -35,7 +35,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlaybackTest do
 
       tracks = Radio.get_tracks(user.id, Date.utc_today())
       assert length(tracks) == 1
-      assert Enum.at(tracks, 0).provider_id == "spotify:track:123"
+      assert Enum.at(tracks, 0).provider_ids == %{spotify: "spotify:track:123"}
     end
 
     test "started_at is calculated from progress_ms when available" do

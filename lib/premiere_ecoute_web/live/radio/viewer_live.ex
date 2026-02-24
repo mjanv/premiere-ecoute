@@ -61,4 +61,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
     tracks = Radio.get_tracks(socket.assigns.user.id, date)
     {:noreply, assign(socket, date: date, tracks: tracks)}
   end
+
+  defp link(:spotify, id), do: "https://open.spotify.com/track/#{id}"
+  defp link(:deezer, id), do: "https://www.deezer.com/track/#{id}"
 end

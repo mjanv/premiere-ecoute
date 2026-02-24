@@ -5,8 +5,8 @@ defmodule PremiereEcoute.Radio.Workers.CleanupOldTracksTest do
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Radio.Workers.CleanupOldTracks
 
-  defp track_attrs(provider_id, started_at) do
-    %{provider_id: provider_id, name: "Song", artist: "Artist", started_at: started_at}
+  defp track_attrs(spotify_id, started_at) do
+    %{provider_ids: %{spotify: spotify_id}, name: "Song", artist: "Artist", started_at: started_at}
   end
 
   defp enable_radio_tracking(user, retention_days: retention_days) do
@@ -24,7 +24,10 @@ defmodule PremiereEcoute.Radio.Workers.CleanupOldTracksTest do
       enable_radio_tracking(user, retention_days: 7)
 
       old_started_at = DateTime.add(DateTime.utc_now(), -8, :day) |> DateTime.truncate(:second)
-      Radio.insert_track(user.id, track_attrs("track:old", old_started_at))
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Radio.insert_track(user.id, "spotify", track_attrs("track:old", old_started_at))
+      end)
 
       assert :ok = perform_job(CleanupOldTracks, %{})
 
@@ -36,19 +39,25 @@ defmodule PremiereEcoute.Radio.Workers.CleanupOldTracksTest do
       enable_radio_tracking(user, retention_days: 7)
 
       recent_started_at = DateTime.add(DateTime.utc_now(), -3, :day) |> DateTime.truncate(:second)
-      Radio.insert_track(user.id, track_attrs("track:recent", recent_started_at))
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Radio.insert_track(user.id, "spotify", track_attrs("track:recent", recent_started_at))
+      end)
 
       assert :ok = perform_job(CleanupOldTracks, %{})
 
       assert [track] = Radio.get_tracks(user.id, DateTime.to_date(recent_started_at))
-      assert track.provider_id == "track:recent"
+      assert track.provider_ids == %{spotify: "track:recent"}
     end
 
     test "does not delete tracks for users with tracking disabled" do
       user = user_fixture(%{role: :streamer})
 
       old_started_at = DateTime.add(DateTime.utc_now(), -8, :day) |> DateTime.truncate(:second)
-      Radio.insert_track(user.id, track_attrs("track:old", old_started_at))
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Radio.insert_track(user.id, "spotify", track_attrs("track:old", old_started_at))
+      end)
 
       assert :ok = perform_job(CleanupOldTracks, %{})
 
