@@ -3,7 +3,6 @@ defmodule PremiereEcoute.Radio.Workers.CleanupOldTracks do
   Oban worker for cleaning up old radio tracks.
 
   Runs daily to delete tracks older than each user's retention policy.
-  Scheduled via Oban cron configuration.
   """
 
   use PremiereEcouteCore.Worker, queue: :radio, max_attempts: 1

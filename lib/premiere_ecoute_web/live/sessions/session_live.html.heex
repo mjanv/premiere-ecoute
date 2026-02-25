@@ -373,7 +373,7 @@
 <!-- YouTube Chapters Modal - Outside all layout containers for proper overlay -->
   <%= if @show_youtube_modal do %>
     <.live_component
-      module={PremiereEcouteWeb.Sessions.Components.YoutubeChaptersModal}
+      module={PremiereEcouteWeb.Sessions.Components.YoutubeMetadata}
       id="youtube-chapters-modal"
       listening_session={@listening_session}
     />
