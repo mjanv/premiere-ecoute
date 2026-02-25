@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Radio.Workers.CleanupOldTracks do
   Scheduled via Oban cron configuration.
   """
 
-  use PremiereEcouteCore.Worker, queue: :cleanup, max_attempts: 1
+  use PremiereEcouteCore.Worker, queue: :radio, max_attempts: 1
 
   require Logger
 
