@@ -110,6 +110,11 @@ ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
 
 ## Post-Deployment
 
+### Access Points
+
+- **Application**: https://premiere-ecoute.fr (or https://68.183.219.251)
+- **Traefik Dashboard**: http://68.183.219.251:8080
+
 ### Verify Deployment
 
 After deployment, verify the services are running:
@@ -119,13 +124,6 @@ ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
 ssh root@68.183.219.251 'systemctl status traefik --no-pager'
 ssh root@68.183.219.251 'systemctl status postgresql --no-pager'
 ```
-
-All services should show as "active (running)".
-
-### Access Points
-
-- **Application**: https://premiere-ecoute.fr (or https://68.183.219.251)
-- **Traefik Dashboard**: http://68.183.219.251:8080
 
 ### View Logs
 
@@ -141,23 +139,15 @@ ssh root@68.183.219.251 'journalctl -u premiere-ecoute -u traefik -u postgresql 
 ### Restart Services
 
 ```bash
-# Restart application
 ssh root@68.183.219.251 'systemctl restart premiere-ecoute'
-
-# Restart Traefik
 ssh root@68.183.219.251 'systemctl restart traefik'
-
-# Restart all services
 ssh root@68.183.219.251 'systemctl restart premiere-ecoute traefik'
 ```
 
 ### Stop Services
 
 ```bash
-# Stop application
 ssh root@68.183.219.251 'systemctl stop premiere-ecoute'
-
-# Stop Traefik
 ssh root@68.183.219.251 'systemctl stop traefik'
 ```
 
@@ -251,106 +241,6 @@ ufw delete allow 8080
 ufw allow from YOUR_IP to any port 8080
 ```
 
-## Troubleshooting
-
-### Services Not Starting
-
-Check service status and logs:
-```bash
-# Check if service is active
-ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
-
-# View recent logs
-ssh root@68.183.219.251 'journalctl -u premiere-ecoute -n 100 --no-pager'
-
-# Follow logs in real-time
-ssh root@68.183.219.251 'journalctl -u premiere-ecoute -f'
-```
-
-### Database Connection Issues
-
-Verify PostgreSQL is running and accepting connections:
-```bash
-ssh root@68.183.219.251 'systemctl status postgresql --no-pager'
-ssh root@68.183.219.251 'sudo -u postgres psql -c "SELECT version();"'
-```
-
-Check database exists:
-```bash
-ssh root@68.183.219.251 'sudo -u postgres psql -l | grep premiere_ecoute_prod'
-```
-
-### SSL Certificate Issues
-
-Check Traefik logs:
-```bash
-ssh root@68.183.219.251 'journalctl -u traefik -n 100 --no-pager'
-```
-
-Verify certificate file permissions:
-```bash
-ssh root@68.183.219.251 'ls -la /opt/traefik/acme.json'
-# Should be owned by traefik:traefik with 600 permissions
-```
-
-### Application Errors
-
-View application logs:
-```bash
-ssh root@68.183.219.251 'journalctl -u premiere-ecoute -f'
-```
-
-Connect to running application for IEx console:
-```bash
-ssh root@68.183.219.251
-/opt/premiere-ecoute/bin/premiere_ecoute remote
-```
-
-### Permission Issues
-
-If you encounter permission errors:
-```bash
-# Verify ownership
-ssh root@68.183.219.251 'ls -la /opt/premiere-ecoute'
-# Should be owned by premiere:premiere
-
-# Fix if needed
-ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute'
-```
-
-## Security Considerations
-
-1. **Secrets management**:
-   - All production secrets are stored as GitHub Secrets, never in version control
-   - Never commit `.env.production` to git
-   - Regularly rotate API keys and secrets
-
-2. **SSH access**:
-   - Use SSH keys only (no password authentication)
-   - Restrict SSH key permissions to deployment-only operations
-   - Consider using a dedicated deployment user instead of root
-
-3. **Restrict Traefik dashboard**:
-   - Limit access to port 8080 or disable it in production
-   - Use UFW to allow only specific IPs
-
-4. **System security**:
-   - Application runs as non-root user `premiere`
-   - Traefik runs as non-root user `traefik`
-   - Keep system packages updated: `ssh root@68.183.219.251 'apt update && apt upgrade'`
-
-5. **Backup strategy**:
-   - Implement regular database backups
-   - Store backups off-server (consider automated S3/DO Spaces uploads)
-
-6. **Monitor logs**:
-   - Regularly check logs for suspicious activity
-   - Consider log aggregation service for production
-
-7. **Firewall**:
-   - UFW configured to allow only necessary ports (22, 80, 443, 8080)
-   - Review and adjust as needed
-
 ## GitHub Actions CI/CD Pipeline
 
 The repository includes an automated deployment pipeline via GitHub Actions that deploys to Digital Ocean on every push to the `main` branch.
@@ -438,13 +328,3 @@ To enable automated deployments, configure the following secrets in your GitHub 
 Deployments are triggered automatically:
 - On every push to the `main` branch
 - Can be manually triggered via **Actions → Deploy to Production → Run workflow**
-
-### Monitoring Deployments
-
-1. Go to **Actions** tab in your GitHub repository
-2. Click on the latest workflow run
-3. Monitor the progress of `build-release` and `deploy-to-digital-ocean` jobs
-4. Check logs for any errors
-
-
-
