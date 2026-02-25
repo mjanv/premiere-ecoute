@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
   Deezer API client.
 
   Provides access to Deezer Web API for fetching playlist data. No authentication required as the Deezer API is public.
+  The number of requests per second is limited to 50 requests / 5 seconds.
   """
 
   use PremiereEcouteCore.Api,

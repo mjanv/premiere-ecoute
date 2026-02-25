@@ -18,7 +18,17 @@ defmodule PremiereEcoute.Radio do
     end
   end
 
-  # LinkProviderTrack.in_seconds(%{radio_track_id: 12, provider: :spotify}, 1)
+  @doc """
+  Fill all missing providers in radio tracks already registered
+  """
+  @spec backward_fill(atom()) :: :ok
+  def backward_fill(provider) do
+    RadioTrack.all()
+    |> Enum.with_index(fn track, seconds -> {track, seconds} end)
+    |> Enum.each(fn {track, seconds} ->
+      LinkProviderTrack.in_seconds(%{radio_track_id: track.id, provider: provider}, seconds)
+    end)
+  end
 
   defdelegate get_track(track_id), to: RadioTrack, as: :get
   defdelegate add_provider(track, new_ids), to: RadioTrack, as: :update_provider_ids
