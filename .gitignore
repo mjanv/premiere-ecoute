@@ -56,3 +56,4 @@ priv/request/
 
 # Agents
 .claude/settings.local.json
+docs/plans
