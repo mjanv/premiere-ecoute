@@ -32,7 +32,9 @@ defmodule PremiereEcouteWeb.Retrospective.PeriodHelpers do
   @doc """
   Builds URL query params map for the given period, year, and month.
   """
-  @spec build_params(:month | :year, integer(), integer()) :: map()
+  @spec build_params(:all | :month | :year, integer(), integer()) :: map()
+  def build_params(:all, _year, _month), do: %{"period" => "all"}
+
   def build_params(period, year, month) do
     params = %{"period" => Atom.to_string(period), "year" => Integer.to_string(year)}
 

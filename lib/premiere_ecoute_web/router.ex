@@ -176,6 +176,7 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :viewer_retrospective, on_mount: [{UserAuth, :viewer}] do
       live "/votes", VotesLive, :index
+      live "/tops", TopsLive, :index
     end
   end
 

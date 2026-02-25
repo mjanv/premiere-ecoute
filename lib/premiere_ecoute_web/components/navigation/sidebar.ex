@@ -134,6 +134,15 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   >
                     {gettext("My votes")}
                   </.sidebar_link>
+                  <.sidebar_link
+                    href={~p"/retrospective/tops"}
+                    current_page={@current_page}
+                    page_id="tops"
+                    title={gettext("My tops")}
+                    icon="hero-trophy"
+                  >
+                    {gettext("My tops")}
+                  </.sidebar_link>
                 </nav>
               </div>
             <% end %>

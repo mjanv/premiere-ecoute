@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Scores.Vote
 
-  @type time_period :: :month | :year
+  @type time_period :: :all | :month | :year
 
   @doc """
   Get all albums listened by a specific streamer during a time period.
@@ -121,6 +121,66 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
 
         {:ok, %{session: session, tracks: tracks}}
     end
+  end
+
+  @doc """
+  Get top tracks voted by a viewer during a time period, sorted by vote score descending.
+  Returns a list of maps with a typed Track struct (with nested Album), the score string, and the vote timestamp.
+  Excludes non-numeric votes (smash/pass). Limited to 10 results.
+  """
+  @spec get_top_tracks_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_top_tracks_by_period(%User{twitch: %{user_id: user_id}}, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: a in Album,
+        on: s.album_id == a.id,
+        join: t in Album.Track,
+        on: t.album_id == a.id and t.id == v.track_id,
+        where: v.viewer_id == ^user_id,
+        where: fragment("? ~ '^[0-9]+$'", v.value),
+        select: %{
+          track: %Album.Track{
+            id: t.id,
+            name: t.name,
+            track_number: t.track_number,
+            duration_ms: t.duration_ms,
+            album_id: t.album_id,
+            album: %Album{
+              id: a.id,
+              name: a.name,
+              artist: a.artist,
+              cover_url: a.cover_url
+            }
+          },
+          score: v.value,
+          voted_at: v.inserted_at
+        },
+        order_by: [
+          desc: fragment("CAST(? AS DECIMAL)", v.value),
+          desc: v.inserted_at
+        ],
+        limit: 10
+
+    case period do
+      :all ->
+        query
+
+      :month ->
+        from v in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", v.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", v.inserted_at, ^month)
+
+      :year ->
+        from v in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", v.inserted_at, ^year)
+    end
+    |> Repo.all()
   end
 
   @doc """

@@ -721,12 +721,14 @@ msgid "No Albums Found"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:74
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:93
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:74
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Please try refreshing the page"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:44
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:71
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:44
 #, elixir-autogen, elixir-format
 msgid "Month"
@@ -746,6 +748,7 @@ msgid "Retrospective"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:50
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:64
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:50
 #, elixir-autogen, elixir-format
 msgid "Year"
@@ -979,7 +982,7 @@ msgstr ""
 msgid "Delete My Account"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:235
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:244
 #, elixir-autogen, elixir-format
 msgid "Discover streamers"
 msgstr ""
@@ -1010,8 +1013,8 @@ msgstr ""
 msgid "Export includes:"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:202
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:230
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:211
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:239
 #, elixir-autogen, elixir-format
 msgid "Followed Channels"
 msgstr ""
@@ -1056,7 +1059,7 @@ msgstr ""
 msgid "New Listening Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:233
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:242
 #, elixir-autogen, elixir-format
 msgid "No followed channels yet"
 msgstr ""
@@ -1121,8 +1124,8 @@ msgstr ""
 msgid "Token Active"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:212
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:218
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:221
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:227
 #, elixir-autogen, elixir-format
 msgid "View all"
 msgstr ""
@@ -1358,7 +1361,7 @@ msgstr ""
 msgid "Welcome to Premiere Ecoute"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:146
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:155
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:161
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:145
 #, elixir-autogen, elixir-format
@@ -1370,8 +1373,8 @@ msgstr ""
 msgid "Feature Flags"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:153
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:157
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:162
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:166
 #: lib/premiere_ecoute_web/live/billboards/index_live.html.heex:12
 #, elixir-autogen, elixir-format
 msgid "My Billboards"
@@ -1487,8 +1490,8 @@ msgid "Billboard title updated successfully"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:45
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:105
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:184
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:102
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:181
 #, elixir-autogen, elixir-format
 msgid "Copy"
 msgstr ""
@@ -1795,7 +1798,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:49
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:371
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:484
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:90
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:87
 #, elixir-autogen, elixir-format
 msgid "Title"
 msgstr ""
@@ -2044,6 +2047,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:248
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:284
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:320
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:57
 #, elixir-autogen, elixir-format
 msgid "All"
 msgstr ""
@@ -2336,11 +2340,13 @@ msgstr ""
 msgid "My votes"
 msgstr ""
 
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:102
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:83
 #, elixir-autogen, elixir-format
 msgid "No Votes Found"
 msgstr ""
 
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:103
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:84
 #, elixir-autogen, elixir-format
 msgid "No votes cast during this period"
@@ -2396,8 +2402,8 @@ msgstr ""
 msgid "Manage your listening sessions and track your music discoveries"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:164
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:167
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:173
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:176
 #: lib/premiere_ecoute_web/live/billboards/submissions_live.html.heex:11
 #, elixir-autogen, elixir-format, fuzzy
 msgid "My Submissions"
@@ -2550,7 +2556,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:286
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:368
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:382
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:120
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:117
 #, elixir-autogen, elixir-format
 msgid "Description"
 msgstr ""
@@ -2933,7 +2939,7 @@ msgstr ""
 msgid "Festival poster"
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:178
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:187
 #, elixir-autogen, elixir-format
 msgid "Festivals"
 msgstr ""
@@ -2948,8 +2954,8 @@ msgstr ""
 msgid "Found %{count} tracks! Ready to create festival playlist."
 msgstr ""
 
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:184
-#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:189
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:193
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:198
 #, elixir-autogen, elixir-format
 msgid "New Festival"
 msgstr ""
@@ -3512,7 +3518,7 @@ msgstr ""
 msgid "Retrospective visibility"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:169
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:166
 #, elixir-autogen, elixir-format
 msgid "Chapters"
 msgstr ""
@@ -3522,7 +3528,7 @@ msgstr ""
 msgid "Export to Youtube"
 msgstr "Export to Spotify"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:202
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:199
 #, elixir-autogen, elixir-format
 msgid "Time Bias"
 msgstr ""
@@ -3628,12 +3634,12 @@ msgstr ""
 msgid "retrying at %{time}"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:82
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:79
 #, elixir-autogen, elixir-format
 msgid "Copy and paste this title and description into your YouTube video"
 msgstr "Copy and paste this title and description into your YouTube video"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:137
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:134
 #, elixir-autogen, elixir-format
 msgid "Intro"
 msgstr "Intro"
@@ -3643,32 +3649,48 @@ msgstr "Intro"
 msgid "No users found"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:153
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:150
 #, elixir-autogen, elixir-format
 msgid "Notes"
 msgstr "Notes"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:113
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:110
 #, elixir-autogen, elixir-format
 msgid "PREMIÈRE ÉCOUTE : \"%{title}\" by %{artist} (React Live)"
 msgstr "PREMIÈRE ÉCOUTE : \"%{title}\" by %{artist} (React Live)"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:193
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:190
 #, elixir-autogen, elixir-format
 msgid "Streamer score"
 msgstr "Streamer score"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:193
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:190
 #, elixir-autogen, elixir-format
 msgid "This week I listened and reacted live to the new album \"%{title}\" by %{artist} !"
 msgstr "This week I listened and reacted live to the new album \"%{title}\" by %{artist} !"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:194
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:191
 #, elixir-autogen, elixir-format
 msgid "Viewer score"
 msgstr "Viewer score"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_chapters.ex:79
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:76
 #, elixir-autogen, elixir-format
 msgid "Youtube"
 msgstr "Youtube"
+
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:29
+#, elixir-autogen, elixir-format
+msgid "All time"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:92
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Failed to load top tracks"
+msgstr ""
+
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:141
+#: lib/premiere_ecoute_web/components/navigation/sidebar.ex:144
+#, elixir-autogen, elixir-format, fuzzy
+msgid "My tops"
+msgstr ""

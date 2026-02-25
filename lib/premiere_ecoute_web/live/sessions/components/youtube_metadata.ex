@@ -67,7 +67,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
     >
       <!-- Background overlay -->
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" phx-click="close_modal" phx-target={@myself}></div>
-
+      
     <!-- Modal panel -->
       <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-gray-900 p-8 shadow-2xl transition-all border border-purple-500/30">
         <!-- Header -->
@@ -79,7 +79,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             {gettext("Copy and paste this title and description into your YouTube video")}
           </p>
         </div>
-
+        
     <!-- Title -->
         <div class="mb-4">
           <div class="flex items-center justify-between mb-2">
@@ -109,7 +109,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
           >{gettext("PREMIÈRE ÉCOUTE : \"%{title}\" by %{artist} (React Live)", title: @youtube_title, artist: @listening_session.album.artist)}</textarea>
         </div>
-
+        
     <!-- YouTube Chapters Textbox -->
         <div>
           <div class="flex items-center justify-between mb-2">
@@ -191,7 +191,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
     {gettext("Viewer score")}: {inspect(@report.session_summary["viewer_score"])}&#013; &#010;<% end %><%= if @options.chapters do %>{@youtube_chapters}<% end %>
           </textarea>
         </div>
-
+        
     <!-- Time Bias Slider -->
         <div class="mt-6">
           <div class="flex items-center justify-between mb-2">

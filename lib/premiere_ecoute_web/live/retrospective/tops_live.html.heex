@@ -1,0 +1,153 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="tops"
+>
+  <div class="min-h-screen synthwave-bg text-white">
+    <!-- Header -->
+    <div class="bg-gray-900 border-b border-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <div class="flex items-center justify-center space-x-4">
+          <!-- Navigation Arrows (hidden for all-time) -->
+          <%= if @selected_period != :all do %>
+            <button
+              phx-click="navigate"
+              phx-value-direction="previous"
+              class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              &lt;
+            </button>
+          <% else %>
+            <div class="px-4 py-2 w-14"></div>
+          <% end %>
+          
+<!-- Period Label -->
+          <div class="px-8 py-3 rounded-lg text-white font-medium min-w-64 text-center text-xl">
+            <%= case @selected_period do %>
+              <% :all -> %>
+                {gettext("All time")}
+              <% :month -> %>
+                {Date.new!(@selected_year, @selected_month, 1) |> Calendar.strftime("%B")} {@selected_year}
+              <% :year -> %>
+                {@selected_year}
+            <% end %>
+          </div>
+
+          <%= if @selected_period != :all do %>
+            <button
+              phx-click="navigate"
+              phx-value-direction="next"
+              class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              &gt;
+            </button>
+          <% else %>
+            <div class="px-4 py-2 w-14"></div>
+          <% end %>
+          
+<!-- Period Toggle -->
+          <div class="ml-8 flex items-center">
+            <div class="bg-gray-800 rounded-lg p-1 flex">
+              <button
+                phx-click={if @selected_period != :all, do: "set_period"}
+                phx-value-period="all"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_period == :all, do: "bg-gray-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("All")}
+              </button>
+              <button
+                phx-click={if @selected_period != :year, do: "set_period"}
+                phx-value-period="year"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_period == :year, do: "bg-gray-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Year")}
+              </button>
+              <button
+                phx-click={if @selected_period != :month, do: "set_period"}
+                phx-value-period="month"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_period == :month, do: "bg-gray-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Month")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Track List -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <.async_result :let={tops_data} assign={@tops_data}>
+        <:loading>
+          <div class="space-y-3">
+            <%= for _ <- 1..12 do %>
+              <div class="animate-pulse h-16 bg-gray-800 rounded-lg"></div>
+            <% end %>
+          </div>
+        </:loading>
+
+        <:failed>
+          <div class="bg-red-900/20 border border-red-800 rounded-lg p-8 text-center">
+            <p class="text-red-400 text-lg">{gettext("Failed to load top tracks")}</p>
+            <p class="text-gray-400 mt-2">{gettext("Please try refreshing the page")}</p>
+          </div>
+        </:failed>
+
+        <%= if Enum.empty?(tops_data) do %>
+          <div class="p-8 text-center">
+            <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
+            </svg>
+            <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Votes Found")}</h3>
+            <p class="text-gray-400">{gettext("No votes cast during this period")}</p>
+          </div>
+        <% else %>
+          <div class="space-y-6">
+            <%= for {group, offset} <- tops_data |> Enum.chunk_by(& &1.score) |> Enum.map_reduce(1, fn g, acc -> {{g, acc}, acc + length(g)} end) |> elem(0) do %>
+              <ul class="space-y-2">
+                <%= for {entry, rank} <- Enum.with_index(group, offset) do %>
+                  <li class="relative flex items-center justify-between overflow-hidden rounded-lg border border-gray-800 hover:border-gray-700 transition-colors">
+                    <!-- Album cover as blurred background -->
+                    <div
+                      class="absolute inset-0 scale-150 bg-center bg-cover blur-md brightness-[0.25]"
+                      style={"background-image: url('#{entry.track.album.cover_url}');"}
+                    >
+                    </div>
+                    <!-- Rank + Track Info -->
+                    <div class="relative flex items-center space-x-4 min-w-0">
+                      <img
+                        src={entry.track.album.cover_url}
+                        alt={entry.track.album.name}
+                        class="w-20 h-20 shrink-0 object-cover"
+                      />
+                      <span class="text-gray-400 font-mono text-base w-10 shrink-0 text-right">
+                        {rank}
+                      </span>
+                      <div class="min-w-0">
+                        <p class="text-white font-semibold text-lg truncate">{entry.track.name}</p>
+                        <p class="text-purple-300 text-base truncate">
+                          {entry.track.album.artist} &mdash; {entry.track.album.name}
+                        </p>
+                      </div>
+                    </div>
+                    
+<!-- Score + Date -->
+                    <div class="relative flex items-center space-x-6 shrink-0 ml-4 pr-5">
+                      <span class="text-gray-400 text-base">
+                        {Calendar.strftime(entry.voted_at, "%b %d, %Y")}
+                      </span>
+                      <div class="bg-purple-600 text-white font-bold rounded-full w-12 h-12 flex items-center justify-center text-base">
+                        {entry.score}
+                      </div>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+        <% end %>
+      </.async_result>
+    </div>
+  </div>
+</Layouts.app>

@@ -105,6 +105,37 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
     end
   end
 
+  describe "get_top_tracks_by_period/3" do
+    test "returns only the viewer's votes, sorted by score descending", %{viewer: viewer} do
+      results = History.get_top_tracks_by_period(viewer, :all)
+
+      # viewer1 has 2 votes; viewer2's vote on track 0 must not appear
+      assert length(results) == 2
+
+      [first, second] = results
+
+      assert %{
+               track: %Track{
+                 name: "Getting Older",
+                 track_number: 1,
+                 album: %Album{name: "Happier Than Ever", artist: "Billie Eilish"}
+               },
+               score: "9",
+               voted_at: %DateTime{}
+             } = first
+
+      assert %{
+               track: %Track{
+                 name: "I Didn't Change My Number",
+                 track_number: 2,
+                 album: %Album{name: "Happier Than Ever", artist: "Billie Eilish"}
+               },
+               score: "7",
+               voted_at: %DateTime{}
+             } = second
+    end
+  end
+
   describe "get_album_session_details/1" do
     test "return no tracks if no votes have been casted", %{sessions: [session | _]} do
       {:ok, details} = History.get_album_session_details(session.id)
