@@ -2,8 +2,6 @@ import Config
 
 config :premiere_ecoute,
   twitch_eventsub_secret: "s3cre77890ab",
-  tidal_client_id: "test_tidal_client_id",
-  tidal_client_secret: "test_tidal_client_secret",
   buymeacoffee_api_key: "test_buymeacoffee_api_key"
 
 config :premiere_ecoute, Oban, testing: :inline
@@ -31,10 +29,6 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   deezer: [
     api: PremiereEcoute.Apis.MusicProvider.DeezerApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.DeezerApi}]
-  ],
-  tidal: [
-    api: PremiereEcoute.Apis.MusicProvider.TidalApi,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.TidalApi}]
   ],
   frankfurter: [
     api: PremiereEcoute.Apis.Payments.FrankfurterApi,

@@ -396,10 +396,6 @@ To enable automated deployments, configure the following secrets in your GitHub 
 - `SPOTIFY_CLIENT_SECRET`: From Spotify Developer Dashboard
 - `SPOTIFY_REDIRECT_URI`: `https://premiere-ecoute.fr/auth/spotify/callback`
 
-#### Tidal API
-- `TIDAL_CLIENT_ID`: From Tidal Developer Portal
-- `TIDAL_CLIENT_SECRET`: From Tidal Developer Portal
-
 #### Twitch API
 - `TWITCH_CLIENT_ID`: From Twitch Developer Console
 - `TWITCH_CLIENT_SECRET`: From Twitch Developer Console

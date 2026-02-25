@@ -53,13 +53,6 @@ config :premiere_ecoute, PremiereEcoute.Apis,
       api: "https://api.deezer.com/"
     ]
   ],
-  tidal: [
-    api: PremiereEcoute.Apis.MusicProvider.TidalApi,
-    urls: [
-      api: "https://openapi.tidal.com/v2",
-      accounts: "https://auth.tidal.com/v1"
-    ]
-  ],
   frankfurter: [
     api: PremiereEcoute.Apis.Payments.FrankfurterApi,
     urls: [
