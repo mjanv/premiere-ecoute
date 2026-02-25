@@ -36,7 +36,7 @@ defmodule PremiereEcouteWeb.Components.Navigation.DayNav do
       <% end %>
 
       <div class="flex-1 text-center">
-        <h1 class="text-4xl font-bold text-white">
+        <h1 class="text-2xl sm:text-4xl font-bold text-white">
           {Calendar.strftime(@date, "%-d %B %Y")}
         </h1>
       </div>

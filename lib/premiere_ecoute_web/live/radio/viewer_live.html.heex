@@ -1,5 +1,5 @@
 <div class="synthwave-bg text-white min-h-screen">
-  <div class="max-w-4xl mx-auto px-6 py-12">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
     <.day_nav
       username={@user.username}
       date={@date}
@@ -12,46 +12,52 @@
         No tracks played on this date.
       </div>
     <% else %>
-      <div class="space-y-6">
+      <div class="space-y-4 sm:space-y-6">
         <%= for {track, _index} <- Enum.with_index(@tracks, 1) do %>
           <div
-            class="group flex items-center gap-6 rounded-xl px-8 py-8 border border-white/10 hover:border-purple-400/40 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-900/40 cursor-default"
+            class="group flex items-center gap-4 sm:gap-6 rounded-xl px-4 sm:px-6 py-4 sm:py-6 border border-white/10 hover:border-purple-400/40 backdrop-blur-sm transition-all duration-300 sm:hover:scale-[1.10] hover:shadow-xl hover:shadow-purple-900/40 cursor-default"
             style="background-color: rgba(220,215,235,0.15);"
           >
             <div class="flex-1 min-w-0">
-              <div class="text-purple-400 text-2xl font-semibold mb-3 group-hover:text-purple-300 transition-colors duration-300">
+              <div class="text-purple-400 text-lg sm:text-2xl font-semibold mb-2 sm:mb-3 group-hover:text-purple-300 transition-colors duration-300">
                 {track.started_at |> DateTime.shift_zone!(@timezone) |> Calendar.strftime("%H:%M")}
               </div>
-              <div class="text-white uppercase font-black text-5xl leading-tight tracking-wide mb-3 transition-colors duration-300">
+              <div class="text-white uppercase font-black text-2xl sm:text-4xl leading-tight tracking-wide mb-2 sm:mb-3 transition-colors duration-300">
                 {track.name}
               </div>
-              <div class="text-gray-300 text-2xl transition-colors duration-300">
+              <div class="text-gray-300 text-lg sm:text-2xl transition-colors duration-300">
                 {track.artist}
                 <%= if track.album do %>
-                  <span class="text-purple-400 italic text-xl">
+                  <span class="text-purple-400 italic text-base sm:text-xl">
                     — {track.album}
                   </span>
                 <% end %>
               </div>
             </div>
-            <%= for {provider, track_id} <- track.provider_ids do %>
+            <%= for {provider, provider_id} <- Map.merge(track.provider_ids, %{apple: nil}) do %>
               <a
-                href={link(provider, track_id)}
+                href={link(track, provider, provider_id)}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="shrink-0 text-white opacity-40 hover:opacity-90 transition-opacity duration-200"
                 aria-label="Open on Spotify"
               >
                 <%= if provider == :spotify do %>
-                  <svg class="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+                  <svg class="w-7 h-7 sm:w-10 sm:h-10 hover:text-green-500" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
                   </svg>
                 <% end %>
                 <%= if provider == :deezer do %>
-                  <svg class="w-10 h-10" viewBox="0 0 120 120" fill="currentColor">
-                    <svg width="120" height="120">
-                      <path d="M101.19 18.41c1.12-6.47 2.75-10.54 4.57-10.55 3.38.01 6.13 14.12 6.13 31.54s-2.75 31.54-6.13 31.54c-1.39 0-2.67-2.4-3.7-6.42-1.63 14.71-5.01 24.82-8.93 24.82-3.03 0-5.75-6.07-7.58-15.65-1.25 18.22-4.38 31.14-8.05 31.14-2.3 0-4.4-5.12-5.95-13.46-1.87 17.21-6.18 29.28-11.22 29.28s-9.36-12.06-11.22-29.28c-1.54 8.34-3.64 13.46-5.95 13.46-3.67 0-6.8-12.93-8.05-31.14-1.83 9.58-4.54 15.65-7.58 15.65-3.91 0-7.3-10.11-8.93-24.82-1.02 4.03-2.31 6.42-3.7 6.42-3.39 0-6.13-14.12-6.13-31.54S11.51 7.86 14.9 7.86c1.82 0 3.44 4.08 4.57 10.55C21.28 7.25 24.21 0 27.53 0c3.94 0 7.35 10.26 8.97 25.15C38.08 14.31 40.48 7.4 43.16 7.4c3.76 0 6.96 13.59 8.15 32.55 2.23-9.72 5.46-15.82 9.03-15.82s6.8 6.1 9.02 15.82C70.55 20.99 73.74 7.4 77.51 7.4c2.68 0 5.07 6.91 6.66 17.75C85.78 10.26 89.2 0 93.13 0c3.31 0 6.25 7.26 8.06 18.41zM0 36.3c0-7.79 1.56-14.1 3.48-14.1s3.48 6.31 3.48 14.1S5.4 50.4 3.48 50.4 0 44.08 0 36.3zm113.7 0c0-7.79 1.56-14.1 3.48-14.1s3.48 6.31 3.48 14.1-1.56 14.1-3.48 14.1-3.48-6.32-3.48-14.1z" />
-                    </svg>
+                  <svg class="w-7 h-7 sm:w-10 sm:h-10 hover:text-purple-500" viewBox="0 0 120 120" fill="currentColor">
+                    <path d="M101.19 18.41c1.12-6.47 2.75-10.54 4.57-10.55 3.38.01 6.13 14.12 6.13 31.54s-2.75 31.54-6.13 31.54c-1.39 0-2.67-2.4-3.7-6.42-1.63 14.71-5.01 24.82-8.93 24.82-3.03 0-5.75-6.07-7.58-15.65-1.25 18.22-4.38 31.14-8.05 31.14-2.3 0-4.4-5.12-5.95-13.46-1.87 17.21-6.18 29.28-11.22 29.28s-9.36-12.06-11.22-29.28c-1.54 8.34-3.64 13.46-5.95 13.46-3.67 0-6.8-12.93-8.05-31.14-1.83 9.58-4.54 15.65-7.58 15.65-3.91 0-7.3-10.11-8.93-24.82-1.02 4.03-2.31 6.42-3.7 6.42-3.39 0-6.13-14.12-6.13-31.54S11.51 7.86 14.9 7.86c1.82 0 3.44 4.08 4.57 10.55C21.28 7.25 24.21 0 27.53 0c3.94 0 7.35 10.26 8.97 25.15C38.08 14.31 40.48 7.4 43.16 7.4c3.76 0 6.96 13.59 8.15 32.55 2.23-9.72 5.46-15.82 9.03-15.82s6.8 6.1 9.02 15.82C70.55 20.99 73.74 7.4 77.51 7.4c2.68 0 5.07 6.91 6.66 17.75C85.78 10.26 89.2 0 93.13 0c3.31 0 6.25 7.26 8.06 18.41zM0 36.3c0-7.79 1.56-14.1 3.48-14.1s3.48 6.31 3.48 14.1S5.4 50.4 3.48 50.4 0 44.08 0 36.3zm113.7 0c0-7.79 1.56-14.1 3.48-14.1s3.48 6.31 3.48 14.1-1.56 14.1-3.48 14.1-3.48-6.32-3.48-14.1z" />
+                  </svg>
+                <% end %>
+                <%= if provider == :apple do %>
+                  <svg class="w-7 h-7 sm:w-10 sm:h-10 hover:text-black" viewBox="0 0 120 120" fill="currentColor">
+                    <path
+                      transform="scale(0.38)"
+                      d="M213.803 167.03c.442 47.58 41.74 63.413 42.197 63.615-.35 1.116-6.599 22.563-21.757 44.716-13.104 19.153-26.705 38.235-48.13 38.63-21.05.388-27.82-12.483-51.888-12.483-24.061 0-31.582 12.088-51.51 12.871-20.68.783-36.428-20.71-49.64-39.793-27-39.033-47.633-110.3-19.928-158.406 13.763-23.89 38.36-39.017 65.056-39.405 20.307-.387 39.475 13.662 51.889 13.662 12.406 0 35.699-16.895 60.186-14.414 10.25.427 39.026 4.14 57.503 31.186-1.49.923-34.335 20.044-33.978 59.822M174.24 50.199c10.98-13.29 18.369-31.79 16.353-50.199-15.826.636-34.962 10.546-46.314 23.828-10.173 11.763-19.082 30.589-16.678 48.633 17.64 1.365 35.66-8.964 46.64-22.262"
+                    />
                   </svg>
                 <% end %>
               </a>
