@@ -213,6 +213,44 @@ defmodule PremiereEcoute.Accounts.User.Token do
   end
 
   @doc """
+  Gets the user with the given API token.
+
+  Returns `{user, token_inserted_at}` if the token is valid, otherwise `nil`.
+  """
+  @spec get_user_by_api_token(String.t()) :: {User.t(), DateTime.t()} | nil
+  def get_user_by_api_token(encoded_token) do
+    with {:ok, token} <- Base.url_decode64(encoded_token, padding: false),
+         query = from(t in by_token_and_context_query(token, "api"), join: user in assoc(t, :user), select: {user, t.inserted_at}),
+         {user, inserted_at} <- Repo.one(query) do
+      {User.preload(user), inserted_at}
+    else
+      _ -> nil
+    end
+  end
+
+  @doc """
+  Deletes all API tokens for the given user.
+  """
+  @spec delete_user_api_tokens(User.t()) :: :ok
+  def delete_user_api_tokens(user) do
+    Repo.delete_all(by_user_and_contexts_query(user, ["api"]))
+    :ok
+  end
+
+  @doc """
+  Generates a long-lived API token for programmatic access.
+
+  Returns the token as a URL-safe base64-encoded string (shown once at creation).
+  The raw binary is stored in the database under context "api" with no expiry.
+  """
+  @spec generate_user_api_token(User.t()) :: String.t()
+  def generate_user_api_token(user) do
+    token = :crypto.strong_rand_bytes(@rand_size)
+    Repo.insert!(%__MODULE__{token: token, context: "api", user_id: user.id})
+    Base.url_encode64(token, padding: false)
+  end
+
+  @doc """
   Gets the user with the given signed token.
 
   If the token is valid `{user, token_inserted_at}` is returned, otherwise `nil` is returned.

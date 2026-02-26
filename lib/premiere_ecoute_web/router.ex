@@ -45,6 +45,11 @@ defmodule PremiereEcouteWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :api_auth do
+    plug :accepts, ["json"]
+    plug PremiereEcouteWeb.Plugs.ApiAuth
+  end
+
   pipeline :app do
     plug :accepts, ["html"]
     plug :put_secure_browser_headers
@@ -208,6 +213,12 @@ defmodule PremiereEcouteWeb.Router do
     get "/:provider", AuthController, :request
     get "/:provider/callback", AuthController, :callback
     get "/:provider/complete", AuthController, :complete
+  end
+
+  scope "/api", PremiereEcouteWeb.Api do
+    pipe_through :api_auth
+
+    get "/status", StatusController, :index
   end
 
   scope "/extension", PremiereEcouteWeb.Extension do
