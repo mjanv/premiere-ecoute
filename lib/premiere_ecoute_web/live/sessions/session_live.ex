@@ -307,6 +307,25 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_info({event, _track}, socket) when event in [:next_track, :previous_track] do
+    session = ListeningSession.get(socket.assigns.session_id)
+
+    socket
+    |> assign(:listening_session, session)
+    |> assign(:user_current_rating, nil)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info(:stop, socket) do
+    session = ListeningSession.get(socket.assigns.session_id)
+
+    socket
+    |> assign(:listening_session, session)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
   def handle_info(_event, socket) do
     {:noreply, socket}
   end

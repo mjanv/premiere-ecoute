@@ -219,6 +219,13 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through :api_auth
 
     get "/status", StatusController, :index
+
+    get "/session", SessionController, :show
+    post "/session/start", SessionController, :start
+    post "/session/stop", SessionController, :stop
+    post "/session/next", SessionController, :next
+    post "/session/previous", SessionController, :previous
+    post "/session/vote", SessionController, :vote
   end
 
   scope "/extension", PremiereEcouteWeb.Extension do

@@ -17,6 +17,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate previous_track(session), to: ListeningSession
   defdelegate active_sessions(user), to: ListeningSession
   defdelegate get_active_session(user), to: ListeningSession
+  defdelegate current_session(user), to: ListeningSession
   defdelegate can_view_retrospective?(session, scope), to: ListeningSession
 
   @doc "Publishes chat message event to Broadway pipeline for vote processing"

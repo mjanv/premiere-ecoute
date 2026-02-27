@@ -27,7 +27,11 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
         |> Profile.changeset()
         |> to_form()
 
-      {:ok, assign(socket, current_user: current_user, profile_form: profile_form)}
+      {:ok,
+       socket
+       |> assign(current_user: current_user, profile_form: profile_form)
+       |> assign(:api_tokens, Accounts.list_user_api_tokens(current_user))
+       |> assign(:new_api_token, nil)}
     end
   end
 
@@ -58,5 +62,26 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
          |> assign(:profile_form, to_form(changeset))
          |> put_flash(:error, "Failed to save settings")}
     end
+  end
+
+  @impl true
+  def handle_event("generate_api_token", _params, socket) do
+    token = Accounts.generate_user_api_token(socket.assigns.current_user)
+    tokens = Accounts.list_user_api_tokens(socket.assigns.current_user)
+
+    {:noreply,
+     socket
+     |> assign(:api_tokens, tokens)
+     |> assign(:new_api_token, token)}
+  end
+
+  @impl true
+  def handle_event("revoke_api_tokens", _params, socket) do
+    Accounts.delete_user_api_tokens(socket.assigns.current_user)
+
+    {:noreply,
+     socket
+     |> assign(:api_tokens, [])
+     |> assign(:new_api_token, nil)}
   end
 end

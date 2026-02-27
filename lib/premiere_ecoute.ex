@@ -35,7 +35,10 @@ defmodule PremiereEcoute do
   @version Mix.Project.config()[:version]
   @commit System.cmd("git", ["rev-parse", "--short", "HEAD"], stderr_to_stdout: true) |> elem(0) |> String.trim()
 
-  defdelegate apply(command), to: PremiereEcouteCore
+  def apply(command) do
+    Application.get_env(:premiere_ecoute, :command_bus, PremiereEcouteCore.CommandBus).apply(command)
+  end
+
   defdelegate paginate(stream, opts), to: Store
 
   @doc "Returns mailer"

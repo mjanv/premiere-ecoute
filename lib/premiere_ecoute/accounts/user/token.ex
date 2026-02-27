@@ -229,6 +229,14 @@ defmodule PremiereEcoute.Accounts.User.Token do
   end
 
   @doc """
+  Returns all API tokens for the given user, ordered by insertion date descending.
+  """
+  @spec list_user_api_tokens(User.t()) :: [t()]
+  def list_user_api_tokens(user) do
+    Repo.all(from t in by_user_and_contexts_query(user, ["api"]), order_by: [desc: t.inserted_at])
+  end
+
+  @doc """
   Deletes all API tokens for the given user.
   """
   @spec delete_user_api_tokens(User.t()) :: :ok

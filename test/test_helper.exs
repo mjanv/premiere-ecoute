@@ -9,5 +9,7 @@ for api <- apis do
   Mox.defmock(Module.concat([api, Mock]), for: api.behaviours())
 end
 
+Mox.defmock(PremiereEcoute.CommandBus.Mock, for: PremiereEcouteCore.CommandBus)
+
 ExUnit.start(capture_log: true, exclude: [:api, :wip])
 Ecto.Adapters.SQL.Sandbox.mode(PremiereEcoute.Repo, :manual)

@@ -21,6 +21,8 @@ defmodule PremiereEcouteCore.CommandBus do
   alias PremiereEcouteCore.EventBus
   alias PremiereEcouteCore.Registry
 
+  @callback apply(struct()) :: {:ok, struct(), list(struct())} | {:ok, list(struct())} | {:error, term()}
+
   @doc """
   Processes a command through the CQRS pipeline.
 
