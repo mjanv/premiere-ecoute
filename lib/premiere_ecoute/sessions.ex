@@ -5,9 +5,14 @@ defmodule PremiereEcoute.Sessions do
   Manages listening session lifecycle, vote processing via Broadway pipelines, and retrospective reports with historical views of albums and votes.
   """
 
+  use PremiereEcouteCore.Context, name: :sessions
+
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores
+
+  # Behaviour
+  @callback publish_message(map()) :: :ok
 
   # Listening session
   defdelegate create_session(attrs), to: ListeningSession, as: :create

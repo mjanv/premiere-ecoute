@@ -151,7 +151,7 @@ defmodule PremiereEcouteWeb.Api.SessionController do
     user = conn.assigns.current_scope.user
     user_id = user.twitch.user_id
 
-    Sessions.publish_message(%MessageSent{
+    Sessions.impl().publish_message(%MessageSent{
       broadcaster_id: user_id,
       user_id: user_id,
       message: to_string(rating),

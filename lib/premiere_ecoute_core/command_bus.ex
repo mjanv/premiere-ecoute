@@ -16,11 +16,14 @@ defmodule PremiereEcouteCore.CommandBus do
       CommandBus.apply(%MyCommand{field: "value"})
   """
 
+  use PremiereEcouteCore.Context, name: :command_bus
+
   require Logger
 
   alias PremiereEcouteCore.EventBus
   alias PremiereEcouteCore.Registry
 
+  # Behaviour
   @callback apply(struct()) :: {:ok, struct(), list(struct())} | {:ok, list(struct())} | {:error, term()}
 
   @doc """

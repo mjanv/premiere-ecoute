@@ -31,13 +31,13 @@ defmodule PremiereEcoute do
 
   alias PremiereEcoute.Accounts.Mailer
   alias PremiereEcoute.Events.Store
+  alias PremiereEcouteCore.CommandBus
 
   @version Mix.Project.config()[:version]
   @commit System.cmd("git", ["rev-parse", "--short", "HEAD"], stderr_to_stdout: true) |> elem(0) |> String.trim()
 
-  def apply(command) do
-    Application.get_env(:premiere_ecoute, :command_bus, PremiereEcouteCore.CommandBus).apply(command)
-  end
+  @doc "Apply a command to the command bus"
+  def apply(command), do: CommandBus.impl().apply(command)
 
   defdelegate paginate(stream, opts), to: Store
 
