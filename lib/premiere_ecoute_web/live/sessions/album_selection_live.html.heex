@@ -466,21 +466,44 @@
             </div>
 
             <div
-              class="mb-6 relative max-w-lg ml-16"
+              class="mb-6 relative ml-16"
               phx-hook="ClickOutside"
               id="track-search-container"
               data-event="clear_search_results"
             >
-              <.form for={@search_form} id="track-search-form" phx-change="search_tracks" phx-submit="search_tracks">
-                <.input
-                  field={@search_form[:query]}
-                  type="text"
-                  placeholder={gettext("Search Spotify tracks...")}
-                  class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50"
-                  style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
-                  error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
-                />
-              </.form>
+              <div class="flex items-center gap-2">
+                <.form
+                  for={@search_form}
+                  id="track-search-form"
+                  phx-change="search_tracks"
+                  phx-submit="search_tracks"
+                  class="flex-1"
+                >
+                  <.input
+                    field={@search_form[:query]}
+                    type="text"
+                    placeholder={gettext("Search Spotify tracks...")}
+                    class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50"
+                    style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                    error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+                  />
+                </.form>
+                <button
+                  type="button"
+                  phx-click="fetch_currently_playing"
+                  class="flex-shrink-0 flex items-center space-x-2 px-3 py-3 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/50 text-cyan-300 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                  title={gettext("Use currently playing")}
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <span class="hidden sm:inline">{gettext("Currently playing")}</span>
+                </button>
+              </div>
 
               <%= if @search_tracks.loading do %>
                 <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4">

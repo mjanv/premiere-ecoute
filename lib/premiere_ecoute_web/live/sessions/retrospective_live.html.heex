@@ -1,14 +1,14 @@
 <!-- Full-page retrospective layout without sidebar/header for sharing -->
 <div class="synthwave-bg min-h-screen text-white">
   
-<!-- Hero Section: Album/Playlist Cover Background with Stats Overlay -->
-  <%= if @listening_session.album || @listening_session.playlist do %>
+<!-- Hero Section: Album/Playlist/Single Cover Background with Stats Overlay -->
+  <%= if @listening_session.album || @listening_session.playlist || @listening_session.single do %>
     <div class="relative h-screen flex items-center justify-center overflow-hidden">
-      <!-- Full-width Album/Playlist Cover Background -->
-      <%= if (@listening_session.album && @listening_session.album.cover_url) || (@listening_session.playlist && @listening_session.playlist.cover_url) do %>
+      <!-- Full-width Cover Background -->
+      <%= if get_session_cover_url(@listening_session) do %>
         <div
           class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={"background-image: url('#{(@listening_session.album && @listening_session.album.cover_url) || (@listening_session.playlist && @listening_session.playlist.cover_url)}')"}
+          style={"background-image: url('#{get_session_cover_url(@listening_session)}')"}
         >
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
         </div>
@@ -331,35 +331,37 @@
               </div>
               
 <!-- Carousel Navigation & Indicators -->
-              <div class="flex justify-center items-center space-x-6 mt-6">
-                <!-- Previous Button -->
-                <button
-                  id="carousel-prev"
-                  class="bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all shadow-lg border border-purple-500/30"
-                >
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                  </svg>
-                </button>
-                
+              <%= if @listening_session.source != :track do %>
+                <div class="flex justify-center items-center space-x-6 mt-6">
+                  <!-- Previous Button -->
+                  <button
+                    id="carousel-prev"
+                    class="bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all shadow-lg border border-purple-500/30"
+                  >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                  </button>
+                  
 <!-- Dot Indicators -->
-                <div class="flex justify-center space-x-2">
-                  <button class="w-3 h-3 bg-white/60 rounded-full carousel-dot active"></button>
-                  <%= for _ <- get_session_tracks(@listening_session) do %>
-                    <button class="w-3 h-3 bg-white/30 rounded-full carousel-dot"></button>
-                  <% end %>
-                </div>
-                
+                  <div class="flex justify-center space-x-2">
+                    <button class="w-3 h-3 bg-white/60 rounded-full carousel-dot active"></button>
+                    <%= for _ <- get_session_tracks(@listening_session) do %>
+                      <button class="w-3 h-3 bg-white/30 rounded-full carousel-dot"></button>
+                    <% end %>
+                  </div>
+                  
 <!-- Next Button -->
-                <button
-                  id="carousel-next"
-                  class="bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all shadow-lg border border-purple-500/30"
-                >
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
+                  <button
+                    id="carousel-next"
+                    class="bg-black/70 hover:bg-black/90 text-white p-3 rounded-full transition-all shadow-lg border border-purple-500/30"
+                  >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </button>
+                </div>
+              <% end %>
             </div>
           </div>
         </.async_result>

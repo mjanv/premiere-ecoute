@@ -27,9 +27,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist | :track, scope: Scope.t()}
+    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist | :track, scope: Scope.t(), resume: boolean()}
 
-    defstruct [:session_id, :source, :scope]
+    # AIDEV-NOTE: resume: true skips start_resume_playback (track already playing on Spotify)
+    defstruct [:session_id, :source, :scope, resume: false]
   end
 
   defmodule SkipNextTrackListeningSession do

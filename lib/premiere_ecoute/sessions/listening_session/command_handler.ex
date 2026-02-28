@@ -113,14 +113,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%StartListeningSession{source: :track, session_id: session_id, scope: scope}) do
+  def handle(%StartListeningSession{source: :track, session_id: session_id, scope: scope, resume: resume}) do
     with {:ok, devices} <- Apis.spotify().devices(scope),
          true <- Enum.any?(devices, fn device -> device["is_active"] end),
          {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
          session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, %{single: single} = session} <- ListeningSession.start(session),
-         {:ok, _} <- Apis.spotify().start_resume_playback(scope, single),
+         {:ok, _} <- maybe_start_playback(resume, scope, single),
          message <-
            PremiereEcoute.Gettext.t(scope, fn ->
              gettext("Now playing: %{name} by %{artist} - vote with !vote", name: single.name, artist: single.artist)
@@ -274,4 +274,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       existing_playlist -> {:ok, existing_playlist}
     end
   end
+
+  # AIDEV-NOTE: resume: true skips Spotify playback start (track already playing)
+  defp maybe_start_playback(true, _scope, _single), do: {:ok, :resumed}
+  defp maybe_start_playback(false, scope, single), do: Apis.spotify().start_resume_playback(scope, single)
 end

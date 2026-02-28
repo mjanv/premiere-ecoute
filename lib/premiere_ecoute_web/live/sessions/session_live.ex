@@ -40,6 +40,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         if listening_session.status != :stopped do
           PlayerSupervisor.start(current_scope.user.id)
         end
+
+        if listening_session.source == :track && listening_session.status == :preparing do
+          send(self(), :auto_start)
+        end
       end
 
       {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
@@ -63,7 +67,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     else
       _ ->
         socket
-        |> put_flash(:error, "Session not found or connect to Spotify")
+        |> put_flash(:error, gettext("Session not found or connect to Spotify"))
         |> redirect(to: ~p"/sessions")
         |> then(fn socket -> {:ok, socket} end)
     end
@@ -89,7 +93,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     case PremiereEcoute.apply(%StartListeningSession{source: :track, session_id: session.id, scope: scope}) do
       {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
       {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
     end
   end
 
@@ -106,7 +110,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       {:noreply, assign(socket, :listening_session, session)}
     else
       {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
     end
   end
 
@@ -122,7 +126,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> case do
       {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
       {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot stop session")}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot stop session"))}
     end
   end
 
@@ -187,7 +191,27 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event(event, _params, socket) do
-    {:noreply, put_flash(socket, :info, "Received event: #{event}")}
+    {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
+  end
+
+  @impl true
+  def handle_info(:auto_start, %{assigns: %{listening_session: session, current_scope: scope}} = socket) do
+    # AIDEV-NOTE: Only auto-start if the session's track is already playing on Spotify (resume: true skips start_resume_playback)
+    currently_playing_id =
+      case PremiereEcoute.Apis.spotify().get_playback_state(scope, %{}) do
+        {:ok, %{"item" => %{"id" => id}, "is_playing" => true}} -> id
+        _ -> nil
+      end
+
+    if currently_playing_id == session.single.track_id do
+      case PremiereEcoute.apply(%StartListeningSession{source: :track, session_id: session.id, scope: scope, resume: true}) do
+        {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+        {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
+        {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
+      end
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
@@ -310,7 +334,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_info({:player, {:error, reason}, _state}, socket) do
     socket
     |> clear_flash()
-    |> put_flash(:error, "Spotify down: #{inspect(reason)}")
+    |> put_flash(:error, gettext("Spotify down: %{reason}", reason: inspect(reason)))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -401,8 +425,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     cond do
       vote_options == ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] -> "0-10"
       vote_options == ["1", "2", "3", "4", "5"] -> "1-5"
-      vote_options == ["smash", "pass"] -> "Smash or Pass"
-      true -> "Custom (#{length(vote_options)} options)"
+      vote_options == ["smash", "pass"] -> gettext("Smash or Pass")
+      true -> gettext("Custom (%{count} options)", count: length(vote_options))
     end
   end
 
@@ -547,9 +571,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   Converts visibility atom (private/protected/public) to capitalized display string.
   """
   @spec visibility_label(atom()) :: String.t()
-  def visibility_label(:private), do: "Private"
-  def visibility_label(:protected), do: "Protected"
-  def visibility_label(:public), do: "Public"
+  def visibility_label(:private), do: gettext("Private")
+  def visibility_label(:protected), do: gettext("Protected")
+  def visibility_label(:public), do: gettext("Public")
 
   @doc """
   Returns SVG icon for visibility level.
@@ -587,7 +611,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   Explains who can view the session retrospective based on visibility setting.
   """
   @spec visibility_description(atom()) :: String.t()
-  def visibility_description(:private), do: "Only you can view the retrospective"
-  def visibility_description(:protected), do: "Authenticated users can view the retrospective"
-  def visibility_description(:public), do: "Anyone with the link can view the retrospective"
+  def visibility_description(:private), do: gettext("Only you can view the retrospective")
+  def visibility_description(:protected), do: gettext("Authenticated users can view the retrospective")
+  def visibility_description(:public), do: gettext("Anyone with the link can view the retrospective")
 end

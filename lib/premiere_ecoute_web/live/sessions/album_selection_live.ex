@@ -53,6 +53,23 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  def handle_event("fetch_currently_playing", _params, socket) do
+    scope = socket.assigns.current_scope
+
+    socket
+    |> assign(:selected_track, AsyncResult.loading())
+    |> start_async(:select_track, fn ->
+      case PremiereEcoute.Apis.spotify().get_playback_state(scope, %{}) do
+        {:ok, %{"item" => item, "currently_playing_type" => "track"}} when not is_nil(item) ->
+          PremiereEcoute.Apis.spotify().get_single(item["id"])
+
+        _ ->
+          {:error, :nothing_playing}
+      end
+    end)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event("search_tracks", %{"query" => query}, socket) when byte_size(query) > 2 do
     socket
     |> assign(:search_tracks, AsyncResult.loading())
@@ -299,6 +316,13 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
   def handle_async(:select_track, {:ok, {:ok, track}}, socket) do
     socket
     |> assign(:selected_track, AsyncResult.ok(track))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:select_track, {:ok, {:error, :nothing_playing}}, socket) do
+    socket
+    |> assign(:selected_track, AsyncResult.ok(nil))
+    |> put_flash(:info, gettext("No track currently playing on Spotify."))
     |> then(fn socket -> {:noreply, socket} end)
   end
 

@@ -69,13 +69,20 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
     scores = Enum.map(consensus, fn {_, %{score: score}} -> score end)
 
-    most_liked_score = Enum.max(scores)
-    {most_liked, _} = Enum.find(consensus, &match?({_, %{score: ^most_liked_score}}, &1))
+    # AIDEV-NOTE: :track sessions have no per-track distribution; return nil for both extremes
+    case scores do
+      [] ->
+        {:ok, %{most_liked: nil, least_liked: nil}}
 
-    least_liked_score = Enum.min(scores)
-    {least_liked, _} = Enum.find(consensus, &match?({_, %{score: ^least_liked_score}}, &1))
+      scores ->
+        most_liked_score = Enum.max(scores)
+        {most_liked, _} = Enum.find(consensus, &match?({_, %{score: ^most_liked_score}}, &1))
 
-    {:ok, %{most_liked: most_liked, least_liked: least_liked}}
+        least_liked_score = Enum.min(scores)
+        {least_liked, _} = Enum.find(consensus, &match?({_, %{score: ^least_liked_score}}, &1))
+
+        {:ok, %{most_liked: most_liked, least_liked: least_liked}}
+    end
   end
 
   @impl true
@@ -353,11 +360,18 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
   defp get_session_title(%{album: %{name: name}}) when not is_nil(name), do: name
   defp get_session_title(%{playlist: %{title: title}}) when not is_nil(title), do: title
+  defp get_session_title(%{single: %{name: name}}) when not is_nil(name), do: name
   defp get_session_title(_), do: "Unknown"
 
   defp get_session_artist(%{album: %{artist: artist}}) when not is_nil(artist), do: artist
   defp get_session_artist(%{playlist: %{owner_name: owner_name}}) when not is_nil(owner_name), do: "by #{owner_name}"
+  defp get_session_artist(%{single: %{artist: artist}}) when not is_nil(artist), do: artist
   defp get_session_artist(_), do: "Unknown Artist"
+
+  defp get_session_cover_url(%{album: %{cover_url: url}}) when not is_nil(url), do: url
+  defp get_session_cover_url(%{playlist: %{cover_url: url}}) when not is_nil(url), do: url
+  defp get_session_cover_url(%{single: %{cover_url: url}}) when not is_nil(url), do: url
+  defp get_session_cover_url(_), do: nil
 
   # Calculate dynamic bar height based on vote count and maximum votes in the dataset.
   # Ensures bars scale proportionally and don't exceed container height.

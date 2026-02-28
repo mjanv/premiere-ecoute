@@ -57,17 +57,17 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:150
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:165
 #, elixir-autogen, elixir-format
 msgid "Album Selection"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:164
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:179
 #, elixir-autogen, elixir-format
 msgid "Search Spotify albums..."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:176
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:191
 #, elixir-autogen, elixir-format
 msgid "Searching albums..."
 msgstr ""
@@ -78,15 +78,15 @@ msgid "Twitch"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:81
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:181
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:241
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:81
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:48
 #, elixir-autogen, elixir-format
 msgid "Viewers"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:98
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:169
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:122
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:229
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:99
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:170
 #, elixir-autogen, elixir-format
@@ -94,7 +94,7 @@ msgid "Album cover"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:192
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:154
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:169
 #, elixir-autogen, elixir-format
 msgid "Delete session"
 msgstr ""
@@ -146,7 +146,6 @@ msgstr ""
 msgid "Display scores"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:187
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:76
 #, elixir-autogen, elixir-format
 msgid "Display votes"
@@ -155,21 +154,22 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:302
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:488
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:41
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:84
 #, elixir-autogen, elixir-format
 msgid "Duration"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:168
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:170
 #, elixir-autogen, elixir-format
 msgid "End Session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:342
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:396
 #, elixir-autogen, elixir-format
 msgid "My Score"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:121
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:123
 #, elixir-autogen, elixir-format
 msgid "Open overlay in new tab"
 msgstr ""
@@ -180,12 +180,12 @@ msgstr ""
 msgid "Released"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:335
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:389
 #, elixir-autogen, elixir-format
 msgid "Score"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:152
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:154
 #, elixir-autogen, elixir-format
 msgid "Start Session"
 msgstr ""
@@ -193,7 +193,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:117
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:211
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:367
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:187
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:247
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:96
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:55
 #, elixir-autogen, elixir-format
@@ -210,7 +210,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:223
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:172
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:37
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:86
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:129
 #, elixir-autogen, elixir-format
 msgid "Tracks"
 msgstr ""
@@ -220,12 +220,12 @@ msgstr ""
 msgid "Unique Voters"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:326
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:380
 #, elixir-autogen, elixir-format
 msgid "Votes"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:292
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:335
 #, elixir-autogen, elixir-format
 msgid "Your rating"
 msgstr ""
@@ -320,8 +320,8 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:78
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:125
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:108
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:115
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:96
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:130
 #, elixir-autogen, elixir-format
 msgid "Album"
 msgstr ""
@@ -338,6 +338,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:70
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:139
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:63
 #, elixir-autogen, elixir-format
 msgid "Albums"
 msgstr ""
@@ -354,6 +355,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:81
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:29
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:76
 #, elixir-autogen, elixir-format
 msgid "Artist"
 msgstr ""
@@ -529,7 +531,7 @@ msgid "Sessions Management"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/home_live.html.heex:41
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:514
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:652
 #, elixir-autogen, elixir-format
 msgid "Start Listening Session"
 msgstr ""
@@ -556,7 +558,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:100
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:135
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:292
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:307
 #, elixir-autogen, elixir-format
 msgid "Unknown"
 msgstr ""
@@ -589,28 +591,28 @@ msgstr ""
 msgid "View and manage listening sessions"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:261
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:430
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:276
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:445
 #, elixir-autogen, elixir-format
 msgid "tracks"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:504
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:642
 #, elixir-autogen, elixir-format
 msgid "Ready to Start"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:276
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:291
 #, elixir-autogen, elixir-format
 msgid "min"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:467
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:605
 #, elixir-autogen, elixir-format
 msgid "0-10 Rating"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:468
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:606
 #, elixir-autogen, elixir-format
 msgid "1-5 Rating"
 msgstr ""
@@ -626,7 +628,8 @@ msgstr ""
 msgid "Manage"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:469
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:607
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:417
 #, elixir-autogen, elixir-format
 msgid "Smash or Pass"
 msgstr ""
@@ -651,7 +654,7 @@ msgstr ""
 msgid "Vote Format"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:453
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:591
 #, elixir-autogen, elixir-format
 msgid "Vote Options"
 msgstr ""
@@ -687,7 +690,7 @@ msgstr ""
 msgid "Terms"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:270
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:330
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:242
 #, elixir-autogen, elixir-format
 msgid "Album details not found"
@@ -695,31 +698,31 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:227
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:330
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:157
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:276
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:217
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:336
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:158
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:248
 #, elixir-autogen, elixir-format
 msgid "Close"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:151
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:211
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:152
 #, elixir-autogen, elixir-format
 msgid "Failed to load album details"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:73
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:93
 #, elixir-autogen, elixir-format
 msgid "Failed to load albums"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:83
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:104
 #, elixir-autogen, elixir-format
 msgid "No Albums Found"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:74
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:94
 #: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:93
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:74
 #, elixir-autogen, elixir-format
@@ -733,7 +736,7 @@ msgstr ""
 msgid "Month"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:84
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:105
 #, elixir-autogen, elixir-format
 msgid "No albums listened during this period"
 msgstr ""
@@ -741,7 +744,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:121
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:124
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:125
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:211
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:271
 #, elixir-autogen, elixir-format
 msgid "Retrospective"
 msgstr ""
@@ -950,7 +953,7 @@ msgstr ""
 msgid "Associated accounts"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:466
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:604
 #, elixir-autogen, elixir-format
 msgid "Choose vote format..."
 msgstr ""
@@ -1018,7 +1021,8 @@ msgstr ""
 msgid "Followed Channels"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:109
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:97
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:148
 #, elixir-autogen, elixir-format
 msgid "From Spotify"
 msgstr ""
@@ -1080,8 +1084,8 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:117
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:261
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:132
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:117
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:120
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:131
 #, elixir-autogen, elixir-format
 msgid "Playlist"
 msgstr ""
@@ -1096,18 +1100,18 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:484
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:622
 #, elixir-autogen, elixir-format
 msgid "Select a format to see options"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:34
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:87
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:71
 #, elixir-autogen, elixir-format
 msgid "Source"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:522
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:660
 #, elixir-autogen, elixir-format
 msgid "Start Over"
 msgstr ""
@@ -1211,7 +1215,7 @@ msgid "Load Playlist"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:160
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:342
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:357
 #, elixir-autogen, elixir-format
 msgid "Loading your playlists..."
 msgstr ""
@@ -1265,9 +1269,10 @@ msgstr ""
 msgid "Preferences"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:55
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:57
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:228
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:145
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:563
 #, elixir-autogen, elixir-format
 msgid "Private"
 msgstr ""
@@ -1277,11 +1282,12 @@ msgstr ""
 msgid "Profile preferences not available"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:54
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:56
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:84
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:217
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:142
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:90
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:133
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:565
 #, elixir-autogen, elixir-format
 msgid "Public"
 msgstr ""
@@ -1489,8 +1495,8 @@ msgid "Billboard title updated successfully"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:45
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:102
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:181
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:98
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:177
 #, elixir-autogen, elixir-format
 msgid "Copy"
 msgstr ""
@@ -1797,7 +1803,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:49
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:371
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:484
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:87
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:83
 #, elixir-autogen, elixir-format
 msgid "Title"
 msgstr ""
@@ -2312,7 +2318,7 @@ msgstr ""
 msgid "Failed to load data"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:186
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:188
 #, elixir-autogen, elixir-format
 msgid "View Retrospective"
 msgstr ""
@@ -2473,7 +2479,8 @@ msgstr ""
 msgid "Are you sure you want to delete this session? This action cannot be undone."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:315
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:284
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:369
 #, elixir-autogen, elixir-format
 msgid "Closed votes"
 msgstr ""
@@ -2489,7 +2496,8 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:313
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:282
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:367
 #, elixir-autogen, elixir-format
 msgid "Open votes"
 msgstr ""
@@ -2542,7 +2550,7 @@ msgstr ""
 msgid "Data target"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:270
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:313
 #, elixir-autogen, elixir-format
 msgid "Off"
 msgstr ""
@@ -2555,7 +2563,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:286
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:368
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:382
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:117
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:113
 #, elixir-autogen, elixir-format
 msgid "Description"
 msgstr ""
@@ -2616,8 +2624,8 @@ msgstr ""
 msgid "Next month"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:206
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:223
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:249
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:266
 #, elixir-autogen, elixir-format
 msgid "Next track in"
 msgstr ""
@@ -2788,7 +2796,7 @@ msgstr ""
 msgid "Review"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:197
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:257
 #, elixir-autogen, elixir-format
 msgid "Session"
 msgstr ""
@@ -2831,48 +2839,44 @@ msgid "Total Tracks"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/rules_live.html.heex:147
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:355
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:370
 #, elixir-autogen, elixir-format
 msgid "Choose a playlist..."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:133
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:121
 #, elixir-autogen, elixir-format
 msgid "From your Spotify"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:92
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:135
 #, elixir-autogen, elixir-format
 msgid "No"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:365
-#, elixir-autogen, elixir-format
-msgid "No tracks found for this %{source}."
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:76
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:119
 #, elixir-autogen, elixir-format
 msgid "Owner"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:335
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:350
 #, elixir-autogen, elixir-format
 msgid "Playlist Selection"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:241
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:80
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:123
 #, elixir-autogen, elixir-format
 msgid "Provider"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:92
+#: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:135
 #, elixir-autogen, elixir-format
 msgid "Yes"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:415
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:430
 #, elixir-autogen, elixir-format
 msgid "playlist"
 msgstr ""
@@ -3016,18 +3020,19 @@ msgid_plural "artists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:190
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:257
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:32
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:49
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:34
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:50
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:67
 #, elixir-autogen, elixir-format
 msgid "Votes are open !"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:101
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:154
 #, elixir-autogen, elixir-format
 msgid "Welcome to the premiere of %{name} by %{artist}"
 msgstr ""
@@ -3134,12 +3139,12 @@ msgstr ""
 msgid "Tracks liked from your extension will be added to this playlist"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:63
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:81
 #, elixir-autogen, elixir-format
 msgid "Votes close in 30 seconds !"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:108
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:126
 #, elixir-autogen, elixir-format
 msgid "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account"
 msgstr ""
@@ -3512,22 +3517,22 @@ msgstr ""
 msgid "e.g., hosting, server, bandwidth"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:132
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:147
 #, elixir-autogen, elixir-format
 msgid "Retrospective visibility"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:166
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:162
 #, elixir-autogen, elixir-format
 msgid "Chapters"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:201
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:203
 #, elixir-autogen, elixir-format
 msgid "Export to Youtube"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:199
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:195
 #, elixir-autogen, elixir-format
 msgid "Time Bias"
 msgstr ""
@@ -3537,12 +3542,12 @@ msgstr ""
 msgid "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:62
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:64
 #, elixir-autogen, elixir-format
 msgid "Days before tracks are deleted"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:30
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:32
 #, elixir-autogen, elixir-format
 msgid "Enable"
 msgstr ""
@@ -3557,22 +3562,22 @@ msgstr ""
 msgid "Manage streamer features and integrations"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:18
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:21
 #, elixir-autogen, elixir-format
 msgid "Radio"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:31
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:33
 #, elixir-autogen, elixir-format
 msgid "Record tracks played during streams"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:61
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:63
 #, elixir-autogen, elixir-format
 msgid "Retention"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:80
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:82
 #, elixir-autogen, elixir-format
 msgid "Save"
 msgstr ""
@@ -3582,12 +3587,12 @@ msgstr ""
 msgid "Streamer Features"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:46
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:48
 #, elixir-autogen, elixir-format
 msgid "Visibility"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:47
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:49
 #, elixir-autogen, elixir-format
 msgid "Who can see your daily track list"
 msgstr ""
@@ -3633,12 +3638,12 @@ msgstr ""
 msgid "retrying at %{time}"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:79
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:75
 #, elixir-autogen, elixir-format
 msgid "Copy and paste this title and description into your YouTube video"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:134
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:130
 #, elixir-autogen, elixir-format
 msgid "Intro"
 msgstr ""
@@ -3648,32 +3653,32 @@ msgstr ""
 msgid "No users found"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:150
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:146
 #, elixir-autogen, elixir-format
 msgid "Notes"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:110
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:106
 #, elixir-autogen, elixir-format
 msgid "PREMIÈRE ÉCOUTE : \"%{title}\" by %{artist} (React Live)"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:190
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:186
 #, elixir-autogen, elixir-format
 msgid "Streamer score"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:190
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:186
 #, elixir-autogen, elixir-format
 msgid "This week I listened and reacted live to the new album \"%{title}\" by %{artist} !"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:191
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:187
 #, elixir-autogen, elixir-format
 msgid "Viewer score"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:76
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:72
 #, elixir-autogen, elixir-format
 msgid "Youtube"
 msgstr ""
@@ -3692,4 +3697,122 @@ msgstr ""
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:144
 #, elixir-autogen, elixir-format
 msgid "My tops"
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:240
+#, elixir-autogen, elixir-format
+msgid "%{name} by %{artist} is over"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:605
+#, elixir-autogen, elixir-format
+msgid "Anyone with the link can view the retrospective"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:604
+#, elixir-autogen, elixir-format
+msgid "Authenticated users can view the retrospective"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:96
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:113
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:202
+#, elixir-autogen, elixir-format
+msgid "Cannot start session"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:129
+#, elixir-autogen, elixir-format
+msgid "Cannot stop session"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:494
+#, elixir-autogen, elixir-format
+msgid "Currently playing"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:418
+#, elixir-autogen, elixir-format
+msgid "Custom (%{count} options)"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:107
+#, elixir-autogen, elixir-format
+msgid "No Singles Found"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:108
+#, elixir-autogen, elixir-format
+msgid "No singles listened during this period"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.ex:325
+#, elixir-autogen, elixir-format
+msgid "No track currently playing on Spotify."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:418
+#, elixir-autogen, elixir-format
+msgid "No tracks found for this session."
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:126
+#, elixir-autogen, elixir-format
+msgid "Now playing: %{name} by %{artist} - vote with !vote"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:603
+#, elixir-autogen, elixir-format
+msgid "Only you can view the retrospective"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:564
+#, elixir-autogen, elixir-format
+msgid "Protected"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:194
+#, elixir-autogen, elixir-format
+msgid "Received event: %{event}"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:479
+#, elixir-autogen, elixir-format
+msgid "Search Spotify tracks..."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:502
+#, elixir-autogen, elixir-format
+msgid "Searching tracks..."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:70
+#, elixir-autogen, elixir-format
+msgid "Session not found or connect to Spotify"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:70
+#, elixir-autogen, elixir-format
+msgid "Singles"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:326
+#, elixir-autogen, elixir-format
+msgid "Spotify down: %{reason}"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:147
+#: lib/premiere_ecoute_web/live/sessions/sessions_live.html.heex:132
+#, elixir-autogen, elixir-format
+msgid "Track"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:465
+#, elixir-autogen, elixir-format
+msgid "Track Selection"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/album_selection_live.html.heex:489
+#, elixir-autogen, elixir-format
+msgid "Use currently playing"
 msgstr ""
