@@ -208,6 +208,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
         Logger.error("Spotify rate limit exceeded: #{inspect(body)}")
         {:error, "Spotify rate limit exceeded"}
 
+      {:ok, %{status: 502, body: body}} ->
+        Logger.warning("Spotify get playback state failed with status 502: #{inspect(body)}")
+        {:ok, state}
+
       {:ok, %{status: status, body: body}} ->
         Logger.error("Spotify get playback state failed with status #{status}: #{inspect(body)}")
         {:error, "Spotify playback state failed"}

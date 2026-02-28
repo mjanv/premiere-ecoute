@@ -2477,7 +2477,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer cette soumission ?"
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:315
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Closed votes"
-msgstr "Fermer"
+msgstr "Votes fermés"
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:118
 #, elixir-autogen, elixir-format, fuzzy
