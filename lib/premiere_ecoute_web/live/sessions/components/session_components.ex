@@ -184,7 +184,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </span>
         </div>
         <span class="text-purple-200 text-sm font-medium">
-          {gettext("Display votes")}
+          {@legend}
         </span>
       </label>
     </div>
@@ -228,10 +228,10 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
                 type="range"
                 name="next_track"
                 min="0"
-                max="30"
+                max="10"
                 value={@value}
                 id="next-track-slider"
-                class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-white/20 slider-purple"
+                class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-white/20 slider-purple"
                 phx-debounce="300"
               />
             </form>

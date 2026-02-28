@@ -47,7 +47,7 @@ defmodule PremiereEcouteWeb.Api.SessionController do
         viewer_score =
           with id when not is_nil(id) <- current_track_id,
                %Report{track_summaries: summaries} <- Report.get_by(session_id: session.id),
-               %{viewer_score: score} <- Enum.find(summaries, fn s -> s.track_id == id end) do
+               %{viewer_score: score} <- Enum.find(summaries, fn s -> s["track_id"] == id end) do
             score
           else
             _ -> nil

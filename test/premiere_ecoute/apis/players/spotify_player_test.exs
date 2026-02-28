@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       scope = user_scope_fixture(user)
 
       # Join presence for the current process to simulate the player's own presence
-      {:ok, phx_ref} = Presence.join(scope.user.id)
+      {:ok, phx_ref} = Presence.join(scope.user.id, :player)
 
       initial_state = %{
         scope: scope,
@@ -51,7 +51,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       test_pid = self()
 
       spawn(fn ->
-        {:ok, _ref} = Presence.join(initial_state.scope.user.id)
+        {:ok, _ref} = Presence.join(initial_state.scope.user.id, :overlay)
         # Keep process alive
         send(test_pid, :presence_joined)
         Process.sleep(:infinity)
@@ -388,7 +388,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       test_pid = self()
 
       spawn(fn ->
-        {:ok, _ref} = Presence.join(user.id)
+        {:ok, _ref} = Presence.join(user.id, :overlay)
         send(test_pid, :presence_joined)
         Process.sleep(:infinity)
       end)
@@ -443,7 +443,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       test_pid = self()
 
       spawn(fn ->
-        {:ok, _ref} = Presence.join(user.id)
+        {:ok, _ref} = Presence.join(user.id, :overlay)
         send(test_pid, :presence_joined)
         Process.sleep(:infinity)
       end)

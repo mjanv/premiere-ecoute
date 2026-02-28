@@ -5,12 +5,11 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     api: PremiereEcoute.Apis.Streaming.TwitchApi,
     urls: [
       api: "http://localhost:4001",
-      # api: "https://api.twitch.tv/helix",
       accounts: "https://id.twitch.tv/oauth2"
     ]
   ],
   spotify: [
-    api: PremiereEcoute.Apis.MusicProvider.SpotifyApi,
+    api: PremiereEcoute.Apis.MusicProvider.SpotifyApi.Facade,
     urls: [
       api: "https://api.spotify.com/v1",
       accounts: "https://accounts.spotify.com/api"

@@ -41,7 +41,7 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     ]
   ],
   spotify: [
-    api: PremiereEcoute.Apis.MusicProvider.SpotifyApi,
+    api: PremiereEcoute.Apis.MusicProvider.SpotifyApi.Facade,
     urls: [
       api: "https://api.spotify.com/v1",
       accounts: "https://accounts.spotify.com/api"

@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
          listening_session when not is_nil(listening_session) <- ListeningSession.get(session_id) do
       if connected?(socket) do
         Process.send_after(self(), :refresh, 100)
-        {:ok, _} = Presence.join(current_scope.user.id)
+        {:ok, _} = Presence.join(current_scope.user.id, :overlay)
         PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{session_id}"])
 
         if listening_session.status != :stopped do
@@ -71,7 +71,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def terminate(_reason, %{assigns: assigns}) do
-    Presence.unjoin(assigns.current_scope.user.id)
+    Presence.unjoin(assigns.current_scope.user.id, :overlay)
     :ok
   end
 
@@ -123,7 +123,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_event("update_next_track", %{"next_track" => value}, %{assigns: assigns} = socket) do
     {value, _} = Integer.parse(value)
-    value = if value in 1..4, do: 0, else: value
+    # value = if value in 1..4, do: 0, else: value
     options = Map.update(assigns.listening_session.options, "next_track", 0, fn _ -> value end)
     {:ok, listening_session} = ListeningSession.update(assigns.listening_session, %{options: options})
     {:noreply, assign(socket, :listening_session, listening_session)}

@@ -29,6 +29,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
     if connected?(socket) do
       PremiereEcoute.PubSub.subscribe("playback:#{user_id}")
+      {:ok, _} = Presence.join(user.id, :overlay)
     end
 
     socket =
@@ -48,7 +49,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
         session ->
           if connected?(socket) do
-            {:ok, _} = Presence.join(session.user.id)
             PremiereEcoute.PubSub.subscribe("session:#{session.id}")
           end
 
@@ -103,7 +103,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   def terminate(_reason, %{assigns: %{listening_session: session}}) do
-    Presence.unjoin(session.user.id)
+    Presence.unjoin(session.user.id, :overlay)
     :ok
   end
 
@@ -169,11 +169,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_info({:session_started, session_id}, %{assigns: %{user_id: user_id}} = socket) do
+  def handle_info({:session_started, session_id}, socket) do
     session = ListeningSession.get(session_id)
     PremiereEcoute.PubSub.subscribe("session:#{session_id}")
-    _ = Presence.join(user_id)
-    _ = PlayerSupervisor.start(user_id)
 
     widget_state =
       case session.user.twitch do
@@ -203,7 +201,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   def handle_info(:session_stopped, %{assigns: %{listening_session: session, user_id: user_id}} = socket)
       when not is_nil(session) do
     PremiereEcoute.PubSub.unsubscribe("session:#{session.id}")
-    Presence.unjoin(user_id)
+    Presence.unjoin(user_id, :overlay)
 
     socket =
       socket

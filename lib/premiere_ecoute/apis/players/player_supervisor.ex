@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Apis.PlayerSupervisor do
   end
 
   @doc """
-  Starts a Spotify player process.
+  Starts a player process.
 
   Starts a new player child process or returns existing process if already started. Handles deduplication automatically.
   """
@@ -33,12 +33,27 @@ defmodule PremiereEcoute.Apis.PlayerSupervisor do
   end
 
   @doc """
-  Stops a Spotify player process.
+  Stops a player process.
 
   Terminates the player child process identified by PID.
   """
   @spec stop(pid()) :: :ok | {:error, :not_found}
   def stop(pid) do
     DynamicSupervisor.terminate_child(__MODULE__, pid)
+  end
+
+  @doc "Returns all active player PIDs"
+  @spec children() :: [pid()]
+  def children do
+    __MODULE__
+    |> Supervisor.which_children()
+    |> Enum.map(fn {_, pid, _, _} -> pid end)
+  end
+
+  @doc "Returns count of active players"
+  @spec count_children() :: map()
+  def count_children do
+    __MODULE__
+    |> Supervisor.count_children()
   end
 end

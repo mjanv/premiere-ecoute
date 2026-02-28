@@ -11,6 +11,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Playlist
 
+  def test, do: 67
+
   @doc """
   Retrieves available Spotify playback devices for the user.
 

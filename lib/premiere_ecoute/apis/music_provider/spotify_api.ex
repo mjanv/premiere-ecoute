@@ -159,6 +159,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
   defdelegate get_artist_top_track(artist_id), to: __MODULE__.Artists
 
   # Player
+  defdelegate test, to: __MODULE__.Player
   defdelegate devices(scope), to: __MODULE__.Player
   defdelegate get_playback_state(scope, state), to: __MODULE__.Player
   defdelegate start_playback(scope, context \\ nil), to: __MODULE__.Player

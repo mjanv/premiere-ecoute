@@ -12,23 +12,19 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
 
   @impl true
   def mount(socket) do
-    {:ok, assign(socket, time_bias: 0, options: %{intro: false, notes: false, chapters: true})}
+    {:ok, assign(socket, time_bias: 0, options: %{intro: true, notes: true, chapters: true})}
   end
 
   @impl true
   def update(assigns, socket) do
     session = assigns.listening_session
-    time_bias = socket.assigns[:time_bias] || 0
-    options = socket.assigns[:options] || %{intro: false, notes: false, chapters: true}
 
     socket
     |> assign(assigns)
     |> assign(:listening_session, session)
     |> assign(:report, Report.get_by(session_id: session.id))
-    |> assign(:time_bias, time_bias)
-    |> assign(:options, options)
     |> assign(:youtube_title, ListeningSession.title(session))
-    |> assign(:youtube_chapters, TrackMarker.format_youtube_chapters(session, time_bias))
+    |> assign(:youtube_chapters, TrackMarker.format_youtube_chapters(session, socket.assigns[:time_bias]))
     |> then(fn socket -> {:ok, socket} end)
   end
 

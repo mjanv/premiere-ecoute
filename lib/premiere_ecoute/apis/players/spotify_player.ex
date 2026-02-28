@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
     Process.send_after(self(), :poll, @poll_interval)
     scope = Scope.for_user(User.get(args))
 
-    with {:ok, phx_ref} <- Presence.join(scope.user.id),
+    with {:ok, phx_ref} <- Presence.join(scope.user.id, :player),
          {:ok, state} <- Apis.spotify().get_playback_state(scope, %{}) do
       {:ok, %{phx_ref: phx_ref, scope: scope, state: state, polls: @polls}}
     else
@@ -61,7 +61,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
          :ok <- Enum.each(events, fn event -> publish(scope, event, state) end) do
       data = %{scope: scope, state: state, polls: polls - 1}
 
-      if length(PremiereEcoute.Presence.player(scope.user.id)) > 1 do
+      if length(PremiereEcoute.Presence.player(scope.user.id, :overlay)) > 0 do
         {:noreply, data}
       else
         {:stop, :normal, data}
@@ -73,6 +73,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   @impl true
   def terminate(reason, %{scope: scope, state: state}) do
+    Presence.unjoin(scope.user.id, :player)
+
     case reason do
       :normal ->
         :ok
