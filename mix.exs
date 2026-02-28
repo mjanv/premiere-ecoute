@@ -120,7 +120,7 @@ defmodule PremiereEcoute.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:prom_ex, "~> 1.11.0"},
-      {:sentry, "~> 11.0.1"},
+      {:sentry, "~> 12.0"},
       # Code quality
       {:credo, "~> 1.7", only: [:dev]},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
@@ -134,7 +134,7 @@ defmodule PremiereEcoute.MixProject do
       {:bypass, "~> 2.1", only: :test},
       {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
       # Development
-      {:doctor, "~> 0.22.0", only: :dev},
+      {:doctor, "~> 0.22", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:tidewave, "~> 0.1", only: :dev},
       {:igniter, "~> 0.5", only: :dev}
