@@ -42,6 +42,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     alias PremiereEcoute.Discography.Album.Track
     alias PremiereEcoute.Discography.LibraryPlaylist
     alias PremiereEcoute.Discography.Playlist
+    alias PremiereEcoute.Discography.Single
+
+    # Tracks
+    @callback get_single(track_id :: String.t()) :: {:ok, Single.t()} | {:error, term()}
 
     # Artists
     @callback get_artist_top_track(artist_id :: String.t()) :: {:ok, Playlist.Track.t()} | {:error, term()}
@@ -57,7 +61,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
                 {:ok, atom()} | {:error, term()}
     @callback toggle_playback_shuffle(scope :: Scope.t(), state :: boolean()) ::
                 {:ok, atom()} | {:error, term()}
-    @callback start_resume_playback(scope :: Scope.t(), item :: Album.t() | Track.t() | Playlist.t()) ::
+    @callback start_resume_playback(scope :: Scope.t(), item :: Album.t() | Track.t() | Playlist.t() | Single.t()) ::
                 {:ok, String.t()} | {:error, term()}
     @callback add_item_to_playback_queue(scope :: Scope.t(), item :: Album.t() | Track.t()) ::
                 {:ok, String.t() | [String.t()]} | {:error, term()}
@@ -75,6 +79,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     # Search
     @callback search_albums(query :: String.t()) :: {:ok, [Album.t()]} | {:error, term()}
     @callback search_artist(query :: String.t()) :: {:ok, map()} | {:error, term()}
+    @callback search_singles(query :: String.t()) :: {:ok, [Single.t()]} | {:error, term()}
 
     # Users
     @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
@@ -154,6 +159,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
   # Albums
   defdelegate get_album(album_id), to: __MODULE__.Albums
   defdelegate get_track(track_id), to: __MODULE__.Tracks
+  defdelegate get_single(track_id), to: __MODULE__.Tracks
 
   # Artists
   defdelegate get_artist_top_track(artist_id), to: __MODULE__.Artists
@@ -183,6 +189,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
   defdelegate search_albums(query), to: __MODULE__.Search
   defdelegate search_artist(query), to: __MODULE__.Search
   defdelegate search_tracks(query), to: __MODULE__.Search
+  defdelegate search_singles(query), to: __MODULE__.Search
 
   # Users
   defdelegate get_user_profile(access_token), to: __MODULE__.Users

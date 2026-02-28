@@ -108,6 +108,46 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert event1.session_id != event2.session_id
     end
 
+    test "successfully creates track session and returns SessionPrepared event" do
+      user = user_fixture()
+      single = single_fixture()
+
+      expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
+
+      command = %PrepareListeningSession{
+        source: :track,
+        user_id: user.id,
+        track_id: single.track_id
+      }
+
+      {:ok, session, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      assert session.user_id == user.id
+      assert session.status == :preparing
+      assert session.source == :track
+      assert session.single.track_id == single.track_id
+      assert session.single.name == single.name
+      assert session.single.artist == single.artist
+      assert event.single_id == session.single_id
+    end
+
+    test "returns SessionNotPrepared when SpotifyApi get_single fails" do
+      user_id = 1
+      track_id = "invalid_track"
+
+      expect(SpotifyApi, :get_single, fn ^track_id -> {:error, :not_found} end)
+
+      command = %PrepareListeningSession{
+        source: :track,
+        user_id: user_id,
+        track_id: track_id
+      }
+
+      {:error, [%SessionNotPrepared{} = event]} = CommandBus.apply(command)
+
+      assert event.user_id == user_id
+    end
+
     test "successfully creates playlist session and returns SessionPrepared event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       playlist = playlist_fixture()
@@ -293,6 +333,62 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
              } = report
 
       assert session_id == session.id
+    end
+  end
+
+  describe "handle/1 - StartListeningSession :track" do
+    test "successfully starts a track session and returns SessionStarted event" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      single = single_fixture()
+
+      expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track123"} end)
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
+                                               "Now playing: Sample Track by Sample Artist - vote with !vote" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{source: :track, user_id: user.id, track_id: single.track_id})
+
+      {:ok, _, [%SessionStarted{} = event]} =
+        CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
+
+      session = ListeningSession.get(event.session_id)
+
+      assert session.status == :active
+      assert event.source == :track
+
+      assert Report.get_by(session_id: session.id) != nil
+    end
+
+    test "fails when no active Spotify device for track session" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      single = single_fixture()
+
+      expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => false}]} end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{source: :track, user_id: user.id, track_id: single.track_id})
+
+      {:error, reason} =
+        CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
+
+      assert reason == "No Spotify active device detected"
     end
   end
 
@@ -500,6 +596,48 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
              } = report
 
       assert session_id == session.id
+    end
+  end
+
+  describe "handle/1 - StopListeningSession :track" do
+    test "stops track session without pausing Spotify and sends end chat message" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      single = single_fixture()
+
+      expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track123"} end)
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Now playing: Sample Track by Sample Artist - vote with !vote" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      # Stop messages
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Sample Track by Sample Artist is over" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{source: :track, user_id: user.id, track_id: single.track_id})
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
+
+      {:ok, session, [%SessionStopped{}]} =
+        CommandBus.apply(%StopListeningSession{source: :track, session_id: started.session_id, scope: scope})
+
+      assert session.status == :stopped
     end
   end
 end

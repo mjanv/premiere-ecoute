@@ -51,6 +51,26 @@
               </button>
             </div>
           </div>
+          
+<!-- Source Toggle -->
+          <div class="ml-4 flex items-center">
+            <div class="bg-gray-800 rounded-lg p-1 flex">
+              <button
+                phx-click={if @selected_source != :album, do: "change_source"}
+                phx-value-source="album"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :album, do: "bg-purple-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Albums")}
+              </button>
+              <button
+                phx-click={if @selected_source != :track, do: "change_source"}
+                phx-value-source="track"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :track, do: "bg-cyan-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Singles")}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -75,42 +95,82 @@
           </div>
         </:failed>
 
-        <%= if Enum.empty?(albums_data) do %>
+        <%= if Enum.empty?(albums_data.items) do %>
           <div class="p-8 text-center">
             <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.367 4.367 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
             </svg>
-            <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Albums Found")}</h3>
-            <p class="text-gray-400">{gettext("No albums listened during this period")}</p>
+            <%= if albums_data.source == :album do %>
+              <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Albums Found")}</h3>
+              <p class="text-gray-400">{gettext("No albums listened during this period")}</p>
+            <% else %>
+              <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Singles Found")}</h3>
+              <p class="text-gray-400">{gettext("No singles listened during this period")}</p>
+            <% end %>
           </div>
         <% else %>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <%= for album_data <- albums_data do %>
-              <div
-                class="group cursor-pointer transform transition-all duration-200 hover:scale-105"
-                phx-click="show_album_details"
-                phx-value-session_id={album_data.session.id}
-              >
-                <!-- Album Cover with Score Overlay -->
-                <div class="relative">
+          <%= if albums_data.source == :album do %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              <%= for item <- albums_data.items do %>
+                <div
+                  class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
+                  phx-click="show_album_details"
+                  phx-value-session_id={item.session.id}
+                >
                   <img
-                    src={album_data.album.cover_url}
+                    src={item.album.cover_url}
                     alt={gettext("Album cover")}
                     class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
                   />
-                  <!-- Centered Large Score -->
-                  <div class="absolute inset-0 flex items-center justify-center p-2">
-                    <div
-                      class="text-white group-hover:text-white/80 font-bold transition-all duration-200 text-center leading-none drop-shadow-2xl max-w-full overflow-hidden"
-                      style="font-size: clamp(2rem, 15vw, 6rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
-                    >
-                      {album_data.report.session_summary["viewer_score"]}
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div class="absolute inset-0 flex flex-col justify-between p-3">
+                    <div class="flex justify-end">
+                      <div
+                        class="text-white font-bold drop-shadow-2xl leading-none"
+                        style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
+                      >
+                        {item.report.session_summary["viewer_score"]}
+                      </div>
+                    </div>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <p class="text-white font-semibold truncate drop-shadow">{item.album.name}</p>
+                      <p class="text-purple-300 text-sm truncate">{item.album.artist}</p>
                     </div>
                   </div>
                 </div>
-              </div>
-            <% end %>
-          </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
+              <%= for item <- albums_data.items do %>
+                <.link
+                  navigate={~p"/sessions/#{item.session.id}"}
+                  class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
+                >
+                  <img
+                    src={item.single.cover_url}
+                    alt={item.single.name}
+                    class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div class="absolute inset-0 flex flex-col justify-between p-3">
+                    <div class="flex justify-end">
+                      <div
+                        class="text-white font-bold drop-shadow-2xl leading-none"
+                        style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
+                      >
+                        {item.report && item.report.session_summary["viewer_score"]}
+                      </div>
+                    </div>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <p class="text-white font-semibold truncate drop-shadow">{item.single.name}</p>
+                      <p class="text-cyan-300 text-sm truncate">{item.single.artist}</p>
+                    </div>
+                  </div>
+                </.link>
+              <% end %>
+            </div>
+          <% end %>
         <% end %>
       </.async_result>
     </div>

@@ -84,6 +84,18 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_event(
         "start_session",
         _params,
+        %{assigns: %{listening_session: %{source: :track} = session, current_scope: scope}} = socket
+      ) do
+    case PremiereEcoute.apply(%StartListeningSession{source: :track, session_id: session.id, scope: scope}) do
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Cannot start session")}
+    end
+  end
+
+  def handle_event(
+        "start_session",
+        _params,
         %{assigns: %{listening_session: session, current_scope: scope}} = socket
       ) do
     with {:ok, session, _} <-
@@ -105,7 +117,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       ) do
     PremiereEcoute.PubSub.unsubscribe("playback:#{scope.user.id}")
 
-    %StopListeningSession{session_id: session.id, scope: scope}
+    %StopListeningSession{source: session.source, session_id: session.id, scope: scope}
     |> PremiereEcoute.apply()
     |> case do
       {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}

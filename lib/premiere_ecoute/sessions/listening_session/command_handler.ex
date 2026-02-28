@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
@@ -61,6 +62,31 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
+  def handle(%PrepareListeningSession{source: :track, user_id: user_id, track_id: track_id, vote_options: vote_options}) do
+    with {:ok, single} <- Apis.spotify().get_single(track_id),
+         {:ok, single} <- Single.create_if_not_exists(single),
+         {:ok, session} <-
+           ListeningSession.create(%{
+             user_id: user_id,
+             source: :track,
+             single_id: single.id,
+             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+           }) do
+      {:ok, session,
+       [
+         %SessionPrepared{
+           session_id: session.id,
+           user_id: session.user_id,
+           single_id: session.single_id
+         }
+       ]}
+    else
+      {:error, reason} ->
+        Logger.error("Cannot prepare listening session due to: #{inspect(reason)}")
+        {:error, [%SessionNotPrepared{user_id: user_id}]}
+    end
+  end
+
   def handle(%PrepareListeningSession{source: :playlist, user_id: user_id, playlist_id: playlist_id, vote_options: vote_options}) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
          {:ok, playlist} <- get_or_create_playlist(playlist),
@@ -84,6 +110,33 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       {:error, reason} ->
         Logger.error("Cannot prepare listening session due to: #{inspect(reason)}")
         {:error, [%SessionNotPrepared{user_id: user_id}]}
+    end
+  end
+
+  def handle(%StartListeningSession{source: :track, session_id: session_id, scope: scope}) do
+    with {:ok, devices} <- Apis.spotify().devices(scope),
+         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+         {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
+         session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         {:ok, %{single: single} = session} <- ListeningSession.start(session),
+         {:ok, _} <- Apis.spotify().start_resume_playback(scope, single),
+         message <-
+           PremiereEcoute.Gettext.t(scope, fn ->
+             gettext("Now playing: %{name} by %{artist} - vote with !vote", name: single.name, artist: single.artist)
+           end),
+         :ok <- Apis.twitch().send_chat_message(scope, message) do
+      {:ok, session, [%SessionStarted{source: :track, session_id: session.id, user_id: scope.user.id}]}
+    else
+      false ->
+        {:error, "No Spotify active device detected"}
+
+      {:error, :active_session_exists} ->
+        {:error, "You already have an active listening session"}
+
+      reason ->
+        Logger.error("Cannot start listening session due to: #{inspect(reason)}")
+        {:error, []}
     end
   end
 
@@ -176,6 +229,23 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
     else
       _ -> {:error, []}
+    end
+  end
+
+  def handle(%StopListeningSession{source: :track, session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         message <-
+           PremiereEcoute.Gettext.t(scope, fn ->
+             gettext("%{name} by %{artist} is over", name: session.single.name, artist: session.single.artist)
+           end),
+         :ok <- Apis.twitch().send_chat_message(scope, message),
+         {:ok, session} <- ListeningSession.stop(session) do
+      {:ok, session, [%SessionStopped{session_id: session.id, user_id: scope.user.id}]}
+    else
+      reason ->
+        Logger.error("Cannot stop listening session due to: #{inspect(reason)}")
+        {:error, []}
     end
   end
 

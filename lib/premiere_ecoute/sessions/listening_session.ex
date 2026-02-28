@@ -12,15 +12,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       current_track: [],
       playlist: [:tracks],
       current_playlist_track: [],
+      single: [],
       track_markers: []
     ],
-    json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist]
+    json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist, :single]
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.Retrospective.Report
@@ -35,6 +37,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
           album: entity(Album.t()),
           current_track: entity(Album.Track.t()),
           playlist: entity(Playlist.t()),
+          single: entity(Single.t()),
           report: entity(Report.t()),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
@@ -42,7 +45,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
-    field :source, Ecto.Enum, values: [:album, :playlist], default: :album
+    field :source, Ecto.Enum, values: [:album, :playlist, :track], default: :album
     field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
     field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -56,6 +59,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     belongs_to :playlist, Playlist, foreign_key: :playlist_id
     belongs_to :current_playlist_track, Playlist.Track, foreign_key: :current_playlist_track_id
+
+    belongs_to :single, Single, foreign_key: :single_id
 
     has_one :report, Report, foreign_key: :session_id
     has_many :track_markers, TrackMarker, foreign_key: :listening_session_id
@@ -83,7 +88,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       :album_id,
       :current_track_id,
       :playlist_id,
-      :current_playlist_track_id
+      :current_playlist_track_id,
+      :single_id
     ])
     |> validate_required([])
     |> foreign_key_constraint(:user_id)
@@ -336,9 +342,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   Extracts title from album name or playlist title depending on session source.
   """
   @spec title(t()) :: String.t()
-  def title(%__MODULE__{album: nil, playlist: nil}), do: ""
-  def title(%__MODULE__{album: %{name: name}, playlist: nil}), do: name
-  def title(%__MODULE__{album: nil, playlist: %{title: title}}), do: title
+  def title(%__MODULE__{album: nil, playlist: nil, single: nil}), do: ""
+  def title(%__MODULE__{album: %{name: name}}), do: name
+  def title(%__MODULE__{playlist: %{title: title}}), do: title
+  def title(%__MODULE__{single: %{name: name}}), do: name
 
   @doc """
   Returns the current track being played.
@@ -376,9 +383,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   Retrieves track list from either album or playlist depending on session source.
   """
   @spec tracks(t()) :: [Album.Track.t()] | [Playlist.Track.t()]
-  def tracks(%__MODULE__{album: nil, playlist: nil}), do: []
-  def tracks(%__MODULE__{album: %{tracks: tracks}, playlist: nil}), do: tracks
-  def tracks(%__MODULE__{album: nil, playlist: %{tracks: tracks}}), do: tracks
+  def tracks(%__MODULE__{album: nil, playlist: nil, single: nil}), do: []
+  def tracks(%__MODULE__{album: %{tracks: tracks}}), do: tracks
+  def tracks(%__MODULE__{playlist: %{tracks: tracks}}), do: tracks
+  def tracks(%__MODULE__{single: %Single{}}), do: []
 
   @doc """
   Calculates total duration of session in minutes.

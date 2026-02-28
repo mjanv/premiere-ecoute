@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Single
 
   @doc """
   Searches Spotify catalog for albums.
@@ -67,6 +68,32 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
     |> SpotifyApi.handle(200, fn %{"items" => items} ->
       Enum.map(items, &parse_track/1)
     end)
+  end
+
+  @doc """
+  Searches Spotify catalog for tracks and returns Single structs.
+
+  Accepts a plain string query. Returns a list of Single structs with artist and cover.
+  """
+  @spec search_singles(String.t()) :: {:ok, [Single.t()]} | {:error, term()}
+  def search_singles(query) when is_binary(query) do
+    SpotifyApi.api()
+    |> SpotifyApi.get(url: "/search", params: [q: query, type: "track", limit: 20])
+    |> SpotifyApi.handle(200, fn %{"tracks" => %{"items" => items}} ->
+      Enum.map(items, &parse_single/1)
+    end)
+  end
+
+  @spec parse_single(map()) :: Single.t()
+  defp parse_single(data) do
+    %Single{
+      provider: :spotify,
+      track_id: data["id"],
+      name: data["name"],
+      artist: Parser.parse_primary_artist(data["artists"]),
+      duration_ms: data["duration_ms"] || 0,
+      cover_url: Parser.parse_album_cover_url(data["album"]["images"])
+    }
   end
 
   @spec build_track_query(Keyword.t()) :: String.t()
