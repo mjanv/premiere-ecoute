@@ -38,6 +38,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
     scope = Scope.for_user(User.get(args))
 
     with {:ok, phx_ref} <- Presence.join(scope.user.id, :player),
+         :ok <- PremiereEcoute.PubSub.subscribe("player:#{scope.user.id}"),
          {:ok, state} <- Apis.spotify().get_playback_state(scope, %{}) do
       {:ok, %{phx_ref: phx_ref, scope: scope, state: state, polls: @polls}}
     else
@@ -59,22 +60,19 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
          {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
          {:ok, state, events} <- handle(old_state, new_state),
          :ok <- Enum.each(events, fn event -> publish(scope, event, state) end) do
-      data = %{scope: scope, state: state, polls: polls - 1}
-
-      if length(PremiereEcoute.Presence.player(scope.user.id, :overlay)) > 0 do
-        {:noreply, data}
-      else
-        {:stop, :normal, data}
-      end
+      {:noreply, %{scope: scope, state: state, polls: polls - 1}}
     else
       {:error, reason} -> {:stop, {:error, reason}, data}
     end
   end
 
   @impl true
-  def terminate(reason, %{scope: scope, state: state}) do
-    Presence.unjoin(scope.user.id, :player)
+  def handle_info(:no_overlay, data) do
+    {:stop, :normal, data}
+  end
 
+  @impl true
+  def terminate(reason, %{scope: scope, state: state}) do
     case reason do
       :normal ->
         :ok

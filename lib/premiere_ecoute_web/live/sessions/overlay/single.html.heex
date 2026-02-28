@@ -5,7 +5,7 @@
         --
       </span>
       <div style={"font-size: 32px; color: #{@text_color}; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;"}>
-        {@score}
+        {score_label(@user, @score)}
       </div>
     </div>
   </:loading>
@@ -43,7 +43,7 @@
       <% end %>
     <% end %>
     <div style={"font-size: 32px; color: #{@text_color}; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;"}>
-      {score_label(@score)}
+      {score_label(@user, @score)}
     </div>
   </div>
 </.async_result>

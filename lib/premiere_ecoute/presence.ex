@@ -15,8 +15,19 @@ defmodule PremiereEcoute.Presence do
     {:ok, %{}}
   end
 
-  def handle_metas(_topic, %{joins: _joins, leaves: _leaves} = _events, _presences, state) do
-    # IO.inspect(events, label: topic)
+  def handle_metas("presence:" <> user_id, %{leaves: leaves}, presences, state) do
+    overlay_left = Map.has_key?(leaves, "overlay")
+
+    overlay_count =
+      presences
+      |> Map.get("overlay", [])
+      |> length()
+
+    # AIDEV-NOTE: only broadcast when a leave caused the last overlay to disconnect
+    if overlay_left and overlay_count == 0 do
+      PremiereEcoute.PubSub.broadcast("player:#{user_id}", :no_overlay)
+    end
+
     {:ok, state}
   end
 

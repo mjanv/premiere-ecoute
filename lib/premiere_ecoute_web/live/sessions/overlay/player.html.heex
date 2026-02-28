@@ -74,7 +74,7 @@
             -
           </span>
           <div style={"font-size: 24px; color: #{@text_color}; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
-            Viewer
+            {score_label(@user, :viewer)}
           </div>
         </div>
         
@@ -84,7 +84,7 @@
             -
           </span>
           <div style={"font-size: 24px; color: #{@text_color}; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
-            Streamer
+            {score_label(@user, :streamer)}
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@
           <% end %>
         <% end %>
         <div style={"font-size: 24px; color: #{@text_color}; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
-          {score_label(:viewer)}
+          {score_label(@user, :viewer)}
         </div>
       </div>
       
@@ -163,13 +163,9 @@
           <% end %>
         <% end %>
         <div style={"font-size: 24px; color: #{@text_color}; text-transform: capitalize; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
-          {score_label(:streamer)}
+          {score_label(@user, :streamer)}
         </div>
       </div>
     </div>
   </.async_result>
-
-  <div style={"position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 16px; color: #{@text_color}; font-weight: 400; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); opacity: 0.6;"}>
-    Made with premiere-ecoute.fr
-  </div>
 </div>

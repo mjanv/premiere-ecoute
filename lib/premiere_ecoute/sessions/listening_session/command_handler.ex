@@ -181,16 +181,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StopListeningSession{session_id: session_id, scope: scope}) do
-    with {:ok, devices} <- Apis.spotify().devices(scope),
-         is_active <- Enum.any?(devices, fn device -> device["is_active"] end),
-         session <- ListeningSession.get(session_id),
+    with session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
          message <-
            PremiereEcoute.Gettext.t(scope, fn -> gettext("The premiere of %{name} is over", name: session.album.name) end),
          :ok <- Apis.twitch().send_chat_message(scope, message),
          {:ok, session} <- ListeningSession.stop(session) do
-      if is_active, do: Apis.spotify().pause_playback(scope)
+      # {:ok, devices} = Apis.spotify().devices(scope)
+      # is_active = Enum.any?(devices, fn device -> device["is_active"] end),
+      # if is_active, do: Apis.spotify().pause_playback(scope)
       {:ok, session, [%SessionStopped{session_id: session.id, user_id: scope.user.id}]}
     else
       reason ->

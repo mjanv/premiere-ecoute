@@ -42,7 +42,7 @@
         <% end %>
       <% end %>
       <div style={"font-size: 32px; color: #{@text_color}; text-transform: uppercase; letter-spacing: 0.5px;"}>
-        {score_label(:viewer)}
+        {score_label(@user, :viewer)}
       </div>
     </div>
     
@@ -83,7 +83,7 @@
         <% end %>
       <% end %>
       <div style={"font-size: 32px; color: #{@text_color}; text-transform: uppercase; letter-spacing: 0.5px;"}>
-        {score_label(:streamer)}
+        {score_label(@user, :streamer)}
       </div>
     </div>
   </div>

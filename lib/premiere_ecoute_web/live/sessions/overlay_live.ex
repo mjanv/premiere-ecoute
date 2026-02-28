@@ -36,7 +36,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       case listening_session do
         nil ->
           socket
-          |> assign(:user_id, user_id)
+          |> assign(:user, user)
           |> assign(:id, nil)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
