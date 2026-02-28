@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.RadioTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Radio.RadioTrack

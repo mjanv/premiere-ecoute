@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.HomeLiveTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
 

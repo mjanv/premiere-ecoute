@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Discography.LibraryPlaylistTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography.LibraryPlaylist
 

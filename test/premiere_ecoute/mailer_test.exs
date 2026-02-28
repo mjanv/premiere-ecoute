@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.MailerTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   import Swoosh.TestAssertions
 

@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.User.ConsentTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.LegalDocument
   alias PremiereEcoute.Accounts.User.Consent

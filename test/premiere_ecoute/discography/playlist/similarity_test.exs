@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Discography.Playlist.SimilarityTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Similarity

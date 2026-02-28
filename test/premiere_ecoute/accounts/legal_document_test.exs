@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.LegalDocumentTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.LegalDocument
 

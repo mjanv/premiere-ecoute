@@ -1,5 +1,5 @@
 defmodule PremiereEcouteCore.EventBusTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   import ExUnit.CaptureLog
 

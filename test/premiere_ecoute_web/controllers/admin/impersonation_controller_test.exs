@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Admin.ImpersonationControllerTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   setup do
     # Create admin user

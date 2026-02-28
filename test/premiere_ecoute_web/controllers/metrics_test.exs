@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.MetricsTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   test "GET /metrics", %{conn: conn} do
     conn = get(conn, "/metrics")

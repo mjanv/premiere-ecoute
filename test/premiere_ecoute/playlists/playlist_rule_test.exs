@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Playlists.PlaylistRuleTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.PlaylistRule

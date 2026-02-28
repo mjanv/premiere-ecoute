@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.User.ProfileTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Profile

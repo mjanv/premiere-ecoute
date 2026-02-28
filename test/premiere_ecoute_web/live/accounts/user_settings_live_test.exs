@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Accounts.UserSettingsLiveTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   alias PremiereEcoute.Accounts
 

@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidatorTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
 

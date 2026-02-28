@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope

@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.Services.AccountRegistrationTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.Services.AccountRegistration
   alias PremiereEcoute.Accounts.User

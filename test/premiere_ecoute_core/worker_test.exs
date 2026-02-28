@@ -10,7 +10,7 @@ defmodule Worker do
 end
 
 defmodule PremiereEcouteCore.WorkerTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   describe "Worker" do
     test "can start a background job" do

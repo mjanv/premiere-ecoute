@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession

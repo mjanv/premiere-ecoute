@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.UserAuthTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   alias Phoenix.LiveView
   alias PremiereEcoute.Accounts

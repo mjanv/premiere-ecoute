@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.{Scope, User}
   alias PremiereEcoute.Accounts.Services.TokenRenewal

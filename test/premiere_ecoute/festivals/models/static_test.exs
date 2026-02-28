@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Festivals.Model.StaticTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Festivals.Festival
   alias PremiereEcoute.Festivals.Models.Static

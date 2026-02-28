@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Radio.Workers.CleanupOldTracksTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Radio

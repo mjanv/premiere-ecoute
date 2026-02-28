@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Festivals.Model.OpenAi do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Festivals.Models.OpenAi
   alias PremiereEcoute.Festivals.Poster

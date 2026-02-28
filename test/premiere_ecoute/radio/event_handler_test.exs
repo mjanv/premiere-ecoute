@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Radio.EventHandlerTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Events.Twitch.StreamEnded

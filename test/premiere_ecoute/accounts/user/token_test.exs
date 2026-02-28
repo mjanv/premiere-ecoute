@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.User.TokenTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User

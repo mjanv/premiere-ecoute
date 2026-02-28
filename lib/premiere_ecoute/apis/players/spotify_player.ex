@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
   @poll_interval 1_000
-  @poll_max_hours 2.5
+  @poll_max_hours 9
   @polls trunc(@poll_max_hours * 3_600_000 / @poll_interval)
 
   @doc """

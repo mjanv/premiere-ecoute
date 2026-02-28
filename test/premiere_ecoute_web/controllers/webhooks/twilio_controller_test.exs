@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Webhooks.TwilioControllerTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   alias PremiereEcoute.Events.Phone.SmsMessageSent
   alias PremiereEcouteWeb.Webhooks.TwilioController

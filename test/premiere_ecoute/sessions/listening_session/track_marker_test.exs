@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarkerTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track, as: AlbumTrack

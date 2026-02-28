@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.DonationsTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Donations
 

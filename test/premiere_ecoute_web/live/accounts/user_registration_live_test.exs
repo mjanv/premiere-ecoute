@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Accounts.UserRegistrationLiveTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   describe "Registration page" do
     test "renders registration page", %{conn: conn} do

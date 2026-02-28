@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Accounts.UserLoginLiveTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   describe "login page" do
     test "renders login page", %{conn: conn} do

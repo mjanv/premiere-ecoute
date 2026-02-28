@@ -1,3 +1,3 @@
 defmodule PremiereEcoute.Apis.MusicProvider.DeezerApiTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 end

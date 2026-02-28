@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.BillboardsTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Billboards
   alias PremiereEcoute.Billboards.Billboard

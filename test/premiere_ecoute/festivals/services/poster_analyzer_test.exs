@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Festivals.Services.PosterAnalyzerTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   import PremiereEcoute.AccountsFixtures
 

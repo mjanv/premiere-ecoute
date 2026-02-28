@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Festivals.PosterTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Festivals.Poster
 

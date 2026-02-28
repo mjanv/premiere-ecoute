@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Discography.AlbumTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
