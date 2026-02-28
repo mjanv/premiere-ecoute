@@ -3,7 +3,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Gateway do
 
   use GenServer
 
-  @interval 500
+  @interval 250
   @timeout 10_000
 
   def start_link(_opts) do

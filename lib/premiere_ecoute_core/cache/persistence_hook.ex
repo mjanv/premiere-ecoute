@@ -83,7 +83,11 @@ defmodule PremiereEcouteCore.Cache.PersistenceHook do
   end
 
   defp dump_path(cache_name) do
-    Application.app_dir(:premiere_ecoute, "priv/cache/#{cache_name}.dump")
+    base =
+      Application.get_env(:premiere_ecoute, :cache_dir) ||
+        Application.app_dir(:premiere_ecoute, "priv/cache")
+
+    Path.join(base, "#{cache_name}.dump")
   end
 
   defp schedule_save(interval) do

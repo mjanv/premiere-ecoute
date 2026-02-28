@@ -184,6 +184,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @spec next_track(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
   def next_track(%__MODULE__{source: :playlist} = session) do
     %{playlist: %{tracks: tracks}} = Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
+    # BUG: hd(Enum.reverse(tracks)) returns the final track regardless of current position.
     current_track(session, hd(Enum.reverse(tracks)).id)
   end
 
