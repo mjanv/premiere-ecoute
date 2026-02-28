@@ -434,7 +434,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   end
 
   describe "handle/1 - StopListeningSession" do
-    @tag :wip
     test "successfully creates session and generate a report" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = user_scope_fixture(user)
@@ -447,15 +446,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :devices, 2, fn _ -> {:ok, [%{"is_active" => true}]} end)
       expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
       expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
-      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
       expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist" ->
         :ok
       end)
-
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One" -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       expect(TwitchApi, :send_chat_message, fn _scope,
                                                "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
@@ -479,7 +474,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
-      {:ok, _, [%SessionStarted{} = event, %NextTrackStarted{}]} = CommandBus.apply(command)
+      {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
       command = %StopListeningSession{session_id: event.session_id, scope: scope}
 

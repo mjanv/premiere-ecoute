@@ -103,7 +103,6 @@ defmodule PremiereEcoute.Accounts.User.TokenTest do
       assert {:error, :not_found} = Accounts.login_user_by_magic_link(encoded_token)
     end
 
-    @tag :unstable
     test "raises when unconfirmed user has password set" do
       user = unconfirmed_user_fixture()
       {1, nil} = Repo.update_all(from(u in User, where: u.id == ^user.id), set: [hashed_password: "hashed"])

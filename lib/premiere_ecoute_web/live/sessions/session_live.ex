@@ -203,10 +203,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   def handle_info(:refresh, %{assigns: %{current_scope: current_scope}} = socket) do
     Process.send_after(self(), :refresh, 1_000)
 
-    {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
-
-    socket
-    |> assign(:open_vote, !is_nil(cached_session))
+    case Cache.get(:sessions, current_scope.user.twitch.user_id) do
+      {:ok, session} -> assign(socket, :open_vote, !is_nil(session))
+      {:error, _reason} -> socket
+    end
     |> then(fn socket -> {:noreply, socket} end)
   end
 

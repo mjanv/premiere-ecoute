@@ -48,7 +48,6 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
   end
 
   describe "follow_streamers/1" do
-    @tag :unstable
     test "automatically follows all followed streamers" do
       %{id: user_id} = user = user_fixture()
       scope = user_scope_fixture(user)
