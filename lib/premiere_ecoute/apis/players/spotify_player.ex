@@ -72,15 +72,12 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   end
 
   @impl true
-  def terminate(reason, %{scope: scope, state: state}) do
-    case reason do
-      :normal ->
-        :ok
+  def terminate(:normal, _), do: :ok
 
-      reason ->
-        Logger.warning("Stop Spotify player due to: #{inspect(reason)}")
-        publish(scope, reason, state)
-    end
+  @impl true
+  def terminate(reason, %{scope: scope, state: state}) do
+    Logger.warning("Stop Spotify player due to: #{inspect(reason)}")
+    publish(scope, reason, state)
 
     :ok
   end

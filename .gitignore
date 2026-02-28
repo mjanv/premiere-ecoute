@@ -52,6 +52,7 @@ node_modules/
 
 # Data files
 priv/request/
+priv/cache/
 *.excalidraw
 
 # Agents

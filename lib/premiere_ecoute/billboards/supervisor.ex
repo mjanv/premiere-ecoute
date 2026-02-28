@@ -5,6 +5,6 @@ defmodule PremiereEcoute.Billboards.Supervisor do
 
   use PremiereEcouteCore.Supervisor,
     children: [
-      {PremiereEcouteCore.Cache, name: :billboards}
+      {PremiereEcouteCore.Cache, name: :billboards, persist: false}
     ]
 end

@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Presence do
     otp_app: :premiere_ecoute,
     pubsub_server: PremiereEcoute.PubSub
 
-  @type role() :: :player | :overlay | :liveview
+  @type role() :: :player | :overlay | :unknown
 
   def init(_opts) do
     {:ok, %{}}

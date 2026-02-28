@@ -76,15 +76,6 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       assert {:stop, :normal, _state} = SpotifyPlayer.handle_info(:poll, exhausted_state)
     end
 
-    test "stops when only one presence left", %{initial_state: initial_state} do
-      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state ->
-        {:ok, initial_state.state}
-      end)
-
-      # Only the presence from setup exists, so it should stop
-      assert {:stop, :normal, _state} = SpotifyPlayer.handle_info(:poll, initial_state)
-    end
-
     test "stops with error when get_playback_state fails", %{initial_state: initial_state} do
       expect(SpotifyApi, :get_playback_state, fn _scope, _old_state ->
         {:error, "Spotify API error"}

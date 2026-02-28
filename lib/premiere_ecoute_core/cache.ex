@@ -5,16 +5,34 @@ defmodule PremiereEcouteCore.Cache do
   Provides a wrapper around Cachex for managing application caches with operations for clearing, deleting, getting, and putting values.
   """
 
+  import Cachex.Spec
+
   require Logger
+
+  alias PremiereEcouteCore.Cache.PersistenceHook
 
   @doc """
   Generates child specification for cache supervision.
 
   Creates Cachex child spec with cache name from opts for starting under supervisor.
+  Accepts `persist: true | milliseconds` to enable disk persistence across restarts
+  via `PremiereEcouteCore.Cache.PersistenceHook`. `true` uses the default interval
+  defined in the hook; an integer overrides it.
   """
   @spec child_spec(keyword()) :: Supervisor.child_spec()
   def child_spec(opts) do
     {name, cachex_opts} = Keyword.pop!(opts, :name)
+    {persist, cachex_opts} = Keyword.pop(cachex_opts, :persist, false)
+
+    cachex_opts =
+      case persist do
+        false ->
+          cachex_opts
+
+        interval ->
+          hook = hook(module: PersistenceHook, args: {name, interval})
+          Keyword.update(cachex_opts, :hooks, [hook], &[hook | &1])
+      end
 
     %{
       id: name,

@@ -5,7 +5,7 @@ defmodule PremiereEcoute.Sessions.Supervisor do
 
   use PremiereEcouteCore.Supervisor,
     mandatory: [
-      {PremiereEcouteCore.Cache, name: :sessions}
+      {PremiereEcouteCore.Cache, name: :sessions, persist: :timer.minutes(5)}
     ],
     optionals: [
       {PremiereEcoute.Sessions.Scores.MessagePipeline, []},

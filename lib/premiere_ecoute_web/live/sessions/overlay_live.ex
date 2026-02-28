@@ -37,6 +37,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
         nil ->
           socket
           |> assign(:user, user)
+          |> assign(:user_id, user_id)
           |> assign(:id, nil)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
@@ -82,6 +83,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
             end
 
           socket
+          |> assign(:user, user)
           |> assign(:user_id, user_id)
           |> assign(:id, session.id)
           |> assign(:score, :streamer)

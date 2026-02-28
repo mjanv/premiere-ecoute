@@ -7,6 +7,6 @@ defmodule PremiereEcoute.Accounts.Supervisor do
 
   use PremiereEcouteCore.Supervisor,
     children: [
-      {PremiereEcouteCore.Cache, name: :users}
+      {PremiereEcouteCore.Cache, name: :users, persist: false}
     ]
 end
