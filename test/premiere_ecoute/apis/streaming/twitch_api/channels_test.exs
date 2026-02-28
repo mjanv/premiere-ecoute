@@ -1,10 +1,9 @@
 defmodule PremiereEcoute.Apis.Streaming.TwitchApi.ChannelsTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Streaming.TwitchApi
 
-  setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
   setup do

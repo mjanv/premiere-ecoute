@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Radio.Workers.LinkProviderTrackTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
@@ -7,7 +7,6 @@ defmodule PremiereEcoute.Radio.Workers.LinkProviderTrackTest do
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Radio.Workers.LinkProviderTrack
 
-  setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
   # Insert the track in manual mode so the scheduled worker job is not executed immediately.

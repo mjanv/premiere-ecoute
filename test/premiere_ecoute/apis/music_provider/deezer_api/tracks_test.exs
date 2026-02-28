@@ -1,12 +1,11 @@
 defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.TracksTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
 
   alias PremiereEcoute.Discography.Album.Track
 
-  setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
   describe "get_track/1" do

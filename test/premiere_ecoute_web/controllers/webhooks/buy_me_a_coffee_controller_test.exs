@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   import ExUnit.CaptureLog
 
@@ -7,7 +7,6 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
   alias PremiereEcoute.Apis.Payments.FrankfurterApi
   alias PremiereEcoute.Donations
 
-  setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
   describe "POST /webhooks/buymeacoffee - donation.created" do

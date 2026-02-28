@@ -88,6 +88,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       ) do
     with {:ok, session, _} <-
            PremiereEcoute.apply(%StartListeningSession{source: session.source, session_id: session.id, scope: scope}),
+         :ok <- :timer.sleep(1_000),
          {:ok, session, _} <-
            PremiereEcoute.apply(%SkipNextTrackListeningSession{source: session.source, session_id: session.id, scope: scope}) do
       {:noreply, assign(socket, :listening_session, session)}

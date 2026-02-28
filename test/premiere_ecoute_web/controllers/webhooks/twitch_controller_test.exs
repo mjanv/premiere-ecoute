@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
-  use PremiereEcouteWeb.ConnCase
+  use PremiereEcouteWeb.ConnCase, async: true
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Commands.Chat.SendChatCommand
@@ -12,7 +12,6 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
   alias PremiereEcouteWeb.Webhooks.TwitchController
 
-  setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
   setup do

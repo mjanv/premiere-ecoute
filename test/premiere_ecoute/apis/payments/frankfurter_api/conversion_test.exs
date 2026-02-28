@@ -1,10 +1,9 @@
 defmodule PremiereEcoute.Apis.Payments.FrankfurterApi.ConversionTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Payments.FrankfurterApi
 
-  setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
   describe "convert/1" do

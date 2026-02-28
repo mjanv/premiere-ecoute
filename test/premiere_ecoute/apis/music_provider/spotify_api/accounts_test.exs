@@ -1,10 +1,9 @@
 defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AccountsTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
 
-  setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
 
   describe "client_credentials/0" do
