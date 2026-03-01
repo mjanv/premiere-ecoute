@@ -8,9 +8,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
     Event - Listening session prepared.
     """
 
-    defstruct [:session_id, :user_id, :album_id, :playlist_id, :single_id]
+    defstruct [:source, :session_id, :user_id, :album_id, :playlist_id, :single_id]
 
     @type t :: %__MODULE__{
+            source: atom(),
             session_id: String.t(),
             user_id: integer(),
             album_id: String.t() | nil,

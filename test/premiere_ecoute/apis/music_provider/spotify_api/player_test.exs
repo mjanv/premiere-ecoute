@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Single
 
   setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
@@ -536,6 +537,22 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
       {:ok, context_uri} = SpotifyApi.start_resume_playback(scope, track)
 
       assert context_uri == "spotify:track:track001"
+    end
+
+    test "can start a single play in the player", %{scope: scope} do
+      single = %Single{provider: :spotify, track_id: "11dFghVXANMlKmJXsNCbNl"}
+
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/play"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}],
+        request: "spotify_api/player/start_resume_playback/request_single.json",
+        status: 204
+      )
+
+      {:ok, context_uri} = SpotifyApi.start_resume_playback(scope, single)
+
+      assert context_uri == "spotify:track:11dFghVXANMlKmJXsNCbNl"
     end
   end
 

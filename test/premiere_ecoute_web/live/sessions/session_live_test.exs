@@ -1,14 +1,13 @@
 defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
-  import Phoenix.LiveViewTest
   import PremiereEcoute.Discography.SingleFixtures
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
-  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
 
   setup do
     start_supervised(PremiereEcoute.Apis.PlayerSupervisor)
@@ -16,24 +15,15 @@ defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
   end
 
   describe "auto-start for track sessions" do
-    test "automatically starts session on mount when source is :track and status is :preparing", %{conn: conn} do
+    test "automatically starts session after prepare when track is already playing on Spotify", _context do
       user = user_fixture(%{role: :streamer, twitch: %{user_id: "1234"}, spotify: %{}})
-      single = single_fixture()
-      {:ok, persisted_single} = Single.create_if_not_exists(single)
 
-      {:ok, session} =
-        ListeningSession.create(%{
-          user_id: user.id,
-          source: :track,
-          single_id: persisted_single.id,
-          status: :preparing,
-          visibility: :protected,
-          options: %{"votes" => 0, "scores" => true, "next_track" => 0},
-          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-        })
+      stub(SpotifyApi.Mock, :get_single, fn track_id ->
+        {:ok, single_fixture(%{track_id: track_id})}
+      end)
 
       stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state ->
-        {:ok, %{"item" => %{"id" => persisted_single.track_id}, "is_playing" => true}}
+        {:ok, %{"item" => %{"id" => "track123"}, "is_playing" => true}}
       end)
 
       expect(SpotifyApi.Mock, :devices, fn _scope -> {:ok, [%{"is_active" => true}]} end)
@@ -42,14 +32,37 @@ defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, _promo -> :ok end)
 
-      conn = log_in_user(conn, user)
-      {:ok, view, _html} = live(conn, ~p"/sessions/#{session.id}")
+      {:ok, session, _} =
+        PremiereEcoute.apply(%PrepareListeningSession{
+          source: :track,
+          user_id: user.id,
+          track_id: "track123",
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
-      # Wait for auto_start message to be processed
-      :sys.get_state(view.pid)
+      assert ListeningSession.get(session.id).status == :active
+    end
 
-      session = ListeningSession.get(session.id)
-      assert session.status == :active
+    test "does not auto-start session after prepare when track is not playing on Spotify", _context do
+      user = user_fixture(%{role: :streamer, twitch: %{user_id: "1234"}, spotify: %{}})
+
+      stub(SpotifyApi.Mock, :get_single, fn track_id ->
+        {:ok, single_fixture(%{track_id: track_id})}
+      end)
+
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state ->
+        {:ok, %{"is_playing" => false}}
+      end)
+
+      {:ok, session, _} =
+        PremiereEcoute.apply(%PrepareListeningSession{
+          source: :track,
+          user_id: user.id,
+          track_id: "track123",
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
+
+      assert session.status == :preparing
     end
   end
 end

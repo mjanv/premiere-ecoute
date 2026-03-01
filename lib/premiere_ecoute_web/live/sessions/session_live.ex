@@ -40,10 +40,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         if listening_session.status != :stopped do
           PlayerSupervisor.start(current_scope.user.id)
         end
-
-        if listening_session.source == :track && listening_session.status == :preparing do
-          send(self(), :auto_start)
-        end
       end
 
       {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
@@ -192,26 +188,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
-  end
-
-  @impl true
-  def handle_info(:auto_start, %{assigns: %{listening_session: session, current_scope: scope}} = socket) do
-    # AIDEV-NOTE: Only auto-start if the session's track is already playing on Spotify (resume: true skips start_resume_playback)
-    currently_playing_id =
-      case PremiereEcoute.Apis.spotify().get_playback_state(scope, %{}) do
-        {:ok, %{"item" => %{"id" => id}, "is_playing" => true}} -> id
-        _ -> nil
-      end
-
-    if currently_playing_id == session.single.track_id do
-      case PremiereEcoute.apply(%StartListeningSession{source: :track, session_id: session.id, scope: scope, resume: true}) do
-        {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
-        {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-        {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
-      end
-    else
-      {:noreply, socket}
-    end
   end
 
   @impl true

@@ -49,6 +49,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       {:ok, session,
        [
          %SessionPrepared{
+           source: :album,
            session_id: session.id,
            user_id: session.user_id,
            album_id: session.album_id,
@@ -75,6 +76,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       {:ok, session,
        [
          %SessionPrepared{
+           source: :track,
            session_id: session.id,
            user_id: session.user_id,
            single_id: session.single_id
@@ -100,6 +102,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       {:ok, session,
        [
          %SessionPrepared{
+           source: :playlist,
            session_id: session.id,
            user_id: session.user_id,
            album_id: nil,
