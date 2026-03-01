@@ -31,6 +31,7 @@ defmodule PremiereEcoute.DataCase do
       import PremiereEcoute.AccountsFixtures
       import PremiereEcoute.Discography.AlbumFixtures
       import PremiereEcoute.Discography.PlaylistFixtures
+      import PremiereEcoute.Discography.SingleFixtures
       import PremiereEcoute.Sessions.ListeningSessionFixtures
       import PremiereEcoute.Sessions.ScoresFixtures
 

@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
   alias PremiereEcouteCore.Cache
 
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Single
 
   setup {Req.Test, :set_req_test_to_shared}
   setup {Req.Test, :verify_on_exit!}
@@ -65,6 +66,36 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
                tracks: [],
                total_tracks: 10
              } in albums
+    end
+  end
+
+  describe "search_singles/1" do
+    test "returns a list of Single structs from a string query", %{token: token} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/search"},
+        headers: [
+          {"authorization", "Bearer #{token}"},
+          {"content-type", "application/json"}
+        ],
+        params: %{"q" => "cut to the feeling", "type" => "track", "limit" => "20"},
+        response: "spotify_api/search/search_singles/response.json",
+        status: 200
+      )
+
+      {:ok, singles} = SpotifyApi.search_singles("cut to the feeling")
+
+      assert [
+               %Single{
+                 id: nil,
+                 provider: :spotify,
+                 track_id: "11dFghVXANMlKmJXsNCbNl",
+                 name: "Cut To The Feeling",
+                 artist: "Carly Rae Jepsen",
+                 duration_ms: 207_959,
+                 cover_url: "https://i.scdn.co/image/ab67616d00001e027359994525d219f64872d3b1"
+               }
+             ] = singles
     end
   end
 

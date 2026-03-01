@@ -23,6 +23,8 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> assign(:selected_album, AsyncResult.ok(nil))
     |> assign(:user_playlists, AsyncResult.ok([]))
     |> assign(:selected_playlist, AsyncResult.ok(nil))
+    |> assign(:search_tracks, AsyncResult.ok([]))
+    |> assign(:selected_track, AsyncResult.ok(nil))
     |> assign(:current_scope, socket.assigns[:current_scope] || %{})
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
@@ -47,6 +49,62 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
   def handle_event("clear_search_results", _params, socket) do
     socket
     |> assign(:search_albums, AsyncResult.ok([]))
+    |> assign(:search_tracks, AsyncResult.ok([]))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("fetch_currently_playing", _params, socket) do
+    scope = socket.assigns.current_scope
+
+    socket
+    |> assign(:selected_track, AsyncResult.loading())
+    |> start_async(:select_track, fn ->
+      case PremiereEcoute.Apis.spotify().get_playback_state(scope, %{}) do
+        {:ok, %{"item" => item, "currently_playing_type" => "track"}} when not is_nil(item) ->
+          PremiereEcoute.Apis.spotify().get_single(item["id"])
+
+        _ ->
+          {:error, :nothing_playing}
+      end
+    end)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("search_tracks", %{"query" => query}, socket) when byte_size(query) > 2 do
+    socket
+    |> assign(:search_tracks, AsyncResult.loading())
+    |> start_async(:search_tracks, fn -> PremiereEcoute.Apis.spotify().search_singles(query) end)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("search_tracks", _params, socket) do
+    socket
+    |> assign(:search_tracks, AsyncResult.ok([]))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("select_track", %{"track_id" => track_id}, socket) do
+    case socket.assigns.search_tracks do
+      %{result: tracks} when is_list(tracks) ->
+        case Enum.find(tracks, fn t -> t.track_id == track_id end) do
+          nil ->
+            socket
+            |> assign(:search_tracks, AsyncResult.ok([]))
+            |> assign(:selected_track, AsyncResult.loading())
+            |> start_async(:select_track, fn -> PremiereEcoute.Apis.spotify().get_single(track_id) end)
+
+          track ->
+            socket
+            |> assign(:search_tracks, AsyncResult.ok([]))
+            |> assign(:selected_track, AsyncResult.ok(track))
+        end
+
+      _ ->
+        socket
+        |> assign(:search_tracks, AsyncResult.ok([]))
+        |> assign(:selected_track, AsyncResult.loading())
+        |> start_async(:select_track, fn -> PremiereEcoute.Apis.spotify().get_single(track_id) end)
+    end
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -55,9 +113,11 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     |> assign(:source_type, source)
     # Clear previous searches
     |> assign(:search_albums, AsyncResult.ok([]))
+    |> assign(:search_tracks, AsyncResult.ok([]))
     # Clear previous selection
     |> assign(:selected_album, AsyncResult.ok(nil))
     |> assign(:selected_playlist, AsyncResult.ok(nil))
+    |> assign(:selected_track, AsyncResult.ok(nil))
     # Reset search form
     |> assign(:search_form, to_form(%{"query" => ""}))
     # Reset vote options state
@@ -106,6 +166,26 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
         |> put_flash(:error, "Please select playlist source first")
         |> then(fn socket -> {:noreply, socket} end)
     end
+  end
+
+  def handle_event(
+        "prepare_session",
+        _params,
+        %{assigns: %{selected_track: %{result: track}}} = socket
+      )
+      when not is_nil(track) do
+    %PrepareListeningSession{
+      source: :track,
+      user_id: get_user_id(socket),
+      track_id: track.track_id,
+      vote_options: get_vote_options(socket.assigns)
+    }
+    |> PremiereEcoute.apply()
+    |> case do
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
+      {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
+    end
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   def handle_event("prepare_session", _params, %{assigns: %{selected_album: nil, selected_playlist: %{result: nil}}} = socket) do
@@ -210,6 +290,53 @@ defmodule PremiereEcouteWeb.Sessions.AlbumSelectionLive do
     socket
     |> assign(:selected_album, AsyncResult.failed(assigns.selected_album, {:error, reason}))
     |> put_flash(:error, "Selection failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:search_tracks, {:ok, {:ok, tracks}}, socket) do
+    socket
+    |> assign(:search_tracks, AsyncResult.ok(tracks))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:search_tracks, {:ok, {:error, reason}}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:search_tracks, AsyncResult.failed(assigns.search_tracks, {:error, reason}))
+    |> put_flash(:error, "Track search failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:search_tracks, {:exit, reason}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:search_tracks, AsyncResult.failed(assigns.search_tracks, {:error, reason}))
+    |> put_flash(:error, "Track search failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:select_track, {:ok, {:ok, track}}, socket) do
+    socket
+    |> assign(:selected_track, AsyncResult.ok(track))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:select_track, {:ok, {:error, :nothing_playing}}, socket) do
+    socket
+    |> assign(:selected_track, AsyncResult.ok(nil))
+    |> put_flash(:info, gettext("No track currently playing on Spotify."))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:select_track, {:ok, {:error, reason}}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:selected_track, AsyncResult.failed(assigns.selected_track, {:error, reason}))
+    |> put_flash(:error, "Track selection failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:select_track, {:exit, reason}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:selected_track, AsyncResult.failed(assigns.selected_track, {:error, reason}))
+    |> put_flash(:error, "Track selection failed. Please try again.")
     |> then(fn socket -> {:noreply, socket} end)
   end
 

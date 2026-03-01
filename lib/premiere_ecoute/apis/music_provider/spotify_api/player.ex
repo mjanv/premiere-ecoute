@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Single
 
   def test, do: 67
 
@@ -243,6 +244,16 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   end
 
   def start_resume_playback(%Scope{} = scope, %Track{provider: :spotify, track_id: track_id}) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.put(
+      url: "/me/player/play",
+      json: %{uris: ["spotify:track:#{track_id}"], position_ms: 0}
+    )
+    |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{track_id}" end)
+  end
+
+  def start_resume_playback(%Scope{} = scope, %Single{provider: :spotify, track_id: track_id}) do
     scope
     |> SpotifyApi.api()
     |> Req.put(

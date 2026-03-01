@@ -64,6 +64,49 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
+  def source_details(%{listening_session: %{source: :track, single: single}} = assigns) do
+    assigns = assign(assigns, :single, single)
+
+    ~H"""
+    <div class="flex items-center justify-end space-x-4">
+      <!-- Single Info -->
+      <div class="text-right">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="text-purple-200 block">{gettext("Artist")}</span>
+            <span class="font-medium text-white">{@single.artist}</span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Provider")}</span>
+            <span class="font-medium text-white">Spotify</span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Duration")}</span>
+            <span class="font-medium text-white">{PremiereEcouteCore.Duration.timer(@single.duration_ms)}</span>
+          </div>
+        </div>
+      </div>
+      
+    <!-- Track Cover -->
+      <div class="flex-shrink-0">
+        <%= if @single.cover_url do %>
+          <img
+            src={@single.cover_url}
+            alt={"#{@single.name} cover"}
+            class="w-32 h-32 rounded-lg shadow-lg"
+          />
+        <% else %>
+          <div class="w-32 h-32 bg-white/20 rounded-lg flex items-center justify-center">
+            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    """
+  end
+
   def source_details(%{listening_session: %{source: :playlist, playlist: playlist}} = assigns) do
     assigns = assign(assigns, :playlist, playlist)
 

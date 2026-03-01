@@ -9,9 +9,12 @@
       
 <!-- Steps with Ariadne's thread connecting them -->
       <div class="relative" id="steps-container">
+        <% content_selected =
+          (@source_type == "album" && @selected_album.ok? && @selected_album.result) ||
+            (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result) ||
+            (@source_type == "track" && @selected_track.ok? && @selected_track.result) %>
         <!-- Ariadne's thread - base line -->
-        <%= if ((@source_type == "album" && @selected_album.ok? && @selected_album.result) || (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result)) && @vote_options_configured do %>
-          <!-- All 4 steps visible - thread goes from step 1 to step 4 -->
+        <%= if content_selected && @vote_options_configured do %>
           <div
             class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full ariane-thread-base"
             data-step="4"
@@ -19,23 +22,16 @@
           >
           </div>
         <% else %>
-          <%= if (@source_type == "album" && @selected_album.ok? && @selected_album.result) || (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result) do %>
-            <!-- Steps 1-3 visible - thread goes from step 1 to step 3 -->
+          <%= if content_selected do %>
             <div class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full ariane-thread-base" data-step="3"></div>
           <% else %>
-            <%= if @source_type == "album" || @source_type == "playlist" do %>
-              <!-- Steps 1-2 visible - thread goes from step 1 to step 2 -->
+            <%= if @source_type do %>
               <div
                 class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full ariane-thread-base"
                 data-step="2"
                 id="thread-to-step-2"
               >
               </div>
-            <% else %>
-              <%= if @source_type do %>
-                <!-- Only step 1 visible - minimal thread -->
-                <div class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full" style="height: 8rem;"></div>
-              <% end %>
             <% end %>
           <% end %>
         <% end %>
@@ -50,22 +46,10 @@
           style="min-height: 2rem;"
           data-progress-step={
             cond do
-              ((@source_type == "album" && @selected_album.ok? && @selected_album.result) ||
-                 (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result)) && @vote_options_configured ->
-                "4"
-
-              (@source_type == "album" && @selected_album.ok? && @selected_album.result) ||
-                  (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result) ->
-                "3"
-
-              @source_type == "album" || @source_type == "playlist" ->
-                "2"
-
-              @source_type ->
-                "1"
-
-              true ->
-                "0"
+              content_selected && @vote_options_configured -> "4"
+              content_selected -> "3"
+              @source_type -> "2"
+              true -> "0"
             end
           }
         >
@@ -87,7 +71,7 @@
             <h2 class="text-2xl font-semibold text-white">{gettext("Source")}</h2>
           </div>
 
-          <div class="grid grid-cols-2 gap-4 max-w-md ml-16">
+          <div class="grid grid-cols-3 gap-4 max-w-xl ml-16">
             <button
               class={[
                 "p-4 rounded-lg border-2 transition-all text-left",
@@ -102,7 +86,11 @@
             >
               <div class="flex items-center space-x-3">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-3a3 3 0 100-6 3 3 0 000 6zm0-1.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
+                    clip-rule="evenodd"
+                  />
                 </svg>
                 <div>
                   <h3 class="font-semibold">{gettext("Album")}</h3>
@@ -126,11 +114,38 @@
             >
               <div class="flex items-center space-x-3">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path d="M3 4a1 1 0 000 2h14a1 1 0 000-2H3zm0 4a1 1 0 000 2h10a1 1 0 000-2H3zm0 4a1 1 0 000 2h6a1 1 0 000-2H3zm11 1a1 1 0 011-1h1v-1a1 1 0 012 0v1h1a1 1 0 010 2h-1v1a1 1 0 01-2 0v-1h-1a1 1 0 01-1-1z" />
                 </svg>
                 <div>
                   <h3 class="font-semibold">{gettext("Playlist")}</h3>
                   <p class="text-sm opacity-70">{gettext("From your Spotify")}</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              class={[
+                "p-4 rounded-lg border-2 transition-all text-left",
+                if @source_type == "track" do
+                  "border-cyan-500 bg-cyan-500/10 text-white"
+                else
+                  "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                end
+              ]}
+              phx-click="select_source"
+              phx-value-source="track"
+            >
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <div>
+                  <h3 class="font-semibold">{gettext("Track")}</h3>
+                  <p class="text-sm opacity-70">{gettext("From Spotify")}</p>
                 </div>
               </div>
             </button>
@@ -440,8 +455,141 @@
           </div>
         <% end %>
         
+<!-- Step 2: Track Selection -->
+        <%= if @source_type == "track" do %>
+          <div class="mb-8 relative" id="step-2">
+            <div class="flex items-center mb-6">
+              <div class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl bg-gradient-primary ring-4 ring-cyan-500/30">
+                2
+              </div>
+              <h2 class="text-2xl font-semibold text-white">{gettext("Track Selection")}</h2>
+            </div>
+
+            <div
+              class="mb-6 relative ml-16"
+              phx-hook="ClickOutside"
+              id="track-search-container"
+              data-event="clear_search_results"
+            >
+              <div class="flex items-center gap-2">
+                <.form
+                  for={@search_form}
+                  id="track-search-form"
+                  phx-change="search_tracks"
+                  phx-submit="search_tracks"
+                  class="flex-1"
+                >
+                  <.input
+                    field={@search_form[:query]}
+                    type="text"
+                    placeholder={gettext("Search Spotify tracks...")}
+                    class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50"
+                    style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                    error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+                  />
+                </.form>
+                <button
+                  type="button"
+                  phx-click="fetch_currently_playing"
+                  class="flex-shrink-0 flex items-center space-x-2 px-3 py-3 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/50 text-cyan-300 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                  title={gettext("Use currently playing")}
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <span class="hidden sm:inline">{gettext("Currently playing")}</span>
+                </button>
+              </div>
+
+              <%= if @search_tracks.loading do %>
+                <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4">
+                  <div class="flex items-center justify-center space-x-3">
+                    <div class="animate-spin rounded-full h-5 w-5 border-2 border-cyan-400 border-t-transparent"></div>
+                    <span class="text-gray-300 text-sm">{gettext("Searching tracks...")}</span>
+                  </div>
+                </div>
+              <% end %>
+
+              <%= if @search_tracks.ok? && length(@search_tracks.result) > 0 do %>
+                <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
+                  <%= for track <- @search_tracks.result do %>
+                    <div
+                      class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center space-x-3"
+                      style="background-color: var(--color-dark-800);"
+                      phx-click="select_track"
+                      phx-value-track_id={track.track_id}
+                    >
+                      <%= if track.cover_url do %>
+                        <img src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
+                      <% end %>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-white font-medium truncate">{track.name}</p>
+                        <p class="text-gray-400 text-sm truncate">{track.artist}</p>
+                      </div>
+                      <span class="text-gray-400 text-xs flex-shrink-0">
+                        {PremiereEcouteCore.Duration.timer(track.duration_ms)}
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+
+            <%= if @selected_track.ok? && @selected_track.result do %>
+              <div class="mt-6">
+                <div class="rounded-xl overflow-hidden ml-16 relative" style="background-color: var(--color-dark-900);">
+                  <%= if @selected_track.result.cover_url do %>
+                    <div
+                      class="absolute inset-0"
+                      style={"background-image: url('#{@selected_track.result.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
+                    >
+                    </div>
+                  <% else %>
+                    <div
+                      class="absolute inset-0"
+                      style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"
+                    >
+                    </div>
+                  <% end %>
+                  <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black/90"></div>
+                  <div class="relative z-10 p-6 h-40 flex items-center">
+                    <div class="flex items-center space-x-6">
+                      <div class="flex-shrink-0">
+                        <%= if @selected_track.result.cover_url do %>
+                          <img
+                            src={@selected_track.result.cover_url}
+                            alt={@selected_track.result.name}
+                            class="w-24 h-24 rounded-lg shadow-2xl border-2 border-white/10"
+                          />
+                        <% else %>
+                          <div class="w-24 h-24 bg-gradient-primary-diagonal rounded-lg flex items-center justify-center shadow-2xl">
+                            <svg class="w-12 h-12 text-white/60" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                            </svg>
+                          </div>
+                        <% end %>
+                      </div>
+                      <div>
+                        <h3 class="text-2xl font-bold text-white mb-1">{@selected_track.result.name}</h3>
+                        <p class="text-white text-lg font-semibold mb-2">{@selected_track.result.artist}</p>
+                        <p class="text-white/70 text-sm">
+                          {PremiereEcouteCore.Duration.timer(@selected_track.result.duration_ms)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        
 <!-- Step 3: Vote Options (only show if album or playlist is selected) -->
-        <%= if (@source_type == "album" && @selected_album.ok? && @selected_album.result) || (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result) do %>
+        <%= if content_selected do %>
           <div class="mb-8 relative" id="step-3">
             <div class="flex items-center mb-6">
               <div class={[
@@ -491,7 +639,7 @@
         <% end %>
         
 <!-- Step 4: Action Buttons (only show if everything is configured) -->
-        <%= if ((@source_type == "album" && @selected_album.ok? && @selected_album.result) || (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result)) && @vote_options_configured do %>
+        <%= if content_selected && @vote_options_configured do %>
           <div class="pt-6 relative" id="step-4">
             <!-- Final step indicator -->
             <div class="flex items-center mb-6">

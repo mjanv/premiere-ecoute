@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
@@ -33,6 +34,40 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         where: s.user_id == ^user_id,
         where: s.status == :stopped,
         select: %{session: s, album: a, report: r},
+        order_by: [desc: s.started_at]
+
+    case period do
+      :month ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.started_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", s.started_at, ^month)
+
+      :year ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.started_at, ^year)
+    end
+    |> Repo.all()
+  end
+
+  @doc """
+  Get all single-track sessions listened by a specific streamer during a time period.
+  """
+  @spec get_singles_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_singles_by_period(%User{id: user_id}, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from s in ListeningSession,
+        join: sg in Single,
+        on: s.single_id == sg.id,
+        left_join: r in Report,
+        on: s.id == r.session_id,
+        where: s.user_id == ^user_id,
+        where: s.status == :stopped,
+        where: s.source == :track,
+        select: %{session: s, single: sg, report: r},
         order_by: [desc: s.started_at]
 
     case period do

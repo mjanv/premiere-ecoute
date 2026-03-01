@@ -5,6 +5,7 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
 
   use PremiereEcouteWeb, :live_view
 
+  alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions
 
   import PremiereEcouteWeb.Retrospective.PeriodHelpers
@@ -20,6 +21,7 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
       |> assign(:selected_year, current_date.year)
       |> assign(:selected_month, current_date.month)
       |> assign(:years_available, get_available_years())
+      |> assign(:selected_source, :album)
       |> assign(:show_modal, false)
       |> assign(:modal_session_id, nil)
 
@@ -35,19 +37,33 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
         _ -> socket.assigns.selected_period
       end
 
+    source =
+      case params["source"] do
+        "track" -> :track
+        "album" -> :album
+        _ -> socket.assigns.selected_source
+      end
+
     year = parse_year(params["year"]) || socket.assigns.selected_year
     month = parse_month(params["month"]) || socket.assigns.selected_month
 
     socket = assign(socket, :selected_period, period)
     socket = assign(socket, :selected_year, year)
     socket = assign(socket, :selected_month, month)
+    socket = assign(socket, :selected_source, source)
 
     user = socket.assigns.current_user
 
     socket
+    |> assign(:albums_data, AsyncResult.loading())
     |> assign_async(:albums_data, fn ->
-      albums = Sessions.get_albums_by_period(user, period, %{year: year, month: month})
-      {:ok, %{albums_data: albums}}
+      items =
+        case source do
+          :album -> Sessions.get_albums_by_period(user, period, %{year: year, month: month})
+          :track -> Sessions.get_singles_by_period(user, period, %{year: year, month: month})
+        end
+
+      {:ok, %{albums_data: %{source: source, items: items}}}
     end)
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -58,7 +74,18 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
     {year, ""} = Integer.parse(year_str)
     {month, ""} = Integer.parse(month_str)
 
-    url_params = build_params(period, year, month)
+    url_params = build_params(period, year, month) |> Map.put("source", socket.assigns.selected_source)
+    {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{url_params}")}
+  end
+
+  @impl true
+  def handle_event("change_source", %{"source" => source_str}, socket) do
+    source = String.to_existing_atom(source_str)
+
+    url_params =
+      build_params(socket.assigns.selected_period, socket.assigns.selected_year, socket.assigns.selected_month)
+      |> Map.put("source", source)
+
     {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{url_params}")}
   end
 
@@ -92,7 +119,10 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
         {"next", :year} -> Date.add(current_date, 365)
       end
 
-    params = build_params(socket.assigns.selected_period, new_date.year, new_date.month)
+    params =
+      build_params(socket.assigns.selected_period, new_date.year, new_date.month)
+      |> Map.put("source", socket.assigns.selected_source)
+
     {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{params}")}
   end
 
@@ -100,7 +130,10 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
   def handle_event("toggle_period", _params, socket) do
     new_period = if socket.assigns.selected_period == :month, do: :year, else: :month
 
-    params = build_params(new_period, socket.assigns.selected_year, socket.assigns.selected_month)
+    params =
+      build_params(new_period, socket.assigns.selected_year, socket.assigns.selected_month)
+      |> Map.put("source", socket.assigns.selected_source)
+
     {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{params}")}
   end
 

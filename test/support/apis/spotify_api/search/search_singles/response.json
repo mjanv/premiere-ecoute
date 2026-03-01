@@ -1,0 +1,51 @@
+{
+  "tracks": {
+    "href": "https://api.spotify.com/v1/search?offset=0&limit=20&query=cut+to+the+feeling&type=track",
+    "limit": 20,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total": 1,
+    "items": [
+      {
+        "album": {
+          "album_type": "single",
+          "total_tracks": 1,
+          "external_urls": {
+            "spotify": "https://open.spotify.com/album/0tGPJ0bkWOUmH7MEOR77qc"
+          },
+          "id": "0tGPJ0bkWOUmH7MEOR77qc",
+          "images": [
+            {
+              "url": "https://i.scdn.co/image/ab67616d0000b2737359994525d219f64872d3b1",
+              "height": 640,
+              "width": 640
+            },
+            {
+              "url": "https://i.scdn.co/image/ab67616d00001e027359994525d219f64872d3b1",
+              "height": 300,
+              "width": 300
+            }
+          ],
+          "name": "Cut To The Feeling",
+          "type": "album",
+          "uri": "spotify:album:0tGPJ0bkWOUmH7MEOR77qc"
+        },
+        "artists": [
+          {
+            "id": "6sFIWsNpZYqfjUpaCgueju",
+            "name": "Carly Rae Jepsen",
+            "type": "artist",
+            "uri": "spotify:artist:6sFIWsNpZYqfjUpaCgueju"
+          }
+        ],
+        "duration_ms": 207959,
+        "id": "11dFghVXANMlKmJXsNCbNl",
+        "name": "Cut To The Feeling",
+        "track_number": 1,
+        "type": "track",
+        "uri": "spotify:track:11dFghVXANMlKmJXsNCbNl"
+      }
+    ]
+  }
+}

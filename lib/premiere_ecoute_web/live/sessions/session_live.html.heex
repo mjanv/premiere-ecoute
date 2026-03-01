@@ -84,7 +84,9 @@
             </div>
             
 <!-- Next Track Timer/Slider -->
-            <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
+            <%= if @listening_session.source != :track do %>
+              <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
+            <% end %>
             
 <!-- Overlay link section with dropdown selector -->
             <div class="mt-4 pt-4 border-t border-white/20" id="overlay-hooks">
@@ -235,135 +237,187 @@
       <div class="w-2/3 p-6 overflow-y-auto">
         <.vote_bar listening_session={@listening_session} open_vote={@open_vote} user_current_rating={@user_current_rating} />
 
-        <%= if @listening_session.options["scores"] do %>
+        <%= if @listening_session.options["scores"] && @listening_session.source != :track do %>
           <.gradient_bg status={@listening_session.status} statutes={[:active, :stopped]}>
             <.note_graph listening_session={@listening_session} trends={@vote_trends} />
           </.gradient_bg>
         <% end %>
 
         <div class="mb-6 mt-8">
-          <%= if length(ListeningSession.tracks(@listening_session)) > 0 do %>
-            <div class="flex flex-col space-y-3">
-              <%= for {track, index} <- Enum.with_index(ListeningSession.tracks(@listening_session), 1) do %>
-                <div class={[
-                  "rounded-lg transition-colors overflow-hidden",
-                  if(ListeningSession.current?(@listening_session, track),
-                    do:
-                      if(@open_vote,
-                        do: "order-first mb-3 border-2 border-green-500/50 hover:bg-green-300/30",
-                        else: "order-first mb-3 border-2 border-orange-500/50 hover:bg-orange-300/30"
-                      ),
-                    else: "border-purple-300/50 border-2 hover:bg-purple-300/30"
-                  )
-                ]}>
-                  <!-- Track Row with Green Background -->
-                  <div class={[
-                    "p-4 transition-colors",
-                    if(ListeningSession.current?(@listening_session, track),
-                      do:
-                        if(@open_vote,
-                          do: "bg-green-600/20 hover:bg-green-600/30",
-                          else: "bg-orange-600/20 hover:bg-orange-600/30"
-                        ),
-                      else: ""
-                    )
-                  ]}>
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center space-x-4 flex-1 min-w-0">
-                        <%= if ListeningSession.current?(@listening_session, track) do %>
-                          <span class={[
-                            "text-lg w-8 flex-shrink-0 font-medium",
-                            if(@open_vote, do: "text-green-400", else: "text-orange-400")
-                          ]}>
-                            {index}
-                          </span>
-                        <% else %>
-                          <span class="text-lg text-gray-400 w-8 flex-shrink-0">{Map.get(track, :track_number, index)}</span>
-                        <% end %>
-                        <div class="flex-1 min-w-0">
-                          <h4 class={[
-                            "font-medium text-lg truncate",
-                            if(ListeningSession.current?(@listening_session, track),
-                              do: if(@open_vote, do: "text-green-300", else: "text-orange-300"),
-                              else: "text-white"
-                            )
-                          ]}>
-                            {track.name}
-                          </h4>
-                          <p class={[
-                            "text-sm",
-                            if(ListeningSession.current?(@listening_session, track),
-                              do: if(@open_vote, do: "text-green-400", else: "text-orange-400"),
-                              else: "text-gray-400"
-                            )
-                          ]}>
-                            {PremiereEcouteCore.Duration.timer(track.duration_ms)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div class="flex items-center space-x-8 text-sm flex-shrink-0">
-                        <%= if @listening_session.status == :active && ListeningSession.current?(@listening_session, track) do %>
-                          <div class="text-center">
-                            <div class={[
-                              "inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-1",
-                              if(@open_vote, do: "bg-green-500/20 text-green-300", else: "bg-orange-500/20 text-orange-300")
-                            ]}>
-                              <%= if @open_vote do %>
-                                {gettext("Open votes")}
-                              <% else %>
-                                {gettext("Closed votes")}
-                              <% end %>
-                            </div>
-                          </div>
-                        <% end %>
-                        <%= if @listening_session.options["votes"] do %>
-                          <.session_track_stat
-                            report={@report}
-                            track={track}
-                            key="unique_votes"
-                            color="purple"
-                            legend={gettext("Votes")}
-                          />
-                        <% end %>
-                        <%= if @listening_session.options["scores"] do %>
-                          <.session_track_stat
-                            report={@report}
-                            track={track}
-                            key="viewer_score"
-                            color="pink"
-                            legend={gettext("Score")}
-                          />
-                          <.session_track_stat
-                            report={@report}
-                            track={track}
-                            key="streamer_score"
-                            color="emerald"
-                            legend={gettext("My Score")}
-                          />
-                        <% end %>
-                      </div>
+          <%= if @listening_session.source == :track do %>
+            <!-- Single track session: show the single prominently -->
+            <div class={[
+              "rounded-lg overflow-hidden border-2",
+              if(@open_vote, do: "border-green-500/50", else: "border-orange-500/50")
+            ]}>
+              <div class={[
+                "p-4",
+                if(@open_vote, do: "bg-green-600/20", else: "bg-orange-600/20")
+              ]}>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-4 flex-1 min-w-0">
+                    <%= if @listening_session.single.cover_url do %>
+                      <img src={@listening_session.single.cover_url} class="w-14 h-14 rounded-lg shadow-lg flex-shrink-0" />
+                    <% end %>
+                    <div class="flex-1 min-w-0">
+                      <h4 class={["font-medium text-lg truncate", if(@open_vote, do: "text-green-300", else: "text-orange-300")]}>
+                        {@listening_session.single.name}
+                      </h4>
+                      <p class={["text-sm", if(@open_vote, do: "text-green-400", else: "text-orange-400")]}>
+                        {@listening_session.single.artist} · {PremiereEcouteCore.Duration.timer(
+                          @listening_session.single.duration_ms
+                        )}
+                      </p>
                     </div>
                   </div>
 
-                  <%= if ListeningSession.current?(@listening_session, track) || @listening_session.status == :stopped do %>
-                    <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
-                      <!-- Horizontal Histogram taking ~80% width -->
-                      <div class="flex items-end justify-center h-32 mx-auto w-4/5">
-                        <.distribution_graph listening_session={@listening_session} report={@report} track={track} />
+                  <div class="flex items-center space-x-8 text-sm flex-shrink-0">
+                    <%= if @listening_session.status == :active do %>
+                      <div class="text-center">
+                        <div class={[
+                          "inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-1",
+                          if(@open_vote, do: "bg-green-500/20 text-green-300", else: "bg-orange-500/20 text-orange-300")
+                        ]}>
+                          <%= if @open_vote do %>
+                            {gettext("Open votes")}
+                          <% else %>
+                            {gettext("Closed votes")}
+                          <% end %>
+                        </div>
                       </div>
-                    </div>
-                  <% end %>
+                    <% end %>
+                  </div>
                 </div>
-              <% end %>
+              </div>
+
+              <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
+                <div class="flex items-end justify-center h-32 mx-auto w-4/5">
+                  <.distribution_graph listening_session={@listening_session} report={@report} track={@listening_session.single} />
+                </div>
+              </div>
             </div>
           <% else %>
-            <div class="text-center py-16 text-gray-400">
-              <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-              </svg>
-              <p>{gettext("No tracks found for this %{source}.", source: Atom.to_string(@listening_session.source))}</p>
-            </div>
+            <%= if length(ListeningSession.tracks(@listening_session)) > 0 do %>
+              <div class="flex flex-col space-y-3">
+                <%= for {track, index} <- Enum.with_index(ListeningSession.tracks(@listening_session), 1) do %>
+                  <div class={[
+                    "rounded-lg transition-colors overflow-hidden",
+                    if(ListeningSession.current?(@listening_session, track),
+                      do:
+                        if(@open_vote,
+                          do: "order-first mb-3 border-2 border-green-500/50 hover:bg-green-300/30",
+                          else: "order-first mb-3 border-2 border-orange-500/50 hover:bg-orange-300/30"
+                        ),
+                      else: "border-purple-300/50 border-2 hover:bg-purple-300/30"
+                    )
+                  ]}>
+                    <div class={[
+                      "p-4 transition-colors",
+                      if(ListeningSession.current?(@listening_session, track),
+                        do:
+                          if(@open_vote,
+                            do: "bg-green-600/20 hover:bg-green-600/30",
+                            else: "bg-orange-600/20 hover:bg-orange-600/30"
+                          ),
+                        else: ""
+                      )
+                    ]}>
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4 flex-1 min-w-0">
+                          <%= if ListeningSession.current?(@listening_session, track) do %>
+                            <span class={[
+                              "text-lg w-8 flex-shrink-0 font-medium",
+                              if(@open_vote, do: "text-green-400", else: "text-orange-400")
+                            ]}>
+                              {index}
+                            </span>
+                          <% else %>
+                            <span class="text-lg text-gray-400 w-8 flex-shrink-0">{Map.get(track, :track_number, index)}</span>
+                          <% end %>
+                          <div class="flex-1 min-w-0">
+                            <h4 class={[
+                              "font-medium text-lg truncate",
+                              if(ListeningSession.current?(@listening_session, track),
+                                do: if(@open_vote, do: "text-green-300", else: "text-orange-300"),
+                                else: "text-white"
+                              )
+                            ]}>
+                              {track.name}
+                            </h4>
+                            <p class={[
+                              "text-sm",
+                              if(ListeningSession.current?(@listening_session, track),
+                                do: if(@open_vote, do: "text-green-400", else: "text-orange-400"),
+                                else: "text-gray-400"
+                              )
+                            ]}>
+                              {PremiereEcouteCore.Duration.timer(track.duration_ms)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="flex items-center space-x-8 text-sm flex-shrink-0">
+                          <%= if @listening_session.status == :active && ListeningSession.current?(@listening_session, track) do %>
+                            <div class="text-center">
+                              <div class={[
+                                "inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-1",
+                                if(@open_vote, do: "bg-green-500/20 text-green-300", else: "bg-orange-500/20 text-orange-300")
+                              ]}>
+                                <%= if @open_vote do %>
+                                  {gettext("Open votes")}
+                                <% else %>
+                                  {gettext("Closed votes")}
+                                <% end %>
+                              </div>
+                            </div>
+                          <% end %>
+                          <%= if @listening_session.options["votes"] do %>
+                            <.session_track_stat
+                              report={@report}
+                              track={track}
+                              key="unique_votes"
+                              color="purple"
+                              legend={gettext("Votes")}
+                            />
+                          <% end %>
+                          <%= if @listening_session.options["scores"] do %>
+                            <.session_track_stat
+                              report={@report}
+                              track={track}
+                              key="viewer_score"
+                              color="pink"
+                              legend={gettext("Score")}
+                            />
+                            <.session_track_stat
+                              report={@report}
+                              track={track}
+                              key="streamer_score"
+                              color="emerald"
+                              legend={gettext("My Score")}
+                            />
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+
+                    <%= if ListeningSession.current?(@listening_session, track) || @listening_session.status == :stopped do %>
+                      <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
+                        <div class="flex items-end justify-center h-32 mx-auto w-4/5">
+                          <.distribution_graph listening_session={@listening_session} report={@report} track={track} />
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-center py-16 text-gray-400">
+                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                </svg>
+                <p>{gettext("No tracks found for this session.")}</p>
+              </div>
+            <% end %>
           <% end %>
         </div>
       </div>
