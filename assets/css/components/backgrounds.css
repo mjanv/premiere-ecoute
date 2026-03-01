@@ -23,6 +23,12 @@
   background: var(--gradient-primary-diagonal);
 }
 
+/* Step circle active state - triggered by JS when Ariane's thread reaches the circle */
+.step-circle-active {
+  background: var(--gradient-primary) !important;
+  box-shadow: 0 0 0 4px rgb(168 85 247 / 0.3), var(--tw-shadow, 0 0 #0000) !important;
+}
+
 /* Background utilities using CSS variables instead of Tailwind gray classes */
 .bg-surface { background-color: var(--color-dark-900); }
 .bg-surface-elevated { background-color: var(--color-dark-800); }

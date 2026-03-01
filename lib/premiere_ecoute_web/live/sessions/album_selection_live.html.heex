@@ -13,43 +13,34 @@
           (@source_type == "album" && @selected_album.ok? && @selected_album.result) ||
             (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result) ||
             (@source_type == "track" && @selected_track.ok? && @selected_track.result) %>
-        <!-- Ariadne's thread - base line -->
-        <%= if content_selected && @vote_options_configured do %>
-          <div
-            class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full ariane-thread-base"
-            data-step="4"
-            style="bottom: 8rem;"
-          >
-          </div>
-        <% else %>
-          <%= if content_selected do %>
-            <div class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full ariane-thread-base" data-step="3"></div>
-          <% else %>
-            <%= if @source_type do %>
-              <div
-                class="absolute left-6 top-12 w-1 bg-gray-700/50 rounded-full ariane-thread-base"
-                data-step="2"
-                id="thread-to-step-2"
-              >
-              </div>
-            <% end %>
-          <% end %>
-        <% end %>
+        <!-- Ariadne's thread - base line spanning from step 1 center to last visible step center -->
+        <div
+          class="absolute left-6 w-1 bg-gray-700/50 rounded-full ariane-thread-base"
+          data-step={
+            cond do
+              content_selected && @vote_options_configured -> "4"
+              content_selected -> "3"
+              @source_type -> "2"
+              true -> "1"
+            end
+          }
+        >
+        </div>
         
 <!-- Progressive fill thread - shows progress as steps complete -->
         <div
           class={[
-            "absolute left-6 top-12 w-1 rounded-full transition-all duration-700 ease-in-out",
+            "absolute left-6 w-1 rounded-full transition-all duration-700 ease-in-out",
             "bg-gradient-primary-vertical",
             "ariane-thread-progress"
           ]}
-          style="min-height: 2rem;"
+          style="height: 0px;"
           data-progress-step={
             cond do
               content_selected && @vote_options_configured -> "4"
               content_selected -> "3"
               @source_type -> "2"
-              true -> "0"
+              true -> "1"
             end
           }
         >
@@ -58,14 +49,10 @@
 <!-- Step 1: Source Selection -->
         <div class="mb-8 relative">
           <div class="flex items-center mb-6">
-            <div class={[
-              "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
-              if @source_type do
-                "bg-gradient-primary ring-4 ring-purple-500/30"
-              else
-                "bg-gray-600 ring-4 ring-gray-500/20"
-              end
-            ]}>
+            <div
+              id="step-circle-1"
+              class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+            >
               1
             </div>
             <h2 class="text-2xl font-semibold text-white">{gettext("Source")}</h2>
@@ -156,10 +143,10 @@
         <%= if @source_type == "album" do %>
           <div class="mb-8 relative" id="step-2">
             <div class="flex items-center mb-6">
-              <div class={[
-                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
-                "bg-gradient-primary ring-4 ring-purple-500/30"
-              ]}>
+              <div
+                id="step-circle-2"
+                class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+              >
                 2
               </div>
               <h2 class="text-2xl font-semibold text-white">{gettext("Album Selection")}</h2>
@@ -341,10 +328,10 @@
         <%= if @source_type == "playlist" do %>
           <div class="mb-8 relative" id="step-2">
             <div class="flex items-center mb-6">
-              <div class={[
-                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
-                "bg-gradient-primary ring-4 ring-purple-500/30"
-              ]}>
+              <div
+                id="step-circle-2"
+                class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+              >
                 2
               </div>
               <h2 class="text-2xl font-semibold text-white">{gettext("Playlist Selection")}</h2>
@@ -459,7 +446,10 @@
         <%= if @source_type == "track" do %>
           <div class="mb-8 relative" id="step-2">
             <div class="flex items-center mb-6">
-              <div class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl bg-gradient-primary ring-4 ring-cyan-500/30">
+              <div
+                id="step-circle-2"
+                class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+              >
                 2
               </div>
               <h2 class="text-2xl font-semibold text-white">{gettext("Track Selection")}</h2>
@@ -592,10 +582,10 @@
         <%= if content_selected do %>
           <div class="mb-8 relative" id="step-3">
             <div class="flex items-center mb-6">
-              <div class={[
-                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
-                "bg-gradient-primary ring-4 ring-purple-500/30"
-              ]}>
+              <div
+                id="step-circle-3"
+                class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+              >
                 3
               </div>
               <h2 class="text-2xl font-semibold text-white">{gettext("Vote Options")}</h2>
@@ -643,10 +633,10 @@
           <div class="pt-6 relative" id="step-4">
             <!-- Final step indicator -->
             <div class="flex items-center mb-6">
-              <div class={[
-                "w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-300",
-                "bg-gradient-primary ring-4 ring-purple-500/30"
-              ]}>
+              <div
+                id="step-circle-4"
+                class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+              >
                 4
               </div>
               <h2 class="text-2xl font-semibold text-white">{gettext("Ready to Start")}</h2>
@@ -684,6 +674,32 @@
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  // Returns {top, center} of a circle relative to the container top
+  function circleMetrics(id, containerTop) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    return {
+      top: rect.top - containerTop,
+      center: rect.top + rect.height / 2 - containerTop,
+    };
+  }
+
+  // Activate circles whose center the progress thread has reached
+  function updateCircles(progressThread, origin, containerTop) {
+    const threadBottom = origin + (parseFloat(getComputedStyle(progressThread).height) || 0);
+    [1, 2, 3, 4].forEach(n => {
+      const circle = document.getElementById('step-circle-' + n);
+      if (!circle) return;
+      const mid = circle.getBoundingClientRect().top + circle.getBoundingClientRect().height / 2 - containerTop;
+      if (threadBottom >= mid - 1) {
+        circle.classList.add('step-circle-active');
+      } else {
+        circle.classList.remove('step-circle-active');
+      }
+    });
+  }
+
   // Dynamic Ariane thread height calculation
   function updateArianesThread() {
     const container = document.getElementById('steps-container');
@@ -691,105 +707,65 @@
 
     const baseThread = container.querySelector('.ariane-thread-base');
     const progressThread = container.querySelector('.ariane-thread-progress');
-
-    // Progress thread should always exist, base thread is optional
     if (!progressThread) return;
 
-    const step = baseThread ? baseThread.getAttribute('data-step') : null;
     const progressStep = progressThread.getAttribute('data-progress-step');
+    const containerTop = container.getBoundingClientRect().top;
 
-    // Find the highest step element to determine full thread length
-    let targetElement = null;
-    
-    // Determine the target based on progress step if no base thread
-    const targetStep = step || progressStep;
+    // Anchor both threads at center of circle 1
+    const c1 = circleMetrics('step-circle-1', containerTop);
+    if (!c1) return;
+    const origin = c1.center;
 
-    if (targetStep === '4') {
-      // Find the step 4 number circle
-      targetElement = document.querySelector('#step-4 .w-12.h-12');
-    } else if (targetStep === '3') {
-      // Find the step 3 number circle
-      targetElement = document.querySelector('#step-3 .w-12.h-12');
-    } else if (targetStep === '2') {
-      // Find the step 2 number circle
-      targetElement = document.querySelector('#step-2 .w-12.h-12');
-    } else if (targetStep === '1') {
-      // Find the step 1 number circle
-      targetElement = document.querySelector('#steps-container .w-12.h-12');
+    // Thread height = distance from circle 1 center to target circle center
+    const heightTo = (id) => {
+      const m = circleMetrics(id, containerTop);
+      return m ? Math.max(0, m.center - origin) : 0;
+    };
+
+    const lastCircleId = progressStep === '4' ? 'step-circle-4'
+      : progressStep === '3' ? 'step-circle-3'
+      : progressStep === '2' ? 'step-circle-2'
+      : 'step-circle-1';
+
+    // Position and size base thread
+    if (baseThread) {
+      baseThread.style.top = origin + 'px';
+      baseThread.style.height = (heightTo(lastCircleId) || 0) + 'px';
     }
 
-    if (targetElement) {
-      const containerTop = container.getBoundingClientRect().top;
-      const targetBottom = targetElement.getBoundingClientRect().bottom;
-      const threadStart = 48; // top-12 = 3rem = 48px
+    // Position progress thread (same origin)
+    progressThread.style.top = origin + 'px';
 
-      // Calculate thread height to the step number circle (stop at circle, not beyond)
-      const baseHeight = Math.max(0, targetBottom - containerTop - threadStart);
+    const progressHeight = heightTo(lastCircleId);
+    const prevHeight = parseFloat(progressThread.style.height) || 0;
+    progressThread.style.height = progressHeight + 'px';
 
-      // Update base thread height if it exists
-      if (baseThread) {
-        baseThread.style.height = baseHeight + 'px';
-      }
-
-      // Calculate progress thread height - should match current progress step
-      let progressHeight = 0;
-      
-      if (progressStep === '0') {
-        // No progress yet
-        progressHeight = 0;
-      } else if (progressStep === '1') {
-        // Find step 1 circle and stop at its bottom
-        const step1Circle = document.querySelector('#steps-container .w-12.h-12');
-        if (step1Circle) {
-          const step1Bottom = step1Circle.getBoundingClientRect().bottom;
-          progressHeight = Math.max(0, step1Bottom - containerTop - threadStart);
+    if (prevHeight === progressHeight) {
+      updateCircles(progressThread, origin, containerTop);
+    } else {
+      const poll = () => {
+        updateCircles(progressThread, origin, containerTop);
+        const current = parseFloat(getComputedStyle(progressThread).height) || 0;
+        if (Math.abs(current - progressHeight) > 1) {
+          requestAnimationFrame(poll);
         } else {
-          progressHeight = 48; // fallback to circle height
+          updateCircles(progressThread, origin, containerTop);
         }
-      } else if (progressStep === '2') {
-        // Find step 2 circle and stop at its bottom
-        const step2Circle = document.querySelector('#step-2 .w-12.h-12');
-        if (step2Circle) {
-          const step2Bottom = step2Circle.getBoundingClientRect().bottom;
-          progressHeight = Math.max(0, step2Bottom - containerTop - threadStart);
-        } else {
-          progressHeight = baseHeight * 0.6; // fallback
-        }
-      } else if (progressStep === '3') {
-        // Find step 3 circle and stop at its bottom
-        const step3Circle = document.querySelector('#step-3 .w-12.h-12');
-        if (step3Circle) {
-          const step3Bottom = step3Circle.getBoundingClientRect().bottom;
-          progressHeight = Math.max(0, step3Bottom - containerTop - threadStart);
-        } else {
-          progressHeight = baseHeight * 0.85; // fallback
-        }
-      } else if (progressStep === '4') {
-        progressHeight = baseHeight;
-      }
-
-      progressThread.style.height = progressHeight + 'px';
-    } else if (progressStep === '0') {
-      // No steps visible yet, hide progress thread
-      progressThread.style.height = '0px';
+      };
+      requestAnimationFrame(poll);
     }
   }
 
-  // Update on page load and when content changes
-  document.addEventListener('DOMContentLoaded', updateArianesThread);
-
-  // Update when LiveView updates
-  document.addEventListener('phx:update', updateArianesThread);
-
-  // Update on window resize
-  window.addEventListener('resize', updateArianesThread);
-
-  // Use ResizeObserver to detect content changes
-  if (window.ResizeObserver) {
-    const observer = new ResizeObserver(updateArianesThread);
-    const container = document.getElementById('steps-container');
-    if (container) {
-      observer.observe(container);
-    }
+  let ariadneRaf;
+  function scheduleUpdate() {
+    cancelAnimationFrame(ariadneRaf);
+    ariadneRaf = requestAnimationFrame(updateArianesThread);
   }
+
+  // Run immediately (script executes after DOM is parsed), and on LiveView updates
+  scheduleUpdate();
+  document.addEventListener('phx:update', scheduleUpdate);
+  document.addEventListener('phx:page-loading-stop', scheduleUpdate);
+  window.addEventListener('resize', scheduleUpdate);
 </script>
