@@ -126,7 +126,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- maybe_start_playback(resume, scope, single),
          message <-
            PremiereEcoute.Gettext.t(scope, fn ->
-             gettext("Now playing: %{name} by %{artist} - vote with !vote", name: single.name, artist: single.artist)
+             gettext("Welcome to the premiere of %{name} by %{artist}", name: single.name, artist: single.artist)
            end),
          :ok <- Apis.twitch().send_chat_message(scope, message) do
       {:ok, session, [%SessionStarted{source: :track, session_id: session.id, user_id: scope.user.id}]}
@@ -278,7 +278,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  # AIDEV-NOTE: resume: true skips Spotify playback start (track already playing)
   defp maybe_start_playback(true, _scope, _single), do: {:ok, :resumed}
   defp maybe_start_playback(false, scope, single), do: Apis.spotify().start_resume_playback(scope, single)
 end

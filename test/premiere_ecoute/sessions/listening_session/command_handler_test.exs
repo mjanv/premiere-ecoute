@@ -349,7 +349,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
-                                               "Now playing: Sample Track by Sample Artist - vote with !vote" ->
+                                               "Welcome to the premiere of Sample Track by Sample Artist" ->
         :ok
       end)
 
@@ -611,7 +611,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Now playing: Sample Track by Sample Artist - vote with !vote" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Welcome to the premiere of Sample Track by Sample Artist" -> :ok end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
