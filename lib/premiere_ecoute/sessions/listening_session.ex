@@ -189,9 +189,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   """
   @spec next_track(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
   def next_track(%__MODULE__{source: :playlist} = session) do
-    %{playlist: %{tracks: tracks}} = Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
-    # BUG: hd(Enum.reverse(tracks)) returns the final track regardless of current position.
-    current_track(session, hd(Enum.reverse(tracks)).id)
+    %{playlist: %{tracks: tracks}, current_playlist_track: current_track} =
+      Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
+
+    current_track
+    |> case do
+      nil ->
+        List.first(tracks, nil)
+
+      current ->
+        current_index = Enum.find_index(tracks, &(&1.id == current.id))
+
+        if current_index == length(tracks) - 1 do
+          nil
+        else
+          Enum.at(tracks, current_index + 1)
+        end
+    end
+    |> case do
+      nil -> {:error, :no_tracks_left}
+      track -> current_track(session, track.id)
+    end
   end
 
   def next_track(%__MODULE__{source: :album} = session) do
@@ -346,6 +364,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def title(%__MODULE__{album: %{name: name}}), do: name
   def title(%__MODULE__{playlist: %{title: title}}), do: title
   def title(%__MODULE__{single: %{name: name}}), do: name
+
+  @doc """
+  Returns the session's artist name.
+
+  Extracts artist from album, playlist owner, or single depending on session source.
+  """
+  @spec artist(t()) :: String.t()
+  def artist(%__MODULE__{album: nil, playlist: nil, single: nil}), do: ""
+  def artist(%__MODULE__{album: %{artist: artist}}), do: artist
+  def artist(%__MODULE__{playlist: %{owner_name: owner_name}}), do: owner_name
+  def artist(%__MODULE__{single: %{artist: artist}}), do: artist
 
   @doc """
   Returns the current track being played.

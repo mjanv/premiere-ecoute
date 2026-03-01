@@ -24,6 +24,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
     |> assign(:listening_session, session)
     |> assign(:report, Report.get_by(session_id: session.id))
     |> assign(:youtube_title, ListeningSession.title(session))
+    |> assign(:youtube_artist, ListeningSession.artist(session))
     |> assign(:youtube_chapters, TrackMarker.format_youtube_chapters(session, socket.assigns[:time_bias]))
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -103,7 +104,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             readonly
             rows="1"
             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-          >{gettext("PREMIÈRE ÉCOUTE : \"%{title}\" by %{artist} (React Live)", title: @youtube_title, artist: @listening_session.album.artist)}</textarea>
+          >{gettext("PREMIÈRE ÉCOUTE : \"%{title}\" by %{artist} (React Live)", title: @youtube_title, artist: @youtube_artist)}</textarea>
         </div>
         
     <!-- YouTube Chapters Textbox -->
@@ -183,7 +184,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             readonly
             rows="12"
             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-          ><%= if @options.intro do %>{gettext("This week I listened and reacted live to the new album \"%{title}\" by %{artist} !", title: @youtube_title, artist: @listening_session.album.artist)}&#013;&#010;&#013;&#010;<% end %><%= if @options.notes do %>{gettext("Streamer score")}: {inspect(@report.session_summary["streamer_score"])}
+          ><%= if @options.intro do %><%= if @listening_session.source == :playlist do %>{gettext("This week I listened and reacted live to the playlist \"%{title}\" by %{artist} !", title: @youtube_title, artist: @youtube_artist)}<% else %>{gettext("This week I listened and reacted live to the new album \"%{title}\" by %{artist} !", title: @youtube_title, artist: @youtube_artist)}<% end %>&#013;&#010;&#013;&#010;<% end %><%= if @options.notes do %>{gettext("Streamer score")}: {inspect(@report.session_summary["streamer_score"])}
     {gettext("Viewer score")}: {inspect(@report.session_summary["viewer_score"])}&#013; &#010;<% end %><%= if @options.chapters do %>{@youtube_chapters}<% end %>
           </textarea>
         </div>

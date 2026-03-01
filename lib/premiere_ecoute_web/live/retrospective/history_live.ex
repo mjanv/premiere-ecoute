@@ -41,6 +41,7 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
       case params["source"] do
         "track" -> :track
         "album" -> :album
+        "playlist" -> :playlist
         _ -> socket.assigns.selected_source
       end
 
@@ -61,6 +62,7 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
         case source do
           :album -> Sessions.get_albums_by_period(user, period, %{year: year, month: month})
           :track -> Sessions.get_singles_by_period(user, period, %{year: year, month: month})
+          :playlist -> Sessions.get_playlists_by_period(user, period, %{year: year, month: month})
         end
 
       {:ok, %{albums_data: %{source: source, items: items}}}
@@ -113,8 +115,8 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
 
     new_date =
       case {direction, socket.assigns.selected_period} do
-        {"previous", :month} -> Date.add(current_date, -Date.days_in_month(current_date))
-        {"next", :month} -> Date.add(current_date, Date.days_in_month(current_date))
+        {"previous", :month} -> current_date |> Date.add(-1) |> Date.beginning_of_month()
+        {"next", :month} -> current_date |> Date.end_of_month() |> Date.add(1)
         {"previous", :year} -> Date.add(current_date, -365)
         {"next", :year} -> Date.add(current_date, 365)
       end

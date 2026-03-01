@@ -454,6 +454,80 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
     end
   end
 
+  describe "handle/1 - SkipNextTrackListeningSession :playlist" do
+    test "advances current_playlist_track and emits NextTrackStarted with the track" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      playlist = playlist_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
+
+      # start: playlist context; skip: individual track
+      expect(SpotifyApi, :start_resume_playback, 2, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:4gVsKMMK0f8dweHL7Vm9HC"} end)
+
+      # SessionStarted schedules: open_playlist ("Votes are open!") + send_promo_message (promo)
+      # NextTrackStarted schedules: open_playlist ("Votes are open!")
+      # Total: 2x "Votes are open!", 1x promo — stub accepts any message in any order
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{source: :playlist, user_id: user.id, playlist_id: playlist.playlist_id})
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
+
+      session = ListeningSession.get(started.session_id)
+      assert session.current_playlist_track_id == nil
+
+      {:ok, session, [%NextTrackStarted{source: :playlist, track: track}]} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      assert session.current_playlist_track_id != nil
+      assert track != nil
+      assert track.name == "Mind Loaded (feat. Caroline Polachek, Lorde & Mustafa)"
+    end
+
+    test "returns error when all playlist tracks are exhausted" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      playlist = playlist_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
+
+      # start: playlist context; skip: individual track
+      expect(SpotifyApi, :start_resume_playback, 2, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:4gVsKMMK0f8dweHL7Vm9HC"} end)
+
+      # SessionStarted schedules: open_playlist ("Votes are open!") + send_promo_message (promo)
+      # NextTrackStarted schedules: open_playlist ("Votes are open!")
+      # Total: 2x "Votes are open!", 1x promo — stub accepts any message in any order
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{source: :playlist, user_id: user.id, playlist_id: playlist.playlist_id})
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
+
+      # Playlist fixture has 1 track — skip once to reach end
+      {:ok, _, [%NextTrackStarted{}]} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      # Second skip — no tracks left
+      {:error, _} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+    end
+  end
+
   describe "handle/1 - SkipPreviousTrackListeningSession" do
     test "successfully skip to the previous track until none are left and returns PreviousTrackStarted event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
@@ -571,7 +645,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
-      command = %StopListeningSession{session_id: event.session_id, scope: scope}
+      command = %StopListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, session, [%SessionStopped{}]} = CommandBus.apply(command)
 
@@ -595,6 +669,51 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
              } = report
 
       assert session_id == session.id
+    end
+  end
+
+  describe "handle/1 - StopListeningSession :playlist" do
+    test "stops playlist session, sends playlist title in stop message, pauses Spotify" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      playlist = playlist_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
+
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      expect(SpotifyApi, :devices, 2, fn _ -> {:ok, [%{"is_active" => true}]} end)
+      expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
+      expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
+
+      expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7"} end)
+
+      expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "The premiere of FLONFLON MUSIC FRIDAY is over" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{source: :playlist, user_id: user.id, playlist_id: playlist.playlist_id})
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
+
+      {:ok, session, [%SessionStopped{}]} =
+        CommandBus.apply(%StopListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      assert session.status == :stopped
     end
   end
 

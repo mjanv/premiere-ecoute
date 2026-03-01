@@ -251,6 +251,63 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     end
   end
 
+  describe "next_track/1 - playlist" do
+    setup %{user: user, playlist: playlist} do
+      track_attrs = fn name, track_id ->
+        %{
+          provider: :spotify,
+          track_id: track_id,
+          album_id: "album001",
+          user_id: "spotify_user_123",
+          name: name,
+          artist: "Test Artist",
+          duration_ms: 180_000,
+          added_at: NaiveDateTime.utc_now(),
+          release_date: ~D[2025-01-01]
+        }
+      end
+
+      {:ok, track1} =
+        %Playlist.Track{playlist_id: playlist.id}
+        |> Playlist.Track.changeset(track_attrs.("Playlist Track 1", "pt001"))
+        |> Repo.insert()
+
+      {:ok, track2} =
+        %Playlist.Track{playlist_id: playlist.id}
+        |> Playlist.Track.changeset(track_attrs.("Playlist Track 2", "pt002"))
+        |> Repo.insert()
+
+      playlist = Playlist.get(playlist.id)
+      {:ok, session} = ListeningSession.create(%{source: :playlist, user_id: user.id, playlist_id: playlist.id})
+      {:ok, session} = ListeningSession.start(session)
+
+      {:ok, %{session: session, track1: track1, track2: track2}}
+    end
+
+    test "selects the first track when no current track is set", %{session: session, track1: track1} do
+      {:ok, after_session} = ListeningSession.next_track(session)
+
+      assert after_session.current_playlist_track.id == track1.id
+      assert after_session.current_playlist_track.name == "Playlist Track 1"
+    end
+
+    test "selects the second track when first is current", %{session: session, track1: track1, track2: track2} do
+      {:ok, session} = ListeningSession.next_track(session)
+      {:ok, after_session} = ListeningSession.next_track(session)
+
+      assert session.current_playlist_track.id == track1.id
+      assert after_session.current_playlist_track.id == track2.id
+    end
+
+    test "returns error when past the last track", %{session: session} do
+      {:ok, session} = ListeningSession.next_track(session)
+      {:ok, session} = ListeningSession.next_track(session)
+      {:error, reason} = ListeningSession.next_track(session)
+
+      assert reason == :no_tracks_left
+    end
+  end
+
   describe "next_track/1" do
     test "select the first track when no current track is selected", %{user: user, album: album} do
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})

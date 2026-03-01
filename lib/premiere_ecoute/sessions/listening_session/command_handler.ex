@@ -213,8 +213,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%SkipNextTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
-         {:ok, _} <- Apis.spotify().next_track(scope) do
-      {:ok, session, [%NextTrackStarted{session_id: session.id, user_id: scope.user.id, track: nil}]}
+         {:ok, session} <- ListeningSession.next_track(session),
+         {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_playlist_track) do
+      {:ok, session,
+       [
+         %NextTrackStarted{
+           source: :playlist,
+           session_id: session.id,
+           user_id: scope.user.id,
+           track: session.current_playlist_track
+         }
+       ]}
     else
       _ -> {:error, []}
     end
@@ -252,7 +261,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%StopListeningSession{session_id: session_id, scope: scope}) do
+  def handle(%StopListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
@@ -271,9 +280,29 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
+  def handle(%StopListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
+         message <-
+           PremiereEcoute.Gettext.t(scope, fn -> gettext("The premiere of %{name} is over", name: session.playlist.title) end),
+         :ok <- Apis.twitch().send_chat_message(scope, message),
+         {:ok, session} <- ListeningSession.stop(session) do
+      {:ok, devices} = Apis.spotify().devices(scope)
+      is_active = Enum.any?(devices, fn device -> device["is_active"] end)
+      if is_active, do: Apis.spotify().pause_playback(scope)
+      {:ok, session, [%SessionStopped{session_id: session.id, user_id: scope.user.id}]}
+    else
+      reason ->
+        Logger.error("Cannot stop listening session due to: #{inspect(reason)}")
+        {:error, []}
+    end
+  end
+
+  # AIDEV-NOTE: creates playlist with all tracks from Spotify to freeze the session's track list at preparation time
   defp get_or_create_playlist(playlist) do
     case Playlist.get_by(playlist_id: playlist.playlist_id, provider: playlist.provider) do
-      nil -> Playlist.create(%{playlist | tracks: [], url: Playlist.url(playlist)})
+      nil -> Playlist.create(%{playlist | url: Playlist.url(playlist)})
       existing_playlist -> {:ok, existing_playlist}
     end
   end
