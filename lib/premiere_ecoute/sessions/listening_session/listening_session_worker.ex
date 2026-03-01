@@ -57,10 +57,25 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "open_playlist", "user_id" => user_id, "session_id" => session_id}}) do
-    with scope <- Scope.for_user(User.get(user_id)),
-         session <- ListeningSession.get(session_id),
-         session <- %{id: session.id, vote_options: session.vote_options, current_track_id: session.current_playlist_track_id},
-         {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, session),
+    scope = Scope.for_user(User.get(user_id))
+    session = ListeningSession.get(session_id)
+    first_track? = is_nil(session.current_playlist_track_id)
+
+    if first_track? do
+      welcome =
+        Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+          gettext("Welcome to the premiere of %{name} by %{artist}",
+            name: session.playlist.title,
+            artist: session.playlist.owner_name
+          )
+        end)
+
+      Apis.twitch().send_chat_message(scope, welcome)
+    end
+
+    cache_entry = %{id: session.id, vote_options: session.vote_options, current_track_id: session.current_playlist_track_id}
+
+    with {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, cache_entry),
          :ok <-
            Apis.twitch().send_chat_message(
              scope,

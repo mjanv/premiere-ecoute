@@ -293,6 +293,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7"} end)
 
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Welcome to the premiere of FLONFLON MUSIC FRIDAY by Flonflon" -> :ok end)
+
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
@@ -689,6 +691,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7"} end)
 
       expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Welcome to the premiere of FLONFLON MUSIC FRIDAY by Flonflon" -> :ok end)
 
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
