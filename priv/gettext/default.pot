@@ -87,8 +87,8 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:134
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:271
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:99
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:170
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:126
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:239
 #, elixir-autogen, elixir-format
 msgid "Album cover"
 msgstr ""
@@ -174,7 +174,7 @@ msgstr ""
 msgid "Open overlay in new tab"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:180
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:249
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:33
 #, elixir-autogen, elixir-format
 msgid "Released"
@@ -210,6 +210,8 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:223
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:172
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:70
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:93
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:72
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:37
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:129
 #, elixir-autogen, elixir-format
@@ -340,6 +342,8 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:70
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:139
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:63
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:86
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:65
 #, elixir-autogen, elixir-format
 msgid "Albums"
 msgstr ""
@@ -692,7 +696,7 @@ msgid "Terms"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:372
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:242
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:311
 #, elixir-autogen, elixir-format
 msgid "Album details not found"
 msgstr ""
@@ -701,14 +705,14 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:330
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:259
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:378
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:158
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:248
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:227
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:317
 #, elixir-autogen, elixir-format
 msgid "Close"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:253
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:152
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:221
 #, elixir-autogen, elixir-format
 msgid "Failed to load album details"
 msgstr ""
@@ -724,8 +728,8 @@ msgid "No Albums Found"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:101
-#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:93
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:74
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:120
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:101
 #, elixir-autogen, elixir-format
 msgid "Please try refreshing the page"
 msgstr ""
@@ -2282,7 +2286,7 @@ msgid "by %{artist}"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:137
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:184
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:253
 #, elixir-autogen, elixir-format
 msgid "track"
 msgid_plural "tracks"
@@ -2334,7 +2338,7 @@ msgstr ""
 msgid "Least liked"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:73
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:100
 #, elixir-autogen, elixir-format
 msgid "Failed to load votes"
 msgstr ""
@@ -2346,19 +2350,19 @@ msgstr ""
 msgid "My votes"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:102
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:83
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:129
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:110
 #, elixir-autogen, elixir-format
 msgid "No Votes Found"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:103
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:84
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:130
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:111
 #, elixir-autogen, elixir-format
 msgid "No votes cast during this period"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:205
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:274
 #, elixir-autogen, elixir-format
 msgid "Track List"
 msgstr ""
@@ -2383,7 +2387,7 @@ msgstr ""
 msgid "My Follows"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:233
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:302
 #, elixir-autogen, elixir-format
 msgid "No vote"
 msgstr ""
@@ -2774,6 +2778,8 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:49
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:77
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:100
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:79
 #, elixir-autogen, elixir-format
 msgid "Playlists"
 msgstr ""
@@ -3022,8 +3028,8 @@ msgid_plural "artists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:275
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:294
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:269
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:288
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr ""
@@ -3692,7 +3698,7 @@ msgstr ""
 msgid "All time"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:92
+#: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:119
 #, elixir-autogen, elixir-format
 msgid "Failed to load top tracks"
 msgstr ""
@@ -3823,4 +3829,14 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:116
 #, elixir-autogen, elixir-format
 msgid "No tracks listened during this period"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:167
+#, elixir-autogen, elixir-format
+msgid "Playlist cover"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:146
+#, elixir-autogen, elixir-format
+msgid "Track cover"
 msgstr ""

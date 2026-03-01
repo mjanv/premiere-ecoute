@@ -9,6 +9,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
@@ -156,6 +157,198 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
       :year ->
         from s in query,
           where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year)
+    end
+    |> Repo.all()
+  end
+
+  @doc """
+  Get all votes casted on singles by a specific viewer during a time period.
+  """
+  @spec get_single_votes_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_single_votes_by_period(%User{twitch: %{user_id: user_id}}, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: sg in Single,
+        on: s.single_id == sg.id,
+        where: v.viewer_id == ^user_id,
+        where: v.value not in ["smash", "pass"],
+        group_by: [sg.id, sg.name, sg.artist, sg.cover_url],
+        select: %{
+          single: %Single{
+            id: sg.id,
+            name: sg.name,
+            artist: sg.artist,
+            cover_url: sg.cover_url
+          },
+          score: fragment("ROUND(AVG(CAST(? AS DECIMAL)), 1)", v.value)
+        },
+        order_by: [desc: count(v.id)]
+
+    case period do
+      :month ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", s.inserted_at, ^month)
+
+      :year ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year)
+    end
+    |> Repo.all()
+  end
+
+  @doc """
+  Get all votes casted on playlist tracks by a specific viewer during a time period.
+  """
+  @spec get_playlist_votes_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_playlist_votes_by_period(%User{twitch: %{user_id: user_id}}, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: p in Playlist,
+        on: s.playlist_id == p.id,
+        where: v.viewer_id == ^user_id,
+        where: v.value not in ["smash", "pass"],
+        group_by: [p.id, p.title, p.owner_name, p.cover_url],
+        select: %{
+          playlist: %Playlist{
+            id: p.id,
+            title: p.title,
+            owner_name: p.owner_name,
+            cover_url: p.cover_url
+          },
+          score: fragment("ROUND(AVG(CAST(? AS DECIMAL)), 1)", v.value)
+        },
+        order_by: [desc: count(v.id)]
+
+    case period do
+      :month ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", s.inserted_at, ^month)
+
+      :year ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year)
+    end
+    |> Repo.all()
+  end
+
+  @doc """
+  Get top singles voted by a viewer during a time period, sorted by vote score descending.
+  """
+  @spec get_top_singles_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_top_singles_by_period(%User{twitch: %{user_id: user_id}}, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: sg in Single,
+        on: s.single_id == sg.id,
+        where: v.viewer_id == ^user_id,
+        where: fragment("? ~ '^[0-9]+$'", v.value),
+        select: %{
+          single: %Single{
+            id: sg.id,
+            name: sg.name,
+            artist: sg.artist,
+            cover_url: sg.cover_url,
+            duration_ms: sg.duration_ms
+          },
+          score: v.value,
+          voted_at: v.inserted_at
+        },
+        order_by: [
+          desc: fragment("CAST(? AS DECIMAL)", v.value),
+          desc: v.inserted_at
+        ],
+        limit: 10
+
+    case period do
+      :all ->
+        query
+
+      :month ->
+        from v in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", v.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", v.inserted_at, ^month)
+
+      :year ->
+        from v in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", v.inserted_at, ^year)
+    end
+    |> Repo.all()
+  end
+
+  @doc """
+  Get top playlist tracks voted by a viewer during a time period, sorted by vote score descending.
+  """
+  @spec get_top_playlist_tracks_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_top_playlist_tracks_by_period(%User{twitch: %{user_id: user_id}}, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: p in Playlist,
+        on: s.playlist_id == p.id,
+        join: pt in PlaylistTrack,
+        on: pt.playlist_id == p.id and pt.id == v.track_id,
+        where: v.viewer_id == ^user_id,
+        where: fragment("? ~ '^[0-9]+$'", v.value),
+        select: %{
+          track: %PlaylistTrack{
+            id: pt.id,
+            name: pt.name,
+            artist: pt.artist,
+            duration_ms: pt.duration_ms,
+            playlist_id: pt.playlist_id,
+            playlist: %Playlist{
+              id: p.id,
+              title: p.title,
+              owner_name: p.owner_name,
+              cover_url: p.cover_url
+            }
+          },
+          score: v.value,
+          voted_at: v.inserted_at
+        },
+        order_by: [
+          desc: fragment("CAST(? AS DECIMAL)", v.value),
+          desc: v.inserted_at
+        ],
+        limit: 10
+
+    case period do
+      :all ->
+        query
+
+      :month ->
+        from v in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", v.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", v.inserted_at, ^month)
+
+      :year ->
+        from v in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", v.inserted_at, ^year)
     end
     |> Repo.all()
   end

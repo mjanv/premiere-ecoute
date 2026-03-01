@@ -51,11 +51,38 @@
               </button>
             </div>
           </div>
+          
+<!-- Source Toggle -->
+          <div class="ml-4 flex items-center">
+            <div class="bg-gray-800 rounded-lg p-1 flex">
+              <button
+                phx-click={if @selected_source != :album, do: "change_source"}
+                phx-value-source="album"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :album, do: "bg-purple-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Albums")}
+              </button>
+              <button
+                phx-click={if @selected_source != :track, do: "change_source"}
+                phx-value-source="track"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :track, do: "bg-cyan-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Tracks")}
+              </button>
+              <button
+                phx-click={if @selected_source != :playlist, do: "change_source"}
+                phx-value-source="playlist"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :playlist, do: "bg-emerald-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Playlists")}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     
-<!-- Album Cover Wall with Votes -->
+<!-- Cover Wall with Votes -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
       <.async_result :let={votes_data} assign={@votes_data}>
         <:loading>
@@ -75,7 +102,7 @@
           </div>
         </:failed>
 
-        <%= if Enum.empty?(votes_data) do %>
+        <%= if Enum.empty?(votes_data.items) do %>
           <div class="p-8 text-center">
             <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
@@ -84,32 +111,87 @@
             <p class="text-gray-400">{gettext("No votes cast during this period")}</p>
           </div>
         <% else %>
-          <!-- Display votes with clickable album covers showing voter score -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <%= for vote_data <- votes_data do %>
-              <div
-                class="group cursor-pointer transform transition-all duration-200 hover:scale-105"
-                phx-click="show_album_details"
-                phx-value-album_id={vote_data.album.id}
-              >
-                <!-- Album Cover with Voter Score Overlay -->
-                <div class="relative">
-                  <img
-                    src={vote_data.album.cover_url}
-                    alt={gettext("Album cover")}
-                    class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
-                  />
-                  <!-- Centered Large Voter Score -->
-                  <div class="absolute inset-0 flex items-center justify-center p-2">
-                    <div
-                      class="text-white group-hover:text-white/80 font-bold transition-all duration-200 text-center leading-none drop-shadow-2xl max-w-full overflow-hidden"
-                      style="font-size: clamp(2rem, 15vw, 6rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
-                    >
-                      {vote_data.score}
+            <%= case votes_data.source do %>
+              <% :album -> %>
+                <%= for vote_data <- votes_data.items do %>
+                  <div
+                    class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
+                    phx-click="show_album_details"
+                    phx-value-album_id={vote_data.album.id}
+                  >
+                    <img
+                      src={vote_data.album.cover_url}
+                      alt={gettext("Album cover")}
+                      class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    <div class="absolute inset-0 flex flex-col justify-between p-3">
+                      <div class="flex justify-end">
+                        <div
+                          class="text-white font-bold drop-shadow-2xl leading-none"
+                          style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
+                        >
+                          {vote_data.score}
+                        </div>
+                      </div>
+                      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p class="text-white font-semibold truncate drop-shadow">{vote_data.album.name}</p>
+                        <p class="text-purple-300 text-sm truncate">{vote_data.album.artist}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                <% end %>
+              <% :track -> %>
+                <%= for vote_data <- votes_data.items do %>
+                  <div class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105">
+                    <img
+                      src={vote_data.single.cover_url}
+                      alt={gettext("Track cover")}
+                      class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    <div class="absolute inset-0 flex flex-col justify-between p-3">
+                      <div class="flex justify-end">
+                        <div
+                          class="text-white font-bold drop-shadow-2xl leading-none"
+                          style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
+                        >
+                          {vote_data.score}
+                        </div>
+                      </div>
+                      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p class="text-white font-semibold truncate drop-shadow">{vote_data.single.name}</p>
+                        <p class="text-cyan-300 text-sm truncate">{vote_data.single.artist}</p>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              <% :playlist -> %>
+                <%= for vote_data <- votes_data.items do %>
+                  <div class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105">
+                    <img
+                      src={vote_data.playlist.cover_url}
+                      alt={gettext("Playlist cover")}
+                      class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    <div class="absolute inset-0 flex flex-col justify-between p-3">
+                      <div class="flex justify-end">
+                        <div
+                          class="text-white font-bold drop-shadow-2xl leading-none"
+                          style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
+                        >
+                          {vote_data.score}
+                        </div>
+                      </div>
+                      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p class="text-white font-semibold truncate drop-shadow">{vote_data.playlist.title}</p>
+                        <p class="text-emerald-300 text-sm truncate">{vote_data.playlist.owner_name}</p>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
             <% end %>
           </div>
         <% end %>

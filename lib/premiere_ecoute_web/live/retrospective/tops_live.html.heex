@@ -72,6 +72,33 @@
               </button>
             </div>
           </div>
+          
+<!-- Source Toggle -->
+          <div class="ml-4 flex items-center">
+            <div class="bg-gray-800 rounded-lg p-1 flex">
+              <button
+                phx-click={if @selected_source != :album, do: "change_source"}
+                phx-value-source="album"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :album, do: "bg-purple-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Albums")}
+              </button>
+              <button
+                phx-click={if @selected_source != :track, do: "change_source"}
+                phx-value-source="track"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :track, do: "bg-cyan-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Tracks")}
+              </button>
+              <button
+                phx-click={if @selected_source != :playlist, do: "change_source"}
+                phx-value-source="playlist"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :playlist, do: "bg-emerald-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Playlists")}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -94,7 +121,7 @@
           </div>
         </:failed>
 
-        <%= if Enum.empty?(tops_data) do %>
+        <%= if Enum.empty?(tops_data.items) do %>
           <div class="p-8 text-center">
             <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
@@ -104,40 +131,57 @@
           </div>
         <% else %>
           <div class="space-y-6">
-            <%= for {group, offset} <- tops_data |> Enum.chunk_by(& &1.score) |> Enum.map_reduce(1, fn g, acc -> {{g, acc}, acc + length(g)} end) |> elem(0) do %>
+            <%= for {group, offset} <- tops_data.items |> Enum.chunk_by(& &1.score) |> Enum.map_reduce(1, fn g, acc -> {{g, acc}, acc + length(g)} end) |> elem(0) do %>
               <ul class="space-y-2">
                 <%= for {entry, rank} <- Enum.with_index(group, offset) do %>
+                  <% {cover_url, cover_alt, label_line1, label_line2, accent_class} =
+                    case tops_data.source do
+                      :album ->
+                        {entry.track.album.cover_url, entry.track.album.name, entry.track.name,
+                         "#{entry.track.album.artist} \u2014 #{entry.track.album.name}", "text-purple-300"}
+
+                      :track ->
+                        {entry.single.cover_url, entry.single.name, entry.single.name, entry.single.artist, "text-blue-300"}
+
+                      :playlist ->
+                        {entry.track.playlist.cover_url, entry.track.playlist.title, entry.track.name,
+                         "#{entry.track.artist} \u2014 #{entry.track.playlist.title}", "text-emerald-300"}
+                    end
+
+                  score_class =
+                    case tops_data.source do
+                      :album -> "bg-purple-600"
+                      :track -> "bg-blue-600"
+                      :playlist -> "bg-emerald-600"
+                    end %>
                   <li class="relative flex items-center justify-between overflow-hidden rounded-lg border border-gray-800 hover:border-gray-700 transition-colors">
-                    <!-- Album cover as blurred background -->
                     <div
                       class="absolute inset-0 scale-150 bg-center bg-cover blur-md brightness-[0.25]"
-                      style={"background-image: url('#{entry.track.album.cover_url}');"}
+                      style={"background-image: url('#{cover_url}');"}
                     >
                     </div>
-                    <!-- Rank + Track Info -->
                     <div class="relative flex items-center space-x-4 min-w-0">
                       <img
-                        src={entry.track.album.cover_url}
-                        alt={entry.track.album.name}
+                        src={cover_url}
+                        alt={cover_alt}
                         class="w-20 h-20 shrink-0 object-cover"
                       />
                       <span class="text-gray-400 font-mono text-base w-10 shrink-0 text-right">
                         {rank}
                       </span>
                       <div class="min-w-0">
-                        <p class="text-white font-semibold text-lg truncate">{entry.track.name}</p>
-                        <p class="text-purple-300 text-base truncate">
-                          {entry.track.album.artist} &mdash; {entry.track.album.name}
+                        <p class="text-white font-semibold text-lg truncate">{label_line1}</p>
+                        <p class={"text-base truncate #{accent_class}"}>
+                          {label_line2}
                         </p>
                       </div>
                     </div>
-                    
-<!-- Score + Date -->
+                    <!-- Score + Date -->
                     <div class="relative flex items-center space-x-6 shrink-0 ml-4 pr-5">
                       <span class="text-gray-400 text-base">
                         {Calendar.strftime(entry.voted_at, "%b %d, %Y")}
                       </span>
-                      <div class="bg-purple-600 text-white font-bold rounded-full w-12 h-12 flex items-center justify-center text-base">
+                      <div class={"#{score_class} text-white font-bold rounded-full w-12 h-12 flex items-center justify-center text-base"}>
                         {entry.score}
                       </div>
                     </div>
