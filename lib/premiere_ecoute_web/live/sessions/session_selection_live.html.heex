@@ -460,7 +460,7 @@
               id="track-search-container"
               data-event="clear_search_results"
             >
-              <div class="flex items-center gap-2">
+              <div class="flex items-end gap-2">
                 <.form
                   for={@search_form}
                   id="track-search-form"
@@ -477,21 +477,23 @@
                     error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
                   />
                 </.form>
-                <button
-                  type="button"
-                  phx-click="fetch_currently_playing"
-                  class="flex-shrink-0 flex items-center space-x-2 px-3 py-3 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/50 text-cyan-300 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
-                  title={gettext("Use currently playing")}
-                >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  <span class="hidden sm:inline">{gettext("Currently playing")}</span>
-                </button>
+                <div class="fieldset mb-2">
+                  <button
+                    type="button"
+                    phx-click="fetch_currently_playing"
+                    class="flex-shrink-0 flex items-center space-x-2 px-3 py-3 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/50 text-cyan-300 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                    title={gettext("Use currently playing")}
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span class="hidden sm:inline">{gettext("Currently playing")}</span>
+                  </button>
+                </div>
               </div>
 
               <%= if @search_tracks.loading do %>
