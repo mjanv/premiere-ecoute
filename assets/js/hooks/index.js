@@ -9,6 +9,7 @@ import { AutoDismissFlash } from "./auto_dismiss_flash";
 import { NextTrackTimer } from "./next_track_timer";
 import { VisibilityDropdown } from "./visibility_dropdown";
 import { SidebarCollapse } from "./sidebar_collapse";
+import { AriadneThread } from "./ariadne_thread";
 import VegaLite from "./vegalite";
 
 export const Hooks = {
@@ -23,5 +24,6 @@ export const Hooks = {
   NextTrackTimer: NextTrackTimer,
   VisibilityDropdown: VisibilityDropdown,
   SidebarCollapse: SidebarCollapse,
+  AriadneThread: AriadneThread,
   VegaLite: VegaLite
 };
