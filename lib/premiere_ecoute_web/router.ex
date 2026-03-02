@@ -170,7 +170,12 @@ defmodule PremiereEcouteWeb.Router do
     live_session :sessions, on_mount: [{UserAuth, :streamer}] do
       live "/", SessionsLive, :index
       live "/new", SessionSelectionLive, :index
+      live "/pick/albums", AlbumPickAdminLive, :index
       live "/:id", SessionLive, :show
+    end
+
+    live_session :public_album_pool, on_mount: [{UserAuth, :current_scope}] do
+      live "/pick/:user_id/submit", AlbumPickSubmissionLive, :new
     end
   end
 

@@ -1,0 +1,115 @@
+defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
+  @moduledoc """
+  Streamer administration page for the random album pick pool.
+
+  Lists all albums in the streamer's pick pool, allows adding new albums via
+  Spotify search, and supports removal of individual entries.
+  """
+
+  use PremiereEcouteWeb, :live_view
+
+  alias Phoenix.LiveView.AsyncResult
+  alias PremiereEcoute.Sessions.AlbumPicks
+
+  @impl true
+  def mount(_params, _session, socket) do
+    user_id = socket.assigns.current_scope.user.id
+
+    socket
+    |> stream(:picks, AlbumPicks.list_for_user(user_id))
+    |> assign(:picks_count, AlbumPicks.count_for_user(user_id))
+    |> assign(:viewer_submit_url, url(~p"/sessions/pick/#{user_id}/submit"))
+    |> assign(:search_form, to_form(%{"query" => ""}))
+    |> assign(:search_albums, AsyncResult.ok([]))
+    |> then(fn socket -> {:ok, socket} end)
+  end
+
+  @impl true
+  def handle_event("search_albums", %{"query" => query}, socket) when byte_size(query) > 2 do
+    socket
+    |> assign(:search_albums, AsyncResult.loading())
+    |> start_async(:search, fn -> PremiereEcoute.Apis.spotify().search_albums(query) end)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("search_albums", _params, socket) do
+    socket
+    |> assign(:search_albums, AsyncResult.ok([]))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("add_album", %{"album_id" => album_id}, socket) do
+    user_id = socket.assigns.current_scope.user.id
+
+    album =
+      case socket.assigns.search_albums do
+        %{result: albums} when is_list(albums) -> Enum.find(albums, &(&1.album_id == album_id))
+        _ -> nil
+      end
+
+    case album do
+      nil ->
+        {:noreply, put_flash(socket, :error, gettext("Album not found in search results"))}
+
+      album ->
+        attrs = %{
+          album_id: album.album_id,
+          name: album.name,
+          artist: album.artist,
+          cover_url: album.cover_url
+        }
+
+        case AlbumPicks.add_entry(user_id, attrs) do
+          {:ok, pick} ->
+            socket
+            |> stream_insert(:picks, pick, at: 0)
+            |> assign(:picks_count, socket.assigns.picks_count + 1)
+            |> assign(:search_albums, AsyncResult.ok([]))
+            |> assign(:search_form, to_form(%{"query" => ""}))
+            |> put_flash(:info, gettext("Album added to pool"))
+            |> then(fn socket -> {:noreply, socket} end)
+
+          {:error, _} ->
+            {:noreply, put_flash(socket, :error, gettext("Could not add album to pool"))}
+        end
+    end
+  end
+
+  def handle_event("remove_album", %{"pick_id" => pick_id_str}, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    {pick_id, ""} = Integer.parse(pick_id_str)
+
+    case AlbumPicks.remove_entry(user_id, pick_id) do
+      {:ok, pick} ->
+        socket
+        |> stream_delete(:picks, pick)
+        |> assign(:picks_count, socket.assigns.picks_count - 1)
+        |> put_flash(:info, gettext("Album removed from pool"))
+        |> then(fn socket -> {:noreply, socket} end)
+
+      {:error, :not_found} ->
+        {:noreply, put_flash(socket, :error, gettext("Album not found"))}
+    end
+  end
+
+  @impl true
+  def handle_async(:search, {:ok, {:ok, albums}}, socket) do
+    socket
+    |> assign(:search_albums, AsyncResult.ok(albums))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:search, {:ok, {:error, reason}}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:search_albums, AsyncResult.failed(assigns.search_albums, {:error, reason}))
+    |> put_flash(:error, gettext("Search failed. Please try again."))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:search, {:exit, reason}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:search_albums, AsyncResult.failed(assigns.search_albums, {:error, reason}))
+    |> put_flash(:error, gettext("Search failed. Please try again."))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+end

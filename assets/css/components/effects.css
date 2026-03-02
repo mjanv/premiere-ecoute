@@ -27,3 +27,10 @@
 /* Hover states for interactive elements */
 .hover-surface:hover { background-color: var(--color-dark-700); }
 .hover-surface-elevated:hover { background-color: var(--color-dark-700); }
+
+/* AIDEV-NOTE: spin-highlight animation for random album pick wheel tiles */
+@keyframes spin-highlight {
+  0%   { background-color: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.05); }
+  50%  { background-color: rgba(147, 51, 234, 0.35);  border-color: rgba(147, 51, 234, 0.6); }
+  100% { background-color: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.05); }
+}

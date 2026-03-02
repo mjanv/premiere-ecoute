@@ -1,0 +1,202 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="my_sessions"
+>
+  <div class="synthwave-bg min-h-screen text-white">
+    <div class="flex-1 py-12">
+      <div class="max-w-4xl mx-auto px-6">
+        <.page_header
+          title={gettext("Album Pick Pool")}
+          subtitle={"#{@picks_count} #{gettext("albums in pool")}"}
+        >
+          <:action>
+            <.link
+              navigate={~p"/sessions/new"}
+              class="px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:border-gray-400 transition-colors"
+            >
+              {gettext("Back to new session")}
+            </.link>
+          </:action>
+        </.page_header>
+        
+<!-- Add album via search -->
+        <div
+          class="rounded-lg p-6 mb-6 border border-gray-700 backdrop-blur-sm overflow-visible"
+          style="background-color: rgba(255,255,255,0.03); position: relative; z-index: 10;"
+        >
+          <h2 class="text-base font-semibold text-white mb-4">{gettext("Add a streamer album")}</h2>
+          <div
+            class="relative"
+            phx-hook="ClickOutside"
+            id="search-container"
+            data-event="search_albums"
+          >
+            <.form for={@search_form} id="album-search-form" phx-change="search_albums" phx-submit="search_albums">
+              <.input
+                field={@search_form[:query]}
+                type="text"
+                placeholder={gettext("Search Spotify albums...")}
+                class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                error_class="border-red-400 focus:border-red-500"
+              />
+            </.form>
+
+            <%= if @search_albums.loading do %>
+              <div
+                class="absolute top-full left-0 right-0 z-50 mt-2 rounded-lg shadow-lg border border-gray-700 p-4"
+                style="background-color: var(--color-dark-800);"
+              >
+                <div class="flex items-center justify-center space-x-3">
+                  <div class="animate-spin rounded-full h-5 w-5 border-2 border-purple-400 border-t-transparent"></div>
+                  <span class="text-gray-300 text-sm">{gettext("Searching albums...")}</span>
+                </div>
+              </div>
+            <% end %>
+
+            <%= if @search_albums.ok? && length(@search_albums.result) > 0 do %>
+              <div
+                class="absolute top-full left-0 right-0 z-50 mt-2 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto"
+                style="background-color: var(--color-dark-800);"
+              >
+                <%= for album <- @search_albums.result do %>
+                  <div class="flex items-center justify-between p-3 hover:bg-white/5 transition-colors first:rounded-t-lg last:rounded-b-lg">
+                    <.album_display album={album} size="sm" show_metadata={true} class="flex-1 min-w-0 mr-3" />
+                    <button
+                      type="button"
+                      phx-click="add_album"
+                      phx-value-album_id={album.album_id}
+                      class="flex-shrink-0 flex items-center space-x-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-md text-xs font-medium transition-colors"
+                    >
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fill-rule="evenodd"
+                          d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      <span>{gettext("Add")}</span>
+                    </button>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Viewer submission link -->
+        <div class="rounded-lg p-6 mb-6 border border-gray-700 backdrop-blur-sm" style="background-color: rgba(255,255,255,0.03);">
+          <h2 class="text-base font-semibold text-white mb-1">{gettext("Viewer submission link")}</h2>
+          <p class="text-gray-400 text-sm mb-3">{gettext("Share this link so viewers can submit albums to your pool.")}</p>
+          <div class="flex items-center gap-2">
+            <code
+              id="viewer-submit-url"
+              class="flex-1 rounded-lg px-4 py-2 text-sm text-purple-300 font-mono truncate border border-gray-700"
+              style="background-color: var(--color-dark-800);"
+            >
+              {@viewer_submit_url}
+            </code>
+            <button
+              type="button"
+              onclick={"navigator.clipboard.writeText('#{@viewer_submit_url}')"}
+              class="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 border border-gray-600 rounded-lg text-sm text-gray-300 hover:text-white hover:border-gray-400 transition-colors"
+              title={gettext("Copy to clipboard")}
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              {gettext("Copy")}
+            </button>
+          </div>
+        </div>
+        
+<!-- Pool list -->
+        <%= if @picks_count == 0 do %>
+          <div
+            class="rounded-lg p-12 text-center border border-gray-700 backdrop-blur-sm"
+            style="background-color: rgba(255,255,255,0.03);"
+          >
+            <div class="text-4xl mb-3">🎲</div>
+            <p class="text-white font-medium">{gettext("No albums in the pool yet")}</p>
+            <p class="text-gray-400 text-sm mt-1">{gettext("Search for albums above to add them.")}</p>
+          </div>
+        <% end %>
+        <div id="picks" phx-update="stream" class="space-y-3">
+          <div
+            :for={{dom_id, pick} <- @streams.picks}
+            id={dom_id}
+            class="rounded-lg p-4 border border-gray-700 hover:border-purple-500/50 backdrop-blur-sm transition-colors"
+            style="background-color: rgba(255,255,255,0.03);"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4 min-w-0">
+                <%= if pick.cover_url do %>
+                  <img src={pick.cover_url} alt={pick.name} class="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                <% else %>
+                  <div class="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                    </svg>
+                  </div>
+                <% end %>
+                <div class="min-w-0">
+                  <p class="font-semibold text-white truncate">{pick.name}</p>
+                  <p class="text-gray-400 text-sm truncate">{pick.artist}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-3 ml-4 flex-shrink-0">
+                <%= if pick.source == :viewer do %>
+                  <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium border bg-purple-600/20 text-purple-400 border-purple-500/30">
+                    {gettext("viewer")}
+                    <%= if pick.submitter && pick.submitter != "" do %>
+                      · {pick.submitter}
+                    <% end %>
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium border bg-green-600/20 text-green-400 border-green-500/30">
+                    {gettext("streamer")}
+                  </span>
+                <% end %>
+
+                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-600/20 text-gray-400 border border-gray-500/30">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  {Calendar.strftime(pick.inserted_at, "%b %d, %Y")}
+                </span>
+
+                <button
+                  type="button"
+                  phx-click="remove_album"
+                  phx-value-pick_id={pick.id}
+                  class="p-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 hover:text-red-300 rounded-lg transition-colors"
+                  title={gettext("Remove from pool")}
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

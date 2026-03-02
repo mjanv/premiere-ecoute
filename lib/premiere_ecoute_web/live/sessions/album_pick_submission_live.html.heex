@@ -1,0 +1,90 @@
+<div class="min-h-screen text-white font-mono relative overflow-hidden synthwave-bg">
+  <div class="text-white flex flex-col min-h-screen relative z-10">
+    <div class="flex-1 py-12">
+      <div class="max-w-2xl mx-auto px-6">
+        <!-- Header -->
+        <div class="mb-12 text-center">
+          <h1 class="text-4xl md:text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 synthwave-title mb-3">
+            {gettext("Submit an Album")}
+          </h1>
+          <p class="text-slate-300/90 text-xl leading-relaxed max-w-2xl mx-auto">
+            {gettext("for")} <span class="text-purple-400">{@streamer.username}</span>
+          </p>
+          <p class="text-slate-400 text-sm mt-2">
+            {gettext("Suggest an album for the random pick pool!")}
+          </p>
+        </div>
+        
+<!-- Success message -->
+        <%= if @success_message do %>
+          <div class="mb-8 bg-gradient-to-br from-green-50/6 to-green-100/3 border border-green-500/30 rounded-2xl shadow-xl backdrop-blur-sm p-6">
+            <div class="flex items-center space-x-4">
+              <div class="flex-shrink-0">
+                <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold text-white mb-1">{gettext("Album Submitted!")}</h3>
+                <p class="text-green-300">{@success_message}</p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+<!-- Submission form -->
+        <div class="bg-gradient-to-br from-white/4 to-white/2 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm p-8">
+          <form phx-change="validate" phx-submit="submit">
+            <!-- Pseudo -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-300 mb-2">
+                {gettext("Your name")} <span class="text-slate-500">{gettext("(optional)")}</span>
+              </label>
+              <input
+                type="text"
+                name="pseudo"
+                value={@pseudo}
+                placeholder={gettext("Your nickname...")}
+                maxlength="50"
+                class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 outline-none transition-colors"
+              />
+            </div>
+            
+<!-- Album URL -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-300 mb-2">
+                {gettext("Spotify album URL")}
+              </label>
+              <input
+                type="text"
+                name="url"
+                value={@url}
+                placeholder="https://open.spotify.com/album/..."
+                class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 outline-none transition-colors"
+              />
+              <p class="text-slate-500 text-xs mt-2">
+                {gettext("Open an album in Spotify, click Share → Copy link.")}
+              </p>
+            </div>
+            
+<!-- Error -->
+            <%= if @error_message do %>
+              <div class="mb-4 p-3 bg-red-900/30 border border-red-500/40 rounded-lg text-red-300 text-sm">
+                {@error_message}
+              </div>
+            <% end %>
+
+            <button
+              type="submit"
+              class="w-full py-3 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-200 shadow-lg"
+            >
+              {gettext("Submit album")}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
