@@ -40,6 +40,7 @@ defmodule PremiereEcoute.Accounts do
 
   ## User Profile
   defdelegate profile(user, path, default \\ nil), to: Profile, as: :get
+  defdelegate edit_user_profile(user, attrs), to: User
 
   ## User Token
   defdelegate generate_user_api_token(user), to: Token

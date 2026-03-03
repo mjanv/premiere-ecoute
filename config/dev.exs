@@ -1,5 +1,7 @@
 import Config
 
+config :open_api_spex, :cache_adapter, OpenApiSpex.Plug.NoneCache
+
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [
     api: PremiereEcoute.Apis.Streaming.TwitchApi,

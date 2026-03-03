@@ -80,6 +80,7 @@ defmodule PremiereEcoute.MixProject do
       {:dns_cluster, "~> 0.2"},
       {:plug_content_security_policy, "~> 0.2.1"},
       {:cors_plug, "~> 3.0"},
+      {:open_api_spex, "~> 3.21"},
       {:fun_with_flags, "~> 1.13"},
       {:fun_with_flags_ui, "~> 1.1"},
       {:vega_lite, "~> 0.1"},
