@@ -347,22 +347,27 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
+  defp get_session_tracks(%{source: :free, track_markers: markers}) when is_list(markers), do: markers
   defp get_session_tracks(%{album: %{tracks: tracks}}) when is_list(tracks), do: tracks
   defp get_session_tracks(%{playlist: %{tracks: tracks}}) when is_list(tracks), do: tracks
   defp get_session_tracks(_), do: []
 
+  defp get_track_id(%{track_id: track_id}, %{source: :free}) when not is_nil(track_id), do: track_id
   defp get_track_id(%{id: id}, %{source: :album}), do: id
   defp get_track_id(%{id: id}, %{source: :playlist}), do: id
   defp get_track_id(track, _), do: Map.get(track, :id) || Map.get(track, :track_id)
 
-  defp get_track_name(%{name: name}), do: name
+  defp get_track_name(%{track_name: name}) when not is_nil(name), do: name
+  defp get_track_name(%{name: name}) when not is_nil(name), do: name
   defp get_track_name(track), do: Map.get(track, :name, "Unknown Track")
 
+  defp get_session_title(%{source: :free, name: name}) when not is_nil(name), do: name
   defp get_session_title(%{album: %{name: name}}) when not is_nil(name), do: name
   defp get_session_title(%{playlist: %{title: title}}) when not is_nil(title), do: title
   defp get_session_title(%{single: %{name: name}}) when not is_nil(name), do: name
   defp get_session_title(_), do: "Unknown"
 
+  defp get_session_artist(%{source: :free}), do: ""
   defp get_session_artist(%{album: %{artist: artist}}) when not is_nil(artist), do: artist
   defp get_session_artist(%{playlist: %{owner_name: owner_name}}) when not is_nil(owner_name), do: "by #{owner_name}"
   defp get_session_artist(%{single: %{artist: artist}}) when not is_nil(artist), do: artist

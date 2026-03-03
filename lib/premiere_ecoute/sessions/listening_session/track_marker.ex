@@ -18,6 +18,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
           id: integer() | nil,
           track_id: integer(),
           track_number: integer(),
+          track_name: String.t() | nil,
           started_at: DateTime.t(),
           listening_session_id: integer()
         }
@@ -26,6 +27,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
   schema "track_markers" do
     field :track_id, :integer
     field :track_number, :integer
+    # AIDEV-NOTE: track_name populated only for :free sessions (no FK to named track table)
+    field :track_name, :string
     field :started_at, :utc_datetime
 
     belongs_to :listening_session, ListeningSession
@@ -35,7 +38,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(marker, attrs) do
     marker
-    |> cast(attrs, [:track_id, :track_number, :started_at, :listening_session_id])
+    |> cast(attrs, [:track_id, :track_number, :track_name, :started_at, :listening_session_id])
     |> validate_required([:track_id, :track_number, :started_at, :listening_session_id])
   end
 
@@ -80,6 +83,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
 
   defp get_track_name(%ListeningSession{source: :playlist, playlist: playlist}, marker) do
     Enum.find(playlist.tracks, %{name: ""}, &(&1.id == marker.track_id)).name
+  end
+
+  # AIDEV-NOTE: :free sessions store track_name directly on the marker (no FK to album/playlist tracks)
+  defp get_track_name(%ListeningSession{source: :free}, marker) do
+    marker.track_name || ""
   end
 
   defp format_timestamp(total_seconds) do

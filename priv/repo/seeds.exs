@@ -9,7 +9,10 @@ end
 # Feature flags
 PremiereEcouteCore.FeatureFlag.enable(:billboards)
 PremiereEcouteCore.FeatureFlag.enable(:listening_sessions)
+PremiereEcouteCore.FeatureFlag.enable(:listening_session_album)
 PremiereEcouteCore.FeatureFlag.enable(:listening_session_playlist)
+PremiereEcouteCore.FeatureFlag.enable(:listening_session_single)
+PremiereEcouteCore.FeatureFlag.enable(:listening_session_free)
 PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
 PremiereEcouteCore.FeatureFlag.enable(:playlists)
 PremiereEcouteCore.FeatureFlag.enable(:playlist_workflows)

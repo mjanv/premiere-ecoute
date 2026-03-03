@@ -158,6 +158,38 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     """
   end
 
+  def source_details(%{listening_session: %{source: :free, name: name}} = assigns) do
+    assigns = assign(assigns, :session_name, name || "Free session")
+
+    ~H"""
+    <div class="flex items-center justify-end space-x-4">
+      <div class="text-right">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="text-purple-200 block">{gettext("Mode")}</span>
+            <span class="font-medium text-white">{gettext("Free")}</span>
+          </div>
+          <div>
+            <span class="text-purple-200 block">{gettext("Session")}</span>
+            <span class="font-medium text-white">{@session_name}</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex-shrink-0">
+        <div class="w-32 h-32 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-center">
+          <svg class="w-12 h-12 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
   attr :report, :any, required: true
   attr :key, :string, required: true
   attr :legend, :string, required: true
@@ -449,14 +481,23 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     do: for(rating <- session.vote_options, do: {rating, 0})
 
   def track_vote_distribution(track_id, report, session) do
-    distribution =
+    individual =
       report.votes
       |> Enum.filter(&(&1.track_id == track_id))
       |> Enum.group_by(& &1.value)
       |> Map.new(fn {value, votes} -> {value, length(votes)} end)
 
+    poll =
+      report.polls
+      |> Enum.filter(&(&1.track_id == track_id))
+      |> Enum.reduce(%{}, fn p, acc ->
+        Enum.reduce(p.votes, acc, fn {rating, count}, inner ->
+          Map.update(inner, rating, count, &(&1 + count))
+        end)
+      end)
+
     for rating <- session.vote_options do
-      {rating, Map.get(distribution, rating, 0)}
+      {rating, Map.get(individual, rating, 0) + Map.get(poll, rating, 0)}
     end
   end
 

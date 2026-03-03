@@ -16,6 +16,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.CaptureCurrentTrackListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.CloseVoteWindowListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.OpenVoteWindowListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
@@ -27,6 +30,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
+  alias PremiereEcoute.Sessions.ListeningSession.Events.TrackCaptured
+  alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowClosed
+  alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowOpened
   alias PremiereEcoute.Sessions.Retrospective.Report
 
   command(PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession)
@@ -34,6 +40,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession)
   command(PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession)
+  command(PremiereEcoute.Sessions.ListeningSession.Commands.CaptureCurrentTrackListeningSession)
+  command(PremiereEcoute.Sessions.ListeningSession.Commands.OpenVoteWindowListeningSession)
+  command(PremiereEcoute.Sessions.ListeningSession.Commands.CloseVoteWindowListeningSession)
 
   @doc false
   def handle(%PrepareListeningSession{source: :album, user_id: user_id, album_id: album_id, vote_options: vote_options}) do
@@ -299,6 +308,143 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
+  def handle(%PrepareListeningSession{
+        source: :free,
+        user_id: user_id,
+        name: name,
+        vote_options: vote_options,
+        vote_mode: vote_mode
+      }) do
+    resolved_options = vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+
+    case ListeningSession.create(%{
+           user_id: user_id,
+           source: :free,
+           name: name || "Free session",
+           vote_mode: vote_mode || :chat,
+           vote_options: resolved_options
+         }) do
+      {:ok, session} ->
+        {:ok, session,
+         [
+           %SessionPrepared{
+             source: :free,
+             session_id: session.id,
+             user_id: session.user_id
+           }
+         ]}
+
+      {:error, reason} ->
+        Logger.error("Cannot prepare free listening session due to: #{inspect(reason)}")
+        {:error, [%SessionNotPrepared{user_id: user_id}]}
+    end
+  end
+
+  def handle(%StartListeningSession{source: :free, session_id: session_id, scope: scope}) do
+    with {:ok, devices} <- Apis.spotify().devices(scope),
+         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+         {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
+         session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         {:ok, session} <- ListeningSession.start(session) do
+      {:ok, session, [%SessionStarted{source: :free, session_id: session.id, user_id: scope.user.id}]}
+    else
+      false ->
+        {:error, "No Spotify active device detected"}
+
+      {:error, :active_session_exists} ->
+        {:error, "You already have an active listening session"}
+
+      reason ->
+        Logger.error("Cannot start free listening session due to: #{inspect(reason)}")
+        {:error, []}
+    end
+  end
+
+  # AIDEV-NOTE: captures currently playing Spotify track into free session; returns error if nothing playing
+  def handle(%CaptureCurrentTrackListeningSession{session_id: session_id, scope: scope}) do
+    with {:ok, %{"item" => item, "is_playing" => true}} <- Apis.spotify().get_playback_state(scope, %{}),
+         {:ok, single} <- Apis.spotify().get_single(item["id"]),
+         {:ok, single} <- Single.create_if_not_exists(single),
+         session <- ListeningSession.get(session_id),
+         {:ok, session} <- set_single_id(session, single.id) do
+      {:ok, session,
+       [
+         %TrackCaptured{
+           session_id: session.id,
+           user_id: scope.user.id,
+           single_id: single.id,
+           track_name: single.name,
+           artist: single.artist
+         }
+       ]}
+    else
+      {:ok, _no_playback} ->
+        {:error, :no_active_playback}
+
+      {:error, reason} ->
+        Logger.error("Cannot capture track due to: #{inspect(reason)}")
+        {:error, reason}
+    end
+  end
+
+  def handle(%OpenVoteWindowListeningSession{session_id: session_id, scope: scope}) do
+    session = ListeningSession.get(session_id)
+
+    cond do
+      session.status != :active ->
+        {:error, :session_not_active}
+
+      is_nil(session.single_id) ->
+        {:error, :no_captured_track}
+
+      true ->
+        {:ok, session,
+         [
+           %VoteWindowOpened{
+             session_id: session.id,
+             user_id: scope.user.id,
+             track_id: session.single_id,
+             vote_mode: session.vote_mode
+           }
+         ]}
+    end
+  end
+
+  def handle(%CloseVoteWindowListeningSession{session_id: session_id, scope: scope}) do
+    session = ListeningSession.get(session_id)
+
+    {:ok, session,
+     [
+       %VoteWindowClosed{
+         session_id: session.id,
+         user_id: scope.user.id,
+         vote_mode: session.vote_mode
+       }
+     ]}
+  end
+
+  def handle(%StopListeningSession{source: :free, session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
+         message <-
+           PremiereEcoute.Gettext.t(scope, fn ->
+             gettext("The free session %{name} is over", name: session.name || "Free session")
+           end),
+         :ok <- Apis.twitch().send_chat_message(scope, message),
+         {:ok, session} <- ListeningSession.stop(session) do
+      {:ok, devices} = Apis.spotify().devices(scope)
+      is_active = Enum.any?(devices, fn device -> device["is_active"] end)
+      if is_active, do: Apis.spotify().pause_playback(scope)
+      {:ok, session, [%SessionStopped{session_id: session.id, user_id: scope.user.id}]}
+    else
+      reason ->
+        Logger.error("Cannot stop free listening session due to: #{inspect(reason)}")
+        {:error, []}
+    end
+  end
+
   # AIDEV-NOTE: creates playlist with all tracks from Spotify to freeze the session's track list at preparation time
   defp get_or_create_playlist(playlist) do
     case Playlist.get_by(playlist_id: playlist.playlist_id, provider: playlist.provider) do
@@ -309,4 +455,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   defp maybe_start_playback(true, _scope, _single), do: {:ok, :resumed}
   defp maybe_start_playback(false, scope, single), do: Apis.spotify().start_resume_playback(scope, single)
+
+  defp set_single_id(session, single_id) do
+    session
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_change(:single_id, single_id)
+    |> PremiereEcoute.Repo.update()
+    |> case do
+      {:ok, s} -> {:ok, ListeningSession.get(s.id)}
+      err -> err
+    end
+  end
 end

@@ -69,4 +69,49 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
 
     @type t :: %__MODULE__{session_id: String.t(), user_id: integer()}
   end
+
+  defmodule TrackCaptured do
+    @moduledoc """
+    Event - A track was captured from Spotify playback into a free session.
+    """
+
+    defstruct [:session_id, :user_id, :single_id, :track_name, :artist]
+
+    @type t :: %__MODULE__{
+            session_id: integer(),
+            user_id: integer(),
+            single_id: integer(),
+            track_name: String.t(),
+            artist: String.t()
+          }
+  end
+
+  defmodule VoteWindowOpened do
+    @moduledoc """
+    Event - Vote window opened for the current track in a free session.
+    """
+
+    defstruct [:session_id, :user_id, :track_id, :vote_mode]
+
+    @type t :: %__MODULE__{
+            session_id: integer(),
+            user_id: integer(),
+            track_id: integer(),
+            vote_mode: :chat | :poll
+          }
+  end
+
+  defmodule VoteWindowClosed do
+    @moduledoc """
+    Event - Vote window closed in a free session.
+    """
+
+    defstruct [:session_id, :user_id, :vote_mode]
+
+    @type t :: %__MODULE__{
+            session_id: integer(),
+            user_id: integer(),
+            vote_mode: :chat | :poll
+          }
+  end
 end

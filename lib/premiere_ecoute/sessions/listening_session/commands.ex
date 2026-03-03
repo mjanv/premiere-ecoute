@@ -10,14 +10,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     @type t :: %__MODULE__{
             user_id: integer(),
-            source: :album | :playlist | :track,
+            source: :album | :playlist | :track | :free,
             album_id: String.t() | nil,
             playlist_id: String.t() | nil,
             track_id: String.t() | nil,
-            vote_options: [String.t()]
+            name: String.t() | nil,
+            vote_options: [String.t()],
+            vote_mode: :chat | :poll | nil
           }
 
-    defstruct [:user_id, :source, :album_id, :playlist_id, :track_id, :vote_options]
+    defstruct [:user_id, :source, :album_id, :playlist_id, :track_id, :name, :vote_options, :vote_mode]
   end
 
   defmodule StartListeningSession do
@@ -27,7 +29,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist | :track, scope: Scope.t(), resume: boolean()}
+    @type t :: %__MODULE__{
+            session_id: String.t(),
+            source: :album | :playlist | :track | :free,
+            scope: Scope.t(),
+            resume: boolean()
+          }
 
     defstruct [:session_id, :source, :scope, resume: false]
   end
@@ -63,8 +70,44 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist | :track, scope: Scope.t()}
+    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist | :track | :free, scope: Scope.t()}
 
     defstruct [:session_id, :source, :scope]
+  end
+
+  defmodule CaptureCurrentTrackListeningSession do
+    @moduledoc """
+    Command - Capture the currently playing Spotify track into a free session.
+    """
+
+    alias PremiereEcoute.Accounts.Scope
+
+    @type t :: %__MODULE__{session_id: integer(), scope: Scope.t()}
+
+    defstruct [:session_id, :scope]
+  end
+
+  defmodule OpenVoteWindowListeningSession do
+    @moduledoc """
+    Command - Open the vote window for the current captured track in a free session.
+    """
+
+    alias PremiereEcoute.Accounts.Scope
+
+    @type t :: %__MODULE__{session_id: integer(), scope: Scope.t()}
+
+    defstruct [:session_id, :scope]
+  end
+
+  defmodule CloseVoteWindowListeningSession do
+    @moduledoc """
+    Command - Close the vote window in a free session.
+    """
+
+    alias PremiereEcoute.Accounts.Scope
+
+    @type t :: %__MODULE__{session_id: integer(), scope: Scope.t()}
+
+    defstruct [:session_id, :scope]
   end
 end

@@ -50,6 +50,9 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         case handle(conn.body_params) do
           %SendChatCommand{} = command -> PremiereEcoute.apply(command)
           %MessageSent{} = event -> Sessions.publish_message(event)
+          %PollStarted{} = event -> Sessions.publish_poll(event)
+          %PollUpdated{} = event -> Sessions.publish_poll(event)
+          %PollEnded{} = event -> Sessions.publish_poll(event)
           %StreamStarted{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
           %StreamEnded{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
           _ -> :ok
@@ -104,14 +107,14 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
 
   def handle(%{
         "subscription" => %{"type" => "channel.poll.begin"},
-        "event" => %{"id" => id, "title" => title, "choices" => choices}
+        "event" => %{"id" => id, "title" => title, "broadcaster_user_id" => broadcaster_id, "choices" => choices}
       }) do
     votes =
       choices
       |> Enum.map(fn %{"title" => title} -> {title, 0} end)
       |> Enum.into(%{})
 
-    %PollStarted{id: id, title: title, votes: votes}
+    %PollStarted{id: id, title: title, broadcaster_id: broadcaster_id, votes: votes}
   end
 
   def handle(%{

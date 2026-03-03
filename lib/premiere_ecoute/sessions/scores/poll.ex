@@ -76,11 +76,15 @@ defmodule PremiereEcoute.Sessions.Scores.Poll do
 
   Inserts new poll if poll_id doesn't exist, otherwise updates existing poll with new total_votes and votes counts.
   """
-  @spec upsert(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  @spec upsert(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()} | :skip
   def upsert(%__MODULE__{poll_id: poll_id} = poll) when not is_nil(poll_id) do
     case Repo.get_by(__MODULE__, poll_id: poll_id) do
       nil ->
-        create(poll)
+        if poll.session_id && poll.track_id do
+          create(poll)
+        else
+          :skip
+        end
 
       p ->
         p

@@ -10,6 +10,7 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
   require Logger
 
   alias PremiereEcouteMock.TwitchApi.Backend
+  alias PremiereEcouteMock.TwitchApi.PollSimulator
 
   plug Plug.Parsers, parsers: [:json], pass: ["text/*"], json_decoder: Jason
   plug Plug.Logger
@@ -178,6 +179,63 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
     Logger.info("Unsubscribing. Remaining subscriptions: #{inspect(subscriptions)}")
 
     no_content(conn)
+  end
+
+  post "/polls" do
+    poll_id = UUID.uuid4()
+    choices = conn.body_params["choices"] || []
+    Logger.info("Mock: creating poll \"#{conn.body_params["title"]}\"")
+
+    PollSimulator.start_poll(
+      poll_id,
+      conn.body_params["broadcaster_id"],
+      conn.body_params["title"],
+      choices
+    )
+
+    json(
+      conn,
+      200,
+      data(
+        %{
+          "id" => poll_id,
+          "broadcaster_id" => conn.body_params["broadcaster_id"],
+          "broadcaster_name" => "mock",
+          "broadcaster_login" => "mock",
+          "title" => conn.body_params["title"],
+          "choices" => Enum.map(choices, fn c -> Map.put(c, "votes", 0) end),
+          "status" => "ACTIVE",
+          "duration" => conn.body_params["duration"],
+          "started_at" => DateTime.to_iso8601(DateTime.utc_now())
+        },
+        %{}
+      )
+    )
+  end
+
+  patch "/polls" do
+    poll_id = conn.body_params["id"]
+    Logger.info("Mock: ending poll #{poll_id}")
+    PollSimulator.end_poll(poll_id)
+
+    json(
+      conn,
+      200,
+      data(
+        %{
+          "id" => poll_id,
+          "broadcaster_id" => conn.body_params["broadcaster_id"],
+          "broadcaster_name" => "mock",
+          "broadcaster_login" => "mock",
+          "title" => "",
+          "choices" => [],
+          "status" => "TERMINATED",
+          "duration" => 0,
+          "started_at" => DateTime.to_iso8601(DateTime.utc_now())
+        },
+        %{}
+      )
+    )
   end
 
   get "/channels/followed" do

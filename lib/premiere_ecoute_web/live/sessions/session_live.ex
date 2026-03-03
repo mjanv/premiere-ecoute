@@ -18,6 +18,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Presence
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.CaptureCurrentTrackListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.CloseVoteWindowListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Commands.OpenVoteWindowListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
@@ -81,6 +84,18 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_event(
+        "start_session",
+        _params,
+        %{assigns: %{listening_session: %{source: :free} = session, current_scope: scope}} = socket
+      ) do
+    case PremiereEcoute.apply(%StartListeningSession{source: :free, session_id: session.id, scope: scope}) do
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
+    end
+  end
+
   def handle_event(
         "start_session",
         _params,
@@ -186,8 +201,58 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
+  def handle_event(
+        "capture_track",
+        _params,
+        %{assigns: %{listening_session: session, current_scope: scope}} = socket
+      ) do
+    case PremiereEcoute.apply(%CaptureCurrentTrackListeningSession{session_id: session.id, scope: scope}) do
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, :no_active_playback} -> {:noreply, put_flash(socket, :info, gettext("Nothing is playing on Spotify."))}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot capture track"))}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "open_votes",
+        _params,
+        %{assigns: %{listening_session: session, current_scope: scope}} = socket
+      ) do
+    case PremiereEcoute.apply(%OpenVoteWindowListeningSession{session_id: session.id, scope: scope}) do
+      {:ok, _, _} -> {:noreply, socket}
+      {:error, :no_captured_track} -> {:noreply, put_flash(socket, :error, gettext("Capture a track first."))}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot open vote window"))}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "close_votes",
+        _params,
+        %{assigns: %{listening_session: session, current_scope: scope}} = socket
+      ) do
+    case PremiereEcoute.apply(%CloseVoteWindowListeningSession{session_id: session.id, scope: scope}) do
+      {:ok, _, _} -> {:noreply, socket}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot close vote window"))}
+    end
+  end
+
+  @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
+  end
+
+  @impl true
+  def handle_info({:track_captured, _single}, %{assigns: %{session_id: session_id}} = socket) do
+    session = ListeningSession.get(session_id)
+
+    socket
+    |> assign(:listening_session, session)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -273,8 +338,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_info(
         {:player, {:percent, percent}, state},
-        %{assigns: %{listening_session: %ListeningSession{status: :active}, current_scope: scope}} = socket
-      ) do
+        %{assigns: %{listening_session: %ListeningSession{status: :active, source: source}, current_scope: scope}} = socket
+      )
+      when source != :free do
     duration_ms = state["item"]["duration_ms"]
     threshold = round(100 * (1 - 30_000 / duration_ms))
 
@@ -537,6 +603,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       "viewer" -> "#{base_url}?score=viewer"
       "both" -> "#{base_url}?score=viewer+streamer"
       "player" -> "#{base_url}?score=player"
+      "votes" -> "#{base_url}?score=votes"
       _ -> base_url
     end
   end

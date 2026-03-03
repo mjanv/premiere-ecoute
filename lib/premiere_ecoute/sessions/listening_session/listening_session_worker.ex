@@ -144,4 +144,71 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
 
     :ok
   end
+
+  # AIDEV-NOTE: open_free — chat vote mode for free sessions; uses single_id as current_track_id in cache
+  @impl Oban.Worker
+  def perform(%Oban.Job{
+        args: %{"action" => "open_free", "user_id" => user_id, "session_id" => session_id, "track_id" => track_id}
+      }) do
+    with scope <- Scope.for_user(User.get(user_id)),
+         session <- ListeningSession.get(session_id),
+         cache_entry <- %{id: session.id, vote_options: session.vote_options, current_track_id: track_id},
+         {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, cache_entry),
+         :ok <-
+           Apis.twitch().send_chat_message(
+             scope,
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+               gettext("Votes are open for %{name}!", name: (session.single && session.single.name) || "")
+             end)
+           ) do
+      PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
+    end
+
+    :ok
+  end
+
+  # AIDEV-NOTE: open_free_poll — poll vote mode; creates Twitch poll with max duration, stores poll_id in cache
+  @impl Oban.Worker
+  def perform(%Oban.Job{
+        args: %{"action" => "open_free_poll", "user_id" => user_id, "session_id" => session_id, "track_id" => track_id}
+      }) do
+    with scope <- Scope.for_user(User.get(user_id)),
+         session <- ListeningSession.get(session_id),
+         {:ok, %{"id" => poll_id}} <-
+           Apis.twitch().create_poll(scope, %{
+             title: (session.single && session.single.name) || "Vote",
+             choices: session.vote_options,
+             duration: 1800
+           }),
+         cache_entry <- %{
+           id: session.id,
+           vote_options: session.vote_options,
+           current_track_id: track_id,
+           poll_id: poll_id
+         },
+         {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, cache_entry),
+         :ok <-
+           Apis.twitch().send_chat_message(
+             scope,
+             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+               gettext("Vote in the poll for %{name}!", name: (session.single && session.single.name) || "")
+             end)
+           ) do
+      PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
+    end
+
+    :ok
+  end
+
+  @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"action" => "close_poll", "user_id" => user_id, "session_id" => session_id}}) do
+    with scope <- Scope.for_user(User.get(user_id)),
+         {:ok, %{poll_id: poll_id}} <- Cache.get(:sessions, scope.user.twitch.user_id),
+         {:ok, _} <- Apis.twitch().end_poll(scope, poll_id),
+         {:ok, _} <- Cache.del(:sessions, scope.user.twitch.user_id) do
+      PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_close)
+    end
+
+    :ok
+  end
 end

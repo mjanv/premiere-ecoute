@@ -47,6 +47,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
           |> assign(:color_secondary, color_secondary)
           |> assign(:listening_session, nil)
           |> assign(:summary, AsyncResult.loading())
+          |> assign(:vote_distribution, [])
 
         session ->
           if connected?(socket) do
@@ -94,6 +95,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
           |> assign(:color_secondary, color_secondary)
           |> assign(:listening_session, session)
           |> assign(:summary, summary_result)
+          |> assign(:vote_distribution, [])
       end
 
     {:ok, socket}
@@ -129,7 +131,12 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   @impl true
   def handle_info({:session_summary, session_summary}, %{assigns: assigns} = socket) do
-    {:noreply, assign(socket, :summary, AsyncResult.ok(assigns.summary, session_summary))}
+    distribution = compute_vote_distribution(session_summary, assigns.listening_session)
+
+    socket
+    |> assign(:summary, AsyncResult.ok(assigns.summary, session_summary))
+    |> assign(:vote_distribution, distribution)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -152,6 +159,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     socket
     |> assign(:widget_state, :open)
     |> assign(:summary, AsyncResult.ok(summary, %{viewer_score: nil, streamer_score: nil}))
+    |> assign(:vote_distribution, [])
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -187,16 +195,14 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
           end
       end
 
-    socket =
-      socket
-      |> assign(:id, session.id)
-      |> assign(:listening_session, session)
-      |> assign(:summary, AsyncResult.ok(%{viewer_score: nil, streamer_score: nil}))
-      |> assign(:widget_state, widget_state)
-      |> assign(:progress, AsyncResult.loading())
-      |> assign(:percent, 0)
-
-    {:noreply, socket}
+    socket
+    |> assign(:id, session.id)
+    |> assign(:listening_session, session)
+    |> assign(:summary, AsyncResult.ok(%{viewer_score: nil, streamer_score: nil}))
+    |> assign(:widget_state, widget_state)
+    |> assign(:progress, AsyncResult.loading())
+    |> assign(:percent, 0)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -205,30 +211,26 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
     PremiereEcoute.PubSub.unsubscribe("session:#{session.id}")
     Presence.unjoin(user_id, :overlay)
 
-    socket =
-      socket
-      |> assign(:id, nil)
-      |> assign(:listening_session, nil)
-      |> assign(:summary, AsyncResult.loading())
-      |> assign(:widget_state, :ended)
-      |> assign(:progress, AsyncResult.loading())
-      |> assign(:percent, 0)
-
-    {:noreply, socket}
+    socket
+    |> assign(:id, nil)
+    |> assign(:listening_session, nil)
+    |> assign(:summary, AsyncResult.loading())
+    |> assign(:widget_state, :ended)
+    |> assign(:progress, AsyncResult.loading())
+    |> assign(:percent, 0)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
   def handle_info(:stop, %{assigns: %{listening_session: session}} = socket) when not is_nil(session) do
-    socket =
-      socket
-      |> assign(:id, nil)
-      |> assign(:listening_session, nil)
-      |> assign(:summary, AsyncResult.loading())
-      |> assign(:widget_state, :ended)
-      |> assign(:progress, AsyncResult.loading())
-      |> assign(:percent, 0)
-
-    {:noreply, socket}
+    socket
+    |> assign(:id, nil)
+    |> assign(:listening_session, nil)
+    |> assign(:summary, AsyncResult.loading())
+    |> assign(:widget_state, :ended)
+    |> assign(:progress, AsyncResult.loading())
+    |> assign(:percent, 0)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -239,11 +241,49 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp parse_score("viewer"), do: :viewer
   defp parse_score("streamer"), do: :streamer
   defp parse_score("viewer streamer"), do: :both
+  defp parse_score("votes"), do: :votes
   defp parse_score(_), do: :player
 
   defp overlay_width(:player), do: 480 * 2.5
   defp overlay_width(:both), do: 480
+  defp overlay_width(:votes), do: 800
   defp overlay_width(_), do: 240
 
   defp overlay_height(_), do: 240
+
+  # AIDEV-NOTE: builds [{option, count}] from votes+polls for the current track
+  defp compute_vote_distribution(summary, %ListeningSession{} = session) do
+    track_id = summary[:track_id] || summary["track_id"]
+
+    if is_nil(track_id) or is_nil(session.vote_options) do
+      []
+    else
+      report = Report.get_by(session_id: session.id)
+
+      if is_nil(report) do
+        []
+      else
+        individual =
+          report.votes
+          |> Enum.filter(&(&1.track_id == track_id))
+          |> Enum.group_by(& &1.value)
+          |> Map.new(fn {value, votes} -> {value, length(votes)} end)
+
+        poll =
+          report.polls
+          |> Enum.filter(&(&1.track_id == track_id))
+          |> Enum.reduce(%{}, fn p, acc ->
+            Enum.reduce(p.votes, acc, fn {rating, count}, inner ->
+              Map.update(inner, rating, count, &(&1 + count))
+            end)
+          end)
+
+        for option <- session.vote_options do
+          {option, Map.get(individual, option, 0) + Map.get(poll, option, 0)}
+        end
+      end
+    end
+  end
+
+  defp compute_vote_distribution(_, _), do: []
 end

@@ -50,9 +50,9 @@ defmodule PremiereEcoute.Events.Chat do
     Event - Poll started.
     """
 
-    @type t :: %__MODULE__{id: String.t(), votes: map()}
+    @type t :: %__MODULE__{id: String.t(), title: String.t(), broadcaster_id: String.t(), votes: map()}
 
-    defstruct [:id, :title, :votes]
+    defstruct [:id, :title, :broadcaster_id, :votes]
   end
 
   defmodule PollUpdated do

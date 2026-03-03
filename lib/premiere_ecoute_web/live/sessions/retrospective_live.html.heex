@@ -2,7 +2,7 @@
 <div class="synthwave-bg min-h-screen text-white">
   
 <!-- Hero Section: Album/Playlist/Single Cover Background with Stats Overlay -->
-  <%= if @listening_session.album || @listening_session.playlist || @listening_session.single do %>
+  <%= if @listening_session.source == :free || @listening_session.album || @listening_session.playlist || @listening_session.single do %>
     <div class="relative h-screen flex items-center justify-center overflow-hidden">
       <!-- Full-width Cover Background -->
       <%= if get_session_cover_url(@listening_session) do %>

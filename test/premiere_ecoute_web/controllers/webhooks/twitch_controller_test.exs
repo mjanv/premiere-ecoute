@@ -315,6 +315,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
 
       assert event == %PollStarted{
                id: "1243456",
+               broadcaster_id: "1337",
                title: "Aren't shoes just really hard socks?",
                votes: %{"Yeah!" => 0, "No!" => 0, "Maybe!" => 0}
              }

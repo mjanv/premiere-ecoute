@@ -17,6 +17,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped
+  alias PremiereEcoute.Sessions.ListeningSession.Events.TrackCaptured
+  alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowClosed
+  alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowOpened
   alias PremiereEcoute.Sessions.ListeningSessionWorker
 
   event(PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared)
@@ -24,6 +27,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   event(PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped)
   event(PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted)
   event(PremiereEcoute.Sessions.ListeningSession.Events.PreviousTrackStarted)
+  event(PremiereEcoute.Sessions.ListeningSession.Events.TrackCaptured)
+  event(PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowOpened)
+  event(PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowClosed)
 
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
@@ -99,6 +105,48 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 10)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_stopped, session_id})
+    :ok
+  end
+
+  def dispatch(%SessionStarted{source: :free, session_id: session_id, user_id: user_id}) do
+    ListeningSessionWorker.in_minutes(%{action: "send_promo_message", user_id: user_id}, 1)
+    PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_started, session_id})
+    :ok
+  end
+
+  def dispatch(%TrackCaptured{session_id: session_id, user_id: _user_id}) do
+    session = ListeningSession.get(session_id)
+    ListeningSession.add_track_marker(session)
+    PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:track_captured, session.single})
+    :ok
+  end
+
+  # AIDEV-NOTE: VoteWindowOpened dispatches different worker jobs depending on vote_mode (:chat vs :poll)
+  def dispatch(%VoteWindowOpened{session_id: session_id, user_id: user_id, track_id: track_id, vote_mode: :chat}) do
+    ListeningSessionWorker.in_seconds(
+      %{action: "open_free", session_id: session_id, user_id: user_id, track_id: track_id},
+      0
+    )
+
+    :ok
+  end
+
+  def dispatch(%VoteWindowOpened{session_id: session_id, user_id: user_id, track_id: track_id, vote_mode: :poll}) do
+    ListeningSessionWorker.in_seconds(
+      %{action: "open_free_poll", session_id: session_id, user_id: user_id, track_id: track_id},
+      0
+    )
+
+    :ok
+  end
+
+  def dispatch(%VoteWindowClosed{session_id: session_id, user_id: user_id, vote_mode: :chat}) do
+    ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
+    :ok
+  end
+
+  def dispatch(%VoteWindowClosed{session_id: session_id, user_id: user_id, vote_mode: :poll}) do
+    ListeningSessionWorker.in_seconds(%{action: "close_poll", session_id: session_id, user_id: user_id}, 0)
     :ok
   end
 

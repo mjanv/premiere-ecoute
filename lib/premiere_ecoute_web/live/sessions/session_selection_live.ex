@@ -33,6 +33,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:picks_empty, true)
     |> assign(:random_pick, nil)
     |> assign(:pick_spinning, false)
+    |> assign(:free_session_name, "")
+    |> assign(:free_vote_mode, nil)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -128,6 +130,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     # Reset vote options state
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
+    |> assign(:free_vote_mode, nil)
     # Load playlists if playlist source is selected
     |> maybe_load_playlists(source)
     |> then(fn socket -> {:noreply, socket} end)
@@ -193,6 +196,22 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  def handle_event("prepare_session", _params, %{assigns: %{source_type: "free"}} = socket) do
+    %PrepareListeningSession{
+      source: :free,
+      user_id: get_user_id(socket),
+      name: socket.assigns.free_session_name,
+      vote_options: get_vote_options(socket.assigns),
+      vote_mode: String.to_existing_atom(socket.assigns.free_vote_mode)
+    }
+    |> PremiereEcoute.apply()
+    |> case do
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
+      {:error, _} -> put_flash(socket, :error, gettext("Cannot create the listening session"))
+    end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event("prepare_session", _params, %{assigns: %{selected_album: nil, selected_playlist: %{result: nil}}} = socket) do
     {:noreply, put_flash(socket, :error, "Please select an album or playlist first")}
   end
@@ -207,9 +226,15 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
         |> then(fn socket -> {:noreply, socket} end)
 
       _ ->
+        opts = get_vote_options(%{vote_options_preset: preset})
+        # Reset poll vote_mode if switching to >5 options (poll no longer allowed)
+        free_vote_mode =
+          if socket.assigns.free_vote_mode == "poll" && length(opts) > 5, do: nil, else: socket.assigns.free_vote_mode
+
         socket
         |> assign(:vote_options_preset, preset)
         |> assign(:vote_options_configured, true)
+        |> assign(:free_vote_mode, free_vote_mode)
         |> then(fn socket -> {:noreply, socket} end)
     end
   end
@@ -254,6 +279,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
     end
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("update_free_session_name", %{"name" => name}, socket) do
+    {:noreply, assign(socket, :free_session_name, name)}
+  end
+
+  def handle_event("select_free_vote_mode", %{"mode" => mode}, socket) do
+    {:noreply, assign(socket, :free_vote_mode, mode)}
   end
 
   def handle_event("open_random_modal", _params, socket) do

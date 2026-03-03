@@ -12,13 +12,14 @@
         <% content_selected =
           (@source_type == "album" && @selected_album.ok? && @selected_album.result) ||
             (@source_type == "playlist" && @selected_playlist.ok? && @selected_playlist.result) ||
-            (@source_type == "track" && @selected_track.ok? && @selected_track.result) %>
+            (@source_type == "track" && @selected_track.ok? && @selected_track.result) ||
+            (@source_type == "free" && @free_session_name != "") %>
         <!-- Ariadne's thread - base line spanning from step 1 center to last visible step center -->
         <div
           class="absolute left-6 w-1 bg-gray-700/50 rounded-full ariane-thread-base"
           data-step={
             cond do
-              content_selected && @vote_options_configured -> "4"
+              content_selected && @vote_options_configured && (@source_type != "free" || @free_vote_mode != nil) -> "4"
               content_selected -> "3"
               @source_type -> "2"
               true -> "1"
@@ -37,7 +38,7 @@
           style="height: 0px;"
           data-progress-step={
             cond do
-              content_selected && @vote_options_configured -> "4"
+              content_selected && @vote_options_configured && (@source_type != "free" || @free_vote_mode != nil) -> "4"
               content_selected -> "3"
               @source_type -> "2"
               true -> "1"
@@ -58,18 +59,27 @@
             <h2 class="text-2xl font-semibold text-white">{gettext("Source")}</h2>
           </div>
 
-          <div class="grid grid-cols-3 gap-4 max-w-xl ml-16">
+          <% album_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_album, for: @current_scope.user)
+          playlist_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_playlist, for: @current_scope.user)
+          single_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_single, for: @current_scope.user)
+          free_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_free, for: @current_scope.user) %>
+          <div class="grid grid-cols-4 gap-4 max-w-2xl ml-16">
             <button
               class={[
                 "p-4 rounded-lg border-2 transition-all text-left",
-                if @source_type == "album" do
-                  "border-purple-500 bg-purple-500/10 text-white"
+                if !album_enabled do
+                  "border-gray-700 bg-gray-900/30 text-gray-600 cursor-not-allowed opacity-50"
                 else
-                  "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                  if @source_type == "album" do
+                    "border-purple-500 bg-purple-500/10 text-white"
+                  else
+                    "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                  end
                 end
               ]}
-              phx-click="select_source"
+              phx-click={if album_enabled, do: "select_source"}
               phx-value-source="album"
+              disabled={!album_enabled}
             >
               <div class="flex items-center space-x-3">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -89,14 +99,19 @@
             <button
               class={[
                 "p-4 rounded-lg border-2 transition-all text-left",
-                if @source_type == "playlist" do
-                  "border-emerald-500 bg-emerald-500/10 text-white"
+                if !playlist_enabled do
+                  "border-gray-700 bg-gray-900/30 text-gray-600 cursor-not-allowed opacity-50"
                 else
-                  "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                  if @source_type == "playlist" do
+                    "border-emerald-500 bg-emerald-500/10 text-white"
+                  else
+                    "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                  end
                 end
               ]}
-              phx-click="select_source"
+              phx-click={if playlist_enabled, do: "select_source"}
               phx-value-source="playlist"
+              disabled={!playlist_enabled}
             >
               <div class="flex items-center space-x-3">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -112,14 +127,19 @@
             <button
               class={[
                 "p-4 rounded-lg border-2 transition-all text-left",
-                if @source_type == "track" do
-                  "border-cyan-500 bg-cyan-500/10 text-white"
+                if !single_enabled do
+                  "border-gray-700 bg-gray-900/30 text-gray-600 cursor-not-allowed opacity-50"
                 else
-                  "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                  if @source_type == "track" do
+                    "border-cyan-500 bg-cyan-500/10 text-white"
+                  else
+                    "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                  end
                 end
               ]}
-              phx-click="select_source"
+              phx-click={if single_enabled, do: "select_source"}
               phx-value-source="track"
+              disabled={!single_enabled}
             >
               <div class="flex items-center space-x-3">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -131,6 +151,38 @@
                 </svg>
                 <div>
                   <h3 class="font-semibold">{gettext("Track")}</h3>
+                  <p class="text-sm opacity-70">{gettext("From Spotify")}</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              class={[
+                "p-4 rounded-lg border-2 transition-all text-left",
+                if !free_enabled do
+                  "border-gray-700 bg-gray-900/30 text-gray-600 cursor-not-allowed opacity-50"
+                else
+                  if @source_type == "free" do
+                    "border-amber-500 bg-amber-500/10 text-white"
+                  else
+                    "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+                  end
+                end
+              ]}
+              phx-click={if free_enabled, do: "select_source"}
+              phx-value-source="free"
+              disabled={!free_enabled}
+            >
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <div>
+                  <h3 class="font-semibold">{gettext("Free")}</h3>
                   <p class="text-sm opacity-70">{gettext("From Spotify")}</p>
                 </div>
               </div>
@@ -725,6 +777,35 @@
           </div>
         <% end %>
         
+<!-- Step 2: Free Mode (only show if Free is selected) -->
+        <%= if @source_type == "free" do %>
+          <div class="mb-8 relative" id="step-2">
+            <div class="flex items-center mb-6">
+              <div
+                id="step-circle-2"
+                class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+              >
+                2
+              </div>
+              <h2 class="text-2xl font-semibold text-white">{gettext("Session Name")}</h2>
+            </div>
+
+            <div class="ml-16 max-w-lg space-y-4">
+              <form phx-change="update_free_session_name">
+                <input
+                  type="text"
+                  name="name"
+                  value={@free_session_name}
+                  placeholder={gettext("Session name")}
+                  phx-debounce="300"
+                  class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
+                  style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                />
+              </form>
+            </div>
+          </div>
+        <% end %>
+        
 <!-- Step 3: Vote Options (only show if album or playlist is selected) -->
         <%= if content_selected do %>
           <div class="mb-8 relative" id="step-3">
@@ -744,14 +825,15 @@
                 <form phx-change="vote_options_preset_change">
                   <select
                     name="preset"
-                    value=""
                     class="rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:ring-opacity-50 border-0"
                     style="background-color: var(--color-dark-800);"
                   >
-                    <option value="" disabled selected>{gettext("Choose vote format...")}</option>
-                    <option value="0-10">{gettext("0-10 Rating")}</option>
-                    <option value="1-5">{gettext("1-5 Rating")}</option>
-                    <option value="smash-pass">{gettext("Smash or Pass")}</option>
+                    <option value="" disabled={@vote_options_preset != nil} selected={@vote_options_preset == nil}>
+                      {gettext("Choose vote format...")}
+                    </option>
+                    <option value="0-10" selected={@vote_options_preset == "0-10"}>{gettext("0-10 Rating")}</option>
+                    <option value="1-5" selected={@vote_options_preset == "1-5"}>{gettext("1-5 Rating")}</option>
+                    <option value="smash-pass" selected={@vote_options_preset == "smash-pass"}>{gettext("Smash or Pass")}</option>
                   </select>
                 </form>
                 
@@ -767,16 +849,58 @@
                 <% else %>
                   <div class="text-gray-500 text-sm">
                     {gettext("Select a format to see options")}
-                    <!-- Debug: preset = {@vote_options_preset || "nil"} -->
                   </div>
                 <% end %>
               </div>
+
+              <%= if @source_type == "free" && @vote_options_preset && @vote_options_preset != "" do %>
+                <% opts = get_vote_options(%{vote_options_preset: @vote_options_preset}) %>
+                <% poll_allowed = length(opts) <= 5 %>
+                <div class="mt-4 flex items-center gap-3">
+                  <button
+                    type="button"
+                    phx-click="select_free_vote_mode"
+                    phx-value-mode="chat"
+                    class={[
+                      "px-4 py-2 rounded-lg text-sm font-medium border transition-colors",
+                      if(@free_vote_mode == "chat",
+                        do: "bg-purple-600/30 border-purple-500 text-purple-200",
+                        else: "bg-transparent border-gray-600 text-gray-400 hover:border-gray-400"
+                      )
+                    ]}
+                  >
+                    {gettext("Chat")}
+                  </button>
+                  <button
+                    type="button"
+                    phx-click={if poll_allowed, do: "select_free_vote_mode"}
+                    phx-value-mode="poll"
+                    disabled={!poll_allowed}
+                    class={[
+                      "px-4 py-2 rounded-lg text-sm font-medium border transition-colors",
+                      if(!poll_allowed,
+                        do: "opacity-40 cursor-not-allowed bg-transparent border-gray-700 text-gray-600",
+                        else:
+                          if(@free_vote_mode == "poll",
+                            do: "bg-amber-600/30 border-amber-500 text-amber-200",
+                            else: "bg-transparent border-gray-600 text-gray-400 hover:border-gray-400"
+                          )
+                      )
+                    ]}
+                  >
+                    {gettext("Twitch Poll")}
+                    <%= if !poll_allowed do %>
+                      <span class="ml-1 text-xs">{gettext("(≤ 5 options only)")}</span>
+                    <% end %>
+                  </button>
+                </div>
+              <% end %>
             </div>
           </div>
         <% end %>
         
 <!-- Step 4: Action Buttons (only show if everything is configured) -->
-        <%= if content_selected && @vote_options_configured do %>
+        <%= if content_selected && @vote_options_configured && (@source_type != "free" || @free_vote_mode != nil) do %>
           <div class="pt-6 relative" id="step-4">
             <!-- Final step indicator -->
             <div class="flex items-center mb-6">

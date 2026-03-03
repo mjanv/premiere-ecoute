@@ -30,6 +30,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @type t :: %__MODULE__{
           id: integer() | nil,
           status: atom(),
+          source: atom(),
+          name: String.t() | nil,
+          vote_mode: atom(),
           visibility: atom(),
           started_at: DateTime.t() | nil,
           ended_at: DateTime.t() | nil,
@@ -45,7 +48,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
-    field :source, Ecto.Enum, values: [:album, :playlist, :track], default: :album
+    field :source, Ecto.Enum, values: [:album, :playlist, :track, :free], default: :album
+    field :name, :string
+    # AIDEV-NOTE: vote_mode for :free sessions only — :chat (>5 options) or :poll (≤5 options)
+    field :vote_mode, Ecto.Enum, values: [:chat, :poll], default: :chat
     field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
     field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -79,6 +85,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> cast(attrs, [
       :status,
       :source,
+      :name,
+      :vote_mode,
       :visibility,
       :options,
       :vote_options,
@@ -173,6 +181,20 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       listening_session_id: session.id,
       track_id: track.id,
       track_number: track_number,
+      started_at: DateTime.utc_now(:second)
+    })
+    |> Repo.insert()
+  end
+
+  # AIDEV-NOTE: :free sessions use single_id as the captured track reference; track_name stored on marker
+  def add_track_marker(%__MODULE__{source: :free, single: single, track_markers: markers} = session)
+      when not is_nil(single) do
+    %TrackMarker{}
+    |> TrackMarker.changeset(%{
+      listening_session_id: session.id,
+      track_id: single.id,
+      track_number: length(markers) + 1,
+      track_name: single.name,
       started_at: DateTime.utc_now(:second)
     })
     |> Repo.insert()
@@ -360,6 +382,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   Extracts title from album name or playlist title depending on session source.
   """
   @spec title(t()) :: String.t()
+  def title(%__MODULE__{source: :free, name: name}), do: name || "Free session"
   def title(%__MODULE__{album: nil, playlist: nil, single: nil}), do: ""
   def title(%__MODULE__{album: %{name: name}}), do: name
   def title(%__MODULE__{playlist: %{title: title}}), do: title
@@ -371,6 +394,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   Extracts artist from album, playlist owner, or single depending on session source.
   """
   @spec artist(t()) :: String.t()
+  def artist(%__MODULE__{source: :free}), do: ""
   def artist(%__MODULE__{album: nil, playlist: nil, single: nil}), do: ""
   def artist(%__MODULE__{album: %{artist: artist}}), do: artist
   def artist(%__MODULE__{playlist: %{owner_name: owner_name}}), do: owner_name
@@ -412,6 +436,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   Retrieves track list from either album or playlist depending on session source.
   """
   @spec tracks(t()) :: [Album.Track.t()] | [Playlist.Track.t()]
+  def tracks(%__MODULE__{source: :free}), do: []
   def tracks(%__MODULE__{album: nil, playlist: nil, single: nil}), do: []
   def tracks(%__MODULE__{album: %{tracks: tracks}}), do: tracks
   def tracks(%__MODULE__{playlist: %{tracks: tracks}}), do: tracks
