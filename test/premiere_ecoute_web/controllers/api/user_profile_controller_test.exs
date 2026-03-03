@@ -1,18 +1,11 @@
 defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
-  use PremiereEcouteWeb.ConnCase, async: true
-
-  alias PremiereEcoute.Accounts
-
-  defp authed_conn(conn, user) do
-    token = Accounts.generate_user_api_token(user)
-    put_req_header(conn, "authorization", "Bearer #{token}")
-  end
+  use PremiereEcouteWeb.ApiCase, async: true
 
   describe "GET /api/profile" do
     test "returns the user profile with default values", %{conn: conn} do
       user = user_fixture()
 
-      conn = conn |> authed_conn(user) |> get(~p"/api/profile")
+      conn = conn |> auth(user) |> get(~p"/api/profile")
 
       assert %{
                "color_scheme" => "system",
@@ -27,7 +20,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
                  "retention_days" => 7,
                  "visibility" => "public"
                }
-             } = json_response(conn, 200)
+             } = response(conn, 200, op(UserProfileController, :show))
     end
 
     test "returns the user profile with custom values", %{conn: conn} do
@@ -40,13 +33,13 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
           }
         })
 
-      conn = conn |> authed_conn(user) |> get(~p"/api/profile")
+      conn = conn |> auth(user) |> get(~p"/api/profile")
 
       assert %{
                "color_scheme" => "dark",
                "language" => "fr",
                "timezone" => "Europe/Paris"
-             } = json_response(conn, 200)
+             } = response(conn, 200, op(UserProfileController, :show))
     end
 
     test "returns 401 without authorization header", %{conn: conn} do
@@ -62,11 +55,11 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
 
       conn =
         conn
-        |> authed_conn(user)
+        |> auth(user)
         |> patch(~p"/api/profile", %{color_scheme: "dark", language: "fr"})
 
       assert %{"color_scheme" => "dark", "language" => "fr", "timezone" => "UTC"} =
-               json_response(conn, 200)
+               response(conn, 200, op(UserProfileController, :update))
     end
 
     test "partial update only changes sent fields", %{conn: conn} do
@@ -74,14 +67,14 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
 
       conn =
         conn
-        |> authed_conn(user)
+        |> auth(user)
         |> patch(~p"/api/profile", %{color_scheme: "dark"})
 
       assert %{
                "color_scheme" => "dark",
                "language" => "it",
                "timezone" => "Europe/Rome"
-             } = json_response(conn, 200)
+             } = response(conn, 200, op(UserProfileController, :update))
     end
 
     test "updates widget_settings", %{conn: conn} do
@@ -89,7 +82,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
 
       conn =
         conn
-        |> authed_conn(user)
+        |> auth(user)
         |> patch(~p"/api/profile", %{widget_settings: %{color_primary: "#ff0000"}})
 
       assert %{
@@ -97,7 +90,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
                  "color_primary" => "#ff0000",
                  "color_secondary" => "#be123c"
                }
-             } = json_response(conn, 200)
+             } = response(conn, 200, op(UserProfileController, :update))
     end
 
     test "updates radio_settings", %{conn: conn} do
@@ -105,7 +98,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
 
       conn =
         conn
-        |> authed_conn(user)
+        |> auth(user)
         |> patch(~p"/api/profile", %{radio_settings: %{enabled: true, retention_days: 14}})
 
       assert %{
@@ -114,7 +107,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
                  "retention_days" => 14,
                  "visibility" => "public"
                }
-             } = json_response(conn, 200)
+             } = response(conn, 200, op(UserProfileController, :update))
     end
 
     test "returns 422 on invalid color_scheme", %{conn: conn} do
@@ -122,7 +115,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
 
       conn =
         conn
-        |> authed_conn(user)
+        |> auth(user)
         |> patch(~p"/api/profile", %{color_scheme: "neon"})
 
       assert %{"errors" => %{"color_scheme" => _}} = json_response(conn, 422)
@@ -133,7 +126,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
 
       conn =
         conn
-        |> authed_conn(user)
+        |> auth(user)
         |> patch(~p"/api/profile", %{widget_settings: %{color_primary: "red"}})
 
       assert %{"errors" => %{"widget_settings" => %{"color_primary" => _}}} =
@@ -145,7 +138,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileControllerTest do
 
       conn =
         conn
-        |> authed_conn(user)
+        |> auth(user)
         |> patch(~p"/api/profile", %{timezone: "Not/ATimezone"})
 
       assert %{"errors" => %{"timezone" => _}} = json_response(conn, 422)

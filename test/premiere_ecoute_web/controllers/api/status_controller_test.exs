@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Api.StatusControllerTest do
-  use PremiereEcouteWeb.ConnCase, async: true
+  use PremiereEcouteWeb.ApiCase, async: true
 
   alias PremiereEcoute.Accounts
 
@@ -20,7 +20,7 @@ defmodule PremiereEcouteWeb.Api.StatusControllerTest do
                  "username" => username,
                  "role" => role
                }
-             } = json_response(conn, 200)
+             } = response(conn, 200, op(StatusController, :index))
 
       assert user_id == user.id
       assert username == user.username

@@ -43,10 +43,12 @@ defmodule PremiereEcouteWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
   end
 
   pipeline :api_auth do
     plug :accepts, ["json"]
+    plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
     plug PremiereEcouteWeb.Plugs.ApiAuth
   end
 
@@ -213,6 +215,13 @@ defmodule PremiereEcouteWeb.Router do
     get "/:provider", AuthController, :request
     get "/:provider/callback", AuthController, :callback
     get "/:provider/complete", AuthController, :complete
+  end
+
+  scope "/api" do
+    pipe_through :api
+
+    get "/openapi", OpenApiSpex.Plug.RenderSpec, []
+    get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
   scope "/api", PremiereEcouteWeb.Api do

@@ -7,8 +7,46 @@ defmodule PremiereEcouteWeb.Api.UserProfileController do
   """
 
   use PremiereEcouteWeb, :controller
+  use OpenApiSpex.ControllerSpecs
 
+  alias OpenApiSpex.Schema
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Repo
+
+  @profile_schema %Schema{
+    type: :object,
+    properties: %{
+      color_scheme: %Schema{type: :string, enum: ["light", "dark", "system"]},
+      language: %Schema{type: :string, enum: ["en", "fr", "it"]},
+      timezone: %Schema{type: :string, example: "Europe/Paris"},
+      widget_settings: %Schema{
+        type: :object,
+        properties: %{
+          color_primary: %Schema{type: :string, pattern: "^#[0-9A-Fa-f]{6}$", example: "#5b21b6"},
+          color_secondary: %Schema{type: :string, pattern: "^#[0-9A-Fa-f]{6}$", example: "#be123c"}
+        }
+      },
+      radio_settings: %Schema{
+        type: :object,
+        properties: %{
+          enabled: %Schema{type: :boolean},
+          retention_days: %Schema{type: :integer, minimum: 1},
+          visibility: %Schema{type: :string, enum: ["private", "public"]}
+        }
+      }
+    }
+  }
+
+  operation(:show,
+    summary: "Get profile",
+    description: "Returns the authenticated user's profile settings.",
+    tags: ["Profile"],
+    security: [%{"bearer" => []}],
+    responses: [
+      ok: {"Profile", "application/json", @profile_schema},
+      unauthorized: "Missing or invalid Authorization header"
+    ]
+  )
 
   @doc """
   Returns the authenticated user's profile settings.
@@ -19,8 +57,22 @@ defmodule PremiereEcouteWeb.Api.UserProfileController do
 
     conn
     |> put_status(:ok)
-    |> json(serialize_profile(profile))
+    |> json(profile)
   end
+
+  operation(:update,
+    summary: "Update profile",
+    description:
+      "Partially updates the authenticated user's profile settings. Only fields present in the request body are changed.",
+    tags: ["Profile"],
+    security: [%{"bearer" => []}],
+    request_body: {"Profile fields to update", "application/json", @profile_schema},
+    responses: [
+      ok: {"Updated profile", "application/json", @profile_schema},
+      unprocessable_entity: "Validation errors",
+      unauthorized: "Missing or invalid Authorization header"
+    ]
+  )
 
   @doc """
   Partially updates the authenticated user's profile settings.
@@ -33,10 +85,10 @@ defmodule PremiereEcouteWeb.Api.UserProfileController do
     user = conn.assigns.current_scope.user
 
     case Accounts.edit_user_profile(user, params) do
-      {:ok, updated_user} ->
+      {:ok, user} ->
         conn
         |> put_status(:ok)
-        |> json(serialize_profile(updated_user.profile))
+        |> json(user.profile)
 
       {:error, changeset} ->
         conn
@@ -45,34 +97,10 @@ defmodule PremiereEcouteWeb.Api.UserProfileController do
     end
   end
 
-  # AIDEV-NOTE: serialize_profile renders nested embeds as plain maps so that
-  # Ecto.Enum atoms and embedded structs are JSON-safe. Nested embeds fall back
-  # to default structs when nil (possible for users created before these fields existed).
-  defp serialize_profile(profile) do
-    widget = profile.widget_settings || %PremiereEcoute.Accounts.User.Profile.WidgetSettings{}
-    radio = profile.radio_settings || %PremiereEcoute.Accounts.User.Profile.RadioSettings{}
-
-    %{
-      color_scheme: profile.color_scheme,
-      language: profile.language,
-      timezone: profile.timezone,
-      widget_settings: %{
-        color_primary: widget.color_primary,
-        color_secondary: widget.color_secondary
-      },
-      radio_settings: %{
-        enabled: radio.enabled,
-        retention_days: radio.retention_days,
-        visibility: radio.visibility
-      }
-    }
-  end
-
+  # AIDEV-NOTE: profile errors are nested under :profile due to cast_embed — unwrap one level
   defp format_errors(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
-      Enum.reduce(opts, msg, fn {key, value}, acc ->
-        String.replace(acc, "%{#{key}}", to_string(value))
-      end)
-    end)
+    changeset
+    |> Repo.traverse_errors()
+    |> Map.get(:profile, %{})
   end
 end

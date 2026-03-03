@@ -80,3 +80,26 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     end)
   end
 end
+
+defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile do
+  # AIDEV-NOTE: nil embeds can occur for users created before these fields existed; fall back to defaults
+  def encode(profile, opts) do
+    profile
+    |> Map.update!(:widget_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.WidgetSettings{}))
+    |> Map.update!(:radio_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.RadioSettings{}))
+    |> Map.take([:color_scheme, :language, :timezone, :widget_settings, :radio_settings])
+    |> Jason.Encode.map(opts)
+  end
+end
+
+defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile.WidgetSettings do
+  def encode(settings, opts) do
+    Jason.Encode.map(Map.take(settings, [:color_primary, :color_secondary]), opts)
+  end
+end
+
+defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile.RadioSettings do
+  def encode(settings, opts) do
+    Jason.Encode.map(Map.take(settings, [:enabled, :retention_days, :visibility]), opts)
+  end
+end

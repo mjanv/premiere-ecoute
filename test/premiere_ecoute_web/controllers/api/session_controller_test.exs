@@ -1,7 +1,6 @@
 defmodule PremiereEcouteWeb.Api.SessionControllerTest do
-  use PremiereEcouteWeb.ConnCase, async: false
+  use PremiereEcouteWeb.ApiCase, async: false
 
-  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
@@ -12,11 +11,6 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
 
   setup {PremiereEcoute.Sessions, :mock}
   setup {PremiereEcouteCore.CommandBus, :mock}
-
-  defp api_conn(conn, user) do
-    token = Accounts.generate_user_api_token(user)
-    put_req_header(conn, "authorization", "Bearer #{token}")
-  end
 
   describe "POST /api/session/start" do
     test "dispatches StartListeningSession command and returns ok", %{conn: conn} do
@@ -42,16 +36,16 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       end)
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/start")
-      |> json_response(200)
+      |> response(200, op(SessionController, :start))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
       user = user_fixture()
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/start")
       |> json_response(404)
     end
@@ -70,16 +64,16 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       end)
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/stop")
-      |> json_response(200)
+      |> response(200, op(SessionController, :stop))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
       user = user_fixture()
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/stop")
       |> json_response(404)
     end
@@ -98,16 +92,16 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       end)
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/next")
-      |> json_response(200)
+      |> response(200, op(SessionController, :next))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
       user = user_fixture()
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/next")
       |> json_response(404)
     end
@@ -126,16 +120,16 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       end)
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/previous")
-      |> json_response(200)
+      |> response(200, op(SessionController, :previous))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
       user = user_fixture()
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/previous")
       |> json_response(404)
     end
@@ -160,9 +154,9 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
 
       response =
         conn
-        |> api_conn(user)
+        |> auth(user)
         |> post(~p"/api/session/vote", %{rating: 7})
-        |> json_response(200)
+        |> response(200, op(SessionController, :vote))
 
       assert response["ok"] == true
       assert response["rating"] == 7
@@ -172,7 +166,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       user = user_fixture(%{twitch: %{user_id: "streamer123"}})
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/vote", %{rating: 11})
       |> json_response(422)
     end
@@ -181,7 +175,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       user = user_fixture(%{twitch: %{user_id: "streamer123"}})
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> post(~p"/api/session/vote", %{})
       |> json_response(422)
     end
@@ -194,9 +188,9 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
 
       response =
         conn
-        |> api_conn(user)
+        |> auth(user)
         |> get(~p"/api/session")
-        |> json_response(200)
+        |> response(200, op(SessionController, :show))
 
       assert response["id"] == session.id
       assert response["status"] == "active"
@@ -206,7 +200,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       user = user_fixture()
 
       conn
-      |> api_conn(user)
+      |> auth(user)
       |> get(~p"/api/session")
       |> json_response(404)
     end
