@@ -220,6 +220,9 @@ defmodule PremiereEcouteWeb.Router do
 
     get "/status", StatusController, :index
 
+    get "/profile", UserProfileController, :show
+    patch "/profile", UserProfileController, :update
+
     get "/session", SessionController, :show
     post "/session/start", SessionController, :start
     post "/session/stop", SessionController, :stop
