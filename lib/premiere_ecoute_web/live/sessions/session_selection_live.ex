@@ -30,9 +30,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
     |> assign(:show_random_modal, false)
-    |> assign(:pool_empty, true)
-    |> assign(:pool_random_pick, nil)
-    |> assign(:pool_spinning, false)
+    |> assign(:picks_empty, true)
+    |> assign(:random_pick, nil)
+    |> assign(:pick_spinning, false)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -261,17 +261,17 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
     socket
     |> assign(:show_random_modal, true)
-    |> assign(:pool_random_pick, nil)
-    |> assign(:pool_spinning, false)
-    |> assign(:pool_empty, AlbumPicks.count_for_user(user_id) == 0)
+    |> assign(:random_pick, nil)
+    |> assign(:pick_spinning, false)
+    |> assign(:picks_empty, AlbumPicks.count_for_user(user_id) == 0)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   def handle_event("close_random_modal", _params, socket) do
     socket
     |> assign(:show_random_modal, false)
-    |> assign(:pool_random_pick, nil)
-    |> assign(:pool_spinning, false)
+    |> assign(:random_pick, nil)
+    |> assign(:pick_spinning, false)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -279,8 +279,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     user_id = get_user_id(socket)
 
     socket
-    |> assign(:pool_spinning, true)
-    |> assign(:pool_random_pick, nil)
+    |> assign(:pick_spinning, true)
+    |> assign(:random_pick, nil)
     |> start_async(:spin_wheel, fn ->
       # AIDEV-NOTE: small delay so the frontend animation has time to play before we push the result
       Process.sleep(2000)
@@ -290,15 +290,15 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   end
 
   def handle_event("use_random_album", _params, socket) do
-    case socket.assigns.pool_random_pick do
+    case socket.assigns.random_pick do
       nil ->
-        {:noreply, put_flash(socket, :error, "No album selected")}
+        {:noreply, put_flash(socket, :error, gettext("No album selected"))}
 
       pick ->
         socket
         |> assign(:show_random_modal, false)
-        |> assign(:pool_random_pick, nil)
-        |> assign(:pool_spinning, false)
+        |> assign(:random_pick, nil)
+        |> assign(:pick_spinning, false)
         |> assign(:selected_album, AsyncResult.loading())
         |> start_async(:select, fn -> PremiereEcoute.Apis.spotify().get_album(pick.album_id) end)
         |> then(fn socket -> {:noreply, socket} end)
@@ -416,23 +416,23 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   def handle_async(:spin_wheel, {:ok, nil}, socket) do
     socket
-    |> assign(:pool_spinning, false)
-    |> assign(:pool_random_pick, nil)
-    |> put_flash(:info, "No albums in the pool yet!")
+    |> assign(:pick_spinning, false)
+    |> assign(:random_pick, nil)
+    |> put_flash(:info, gettext("No albums in the pick list yet!"))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   def handle_async(:spin_wheel, {:ok, pick}, socket) do
     socket
-    |> assign(:pool_spinning, false)
-    |> assign(:pool_random_pick, pick)
+    |> assign(:pick_spinning, false)
+    |> assign(:random_pick, pick)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   def handle_async(:spin_wheel, {:exit, _reason}, socket) do
     socket
-    |> assign(:pool_spinning, false)
-    |> put_flash(:error, "Spin failed. Please try again.")
+    |> assign(:pick_spinning, false)
+    |> put_flash(:error, gettext("Spin failed. Please try again."))
     |> then(fn socket -> {:noreply, socket} end)
   end
 

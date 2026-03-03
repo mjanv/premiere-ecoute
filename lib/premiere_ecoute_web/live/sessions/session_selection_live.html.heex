@@ -360,7 +360,7 @@
               <div class="flex items-center justify-between p-6 border-b border-white/10">
                 <div>
                   <h2 class="text-xl font-bold text-white">{gettext("Random Album Pick")}</h2>
-                  <p class="text-sm text-gray-400 mt-1">{gettext("Spin to pick a random album from your pool")}</p>
+                  <p class="text-sm text-gray-400 mt-1">{gettext("Spin to pick a random album from your list")}</p>
                 </div>
                 <button
                   type="button"
@@ -380,23 +380,20 @@
 <!-- Spin area -->
               <div class="p-6">
                 <%= cond do %>
-                  <% @pool_empty -> %>
+                  <% @picks_empty -> %>
                     <div class="text-center py-10">
                       <div class="text-4xl mb-3">🎲</div>
-                      <p class="text-gray-400 mb-1">{gettext("Your pool is empty.")}</p>
-                      <p class="text-gray-500 text-sm">{gettext("Add albums from the pool management page.")}</p>
+                      <p class="text-gray-400 mb-1">{gettext("Your pick list is empty.")}</p>
+                      <p class="text-gray-500 text-sm">{gettext("Add albums from the pick management page.")}</p>
                     </div>
-                  <% @pool_random_pick != nil -> %>
+                  <% @random_pick != nil -> %>
                     <!-- Winner revealed -->
                     <div class="text-center">
-                      <p class="text-purple-400 text-sm font-medium mb-4 uppercase tracking-wide">
-                        {gettext("The wheel has spoken!")}
-                      </p>
                       <div class="flex items-center space-x-4 p-4 rounded-xl bg-purple-600/10 border border-purple-500/30 mx-auto max-w-sm mb-5">
-                        <%= if @pool_random_pick.cover_url do %>
+                        <%= if @random_pick.cover_url do %>
                           <img
-                            src={@pool_random_pick.cover_url}
-                            alt={@pool_random_pick.name}
+                            src={@random_pick.cover_url}
+                            alt={@random_pick.name}
                             class="w-20 h-20 rounded-lg shadow-lg flex-shrink-0"
                           />
                         <% else %>
@@ -407,10 +404,10 @@
                           </div>
                         <% end %>
                         <div class="text-left">
-                          <p class="font-bold text-white text-lg leading-tight">{@pool_random_pick.name}</p>
-                          <p class="text-gray-300 text-sm">{@pool_random_pick.artist}</p>
-                          <%= if @pool_random_pick.source == :viewer && @pool_random_pick.submitter && @pool_random_pick.submitter != "" do %>
-                            <p class="text-purple-400 text-xs mt-1">{gettext("Submitted by")} {@pool_random_pick.submitter}</p>
+                          <p class="font-bold text-white text-lg leading-tight">{@random_pick.name}</p>
+                          <p class="text-gray-300 text-sm">{@random_pick.artist}</p>
+                          <%= if @random_pick.source == :viewer && @random_pick.submitter && @random_pick.submitter != "" do %>
+                            <p class="text-purple-400 text-xs mt-1">{gettext("Submitted by")} {@random_pick.submitter}</p>
                           <% end %>
                         </div>
                       </div>
@@ -431,7 +428,7 @@
                         </button>
                       </div>
                     </div>
-                  <% @pool_spinning -> %>
+                  <% @pick_spinning -> %>
                     <div class="flex flex-col items-center justify-center py-10 space-y-4">
                       <div class="animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent"></div>
                       <p class="text-purple-400 text-sm animate-pulse">{gettext("Spinning...")}</p>
@@ -465,7 +462,7 @@
                     />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>{gettext("Manage pool")}</span>
+                  <span>{gettext("Manage picks")}</span>
                 </.link>
               </div>
             </div>

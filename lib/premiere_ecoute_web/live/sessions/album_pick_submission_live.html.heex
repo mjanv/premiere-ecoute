@@ -11,7 +11,7 @@
             {gettext("for")} <span class="text-purple-400">{@streamer.username}</span>
           </p>
           <p class="text-slate-400 text-sm mt-2">
-            {gettext("Suggest an album for the random pick pool!")}
+            {gettext("Suggest an album for the random pick!")}
           </p>
         </div>
         
@@ -36,49 +36,122 @@
         
 <!-- Submission form -->
         <div class="bg-gradient-to-br from-white/4 to-white/2 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm p-8">
-          <form phx-change="validate" phx-submit="submit">
-            <!-- Pseudo -->
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-slate-300 mb-2">
-                {gettext("Your name")} <span class="text-slate-500">{gettext("(optional)")}</span>
-              </label>
-              <input
-                type="text"
-                name="pseudo"
-                value={@pseudo}
-                placeholder={gettext("Your nickname...")}
-                maxlength="50"
-                class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 outline-none transition-colors"
-              />
-            </div>
-            
-<!-- Album URL -->
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-slate-300 mb-2">
-                {gettext("Spotify album URL")}
-              </label>
-              <input
-                type="text"
-                name="url"
-                value={@url}
-                placeholder="https://open.spotify.com/album/..."
-                class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 outline-none transition-colors"
-              />
-              <p class="text-slate-500 text-xs mt-2">
-                {gettext("Open an album in Spotify, click Share → Copy link.")}
-              </p>
-            </div>
-            
-<!-- Error -->
-            <%= if @error_message do %>
-              <div class="mb-4 p-3 bg-red-900/30 border border-red-500/40 rounded-lg text-red-300 text-sm">
-                {@error_message}
-              </div>
-            <% end %>
+          <!-- Pseudo — phx-update="ignore" prevents LiveView from patching this on re-renders -->
+          <div id="pseudo-wrapper" phx-update="ignore" class="mb-6">
+            <label class="block text-sm font-medium text-slate-300 mb-2">
+              {gettext("Your name")} <span class="text-slate-500">{gettext("(optional)")}</span>
+            </label>
+            <input
+              type="text"
+              name="pseudo"
+              id="pseudo-input"
+              placeholder={gettext("Your nickname...")}
+              maxlength="50"
+              class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 outline-none transition-colors"
+            />
+          </div>
+          
+<!-- Album search -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-slate-300 mb-2">
+              {gettext("Search an album")}
+            </label>
+            <div
+              class="relative"
+              phx-hook="ClickOutside"
+              id="search-container"
+              data-event="clear_search_results"
+            >
+              <.form for={@search_form} id="album-search-form" phx-change="search_albums" phx-submit="search_albums">
+                <.input
+                  field={@search_form[:query]}
+                  type="text"
+                  placeholder={gettext("Search Spotify albums...")}
+                  class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                  error_class="border-red-400 focus:border-red-500"
+                />
+              </.form>
 
+              <%= if @search_albums.loading do %>
+                <div class="absolute top-full left-0 right-0 z-50 mt-2 rounded-lg shadow-lg border border-white/10 p-4 bg-gray-900">
+                  <div class="flex items-center justify-center space-x-3">
+                    <div class="animate-spin rounded-full h-5 w-5 border-2 border-purple-400 border-t-transparent"></div>
+                    <span class="text-gray-300 text-sm">{gettext("Searching albums...")}</span>
+                  </div>
+                </div>
+              <% end %>
+
+              <%= if @search_albums.ok? && length(@search_albums.result) > 0 do %>
+                <div class="absolute top-full left-0 right-0 z-50 mt-2 rounded-lg shadow-lg border border-white/10 max-h-80 overflow-y-auto bg-gray-900">
+                  <%= for album <- @search_albums.result do %>
+                    <div class="flex items-center justify-between p-3 hover:bg-white/5 transition-colors first:rounded-t-lg last:rounded-b-lg">
+                      <.album_display album={album} size="sm" show_metadata={true} class="flex-1 min-w-0 mr-3" />
+                      <button
+                        type="button"
+                        phx-click="select_album"
+                        phx-value-album_id={album.album_id}
+                        class="flex-shrink-0 px-3 py-1.5 border border-white/20 hover:border-purple-400 text-gray-300 hover:text-white rounded-md text-xs font-medium transition-colors"
+                      >
+                        {gettext("Select")}
+                      </button>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+          
+<!-- Selected album preview -->
+          <%= if @selected_album do %>
+            <div class="mb-6 flex items-center gap-4 p-4 rounded-xl bg-purple-600/10 border border-purple-500/30">
+              <%= if @selected_album.cover_url do %>
+                <img
+                  src={@selected_album.cover_url}
+                  alt={@selected_album.name}
+                  class="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                />
+              <% else %>
+                <div class="w-14 h-14 rounded-lg bg-purple-900/50 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                  </svg>
+                </div>
+              <% end %>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-white truncate">{@selected_album.name}</p>
+                <p class="text-gray-400 text-sm truncate">{@selected_album.artist}</p>
+              </div>
+              <button
+                type="button"
+                phx-click="clear_selected_album"
+                class="flex-shrink-0 p-1.5 text-gray-500 hover:text-gray-300 transition-colors"
+                title={gettext("Clear selection")}
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          <% end %>
+          
+<!-- Error -->
+          <%= if @error_message do %>
+            <div class="mb-4 p-3 bg-red-900/30 border border-red-500/40 rounded-lg text-red-300 text-sm">
+              {@error_message}
+            </div>
+          <% end %>
+
+          <form phx-submit="submit_album">
+            <input type="hidden" name="pseudo" value="" id="pseudo-hidden" />
             <button
               type="submit"
-              class="w-full py-3 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-200 shadow-lg"
+              onclick="document.getElementById('pseudo-hidden').value = document.getElementById('pseudo-input').value"
+              disabled={is_nil(@selected_album)}
+              class="w-full py-3 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-200 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {gettext("Submit album")}
             </button>

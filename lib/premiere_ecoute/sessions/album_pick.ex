@@ -1,6 +1,6 @@
 defmodule PremiereEcoute.Sessions.AlbumPick do
   @moduledoc """
-  Album pick entry in a streamer's random selection pool.
+  Album pick entry in a streamer's random selection list.
 
   Tracks albums added by the streamer or submitted by viewers that can be
   randomly selected when starting a new listening session.

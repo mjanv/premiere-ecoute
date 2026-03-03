@@ -1,8 +1,8 @@
 defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
   @moduledoc """
-  Streamer administration page for the random album pick pool.
+  Streamer administration page for the random album pick list.
 
-  Lists all albums in the streamer's pick pool, allows adding new albums via
+  Lists all albums in the streamer's pick list, allows adding new albums via
   Spotify search, and supports removal of individual entries.
   """
 
@@ -15,10 +15,13 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
   def mount(_params, _session, socket) do
     user_id = socket.assigns.current_scope.user.id
 
+    PremiereEcoute.PubSub.subscribe("album_picks:#{user_id}")
+
     socket
     |> stream(:picks, AlbumPicks.list_for_user(user_id))
     |> assign(:picks_count, AlbumPicks.count_for_user(user_id))
     |> assign(:viewer_submit_url, url(~p"/sessions/pick/#{user_id}/submit"))
+    |> assign(:show_clear_modal, false)
     |> assign(:search_form, to_form(%{"query" => ""}))
     |> assign(:search_albums, AsyncResult.ok([]))
     |> then(fn socket -> {:ok, socket} end)
@@ -66,11 +69,11 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
             |> assign(:picks_count, socket.assigns.picks_count + 1)
             |> assign(:search_albums, AsyncResult.ok([]))
             |> assign(:search_form, to_form(%{"query" => ""}))
-            |> put_flash(:info, gettext("Album added to pool"))
+            |> put_flash(:info, gettext("Album added"))
             |> then(fn socket -> {:noreply, socket} end)
 
           {:error, _} ->
-            {:noreply, put_flash(socket, :error, gettext("Could not add album to pool"))}
+            {:noreply, put_flash(socket, :error, gettext("Could not add album"))}
         end
     end
   end
@@ -84,12 +87,40 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
         socket
         |> stream_delete(:picks, pick)
         |> assign(:picks_count, socket.assigns.picks_count - 1)
-        |> put_flash(:info, gettext("Album removed from pool"))
+        |> put_flash(:info, gettext("Album removed"))
         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, :not_found} ->
         {:noreply, put_flash(socket, :error, gettext("Album not found"))}
     end
+  end
+
+  def handle_event("open_clear_modal", _params, socket) do
+    {:noreply, assign(socket, :show_clear_modal, true)}
+  end
+
+  def handle_event("close_clear_modal", _params, socket) do
+    {:noreply, assign(socket, :show_clear_modal, false)}
+  end
+
+  def handle_event("confirm_clear_all", _params, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    AlbumPicks.clear_all(user_id)
+
+    socket
+    |> stream(:picks, [], reset: true)
+    |> assign(:picks_count, 0)
+    |> assign(:show_clear_modal, false)
+    |> put_flash(:info, gettext("List cleared"))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:pick_added, pick}, socket) do
+    socket
+    |> stream_insert(:picks, pick, at: 0)
+    |> assign(:picks_count, socket.assigns.picks_count + 1)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true

@@ -1,10 +1,10 @@
 defmodule PremiereEcoute.Sessions.AlbumPicks do
   @moduledoc """
-  Context for managing a streamer's album pick pool.
+  Context for managing a streamer's album pick list.
 
-  Streamers curate a pool of albums from which a random one can be selected
+  Streamers curate a list of albums from which a random one can be selected
   when starting a new listening session. Viewers can also submit albums to
-  the pool via a public page.
+  the list via a public page.
   """
 
   import Ecto.Query
@@ -24,9 +24,9 @@ defmodule PremiereEcoute.Sessions.AlbumPicks do
   end
 
   @doc """
-  Adds an album to the streamer's pick pool.
+  Adds an album to the streamer's pick list.
 
-  Silently ignores duplicates (same album already in pool).
+  Silently ignores duplicates (same album already in list).
   Returns `{:ok, pick}` on success or `{:error, changeset}` on failure.
   """
   @spec add_entry(integer(), map()) :: {:ok, AlbumPick.t()} | {:error, Ecto.Changeset.t()} | {:error, :already_exists}
@@ -52,10 +52,10 @@ defmodule PremiereEcoute.Sessions.AlbumPicks do
   end
 
   @doc """
-  Adds a viewer-submitted album to the streamer's pick pool.
+  Adds a viewer-submitted album to the streamer's pick list.
 
   Returns `{:ok, pick}` on success, `{:error, :already_exists}` if the album
-  is already in the pool, or `{:error, changeset}` on validation failure.
+  is already in the list, or `{:error, changeset}` on validation failure.
   """
   @spec add_viewer_entry(integer(), map(), String.t()) ::
           {:ok, AlbumPick.t()} | {:error, Ecto.Changeset.t()} | {:error, :already_exists}
@@ -103,9 +103,24 @@ defmodule PremiereEcoute.Sessions.AlbumPicks do
   end
 
   @doc """
+  Removes all album picks for the given user.
+
+  Returns the number of deleted entries.
+  """
+  @spec clear_all(integer()) :: non_neg_integer()
+  def clear_all(user_id) do
+    {count, _} =
+      AlbumPick
+      |> where([p], p.user_id == ^user_id)
+      |> Repo.delete_all()
+
+    count
+  end
+
+  @doc """
   Returns a random album pick for the given user.
 
-  Returns `nil` if the pool is empty.
+  Returns `nil` if the list is empty.
   """
   @spec random_entry(integer()) :: AlbumPick.t() | nil
   def random_entry(user_id) do
