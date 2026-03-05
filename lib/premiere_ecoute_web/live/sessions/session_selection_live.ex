@@ -7,6 +7,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents
+
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions.AlbumPicks
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
@@ -35,6 +37,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:pick_spinning, false)
     |> assign(:free_session_name, "")
     |> assign(:free_vote_mode, nil)
+    |> update_state()
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -133,6 +136,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:free_vote_mode, nil)
     # Load playlists if playlist source is selected
     |> maybe_load_playlists(source)
+    |> update_state()
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -165,6 +169,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
           playlist ->
             socket
             |> assign(:selected_playlist, AsyncResult.ok(playlist))
+            |> update_state()
             |> then(fn socket -> {:noreply, socket} end)
         end
 
@@ -223,6 +228,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
         socket
         |> assign(:vote_options_preset, nil)
         |> assign(:vote_options_configured, false)
+        |> update_state()
         |> then(fn socket -> {:noreply, socket} end)
 
       _ ->
@@ -235,6 +241,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
         |> assign(:vote_options_preset, preset)
         |> assign(:vote_options_configured, true)
         |> assign(:free_vote_mode, free_vote_mode)
+        |> update_state()
         |> then(fn socket -> {:noreply, socket} end)
     end
   end
@@ -282,11 +289,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   end
 
   def handle_event("update_free_session_name", %{"name" => name}, socket) do
-    {:noreply, assign(socket, :free_session_name, name)}
+    {:noreply, socket |> assign(:free_session_name, name) |> update_state()}
   end
 
   def handle_event("select_free_vote_mode", %{"mode" => mode}, socket) do
-    {:noreply, assign(socket, :free_vote_mode, mode)}
+    {:noreply, socket |> assign(:free_vote_mode, mode) |> update_state()}
   end
 
   def handle_event("open_random_modal", _params, socket) do
@@ -363,6 +370,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   def handle_async(:select, {:ok, {:ok, album}}, socket) do
     socket
     |> assign(:selected_album, AsyncResult.ok(album))
+    |> update_state()
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -403,6 +411,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   def handle_async(:select_track, {:ok, {:ok, track}}, socket) do
     socket
     |> assign(:selected_track, AsyncResult.ok(track))
+    |> update_state()
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -505,4 +514,35 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   end
 
   defp maybe_load_playlists(socket, _), do: socket
+
+  # AIDEV-NOTE: derived assigns kept in sync here; call after any mutation of source/selection/vote assigns
+  defp update_state(socket) do
+    %{
+      source_type: source_type,
+      selected_album: selected_album,
+      selected_playlist: selected_playlist,
+      selected_track: selected_track,
+      free_session_name: free_session_name,
+      vote_options_configured: vote_options_configured,
+      free_vote_mode: free_vote_mode
+    } = socket.assigns
+
+    content_selected =
+      (source_type == "album" && selected_album.ok? && selected_album.result) ||
+        (source_type == "playlist" && selected_playlist.ok? && selected_playlist.result) ||
+        (source_type == "track" && selected_track.ok? && selected_track.result) ||
+        (source_type == "free" && free_session_name != "")
+
+    step =
+      cond do
+        content_selected && vote_options_configured && (source_type != "free" || free_vote_mode != nil) -> "4"
+        content_selected -> "3"
+        source_type -> "2"
+        true -> "1"
+      end
+
+    socket
+    |> assign(:content_selected, content_selected)
+    |> assign(:step, step)
+  end
 end
