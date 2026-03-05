@@ -31,8 +31,14 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
        socket
        |> assign(current_user: current_user, profile_form: profile_form)
        |> assign(:api_tokens, Accounts.list_user_api_tokens(current_user))
-       |> assign(:new_api_token, nil)}
+       |> assign(:new_api_token, nil)
+       |> assign(:overlay_score_type, "streamer")}
     end
+  end
+
+  @impl true
+  def handle_event("change_overlay_score_type", %{"score_type" => score_type}, socket) do
+    {:noreply, assign(socket, :overlay_score_type, score_type)}
   end
 
   @impl true
@@ -83,5 +89,18 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
      socket
      |> assign(:api_tokens, [])
      |> assign(:new_api_token, nil)}
+  end
+
+  defp overlay_url(user_id, score_type) do
+    base = "#{PremiereEcouteWeb.Endpoint.url()}/sessions/overlay/#{user_id}"
+
+    case score_type do
+      "streamer" -> "#{base}?score=streamer"
+      "viewer" -> "#{base}?score=viewer"
+      "both" -> "#{base}?score=viewer+streamer"
+      "player" -> "#{base}?score=player"
+      "votes" -> "#{base}?score=votes"
+      _ -> base
+    end
   end
 end

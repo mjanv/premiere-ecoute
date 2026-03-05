@@ -85,7 +85,9 @@
             
 <!-- Next Track Timer/Slider — not shown for :track or :free -->
             <%= if @listening_session.source not in [:track, :free] do %>
-              <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
+              <div class="mt-4 pt-4 border-t border-white/20 space-y-2">
+                <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
+              </div>
             <% end %>
             
 <!-- Free mode controls: capture + open/close vote window -->
@@ -157,55 +159,6 @@
                 </div>
               </div>
             <% end %>
-            
-<!-- Overlay link section with dropdown selector -->
-            <div class="mt-4 pt-4 border-t border-white/20" id="overlay-hooks">
-              <div class="relative">
-                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 z-10">
-                  <form phx-change="change_overlay_score_type" class="flex items-center">
-                    <select
-                      name="score_type"
-                      value={@overlay_score_type}
-                      phx-update="ignore"
-                      id="select_type"
-                      class="text-xs text-purple-200 font-medium bg-transparent border-none focus:outline-none cursor-pointer w-20"
-                    >
-                      <option value="streamer" class="bg-gray-800 text-white">Streamer</option>
-                      <option value="viewer" class="bg-gray-800 text-white">Viewer</option>
-                      <option value="both" class="bg-gray-800 text-white">Both</option>
-                      <option value="player" class="bg-gray-800 text-white">Player</option>
-                      <option value="votes" class="bg-gray-800 text-white">Votes</option>
-                    </select>
-                  </form>
-                  <div class="w-px h-4 bg-white/20"></div>
-                </div>
-                <input
-                  type="text"
-                  readonly
-                  value={get_current_overlay_url(@socket.host_uri, @current_scope.user.id, @overlay_score_type)}
-                  class="w-full bg-white/10 border border-white/20 rounded-lg pl-30 pr-10 py-2 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  id={"overlay-url-input-#{@overlay_score_type}"}
-                />
-                <div class="absolute right-1 top-1 bottom-1 flex space-x-1">
-                  <div id="open-url-hook" phx-hook="OpenUrl">
-                    <button
-                      phx-click="open_overlay"
-                      class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors flex items-center justify-center h-full"
-                      title={gettext("Open overlay in new tab")}
-                    >
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
             
 <!-- Session control buttons and visibility selector -->
             <div class="mt-4 pt-4 border-t border-white/20">

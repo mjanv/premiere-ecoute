@@ -13,46 +13,80 @@
           class="absolute left-6 w-1 rounded-full transition-all duration-700 ease-in-out bg-gradient-primary-vertical ariane-thread-progress"
           style="height: 0px;"
           data-progress-step={@step}
-        ></div>
-
-        <!-- Step 1: Source -->
+        >
+        </div>
+        
+<!-- Step 1: Source -->
         <div class="mb-8 relative">
           <div class="flex items-center mb-6">
-            <div id="step-circle-1" class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20">
+            <div
+              id="step-circle-1"
+              class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+            >
               1
             </div>
             <h2 class="text-2xl font-semibold text-white">{gettext("Source")}</h2>
           </div>
           <.source_buttons source_type={@source_type} current_scope={@current_scope} />
         </div>
-
-        <!-- Step 2: Content selection -->
-        <.album_step :if={@source_type == "album"} selected_album={@selected_album} search_albums={@search_albums} search_form={@search_form} />
-        <.random_album_modal :if={@show_random_modal} picks_empty={@picks_empty} pick_spinning={@pick_spinning} random_pick={@random_pick} />
+        
+<!-- Step 2: Content selection -->
+        <.album_step
+          :if={@source_type == "album"}
+          selected_album={@selected_album}
+          search_albums={@search_albums}
+          search_form={@search_form}
+        />
+        <.random_album_modal
+          :if={@show_random_modal}
+          picks_empty={@picks_empty}
+          pick_spinning={@pick_spinning}
+          random_pick={@random_pick}
+        />
         <.playlist_step :if={@source_type == "playlist"} user_playlists={@user_playlists} selected_playlist={@selected_playlist} />
-        <.track_step :if={@source_type == "track"} selected_track={@selected_track} search_tracks={@search_tracks} search_form={@search_form} />
+        <.track_step
+          :if={@source_type == "track"}
+          selected_track={@selected_track}
+          search_tracks={@search_tracks}
+          search_form={@search_form}
+        />
         <.free_step :if={@source_type == "free"} free_session_name={@free_session_name} />
-
-        <!-- Step 3: Vote options -->
-        <.vote_options_step :if={@content_selected} vote_options_preset={@vote_options_preset} source_type={@source_type} free_vote_mode={@free_vote_mode} />
-
-        <!-- Step 4: Start -->
+        
+<!-- Step 3: Vote options -->
+        <.vote_options_step
+          :if={@content_selected}
+          vote_options_preset={@vote_options_preset}
+          source_type={@source_type}
+          free_vote_mode={@free_vote_mode}
+        />
+        
+<!-- Step 4: Start -->
         <%= if @step == "4" do %>
           <div class="pt-6 relative" id="step-4">
             <div class="flex items-center mb-6">
-              <div id="step-circle-4" class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20">
+              <div
+                id="step-circle-4"
+                class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+              >
                 4
               </div>
               <h2 class="text-2xl font-semibold text-white">{gettext("Ready to Start")}</h2>
             </div>
             <div class="flex items-center space-x-4 ml-16">
-              <button class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-8 rounded-lg font-medium transition-colors flex items-center space-x-2" phx-click="prepare_session">
+              <button
+                class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-8 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                phx-click="prepare_session"
+              >
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
                 </svg>
                 <span>{gettext("Start Listening Session")}</span>
               </button>
-              <button class="border border-purple-600 text-purple-300 hover:bg-purple-800 py-3 px-6 rounded-lg font-medium transition-colors" phx-click="select_source" phx-value-source="">
+              <button
+                class="border border-purple-600 text-purple-300 hover:bg-purple-800 py-3 px-6 rounded-lg font-medium transition-colors"
+                phx-click="select_source"
+                phx-value-source=""
+              >
                 {gettext("Start Over")}
               </button>
             </div>

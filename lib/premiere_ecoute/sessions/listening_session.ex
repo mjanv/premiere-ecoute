@@ -494,6 +494,41 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Map.new()
   end
 
+  @doc """
+  Returns a paginated page of sessions for a user, ordered by status priority (active > preparing > stopped) then date descending.
+  """
+  # AIDEV-NOTE: status priority: active(1) > preparing(2) > stopped(3), then newest first
+  @spec page_for_user(integer(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
+  def page_for_user(user_id, page_number, page_size \\ 10) do
+    query =
+      from s in __MODULE__,
+        where: s.user_id == ^user_id,
+        order_by: [
+          fragment("CASE status WHEN 'active' THEN 1 WHEN 'preparing' THEN 2 ELSE 3 END"),
+          desc: s.inserted_at
+        ]
+
+    page = Repo.paginate(query, page: page_number, page_size: page_size)
+
+    %{
+      page
+      | entries:
+          Repo.preload(page.entries,
+            user: [:twitch, :spotify],
+            album: [:tracks],
+            current_track: [],
+            playlist: [:tracks],
+            current_playlist_track: [],
+            single: [],
+            track_markers: []
+          )
+    }
+  end
+
+  @spec next_page_for_user(integer(), Scrivener.Page.t()) :: Scrivener.Page.t()
+  def next_page_for_user(_user_id, %Scrivener.Page{page_number: n, total_pages: n} = page), do: page
+  def next_page_for_user(user_id, %Scrivener.Page{page_number: n, page_size: ps}), do: page_for_user(user_id, n + 1, ps)
+
   defp has_active_session?(user_id, exclude_session_id) do
     from(s in __MODULE__,
       where: s.user_id == ^user_id and s.status == :active and s.id != ^exclude_session_id

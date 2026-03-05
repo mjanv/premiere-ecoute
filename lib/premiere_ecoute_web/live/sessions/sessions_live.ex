@@ -14,7 +14,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: scope}} = socket) do
-    page = ListeningSession.page([where: [user_id: scope.user.id]], 1, 10)
+    page = ListeningSession.page_for_user(scope.user.id, 1)
 
     socket
     |> assign(:show_delete_modal, false)
@@ -31,7 +31,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   @impl true
   def handle_event("next-page", _params, %{assigns: %{current_scope: scope, page: page}} = socket) do
-    next_page = ListeningSession.next_page([where: [user_id: scope.user.id]], page)
+    next_page = ListeningSession.next_page_for_user(scope.user.id, page)
 
     socket
     |> assign(:page, next_page)

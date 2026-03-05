@@ -272,82 +272,96 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
 
   @spec next_track(map()) :: Phoenix.LiveView.Rendered.t()
   def next_track(assigns) do
+    # AIDEV-NOTE: fill% drives the CSS custom property for the track gradient; max=60 step=5
+    fill = if assigns.value && assigns.value > 0, do: round(assigns.value / 15 * 100), else: 0
+    assigns = assign(assigns, :fill, fill)
+
     ~H"""
-    <div class="pt-2">
-      <%= if @at do %>
-        <!-- Active Timer - replaces slider when countdown is active -->
-        <div class="flex items-center justify-center space-x-2">
-          <span class="text-purple-200 text-xs font-medium">
-            {gettext("Next track in")}
+    <div class="flex items-center gap-3">
+      <span class="text-purple-200 text-sm font-medium whitespace-nowrap shrink-0">
+        <%= if @at do %>
+          {gettext("Next track in")}
+        <% else %>
+          {gettext("Next track in")}
+          <span class={["ml-1", if(@value == 0, do: "text-white/30", else: "text-purple-300")]}>
+            {if @value == 0, do: gettext("Off"), else: "#{@value}s"}
           </span>
-          <div
-            id="next-track-timer"
-            phx-hook="NextTrackTimer"
-            data-next-track-at={DateTime.to_iso8601(@at)}
-            class="bg-purple-600/20 px-2 py-1 rounded border border-purple-500/30"
-          >
-            <span class="font-mono text-sm font-bold text-purple-300" id="timer-display">
-              --:--
-            </span>
-          </div>
+        <% end %>
+      </span>
+      <%= if @at do %>
+        <div
+          id="next-track-timer"
+          phx-hook="NextTrackTimer"
+          data-next-track-at={DateTime.to_iso8601(@at)}
+        >
+          <span class="text-sm font-bold text-purple-300 tabular-nums" id="timer-display">
+            --:--
+          </span>
         </div>
       <% else %>
-        <!-- Slider - shown when no timer is active -->
-        <div class="flex items-center space-x-4">
-          <span class="text-purple-200 text-sm font-medium whitespace-nowrap">
-            {gettext("Next track in")}
-          </span>
-          <div class="flex-1 px-1 relative">
-            <form phx-change="update_next_track">
-              <input
-                type="range"
-                name="next_track"
-                min="0"
-                max="10"
-                value={@value}
-                id="next-track-slider"
-                class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-white/20 slider-purple"
-                phx-debounce="300"
-              />
-            </form>
-            <style>
-              .slider-purple::-webkit-slider-thumb {
-                appearance: none;
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                background: #8b5cf6;
-                cursor: pointer;
-                border: 2px solid white;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-              }
-              .slider-purple::-moz-range-thumb {
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                background: #8b5cf6;
-                cursor: pointer;
-                border: 2px solid white;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-              }
-              .slider-purple::-webkit-slider-track {
-                height: 8px;
-                border-radius: 4px;
-                background: linear-gradient(to right, #8b5cf6 0%, #8b5cf6 {(@show[:next_track] / 60) * 100}%, rgba(255,255,255,0.2) {(@show[:next_track] / 60) * 100}%, rgba(255,255,255,0.2) 100%);
-              }
-            </style>
-          </div>
-          <span class={[
-            "text-sm font-medium min-w-[60px] text-center",
-            if(@value == 0, do: "text-gray-400", else: "text-white")
-          ]}>
-            <%= if @value == 0 do %>
-              {gettext("Off")}
-            <% else %>
-              {@value}s
-            <% end %>
-          </span>
-        </div>
+        <form phx-change="update_next_track" class="flex items-center flex-1">
+          <style>
+            #next-track-slider {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 100%;
+              height: 8px;
+              border-radius: 4px;
+              outline: none;
+              cursor: pointer;
+              background: linear-gradient(
+                to right,
+                #a855f7 0%,
+                #a855f7 <%= @fill %>%,
+                rgba(255,255,255,0.12) <%= @fill %>%,
+                rgba(255,255,255,0.12) 100%
+              );
+            }
+            #next-track-slider::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+              background: #fff;
+              border: 2px solid #a855f7;
+              cursor: pointer;
+              transition: transform 0.15s ease;
+            }
+            #next-track-slider::-webkit-slider-thumb:hover {
+              transform: scale(1.2);
+            }
+            #next-track-slider::-moz-range-thumb {
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+              background: #fff;
+              border: 2px solid #a855f7;
+              cursor: pointer;
+            }
+            #next-track-slider::-moz-range-track {
+              height: 8px;
+              border-radius: 4px;
+              background: rgba(255,255,255,0.12);
+            }
+            #next-track-slider::-moz-range-progress {
+              height: 8px;
+              border-radius: 4px;
+              background: #a855f7;
+            }
+          </style>
+          <input
+            type="range"
+            name="next_track"
+            min="0"
+            max="15"
+            step="1"
+            value={@value}
+            id="next-track-slider"
+            phx-debounce="300"
+            class="flex-1"
+          />
+        </form>
       <% end %>
     </div>
     """

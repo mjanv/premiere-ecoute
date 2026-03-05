@@ -54,7 +54,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:session_id, session_id)
       |> assign(:user_current_rating, nil)
       |> assign(:report, nil)
-      |> assign(:overlay_score_type, "streamer")
       |> assign(:vote_trends, nil)
       |> assign(:next_track_at, nil)
       |> assign(:show_youtube_modal, false)
@@ -163,17 +162,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       ListeningSession.update(assigns.listening_session, %{visibility: String.to_existing_atom(visibility)})
 
     {:noreply, assign(socket, :listening_session, listening_session)}
-  end
-
-  @impl true
-  def handle_event("change_overlay_score_type", params, socket) do
-    score_type = params["score_type"] || params[:score_type] || "streamer"
-    {:noreply, assign(socket, :overlay_score_type, score_type)}
-  end
-
-  @impl true
-  def handle_event("open_overlay", _params, socket) do
-    {:noreply, push_event(socket, "open_url", %{url: build_overlay_url(socket)})}
   end
 
   @impl true
@@ -587,24 +575,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         ]
 
         Enum.at(colors, rem(index, length(colors)), "bg-gray-500")
-    end
-  end
-
-  defp build_overlay_url(socket) do
-    user_id = socket.assigns.current_scope.user.id
-    get_current_overlay_url(socket.host_uri, user_id, socket.assigns.overlay_score_type)
-  end
-
-  defp get_current_overlay_url(host_uri, user_id, score_type) do
-    base_url = "#{host_uri}/sessions/overlay/#{user_id}"
-
-    case score_type do
-      "streamer" -> "#{base_url}?score=streamer"
-      "viewer" -> "#{base_url}?score=viewer"
-      "both" -> "#{base_url}?score=viewer+streamer"
-      "player" -> "#{base_url}?score=player"
-      "votes" -> "#{base_url}?score=votes"
-      _ -> base_url
     end
   end
 
