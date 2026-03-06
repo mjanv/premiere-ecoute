@@ -122,9 +122,10 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_info({:session_updated, session}, %{assigns: %{summary: summary}} = socket) do
+  def handle_info({:next_track_started, session}, %{assigns: %{summary: summary}} = socket) do
     socket
     |> assign(:listening_session, session)
+    |> assign(:widget_state, :closed)
     |> assign(:summary, AsyncResult.ok(summary, %{viewer_score: nil, streamer_score: nil}))
     |> then(fn socket -> {:noreply, socket} end)
   end

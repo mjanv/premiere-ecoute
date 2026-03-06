@@ -114,7 +114,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     with scope <- Scope.for_user(User.get(user_id)),
          {:ok, session, _} <-
            PremiereEcoute.apply(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
-      PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_updated, session})
+      PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track_started, session})
     end
 
     :ok
@@ -125,7 +125,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     with scope <- Scope.for_user(User.get(user_id)),
          {:ok, session, _} <-
            PremiereEcoute.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
-      PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_updated, session})
+      PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track_started, session})
     end
 
     :ok

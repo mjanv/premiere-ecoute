@@ -244,7 +244,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_info({:session_updated, session}, socket) do
+  def handle_info({:next_track_started, session}, socket) do
     socket
     |> assign(:listening_session, session)
     |> assign(:user_current_rating, nil)

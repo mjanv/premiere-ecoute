@@ -64,7 +64,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
     |> PremiereEcoute.apply()
     |> case do
       {:ok, session, _} ->
-        send(self(), {:session_updated, session})
+        send(self(), {:next_track_started, session})
         {:noreply, assign(socket, :listening_session, session)}
 
       {:error, _} ->

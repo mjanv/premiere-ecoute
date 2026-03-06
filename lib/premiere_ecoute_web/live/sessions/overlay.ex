@@ -14,16 +14,16 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp score_value(summary, :viewer) do
     case summary["viewer_score"] || Map.get(summary, :viewer_score) do
       nil -> "-"
-      0 -> "-"
-      10 -> "10"
-      score -> Integer.to_string(score)
+      +0.0 -> "-"
+      10.0 -> "10"
+      score -> Float.to_string(score)
     end
   end
 
   defp score_value(summary, :streamer) do
     case summary["streamer_score"] || Map.get(summary, :streamer_score) do
       nil -> "-"
-      0 -> "-"
+      +0.0 -> "-"
       score -> Integer.to_string(trunc(score))
     end
   end
