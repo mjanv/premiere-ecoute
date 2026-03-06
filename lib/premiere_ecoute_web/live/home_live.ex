@@ -20,7 +20,9 @@ defmodule PremiereEcouteWeb.HomeLive do
 
   @impl true
   def handle_params(_params, _url, %{assigns: %{current_scope: %{user: user}}} = socket) do
-    last_sessions = ListeningSession.all(where: [user_id: user.id, source: :album], order_by: [desc: :started_at], limit: 10)
+    last_sessions =
+      ListeningSession.all(where: [user_id: user.id, status: :stopped, source: :album], order_by: [desc: :started_at], limit: 10)
+
     next_radio = Radio.next_in?(user.id)
     last_radios = PremiereEcoute.Radio.RadioTrack.all(where: [user_id: user.id], order_by: [desc: :started_at], limit: 10)
 
