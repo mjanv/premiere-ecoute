@@ -4,83 +4,96 @@
       <div class="max-w-7xl mx-auto px-6">
         <div class="w-full">
           <%= if @current_user.role in [:streamer, :admin] do %>
-            <h2 class="text-4xl font-bold text-white mb-8 text-left">{gettext("My Activity")}</h2>
+            <h2 class="text-4xl font-bold text-white mb-12 text-center">
+              {gettext("Hello, %{name}", name: @current_user.username)}
+            </h2>
 
-            <div class="mb-12">
-              <div class="flex gap-6">
-                <%= if (@current_session && @current_session.source == :album) do %>
-                  <.activity_card
-                    type="content"
-                    label={gettext("Current Session")}
-                    title={@current_session.album.name}
-                    subtitle={gettext("by %{artist}", artist: @current_session.album.artist)}
-                    status_text={
-                      case @current_session.status do
-                        :active -> gettext("Live")
-                        :preparing -> gettext("Ready")
-                      end
-                    }
-                    action_text={gettext("Go to session")}
-                    href={~p"/sessions/#{@current_session.id}"}
-                  >
-                    <:icon>
-                      <%= if @current_session.album.cover_url do %>
-                        <img
-                          src={@current_session.album.cover_url}
-                          alt={@current_session.album.name}
-                          class="w-16 h-16 rounded-lg object-cover shadow-md"
-                        />
-                      <% end %>
-                    </:icon>
-                  </.activity_card>
-                <% else %>
-                  <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
-                    <.activity_card
-                      type="action"
-                      label={gettext("Create Session")}
-                      title={gettext("Start Listening Session")}
-                      subtitle={gettext("Share music with your community")}
-                      status_text={gettext("New")}
-                      status_variant="info"
-                      action_text={gettext("Choose an album to get started")}
-                      href={~p"/sessions/new"}
-                    />
-                  <% end %>
+            <%!-- Recently listened --%>
+            <section class="mb-12">
+              <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+                {gettext("Recently listened")}
+              </h3>
+              <.scroll_carousel id="album-carousel">
+                <%= for session <- @listening_sessions do %>
+                  <.album_square album={session.album} />
                 <% end %>
-                
-<!-- Latest Billboard Card using activity_card component -->
-                <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
-                  <%= if @latest_billboard do %>
-                    <.activity_card
-                      type="content"
-                      label={gettext("Current Billboard")}
-                      title={@latest_billboard.title}
-                      subtitle={ngettext("1 submission", "%{count} submissions", length(@latest_billboard.submissions))}
-                      status_text={
-                        case @latest_billboard.status do
-                          :active -> gettext("Active")
-                          :stopped -> gettext("Stopped")
-                          :created -> gettext("Created")
-                        end
-                      }
-                      action_text={gettext("Go to billboard")}
-                      href={~p"/billboards/#{@latest_billboard.billboard_id}"}
-                    />
-                  <% else %>
-                    <.activity_card
-                      type="action"
-                      label={gettext("Create Billboard")}
-                      title={gettext("Create Music Billboard")}
-                      subtitle={gettext("Collect community playlists")}
-                      status_text={gettext("New")}
-                      status_variant="default"
-                      action_text={gettext("Start collecting submissions")}
-                      href={~p"/billboards/new"}
-                    />
-                  <% end %>
+                <%= if @listening_sessions == [] do %>
+                  <p class="text-slate-500 text-sm">{gettext("No sessions yet.")}</p>
+                <% end %>
+              </.scroll_carousel>
+            </section>
+
+            <%!-- On the radio --%>
+            <section class="mb-12">
+              <div class="flex items-center gap-3 mb-4">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400">
+                  {gettext("On the radio")}
+                </h3>
+                <%= if @next_radio do %>
+                  <span class="flex items-center gap-1.5 text-xs text-green-400">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    {gettext("Active")} · {gettext("next capture at %{time}", time: Calendar.strftime(@next_radio, "%H:%M"))}
+                  </span>
+                <% else %>
+                  <span class="flex items-center gap-1.5 text-xs text-slate-500">
+                    <span class="inline-flex rounded-full h-2 w-2 bg-red-500/60"></span>
+                    {gettext("Inactive")}
+                  </span>
                 <% end %>
               </div>
-            </div>
+              <.scroll_carousel id="radio-carousel">
+                <%= for radio <- @last_radios do %>
+                  <.radio_track_card track={radio} />
+                <% end %>
+                <%= if @last_radios == [] do %>
+                  <p class="text-slate-500 text-sm">{gettext("No radio tracks yet.")}</p>
+                <% end %>
+              </.scroll_carousel>
+            </section>
+
+            <%!-- Upcoming events --%>
+            <section class="mb-12">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400">
+                  {gettext("Upcoming events")}
+                </h3>
+                <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
+                  <.link
+                    href={~p"/sessions/new"}
+                    class="w-7 h-7 rounded-full bg-purple-600 hover:bg-purple-500 border border-purple-500 flex items-center justify-center transition-all"
+                  >
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </.link>
+                <% end %>
+              </div>
+
+              <%!-- AIDEV-NOTE: active sessions sorted first by query order_by fragment --%>
+              <div class="rounded-xl border border-white/10 bg-white/10 overflow-hidden">
+                <%= if @upcoming_sessions == [] do %>
+                  <.link href={~p"/sessions/new"} class="group block">
+                    <div class="flex flex-col items-center justify-center gap-3 p-12 hover:bg-white/5 transition-all">
+                      <div class="w-10 h-10 rounded-full bg-white/5 group-hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      </div>
+                      <p class="text-slate-500 text-sm">{gettext("No active sessions. Start a new one.")}</p>
+                    </div>
+                  </.link>
+                <% else %>
+                  <div class="flex flex-col divide-y divide-white/5">
+                    <%= for session <- @upcoming_sessions do %>
+                      <.session_row session={session} />
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </section>
           <% end %>
         </div>
       </div>

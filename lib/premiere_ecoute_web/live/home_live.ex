@@ -1,45 +1,43 @@
 defmodule PremiereEcouteWeb.HomeLive do
   @moduledoc """
   Home page LiveView.
-
-  Displays user's current listening session and latest billboard on the home page.
   """
 
   use PremiereEcouteWeb, :live_view
 
+  import Ecto.Query, only: [from: 2]
+  import PremiereEcouteWeb.HomeComponents
+
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Billboards
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Radio
 
   @impl true
   def mount(_params, _session, socket) do
-    current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
-
-    socket
-    |> assign(:current_user, User.preload(current_user))
-    |> assign(:current_session, ListeningSession.current_session(current_user))
-    |> load_recent_billboards()
-    |> then(fn socket -> {:ok, socket} end)
+    {:ok, socket}
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
-  end
+  def handle_params(_params, _url, %{assigns: %{current_scope: %{user: user}}} = socket) do
+    last_sessions = ListeningSession.all(where: [user_id: user.id, source: :album], order_by: [desc: :started_at], limit: 10)
+    next_radio = Radio.next_in?(user.id)
+    last_radios = PremiereEcoute.Radio.RadioTrack.all(where: [user_id: user.id], order_by: [desc: :started_at], limit: 10)
 
-  defp load_recent_billboards(%{assigns: assigns} = socket) do
-    if assigns.current_scope do
-      latest_billboard =
-        Billboards.all(
-          where: [user_id: assigns.current_scope.user.id],
-          order_by: [desc: :inserted_at],
-          limit: 1
-        )
-        |> List.first()
+    upcoming_sessions =
+      from(s in ListeningSession,
+        where: s.user_id == ^user.id and s.status in [:active, :preparing],
+        order_by: [fragment("CASE status WHEN 'active' THEN 0 ELSE 1 END"), asc: s.inserted_at]
+      )
+      |> Repo.all()
+      |> ListeningSession.preload()
 
-      assign(socket, :latest_billboard, latest_billboard)
-    else
-      assign(socket, :latest_billboard, nil)
-    end
+    socket
+    |> assign(:current_user, User.preload(user))
+    |> assign(:current_session, ListeningSession.current_session(user))
+    |> assign(:listening_sessions, last_sessions)
+    |> assign(next_radio: next_radio, last_radios: last_radios)
+    |> assign(:upcoming_sessions, upcoming_sessions)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 end

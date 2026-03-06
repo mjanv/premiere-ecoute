@@ -43,7 +43,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-      
+
     <!-- Album Cover -->
       <div class="flex-shrink-0">
         <%= if @album.cover_url do %>
@@ -86,7 +86,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-      
+
     <!-- Track Cover -->
       <div class="flex-shrink-0">
         <%= if @single.cover_url do %>
@@ -137,7 +137,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-      
+
     <!-- Playlist Cover -->
       <div class="flex-shrink-0">
         <%= if @playlist.cover_url do %>
@@ -272,7 +272,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
 
   @spec next_track(map()) :: Phoenix.LiveView.Rendered.t()
   def next_track(assigns) do
-    # AIDEV-NOTE: fill% drives the CSS custom property for the track gradient; max=60 step=5
     fill = if assigns.value && assigns.value > 0, do: round(assigns.value / 15 * 100), else: 0
     assigns = assign(assigns, :fill, fill)
 
@@ -617,7 +616,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      
+
     <!-- Dropdown menu -->
       <div
         id="visibility-dropdown-menu"
