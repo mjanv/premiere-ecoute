@@ -13,15 +13,18 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
 
   defp score_value(summary, :viewer) do
     case summary["viewer_score"] || Map.get(summary, :viewer_score) do
-      nil -> "?"
-      score -> score
+      nil -> "-"
+      0 -> "-"
+      10 -> "10"
+      score -> Integer.to_string(score)
     end
   end
 
   defp score_value(summary, :streamer) do
     case summary["streamer_score"] || Map.get(summary, :streamer_score) do
-      nil -> "?"
-      score -> score
+      nil -> "-"
+      0 -> "-"
+      score -> Integer.to_string(trunc(score))
     end
   end
 
@@ -30,7 +33,12 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp score_nil?(summary, :streamer), do: is_nil(summary["streamer_score"] || Map.get(summary, :streamer_score))
 
   defp score_label(_user, :viewer), do: "Chat"
-  defp score_label(user, :streamer), do: user.username
+  defp score_label(%{username: username}, :streamer), do: username
+  defp score_label(_user, :streamer), do: "Streamer"
+
+  # AIDEV-NOTE: shrink font for two-digit scores to prevent overflow in 240px container
+  defp score_font_size(value) when is_integer(value) and value >= 10, do: "80px"
+  defp score_font_size(_), do: "80px"
 
   def widget_bg(:idle, _c1, _c2), do: "#000000"
   def widget_bg(:closed, c1, _c2), do: c1
