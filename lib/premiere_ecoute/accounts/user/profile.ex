@@ -82,7 +82,6 @@ defmodule PremiereEcoute.Accounts.User.Profile do
 end
 
 defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile do
-  # AIDEV-NOTE: nil embeds can occur for users created before these fields existed; fall back to defaults
   def encode(profile, opts) do
     profile
     |> Map.update!(:widget_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.WidgetSettings{}))

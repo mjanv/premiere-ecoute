@@ -361,7 +361,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  # AIDEV-NOTE: captures currently playing Spotify track into free session; returns error if nothing playing
   def handle(%CaptureCurrentTrackListeningSession{session_id: session_id, scope: scope}) do
     with {:ok, %{"item" => item, "is_playing" => true}} <- Apis.spotify().get_playback_state(scope, %{}),
          {:ok, single} <- Apis.spotify().get_single(item["id"]),
@@ -445,7 +444,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  # AIDEV-NOTE: creates playlist with all tracks from Spotify to freeze the session's track list at preparation time
   defp get_or_create_playlist(playlist) do
     case Playlist.get_by(playlist_id: playlist.playlist_id, provider: playlist.provider) do
       nil -> Playlist.create(%{playlist | url: Playlist.url(playlist)})

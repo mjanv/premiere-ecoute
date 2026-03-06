@@ -252,7 +252,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   defp overlay_height(_), do: 240
 
-  # AIDEV-NOTE: builds [{option, count}] from votes+polls for the current track
   defp compute_vote_distribution(summary, %ListeningSession{} = session) do
     track_id = summary[:track_id] || summary["track_id"]
 

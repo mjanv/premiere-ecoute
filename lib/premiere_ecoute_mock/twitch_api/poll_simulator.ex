@@ -15,8 +15,6 @@ defmodule PremiereEcouteMock.TwitchApi.PollSimulator do
   @webhook_url "http://localhost:4000/webhooks/twitch"
   @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
 
-  # AIDEV-NOTE: state is a map of poll_id => %{broadcaster_id, title, choices: [%{title, votes}]}
-
   @spec start_link(term()) :: GenServer.on_start()
   def start_link(_), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
 

@@ -97,7 +97,6 @@ defmodule PremiereEcouteWeb.Api.UserProfileController do
     end
   end
 
-  # AIDEV-NOTE: profile errors are nested under :profile due to cast_embed — unwrap one level
   defp format_errors(changeset) do
     changeset
     |> Repo.traverse_errors()

@@ -1,6 +1,4 @@
-<% # AIDEV-NOTE: vote_bar overlay — horizontal colored split bar, winner expands to full width on close
-# Uses max-width transition (animatable) instead of flex (not animatable in browsers)
-total = @vote_distribution |> Enum.map(&elem(&1, 1)) |> Enum.sum()
+<% total = @vote_distribution |> Enum.map(&elem(&1, 1)) |> Enum.sum()
 max_count = @vote_distribution |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end)
 
 option_colors = [

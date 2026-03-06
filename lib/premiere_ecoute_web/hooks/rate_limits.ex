@@ -32,8 +32,6 @@ defmodule PremiereEcouteWeb.Hooks.RateLimits do
 
   defp handle_rate_limits(_, socket), do: {:cont, socket}
 
-  # AIDEV-NOTE: seeds initial state before the first broadcast arrives
-  # Each banner is {api, message, expires_at} — mirrors RateLimitMonitor.apis/0
   defp current_apis do
     :rate_limits
     |> Cachex.stream!()

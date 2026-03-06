@@ -4,8 +4,6 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
 
   Emotes are identified as space-separated words in chat messages.
   Common pattern: channel prefix followed by identifier (e.g., angledPepog, angledHello).
-
-  AIDEV-NOTE: emote-extraction; parses message body to extract individual emotes
   """
 
   require Explorer.DataFrame, as: DataFrame
@@ -27,8 +25,6 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
     |> Sink.preprocess("time")
   end
 
-  # AIDEV-NOTE: emote-pattern; assumes emotes are capitalized words or mixed-case identifiers
-  # Common Twitch emote patterns: PascalCase, lowercase+PascalCase (e.g., angledPepog)
   defp extract_emotes(df) do
     # Convert to rows to extract emotes, then convert back to DataFrame
     df
@@ -91,7 +87,6 @@ defmodule PremiereEcoute.Twitch.History.SiteHistory.Emotes do
   @doc "Filters emotes by prefix."
   @spec group_by_prefix(Explorer.DataFrame.t(), String.t()) :: Explorer.DataFrame.t()
   def group_by_prefix(df, prefix) do
-    # AIDEV-NOTE: prefix-filter; cannot use Series.transform in filter_with, so we use to_rows
     df
     |> DataFrame.to_rows()
     |> Enum.filter(fn row ->

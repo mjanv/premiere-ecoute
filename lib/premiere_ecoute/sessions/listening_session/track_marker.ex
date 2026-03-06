@@ -27,7 +27,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
   schema "track_markers" do
     field :track_id, :integer
     field :track_number, :integer
-    # AIDEV-NOTE: track_name populated only for :free sessions (no FK to named track table)
     field :track_name, :string
     field :started_at, :utc_datetime
 
@@ -85,7 +84,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
     Enum.find(playlist.tracks, %{name: ""}, &(&1.id == marker.track_id)).name
   end
 
-  # AIDEV-NOTE: :free sessions store track_name directly on the marker (no FK to album/playlist tracks)
   defp get_track_name(%ListeningSession{source: :free}, marker) do
     marker.track_name || ""
   end

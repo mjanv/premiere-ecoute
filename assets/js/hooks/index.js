@@ -10,6 +10,7 @@ import { NextTrackTimer } from "./next_track_timer";
 import { VisibilityDropdown } from "./visibility_dropdown";
 import { SidebarCollapse } from "./sidebar_collapse";
 import { AriadneThread } from "./ariadne_thread";
+import { ScrollCarousel } from "./scroll_carousel";
 import VegaLite from "./vegalite";
 
 export const Hooks = {
@@ -25,5 +26,6 @@ export const Hooks = {
   VisibilityDropdown: VisibilityDropdown,
   SidebarCollapse: SidebarCollapse,
   AriadneThread: AriadneThread,
+  ScrollCarousel: ScrollCarousel,
   VegaLite: VegaLite
 };

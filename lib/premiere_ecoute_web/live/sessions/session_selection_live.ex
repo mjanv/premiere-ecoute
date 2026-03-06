@@ -322,7 +322,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:pick_spinning, true)
     |> assign(:random_pick, nil)
     |> start_async(:spin_wheel, fn ->
-      # AIDEV-NOTE: small delay so the frontend animation has time to play before we push the result
       Process.sleep(2000)
       AlbumPicks.random_entry(user_id)
     end)
@@ -515,7 +514,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   defp maybe_load_playlists(socket, _), do: socket
 
-  # AIDEV-NOTE: derived assigns kept in sync here; call after any mutation of source/selection/vote assigns
   defp update_state(socket) do
     %{
       source_type: source_type,

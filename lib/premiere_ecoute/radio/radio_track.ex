@@ -133,7 +133,6 @@ defmodule PremiereEcoute.Radio.RadioTrack do
     |> Repo.delete_all()
   end
 
-  # AIDEV-NOTE: two tracks are consecutive duplicates if they share at least one provider+id pair
   defp consecutive_duplicate?(last_ids, incoming_ids) do
     Enum.any?(incoming_ids, fn {provider, id} ->
       Map.get(last_ids, to_atom(provider)) == id

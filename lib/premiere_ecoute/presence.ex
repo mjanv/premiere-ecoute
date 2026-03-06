@@ -23,7 +23,6 @@ defmodule PremiereEcoute.Presence do
       |> Map.get("overlay", [])
       |> length()
 
-    # AIDEV-NOTE: only broadcast when a leave caused the last overlay to disconnect
     if overlay_left and overlay_count == 0 do
       PremiereEcoute.PubSub.broadcast("player:#{user_id}", :no_overlay)
     end

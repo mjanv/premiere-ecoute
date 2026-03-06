@@ -25,7 +25,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   def perform(%Oban.Job{args: %{"action" => "open_track", "user_id" => user_id, "session_id" => session_id}}) do
     with scope <- Scope.for_user(User.get(user_id)),
          session <- ListeningSession.get(session_id),
-         # AIDEV-NOTE: :track sessions have no current_track_id; use single_id so the vote pipeline accepts messages
          cache_entry <- %{id: session.id, vote_options: session.vote_options, current_track_id: session.single_id},
          {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, cache_entry),
          :ok <-
@@ -145,7 +144,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     :ok
   end
 
-  # AIDEV-NOTE: open_free — chat vote mode for free sessions; uses single_id as current_track_id in cache
   @impl Oban.Worker
   def perform(%Oban.Job{
         args: %{"action" => "open_free", "user_id" => user_id, "session_id" => session_id, "track_id" => track_id}
@@ -167,7 +165,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     :ok
   end
 
-  # AIDEV-NOTE: open_free_poll — poll vote mode; creates Twitch poll with max duration, stores poll_id in cache
   @impl Oban.Worker
   def perform(%Oban.Job{
         args: %{"action" => "open_free_poll", "user_id" => user_id, "session_id" => session_id, "track_id" => track_id}

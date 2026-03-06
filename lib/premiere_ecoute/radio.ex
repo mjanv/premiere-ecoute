@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Radio do
 
   alias PremiereEcoute.Radio.RadioTrack
   alias PremiereEcoute.Radio.Workers.LinkProviderTrack
+  alias PremiereEcoute.Radio.Workers.TrackSpotifyPlayback
 
   @doc """
   Insert a new track for a user and schedule provider ID resolution 15 seconds later.
@@ -18,9 +19,14 @@ defmodule PremiereEcoute.Radio do
     end
   end
 
-  @doc """
-  Fill all missing providers in radio tracks already registered
-  """
+  defdelegate get_track(track_id), to: RadioTrack, as: :get
+  defdelegate add_provider(track, new_ids), to: RadioTrack, as: :update_provider_ids
+  defdelegate get_tracks(user_id, date), to: RadioTrack, as: :for_date
+  defdelegate delete_tracks_before(user_id, cutoff_datetime), to: RadioTrack, as: :delete_before
+
+  defdelegate next_in?(user_id), to: TrackSpotifyPlayback
+
+  @doc "Fill all missing providers in radio tracks already registered"
   @spec backward_fill(atom()) :: :ok
   def backward_fill(provider) do
     RadioTrack.all()
@@ -29,9 +35,4 @@ defmodule PremiereEcoute.Radio do
       LinkProviderTrack.in_seconds(%{radio_track_id: track.id, provider: provider}, seconds)
     end)
   end
-
-  defdelegate get_track(track_id), to: RadioTrack, as: :get
-  defdelegate add_provider(track, new_ids), to: RadioTrack, as: :update_provider_ids
-  defdelegate get_tracks(user_id, date), to: RadioTrack, as: :for_date
-  defdelegate delete_tracks_before(user_id, cutoff_datetime), to: RadioTrack, as: :delete_before
 end

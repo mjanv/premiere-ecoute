@@ -36,10 +36,6 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
   defp score_label(%{username: username}, :streamer), do: username
   defp score_label(_user, :streamer), do: "Streamer"
 
-  # AIDEV-NOTE: shrink font for two-digit scores to prevent overflow in 240px container
-  defp score_font_size(value) when is_integer(value) and value >= 10, do: "80px"
-  defp score_font_size(_), do: "80px"
-
   def widget_bg(:idle, _c1, _c2), do: "#000000"
   def widget_bg(:closed, c1, _c2), do: c1
   def widget_bg(:open, _c1, _c2), do: "#000000"

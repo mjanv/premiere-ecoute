@@ -1,4 +1,4 @@
-/* AIDEV-NOTE: Sidebar collapse animations and transitions */
+/* Sidebar collapse animations and transitions */
 
 /* Base sidebar styles with transition support */
 .sidebar {
@@ -50,23 +50,23 @@
   pointer-events: none;
 }
 
-/* Sidebar toggle button - AIDEV-NOTE: positioned absolute to save vertical space */
+/* Sidebar toggle button */
 .sidebar-toggle-btn {
   transition: all 200ms ease-in-out;
 }
 
-/* AIDEV-NOTE: Icon is a span element, target it directly for rotation */
+/* Icon is a span element, target it directly for rotation */
 .sidebar-toggle-btn .hero-chevron-left {
   transition: transform 200ms ease-in-out;
   display: inline-block;
 }
 
-/* AIDEV-NOTE: Rotate chevron 180° when collapsed to point right */
+/* Rotate chevron 180° when collapsed to point right */
 .sidebar-collapsed .sidebar-toggle-btn .hero-chevron-left {
   transform: rotate(180deg);
 }
 
-/* AIDEV-NOTE: Center button horizontally when collapsed */
+/* Center button horizontally when collapsed */
 .sidebar-collapsed .sidebar-toggle-btn {
   right: 50%;
   transform: translateX(50%);

@@ -43,7 +43,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-
+      
     <!-- Album Cover -->
       <div class="flex-shrink-0">
         <%= if @album.cover_url do %>
@@ -86,7 +86,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-
+      
     <!-- Track Cover -->
       <div class="flex-shrink-0">
         <%= if @single.cover_url do %>
@@ -137,7 +137,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-
+      
     <!-- Playlist Cover -->
       <div class="flex-shrink-0">
         <%= if @playlist.cover_url do %>
@@ -616,7 +616,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-
+      
     <!-- Dropdown menu -->
       <div
         id="visibility-dropdown-menu"

@@ -124,7 +124,6 @@ defmodule PremiereEcouteCore.Aggregate do
       def all(clauses \\ []), do: Repo.all(all_query(clauses))
 
       @doc "Fetches all entities matching query and clauses"
-
       def all_by(query \\ __MODULE__, clauses), do: preload(Repo.all_by(query, clauses))
 
       @doc "Fetches paginated entities"
@@ -149,6 +148,7 @@ defmodule PremiereEcouteCore.Aggregate do
         __MODULE__
         |> where(^Keyword.get(clauses, :where, true))
         |> order_by(^Keyword.get(clauses, :order_by, asc: :updated_at))
+        |> limit(^Keyword.get(clauses, :limit, 100))
         |> preload(unquote(root))
       end
 

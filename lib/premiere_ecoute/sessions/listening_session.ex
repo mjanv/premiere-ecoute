@@ -50,7 +50,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
     field :source, Ecto.Enum, values: [:album, :playlist, :track, :free], default: :album
     field :name, :string
-    # AIDEV-NOTE: vote_mode for :free sessions only — :chat (>5 options) or :poll (≤5 options)
     field :vote_mode, Ecto.Enum, values: [:chat, :poll], default: :chat
     field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
     field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
@@ -186,7 +185,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> Repo.insert()
   end
 
-  # AIDEV-NOTE: :free sessions use single_id as the captured track reference; track_name stored on marker
   def add_track_marker(%__MODULE__{source: :free, single: single, track_markers: markers} = session)
       when not is_nil(single) do
     %TrackMarker{}
@@ -497,7 +495,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @doc """
   Returns a paginated page of sessions for a user, ordered by status priority (active > preparing > stopped) then date descending.
   """
-  # AIDEV-NOTE: status priority: active(1) > preparing(2) > stopped(3), then newest first
   @spec page_for_user(integer(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
   def page_for_user(user_id, page_number, page_size \\ 10) do
     query =

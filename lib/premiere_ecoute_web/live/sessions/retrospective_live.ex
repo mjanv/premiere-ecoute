@@ -69,7 +69,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
     scores = Enum.map(consensus, fn {_, %{score: score}} -> score end)
 
-    # AIDEV-NOTE: :track sessions have no per-track distribution; return nil for both extremes
     case scores do
       [] ->
         {:ok, %{most_liked: nil, least_liked: nil}}

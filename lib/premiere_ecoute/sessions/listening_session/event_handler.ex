@@ -121,7 +121,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  # AIDEV-NOTE: VoteWindowOpened dispatches different worker jobs depending on vote_mode (:chat vs :poll)
   def dispatch(%VoteWindowOpened{session_id: session_id, user_id: user_id, track_id: track_id, vote_mode: :chat}) do
     ListeningSessionWorker.in_seconds(
       %{action: "open_free", session_id: session_id, user_id: user_id, track_id: track_id},
