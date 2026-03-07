@@ -332,6 +332,31 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   @doc """
+  Retrieves upcoming sessions for a user.
+
+  Returns all active and preparing listening sessions for the current user.
+  """
+  @spec upcoming_sessions(User.t()) :: [t()]
+  def upcoming_sessions(user) do
+    from(s in __MODULE__,
+      where: s.user_id == ^user.id and s.status in [:active, :preparing],
+      order_by: [fragment("CASE status WHEN 'active' THEN 0 ELSE 1 END"), asc: s.inserted_at]
+    )
+    |> Repo.all()
+    |> preload()
+  end
+
+  @doc """
+  Retrieves last stopped sessions for a user.
+
+  Returns all stopped listening sessions for the current user.
+  """
+  @spec stopped_sessions(User.t(), integer()) :: [t()]
+  def stopped_sessions(user, limit \\ 10) do
+    all(where: [user_id: user.id, status: :stopped, source: :album], order_by: [desc: :started_at], limit: limit)
+  end
+
+  @doc """
   Retrieves user's current session.
 
   Returns the most recent active or preparing session for the user, prioritizing active sessions.

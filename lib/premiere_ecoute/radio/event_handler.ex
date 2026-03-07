@@ -2,8 +2,7 @@ defmodule PremiereEcoute.Radio.EventHandler do
   @moduledoc """
   GenServer that reacts to Twitch stream lifecycle events to control radio track polling.
 
-  Subscribes to "twitch:events" PubSub topic and starts/stops Spotify playback polling
-  based on stream.online and stream.offline events.
+  Subscribes to "twitch:events" PubSub topic and starts/stops Spotify playback polling based on stream.online and stream.offline events.
   """
 
   use GenServer
@@ -40,10 +39,9 @@ defmodule PremiereEcoute.Radio.EventHandler do
   @impl true
   def handle_info(%StreamEnded{broadcaster_id: broadcaster_id}, state) do
     case Accounts.get_user_by_twitch_id(broadcaster_id) do
-      %{id: user_id} ->
-        Logger.info("Radio: stopping playback polling for user #{user_id}")
-
-        TrackSpotifyPlayback.cancel_all(user_id)
+      %{profile: %{radio_settings: %{enabled: _}}} = user ->
+        Logger.info("Radio: stopping playback polling for user #{user.id}")
+        TrackSpotifyPlayback.cancel_all(user.id)
 
       _ ->
         :ok

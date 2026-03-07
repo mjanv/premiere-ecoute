@@ -4,35 +4,22 @@ defmodule PremiereEcoute.Radio do
   """
 
   alias PremiereEcoute.Radio.RadioTrack
-  alias PremiereEcoute.Radio.Workers.LinkProviderTrack
+  alias PremiereEcoute.Radio.Services.Backfill
   alias PremiereEcoute.Radio.Workers.TrackSpotifyPlayback
 
-  @doc """
-  Insert a new track for a user and schedule provider ID resolution 15 seconds later.
-  """
-  @spec insert_track(integer(), String.t(), map()) ::
-          {:ok, RadioTrack.t()} | {:error, :consecutive_duplicate | Ecto.Changeset.t()}
-  def insert_track(user_id, provider, track_data) do
-    with {:ok, track} <- RadioTrack.insert(user_id, track_data),
-         {:ok, _job} <- LinkProviderTrack.in_seconds(%{radio_track_id: track.id, provider: provider}, 15) do
-      {:ok, track}
-    end
-  end
-
+  # Model
   defdelegate get_track(track_id), to: RadioTrack, as: :get
+  defdelegate last_tracks(user_id, limit \\ 10), to: RadioTrack, as: :last_tracks
   defdelegate add_provider(track, new_ids), to: RadioTrack, as: :update_provider_ids
   defdelegate get_tracks(user_id, date), to: RadioTrack, as: :for_date
   defdelegate delete_tracks_before(user_id, cutoff_datetime), to: RadioTrack, as: :delete_before
 
-  defdelegate next_in?(user_id), to: TrackSpotifyPlayback
+  # Services
+  def start_radio(user), do: TrackSpotifyPlayback.in_seconds(%{user_id: user.id}, 15)
+  def stop_radio(user), do: TrackSpotifyPlayback.cancel_all(user.id)
+  defdelegate insert_track(user_id, provider, track_data), to: Backfill
+  defdelegate backward_fill(provider), to: Backfill
 
-  @doc "Fill all missing providers in radio tracks already registered"
-  @spec backward_fill(atom()) :: :ok
-  def backward_fill(provider) do
-    RadioTrack.all()
-    |> Enum.with_index(fn track, seconds -> {track, seconds} end)
-    |> Enum.each(fn {track, seconds} ->
-      LinkProviderTrack.in_seconds(%{radio_track_id: track.id, provider: provider}, seconds)
-    end)
-  end
+  # Workers
+  defdelegate next_in?(user_id), to: TrackSpotifyPlayback
 end

@@ -96,8 +96,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
   defp schedule_next_poll(user_id, playback \\ %{}) do
     delay_s =
       case playback do
-        %{"progress_ms" => progress_ms, "item" => %{"duration_ms" => duration_ms}}
-        when is_integer(progress_ms) and is_integer(duration_ms) ->
+        %{"progress_ms" => progress_ms, "item" => %{"duration_ms" => duration_ms}} ->
           div(duration_ms - progress_ms + 30_000, 1000)
 
         _ ->

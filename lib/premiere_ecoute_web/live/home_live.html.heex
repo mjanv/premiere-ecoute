@@ -43,6 +43,27 @@
                     {gettext("Inactive")}
                   </span>
                 <% end %>
+                <%= if @next_radio do %>
+                  <button
+                    phx-click="stop_radio"
+                    class="ml-auto w-7 h-7 rounded-full bg-red-600/80 hover:bg-red-500 border border-red-500/50 flex items-center justify-center transition-all"
+                    title={gettext("Stop radio")}
+                  >
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <rect x="6" y="6" width="12" height="12" rx="1" />
+                    </svg>
+                  </button>
+                <% else %>
+                  <button
+                    phx-click="start_radio"
+                    class="ml-auto w-7 h-7 rounded-full bg-green-600/80 hover:bg-green-500 border border-green-500/50 flex items-center justify-center transition-all"
+                    title={gettext("Start radio")}
+                  >
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </button>
+                <% end %>
               </div>
               <.scroll_carousel id="radio-carousel">
                 <%= for radio <- @last_radios do %>

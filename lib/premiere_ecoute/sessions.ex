@@ -21,6 +21,8 @@ defmodule PremiereEcoute.Sessions do
   defdelegate next_track(session), to: ListeningSession
   defdelegate previous_track(session), to: ListeningSession
   defdelegate active_sessions(user), to: ListeningSession
+  defdelegate upcoming_sessions(user), to: ListeningSession
+  defdelegate stopped_sessions(user, limit \\ 10), to: ListeningSession
   defdelegate get_active_session(user), to: ListeningSession
   defdelegate current_session(user), to: ListeningSession
   defdelegate can_view_retrospective?(session, scope), to: ListeningSession
