@@ -8,9 +8,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
   - Support for repeated plays (e.g., skipping back to previous tracks)
   """
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
+  use PremiereEcouteCore.Aggregate.Object
 
   alias PremiereEcoute.Sessions.ListeningSession
 

@@ -368,4 +368,198 @@
       </div>
     </div>
   <% end %>
+  
+<!-- Reviews Section -->
+  <div class="px-8 py-12 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-3xl font-bold text-purple-300">{gettext("Reviews")}</h2>
+      <%= if @current_scope && @current_scope.user do %>
+        <button
+          phx-click="open_review_modal"
+          class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-xl font-bold transition-all border border-purple-400/30 shadow-lg"
+        >
+          <%= if Reviews.get_for_user(@listening_session.id, @current_scope.user.id) do %>
+            {gettext("Edit my review")}
+          <% else %>
+            {gettext("Write a review")}
+          <% end %>
+        </button>
+      <% end %>
+    </div>
+
+    <%= if @reviews == [] do %>
+      <div class="text-center py-16 bg-black/30 backdrop-blur-md rounded-2xl border border-white/10">
+        <p class="text-white/50 text-lg">{gettext("No reviews yet. Be the first to share your thoughts!")}</p>
+      </div>
+    <% else %>
+      <div class="space-y-6">
+        <%= for review <- @reviews do %>
+          <div class="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  {String.first(review.user.username || "?")}
+                </div>
+                <div>
+                  <p class="font-bold text-white">{review.user.username}</p>
+                  <p class="text-xs text-white/40">
+                    {Calendar.strftime(review.inserted_at, "%B %d, %Y")} ·
+                    <span class={"px-2 py-0.5 rounded-full text-xs font-bold #{if review.role == :streamer, do: "bg-purple-500/30 text-purple-300", else: "bg-pink-500/30 text-pink-300"}"}>
+                      {if review.role == :streamer, do: gettext("Streamer"), else: gettext("Viewer")}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4 shrink-0">
+                <%= if review.rating && review.rating > 0 do %>
+                  <span class="text-2xl font-bold text-purple-300">{review.rating}/10</span>
+                <% end %>
+                <%= if review.like != nil do %>
+                  <span class="text-2xl">{if review.like, do: "❤️", else: "💔"}</span>
+                <% end %>
+                <%= if @current_scope && @current_scope.user && @current_scope.user.id == review.user_id do %>
+                  <button
+                    phx-click="delete_review"
+                    phx-value-id={review.id}
+                    data-confirm={gettext("Delete your review?")}
+                    class="text-white/30 hover:text-red-400 transition-colors p-1"
+                    title={gettext("Delete review")}
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+
+            <%= if review.content && review.content != "" do %>
+              <p class="mt-4 text-white/80 leading-relaxed">{review.content}</p>
+            <% end %>
+
+            <%= if review.tags && review.tags != [] do %>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <%= for tag <- review.tags do %>
+                  <span class="px-3 py-1 bg-purple-900/40 text-purple-300 text-xs rounded-full border border-purple-400/20">
+                    {tag}
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <div class="mt-3 flex gap-4 text-xs text-white/30">
+              <%= if review.watched_before != nil do %>
+                <span>{if review.watched_before, do: gettext("Knew it before"), else: gettext("First listen")}</span>
+              <% end %>
+              <%= if review.watched_on do %>
+                <span>{gettext("Listened on")} {Calendar.strftime(review.watched_on, "%B %d, %Y")}</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
+<!-- Review Modal -->
+  <%= if @review_modal_open && @review_form do %>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-lg shadow-2xl">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold text-purple-300">
+            {if @editing_review, do: gettext("Edit your review"), else: gettext("Write a review")}
+          </h3>
+          <button phx-click="close_review_modal" class="text-white/40 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <.form for={@review_form} phx-submit="save_review" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-white/70 mb-2">{gettext("Your thoughts")}</label>
+            <textarea
+              name="review[content]"
+              rows="5"
+              value={@review_form[:content].value}
+              class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-400 resize-none"
+              placeholder={gettext("Share your thoughts about this session...")}
+            >{@review_form[:content].value}</textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-white/70 mb-2">{gettext("Rating (0-10)")}</label>
+              <input
+                type="number"
+                name="review[rating]"
+                value={@review_form[:rating].value}
+                min="0"
+                max="10"
+                step="0.5"
+                class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-white/70 mb-2">{gettext("Did you like it?")}</label>
+              <select
+                name="review[like]"
+                class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400"
+              >
+                <option value="">{gettext("No opinion")}</option>
+                <option value="true" selected={@review_form[:like].value == true}>{gettext("Liked it ❤️")}</option>
+                <option value="false" selected={@review_form[:like].value == false}>{gettext("Didn't like it 💔")}</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-white/70 mb-2">{gettext("Tags (comma-separated)")}</label>
+            <input
+              type="text"
+              name="review[tags_input]"
+              value={Enum.join(@review_form[:tags].value || [], ", ")}
+              class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-400"
+              placeholder={gettext("jazz, chill, discovery...")}
+            />
+          </div>
+
+          <div class="flex items-center gap-3">
+            <input
+              type="checkbox"
+              name="review[watched_before]"
+              id="watched_before"
+              value="true"
+              checked={@review_form[:watched_before].value}
+              class="w-4 h-4 accent-purple-500"
+            />
+            <label for="watched_before" class="text-sm text-white/70">{gettext("I knew this album/session before")}</label>
+          </div>
+
+          <div class="flex gap-3 pt-2">
+            <button
+              type="submit"
+              class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-3 rounded-xl font-bold transition-all"
+            >
+              {gettext("Save")}
+            </button>
+            <button
+              type="button"
+              phx-click="close_review_modal"
+              class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-bold transition-all"
+            >
+              {gettext("Cancel")}
+            </button>
+          </div>
+        </.form>
+      </div>
+    </div>
+  <% end %>
 </div>

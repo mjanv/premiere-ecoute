@@ -136,8 +136,9 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: s.album_id == a.id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [a.id, a.name, a.artist, a.cover_url],
+        group_by: [s.id, a.id, a.name, a.artist, a.cover_url],
         select: %{
+          session_id: s.id,
           album: %Album{
             id: a.id,
             name: a.name,
@@ -178,8 +179,9 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: s.single_id == sg.id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [sg.id, sg.name, sg.artist, sg.cover_url],
+        group_by: [s.id, sg.id, sg.name, sg.artist, sg.cover_url],
         select: %{
+          session_id: s.id,
           single: %Single{
             id: sg.id,
             name: sg.name,
@@ -220,8 +222,9 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: s.playlist_id == p.id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [p.id, p.title, p.owner_name, p.cover_url],
+        group_by: [s.id, p.id, p.title, p.owner_name, p.cover_url],
         select: %{
+          session_id: s.id,
           playlist: %Playlist{
             id: p.id,
             title: p.title,

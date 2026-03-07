@@ -184,6 +184,9 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :streamer_retrospective, on_mount: [{UserAuth, :streamer}] do
       live "/history", HistoryLive, :index
+    end
+
+    live_session :any_retrospective, on_mount: [{UserAuth, :current_scope}] do
       live "/sessions/:id", SessionLive, :show
     end
 

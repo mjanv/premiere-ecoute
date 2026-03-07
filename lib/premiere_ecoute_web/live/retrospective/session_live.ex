@@ -11,13 +11,21 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Sessions.ListeningSession.Review
+  alias PremiereEcoute.Sessions.Reviews
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
+    session_id_int = String.to_integer(session_id)
+
     socket =
       socket
-      |> assign(:session_id, session_id)
+      |> assign(:session_id, session_id_int)
       |> assign(:session_data, AsyncResult.loading())
+      |> assign(:reviews, Reviews.list_for_session(session_id_int))
+      |> assign(:review_modal_open, false)
+      |> assign(:review_form, nil)
+      |> assign(:editing_review, nil)
       |> assign_async(:session_data, fn -> load_session(session_id) end)
 
     {:ok, socket}
@@ -26,6 +34,137 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("open_review_modal", _params, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session_id = socket.assigns.session_id
+
+    existing =
+      if current_scope && current_scope.user do
+        Reviews.get_for_user(session_id, current_scope.user.id)
+      end
+
+    role =
+      if current_scope && current_scope.user && socket.assigns.session_data.result do
+        session = socket.assigns.session_data.result.session
+        if current_scope.user.id == session.user_id, do: :streamer, else: :viewer
+      else
+        :viewer
+      end
+
+    changeset =
+      if existing do
+        Review.changeset(existing, Map.from_struct(existing))
+      else
+        Review.changeset(%Review{}, %{role: role, watched_on: Date.utc_today()})
+      end
+
+    {:noreply,
+     socket
+     |> assign(:review_modal_open, true)
+     |> assign(:review_form, Phoenix.Component.to_form(changeset, as: :review))
+     |> assign(:editing_review, existing)}
+  end
+
+  @impl true
+  def handle_event("close_review_modal", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:review_modal_open, false)
+     |> assign(:review_form, nil)
+     |> assign(:editing_review, nil)}
+  end
+
+  @impl true
+  def handle_event("set_review_rating", %{"rating" => rating}, socket) do
+    {value, _} = Float.parse(rating)
+    changeset = Ecto.Changeset.put_change(socket.assigns.review_form.source, :rating, value)
+    {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+  end
+
+  @impl true
+  def handle_event("toggle_review_like", _params, socket) do
+    form = socket.assigns.review_form
+    next = if form[:like].value == true, do: nil, else: true
+    changeset = Ecto.Changeset.put_change(form.source, :like, next)
+    {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+  end
+
+  @impl true
+  def handle_event("save_review", %{"review" => params}, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session_id = socket.assigns.session_id
+
+    if current_scope && current_scope.user do
+      # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
+      params = normalize_review_params(params)
+
+      result =
+        case socket.assigns.editing_review do
+          nil -> Reviews.create(session_id, current_scope.user, params)
+          review -> Reviews.update(review, params)
+        end
+
+      case result do
+        {:ok, _} ->
+          {:noreply,
+           socket
+           |> assign(:reviews, Reviews.list_for_session(session_id))
+           |> assign(:review_modal_open, false)
+           |> assign(:review_form, nil)
+           |> assign(:editing_review, nil)
+           |> put_flash(:info, gettext("Review saved"))}
+
+        {:error, changeset} ->
+          {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+      end
+    else
+      {:noreply, put_flash(socket, :error, gettext("You must be logged in to write a review"))}
+    end
+  end
+
+  @impl true
+  def handle_event("delete_review", %{"id" => id}, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session_id = socket.assigns.session_id
+
+    if current_scope && current_scope.user do
+      case Reviews.delete(String.to_integer(id), current_scope.user) do
+        {:ok, _} ->
+          {:noreply,
+           socket
+           |> assign(:reviews, Reviews.list_for_session(session_id))
+           |> put_flash(:info, gettext("Review deleted"))}
+
+        {:error, :not_found} ->
+          {:noreply, put_flash(socket, :error, gettext("Review not found"))}
+      end
+    else
+      {:noreply, put_flash(socket, :error, gettext("You must be logged in to delete a review"))}
+    end
+  end
+
+  defp normalize_review_params(params) do
+    tags =
+      params
+      |> Map.get("tags_input", "")
+      |> String.split(",")
+      |> Enum.map(&String.trim/1)
+      |> Enum.reject(&(&1 == ""))
+
+    like =
+      case Map.get(params, "like") do
+        "true" -> true
+        "false" -> false
+        _ -> nil
+      end
+
+    params
+    |> Map.put("tags", tags)
+    |> Map.delete("tags_input")
+    |> Map.put("like", like)
   end
 
   defp load_session(session_id) do
@@ -40,6 +179,14 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
     case result do
       {:ok, data} -> {:ok, %{session_data: data}}
     end
+  end
+
+  # AIDEV-NOTE: returns %{track_id => score_string} for a specific Twitch viewer from report votes.
+  def my_votes_by_track(report, twitch_user_id) do
+    report.votes
+    |> Enum.reject(& &1.is_streamer)
+    |> Enum.filter(&(&1.viewer_id == twitch_user_id))
+    |> Map.new(fn v -> {v.track_id, v.value} end)
   end
 
   # AIDEV-NOTE: builds distribution from report votes + polls for all vote options.
