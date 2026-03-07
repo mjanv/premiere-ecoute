@@ -1,0 +1,314 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="retrospective"
+>
+  <div class="relative min-h-screen text-white" style="background: #0a0010;">
+    <.async_result :let={session_data} assign={@session_data}>
+      <:loading>
+        <div class="h-64 bg-gray-900 animate-pulse"></div>
+        <div class="max-w-6xl mx-auto px-6 py-10">
+          <div class="flex gap-8 animate-pulse">
+            <div class="w-64 shrink-0 space-y-4">
+              <div class="w-full aspect-square bg-gray-800 rounded-lg"></div>
+              <div class="h-10 bg-gray-800 rounded"></div>
+            </div>
+            <div class="flex-1 space-y-4 pt-2">
+              <div class="h-10 bg-gray-800 rounded w-2/3"></div>
+              <div class="h-6 bg-gray-800 rounded w-1/3"></div>
+              <div class="h-4 bg-gray-800 rounded w-1/4 mt-6"></div>
+              <div class="space-y-2 mt-6">
+                <%= for _ <- 1..8 do %>
+                  <div class="h-12 bg-gray-800 rounded"></div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </:loading>
+
+      <:failed>
+        <div class="max-w-6xl mx-auto px-6 py-20 text-center">
+          <p class="text-red-400 text-lg mb-4">{gettext("Failed to load session details")}</p>
+          <.link
+            navigate={~p"/retrospective/history"}
+            class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 text-sm"
+          >
+            {gettext("Back to history")}
+          </.link>
+        </div>
+      </:failed>
+
+      <%= if session_data do %>
+        <%!-- Resolve cover/name/artist per session source --%>
+        <% {cover_url, title, artist, spotify_url} =
+          case session_data.session.source do
+            :album ->
+              album = session_data.session.album
+              spotify = album.album_id && "https://open.spotify.com/album/#{album.album_id}"
+              {album.cover_url, album.name, album.artist, spotify}
+
+            :track ->
+              sg = session_data.single
+              spotify = sg.track_id && "https://open.spotify.com/track/#{sg.track_id}"
+              {sg.cover_url, sg.name, sg.artist, spotify}
+
+            :playlist ->
+              pl = session_data.playlist
+              {pl.cover_url, pl.title, pl.owner_name, PremiereEcoute.Discography.Playlist.url(pl)}
+          end %>
+
+        <%!-- Hero backdrop: absolute so it doesn't push content down --%>
+        <div class="absolute inset-x-0 top-0 h-[32rem]">
+          <div class="max-w-6xl mx-auto px-6 h-full relative overflow-hidden">
+            <img
+              src={cover_url}
+              alt=""
+              aria-hidden="true"
+              class="w-full h-full object-cover object-top"
+              style="filter: blur(4px) brightness(0.9) saturate(1.8);"
+            />
+          </div>
+          <div
+            class="absolute inset-0"
+            style="background: linear-gradient(to bottom, transparent 0%, rgba(10,0,16,0.3) 55%, #0a0010 85%);"
+          >
+          </div>
+        </div>
+
+        <%!-- Two-column layout --%>
+        <div class="max-w-6xl mx-auto px-6 pb-20 relative z-10 pt-72">
+          <div class="flex gap-10 items-start">
+            <%!-- Left column: 1/3 --%>
+            <div class="w-64 shrink-0 space-y-6">
+              <%!-- Back link --%>
+              <.link
+                navigate={~p"/retrospective/history"}
+                class="inline-flex items-center gap-1.5 ml-6 px-2.5 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium transition-all"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                {gettext("Back to history")}
+              </.link>
+
+              <%!-- Cover --%>
+              <img
+                src={cover_url}
+                alt={title}
+                class="w-full aspect-square object-cover rounded-lg shadow-2xl"
+                style="box-shadow: 0 8px 40px rgba(0,0,0,0.7);"
+              />
+
+              <%!-- Where to listen --%>
+              <%= if spotify_url do %>
+                <div>
+                  <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                    {gettext("Where to listen")}
+                  </h3>
+                  <div class="space-y-2">
+                    <a
+                      href={spotify_url}
+                      target="_blank"
+                      rel="noopener"
+                      class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-[#1DB954]/10 border border-white/10 hover:border-[#1DB954]/40 text-slate-300 hover:text-[#1DB954] text-sm transition-all"
+                    >
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                      </svg>
+                      Spotify
+                    </a>
+                  </div>
+                </div>
+              <% end %>
+
+              <%!-- Links --%>
+              <div>
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                  {gettext("Links")}
+                </h3>
+                <div class="space-y-2">
+                  <.link
+                    navigate={~p"/sessions/#{session_data.session.id}"}
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm transition-all"
+                  >
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                      />
+                    </svg>
+                    {gettext("Session")}
+                  </.link>
+                  <.link
+                    navigate={~p"/sessions/#{session_data.session.id}/retrospective"}
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm transition-all"
+                  >
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                    {gettext("Retrospective")}
+                  </.link>
+                </div>
+              </div>
+            </div>
+
+            <%!-- Right column: 2/3 --%>
+            <div class="flex-1 min-w-0">
+              <%!-- Title + artist --%>
+              <div class="mb-6">
+                <h1 class="text-4xl font-bold text-white leading-tight mb-1">
+                  {title}
+                </h1>
+                <p class="text-xl text-purple-300">{artist}</p>
+
+                <div class="flex items-center gap-3 mt-3 text-sm text-slate-500">
+                  <%= case session_data.session.source do %>
+                    <% :album -> %>
+                      <%= if session_data.session.album.release_date do %>
+                        <span>{session_data.session.album.release_date.year}</span>
+                        <span>·</span>
+                      <% end %>
+                      <% total_tracks = session_data.session.album.total_tracks || length(session_data.session.album.tracks) %>
+                      <%= if total_tracks > 0 do %>
+                        <span>{ngettext("1 track", "%{count} tracks", total_tracks, count: total_tracks)}</span>
+                        <span>·</span>
+                      <% end %>
+                    <% :playlist -> %>
+                      <% total_tracks = length(session_data.playlist.tracks) %>
+                      <%= if total_tracks > 0 do %>
+                        <span>{ngettext("1 track", "%{count} tracks", total_tracks, count: total_tracks)}</span>
+                        <span>·</span>
+                      <% end %>
+                    <% :track -> %>
+                  <% end %>
+                  <%= if session_data.session.started_at do %>
+                    <span>
+                      {gettext("Listened on %{date} by %{name}",
+                        date: Calendar.strftime(session_data.session.started_at, "%B %d, %Y"),
+                        name: session_data.session.user.username
+                      )}
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+
+              <%!-- Scores --%>
+              <%= if session_data.session.report && session_data.session.report.session_summary do %>
+                <% viewer_dist = vote_distribution(session_data.session.report, session_data.session, :viewer) %>
+                <% streamer_dist = vote_distribution(session_data.session.report, session_data.session, :streamer) %>
+                <div class="flex gap-4 mb-8">
+                  <div class="flex-1 bg-white/5 border border-white/10 rounded-xl p-4">
+                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">{gettext("Viewers")}</p>
+                    <div class="flex items-end gap-3">
+                      <p class="text-3xl font-bold text-purple-300 leading-none shrink-0">
+                        {session_data.session.report.session_summary[:viewer_score]}
+                      </p>
+                      <%= if viewer_dist != [] do %>
+                        <div class="flex items-end gap-px flex-1 h-8">
+                          <%= for {_n, pct} <- viewer_dist do %>
+                            <div
+                              class="flex-1 bg-slate-600 rounded-sm min-h-px"
+                              style={"height: #{max(pct, 4)}%;"}
+                            >
+                            </div>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                  <div class="flex-1 bg-white/5 border border-white/10 rounded-xl p-4">
+                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">{gettext("Streamer")}</p>
+                    <div class="flex items-end gap-3">
+                      <p class="text-3xl font-bold text-pink-300 leading-none shrink-0">
+                        {session_data.session.report.session_summary[:streamer_score]}
+                      </p>
+                      <%= if streamer_dist != [] do %>
+                        <div class="flex items-end gap-px flex-1 h-8">
+                          <%= for {_n, pct} <- streamer_dist do %>
+                            <div
+                              class="flex-1 bg-slate-600 rounded-sm min-h-px"
+                              style={"height: #{max(pct, 4)}%;"}
+                            >
+                            </div>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+
+              <%!-- Track list (album and playlist only) --%>
+              <%= if session_data.session.source in [:album, :playlist] do %>
+                <% tracks = session_data.tracks %>
+                <%= if tracks != [] do %>
+                  <section>
+                    <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                      {gettext("Tracks")}
+                    </h2>
+                    <div class="space-y-1">
+                      <%= for track <- tracks do %>
+                        <% track_name =
+                          case session_data.session.source do
+                            :album -> track.track_album.name
+                            :playlist -> track.playlist_track && track.playlist_track.name
+                          end %>
+                        <% track_number =
+                          case session_data.session.source do
+                            :album -> track.track_album.track_number
+                            :playlist -> nil
+                          end %>
+                        <div class="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group">
+                          <div class="flex items-center gap-4 min-w-0">
+                            <%= if track_number do %>
+                              <span class="text-slate-600 group-hover:text-slate-400 font-mono text-base w-5 text-right shrink-0 transition-colors">
+                                {track_number}
+                              </span>
+                            <% end %>
+                            <p class="text-slate-200 group-hover:text-white text-base truncate transition-colors">
+                              {track_name}
+                            </p>
+                          </div>
+                          <div class="flex items-center gap-2 shrink-0 ml-4">
+                            <span class="text-sm text-slate-500 mr-1">{gettext("viewers")}</span>
+                            <span class="text-base font-semibold text-purple-300 w-8 text-right">
+                              {track.track_summary[:viewer_score] || track.track_summary["viewer_score"]}
+                            </span>
+                            <span class="text-slate-700 mx-1">·</span>
+                            <span class="text-sm text-slate-500 mr-1">{gettext("streamer")}</span>
+                            <span class="text-base font-semibold text-pink-300 w-8 text-right">
+                              {track.track_summary[:streamer_score] || track.track_summary["streamer_score"]}
+                            </span>
+                          </div>
+                        </div>
+                      <% end %>
+                    </div>
+                  </section>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="max-w-6xl mx-auto px-6 py-20 text-center">
+          <p class="text-slate-400 mb-4">{gettext("Session not found")}</p>
+          <.link
+            navigate={~p"/retrospective/history"}
+            class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 text-sm"
+          >
+            {gettext("Back to history")}
+          </.link>
+        </div>
+      <% end %>
+    </.async_result>
+  </div>
+</Layouts.app>

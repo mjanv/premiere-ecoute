@@ -148,9 +148,9 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
 
       assert %{session: %ListeningSession{}, tracks: [track1, track2]} = details
       assert %{track_album: %Track{}, track_summary: summary1} = track1
-      assert %{"streamer_score" => +0.0, "viewer_score" => 8.0} = summary1
+      assert %{streamer_score: +0.0, viewer_score: 8.0} = summary1
       assert %{track_album: %Track{}, track_summary: summary2} = track2
-      assert %{"streamer_score" => +0.0, "viewer_score" => 7.0} = summary2
+      assert %{streamer_score: +0.0, viewer_score: 7.0} = summary2
     end
   end
 end

@@ -362,10 +362,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
       from s in ListeningSession,
         join: a in Album,
         on: s.album_id == a.id,
-        left_join: r in Report,
-        on: s.id == r.session_id,
         where: s.id == ^session_id,
-        preload: [album: [:tracks], user: [], report: []],
+        preload: [album: [:tracks], user: []],
         select: s
 
     query
@@ -375,14 +373,77 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         {:error, :not_found}
 
       session ->
+        {:ok, report} = Report.generate(session)
+
         tracks =
-          session.report.track_summaries
-          |> Enum.map(fn %{"track_id" => id} = track_summary ->
+          report.track_summaries
+          |> Enum.map(fn track_summary ->
+            id = track_summary[:track_id] || track_summary["track_id"]
             track = Enum.find(session.album.tracks, &(&1.id == id))
             %{track_album: track, track_summary: track_summary}
           end)
 
-        {:ok, %{session: session, tracks: tracks}}
+        {:ok, %{session: %{session | report: report}, tracks: tracks}}
+    end
+  end
+
+  @doc """
+  Get detailed information for a specific single-track session.
+  """
+  @spec get_single_session_details(integer()) :: {:ok, map()} | {:error, :not_found}
+  def get_single_session_details(session_id) do
+    query =
+      from s in ListeningSession,
+        join: sg in Single,
+        on: s.single_id == sg.id,
+        where: s.id == ^session_id,
+        preload: [user: []],
+        select: {s, sg}
+
+    query
+    |> Repo.one()
+    |> case do
+      nil ->
+        {:error, :not_found}
+
+      {session, single} ->
+        {:ok, report} = Report.generate(session)
+        {:ok, %{session: %{session | report: report}, single: single}}
+    end
+  end
+
+  @doc """
+  Get detailed information for a specific playlist session.
+  """
+  @spec get_playlist_session_details(integer()) :: {:ok, map()} | {:error, :not_found}
+  def get_playlist_session_details(session_id) do
+    query =
+      from s in ListeningSession,
+        join: p in Playlist,
+        on: s.playlist_id == p.id,
+        where: s.id == ^session_id,
+        preload: [user: []],
+        select: {s, p}
+
+    query
+    |> Repo.one()
+    |> case do
+      nil ->
+        {:error, :not_found}
+
+      {session, playlist} ->
+        playlist = Repo.preload(playlist, :tracks)
+        {:ok, report} = Report.generate(session)
+
+        tracks =
+          report.track_summaries
+          |> Enum.map(fn track_summary ->
+            id = track_summary[:track_id] || track_summary["track_id"]
+            track = Enum.find(playlist.tracks, &(&1.id == id))
+            %{playlist_track: track, track_summary: track_summary}
+          end)
+
+        {:ok, %{session: %{session | report: report}, playlist: playlist, tracks: tracks}}
     end
   end
 

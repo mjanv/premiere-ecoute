@@ -53,4 +53,6 @@ defmodule PremiereEcoute.Sessions do
   defdelegate get_top_singles_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_top_playlist_tracks_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_album_session_details(session_id), to: Retrospective.History
+  defdelegate get_single_session_details(session_id), to: Retrospective.History
+  defdelegate get_playlist_session_details(session_id), to: Retrospective.History
 end

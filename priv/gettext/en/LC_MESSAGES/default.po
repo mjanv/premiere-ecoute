@@ -84,15 +84,15 @@ msgid "Twitch"
 msgstr "Twitch"
 
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:81
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:283
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:159
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:81
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:48
 #, elixir-autogen, elixir-format
 msgid "Viewers"
 msgstr "Viewers"
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:134
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:271
+#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:133
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:75
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:125
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:252
 #, elixir-autogen, elixir-format
@@ -195,7 +195,7 @@ msgstr "Start Session"
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:117
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:211
 #: lib/premiere_ecoute_web/live/admin/admin_users_live.html.heex:367
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:289
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:163
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:96
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:55
 #, elixir-autogen, elixir-format
@@ -212,6 +212,7 @@ msgstr "Total Votes"
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:223
 #: lib/premiere_ecoute_web/live/playlists/workflows_live.html.heex:172
 #: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:70
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:172
 #: lib/premiere_ecoute_web/live/retrospective/tops_live.html.heex:91
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:70
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:37
@@ -698,7 +699,6 @@ msgstr "Privacy"
 msgid "Terms"
 msgstr "Terms"
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:372
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:324
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Album details not found"
@@ -706,15 +706,12 @@ msgstr "Album details not found"
 
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:227
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:330
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:259
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:378
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:240
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:330
 #, elixir-autogen, elixir-format
 msgid "Close"
 msgstr "Close"
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:253
 #: lib/premiere_ecoute_web/live/retrospective/votes_live.html.heex:234
 #, elixir-autogen, elixir-format
 msgid "Failed to load album details"
@@ -752,7 +749,7 @@ msgstr "No albums listened during this period"
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:121
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:124
 #: lib/premiere_ecoute_web/live/homepage_live.html.heex:125
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:313
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:124
 #, elixir-autogen, elixir-format
 msgid "Retrospective"
 msgstr "Retrospective"
@@ -2729,7 +2726,7 @@ msgstr "Remove"
 msgid "Review"
 msgstr "Review"
 
-#: lib/premiere_ecoute_web/live/retrospective/history_live.html.heex:299
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:115
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:173
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Session"
@@ -4024,6 +4021,7 @@ msgstr "albums. This cannot be undone."
 msgid "for"
 msgstr "for"
 
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:191
 #: lib/premiere_ecoute_web/live/sessions/album_pick_admin_live.html.heex:183
 #, elixir-autogen, elixir-format, fuzzy
 msgid "streamer"
@@ -4235,3 +4233,47 @@ msgstr "Votes are open !"
 #, elixir-autogen, elixir-format
 msgid "next capture at %{time}"
 msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:146
+#, elixir-autogen, elixir-format, fuzzy
+msgid "1 track"
+msgid_plural "%{count} tracks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:35
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:69
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:207
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Back to history"
+msgstr "Back to Library"
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:33
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Failed to load session details"
+msgstr "Failed to load data"
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:105
+#, elixir-autogen, elixir-format
+msgid "Links"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:150
+#, elixir-autogen, elixir-format
+msgid "Listened on %{date} by %{name}"
+msgstr "Listened on %{date} by %{name}"
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:205
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Session not found"
+msgstr "Session Information"
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:83
+#, elixir-autogen, elixir-format
+msgid "Where to listen"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:186
+#, elixir-autogen, elixir-format, fuzzy
+msgid "viewers"
+msgstr "viewer"

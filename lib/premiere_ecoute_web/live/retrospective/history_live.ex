@@ -22,8 +22,6 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
       |> assign(:selected_month, current_date.month)
       |> assign(:years_available, get_available_years())
       |> assign(:selected_source, :album)
-      |> assign(:show_modal, false)
-      |> assign(:modal_session_id, nil)
 
     {:ok, socket}
   end
@@ -92,24 +90,6 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
   end
 
   @impl true
-  def handle_event("show_album_details", %{"session_id" => session_id}, socket) do
-    socket
-    |> assign(:show_modal, true)
-    |> assign(:modal_session_id, session_id)
-    |> assign_async(:modal_data, fn -> load_modal_data(session_id) end)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_event("close_modal", _params, socket) do
-    socket
-    |> assign(:show_modal, false)
-    |> assign(:modal_session_id, nil)
-    |> assign(:modal_data, %{loading: false, ok?: false, result: nil})
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
   def handle_event("navigate", %{"direction" => direction}, socket) do
     current_date = Date.new!(socket.assigns.selected_year, socket.assigns.selected_month, 1)
 
@@ -137,17 +117,5 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
       |> Map.put("source", socket.assigns.selected_source)
 
     {:noreply, push_patch(socket, to: ~p"/retrospective/history?#{params}")}
-  end
-
-  # Private helper functions
-
-  defp load_modal_data(session_id) do
-    case Sessions.get_album_session_details(session_id) do
-      {:ok, details} ->
-        {:ok, %{modal_data: details}}
-
-      {:error, :not_found} ->
-        {:ok, %{modal_data: nil}}
-    end
   end
 end
