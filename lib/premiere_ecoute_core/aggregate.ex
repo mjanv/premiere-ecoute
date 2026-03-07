@@ -148,7 +148,10 @@ defmodule PremiereEcouteCore.Aggregate do
         __MODULE__
         |> where(^Keyword.get(clauses, :where, true))
         |> order_by(^Keyword.get(clauses, :order_by, asc: :updated_at))
-        |> limit(^Keyword.get(clauses, :limit, 500))
+        |> then(fn query ->
+          limit = Keyword.get(clauses, :limit)
+          if limit, do: limit(query, ^limit), else: query
+        end)
         |> preload(unquote(root))
       end
 
