@@ -43,7 +43,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   end
 
   # AIDEV-NOTE: builds distribution from report votes + polls for all vote options.
-  # Returns [{label, count}] in vote_options order, suitable for a bar chart.
+  # Returns [{label, pct}] normalized 0-100 relative to max bucket, or [] if no votes.
   def vote_distribution(report, session, :viewer) do
     individual =
       report.votes
@@ -91,8 +91,22 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   end
 
   defp merge_distributions(individual, poll, session) do
-    for option <- vote_options(session) do
-      {option, Map.get(individual, option, 0) + Map.get(poll, option, 0)}
+    counts =
+      for option <- vote_options(session) do
+        {option, Map.get(individual, option, 0) + Map.get(poll, option, 0)}
+      end
+
+    max_count = counts |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end)
+    total = counts |> Enum.map(&elem(&1, 1)) |> Enum.sum()
+
+    if max_count == 0 do
+      []
+    else
+      Enum.map(counts, fn {option, count} ->
+        bar_pct = round(count / max_count * 100)
+        real_pct = round(count / total * 100)
+        {option, bar_pct, real_pct}
+      end)
     end
   end
 

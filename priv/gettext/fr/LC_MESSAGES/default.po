@@ -4235,11 +4235,11 @@ msgid "next capture at %{time}"
 msgstr "prochain enregistrement à %{time}"
 
 #: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:146
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "1 track"
 msgid_plural "%{count} tracks"
-msgstr[0] "morceaux"
-msgstr[1] "morceaux"
+msgstr[0] "1 morceau"
+msgstr[1] "%{count} morceaux"
 
 #: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:35
 #: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:69

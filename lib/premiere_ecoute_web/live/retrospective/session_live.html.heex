@@ -214,11 +214,12 @@
                       </p>
                       <%= if viewer_dist != [] do %>
                         <div class="flex items-end gap-px flex-1 h-8">
-                          <%= for {_n, pct} <- viewer_dist do %>
-                            <div
-                              class="flex-1 bg-slate-600 rounded-sm min-h-px"
-                              style={"height: #{max(pct, 4)}%;"}
-                            >
+                          <%= for {n, bar_pct, real_pct} <- viewer_dist do %>
+                            <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
+                              <div class="w-full h-full bg-slate-600 rounded-sm"></div>
+                              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
+                                {n}: {real_pct}%
+                              </div>
                             </div>
                           <% end %>
                         </div>
@@ -233,11 +234,12 @@
                       </p>
                       <%= if streamer_dist != [] do %>
                         <div class="flex items-end gap-px flex-1 h-8">
-                          <%= for {_n, pct} <- streamer_dist do %>
-                            <div
-                              class="flex-1 bg-slate-600 rounded-sm min-h-px"
-                              style={"height: #{max(pct, 4)}%;"}
-                            >
+                          <%= for {n, bar_pct, real_pct} <- streamer_dist do %>
+                            <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
+                              <div class="w-full h-full bg-slate-600 rounded-sm"></div>
+                              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
+                                {n}: {real_pct}%
+                              </div>
                             </div>
                           <% end %>
                         </div>
