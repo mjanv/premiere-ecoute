@@ -12,17 +12,32 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession.Review
+  alias PremiereEcoute.Sessions.ReviewLikes
   alias PremiereEcoute.Sessions.Reviews
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
     session_id_int = String.to_integer(session_id)
 
+    reviews = Reviews.list_for_session(session_id_int)
+    review_ids = Enum.map(reviews, & &1.id)
+
+    current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
+
+    liked_ids =
+      if current_user,
+        do: ReviewLikes.liked_review_ids(review_ids, current_user.id),
+        else: MapSet.new()
+
+    like_counts = Map.new(review_ids, fn id -> {id, ReviewLikes.count_for_review(id)} end)
+
     socket =
       socket
       |> assign(:session_id, session_id_int)
       |> assign(:session_data, AsyncResult.loading())
-      |> assign(:reviews, Reviews.list_for_session(session_id_int))
+      |> assign(:reviews, reviews)
+      |> assign(:liked_ids, liked_ids)
+      |> assign(:like_counts, like_counts)
       |> assign(:review_modal_open, false)
       |> assign(:review_form, nil)
       |> assign(:editing_review, nil)
@@ -109,9 +124,12 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
       case result do
         {:ok, _} ->
+          reviews = Reviews.list_for_session(session_id)
+
           {:noreply,
            socket
-           |> assign(:reviews, Reviews.list_for_session(session_id))
+           |> assign(:reviews, reviews)
+           |> reload_likes(current_scope.user)
            |> assign(:review_modal_open, false)
            |> assign(:review_form, nil)
            |> assign(:editing_review, nil)
@@ -133,9 +151,12 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
     if current_scope && current_scope.user do
       case Reviews.delete(String.to_integer(id), current_scope.user) do
         {:ok, _} ->
+          reviews = Reviews.list_for_session(session_id)
+
           {:noreply,
            socket
-           |> assign(:reviews, Reviews.list_for_session(session_id))
+           |> assign(:reviews, reviews)
+           |> reload_likes(current_scope.user)
            |> put_flash(:info, gettext("Review deleted"))}
 
         {:error, :not_found} ->
@@ -144,6 +165,26 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
     else
       {:noreply, put_flash(socket, :error, gettext("You must be logged in to delete a review"))}
     end
+  end
+
+  @impl true
+  def handle_event("toggle_like_review", %{"id" => id}, socket) do
+    current_scope = socket.assigns[:current_scope]
+
+    if current_scope && current_scope.user do
+      {:ok, _} = ReviewLikes.toggle(String.to_integer(id), current_scope.user)
+      {:noreply, reload_likes(socket, current_scope.user)}
+    else
+      {:noreply, put_flash(socket, :error, gettext("You must be logged in to like a review"))}
+    end
+  end
+
+  defp reload_likes(socket, user) do
+    review_ids = Enum.map(socket.assigns.reviews, & &1.id)
+
+    socket
+    |> assign(:liked_ids, ReviewLikes.liked_review_ids(review_ids, user.id))
+    |> assign(:like_counts, Map.new(review_ids, fn id -> {id, ReviewLikes.count_for_review(id)} end))
   end
 
   defp normalize_review_params(params) do

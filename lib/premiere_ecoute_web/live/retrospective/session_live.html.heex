@@ -474,11 +474,35 @@
                               <% end %>
                             </div>
                           <% end %>
-                          <div class="mt-2 flex gap-4 text-xs text-slate-600">
-                            <%= if review.watched_before do %>
-                              <span>{gettext("Knew it before")}</span>
+                          <div class="mt-2 flex items-center gap-2 text-xs text-slate-600">
+                            <%!-- Like button --%>
+                            <% liked = MapSet.member?(@liked_ids, review.id) %>
+                            <% like_count = Map.get(@like_counts, review.id, 0) %>
+                            <%= if assigns[:current_scope] && assigns[:current_scope].user do %>
+                              <button
+                                phx-click="toggle_like_review"
+                                phx-value-id={review.id}
+                                class={"flex items-center gap-1 transition-colors #{if liked, do: "text-pink-400", else: "text-slate-600 hover:text-pink-400"}"}
+                                title={if liked, do: gettext("Unlike"), else: gettext("Like")}
+                              >
+                                <svg
+                                  class="w-4 h-4"
+                                  fill={if liked, do: "currentColor", else: "none"}
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                  />
+                                </svg>
+                                <span>{like_count}</span>
+                              </button>
                             <% end %>
                             <%= if review.watched_on do %>
+                              <span>•</span>
                               <span>{gettext("Listened on")} {Calendar.strftime(review.watched_on, "%B %d, %Y")}</span>
                             <% end %>
                           </div>

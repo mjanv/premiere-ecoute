@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Review do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.ReviewLike
 
   schema "reviews" do
     field :role, Ecto.Enum, values: [:streamer, :viewer]
@@ -20,6 +21,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Review do
 
     belongs_to :session, ListeningSession
     belongs_to :user, User
+
+    has_many :likes, ReviewLike
 
     timestamps(type: :utc_datetime)
   end
