@@ -13,6 +13,7 @@ import { AriadneThread } from "./ariadne_thread";
 import { ScrollCarousel } from "./scroll_carousel";
 import VegaLite from "./vegalite";
 import { MotionDemo } from "./motion_demo";
+import { LikeHeart } from "./like_heart";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -29,5 +30,6 @@ export const Hooks = {
   AriadneThread: AriadneThread,
   ScrollCarousel: ScrollCarousel,
   VegaLite: VegaLite,
-  MotionDemo: MotionDemo
+  MotionDemo: MotionDemo,
+  LikeHeart: LikeHeart
 };

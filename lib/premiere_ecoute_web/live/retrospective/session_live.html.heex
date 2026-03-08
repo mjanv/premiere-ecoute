@@ -562,6 +562,8 @@
                                 title={if liked, do: gettext("Unlike"), else: gettext("Like")}
                               >
                                 <svg
+                                  id={"like-heart-#{review.id}"}
+                                  phx-hook="LikeHeart"
                                   class="w-4 h-4"
                                   fill={if liked, do: "currentColor", else: "none"}
                                   stroke="currentColor"
