@@ -7,17 +7,9 @@ defmodule PremiereEcouteWeb.PlaygroundLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Twitch.History.SiteHistory.MinuteWatched
+  @impl true
+  def mount(_params, _session, socket), do: {:ok, socket}
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, socket}
-  end
-
-  @impl true
-  def handle_params(_params, _url, socket) do
-    data = "priv/request-1.zip" |> MinuteWatched.read() |> MinuteWatched.group_day()
-
-    {:noreply, assign_async(socket, [:data], fn -> {:ok, %{data: data}} end)}
-  end
+  def handle_params(_params, _url, socket), do: {:noreply, socket}
 end

@@ -1,20 +1,7 @@
 <Layouts.app flash={@flash} banners={assigns[:banners] || []} current_scope={assigns[:current_scope] || %{}}>
-  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
-    <div class="flex-1 py-12">
-      <div class="max-w-7xl mx-auto px-6">
-        <.async_result :let={data} assign={@data}>
-          <:loading></:loading>
-          <:failed :let={_reason}></:failed>
-          <.live_component
-            module={PremiereEcouteWeb.Components.Live.Graph}
-            id="hours_watched"
-            title="Hours per month"
-            x="day"
-            y="minutes"
-            data={data}
-          />
-        </.async_result>
-      </div>
+  <div class="min-h-screen bg-gray-950 flex items-center justify-center">
+    <div id="motion-demo" phx-hook="MotionDemo">
+      <div data-cube class="w-16 h-16 rounded-xl bg-purple-500"></div>
     </div>
   </div>
 </Layouts.app>

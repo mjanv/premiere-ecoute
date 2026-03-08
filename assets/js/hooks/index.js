@@ -12,6 +12,7 @@ import { SidebarCollapse } from "./sidebar_collapse";
 import { AriadneThread } from "./ariadne_thread";
 import { ScrollCarousel } from "./scroll_carousel";
 import VegaLite from "./vegalite";
+import { MotionDemo } from "./motion_demo";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -27,5 +28,6 @@ export const Hooks = {
   SidebarCollapse: SidebarCollapse,
   AriadneThread: AriadneThread,
   ScrollCarousel: ScrollCarousel,
-  VegaLite: VegaLite
+  VegaLite: VegaLite,
+  MotionDemo: MotionDemo
 };
