@@ -378,7 +378,7 @@
           phx-click="open_review_modal"
           class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-xl font-bold transition-all border border-purple-400/30 shadow-lg"
         >
-          <%= if Reviews.get_for_user(@listening_session.id, @current_scope.user.id) do %>
+          <%= if Reviews.get_for_user_and_session(@listening_session.id, @current_scope.user.id) do %>
             {gettext("Edit my review")}
           <% else %>
             {gettext("Write a review")}
@@ -482,7 +482,7 @@
           </button>
         </div>
 
-        <.form for={@review_form} phx-submit="save_review" class="space-y-5">
+        <.form for={@review_form} phx-submit="save_review" phx-change="update_review_form" class="space-y-5">
           <div>
             <label class="block text-sm font-medium text-white/70 mb-2">{gettext("Your thoughts")}</label>
             <textarea
@@ -503,7 +503,7 @@
                 value={@review_form[:rating].value}
                 min="0"
                 max="10"
-                step="0.5"
+                step="any"
                 class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400"
               />
             </div>
@@ -525,7 +525,7 @@
             <input
               type="text"
               name="review[tags_input]"
-              value={Enum.join(@review_form[:tags].value || [], ", ")}
+              value={@review_form[:tags_input].value || Enum.join(@review_form[:tags].value || [], ", ")}
               class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-400"
               placeholder={gettext("jazz, chill, discovery...")}
             />

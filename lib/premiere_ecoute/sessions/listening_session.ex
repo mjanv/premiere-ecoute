@@ -349,6 +349,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   @doc """
+  Returns all stopped sessions for a given album, ordered by most recent first.
+  """
+  @spec list_for_album(integer()) :: [t()]
+  def list_for_album(album_id) do
+    all(where: [album_id: album_id, status: :stopped], order_by: [desc: :started_at])
+  end
+
+  @doc """
   Retrieves last stopped sessions for a user.
 
   Returns all stopped listening sessions for the current user.

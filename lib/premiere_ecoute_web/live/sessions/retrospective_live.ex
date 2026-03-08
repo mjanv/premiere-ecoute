@@ -103,12 +103,15 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
     existing =
       if current_scope && current_scope.user do
-        Reviews.get_for_user(session.id, current_scope.user.id)
+        # AIDEV-NOTE: prefer session review; fall back to album review so users who reviewed
+        # the album standalone can update it to also link to this session
+        Reviews.get_for_user_and_session(session.id, current_scope.user.id) ||
+          (session.album_id && Reviews.get_for_user_and_album(session.album_id, current_scope.user.id))
       end
 
     changeset =
       if existing do
-        Review.changeset(existing, %{})
+        Review.changeset(existing, Map.from_struct(existing))
       else
         Review.changeset(%Review{}, %{role: role})
       end
@@ -130,6 +133,23 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   end
 
   @impl true
+  def handle_event("update_review_form", %{"review" => params}, socket) do
+    # AIDEV-NOTE: cast all user-editable fields to keep the form consistent between phx-change events
+    changeset =
+      Ecto.Changeset.cast(socket.assigns.review_form.source, params, [
+        :content,
+        :tags_input,
+        :watched_on,
+        :watched_before,
+        :rating,
+        :like,
+        :role
+      ])
+
+    {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+  end
+
+  @impl true
   def handle_event("save_review", %{"review" => params}, socket) do
     current_scope = socket.assigns[:current_scope]
     session = socket.assigns.listening_session
@@ -140,10 +160,16 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
       # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
       params = normalize_review_params(params)
 
+      # AIDEV-NOTE: always inject session_id/album_id so album-only reviews get linked to the session on save
+      extra = %{"session_id" => session.id, "album_id" => session.album_id}
+
       result =
         case socket.assigns[:editing_review] do
-          nil -> Reviews.create(session.id, user, params)
-          review -> Reviews.update(review, params)
+          nil ->
+            Reviews.create(user, Map.merge(params, extra))
+
+          review ->
+            Reviews.update(review, Map.merge(params, extra))
         end
 
       case result do
@@ -156,8 +182,8 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
            |> assign(:editing_review, nil)
            |> put_flash(:info, gettext("Review saved"))}
 
-        {:error, changeset} ->
-          {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+        {:error, _changeset} ->
+          {:noreply, put_flash(socket, :error, gettext("Failed to save review"))}
       end
     else
       {:noreply, put_flash(socket, :error, gettext("You must be logged in to write a review"))}

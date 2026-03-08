@@ -66,7 +66,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
     existing =
       if current_scope && current_scope.user do
-        Reviews.get_for_user(session_id, current_scope.user.id)
+        Reviews.get_for_user_and_session(session_id, current_scope.user.id)
       end
 
     role =
@@ -116,6 +116,23 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   end
 
   @impl true
+  def handle_event("update_review_form", %{"review" => params}, socket) do
+    # AIDEV-NOTE: cast all user-editable fields to keep the form consistent between phx-change events
+    changeset =
+      Ecto.Changeset.cast(socket.assigns.review_form.source, params, [
+        :content,
+        :tags_input,
+        :watched_on,
+        :watched_before,
+        :rating,
+        :like,
+        :role
+      ])
+
+    {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+  end
+
+  @impl true
   def handle_event("save_review", %{"review" => params}, socket) do
     current_scope = socket.assigns[:current_scope]
     session_id = socket.assigns.listening_session.id
@@ -124,10 +141,17 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
       # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
       params = normalize_review_params(params)
 
+      session = socket.assigns.listening_session
+
       result =
         case socket.assigns.editing_review do
-          nil -> Reviews.create(session_id, current_scope.user, params)
-          review -> Reviews.update(review, params)
+          nil ->
+            # AIDEV-NOTE: link review to both the session and its album (when album-sourced)
+            extra = %{"session_id" => session_id, "album_id" => session.album_id}
+            Reviews.create(current_scope.user, Map.merge(params, extra))
+
+          review ->
+            Reviews.update(review, params)
         end
 
       case result do

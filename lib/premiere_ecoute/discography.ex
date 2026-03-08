@@ -18,17 +18,17 @@ defmodule PremiereEcoute.Discography do
   # Album
   defdelegate create_album(album), to: Album, as: :create
   defdelegate get_album(id), to: Album, as: :get
+  defdelegate list_albums(), to: Album, as: :all
 
   # Playlist
   defdelegate create_playlist(playlist), to: Playlist, as: :create
 
-
-  @spec title(any()) :: String.t()| nil
+  @spec title(any()) :: String.t() | nil
   def title(%{title: title}), do: title
   def title(%{name: name}), do: name
   def title(_), do: nil
 
-  @spec url(any()) :: String.t()| nil
+  @spec url(any()) :: String.t() | nil
   def url(%Album{provider: :spotify, album_id: id}), do: "https://open.spotify.com/album/#{id}"
 
   def url(%Album.Track{provider: :spotify, track_id: id}), do: "https://open.spotify.com/track/#{id}"

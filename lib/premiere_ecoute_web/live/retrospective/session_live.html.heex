@@ -372,7 +372,7 @@
                   <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500">
                     {gettext("Reviews")}
                   </h2>
-                  <%= if !Reviews.get_for_user(@listening_session.id, assigns[:current_scope].user.id) do %>
+                  <%= if !Reviews.get_for_user_and_session(@listening_session.id, assigns[:current_scope].user.id) do %>
                     <button
                       phx-click="open_review_modal"
                       class="px-3 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium transition-all"
@@ -634,7 +634,7 @@
               </button>
             </div>
 
-            <.form for={@review_form} phx-submit="save_review" class="space-y-4">
+            <.form for={@review_form} phx-submit="save_review" phx-change="update_review_form" class="space-y-4">
               <input type="hidden" name="review[role]" value={@review_form[:role].value} />
 
               <%!-- Line 1: Watched on + Watched before --%>
@@ -679,7 +679,7 @@
                   <input
                     type="text"
                     name="review[tags_input]"
-                    value={Enum.join(@review_form[:tags].value || [], ", ")}
+                    value={@review_form[:tags_input].value || Enum.join(@review_form[:tags].value || [], ", ")}
                     class="w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
                     placeholder={gettext("jazz, chill...")}
                   />

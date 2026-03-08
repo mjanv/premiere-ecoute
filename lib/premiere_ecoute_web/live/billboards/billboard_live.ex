@@ -8,9 +8,7 @@ defmodule PremiereEcouteWeb.Billboards.BillboardLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Billboards
-  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Similarity
-  alias PremiereEcoute.Discography.Playlist.Track
 
   @impl true
   def mount(_params, _session, socket) do

@@ -147,6 +147,27 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
               </div>
             <% end %>
             
+    <!-- Discography section -->
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:discography, for: @current_user) do %>
+              <div class="mb-6">
+                <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                  <.icon name="hero-square-2-stack" class="w-4 h-4 mr-2" />
+                  <span class="sidebar-link-text">{gettext("Discography")}</span>
+                </h3>
+                <nav class="space-y-1">
+                  <.sidebar_link
+                    href={~p"/discography/albums"}
+                    current_page={@current_page}
+                    page_id="albums"
+                    title={gettext("Albums")}
+                    icon="hero-musical-note"
+                  >
+                    {gettext("Albums")}
+                  </.sidebar_link>
+                </nav>
+              </div>
+            <% end %>
+            
     <!-- Billboards section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
               <div class="mb-6">
