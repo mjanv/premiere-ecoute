@@ -2706,7 +2706,7 @@ msgstr "Supprimer"
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:292
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Review"
-msgstr "Relu"
+msgstr "Review"
 
 #: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:210
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:173

@@ -4424,7 +4424,7 @@ msgstr "Reviewed"
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:375
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Reviews"
-msgstr "Review"
+msgstr "Reviews"
 
 #: lib/premiere_ecoute_web/live/retrospective/session_live.html.heex:718
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.html.heex:493
