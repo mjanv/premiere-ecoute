@@ -11,15 +11,23 @@ defmodule PremiereEcoute.Sessions.Reviews do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession.Review
+  alias PremiereEcoute.Sessions.ListeningSession.ReviewLike
 
   @doc """
   Returns all reviews for a session, preloading the associated user, ordered by insertion date.
   """
   @spec list_for_session(integer()) :: [Review.t()]
   def list_for_session(session_id) do
+    likes_count_subquery =
+      ReviewLike
+      |> where([l], l.review_id == parent_as(:review).id)
+      |> select([l], count(l.id))
+
     Review
+    |> from(as: :review)
     |> where([r], r.session_id == ^session_id)
-    |> order_by([r], asc: r.inserted_at)
+    |> order_by([r], [fragment("CASE WHEN ? = 'streamer' THEN 0 ELSE 1 END", r.role), asc: r.inserted_at])
+    |> select_merge([r], %{likes_count: subquery(likes_count_subquery)})
     |> preload(:user)
     |> Repo.all()
   end

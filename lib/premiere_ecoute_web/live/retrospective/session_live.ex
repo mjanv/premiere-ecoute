@@ -29,15 +29,12 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
         do: ReviewLikes.liked_review_ids(review_ids, current_user.id),
         else: MapSet.new()
 
-    like_counts = Map.new(review_ids, fn id -> {id, ReviewLikes.count_for_review(id)} end)
-
     socket =
       socket
       |> assign(:session_id, session_id_int)
       |> assign(:session_data, AsyncResult.loading())
       |> assign(:reviews, reviews)
       |> assign(:liked_ids, liked_ids)
-      |> assign(:like_counts, like_counts)
       |> assign(:review_modal_open, false)
       |> assign(:review_form, nil)
       |> assign(:editing_review, nil)
@@ -124,12 +121,9 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
       case result do
         {:ok, _} ->
-          reviews = Reviews.list_for_session(session_id)
-
           {:noreply,
            socket
-           |> assign(:reviews, reviews)
-           |> reload_likes(current_scope.user)
+           |> reload_reviews(session_id, current_scope.user)
            |> assign(:review_modal_open, false)
            |> assign(:review_form, nil)
            |> assign(:editing_review, nil)
@@ -151,12 +145,9 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
     if current_scope && current_scope.user do
       case Reviews.delete(String.to_integer(id), current_scope.user) do
         {:ok, _} ->
-          reviews = Reviews.list_for_session(session_id)
-
           {:noreply,
            socket
-           |> assign(:reviews, reviews)
-           |> reload_likes(current_scope.user)
+           |> reload_reviews(session_id, current_scope.user)
            |> put_flash(:info, gettext("Review deleted"))}
 
         {:error, :not_found} ->
@@ -173,18 +164,19 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
     if current_scope && current_scope.user do
       {:ok, _} = ReviewLikes.toggle(String.to_integer(id), current_scope.user)
-      {:noreply, reload_likes(socket, current_scope.user)}
+      {:noreply, reload_reviews(socket, socket.assigns.session_id, current_scope.user)}
     else
       {:noreply, put_flash(socket, :error, gettext("You must be logged in to like a review"))}
     end
   end
 
-  defp reload_likes(socket, user) do
-    review_ids = Enum.map(socket.assigns.reviews, & &1.id)
+  defp reload_reviews(socket, session_id, user) do
+    reviews = Reviews.list_for_session(session_id)
+    review_ids = Enum.map(reviews, & &1.id)
 
     socket
+    |> assign(:reviews, reviews)
     |> assign(:liked_ids, ReviewLikes.liked_review_ids(review_ids, user.id))
-    |> assign(:like_counts, Map.new(review_ids, fn id -> {id, ReviewLikes.count_for_review(id)} end))
   end
 
   defp normalize_review_params(params) do
@@ -220,6 +212,13 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
     case result do
       {:ok, data} -> {:ok, %{session_data: data}}
     end
+  end
+
+  # AIDEV-NOTE: builds vote distribution for a single viewer's votes (my_votes map from my_votes_by_track).
+  def my_vote_distribution(my_votes, session) do
+    votes = Enum.map(my_votes, fn {_track_id, value} -> %{value: value, is_streamer: false} end)
+    individual = build_individual_distribution(votes, session)
+    merge_distributions(individual, %{}, session)
   end
 
   # AIDEV-NOTE: returns %{track_id => score_string} for a specific Twitch viewer from report votes.

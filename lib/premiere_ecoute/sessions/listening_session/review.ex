@@ -1,11 +1,13 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.Review do
   @moduledoc false
 
-  use PremiereEcouteCore.Aggregate.Object
+  use PremiereEcouteCore.Aggregate, root: [:user, :likes], json: [:id]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.ReviewLike
+
+  @type t :: %__MODULE__{}
 
   schema "reviews" do
     field :role, Ecto.Enum, values: [:streamer, :viewer]
@@ -23,6 +25,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Review do
     belongs_to :user, User
 
     has_many :likes, ReviewLike
+
+    field :likes_count, :integer, virtual: true, default: 0
 
     timestamps(type: :utc_datetime)
   end

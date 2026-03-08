@@ -5,6 +5,8 @@ defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
 
   use PremiereEcouteWeb, :live_view
 
+  on_mount {PremiereEcouteWeb.UserAuth, :streamer}
+
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions
 

@@ -272,9 +272,24 @@
                     </div>
                   </div>
                   <%= if my_session_score do %>
+                    <% my_dist = my_vote_distribution(my_votes, session_data.session) %>
                     <div class="flex-1 bg-white/5 border border-cyan-400/20 rounded-xl p-4">
                       <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">{gettext("Me")}</p>
-                      <p class="text-3xl font-bold text-cyan-300 leading-none">{my_session_score}</p>
+                      <div class="flex items-end gap-3">
+                        <p class="text-3xl font-bold text-cyan-300 leading-none shrink-0">{my_session_score}</p>
+                        <%= if my_dist != [] do %>
+                          <div class="flex items-end gap-px flex-1 h-8">
+                            <%= for {n, bar_pct, real_pct} <- my_dist do %>
+                              <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
+                                <div class="w-full h-full bg-slate-600 rounded-sm"></div>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
+                                  {n}: {real_pct}%
+                                </div>
+                              </div>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
                     </div>
                   <% end %>
                 </div>
@@ -314,6 +329,13 @@
                           <% track_id = track.track_summary[:track_id] || track.track_summary["track_id"] %>
                           <% my_track_score = my_votes && Map.get(my_votes, track_id) %>
                           <div class="flex items-center gap-2 shrink-0 ml-4">
+                            <%= if my_track_score do %>
+                              <span class="text-sm text-slate-500 mr-1">{gettext("me")}</span>
+                              <span class="text-base font-semibold text-cyan-300 w-8 text-right">
+                                {my_track_score}
+                              </span>
+                              <span class="text-slate-700 mx-1">·</span>
+                            <% end %>
                             <span class="text-sm text-slate-500 mr-1">{gettext("viewers")}</span>
                             <span class="text-base font-semibold text-purple-300 w-8 text-right">
                               {track.track_summary[:viewer_score] || track.track_summary["viewer_score"]}
@@ -323,13 +345,6 @@
                             <span class="text-base font-semibold text-pink-300 w-8 text-right">
                               {track.track_summary[:streamer_score] || track.track_summary["streamer_score"]}
                             </span>
-                            <%= if my_track_score do %>
-                              <span class="text-slate-700 mx-1">·</span>
-                              <span class="text-sm text-slate-500 mr-1">{gettext("me")}</span>
-                              <span class="text-base font-semibold text-cyan-300 w-8 text-right">
-                                {my_track_score}
-                              </span>
-                            <% end %>
                           </div>
                         </div>
                       <% end %>
@@ -360,7 +375,7 @@
                   <% else %>
                     <div class="space-y-4">
                       <%= for review <- @reviews do %>
-                        <div class="bg-white/5 border border-white/10 rounded-xl p-5">
+                        <div class={"rounded-xl p-5 #{if review.role == :streamer, do: "bg-purple-900/20 border border-purple-500/40", else: "bg-white/5 border border-white/10"}"}>
                           <div class="flex items-start justify-between gap-4">
                             <div class="flex items-center gap-3">
                               <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
@@ -463,7 +478,7 @@
                             </div>
                           </div>
                           <%= if review.content && review.content != "" do %>
-                            <p class="mt-3 text-slate-300 text-sm leading-relaxed">{review.content}</p>
+                            <p class="mt-3 text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{review.content}</p>
                           <% end %>
                           <%= if review.tags && review.tags != [] do %>
                             <div class="mt-3 flex flex-wrap gap-1.5">
@@ -477,7 +492,7 @@
                           <div class="mt-2 flex items-center gap-2 text-xs text-slate-600">
                             <%!-- Like button --%>
                             <% liked = MapSet.member?(@liked_ids, review.id) %>
-                            <% like_count = Map.get(@like_counts, review.id, 0) %>
+                            <% like_count = review.likes_count %>
                             <%= if assigns[:current_scope] && assigns[:current_scope].user do %>
                               <button
                                 phx-click="toggle_like_review"
