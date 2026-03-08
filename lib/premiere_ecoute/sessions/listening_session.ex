@@ -468,6 +468,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def tracks(%__MODULE__{single: %Single{}}), do: []
 
   @doc """
+  Returns the primary entity (album, playlist, or single) associated with the session.
+  """
+  @spec entity(t()) :: Album.t() | Playlist.t() | Single.t() | nil
+  def entity(%__MODULE__{source: :album, album: album}), do: album
+  def entity(%__MODULE__{source: :playlist, playlist: playlist}), do: playlist
+  def entity(%__MODULE__{source: :track, single: single}), do: single
+  def entity(%__MODULE__{}), do: nil
+
+  @doc """
   Calculates total duration of session in minutes.
 
   Sums duration of all tracks in the session and converts from milliseconds to minutes.

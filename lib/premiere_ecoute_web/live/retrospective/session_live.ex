@@ -9,16 +9,24 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias Phoenix.LiveView.AsyncResult
-  alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
+  alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.ReviewLikes
   alias PremiereEcoute.Sessions.Reviews
 
   @impl true
   def mount(%{"id" => session_id}, _session, socket) do
     session_id_int = String.to_integer(session_id)
+
+    listening_session =
+      session_id_int
+      |> ListeningSession.get()
+      |> Repo.preload(report: [:votes, :polls])
+
+    {:ok, report} = Report.generate(listening_session)
+    tracks = build_tracks(listening_session, report)
 
     reviews = Reviews.list_for_session(session_id_int)
     review_ids = Enum.map(reviews, & &1.id)
@@ -32,8 +40,9 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
     socket =
       socket
-      |> assign(:session_id, session_id_int)
-      |> assign(:session_data, AsyncResult.loading())
+      |> assign(:listening_session, listening_session)
+      |> assign(:report, report)
+      |> assign(:tracks, tracks)
       |> assign(:reviews, reviews)
       |> assign(:liked_ids, liked_ids)
       |> assign(:review_modal_open, false)
@@ -41,7 +50,6 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
       |> assign(:editing_review, nil)
       |> assign(:replays_modal_open, false)
       |> assign(:replays_entries, [])
-      |> assign_async(:session_data, fn -> load_session(session_id) end)
 
     {:ok, socket}
   end
@@ -54,7 +62,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   @impl true
   def handle_event("open_review_modal", _params, socket) do
     current_scope = socket.assigns[:current_scope]
-    session_id = socket.assigns.session_id
+    session_id = socket.assigns.listening_session.id
 
     existing =
       if current_scope && current_scope.user do
@@ -62,8 +70,8 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
       end
 
     role =
-      if current_scope && current_scope.user && socket.assigns.session_data.result do
-        session = socket.assigns.session_data.result.session
+      if current_scope && current_scope.user do
+        session = socket.assigns.listening_session
         if current_scope.user.id == session.user_id, do: :streamer, else: :viewer
       else
         :viewer
@@ -110,7 +118,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   @impl true
   def handle_event("save_review", %{"review" => params}, socket) do
     current_scope = socket.assigns[:current_scope]
-    session_id = socket.assigns.session_id
+    session_id = socket.assigns.listening_session.id
 
     if current_scope && current_scope.user do
       # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
@@ -143,7 +151,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   @impl true
   def handle_event("delete_review", %{"id" => id}, socket) do
     current_scope = socket.assigns[:current_scope]
-    session_id = socket.assigns.session_id
+    session_id = socket.assigns.listening_session.id
 
     if current_scope && current_scope.user do
       case Reviews.delete(String.to_integer(id), current_scope.user) do
@@ -167,7 +175,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
     if current_scope && current_scope.user do
       {:ok, _} = ReviewLikes.toggle(String.to_integer(id), current_scope.user)
-      {:noreply, reload_reviews(socket, socket.assigns.session_id, current_scope.user)}
+      {:noreply, reload_reviews(socket, socket.assigns.listening_session.id, current_scope.user)}
     else
       {:noreply, put_flash(socket, :error, gettext("You must be logged in to like a review"))}
     end
@@ -175,7 +183,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
   @impl true
   def handle_event("open_replays_modal", _params, socket) do
-    replays = get_in(socket.assigns, [:session_data, Access.key(:result), Access.key(:session), Access.key(:replays)]) || []
+    replays = socket.assigns.listening_session.replays || []
     entries = if replays == [], do: [%{"label" => "", "url" => ""}], else: replays
 
     {:noreply,
@@ -205,7 +213,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   @impl true
   def handle_event("save_replays", %{"replays" => params}, socket) do
     current_scope = socket.assigns[:current_scope]
-    session = socket.assigns.session_data.result.session
+    session = socket.assigns.listening_session
 
     if current_scope && current_scope.user && current_scope.user.id == session.user_id do
       # AIDEV-NOTE: params arrive as %{"0" => %{"label" => ..., "url" => ...}, "1" => ...}
@@ -213,11 +221,9 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
       case ListeningSession.update_replays(session, replays) do
         {:ok, updated_session} ->
-          updated_data = %{socket.assigns.session_data.result | session: %{session | replays: updated_session.replays}}
-
           {:noreply,
            socket
-           |> assign(:session_data, AsyncResult.ok(socket.assigns.session_data, updated_data))
+           |> assign(:listening_session, %{session | replays: updated_session.replays})
            |> assign(:replays_modal_open, false)
            |> put_flash(:info, gettext("Replays saved"))}
 
@@ -259,19 +265,22 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
     |> Map.put("like", like)
   end
 
-  defp load_session(session_id) do
-    # AIDEV-NOTE: tries album first, then single, then playlist — matches ListeningSession.source values
-    result =
-      with {:error, :not_found} <- Sessions.get_album_session_details(session_id),
-           {:error, :not_found} <- Sessions.get_single_session_details(session_id),
-           {:error, :not_found} <- Sessions.get_playlist_session_details(session_id) do
-        {:ok, nil}
-      end
-
-    case result do
-      {:ok, data} -> {:ok, %{session_data: data}}
-    end
+  # AIDEV-NOTE: builds [{track_album|playlist_track, track_summary}] from report summaries + preloaded tracks.
+  defp build_tracks(%ListeningSession{source: :album} = session, report) do
+    Enum.map(report.track_summaries, fn summary ->
+      id = summary[:track_id] || summary["track_id"]
+      %{track_album: Enum.find(session.album.tracks, &(&1.id == id)), track_summary: summary}
+    end)
   end
+
+  defp build_tracks(%ListeningSession{source: :playlist} = session, report) do
+    Enum.map(report.track_summaries, fn summary ->
+      id = summary[:track_id] || summary["track_id"]
+      %{playlist_track: Enum.find(session.playlist.tracks, &(&1.id == id)), track_summary: summary}
+    end)
+  end
+
+  defp build_tracks(_session, _report), do: []
 
   # AIDEV-NOTE: builds vote distribution for a single viewer's votes (my_votes map from my_votes_by_track).
   def my_vote_distribution(my_votes, session) do
