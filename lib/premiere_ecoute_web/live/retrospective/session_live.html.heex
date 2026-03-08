@@ -89,8 +89,10 @@
             <div class="w-64 shrink-0 space-y-6">
               <%!-- Back link --%>
               <.link
+                id="back-link"
+                phx-hook="BackLink"
                 navigate={~p"/retrospective/history"}
-                class="inline-flex items-center gap-1.5 ml-6 px-2.5 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium transition-all"
+                class="inline-flex items-center gap-1.5 ml-6 px-2.5 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium"
               >
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -299,10 +301,10 @@
                         {session_data.session.report.session_summary[:viewer_score]}
                       </p>
                       <%= if viewer_dist != [] do %>
-                        <div class="flex items-end gap-px flex-1 h-8">
+                        <div id="bar-viewer" phx-hook="BarBounce" class="flex items-end gap-px flex-1 h-8">
                           <%= for {n, bar_pct, real_pct} <- viewer_dist do %>
                             <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
-                              <div class="w-full h-full bg-slate-600 rounded-sm"></div>
+                              <div data-bar style="transform-origin: bottom;" class="w-full h-full bg-slate-600 rounded-sm"></div>
                               <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
                                 {n}: {real_pct}%
                               </div>
@@ -319,10 +321,10 @@
                         {session_data.session.report.session_summary[:streamer_score]}
                       </p>
                       <%= if streamer_dist != [] do %>
-                        <div class="flex items-end gap-px flex-1 h-8">
+                        <div id="bar-streamer" phx-hook="BarBounce" class="flex items-end gap-px flex-1 h-8">
                           <%= for {n, bar_pct, real_pct} <- streamer_dist do %>
                             <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
-                              <div class="w-full h-full bg-slate-600 rounded-sm"></div>
+                              <div data-bar style="transform-origin: bottom;" class="w-full h-full bg-slate-600 rounded-sm"></div>
                               <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
                                 {n}: {real_pct}%
                               </div>
@@ -339,10 +341,10 @@
                       <div class="flex items-end gap-3">
                         <p class="text-3xl font-bold text-cyan-300 leading-none shrink-0">{my_session_score}</p>
                         <%= if my_dist != [] do %>
-                          <div class="flex items-end gap-px flex-1 h-8">
+                          <div id="bar-me" phx-hook="BarBounce" class="flex items-end gap-px flex-1 h-8">
                             <%= for {n, bar_pct, real_pct} <- my_dist do %>
                               <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
-                                <div class="w-full h-full bg-slate-600 rounded-sm"></div>
+                                <div data-bar style="transform-origin: bottom;" class="w-full h-full bg-slate-600 rounded-sm"></div>
                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
                                   {n}: {real_pct}%
                                 </div>

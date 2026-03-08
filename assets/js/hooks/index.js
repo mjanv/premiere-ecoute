@@ -14,6 +14,8 @@ import { ScrollCarousel } from "./scroll_carousel";
 import VegaLite from "./vegalite";
 import { MotionDemo } from "./motion_demo";
 import { LikeHeart } from "./like_heart";
+import { BarBounce } from "./bar_bounce";
+import { BackLink } from "./back_link";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -31,5 +33,7 @@ export const Hooks = {
   ScrollCarousel: ScrollCarousel,
   VegaLite: VegaLite,
   MotionDemo: MotionDemo,
-  LikeHeart: LikeHeart
+  LikeHeart: LikeHeart,
+  BarBounce: BarBounce,
+  BackLink: BackLink
 };
