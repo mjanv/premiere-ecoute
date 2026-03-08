@@ -154,7 +154,7 @@
             </h2>
             <div class="flex space-x-2">
               <a
-                href={PremiereEcoute.Discography.Playlist.Track.url(@selected.track)}
+                href={PremiereEcoute.Discography.url(@selected.track)}
                 target="_blank"
                 class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
               >
@@ -171,11 +171,11 @@
               <%= for track <- @selected.tracks |> Enum.uniq_by(&{&1.provider, &1.playlist_id}) do %>
                 <div class="bg-gray-800 p-3 rounded-lg">
                   <a
-                    href={PremiereEcoute.Discography.Playlist.url(track)}
+                    href={PremiereEcoute.Discography.url(track)}
                     target="_blank"
                     class="text-purple-400 hover:text-purple-300 text-sm text-center block break-all"
                   >
-                    {PremiereEcoute.Discography.Playlist.url(track)}
+                    {PremiereEcoute.Discography.url(track)}
                   </a>
                 </div>
               <% end %>
@@ -212,7 +212,7 @@
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
-                      href={PremiereEcoute.Discography.Playlist.Track.url(track_group.track)}
+                      href={PremiereEcoute.Discography.url(track_group.track)}
                       target="_blank"
                       class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                     >
@@ -254,7 +254,7 @@
                   </div>
                   <div class="flex space-x-2 ml-4">
                     <a
-                      href={PremiereEcoute.Discography.Playlist.Track.url(track_group.track)}
+                      href={PremiereEcoute.Discography.url(track_group.track)}
                       target="_blank"
                       class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                     >
@@ -282,7 +282,7 @@
           </div>
           <div class="mt-4">
             <a
-              href={PremiereEcoute.Discography.Playlist.url(@selected)}
+              href={PremiereEcoute.Discography.url(@selected)}
               target="_blank"
               class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
@@ -336,7 +336,7 @@
                     </div>
                     <div class="flex space-x-2 ml-4">
                       <a
-                        href={PremiereEcoute.Discography.Playlist.Track.url(track)}
+                        href={PremiereEcoute.Discography.url(track)}
                         target="_blank"
                         class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                       >
@@ -374,7 +374,7 @@
                     </div>
                     <div class="flex space-x-2 ml-4">
                       <a
-                        href={PremiereEcoute.Discography.Playlist.url(similar_playlist)}
+                        href={PremiereEcoute.Discography.url(similar_playlist)}
                         target="_blank"
                         class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
                       >

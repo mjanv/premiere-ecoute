@@ -12,6 +12,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   alias PremiereEcoute.Apis
 
+  alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Single
@@ -446,7 +447,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   defp get_or_create_playlist(playlist) do
     case Playlist.get_by(playlist_id: playlist.playlist_id, provider: playlist.provider) do
-      nil -> Playlist.create(%{playlist | url: Playlist.url(playlist)})
+      nil -> Playlist.create(%{playlist | url: Discography.url(playlist)})
       existing_playlist -> {:ok, existing_playlist}
     end
   end

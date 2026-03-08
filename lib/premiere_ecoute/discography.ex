@@ -21,4 +21,19 @@ defmodule PremiereEcoute.Discography do
 
   # Playlist
   defdelegate create_playlist(playlist), to: Playlist, as: :create
+
+
+  def title(%{title: title}), do: title
+  def title(%{name: name}), do: name
+
+  @spec url(any()) :: String.t()| nil
+  def url(%Album{provider: :spotify, album_id: id}), do: "https://open.spotify.com/album/#{id}"
+
+  def url(%Album.Track{provider: :spotify, track_id: id}), do: "https://open.spotify.com/track/#{id}"
+  def url(%Album.Track{provider: :deezer, track_id: id}), do: "https://www.deezer.com/track/#{id}"
+
+  def url(%Playlist{provider: :spotify, playlist_id: id}), do: "https://open.spotify.com/playlist/#{id}"
+  def url(%Playlist{provider: :deezer, playlist_id: id}), do: "https://www.deezer.com/playlist/#{id}"
+
+  def url(_), do: nil
 end

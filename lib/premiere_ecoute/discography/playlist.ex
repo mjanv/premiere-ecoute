@@ -96,13 +96,4 @@ defmodule PremiereEcoute.Discography.Playlist do
     |> cast_assoc(:tracks)
     |> Repo.update()
   end
-
-  @doc """
-  Generates the external URL for a playlist.
-
-  Returns the appropriate URL based on provider (Spotify or Deezer) and playlist ID.
-  """
-  @spec url(t()) :: String.t()
-  def url(%{provider: :spotify, playlist_id: id}), do: "https://open.spotify.com/playlist/#{id}"
-  def url(%{provider: :deezer, playlist_id: id}), do: "https://www.deezer.com/playlist/#{id}"
 end
