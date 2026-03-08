@@ -106,6 +106,67 @@
                 style="box-shadow: 0 8px 40px rgba(0,0,0,0.7);"
               />
 
+              <%!-- Replays --%>
+              <% replays = session_data.session.replays || [] %>
+              <% is_owner =
+                assigns[:current_scope] && assigns[:current_scope].user &&
+                  assigns[:current_scope].user.id == session_data.session.user_id %>
+              <%= if replays != [] || is_owner do %>
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500">
+                      {gettext("Replays")}
+                    </h3>
+                    <%= if is_owner do %>
+                      <button
+                        phx-click="open_replays_modal"
+                        class="text-slate-600 hover:text-white transition-colors"
+                        title={gettext("Edit replays")}
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    <% end %>
+                  </div>
+                  <%= if replays == [] do %>
+                    <p class="text-slate-600 text-xs py-1">{gettext("No replays yet.")}</p>
+                  <% else %>
+                    <div class="space-y-2">
+                      <%= for replay <- replays do %>
+                        <a
+                          href={replay["url"]}
+                          target="_blank"
+                          rel="noopener"
+                          class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm transition-all"
+                        >
+                          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                            />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          {replay["label"] || replay["url"]}
+                        </a>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+
               <%!-- Where to listen --%>
               <%= if spotify_url do %>
                 <div>
@@ -530,6 +591,80 @@
             </div>
           </div>
         </div>
+
+        <%!-- Replays modal --%>
+        <%= if @replays_modal_open do %>
+          <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-lg shadow-2xl">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white">{gettext("Edit replays")}</h3>
+                <button phx-click="close_replays_modal" class="text-slate-500 hover:text-white transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form phx-submit="save_replays" class="space-y-3">
+                <%= for {entry, index} <- Enum.with_index(@replays_entries) do %>
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="text"
+                      name={"replays[#{index}][label]"}
+                      value={entry["label"]}
+                      placeholder={gettext("Label (e.g. YouTube VOD)")}
+                      class="w-32 shrink-0 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                    />
+                    <input
+                      type="url"
+                      name={"replays[#{index}][url]"}
+                      value={entry["url"]}
+                      placeholder="https://..."
+                      class="flex-1 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                    />
+                    <button
+                      type="button"
+                      phx-click="remove_replay_entry"
+                      phx-value-index={index}
+                      class="text-slate-600 hover:text-red-400 transition-colors shrink-0"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                <% end %>
+
+                <button
+                  type="button"
+                  phx-click="add_replay_entry"
+                  class="flex items-center gap-1.5 text-slate-500 hover:text-white text-sm transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  {gettext("Add link")}
+                </button>
+
+                <div class="flex gap-3 pt-2">
+                  <button
+                    type="submit"
+                    class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                  >
+                    {gettext("Save")}
+                  </button>
+                  <button
+                    type="button"
+                    phx-click="close_replays_modal"
+                    class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                  >
+                    {gettext("Cancel")}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        <% end %>
 
         <%!-- Review modal --%>
         <%= if @review_modal_open && @review_form do %>

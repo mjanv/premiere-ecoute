@@ -52,6 +52,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     field :name, :string
     field :vote_mode, Ecto.Enum, values: [:chat, :poll], default: :chat
     field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
+    field :replays, {:array, :map}, default: []
     field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     field :started_at, :utc_datetime
@@ -85,6 +86,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       :status,
       :source,
       :name,
+      :replays,
       :vote_mode,
       :visibility,
       :options,
@@ -550,6 +552,20 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @spec next_page_for_user(integer(), Scrivener.Page.t()) :: Scrivener.Page.t()
   def next_page_for_user(_user_id, %Scrivener.Page{page_number: n, total_pages: n} = page), do: page
   def next_page_for_user(user_id, %Scrivener.Page{page_number: n, page_size: ps}), do: page_for_user(user_id, n + 1, ps)
+
+  @doc """
+  Updates the replay links for a session.
+
+  Each replay is a map with "label" and "url" keys. Empty-URL entries are dropped.
+  """
+  @spec update_replays(t(), list(map())) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def update_replays(%__MODULE__{} = session, replays) do
+    cleaned = Enum.reject(replays, fn r -> r["url"] == nil or String.trim(r["url"]) == "" end)
+
+    session
+    |> changeset(%{replays: cleaned})
+    |> Repo.update()
+  end
 
   defp has_active_session?(user_id, exclude_session_id) do
     from(s in __MODULE__,

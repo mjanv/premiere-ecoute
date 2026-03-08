@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
 
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
   alias PremiereEcoute.Sessions.ReviewLikes
   alias PremiereEcoute.Sessions.Reviews
@@ -38,6 +39,8 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
       |> assign(:review_modal_open, false)
       |> assign(:review_form, nil)
       |> assign(:editing_review, nil)
+      |> assign(:replays_modal_open, false)
+      |> assign(:replays_entries, [])
       |> assign_async(:session_data, fn -> load_session(session_id) end)
 
     {:ok, socket}
@@ -167,6 +170,62 @@ defmodule PremiereEcouteWeb.Retrospective.SessionLive do
       {:noreply, reload_reviews(socket, socket.assigns.session_id, current_scope.user)}
     else
       {:noreply, put_flash(socket, :error, gettext("You must be logged in to like a review"))}
+    end
+  end
+
+  @impl true
+  def handle_event("open_replays_modal", _params, socket) do
+    replays = get_in(socket.assigns, [:session_data, Access.key(:result), Access.key(:session), Access.key(:replays)]) || []
+    entries = if replays == [], do: [%{"label" => "", "url" => ""}], else: replays
+
+    {:noreply,
+     socket
+     |> assign(:replays_modal_open, true)
+     |> assign(:replays_entries, entries)}
+  end
+
+  @impl true
+  def handle_event("close_replays_modal", _params, socket) do
+    {:noreply, assign(socket, :replays_modal_open, false)}
+  end
+
+  @impl true
+  def handle_event("add_replay_entry", _params, socket) do
+    entries = socket.assigns.replays_entries ++ [%{"label" => "", "url" => ""}]
+    {:noreply, assign(socket, :replays_entries, entries)}
+  end
+
+  @impl true
+  def handle_event("remove_replay_entry", %{"index" => index}, socket) do
+    entries = List.delete_at(socket.assigns.replays_entries, String.to_integer(index))
+    entries = if entries == [], do: [%{"label" => "", "url" => ""}], else: entries
+    {:noreply, assign(socket, :replays_entries, entries)}
+  end
+
+  @impl true
+  def handle_event("save_replays", %{"replays" => params}, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session = socket.assigns.session_data.result.session
+
+    if current_scope && current_scope.user && current_scope.user.id == session.user_id do
+      # AIDEV-NOTE: params arrive as %{"0" => %{"label" => ..., "url" => ...}, "1" => ...}
+      replays = params |> Enum.sort_by(fn {k, _} -> String.to_integer(k) end) |> Enum.map(&elem(&1, 1))
+
+      case ListeningSession.update_replays(session, replays) do
+        {:ok, updated_session} ->
+          updated_data = %{socket.assigns.session_data.result | session: %{session | replays: updated_session.replays}}
+
+          {:noreply,
+           socket
+           |> assign(:session_data, AsyncResult.ok(socket.assigns.session_data, updated_data))
+           |> assign(:replays_modal_open, false)
+           |> put_flash(:info, gettext("Replays saved"))}
+
+        {:error, _changeset} ->
+          {:noreply, put_flash(socket, :error, gettext("Failed to save replays"))}
+      end
+    else
+      {:noreply, put_flash(socket, :error, gettext("Not authorized"))}
     end
   end
 
