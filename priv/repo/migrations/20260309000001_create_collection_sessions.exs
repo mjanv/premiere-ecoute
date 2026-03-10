@@ -4,10 +4,10 @@ defmodule PremiereEcoute.Repo.Migrations.CreateCollectionSessions do
   def change do
     create table(:collection_sessions) do
       add :status, :string, null: false, default: "pending"
-      add :rule, :string, null: false, default: "ordered"
-      add :selection_mode, :string, null: false, default: "streamer_choice"
-      add :vote_duration, :integer
       add :current_index, :integer, null: false, default: 0
+      add :kept, {:array, :string}, null: false, default: []
+      add :rejected, {:array, :string}, null: false, default: []
+      add :skipped, {:array, :string}, null: false, default: []
 
       add :user_id, references(:users, on_delete: :delete_all), null: false
       add :origin_playlist_id, references(:library_playlists, on_delete: :restrict), null: false

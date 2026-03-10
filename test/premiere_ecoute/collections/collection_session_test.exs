@@ -4,14 +4,12 @@ defmodule PremiereEcoute.Collections.CollectionSessionTest do
   alias PremiereEcoute.Collections.CollectionSession
 
   describe "changeset/2" do
-    test "valid streamer_choice session requires no vote_duration" do
+    test "valid session with required fields" do
       user = user_fixture()
       origin = collection_library_playlist_fixture(user)
       destination = collection_library_playlist_fixture(user)
 
       attrs = %{
-        rule: :ordered,
-        selection_mode: :streamer_choice,
         user_id: user.id,
         origin_playlist_id: origin.id,
         destination_playlist_id: destination.id
@@ -20,71 +18,11 @@ defmodule PremiereEcoute.Collections.CollectionSessionTest do
       assert %{valid?: true} = CollectionSession.changeset(%CollectionSession{}, attrs)
     end
 
-    test "viewer_vote session requires vote_duration" do
-      user = user_fixture()
-      origin = collection_library_playlist_fixture(user)
-      destination = collection_library_playlist_fixture(user)
-
-      attrs = %{
-        rule: :ordered,
-        selection_mode: :viewer_vote,
-        user_id: user.id,
-        origin_playlist_id: origin.id,
-        destination_playlist_id: destination.id
-      }
-
-      changeset = CollectionSession.changeset(%CollectionSession{}, attrs)
-      assert "can't be blank" in errors_on(changeset).vote_duration
-    end
-
-    test "duel session requires vote_duration" do
-      user = user_fixture()
-      origin = collection_library_playlist_fixture(user)
-      destination = collection_library_playlist_fixture(user)
-
-      attrs = %{
-        rule: :ordered,
-        selection_mode: :duel,
-        user_id: user.id,
-        origin_playlist_id: origin.id,
-        destination_playlist_id: destination.id
-      }
-
-      changeset = CollectionSession.changeset(%CollectionSession{}, attrs)
-      assert "can't be blank" in errors_on(changeset).vote_duration
-    end
-
-    test "viewer_vote with vote_duration is valid" do
-      user = user_fixture()
-      origin = collection_library_playlist_fixture(user)
-      destination = collection_library_playlist_fixture(user)
-
-      attrs = %{
-        rule: :ordered,
-        selection_mode: :viewer_vote,
-        vote_duration: 30,
-        user_id: user.id,
-        origin_playlist_id: origin.id,
-        destination_playlist_id: destination.id
-      }
-
-      assert %{valid?: true} = CollectionSession.changeset(%CollectionSession{}, attrs)
-    end
-
-    test "random rule is accepted" do
-      user = user_fixture()
-      origin = collection_library_playlist_fixture(user)
-      destination = collection_library_playlist_fixture(user)
-
-      attrs = %{
-        rule: :random,
-        selection_mode: :streamer_choice,
-        user_id: user.id,
-        origin_playlist_id: origin.id,
-        destination_playlist_id: destination.id
-      }
-
-      assert %{valid?: true} = CollectionSession.changeset(%CollectionSession{}, attrs)
+    test "invalid without required associations" do
+      changeset = CollectionSession.changeset(%CollectionSession{}, %{})
+      assert "can't be blank" in errors_on(changeset).user_id
+      assert "can't be blank" in errors_on(changeset).origin_playlist_id
+      assert "can't be blank" in errors_on(changeset).destination_playlist_id
     end
   end
 
@@ -107,25 +45,6 @@ defmodule PremiereEcoute.Collections.CollectionSessionTest do
 
       {:ok, completed} = CollectionSession.complete(session)
       assert completed.status == :completed
-    end
-  end
-
-  describe "advance/2" do
-    test "increments current_index by default step of 1" do
-      user = user_fixture()
-      session = collection_session_fixture(user)
-
-      assert session.current_index == 0
-      {:ok, advanced} = CollectionSession.advance(session)
-      assert advanced.current_index == 1
-    end
-
-    test "increments current_index by step 2 for duel" do
-      user = user_fixture()
-      session = collection_session_fixture(user)
-
-      {:ok, advanced} = CollectionSession.advance(session, 2)
-      assert advanced.current_index == 2
     end
   end
 

@@ -8,7 +8,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   - duel: two tracks, viewer picks A or B; streamer finalizes
 
   Subscribes to PubSub for live vote updates and vote window close events.
-  Displays a progress sidebar of all decisions made so far.
+  Decision state (kept/rejected/skipped) is read directly from session arrays.
   """
 
   use PremiereEcouteWeb, :live_view
@@ -16,7 +16,6 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   require Logger
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
-  alias PremiereEcoute.Collections.CollectionDecision
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.CloseVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.CompleteCollectionSession
@@ -42,7 +41,6 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       end
 
       {tracks, votes_a, votes_b, active_track_id, duel_track_id, vote_open} = load_cache(session_id)
-      decisions = CollectionDecision.all_for_session(session_id)
 
       socket
       |> assign(:session, session)
@@ -50,7 +48,6 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:scope, scope)
       |> assign(:tracks, tracks)
       |> assign(:original_tracks, tracks)
-      |> assign(:decisions, decisions)
       |> assign(:active_track_id, active_track_id)
       |> assign(:duel_track_id, duel_track_id)
       |> assign(:votes_a, votes_a)
@@ -60,9 +57,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:playing_track_id, nil)
       |> assign(:hide_decided, false)
       |> assign(:show_end_modal, false)
-      # AIDEV-NOTE: round_mode/round_duration override session defaults per round; nil = use session default
-      |> assign(:round_mode, session.selection_mode)
-      |> assign(:round_duration, session.vote_duration)
+      |> assign(:round_mode, :streamer_choice)
+      |> assign(:round_duration, 60)
       |> then(fn socket -> {:ok, socket} end)
     end
   end
@@ -115,12 +111,10 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info({:track_decided, _track_id, _decision}, socket) do
-    decisions = CollectionDecision.all_for_session(socket.assigns.session_id)
     session = CollectionSession.get(socket.assigns.session_id)
 
     {:noreply,
      assign(socket,
-       decisions: decisions,
        session: session,
        votes_a: 0,
        votes_b: 0,
@@ -230,54 +224,40 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_event("decide", %{"decision" => decision_str}, %{assigns: assigns} = socket) do
-    %{session: session, scope: scope, tracks: tracks, votes_a: va, votes_b: vb, round_mode: round_mode} = assigns
+    %{session: session, scope: scope, tracks: tracks, round_mode: round_mode} = assigns
     decision = String.to_existing_atom(decision_str)
     track = Enum.at(tracks, session.current_index)
     duel = Enum.at(tracks, session.current_index + 1)
 
     # AIDEV-NOTE: in duel mode, Pick A (:kept) = track A wins, Pick B (:rejected) = track B wins.
-    # Winner stored as :kept; loser gets a separate :rejected row via maybe_decide_duel_loser.
-    # positions reflect each track's actual index in the list.
-    {primary, loser, effective_decision, winner_position, loser_position} =
+    # Command handler records winner as :kept and loser as :rejected in one update.
+    {primary, loser, effective_decision} =
       case {round_mode, decision} do
-        {:duel, :kept} -> {track, duel, :kept, session.current_index, session.current_index + 1}
-        {:duel, :rejected} -> {duel, track, :kept, session.current_index + 1, session.current_index}
-        _ -> {track, nil, decision, session.current_index, nil}
+        {:duel, :kept} -> {track, duel, :kept}
+        {:duel, :rejected} -> {duel, track, :kept}
+        _ -> {track, nil, decision}
       end
 
     cmd = %DecideTrack{
       session_id: session.id,
       scope: scope,
       track_id: primary && primary.track_id,
-      track_name: primary && primary.name,
-      artist: primary && primary.artist,
-      position: winner_position,
       decision: effective_decision,
-      votes_a: va,
-      votes_b: vb,
-      duel_track_id: loser && loser.track_id,
-      duel_track_name: loser && loser.name,
-      duel_artist: loser && loser.artist,
-      duel_position: loser_position
+      duel_track_id: loser && loser.track_id
     }
 
     case CommandBus.apply(cmd) do
       {:ok, advanced, _events} ->
-        decisions = CollectionDecision.all_for_session(session.id)
-
         {:noreply,
          assign(socket,
            session: advanced,
-           decisions: decisions,
            votes_a: 0,
            votes_b: 0,
            vote_open: false,
            active_track_id: nil,
            duel_track_id: nil,
            countdown: nil,
-           playing_track_id: nil,
-           round_mode: advanced.selection_mode,
-           round_duration: advanced.vote_duration
+           playing_track_id: nil
          )}
 
       {:error, reason} ->
@@ -548,6 +528,17 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   def decision_class(:kept), do: "bg-green-600/20 text-green-400 border-green-500/30"
   def decision_class(:rejected), do: "bg-red-600/20 text-red-400 border-red-500/30"
   def decision_class(:skipped), do: "bg-gray-600/20 text-gray-400 border-gray-500/30"
+
+  # AIDEV-NOTE: derives decision from inline session arrays; returns nil if track not yet decided
+  @spec track_decision(CollectionSession.t(), String.t()) :: :kept | :rejected | :skipped | nil
+  def track_decision(session, track_id) do
+    cond do
+      track_id in session.kept -> :kept
+      track_id in session.rejected -> :rejected
+      track_id in session.skipped -> :skipped
+      true -> nil
+    end
+  end
 
   @spec vote_bar_width(integer(), integer(), :a | :b) :: String.t()
   def vote_bar_width(0, 0, _side), do: "50%"

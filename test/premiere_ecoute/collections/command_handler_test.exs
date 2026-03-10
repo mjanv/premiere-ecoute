@@ -2,7 +2,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.Scope
-  alias PremiereEcoute.Collections.CollectionDecision
   alias PremiereEcoute.Collections.CollectionSession.Commands.CloseVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.CompleteCollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.DecideTrack
@@ -30,41 +29,16 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       command = %PrepareCollectionSession{
         scope: scope,
         origin_playlist_id: origin.id,
-        destination_playlist_id: destination.id,
-        rule: :ordered,
-        selection_mode: :streamer_choice,
-        vote_duration: nil
+        destination_playlist_id: destination.id
       }
 
       {:ok, session, [%CollectionSessionPrepared{} = event]} = CommandBus.apply(command)
 
       assert session.status == :pending
-      assert session.rule == :ordered
-      assert session.selection_mode == :streamer_choice
       assert session.origin_playlist_id == origin.id
       assert session.destination_playlist_id == destination.id
       assert event.session_id == session.id
       assert event.user_id == user.id
-    end
-
-    test "creates viewer_vote session with vote_duration" do
-      user = user_fixture(%{twitch: %{user_id: "1234"}})
-      scope = Scope.for_user(user)
-      origin = collection_library_playlist_fixture(user)
-      destination = collection_library_playlist_fixture(user)
-
-      command = %PrepareCollectionSession{
-        scope: scope,
-        origin_playlist_id: origin.id,
-        destination_playlist_id: destination.id,
-        rule: :ordered,
-        selection_mode: :viewer_vote,
-        vote_duration: 30
-      }
-
-      {:ok, session, [%CollectionSessionPrepared{}]} = CommandBus.apply(command)
-      assert session.selection_mode == :viewer_vote
-      assert session.vote_duration == 30
     end
   end
 
@@ -87,21 +61,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       {:ok, cached} = Cache.get(:collections, session.id)
       assert is_list(cached.tracks)
     end
-
-    test "shuffles tracks when rule is random" do
-      user = user_fixture(%{twitch: %{user_id: "1234"}})
-      scope = Scope.for_user(user)
-      playlist = playlist_fixture()
-      session = collection_session_fixture(user, %{rule: :random})
-
-      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
-
-      command = %StartCollectionSession{session_id: session.id, scope: scope}
-      {:ok, _started, [%CollectionSessionStarted{}]} = CommandBus.apply(command)
-
-      {:ok, cached} = Cache.get(:collections, session.id)
-      assert is_list(cached.tracks)
-    end
   end
 
   describe "handle/1 - OpenVoteWindow" do
@@ -109,13 +68,21 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = Scope.for_user(user)
       playlist = playlist_fixture()
-      session = collection_session_fixture(user, %{selection_mode: :viewer_vote, vote_duration: 30})
+      session = collection_session_fixture(user)
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        command = %OpenVoteWindow{session_id: session.id, scope: scope, track_id: "track1", duel_track_id: nil}
+        command = %OpenVoteWindow{
+          session_id: session.id,
+          scope: scope,
+          track_id: "track1",
+          duel_track_id: nil,
+          selection_mode: :viewer_vote,
+          vote_duration: 30
+        }
+
         {:ok, _session, [%VoteWindowOpened{} = event]} = CommandBus.apply(command)
 
         assert event.track_id == "track1"
@@ -133,7 +100,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = Scope.for_user(user)
       playlist = playlist_fixture()
-      session = collection_session_fixture(user, %{selection_mode: :duel, vote_duration: 20})
+      session = collection_session_fixture(user)
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
@@ -157,13 +124,20 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = Scope.for_user(user)
       playlist = playlist_fixture()
-      session = collection_session_fixture(user, %{selection_mode: :viewer_vote, vote_duration: 30})
+      session = collection_session_fixture(user)
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        CommandBus.apply(%OpenVoteWindow{session_id: session.id, scope: scope, track_id: "track1", duel_track_id: nil})
+        CommandBus.apply(%OpenVoteWindow{
+          session_id: session.id,
+          scope: scope,
+          track_id: "track1",
+          duel_track_id: nil,
+          selection_mode: :viewer_vote,
+          vote_duration: 30
+        })
       end)
 
       command = %CloseVoteWindow{session_id: session.id, scope: scope}
@@ -178,11 +152,11 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
   end
 
   describe "handle/1 - DecideTrack in duel mode" do
-    test "stores winner as :kept and loser as :rejected in separate rows" do
+    test "stores winner as :kept and loser as :rejected in session arrays" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = Scope.for_user(user)
       playlist = playlist_fixture()
-      session = collection_session_fixture(user, %{selection_mode: :duel, vote_duration: 20})
+      session = collection_session_fixture(user)
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
@@ -191,37 +165,22 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "winner_id",
-        track_name: "Winner Song",
-        artist: "Artist A",
-        position: 0,
         decision: :kept,
-        votes_a: 5,
-        votes_b: 3,
-        duel_track_id: "loser_id",
-        duel_track_name: "Loser Song",
-        duel_artist: "Artist B",
-        duel_position: 1
+        duel_track_id: "loser_id"
       }
 
-      {:ok, _advanced, _events} = CommandBus.apply(command)
+      {:ok, advanced, _events} = CommandBus.apply(command)
 
-      decisions = CollectionDecision.all_for_session(session.id)
-      assert length(decisions) == 2
-
-      winner = Enum.find(decisions, &(&1.track_id == "winner_id"))
-      loser = Enum.find(decisions, &(&1.track_id == "loser_id"))
-
-      assert winner.decision == :kept
-      assert winner.position == 0
-      assert loser.decision == :rejected
-      assert loser.position == 1
+      assert "winner_id" in advanced.kept
+      assert "loser_id" in advanced.rejected
+      assert advanced.current_index == 2
     end
 
     test "when picking B, the LiveView remaps so B arrives as primary :kept with A as duel loser :rejected" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = Scope.for_user(user)
       playlist = playlist_fixture()
-      session = collection_session_fixture(user, %{selection_mode: :duel, vote_duration: 20})
+      session = collection_session_fixture(user)
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
@@ -231,30 +190,14 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "track_b_id",
-        track_name: "Track B",
-        artist: "Artist B",
-        position: 1,
         decision: :kept,
-        votes_a: 2,
-        votes_b: 7,
-        duel_track_id: "track_a_id",
-        duel_track_name: "Track A",
-        duel_artist: "Artist A",
-        duel_position: 0
+        duel_track_id: "track_a_id"
       }
 
-      {:ok, _advanced, _events} = CommandBus.apply(command)
+      {:ok, advanced, _events} = CommandBus.apply(command)
 
-      decisions = CollectionDecision.all_for_session(session.id)
-      assert length(decisions) == 2
-
-      track_a = Enum.find(decisions, &(&1.track_id == "track_a_id"))
-      track_b = Enum.find(decisions, &(&1.track_id == "track_b_id"))
-
-      assert track_b.decision == :kept
-      assert track_b.position == 1
-      assert track_a.decision == :rejected
-      assert track_a.position == 0
+      assert "track_b_id" in advanced.kept
+      assert "track_a_id" in advanced.rejected
     end
   end
 
@@ -272,12 +215,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "track1",
-        track_name: "Test Track",
-        artist: "Test Artist",
-        position: 0,
         decision: :kept,
-        votes_a: nil,
-        votes_b: nil,
         duel_track_id: nil
       }
 
@@ -292,7 +230,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       scope = Scope.for_user(user)
       playlist = playlist_fixture()
-      session = collection_session_fixture(user, %{selection_mode: :duel, vote_duration: 20})
+      session = collection_session_fixture(user)
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
@@ -301,12 +239,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "trackA",
-        track_name: "Track A",
-        artist: "Artist A",
-        position: 0,
         decision: :kept,
-        votes_a: 5,
-        votes_b: 3,
         duel_track_id: "trackB"
       }
 
@@ -330,12 +263,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "track1",
-        track_name: "Test Track",
-        artist: "Test Artist",
-        position: 0,
         decision: :kept,
-        votes_a: nil,
-        votes_b: nil,
         duel_track_id: nil
       })
 
@@ -363,12 +291,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "track1",
-        track_name: "Test Track",
-        artist: "Test Artist",
-        position: 0,
         decision: :rejected,
-        votes_a: nil,
-        votes_b: nil,
         duel_track_id: nil
       })
 
@@ -392,12 +315,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "kept_track",
-        track_name: "Kept Track",
-        artist: "Artist",
-        position: 0,
         decision: :kept,
-        votes_a: nil,
-        votes_b: nil,
         duel_track_id: nil
       })
 
@@ -427,12 +345,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "kept_track",
-        track_name: "Kept Track",
-        artist: "Artist",
-        position: 0,
         decision: :kept,
-        votes_a: nil,
-        votes_b: nil,
         duel_track_id: nil
       })
 
@@ -440,12 +353,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
         session_id: session.id,
         scope: scope,
         track_id: "rejected_track",
-        track_name: "Rejected Track",
-        artist: "Artist",
-        position: 1,
         decision: :rejected,
-        votes_a: nil,
-        votes_b: nil,
         duel_track_id: nil
       })
 

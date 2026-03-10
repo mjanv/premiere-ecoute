@@ -2,7 +2,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
   @moduledoc """
   New collection session creation LiveView.
 
-  Form to configure origin/destination playlists, rule, selection mode, and vote duration.
+  Form to select origin and destination playlists.
   Dispatches PrepareCollectionSession then redirects to the session page.
   """
 
@@ -40,10 +40,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
     command = %PrepareCollectionSession{
       scope: scope,
       origin_playlist_id: origin_id,
-      destination_playlist_id: destination_id,
-      rule: :ordered,
-      selection_mode: :streamer_choice,
-      vote_duration: 60
+      destination_playlist_id: destination_id
     }
 
     case CommandBus.apply(command) do

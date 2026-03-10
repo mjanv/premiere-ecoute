@@ -2,10 +2,9 @@ defmodule PremiereEcoute.Collections.CollectionSessionFixtures do
   @moduledoc """
   Collection session fixtures.
 
-  Provides factory functions for collection sessions and decisions in test suites.
+  Provides factory functions for collection sessions in test suites.
   """
 
-  alias PremiereEcoute.Collections.CollectionDecision
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Repo
@@ -38,8 +37,6 @@ defmodule PremiereEcoute.Collections.CollectionSessionFixtures do
     destination = collection_library_playlist_fixture(user, %{title: "Destination Playlist"})
 
     default_attrs = %{
-      rule: :ordered,
-      selection_mode: :streamer_choice,
       user_id: user.id,
       origin_playlist_id: origin.id,
       destination_playlist_id: destination.id
@@ -50,23 +47,6 @@ defmodule PremiereEcoute.Collections.CollectionSessionFixtures do
       |> CollectionSession.changeset(Map.merge(default_attrs, attrs))
       |> Repo.insert()
 
-    Repo.preload(session, [:user, :origin_playlist, :destination_playlist, :decisions])
-  end
-
-  @doc """
-  Creates a CollectionDecision fixture for a session.
-  """
-  @spec collection_decision_fixture(integer(), map()) :: CollectionDecision.t()
-  def collection_decision_fixture(session_id, attrs \\ %{}) do
-    default_attrs = %{
-      track_id: "track_#{System.unique_integer([:positive])}",
-      track_name: "Test Track",
-      artist: "Test Artist",
-      position: 0,
-      decision: :kept
-    }
-
-    {:ok, decision} = CollectionDecision.decide(session_id, Map.merge(default_attrs, attrs))
-    decision
+    Repo.preload(session, [:user, :origin_playlist, :destination_playlist])
   end
 end

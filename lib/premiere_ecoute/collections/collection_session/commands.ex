@@ -9,13 +9,10 @@ defmodule PremiereEcoute.Collections.CollectionSession.Commands do
     @type t :: %__MODULE__{
             scope: Scope.t(),
             origin_playlist_id: integer(),
-            destination_playlist_id: integer(),
-            rule: :ordered | :random,
-            selection_mode: :streamer_choice | :viewer_vote | :duel,
-            vote_duration: integer() | nil
+            destination_playlist_id: integer()
           }
 
-    defstruct [:scope, :origin_playlist_id, :destination_playlist_id, :rule, :selection_mode, :vote_duration]
+    defstruct [:scope, :origin_playlist_id, :destination_playlist_id]
   end
 
   defmodule StartCollectionSession do
@@ -37,33 +34,11 @@ defmodule PremiereEcoute.Collections.CollectionSession.Commands do
             session_id: integer(),
             scope: Scope.t(),
             track_id: String.t(),
-            track_name: String.t(),
-            artist: String.t(),
-            position: integer(),
             decision: :kept | :rejected | :skipped,
-            votes_a: integer(),
-            votes_b: integer(),
-            duel_track_id: String.t() | nil,
-            duel_track_name: String.t() | nil,
-            duel_artist: String.t() | nil,
-            duel_position: integer() | nil
+            duel_track_id: String.t() | nil
           }
 
-    defstruct [
-      :session_id,
-      :scope,
-      :track_id,
-      :track_name,
-      :artist,
-      :position,
-      :decision,
-      :votes_a,
-      :votes_b,
-      :duel_track_id,
-      :duel_track_name,
-      :duel_artist,
-      :duel_position
-    ]
+    defstruct [:session_id, :scope, :track_id, :decision, :duel_track_id]
   end
 
   defmodule OpenVoteWindow do
