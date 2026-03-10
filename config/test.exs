@@ -12,6 +12,8 @@ config :premiere_ecoute,
     PremiereEcoute.Sessions.ListeningSession.EventHandler,
     PremiereEcoute.Sessions.Scores.CommandHandler,
     PremiereEcoute.Sessions.Scores.PollHandler,
+    PremiereEcoute.Collections.CollectionSession.CommandHandler,
+    PremiereEcoute.Collections.CollectionSession.EventHandler,
     PremiereEcouteCore.CommandBusTest.Handler,
     PremiereEcouteCore.CommandBusTest.EventDispatcher,
     PremiereEcouteCore.EventBusTest.Handler

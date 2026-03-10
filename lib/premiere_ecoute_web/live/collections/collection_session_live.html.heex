@@ -1,0 +1,446 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="collections"
+>
+  <div class="synthwave-bg min-h-screen text-white">
+    <div class="flex-1 py-10">
+      <div class="max-w-7xl mx-auto px-6">
+        <%!-- Header --%>
+        <div class="flex items-center gap-4 mb-8">
+          <.link navigate={~p"/collections"} class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </.link>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-2xl font-bold text-white">
+                {if @session.origin_playlist, do: @session.origin_playlist.title}
+              </h1>
+              <span class="text-gray-400">→</span>
+              <span class="text-gray-300">
+                {if @session.destination_playlist, do: @session.destination_playlist.title}
+              </span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-xs text-gray-400">
+                {String.capitalize(to_string(@session.selection_mode))} ·
+                {String.capitalize(to_string(@session.rule))}
+              </span>
+              <span class={[
+                "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border",
+                case @session.status do
+                  :pending -> "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
+                  :active -> "bg-green-600/20 text-green-400 border-green-500/30"
+                  :completed -> "bg-gray-600/20 text-gray-400 border-gray-500/30"
+                end
+              ]}>
+                {String.capitalize(to_string(@session.status))}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <%!-- Completed --%>
+        <%= if @session.status == :completed do %>
+          <div class="text-center py-24">
+            <div class="w-20 h-20 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg
+                class="w-10 h-10 text-green-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-3">{gettext("Collection complete!")}</h2>
+            <p class="text-gray-400 mb-2">
+              {gettext(
+                "%{kept} tracks kept · %{total} tracks reviewed",
+                kept: Enum.count(@decisions, &(&1.decision == :kept)),
+                total: length(@decisions)
+              )}
+            </p>
+            <p class="text-sm text-gray-500 mb-8">
+              {gettext("Kept tracks have been synced to %{playlist}.",
+                playlist: @session.destination_playlist && @session.destination_playlist.title
+              )}
+            </p>
+            <.link
+              navigate={~p"/collections"}
+              class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+            >
+              {gettext("Back to collections")}
+            </.link>
+          </div>
+        <% else %>
+          <%!-- Pending --%>
+          <%= if @session.status == :pending do %>
+            <div class="text-center py-24">
+              <div class="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg
+                  class="w-10 h-10 text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                  />
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white mb-3">{gettext("Ready to start?")}</h2>
+              <p class="text-gray-400 mb-8">
+                {gettext("Tracks will be loaded from your origin playlist.")}
+              </p>
+              <button
+                phx-click="start"
+                class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-lg font-semibold transition-colors shadow-xl"
+              >
+                {gettext("Start collection")}
+              </button>
+            </div>
+          <% else %>
+            <%!-- Active --%>
+            <div>
+              <%!-- Main area --%>
+              <div>
+                <%!-- All tracks done --%>
+                <%= if Enum.at(@tracks, @session.current_index) == nil do %>
+                  <div class="text-center py-20 bg-white/5 rounded-xl border border-white/10">
+                    <p class="text-xl text-gray-300 mb-2">{gettext("All tracks reviewed!")}</p>
+                    <p class="text-gray-500 mb-8">
+                      {gettext(
+                        "%{kept} kept · %{rejected} rejected · %{skipped} skipped",
+                        kept: Enum.count(@decisions, &(&1.decision == :kept)),
+                        rejected: Enum.count(@decisions, &(&1.decision == :rejected)),
+                        skipped: Enum.count(@decisions, &(&1.decision == :skipped))
+                      )}
+                    </p>
+                    <button
+                      phx-click="complete"
+                      class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+                    >
+                      {gettext("Sync to Spotify & complete")}
+                    </button>
+                  </div>
+                <% else %>
+                  <%!-- Toolbar: playback + round settings --%>
+                  <div class="flex items-center gap-2 mb-4 flex-wrap">
+                    <button
+                      phx-click="complete"
+                      class="flex items-center gap-1.5 px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-lg text-xs font-medium transition-colors ml-auto"
+                      data-confirm={gettext("Sync kept tracks to Spotify and end the session?")}
+                    >
+                      {gettext("End session")}
+                    </button>
+                    <div class="w-px h-4 bg-white/20"></div>
+                    <%!-- Play/Stop --%>
+                    <%= if @playing do %>
+                      <button
+                        phx-click="stop_playback"
+                        class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-colors"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                          <rect x="6" y="4" width="4" height="16" rx="1" /><rect
+                            x="14"
+                            y="4"
+                            width="4"
+                            height="16"
+                            rx="1"
+                          />
+                        </svg>
+                        {gettext("Stop")}
+                      </button>
+                    <% else %>
+                      <button
+                        phx-click="play_track"
+                        class="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        {gettext("Play")}
+                      </button>
+                    <% end %>
+                    <%!-- Shuffle --%>
+                    <button
+                      phx-click="shuffle_remaining"
+                      class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-colors"
+                      title={gettext("Shuffle remaining tracks")}
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 6h5l2 3m4-3h5v2l-4 5 4 5v2h-5l-2-3m-4 3H4v-2l4-5-4-5V6z"
+                        />
+                      </svg>
+                      {gettext("Shuffle")}
+                    </button>
+
+                    <%= if not @vote_open do %>
+                      <div class="w-px h-4 bg-white/20 mx-1"></div>
+                      <%!-- Mode --%>
+                      <%= for {mode, label} <- [{:streamer_choice, gettext("Streamer")}, {:viewer_vote, gettext("Vote")}, {:duel, gettext("Duel")}] do %>
+                        <button
+                          phx-click="set_round_mode"
+                          phx-value-mode={mode}
+                          class={[
+                            "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                            if @round_mode == mode do
+                              "bg-purple-600 text-white"
+                            else
+                              "bg-white/10 text-gray-300 hover:bg-white/20"
+                            end
+                          ]}
+                        >
+                          {label}
+                        </button>
+                      <% end %>
+                      <%!-- Duration — only for vote modes --%>
+                      <%= if @round_mode != :streamer_choice do %>
+                        <div class="w-px h-4 bg-white/20 mx-1"></div>
+                        <%= for {label, secs} <- [{"30s", 30}, {"1m", 60}, {"2m", 120}, {"5m", 300}] do %>
+                          <button
+                            phx-click="set_round_duration"
+                            phx-value-duration={secs}
+                            class={[
+                              "px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                              if @round_duration == secs do
+                                "bg-blue-600 text-white"
+                              else
+                                "bg-white/10 text-gray-300 hover:bg-white/20"
+                              end
+                            ]}
+                          >
+                            {label}
+                          </button>
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                  </div>
+
+                  <%!-- Duel --%>
+                  <%= if @round_mode == :duel do %>
+                    <div class="grid grid-cols-2 gap-6 mb-6">
+                      <.track_card
+                        track={Enum.at(@tracks, @session.current_index)}
+                        label={gettext("Track A — vote 1")}
+                        accent="blue"
+                        votes={@votes_a}
+                      />
+                      <.track_card
+                        track={Enum.at(@tracks, @session.current_index + 1)}
+                        label={gettext("Track B — vote 2")}
+                        accent="amber"
+                        votes={@votes_b}
+                      />
+                    </div>
+
+                    <%= if @votes_a > 0 || @votes_b > 0 do %>
+                      <div class="mb-6 bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex justify-between text-sm text-gray-400 mb-2">
+                          <span>A — {@votes_a}</span>
+                          <span>B — {@votes_b}</span>
+                        </div>
+                        <div class="h-3 bg-white/10 rounded-full overflow-hidden flex">
+                          <div
+                            class="bg-blue-500 h-full rounded-l-full transition-all duration-300"
+                            style={"width: #{vote_bar_width(@votes_a, @votes_b, :a)}"}
+                          >
+                          </div>
+                          <div
+                            class="bg-amber-500 h-full rounded-r-full transition-all duration-300"
+                            style={"width: #{vote_bar_width(@votes_a, @votes_b, :b)}"}
+                          >
+                          </div>
+                        </div>
+                      </div>
+                    <% end %>
+
+                    <.vote_controls
+                      vote_open={@vote_open}
+                      countdown={@countdown}
+                      mode={@round_mode}
+                      votes_a={@votes_a}
+                      votes_b={@votes_b}
+                    />
+                  <% else %>
+                    <%!-- Viewer vote --%>
+                    <%= if @round_mode == :viewer_vote do %>
+                      <.track_card
+                        track={Enum.at(@tracks, @session.current_index)}
+                        label={gettext("Now evaluating — vote 1 to keep, 2 to reject")}
+                        accent="purple"
+                      />
+
+                      <%= if @votes_a > 0 || @votes_b > 0 do %>
+                        <div class="mt-6 bg-white/5 rounded-xl p-4 border border-white/10">
+                          <div class="flex justify-between text-sm text-gray-400 mb-2">
+                            <span>✅ {gettext("Keep")} — {@votes_a}</span>
+                            <span>❌ {gettext("Reject")} — {@votes_b}</span>
+                          </div>
+                          <div class="h-3 bg-white/10 rounded-full overflow-hidden flex">
+                            <div
+                              class="bg-green-500 h-full rounded-l-full transition-all duration-300"
+                              style={"width: #{vote_bar_width(@votes_a, @votes_b, :a)}"}
+                            >
+                            </div>
+                            <div
+                              class="bg-red-500 h-full rounded-r-full transition-all duration-300"
+                              style={"width: #{vote_bar_width(@votes_a, @votes_b, :b)}"}
+                            >
+                            </div>
+                          </div>
+                        </div>
+                      <% end %>
+
+                      <.vote_controls
+                        vote_open={@vote_open}
+                        countdown={@countdown}
+                        mode={@round_mode}
+                        votes_a={@votes_a}
+                        votes_b={@votes_b}
+                      />
+                    <% else %>
+                      <%!-- Streamer choice --%>
+                      <.track_card
+                        track={Enum.at(@tracks, @session.current_index)}
+                        label={gettext("Now evaluating")}
+                        accent="purple"
+                      />
+                      <div class="flex gap-2 mt-3">
+                        <button
+                          phx-click="decide"
+                          phx-value-decision="kept"
+                          class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors"
+                        >
+                          {gettext("Keep")}
+                        </button>
+                        <button
+                          phx-click="decide"
+                          phx-value-decision="skipped"
+                          class="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors"
+                        >
+                          {gettext("Skip")}
+                        </button>
+                        <button
+                          phx-click="decide"
+                          phx-value-decision="rejected"
+                          class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors"
+                        >
+                          {gettext("Reject")}
+                        </button>
+                      </div>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </div>
+
+            </div>
+
+            <%!-- Playlist track lists --%>
+            <div class="grid grid-cols-2 gap-6 mt-8">
+              <%!-- Origin playlist --%>
+              <div class="bg-white/5 rounded-xl border border-white/10 p-5">
+                <h3 class="font-semibold text-white mb-1">
+                  {if @session.origin_playlist, do: @session.origin_playlist.title}
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">
+                  {gettext("%{done}/%{total} reviewed",
+                    done: length(@decisions),
+                    total: length(@tracks)
+                  )}
+                </p>
+                <div class="space-y-1 max-h-[50vh] overflow-y-auto pr-1" id="origin-tracklist" phx-hook="ScrollToActive">
+                  <%= for {track, idx} <- Enum.with_index(@tracks) do %>
+                    <% decision = Enum.find(@decisions, &(&1.position == idx)) %>
+                    <div
+                      {if idx == @session.current_index, do: %{"data-active" => true}, else: %{}}
+                      class={[
+                      "flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm",
+                      cond do
+                        idx == @session.current_index -> "bg-purple-600/20 border border-purple-500/40"
+                        not is_nil(decision) -> "opacity-50"
+                        true -> "hover:bg-white/5"
+                      end
+                    ]}>
+                      <div class="min-w-0">
+                        <p class="text-white truncate">{track.name}</p>
+                        <p class="text-xs text-gray-500 truncate">{track.artist}</p>
+                      </div>
+                      <%= if not is_nil(decision) do %>
+                        <span class={[
+                          "flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border",
+                          decision_class(decision.decision)
+                        ]}>
+                          {String.capitalize(to_string(decision.decision))}
+                        </span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+
+              <%!-- Destination playlist --%>
+              <div class="bg-white/5 rounded-xl border border-white/10 p-5">
+                <h3 class="font-semibold text-white mb-1">
+                  {if @session.destination_playlist, do: @session.destination_playlist.title}
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">
+                  {gettext("%{count} tracks kept",
+                    count: Enum.count(@decisions, &(&1.decision == :kept))
+                  )}
+                </p>
+                <div class="space-y-1 max-h-[50vh] overflow-y-auto pr-1" id="destination-tracklist" phx-hook="ScrollToActive">
+                  <% kept = Enum.filter(@decisions, &(&1.decision == :kept)) %>
+                  <p :if={Enum.empty?(kept)} class="text-sm text-gray-500 px-3 py-2">
+                    {gettext("No tracks kept yet.")}
+                  </p>
+                  <%= for {d, idx} <- Enum.with_index(kept) do %>
+                    <div
+                      {if idx == length(kept) - 1, do: %{"data-active" => true}, else: %{}}
+                      class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-white/5"
+                    >
+                      <div class="min-w-0">
+                        <p class="text-white truncate">{d.track_name}</p>
+                        <p class="text-xs text-gray-500 truncate">{d.artist}</p>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+
+                <button
+                  :if={@session.current_index >= length(@tracks) && length(@tracks) > 0}
+                  phx-click="complete"
+                  class="mt-4 w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors text-sm"
+                >
+                  {gettext("Sync to Spotify & complete")}
+                </button>
+              </div>
+            </div>
+
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

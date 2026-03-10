@@ -15,17 +15,46 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
   alias PremiereEcoute.Discography.Playlist.Track
 
   @limit 10
+  @tracks_limit 100
 
   @doc """
   Fetches a Spotify playlist by ID.
 
-  Retrieves playlist metadata and tracks from Spotify API. Parses response into Playlist aggregate with tracks.
+  Retrieves playlist metadata and all tracks from Spotify API, paginating through
+  the tracks endpoint until all tracks are collected. Parses response into Playlist
+  aggregate with tracks.
   """
   @spec get_playlist(String.t()) :: {:ok, Playlist.t()} | {:error, term()}
   def get_playlist(playlist_id) when is_binary(playlist_id) do
+    with {:ok, {playlist, total}} <-
+           SpotifyApi.api()
+           |> SpotifyApi.get(url: "/playlists/#{playlist_id}")
+           |> SpotifyApi.handle(200, &parse_playlist/1),
+         {:ok, remaining_tracks} <- fetch_remaining_tracks(playlist_id, total) do
+      {:ok, %{playlist | tracks: playlist.tracks ++ remaining_tracks}}
+    end
+  end
+
+  defp fetch_remaining_tracks(_playlist_id, total) when total <= @tracks_limit, do: {:ok, []}
+
+  defp fetch_remaining_tracks(playlist_id, total) do
+    offsets = Enum.take_every(@tracks_limit..(total - 1), @tracks_limit)
+
+    offsets
+    |> Task.async_stream(&fetch_tracks_page(playlist_id, &1), ordered: true, max_concurrency: 5)
+    |> Enum.reduce_while({:ok, []}, fn
+      {:ok, {:ok, tracks}}, {:ok, acc} -> {:cont, {:ok, acc ++ tracks}}
+      {:ok, {:error, _} = err}, _acc -> {:halt, err}
+      {:exit, reason}, _acc -> {:halt, {:error, reason}}
+    end)
+  end
+
+  defp fetch_tracks_page(playlist_id, offset) do
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/playlists/#{playlist_id}")
-    |> SpotifyApi.handle(200, &parse_playlist/1)
+    |> SpotifyApi.get(url: "/playlists/#{playlist_id}/tracks", params: [limit: @tracks_limit, offset: offset])
+    |> SpotifyApi.handle(200, fn %{"items" => items} ->
+      items |> Enum.filter(&valid_track_item?/1) |> Enum.map(&parse_track(&1, playlist_id))
+    end)
   end
 
   @doc """
@@ -119,27 +148,32 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     |> SpotifyApi.handle(200, fn body -> body end)
   end
 
-  @doc """
-  Parses Spotify API playlist response into Playlist aggregate.
+  defp valid_track_item?(item), do: not is_nil(item["track"])
 
-  Transforms raw Spotify playlist JSON into structured Playlist with tracks, metadata, and owner information.
-  """
-  @spec parse_playlist(map()) :: Playlist.t()
-  def parse_playlist(data) do
-    %Playlist{
+  @spec parse_playlist(map()) :: {Playlist.t(), integer()}
+  defp parse_playlist(data) do
+    tracks =
+      if Map.has_key?(data["tracks"], "items") do
+        data["tracks"]["items"]
+        |> Enum.filter(&valid_track_item?/1)
+        |> Enum.map(fn item -> parse_track(item, data["id"]) end)
+      else
+        []
+      end
+
+    playlist = %Playlist{
       provider: :spotify,
       playlist_id: data["id"],
       owner_name: data["owner"]["display_name"],
       owner_id: data["owner"]["id"],
       title: data["name"],
       cover_url: Parser.parse_album_cover_url(data["images"]),
-      tracks:
-        if Map.has_key?(data["tracks"], "items") do
-          Enum.map(data["tracks"]["items"], fn item -> parse_track(item, data["id"]) end)
-        else
-          []
-        end
+      tracks: tracks
     }
+
+    total = get_in(data, ["tracks", "total"]) || 0
+
+    {playlist, total}
   end
 
   @doc """

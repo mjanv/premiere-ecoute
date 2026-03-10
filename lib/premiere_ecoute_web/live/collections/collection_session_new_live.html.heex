@@ -1,0 +1,91 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="collections"
+>
+  <div class="synthwave-bg min-h-screen text-white">
+    <div class="flex-1 py-12">
+      <div class="max-w-2xl mx-auto px-6">
+        <.page_header
+          title={gettext("New collection")}
+          subtitle={gettext("Set up a curation session for your community")}
+        />
+
+        <%= if Enum.empty?(@playlists) do %>
+          <div class="text-center py-16 text-gray-400">
+            <p class="text-lg mb-4">{gettext("No playlists in your library yet.")}</p>
+            <.link
+              navigate={~p"/playlists"}
+              class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+            >
+              {gettext("Go to your library")}
+            </.link>
+          </div>
+        <% else %>
+          <.form
+            for={@form}
+            phx-change="validate"
+            phx-submit="submit"
+            class="space-y-4 bg-white/5 rounded-xl p-6 border border-white/10"
+          >
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1.5">
+                  {gettext("Origin playlist")}
+                </label>
+                <select
+                  name="session[origin_playlist_id]"
+                  class="w-full bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  <option value="">{gettext("Select…")}</option>
+                  <option
+                    :for={playlist <- @playlists}
+                    value={playlist.id}
+                    selected={@form[:origin_playlist_id].value == to_string(playlist.id)}
+                  >
+                    {playlist.title}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1.5">
+                  {gettext("Destination playlist")}
+                </label>
+                <select
+                  name="session[destination_playlist_id]"
+                  class="w-full bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  <option value="">{gettext("Select…")}</option>
+                  <option
+                    :for={playlist <- @playlists}
+                    value={playlist.id}
+                    selected={@form[:destination_playlist_id].value == to_string(playlist.id)}
+                  >
+                    {playlist.title}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+              <.link
+                navigate={~p"/collections"}
+                class="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                {gettext("Cancel")}
+              </.link>
+              <button
+                type="submit"
+                class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                {gettext("Start collection")}
+              </button>
+            </div>
+          </.form>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

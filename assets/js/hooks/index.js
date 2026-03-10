@@ -16,6 +16,7 @@ import { MotionDemo } from "./motion_demo";
 import { LikeHeart } from "./like_heart";
 import { BarBounce } from "./bar_bounce";
 import { BackLink } from "./back_link";
+import { ScrollToActive } from "./scroll_to_active";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -35,5 +36,6 @@ export const Hooks = {
   MotionDemo: MotionDemo,
   LikeHeart: LikeHeart,
   BarBounce: BarBounce,
-  BackLink: BackLink
+  BackLink: BackLink,
+  ScrollToActive: ScrollToActive
 };
