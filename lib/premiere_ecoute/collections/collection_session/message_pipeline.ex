@@ -48,12 +48,13 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
   """
   @spec process(MessageSent.t()) :: {:ok, map()} | {:error, term()}
   def process(%MessageSent{broadcaster_id: broadcaster_id, user_id: user_id, message: message}) do
-    with {:ok, %{active_track_id: track_id} = cached} when not is_nil(track_id) <-
+    with {:ok, %{active_track_id: track_id, session_id: session_id}} when not is_nil(track_id) <-
            Cache.get(:collections, broadcaster_id),
          {:ok, side} <- parse_side(message) do
       {:ok,
        %{
-         session_id: cached.session_id,
+         broadcaster_id: broadcaster_id,
+         session_id: session_id,
          track_id: track_id,
          user_id: user_id,
          side: side
@@ -66,9 +67,11 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
   @doc false
   @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
-    # AIDEV-NOTE: votes are tallied in cache (not DB) during the window; persisted to
-    # collection_decisions only when the streamer makes the final call via DecideTrack.
-    with {:ok, cached} <- Cache.get(:collections, session_id) do
+    # AIDEV-NOTE: votes are tallied in cache (not DB) during the window; cache is keyed
+    # by broadcaster_id — read it from the first message's data.
+    broadcaster_id = hd(messages).data.broadcaster_id
+
+    with {:ok, cached} <- Cache.get(:collections, broadcaster_id) do
       {count_a, count_b} =
         Enum.reduce(messages, {0, 0}, fn msg, {a, b} ->
           case msg.data.side do
@@ -82,7 +85,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
         |> Map.update(:votes_a, count_a, &(&1 + count_a))
         |> Map.update(:votes_b, count_b, &(&1 + count_b))
 
-      Cache.put(:collections, session_id, updated)
+      Cache.put(:collections, broadcaster_id, updated)
 
       PremiereEcoute.PubSub.broadcast(
         "collection:#{session_id}",

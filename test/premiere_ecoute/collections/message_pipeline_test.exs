@@ -20,13 +20,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipelineTest do
       votes_b: 0
     })
 
-    Cache.put(:collections, session.id, %{
-      session_id: session.id,
-      active_track_id: "track1",
-      votes_a: 0,
-      votes_b: 0
-    })
-
     {:ok, %{user: user, session: session}}
   end
 
@@ -69,7 +62,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipelineTest do
   end
 
   describe "publish/2 - vote tallying" do
-    test "accumulates votes_a and votes_b in cache", %{session: session} do
+    test "accumulates votes_a and votes_b in cache" do
       messages = [
         %MessageSent{broadcaster_id: "broadcaster1", user_id: "v1", message: "1"},
         %MessageSent{broadcaster_id: "broadcaster1", user_id: "v2", message: "2"},
@@ -82,7 +75,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipelineTest do
 
       :timer.sleep(600)
 
-      {:ok, cached} = Cache.get(:collections, session.id)
+      {:ok, cached} = Cache.get(:collections, "broadcaster1")
       assert cached.votes_a == 2
       assert cached.votes_b == 1
     end

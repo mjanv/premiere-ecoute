@@ -419,7 +419,8 @@
                   )}
                 </p>
                 <div class="space-y-1 max-h-[50vh] overflow-y-auto pr-1" id="destination-tracklist" phx-hook="ScrollToActive">
-                  <% kept_tracks = Enum.map(@session.kept, fn tid -> Enum.find(@tracks, &(&1.track_id == tid)) end) |> Enum.reject(&is_nil/1) %>
+                  <% kept_tracks =
+                    Enum.map(@session.kept, fn tid -> Enum.find(@tracks, &(&1.track_id == tid)) end) |> Enum.reject(&is_nil/1) %>
                   <p :if={Enum.empty?(kept_tracks)} class="text-sm text-gray-500 px-3 py-2">
                     {gettext("No tracks kept yet.")}
                   </p>

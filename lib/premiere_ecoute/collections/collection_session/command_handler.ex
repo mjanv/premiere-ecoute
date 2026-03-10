@@ -65,9 +65,13 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   @doc false
   def handle(%StartCollectionSession{session_id: session_id, scope: scope}) do
     session = CollectionSession.get(session_id)
+    # AIDEV-NOTE: cache is keyed by broadcaster_id (Twitch user_id) so MessagePipeline can look
+    # it up from incoming MessageSent events. session_id is stored inside for the pipeline to use.
+    broadcaster_id = scope.user.twitch.user_id
 
     with {:ok, playlist} <- Apis.provider(session.origin_playlist.provider).get_playlist(session.origin_playlist.playlist_id),
-         {:ok, _} <- Cache.put(:collections, session_id, %{tracks: playlist.tracks}),
+         {:ok, _} <- Cache.put(:collections, broadcaster_id, %{session_id: session_id, tracks: playlist.tracks}),
+         {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
          {:ok, session} <- CollectionSession.start(session) do
       {:ok, session,
        [
@@ -140,13 +144,14 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
         vote_duration: duration
       }) do
     session = CollectionSession.get(session_id)
+    broadcaster_id = scope.user.twitch.user_id
 
     # AIDEV-NOTE: cache entry stores current track ids so MessagePipeline can route votes
-    with {:ok, cached} <- Cache.get(:collections, session_id),
+    with {:ok, cached} <- Cache.get(:collections, broadcaster_id),
          {:ok, _} <-
            Cache.put(
              :collections,
-             session_id,
+             broadcaster_id,
              Map.merge(cached, %{
                active_track_id: track_id,
                duel_track_id: duel_track_id,
@@ -175,11 +180,12 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   @doc false
   def handle(%CloseVoteWindow{session_id: session_id, scope: scope}) do
     session = CollectionSession.get(session_id)
+    broadcaster_id = scope.user.twitch.user_id
 
-    with {:ok, cached} <- Cache.get(:collections, session_id),
+    with {:ok, cached} <- Cache.get(:collections, broadcaster_id),
          track_id <- Map.get(cached, :active_track_id),
          {:ok, _} <-
-           Cache.put(:collections, session_id, Map.drop(cached, [:active_track_id, :duel_track_id, :votes_a, :votes_b])) do
+           Cache.put(:collections, broadcaster_id, Map.drop(cached, [:active_track_id, :duel_track_id, :votes_a, :votes_b])) do
       {:ok, session,
        [
          %VoteWindowClosed{
@@ -205,9 +211,12 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
     session = CollectionSession.get(session_id)
     to_remove = if(remove_kept, do: session.kept, else: []) ++ if remove_rejected, do: session.rejected, else: []
 
+    broadcaster_id = scope.user.twitch.user_id
+
     with {:ok, _} <- sync_to_spotify(scope, session),
          {:ok, _} <- remove_from_origin(scope, session, to_remove),
-         {:ok, _} <- Cache.del(:collections, session_id),
+         {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
+         {:ok, _} <- Cache.del(:collections, broadcaster_id),
          {:ok, session} <- CollectionSession.complete(session) do
       {:ok, session,
        [

@@ -40,11 +40,13 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         PremiereEcoute.PubSub.subscribe("collection:#{session_id}")
       end
 
-      {tracks, votes_a, votes_b, active_track_id, duel_track_id, vote_open} = load_cache(session_id)
+      broadcaster_id = scope.user.twitch.user_id
+      {tracks, votes_a, votes_b, active_track_id, duel_track_id, vote_open} = load_cache(broadcaster_id)
 
       socket
       |> assign(:session, session)
       |> assign(:session_id, session_id)
+      |> assign(:broadcaster_id, broadcaster_id)
       |> assign(:scope, scope)
       |> assign(:tracks, tracks)
       |> assign(:original_tracks, tracks)
@@ -89,7 +91,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info(:session_started, socket) do
-    {tracks, _, _, _, _, _} = load_cache(socket.assigns.session_id)
+    {tracks, _, _, _, _, _} = load_cache(socket.assigns.broadcaster_id)
     session = CollectionSession.get(socket.assigns.session_id)
     {:noreply, assign(socket, tracks: tracks, session: session)}
   end
@@ -153,7 +155,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   def handle_event("start", _params, %{assigns: %{session: session, scope: scope}} = socket) do
     case CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope}) do
       {:ok, started, _events} ->
-        {tracks, _, _, _, _, _} = load_cache(session.id)
+        {tracks, _, _, _, _, _} = load_cache(socket.assigns.broadcaster_id)
         {:noreply, assign(socket, session: started, tracks: tracks, original_tracks: tracks)}
 
       {:error, reason} ->
@@ -193,7 +195,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
     case CommandBus.apply(cmd) do
       {:ok, _session, _events} ->
-        {_, votes_a, votes_b, active_id, duel_id, _} = load_cache(session.id)
+        {_, votes_a, votes_b, active_id, duel_id, _} = load_cache(socket.assigns.broadcaster_id)
         Process.send_after(self(), :tick, 1000)
 
         {:noreply,
@@ -300,14 +302,18 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   @impl true
-  def handle_event("shuffle_remaining", _params, %{assigns: %{session_id: session_id, tracks: tracks, session: session}} = socket) do
+  def handle_event(
+        "shuffle_remaining",
+        _params,
+        %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
+      ) do
     idx = session.current_index
     {done, remaining} = Enum.split(tracks, idx)
     shuffled = done ++ Enum.shuffle(remaining)
 
-    case Cache.get(:collections, session_id) do
+    case Cache.get(:collections, broadcaster_id) do
       {:ok, cached} when not is_nil(cached) ->
-        Cache.put(:collections, session_id, Map.put(cached, :tracks, shuffled))
+        Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, shuffled))
         {:noreply, assign(socket, tracks: shuffled)}
 
       _ ->
@@ -319,7 +325,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   def handle_event(
         "restore_order",
         _params,
-        %{assigns: %{session_id: session_id, original_tracks: original_tracks, tracks: tracks, session: session}} = socket
+        %{assigns: %{broadcaster_id: broadcaster_id, original_tracks: original_tracks, tracks: tracks, session: session}} = socket
       ) do
     idx = session.current_index
     {done, _} = Enum.split(tracks, idx)
@@ -327,9 +333,9 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     remaining = Enum.drop(original_tracks, idx)
     restored = done ++ remaining
 
-    case Cache.get(:collections, session_id) do
+    case Cache.get(:collections, broadcaster_id) do
       {:ok, cached} when not is_nil(cached) ->
-        Cache.put(:collections, session_id, Map.put(cached, :tracks, restored))
+        Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, restored))
         {:noreply, assign(socket, tracks: restored)}
 
       _ ->
