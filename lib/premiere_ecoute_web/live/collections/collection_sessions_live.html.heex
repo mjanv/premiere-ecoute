@@ -1,0 +1,121 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="collections"
+>
+  <div class="synthwave-bg min-h-screen text-white">
+    <div class="flex-1 py-12">
+      <div class="max-w-5xl mx-auto px-6">
+        <.page_header
+          title={gettext("Collections")}
+          subtitle={gettext("Curate your Spotify playlists live with your community")}
+        >
+          <:action>
+            <.link
+              navigate={~p"/collections/new"}
+              class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              {gettext("New collection")}
+            </.link>
+          </:action>
+        </.page_header>
+
+        <%= if Enum.empty?(@sessions) do %>
+          <div class="text-center py-24 text-gray-400">
+            <svg
+              class="w-16 h-16 mx-auto mb-4 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+              />
+            </svg>
+            <p class="text-xl font-medium text-gray-300 mb-2">{gettext("No collections yet")}</p>
+            <p class="text-gray-500 mb-6">
+              {gettext("Start a collection to curate a playlist with your community.")}
+            </p>
+            <.link
+              navigate={~p"/collections/new"}
+              class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
+            >
+              {gettext("Create your first collection")}
+            </.link>
+          </div>
+        <% else %>
+          <div class="space-y-3">
+            <.link
+              :for={session <- @sessions}
+              navigate={~p"/collections/#{session.id}"}
+              class="block rounded-lg p-6 border border-gray-700 hover:border-purple-500 hover:bg-purple-300/20 backdrop-blur-sm transition-colors"
+            >
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <div class="flex-1 min-w-0 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+                    <p class="text-xs text-gray-500 mb-0.5">{gettext("From")}</p>
+                    <p class="text-white font-medium truncate">{session.origin_playlist.title}</p>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-gray-500 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                  <div class="flex-1 min-w-0 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+                    <p class="text-xs text-gray-500 mb-0.5">{gettext("To")}</p>
+                    <p class="text-gray-300 font-medium truncate">{session.destination_playlist.title}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  <span class={[
+                    "inline-flex items-center px-2 py-1 rounded text-xs font-medium border",
+                    status_class(session.status)
+                  ]}>
+                    {String.capitalize(to_string(session.status))}
+                  </span>
+                  <p class="text-sm text-gray-500">
+                    {PremiereEcouteCore.Date.date(session.inserted_at)}
+                  </p>
+                  <svg
+                    class="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </.link>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

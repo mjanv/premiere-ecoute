@@ -115,6 +115,16 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     </.sidebar_link>
 
                     <.sidebar_link
+                      href={~p"/collections"}
+                      current_page={@current_page}
+                      page_id="collections"
+                      title={gettext("Collections")}
+                      icon="hero-queue-list"
+                    >
+                      {gettext("Collections")}
+                    </.sidebar_link>
+
+                    <.sidebar_link
                       href={~p"/retrospective/history"}
                       current_page={@current_page}
                       page_id="retrospective"

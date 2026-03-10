@@ -11,6 +11,7 @@ defmodule PremiereEcoute do
       {Apis, except: []},
       {Accounts, except: []},
       {Billboard, except: []},
+      {Collections, except: []},
       {Commands, except: []},
       {Discography, except: []},
       {Donations, except: []},

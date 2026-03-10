@@ -34,6 +34,7 @@ defmodule PremiereEcoute.DataCase do
       import PremiereEcoute.Discography.SingleFixtures
       import PremiereEcoute.Sessions.ListeningSessionFixtures
       import PremiereEcoute.Sessions.ScoresFixtures
+      import PremiereEcoute.Collections.CollectionSessionFixtures
 
       import Hammox
       import Swoosh.TestAssertions
