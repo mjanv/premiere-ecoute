@@ -2,6 +2,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Collections.CollectionDecision
   alias PremiereEcoute.Collections.CollectionSession.Commands.CloseVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.CompleteCollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.DecideTrack
@@ -176,6 +177,87 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
     end
   end
 
+  describe "handle/1 - DecideTrack in duel mode" do
+    test "stores winner as :kept and loser as :rejected in separate rows" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+      session = collection_session_fixture(user, %{selection_mode: :duel, vote_duration: 20})
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      command = %DecideTrack{
+        session_id: session.id,
+        scope: scope,
+        track_id: "winner_id",
+        track_name: "Winner Song",
+        artist: "Artist A",
+        position: 0,
+        decision: :kept,
+        votes_a: 5,
+        votes_b: 3,
+        duel_track_id: "loser_id",
+        duel_track_name: "Loser Song",
+        duel_artist: "Artist B",
+        duel_position: 1
+      }
+
+      {:ok, _advanced, _events} = CommandBus.apply(command)
+
+      decisions = CollectionDecision.all_for_session(session.id)
+      assert length(decisions) == 2
+
+      winner = Enum.find(decisions, &(&1.track_id == "winner_id"))
+      loser = Enum.find(decisions, &(&1.track_id == "loser_id"))
+
+      assert winner.decision == :kept
+      assert winner.position == 0
+      assert loser.decision == :rejected
+      assert loser.position == 1
+    end
+
+    test "when picking B, the LiveView remaps so B arrives as primary :kept with A as duel loser :rejected" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+      session = collection_session_fixture(user, %{selection_mode: :duel, vote_duration: 20})
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      # AIDEV-NOTE: LiveView remaps "Pick B" before sending: primary = B (kept), loser = A (rejected)
+      command = %DecideTrack{
+        session_id: session.id,
+        scope: scope,
+        track_id: "track_b_id",
+        track_name: "Track B",
+        artist: "Artist B",
+        position: 1,
+        decision: :kept,
+        votes_a: 2,
+        votes_b: 7,
+        duel_track_id: "track_a_id",
+        duel_track_name: "Track A",
+        duel_artist: "Artist A",
+        duel_position: 0
+      }
+
+      {:ok, _advanced, _events} = CommandBus.apply(command)
+
+      decisions = CollectionDecision.all_for_session(session.id)
+      assert length(decisions) == 2
+
+      track_a = Enum.find(decisions, &(&1.track_id == "track_a_id"))
+      track_b = Enum.find(decisions, &(&1.track_id == "track_b_id"))
+
+      assert track_b.decision == :kept
+      assert track_b.position == 1
+      assert track_a.decision == :rejected
+      assert track_a.position == 0
+    end
+  end
+
   describe "handle/1 - DecideTrack" do
     test "records decision, advances index, emits TrackDecided" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
@@ -295,6 +377,89 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       assert completed.status == :completed
       assert event.kept_count == 0
+    end
+
+    test "removes kept tracks from origin playlist when remove_kept is true" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}, spotify: %{user_id: "sp1"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+      session = collection_session_fixture(user)
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      CommandBus.apply(%DecideTrack{
+        session_id: session.id,
+        scope: scope,
+        track_id: "kept_track",
+        track_name: "Kept Track",
+        artist: "Artist",
+        position: 0,
+        decision: :kept,
+        votes_a: nil,
+        votes_b: nil,
+        duel_track_id: nil
+      })
+
+      expect(SpotifyApi, :add_items_to_playlist, fn _scope, _id, _tracks -> {:ok, %{}} end)
+
+      expect(SpotifyApi, :remove_playlist_items, fn _scope, playlist_id, tracks ->
+        assert playlist_id == session.origin_playlist.playlist_id
+        assert Enum.map(tracks, & &1.track_id) == ["kept_track"]
+        {:ok, %{}}
+      end)
+
+      command = %CompleteCollectionSession{session_id: session.id, scope: scope, remove_kept: true}
+      {:ok, completed, _events} = CommandBus.apply(command)
+      assert completed.status == :completed
+    end
+
+    test "removes rejected tracks from origin playlist when remove_rejected is true" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}, spotify: %{user_id: "sp1"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+      session = collection_session_fixture(user)
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      CommandBus.apply(%DecideTrack{
+        session_id: session.id,
+        scope: scope,
+        track_id: "kept_track",
+        track_name: "Kept Track",
+        artist: "Artist",
+        position: 0,
+        decision: :kept,
+        votes_a: nil,
+        votes_b: nil,
+        duel_track_id: nil
+      })
+
+      CommandBus.apply(%DecideTrack{
+        session_id: session.id,
+        scope: scope,
+        track_id: "rejected_track",
+        track_name: "Rejected Track",
+        artist: "Artist",
+        position: 1,
+        decision: :rejected,
+        votes_a: nil,
+        votes_b: nil,
+        duel_track_id: nil
+      })
+
+      expect(SpotifyApi, :add_items_to_playlist, fn _scope, _id, _tracks -> {:ok, %{}} end)
+
+      expect(SpotifyApi, :remove_playlist_items, fn _scope, playlist_id, tracks ->
+        assert playlist_id == session.origin_playlist.playlist_id
+        assert Enum.map(tracks, & &1.track_id) == ["rejected_track"]
+        {:ok, %{}}
+      end)
+
+      command = %CompleteCollectionSession{session_id: session.id, scope: scope, remove_rejected: true}
+      {:ok, completed, _events} = CommandBus.apply(command)
+      assert completed.status == :completed
     end
   end
 end

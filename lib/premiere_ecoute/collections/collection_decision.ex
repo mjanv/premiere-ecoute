@@ -74,7 +74,7 @@ defmodule PremiereEcoute.Collections.CollectionDecision do
     |> changeset(
       Map.merge(attrs, %{collection_session_id: session_id, decided_at: DateTime.utc_now() |> DateTime.truncate(:second)})
     )
-    |> Repo.insert()
+    |> Repo.insert(on_conflict: :nothing, conflict_target: [:collection_session_id, :track_id])
   end
 
   @doc "Increments vote counts for a given track within a session."
@@ -103,6 +103,16 @@ defmodule PremiereEcoute.Collections.CollectionDecision do
   def kept_for_session(session_id) do
     from(d in __MODULE__,
       where: d.collection_session_id == ^session_id and d.decision == :kept,
+      order_by: [asc: d.position]
+    )
+    |> Repo.all()
+  end
+
+  @doc "Returns rejected decisions for a session ordered by position."
+  @spec rejected_for_session(integer()) :: [t()]
+  def rejected_for_session(session_id) do
+    from(d in __MODULE__,
+      where: d.collection_session_id == ^session_id and d.decision == :rejected,
       order_by: [asc: d.position]
     )
     |> Repo.all()

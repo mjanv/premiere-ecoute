@@ -98,8 +98,13 @@ defmodule PremiereEcoute.Collections.CollectionSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: integer(), scope: Scope.t()}
+    @type t :: %__MODULE__{
+            session_id: integer(),
+            scope: Scope.t(),
+            remove_kept: boolean(),
+            remove_rejected: boolean()
+          }
 
-    defstruct [:session_id, :scope]
+    defstruct [:session_id, :scope, remove_kept: false, remove_rejected: false]
   end
 end

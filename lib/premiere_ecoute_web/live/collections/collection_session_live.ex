@@ -49,6 +49,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:session_id, session_id)
       |> assign(:scope, scope)
       |> assign(:tracks, tracks)
+      |> assign(:original_tracks, tracks)
       |> assign(:decisions, decisions)
       |> assign(:active_track_id, active_track_id)
       |> assign(:duel_track_id, duel_track_id)
@@ -56,7 +57,9 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:votes_b, votes_b)
       |> assign(:vote_open, vote_open)
       |> assign(:countdown, nil)
-      |> assign(:playing, false)
+      |> assign(:playing_track_id, nil)
+      |> assign(:hide_decided, false)
+      |> assign(:show_end_modal, false)
       # AIDEV-NOTE: round_mode/round_duration override session defaults per round; nil = use session default
       |> assign(:round_mode, session.selection_mode)
       |> assign(:round_duration, session.vote_duration)
@@ -157,7 +160,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     case CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope}) do
       {:ok, started, _events} ->
         {tracks, _, _, _, _, _} = load_cache(session.id)
-        {:noreply, assign(socket, session: started, tracks: tracks)}
+        {:noreply, assign(socket, session: started, tracks: tracks, original_tracks: tracks)}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, inspect(reason))}
@@ -172,6 +175,11 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   @impl true
   def handle_event("set_round_duration", %{"duration" => duration}, socket) do
     {:noreply, assign(socket, round_duration: String.to_integer(duration))}
+  end
+
+  @impl true
+  def handle_event("toggle_hide_decided", _params, socket) do
+    {:noreply, assign(socket, :hide_decided, not socket.assigns.hide_decided)}
   end
 
   @impl true
@@ -267,7 +275,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
            active_track_id: nil,
            duel_track_id: nil,
            countdown: nil,
-           playing: false,
+           playing_track_id: nil,
            round_mode: advanced.selection_mode,
            round_duration: advanced.vote_duration
          )}
@@ -278,10 +286,33 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   @impl true
-  def handle_event("complete", _params, %{assigns: %{session: session, scope: scope}} = socket) do
-    case CommandBus.apply(%CompleteCollectionSession{session_id: session.id, scope: scope}) do
+  def handle_event("modal_content_click", _params, socket), do: {:noreply, socket}
+
+  @impl true
+  def handle_event("show_end_modal", _params, socket) do
+    {:noreply, assign(socket, :show_end_modal, true)}
+  end
+
+  @impl true
+  def handle_event("hide_end_modal", _params, socket) do
+    {:noreply, assign(socket, :show_end_modal, false)}
+  end
+
+  @impl true
+  def handle_event("complete", params, %{assigns: %{session: session, scope: scope}} = socket) do
+    remove_kept = Map.get(params, "remove_kept") == "true"
+    remove_rejected = Map.get(params, "remove_rejected") == "true"
+
+    cmd = %CompleteCollectionSession{
+      session_id: session.id,
+      scope: scope,
+      remove_kept: remove_kept,
+      remove_rejected: remove_rejected
+    }
+
+    case CommandBus.apply(cmd) do
       {:ok, completed, _events} ->
-        {:noreply, assign(socket, session: completed)}
+        {:noreply, assign(socket, session: completed, show_end_modal: false)}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, inspect(reason))}
@@ -305,29 +336,59 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   @impl true
-  def handle_event("play_track", _params, %{assigns: %{tracks: tracks, session: session, scope: scope}} = socket) do
-    track = Enum.at(tracks, session.current_index)
+  def handle_event(
+        "restore_order",
+        _params,
+        %{assigns: %{session_id: session_id, original_tracks: original_tracks, tracks: tracks, session: session}} = socket
+      ) do
+    idx = session.current_index
+    {done, _} = Enum.split(tracks, idx)
+    # AIDEV-NOTE: restore original order for remaining by dropping the first idx entries from original
+    remaining = Enum.drop(original_tracks, idx)
+    restored = done ++ remaining
 
-    case track && SpotifyApi.start_resume_playback(scope, track) do
-      {:ok, _} ->
-        {:noreply, assign(socket, :playing, true)}
+    case Cache.get(:collections, session_id) do
+      {:ok, cached} when not is_nil(cached) ->
+        Cache.put(:collections, session_id, Map.put(cached, :tracks, restored))
+        {:noreply, assign(socket, tracks: restored)}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, inspect(reason))}
-
-      nil ->
+      _ ->
         {:noreply, socket}
     end
+  end
+
+  @impl true
+  def handle_event("play_track", _params, %{assigns: %{tracks: tracks, session: session, scope: scope}} = socket) do
+    play(Enum.at(tracks, session.current_index), scope, socket)
+  end
+
+  @impl true
+  def handle_event("play_track_a", _params, %{assigns: %{tracks: tracks, session: session, scope: scope}} = socket) do
+    play(Enum.at(tracks, session.current_index), scope, socket)
+  end
+
+  @impl true
+  def handle_event("play_track_b", _params, %{assigns: %{tracks: tracks, session: session, scope: scope}} = socket) do
+    play(Enum.at(tracks, session.current_index + 1), scope, socket)
   end
 
   @impl true
   def handle_event("stop_playback", _params, %{assigns: %{scope: scope}} = socket) do
     case SpotifyApi.pause_playback(scope) do
       {:ok, _} ->
-        {:noreply, assign(socket, :playing, false)}
+        {:noreply, assign(socket, :playing_track_id, nil)}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, inspect(reason))}
+    end
+  end
+
+  defp play(nil, _scope, socket), do: {:noreply, socket}
+
+  defp play(track, scope, socket) do
+    case SpotifyApi.start_resume_playback(scope, track) do
+      {:ok, _} -> {:noreply, assign(socket, :playing_track_id, track.track_id)}
+      {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
     end
   end
 
@@ -337,6 +398,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   attr :label, :string, required: true
   attr :accent, :string, default: "purple"
   attr :votes, :integer, default: nil
+  attr :play_event, :string, default: nil
+  attr :playing_track_id, :string, default: nil
 
   def track_card(%{track: nil} = assigns) do
     ~H"""
@@ -356,18 +419,46 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         _ -> "border-white/10"
       end
     ]}>
-      <p class={[
-        "text-xs font-medium mb-1",
-        case @accent do
-          "blue" -> "text-blue-400"
-          "amber" -> "text-amber-400"
-          _ -> "text-purple-400"
-        end
-      ]}>
-        {@label}
-      </p>
-      <p class="text-white font-semibold leading-tight">{@track.name}</p>
-      <p class="text-gray-400 text-sm">{@track.artist}</p>
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <p class={[
+            "text-xs font-medium mb-1",
+            case @accent do
+              "blue" -> "text-blue-400"
+              "amber" -> "text-amber-400"
+              _ -> "text-purple-400"
+            end
+          ]}>
+            {@label}
+          </p>
+          <p class="text-white font-semibold leading-tight">{@track.name}</p>
+          <p class="text-gray-400 text-sm">{@track.artist}</p>
+        </div>
+        <%= if @play_event do %>
+          <% playing = @playing_track_id == @track.track_id %>
+          <button
+            phx-click={if playing, do: "stop_playback", else: @play_event}
+            class={[
+              "flex-shrink-0 mt-1 p-1.5 rounded-lg text-white transition-colors",
+              if playing do
+                "bg-green-600/30 hover:bg-red-600/40"
+              else
+                "bg-white/10 hover:bg-white/20"
+              end
+            ]}
+          >
+            <%= if playing do %>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+            <% else %>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            <% end %>
+          </button>
+        <% end %>
+      </div>
       <%= if @votes != nil do %>
         <p class="text-xl font-bold text-white mt-2">
           {@votes} <span class="text-xs text-gray-500 font-normal">{gettext("votes")}</span>

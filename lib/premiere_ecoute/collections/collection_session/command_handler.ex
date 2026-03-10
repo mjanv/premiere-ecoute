@@ -13,7 +13,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Collections.CollectionDecision
   alias PremiereEcoute.Collections.CollectionSession
-  alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Collections.CollectionSession.Commands.CloseVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.CompleteCollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.DecideTrack
@@ -26,6 +25,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   alias PremiereEcoute.Collections.CollectionSession.Events.TrackDecided
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowClosed
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
+  alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcouteCore.Cache
 
   command(PrepareCollectionSession)
@@ -46,23 +46,23 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
       }) do
     user_id = scope.user.id
 
-    with {:ok, session} <-
-           CollectionSession.create(%{
-             user_id: user_id,
-             origin_playlist_id: origin_id,
-             destination_playlist_id: dest_id,
-             rule: rule,
-             selection_mode: mode,
-             vote_duration: vote_duration
-           }) do
-      {:ok, session,
-       [
-         %CollectionSessionPrepared{
-           session_id: session.id,
-           user_id: user_id
-         }
-       ]}
-    else
+    case CollectionSession.create(%{
+           user_id: user_id,
+           origin_playlist_id: origin_id,
+           destination_playlist_id: dest_id,
+           rule: rule,
+           selection_mode: mode,
+           vote_duration: vote_duration
+         }) do
+      {:ok, session} ->
+        {:ok, session,
+         [
+           %CollectionSessionPrepared{
+             session_id: session.id,
+             user_id: user_id
+           }
+         ]}
+
       {:error, reason} ->
         Logger.error("Cannot prepare collection session: #{inspect(reason)}")
         {:error, reason}
@@ -209,11 +209,19 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   end
 
   @doc false
-  def handle(%CompleteCollectionSession{session_id: session_id, scope: scope}) do
+  def handle(%CompleteCollectionSession{
+        session_id: session_id,
+        scope: scope,
+        remove_kept: remove_kept,
+        remove_rejected: remove_rejected
+      }) do
     session = CollectionSession.get(session_id)
     kept = CollectionDecision.kept_for_session(session_id)
+    rejected = if remove_rejected, do: CollectionDecision.rejected_for_session(session_id), else: []
+    to_remove = if(remove_kept, do: kept, else: []) ++ rejected
 
     with {:ok, _} <- sync_to_spotify(scope, session, kept),
+         {:ok, _} <- remove_from_origin(scope, session, to_remove),
          {:ok, _} <- Cache.del(:collections, session_id),
          {:ok, session} <- CollectionSession.complete(session) do
       {:ok, session,
@@ -232,6 +240,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   end
 
   defp maybe_decide_duel_loser(_session_id, nil, _name, _artist, _position), do: :ok
+  defp maybe_decide_duel_loser(_session_id, _track_id, nil, _artist, _position), do: :ok
 
   defp maybe_decide_duel_loser(session_id, track_id, track_name, artist, position) do
     case CollectionDecision.decide(session_id, %{
@@ -251,6 +260,14 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
 
   defp maybe_shuffle(tracks, :random), do: Enum.shuffle(tracks)
   defp maybe_shuffle(tracks, :ordered), do: tracks
+
+  defp remove_from_origin(_scope, _session, []), do: {:ok, :nothing_to_remove}
+
+  defp remove_from_origin(scope, session, decisions) do
+    playlist_id = session.origin_playlist.playlist_id
+    tracks = Enum.map(decisions, &%Track{provider: :spotify, track_id: &1.track_id})
+    Apis.spotify().remove_playlist_items(scope, playlist_id, tracks)
+  end
 
   defp sync_to_spotify(_scope, _session, []), do: {:ok, :nothing_to_sync}
 
