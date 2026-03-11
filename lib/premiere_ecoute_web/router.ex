@@ -151,6 +151,10 @@ defmodule PremiereEcouteWeb.Router do
   scope "/collections", PremiereEcouteWeb.Collections do
     pipe_through [:browser]
 
+    live_session :collections_overlay, on_mount: [{UserAuth, :current_scope}] do
+      live "/overlay/:user_id", CollectionOverlayLive, :show
+    end
+
     live_session :collections, on_mount: [{UserAuth, :streamer}] do
       live "/", CollectionSessionsLive, :index
       live "/new", CollectionSessionNewLive, :new
