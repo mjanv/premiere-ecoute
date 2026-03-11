@@ -7,10 +7,10 @@ defmodule PremiereEcoute.Sessions do
 
   use PremiereEcouteCore.Context, name: :sessions
 
+  alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores
-  alias PremiereEcoute.Collections.CollectionSession
 
   # Behaviour
   @callback publish_message(map()) :: :ok
