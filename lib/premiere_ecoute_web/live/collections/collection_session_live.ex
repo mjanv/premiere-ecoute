@@ -344,6 +344,45 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   @impl true
+  def handle_event(
+        "move_to_top",
+        %{"index" => idx_str},
+        %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
+      ) do
+    idx = String.to_integer(idx_str)
+    current = session.current_index
+
+    if idx > current do
+      {before_current, from_current} = Enum.split(tracks, current)
+      # AIDEV-NOTE: from_current starts at current_index; move track at relative offset to front
+      remaining_idx = idx - current
+      track = Enum.at(from_current, remaining_idx)
+      reordered = before_current ++ [track | List.delete_at(from_current, remaining_idx)]
+
+      case Cache.get(:collections, broadcaster_id) do
+        {:ok, cached} when not is_nil(cached) ->
+          Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, reordered))
+          {:noreply, assign(socket, tracks: reordered)}
+
+        _ ->
+          {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("move_up", %{"index" => idx_str}, %{assigns: assigns} = socket) do
+    reorder(socket, String.to_integer(idx_str), -1, assigns)
+  end
+
+  @impl true
+  def handle_event("move_down", %{"index" => idx_str}, %{assigns: assigns} = socket) do
+    reorder(socket, String.to_integer(idx_str), +1, assigns)
+  end
+
+  @impl true
   def handle_event("play_track", _params, %{assigns: %{tracks: tracks, session: session, scope: scope}} = socket) do
     play(Enum.at(tracks, session.current_index), scope, socket)
   end
@@ -366,6 +405,27 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, inspect(reason))}
+    end
+  end
+
+  defp reorder(socket, idx, delta, %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}) do
+    current = session.current_index
+    target = idx + delta
+
+    if idx > current && target > current && target < length(tracks) do
+      track = Enum.at(tracks, idx)
+      reordered = tracks |> List.delete_at(idx) |> List.insert_at(target, track)
+
+      case Cache.get(:collections, broadcaster_id) do
+        {:ok, cached} when not is_nil(cached) ->
+          Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, reordered))
+          {:noreply, assign(socket, tracks: reordered)}
+
+        _ ->
+          {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
     end
   end
 
