@@ -34,6 +34,8 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
   @doc false
   @spec handle_message(atom(), Message.t(), any()) :: Message.t()
   def handle_message(:session, message, _) do
+    Logger.info("#{inspect(message)}")
+
     case process(message.data) do
       {:ok, vote} -> message |> Message.put_data(vote) |> Message.put_batch_key(vote.session_id) |> Message.put_batcher(:writer)
       {:error, reason} -> Message.failed(message, reason)

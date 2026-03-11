@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Sessions do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores
+  alias PremiereEcoute.Collections.CollectionSession
 
   # Behaviour
   @callback publish_message(map()) :: :ok
@@ -29,7 +30,10 @@ defmodule PremiereEcoute.Sessions do
 
   @doc "Publishes chat message event to Broadway pipeline for vote processing"
   @spec publish_message(map()) :: :ok
-  def publish_message(event), do: PremiereEcouteCore.publish(Scores.MessagePipeline, event)
+  def publish_message(event) do
+    PremiereEcouteCore.publish(Scores.MessagePipeline, event)
+    PremiereEcouteCore.publish(CollectionSession.MessagePipeline, event)
+  end
 
   @doc "Publishes poll event to Broadway pipeline for vote processing"
   @spec publish_poll(map()) :: :ok
