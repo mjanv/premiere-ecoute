@@ -115,16 +115,6 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     </.sidebar_link>
 
                     <.sidebar_link
-                      href={~p"/collections"}
-                      current_page={@current_page}
-                      page_id="collections"
-                      title={gettext("Collections")}
-                      icon="hero-queue-list"
-                    >
-                      {gettext("Collections")}
-                    </.sidebar_link>
-
-                    <.sidebar_link
                       href={~p"/retrospective/history"}
                       current_page={@current_page}
                       page_id="retrospective"
@@ -153,6 +143,29 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   >
                     {gettext("My tops")}
                   </.sidebar_link>
+                </nav>
+              </div>
+            <% end %>
+            
+    <!-- Collections section -->
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:collections, for: @current_user) do %>
+              <div class="mb-6">
+                <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                  <.icon name="hero-star" class="w-4 h-4 mr-2" />
+                  <span class="sidebar-link-text">{gettext("Collections")}</span>
+                </h3>
+                <nav class="space-y-1">
+                  <%= if @current_user.role in [:streamer, :admin] do %>
+                    <.sidebar_link
+                      href={~p"/collections"}
+                      current_page={@current_page}
+                      page_id="collections"
+                      title={gettext("Collections")}
+                      icon="hero-queue-list"
+                    >
+                      {gettext("Collections")}
+                    </.sidebar_link>
+                  <% end %>
                 </nav>
               </div>
             <% end %>

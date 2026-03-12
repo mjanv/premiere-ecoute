@@ -49,7 +49,7 @@ defmodule PremiereEcouteWeb.HomeLive do
   @impl true
   def handle_event("stop_radio", _params, %{assigns: %{current_scope: %{user: user}}} = socket) do
     case Radio.stop_radio(user) do
-      {:ok, _} -> {:noreply, assign(socket, next_radio: Radio.next_in?(user.id))}
+      {:ok, 1} -> {:noreply, assign(socket, next_radio: Radio.next_in?(user.id))}
       _ -> {:noreply, put_flash(socket, :error, gettext("Failed to stop radio"))}
     end
   end

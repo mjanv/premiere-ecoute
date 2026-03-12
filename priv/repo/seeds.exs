@@ -7,16 +7,18 @@ defmodule Seeds do
 end
 
 # Feature flags
-PremiereEcouteCore.FeatureFlag.enable(:billboards)
+PremiereEcouteCore.FeatureFlag.enable(:playlists)
+PremiereEcouteCore.FeatureFlag.enable(:playlist_workflows)
 PremiereEcouteCore.FeatureFlag.enable(:listening_sessions)
 PremiereEcouteCore.FeatureFlag.enable(:listening_session_album)
 PremiereEcouteCore.FeatureFlag.enable(:listening_session_playlist)
 PremiereEcouteCore.FeatureFlag.enable(:listening_session_single)
 PremiereEcouteCore.FeatureFlag.enable(:listening_session_free)
-PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
-PremiereEcouteCore.FeatureFlag.enable(:playlists)
-PremiereEcouteCore.FeatureFlag.enable(:playlist_workflows)
+PremiereEcouteCore.FeatureFlag.enable(:collections)
+PremiereEcouteCore.FeatureFlag.enable(:discography)
+PremiereEcouteCore.FeatureFlag.enable(:billboards)
 PremiereEcouteCore.FeatureFlag.enable(:festivals)
+PremiereEcouteCore.FeatureFlag.enable(:follow_channels)
 
 # Accounts
 Logger.info(IO.ANSI.green() <> IO.ANSI.bright() <> "Accounts:" <> IO.ANSI.reset())

@@ -37,6 +37,7 @@ defmodule PremiereEcoute.Collections.CollectionSession do
   schema "collection_sessions" do
     field :status, Ecto.Enum, values: [:pending, :active, :completed], default: :pending
     field :current_index, :integer, default: 0
+
     field :kept, {:array, :string}, default: []
     field :rejected, {:array, :string}, default: []
     field :skipped, {:array, :string}, default: []

@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   alias PremiereEcoute.Collections.CollectionSession.Events.TrackDecided
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowClosed
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
-  alias PremiereEcoute.Collections.CollectionSessionWorker
+  # alias PremiereEcoute.Collections.CollectionSessionWorker
 
   event(CollectionSessionPrepared)
   event(CollectionSessionStarted)
@@ -42,15 +42,14 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   @impl true
   def dispatch(%VoteWindowOpened{
         session_id: session_id,
-        user_id: user_id,
-        track_id: track_id,
-        vote_duration: vote_duration
+        user_id: _user_id,
+        track_id: _track_id,
+        vote_duration: _vote_duration
       }) do
-    # Schedule auto-close after vote_duration seconds
-    CollectionSessionWorker.in_seconds(
-      %{action: "close_vote", session_id: session_id, user_id: user_id, track_id: track_id},
-      vote_duration
-    )
+    # CollectionSessionWorker.in_seconds(
+    #   %{action: "close_vote", session_id: session_id, user_id: user_id, track_id: track_id},
+    #   vote_duration
+    # )
 
     PremiereEcoute.PubSub.broadcast("collection:#{session_id}", :vote_open)
     :ok

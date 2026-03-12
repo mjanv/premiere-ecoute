@@ -69,8 +69,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
   @doc false
   @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
-    # AIDEV-NOTE: votes are tallied in cache (not DB) during the window; cache is keyed
-    # by broadcaster_id — read it from the first message's data.
     broadcaster_id = hd(messages).data.broadcaster_id
 
     with {:ok, cached} <- Cache.get(:collections, broadcaster_id) do

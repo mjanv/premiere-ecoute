@@ -18,7 +18,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
 
     socket
     |> assign(:playlists, playlists)
-    |> assign(:form, to_form(default_form_params()))
+    |> assign(:form, to_form(default_form()))
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -34,16 +34,13 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
 
   @impl true
   def handle_event("submit", %{"session" => params}, %{assigns: %{current_scope: scope}} = socket) do
-    origin_id = parse_id(params["origin_playlist_id"])
-    destination_id = parse_id(params["destination_playlist_id"])
-
-    command = %PrepareCollectionSession{
+    %PrepareCollectionSession{
       scope: scope,
-      origin_playlist_id: origin_id,
-      destination_playlist_id: destination_id
+      origin_playlist_id: parse_id(params["origin_playlist_id"]),
+      destination_playlist_id: parse_id(params["destination_playlist_id"])
     }
-
-    case CommandBus.apply(command) do
+    |> CommandBus.apply()
+    |> case do
       {:ok, session, _events} ->
         {:noreply, push_navigate(socket, to: ~p"/collections/#{session.id}")}
 
@@ -54,7 +51,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
     end
   end
 
-  defp default_form_params do
+  defp default_form do
     %{
       "origin_playlist_id" => "",
       "destination_playlist_id" => ""

@@ -2,6 +2,18 @@
 # Separate routers needed because Let's Encrypt cannot issue certs for IP addresses
 http:
   routers:
+    twitch-ws:
+      rule: "Host(`premiere-ecoute.fr`) && PathPrefix(`/twitch`)"
+      service: twitch-ws
+      middlewares:
+        - strip-twitch-prefix
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+        options: no-h2
+      priority: 100
+
     app-domain:
       rule: "Host(`premiere-ecoute.fr`)"
       service: app
@@ -18,11 +30,29 @@ http:
         - websecure
       tls: {}
 
+  middlewares:
+    strip-twitch-prefix:
+      stripPrefix:
+        prefixes:
+          - "/twitch"
+
   services:
     app:
       loadBalancer:
         servers:
           - url: "http://localhost:4000"
+
+    # AIDEV-NOTE: Proxies /twitch WSS connections to Twitch IRC WebSocket endpoint
+    # Raw text frames required — no compression, no rewriting, HTTP/1.1 only on upstream
+    twitch-ws:
+      loadBalancer:
+        servers:
+          - url: "https://irc-ws.chat.twitch.tv:443"
+        serversTransport: twitch-transport
+
+  serversTransports:
+    twitch-transport:
+      disableHTTP2: true
 
 # AIDEV-NOTE: HTTP/2 disabled via ALPN — HTTP/2 strips Connection/Upgrade headers, breaking Phoenix LiveView WebSocket upgrades
 tls:

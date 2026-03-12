@@ -19,8 +19,6 @@ defmodule PremiereEcoute.Collections.CollectionSessionWorker do
   alias PremiereEcoute.Apis
   alias PremiereEcouteCore.Cache
 
-  # AIDEV-NOTE: Broadcasts vote counts from cache to LiveView so streamer sees final tally
-  # before making the decision. Does NOT auto-decide — streamer always finalizes.
   @impl Oban.Worker
   def perform(%Oban.Job{
         args: %{"action" => "close_vote", "session_id" => session_id, "user_id" => user_id, "track_id" => track_id}
@@ -39,7 +37,6 @@ defmodule PremiereEcoute.Collections.CollectionSessionWorker do
 
       PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:vote_closed, track_id, %{votes_a: votes_a, votes_b: votes_b}})
 
-      # Clean up active vote state from cache but keep track list
       Cache.put(:collections, session_id, Map.drop(cached, [:active_track_id, :duel_track_id, :votes_a, :votes_b]))
     end
 

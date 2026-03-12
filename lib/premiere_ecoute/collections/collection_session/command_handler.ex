@@ -36,25 +36,20 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
 
   @doc false
   def handle(%PrepareCollectionSession{
-        scope: scope,
-        origin_playlist_id: origin_id,
-        destination_playlist_id: dest_id
+        scope: %{user: %{id: user_id}},
+        origin_playlist_id: origin_playlist_id,
+        destination_playlist_id: destination_playlist_id
       }) do
-    user_id = scope.user.id
-
-    case CollectionSession.create(%{
-           user_id: user_id,
-           origin_playlist_id: origin_id,
-           destination_playlist_id: dest_id
-         }) do
+    %{
+      user_id: user_id,
+      origin_playlist_id: origin_playlist_id,
+      destination_playlist_id: destination_playlist_id
+    }
+    |> CollectionSession.create()
+    |> case do
       {:ok, session} ->
-        {:ok, session,
-         [
-           %CollectionSessionPrepared{
-             session_id: session.id,
-             user_id: user_id
-           }
-         ]}
+        event = %CollectionSessionPrepared{session_id: session.id, user_id: user_id}
+        {:ok, session, [event]}
 
       {:error, reason} ->
         Logger.error("Cannot prepare collection session: #{inspect(reason)}")
@@ -63,23 +58,13 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   end
 
   @doc false
-  def handle(%StartCollectionSession{session_id: session_id, scope: scope}) do
-    session = CollectionSession.get(session_id)
-    # AIDEV-NOTE: cache is keyed by broadcaster_id (Twitch user_id) so MessagePipeline can look
-    # it up from incoming MessageSent events. session_id is stored inside for the pipeline to use.
-    broadcaster_id = scope.user.twitch.user_id
-
-    with {:ok, playlist} <- Apis.provider(session.origin_playlist.provider).get_playlist(session.origin_playlist.playlist_id),
+  def handle(%StartCollectionSession{session_id: session_id, scope: %{user: %{twitch: %{user_id: broadcaster_id}}} = scope}) do
+    with %CollectionSession{origin_playlist: origin_playlist} = session <- CollectionSession.get(session_id),
+         {:ok, playlist} <- Apis.provider(origin_playlist.provider).get_playlist(origin_playlist.playlist_id),
          {:ok, _} <- Cache.put(:collections, broadcaster_id, %{session_id: session_id, tracks: playlist.tracks}),
          {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
          {:ok, session} <- CollectionSession.start(session) do
-      {:ok, session,
-       [
-         %CollectionSessionStarted{
-           session_id: session.id,
-           user_id: scope.user.id
-         }
-       ]}
+      {:ok, session, [%CollectionSessionStarted{session_id: session.id, user_id: scope.user.id}]}
     else
       {:error, reason} ->
         Logger.error("Cannot start collection session #{session_id}: #{inspect(reason)}")
@@ -137,33 +122,21 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   @doc false
   def handle(%OpenVoteWindow{
         session_id: session_id,
-        scope: scope,
+        scope: %{user: %{id: user_id, twitch: %{user_id: broadcaster_id}}},
         track_id: track_id,
         duel_track_id: duel_track_id,
         selection_mode: mode,
         vote_duration: duration
       }) do
-    session = CollectionSession.get(session_id)
-    broadcaster_id = scope.user.twitch.user_id
-
-    # AIDEV-NOTE: cache entry stores current track ids so MessagePipeline can route votes
-    with {:ok, cached} <- Cache.get(:collections, broadcaster_id),
-         {:ok, _} <-
-           Cache.put(
-             :collections,
-             broadcaster_id,
-             Map.merge(cached, %{
-               active_track_id: track_id,
-               duel_track_id: duel_track_id,
-               votes_a: 0,
-               votes_b: 0
-             })
-           ) do
+    with session = CollectionSession.get(session_id),
+         {:ok, cached} <- Cache.get(:collections, broadcaster_id),
+         cached = Map.merge(cached, %{active_track_id: track_id, duel_track_id: duel_track_id, votes_a: 0, votes_b: 0}),
+         {:ok, _} <- Cache.put(:collections, broadcaster_id, cached) do
       {:ok, session,
        [
          %VoteWindowOpened{
            session_id: session_id,
-           user_id: scope.user.id,
+           user_id: user_id,
            track_id: track_id,
            duel_track_id: duel_track_id,
            selection_mode: mode,
@@ -178,22 +151,13 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   end
 
   @doc false
-  def handle(%CloseVoteWindow{session_id: session_id, scope: scope}) do
-    session = CollectionSession.get(session_id)
-    broadcaster_id = scope.user.twitch.user_id
-
-    with {:ok, cached} <- Cache.get(:collections, broadcaster_id),
-         track_id <- Map.get(cached, :active_track_id),
-         {:ok, _} <-
-           Cache.put(:collections, broadcaster_id, Map.drop(cached, [:active_track_id, :duel_track_id, :votes_a, :votes_b])) do
-      {:ok, session,
-       [
-         %VoteWindowClosed{
-           session_id: session_id,
-           user_id: scope.user.id,
-           track_id: track_id
-         }
-       ]}
+  def handle(%CloseVoteWindow{session_id: session_id, scope: %{user: %{id: user_id, twitch: %{user_id: broadcaster_id}}}}) do
+    with session = CollectionSession.get(session_id),
+         {:ok, cached} <- Cache.get(:collections, broadcaster_id),
+         track_id = Map.get(cached, :active_track_id),
+         cached = Map.drop(cached, [:active_track_id, :duel_track_id, :votes_a, :votes_b]),
+         {:ok, _} <- Cache.put(:collections, broadcaster_id, cached) do
+      {:ok, session, [%VoteWindowClosed{session_id: session_id, user_id: user_id, track_id: track_id}]}
     else
       {:error, reason} ->
         Logger.error("Cannot close vote window for session #{session_id}: #{inspect(reason)}")
@@ -245,7 +209,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
 
   defp sync_to_spotify(scope, session) do
     playlist_id = session.destination_playlist.playlist_id
-    # AIDEV-NOTE: convert kept track_id list to Track structs for the Spotify API
     tracks = Enum.map(session.kept, &%Track{provider: :spotify, track_id: &1})
     Apis.spotify().add_items_to_playlist(scope, playlist_id, tracks)
   end

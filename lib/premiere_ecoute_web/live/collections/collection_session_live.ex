@@ -22,6 +22,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   alias PremiereEcoute.Collections.CollectionSession.Commands.DecideTrack
   alias PremiereEcoute.Collections.CollectionSession.Commands.OpenVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.StartCollectionSession
+  alias PremiereEcoute.Collections.Tracklist
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.CommandBus
 
@@ -153,7 +154,9 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_event("start", _params, %{assigns: %{session: session, scope: scope}} = socket) do
-    case CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope}) do
+    %StartCollectionSession{session_id: session.id, scope: scope}
+    |> CommandBus.apply()
+    |> case do
       {:ok, started, _events} ->
         {tracks, _, _, _, _, _} = load_cache(socket.assigns.broadcaster_id)
         {:noreply, assign(socket, session: started, tracks: tracks, original_tracks: tracks)}
@@ -184,7 +187,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     track = Enum.at(tracks, session.current_index)
     duel = if round_mode == :duel, do: Enum.at(tracks, session.current_index + 1)
 
-    cmd = %OpenVoteWindow{
+    %OpenVoteWindow{
       session_id: session.id,
       scope: scope,
       track_id: track && track.track_id,
@@ -192,8 +195,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       selection_mode: round_mode,
       vote_duration: round_duration
     }
-
-    case CommandBus.apply(cmd) do
+    |> CommandBus.apply()
+    |> case do
       {:ok, _session, _events} ->
         {_, votes_a, votes_b, active_id, duel_id, _} = load_cache(socket.assigns.broadcaster_id)
         Process.send_after(self(), :tick, 1000)
@@ -215,44 +218,69 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_event("close_vote", _params, %{assigns: %{session: session, scope: scope}} = socket) do
-    case CommandBus.apply(%CloseVoteWindow{session_id: session.id, scope: scope}) do
-      {:ok, _session, _events} ->
-        {:noreply, assign(socket, vote_open: false, countdown: nil)}
-
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, inspect(reason))}
+    %CloseVoteWindow{session_id: session.id, scope: scope}
+    |> CommandBus.apply()
+    |> case do
+      {:ok, _session, _events} -> {:noreply, assign(socket, vote_open: false, countdown: nil)}
+      {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
     end
   end
 
   @impl true
-  def handle_event("decide", %{"decision" => decision_str}, %{assigns: assigns} = socket) do
-    %{session: session, scope: scope, tracks: tracks, round_mode: round_mode} = assigns
-    decision = String.to_existing_atom(decision_str)
-    track = Enum.at(tracks, session.current_index)
-    duel = Enum.at(tracks, session.current_index + 1)
+  def handle_event(
+        "decide",
+        %{"decision" => decision},
+        %{assigns: %{session: session, scope: scope, tracks: tracks, round_mode: round_mode}} = socket
+      ) do
+    decision = String.to_existing_atom(decision)
 
-    # AIDEV-NOTE: in duel mode, Pick A (:kept) = track A wins, Pick B (:rejected) = track B wins.
-    # Command handler records winner as :kept and loser as :rejected in one update.
-    {primary, loser, effective_decision} =
-      case {round_mode, decision} do
-        {:duel, :kept} -> {track, duel, :kept}
-        {:duel, :rejected} -> {duel, track, :kept}
-        _ -> {track, nil, decision}
-      end
+    case round_mode do
+      :streamer_choice ->
+        track = Enum.at(tracks, session.current_index)
 
-    cmd = %DecideTrack{
-      session_id: session.id,
-      scope: scope,
-      track_id: primary && primary.track_id,
-      decision: effective_decision,
-      duel_track_id: loser && loser.track_id
-    }
+        %DecideTrack{
+          session_id: session.id,
+          scope: scope,
+          track_id: track && track.track_id,
+          decision: decision,
+          duel_track_id: nil
+        }
 
-    case CommandBus.apply(cmd) do
-      {:ok, advanced, _events} ->
+      :viewer_vote ->
+        track = Enum.at(tracks, session.current_index)
+
+        %DecideTrack{
+          session_id: session.id,
+          scope: scope,
+          track_id: track && track.track_id,
+          decision: decision,
+          duel_track_id: nil
+        }
+
+      :duel ->
+        a = Enum.at(tracks, session.current_index)
+        b = Enum.at(tracks, session.current_index + 1)
+
+        {winner, loser} =
+          case decision do
+            :kept -> {a, b}
+            :rejected -> {b, a}
+          end
+
+        %DecideTrack{
+          session_id: session.id,
+          scope: scope,
+          track_id: winner && winner.track_id,
+          decision: :kept,
+          duel_track_id: loser && loser.track_id
+        }
+    end
+    |> CommandBus.apply()
+    |> case do
+      {:ok, session, _events} ->
         {:noreply,
          assign(socket,
-           session: advanced,
+           session: session,
            votes_a: 0,
            votes_b: 0,
            vote_open: false,
@@ -268,57 +296,28 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   @impl true
-  def handle_event("modal_content_click", _params, socket), do: {:noreply, socket}
-
-  @impl true
-  def handle_event("show_end_modal", _params, socket) do
-    {:noreply, assign(socket, :show_end_modal, true)}
-  end
-
-  @impl true
-  def handle_event("hide_end_modal", _params, socket) do
-    {:noreply, assign(socket, :show_end_modal, false)}
-  end
-
-  @impl true
   def handle_event("complete", params, %{assigns: %{session: session, scope: scope}} = socket) do
-    remove_kept = Map.get(params, "remove_kept") == "true"
-    remove_rejected = Map.get(params, "remove_rejected") == "true"
-
-    cmd = %CompleteCollectionSession{
+    %CompleteCollectionSession{
       session_id: session.id,
       scope: scope,
-      remove_kept: remove_kept,
-      remove_rejected: remove_rejected
+      remove_kept: Map.get(params, "remove_kept") == "true",
+      remove_rejected: Map.get(params, "remove_rejected") == "true"
     }
-
-    case CommandBus.apply(cmd) do
-      {:ok, completed, _events} ->
-        {:noreply, assign(socket, session: completed, show_end_modal: false)}
-
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, inspect(reason))}
+    |> CommandBus.apply()
+    |> case do
+      {:ok, session, _events} -> {:noreply, assign(socket, session: session, show_end_modal: false)}
+      {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
     end
   end
 
   @impl true
   def handle_event(
-        "shuffle_remaining",
+        "shuffle",
         _params,
         %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
       ) do
-    idx = session.current_index
-    {done, remaining} = Enum.split(tracks, idx)
-    shuffled = done ++ Enum.shuffle(remaining)
-
-    case Cache.get(:collections, broadcaster_id) do
-      {:ok, cached} when not is_nil(cached) ->
-        Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, shuffled))
-        {:noreply, assign(socket, tracks: shuffled)}
-
-      _ ->
-        {:noreply, socket}
-    end
+    {:ok, tracks} = Tracklist.shuffle(session, broadcaster_id, tracks)
+    {:noreply, assign(socket, tracks: tracks)}
   end
 
   @impl true
@@ -327,59 +326,38 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         _params,
         %{assigns: %{broadcaster_id: broadcaster_id, original_tracks: original_tracks, tracks: tracks, session: session}} = socket
       ) do
-    idx = session.current_index
-    {done, _} = Enum.split(tracks, idx)
-    # AIDEV-NOTE: restore original order for remaining by dropping the first idx entries from original
-    remaining = Enum.drop(original_tracks, idx)
-    restored = done ++ remaining
-
-    case Cache.get(:collections, broadcaster_id) do
-      {:ok, cached} when not is_nil(cached) ->
-        Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, restored))
-        {:noreply, assign(socket, tracks: restored)}
-
-      _ ->
-        {:noreply, socket}
-    end
+    {:ok, tracks} = Tracklist.restore(session, broadcaster_id, tracks, original_tracks)
+    {:noreply, assign(socket, tracks: tracks)}
   end
 
   @impl true
   def handle_event(
         "move_to_top",
-        %{"index" => idx_str},
+        %{"index" => index},
         %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
       ) do
-    idx = String.to_integer(idx_str)
-    current = session.current_index
-
-    if idx > current do
-      {before_current, from_current} = Enum.split(tracks, current)
-      # AIDEV-NOTE: from_current starts at current_index; move track at relative offset to front
-      remaining_idx = idx - current
-      track = Enum.at(from_current, remaining_idx)
-      reordered = before_current ++ [track | List.delete_at(from_current, remaining_idx)]
-
-      case Cache.get(:collections, broadcaster_id) do
-        {:ok, cached} when not is_nil(cached) ->
-          Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, reordered))
-          {:noreply, assign(socket, tracks: reordered)}
-
-        _ ->
-          {:noreply, socket}
-      end
-    else
-      {:noreply, socket}
-    end
+    {:ok, tracks} = Tracklist.move_to_top(session, String.to_integer(index), broadcaster_id, tracks)
+    {:noreply, assign(socket, tracks: tracks)}
   end
 
   @impl true
-  def handle_event("move_up", %{"index" => idx_str}, %{assigns: assigns} = socket) do
-    reorder(socket, String.to_integer(idx_str), -1, assigns)
+  def handle_event(
+        "move_up",
+        %{"index" => index},
+        %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
+      ) do
+    {:ok, tracks} = Tracklist.reorder(session, String.to_integer(index), -1, broadcaster_id, tracks)
+    {:noreply, assign(socket, tracks: tracks)}
   end
 
   @impl true
-  def handle_event("move_down", %{"index" => idx_str}, %{assigns: assigns} = socket) do
-    reorder(socket, String.to_integer(idx_str), +1, assigns)
+  def handle_event(
+        "move_down",
+        %{"index" => index},
+        %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
+      ) do
+    {:ok, tracks} = Tracklist.reorder(session, String.to_integer(index), +1, broadcaster_id, tracks)
+    {:noreply, assign(socket, tracks: tracks)}
   end
 
   @impl true
@@ -408,25 +386,17 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     end
   end
 
-  defp reorder(socket, idx, delta, %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}) do
-    current = session.current_index
-    target = idx + delta
+  @impl true
+  def handle_event("modal_content_click", _params, socket), do: {:noreply, socket}
 
-    if idx > current && target > current && target < length(tracks) do
-      track = Enum.at(tracks, idx)
-      reordered = tracks |> List.delete_at(idx) |> List.insert_at(target, track)
+  @impl true
+  def handle_event("show_end_modal", _params, socket) do
+    {:noreply, assign(socket, :show_end_modal, true)}
+  end
 
-      case Cache.get(:collections, broadcaster_id) do
-        {:ok, cached} when not is_nil(cached) ->
-          Cache.put(:collections, broadcaster_id, Map.put(cached, :tracks, reordered))
-          {:noreply, assign(socket, tracks: reordered)}
-
-        _ ->
-          {:noreply, socket}
-      end
-    else
-      {:noreply, socket}
-    end
+  @impl true
+  def handle_event("hide_end_modal", _params, socket) do
+    {:noreply, assign(socket, :show_end_modal, false)}
   end
 
   defp play(nil, _scope, socket), do: {:noreply, socket}
@@ -608,7 +578,6 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @spec vote_bar_width(integer(), integer(), :a | :b) :: String.t()
   def vote_bar_width(0, 0, _side), do: "50%"
-
   def vote_bar_width(a, b, :a), do: "#{trunc(a / (a + b) * 100)}%"
   def vote_bar_width(a, b, :b), do: "#{trunc(b / (a + b) * 100)}%"
 end
