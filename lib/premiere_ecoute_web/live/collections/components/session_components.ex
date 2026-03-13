@@ -155,5 +155,4 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
     </div>
     """
   end
-
 end

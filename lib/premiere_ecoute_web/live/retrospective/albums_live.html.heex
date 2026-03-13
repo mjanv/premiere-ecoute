@@ -16,7 +16,7 @@
       <% else %>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           <%= for album <- @albums do %>
-            <.link navigate={~p"/discography/albums/#{album.id}"} class="group block">
+            <.link navigate={~p"/discography/albums/#{album.slug}"} class="group block">
               <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
                 <img
                   src={album.cover_url}

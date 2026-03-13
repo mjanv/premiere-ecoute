@@ -10,8 +10,13 @@ defmodule PremiereEcoute.Discography.Album do
   use PremiereEcouteCore.Aggregate,
     root: [:tracks],
     identity: [:provider, :album_id],
-    json: [:id, :name, :artist, :release_date, :cover_url, :total_tracks, :tracks]
+    json: [:id, :name, :slug, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
+  defmodule Slug do
+    use EctoAutoslugField.Slug, from: :name, to: :slug, always_change: true
+  end
+
+  alias PremiereEcoute.Discography.Album.Slug
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Repo
 
@@ -33,6 +38,7 @@ defmodule PremiereEcoute.Discography.Album do
     field :provider, Ecto.Enum, values: [:spotify, :deezer]
     field :album_id, :string
     field :name, :string
+    field :slug, Slug.Type
     field :artist, :string
     field :release_date, :date
     field :cover_url, :string
@@ -61,6 +67,8 @@ defmodule PremiereEcoute.Discography.Album do
       message: "are still linked to this album"
     )
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
+    |> Slug.maybe_generate_slug()
+    |> Slug.unique_constraint()
   end
 
   @doc """
@@ -83,6 +91,12 @@ defmodule PremiereEcoute.Discography.Album do
   def get(id) do
     __MODULE__
     |> Repo.get(id)
+    |> Repo.preload(:tracks)
+  end
+
+  def get_album_by_slug(slug) do
+    __MODULE__
+    |> Repo.get_by(slug: slug)
     |> Repo.preload(:tracks)
   end
 

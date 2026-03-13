@@ -56,17 +56,17 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
   def handle_event("save_profile", %{"profile" => profile_params}, socket) do
     case Accounts.User.edit_user_profile(socket.assigns.current_user, profile_params) do
       {:ok, updated_user} ->
-         socket
-         |> assign(:current_user, updated_user)
-         |> assign(:profile_form, updated_user.profile |> Profile.changeset() |> to_form())
-         |> put_flash(:info, "Settings saved")
-         |> then(fn socket -> {:noreply, socket} end)
+        socket
+        |> assign(:current_user, updated_user)
+        |> assign(:profile_form, updated_user.profile |> Profile.changeset() |> to_form())
+        |> put_flash(:info, "Settings saved")
+        |> then(fn socket -> {:noreply, socket} end)
 
       {:error, changeset} ->
-         socket
-         |> assign(:profile_form, to_form(changeset))
-         |> put_flash(:error, "Failed to save settings")
-         |> then(fn socket -> {:noreply, socket} end)
+        socket
+        |> assign(:profile_form, to_form(changeset))
+        |> put_flash(:error, "Failed to save settings")
+        |> then(fn socket -> {:noreply, socket} end)
     end
   end
 

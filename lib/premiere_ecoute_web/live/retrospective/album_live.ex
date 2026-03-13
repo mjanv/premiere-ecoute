@@ -13,8 +13,8 @@ defmodule PremiereEcouteWeb.Retrospective.AlbumLive do
   alias PremiereEcoute.Sessions.Reviews
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    album = Discography.get_album(String.to_integer(id))
+  def mount(%{"slug" => slug}, _session, socket) do
+    album = Discography.get_album_by_slug(slug)
 
     if is_nil(album) do
       {:ok, push_navigate(socket, to: ~p"/discography/albums")}

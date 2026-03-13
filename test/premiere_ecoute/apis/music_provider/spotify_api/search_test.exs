@@ -49,6 +49,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
                  :name,
                  :provider,
                  :release_date,
+                 :slug,
                  :total_tracks,
                  :tracks,
                  :updated_at

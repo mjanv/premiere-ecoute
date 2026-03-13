@@ -11,8 +11,6 @@ defmodule PremiereEcouteWeb.Retrospective.AlbumsLive do
   @impl true
   def mount(_params, _session, socket) do
     albums = Discography.list_albums()
-
-    # AIDEV-NOTE: loads review count per album in one query to avoid N+1
     review_counts = Reviews.count_by_album(Enum.map(albums, & &1.id))
 
     {:ok,

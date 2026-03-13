@@ -10,8 +10,8 @@ defmodule PremiereEcoute.Sessions.ReviewsTest do
     viewer = user_fixture()
 
     # Persist albums for FK-linked reviews
-    {:ok, album} = Album.create(album_fixture(%{album_id: "album-a"}))
-    {:ok, album2} = Album.create(album_fixture(%{album_id: "album-b", tracks: unique_tracks("b")}))
+    {:ok, album} = Album.create(album_fixture(%{album_id: "album-a", name: "A"}))
+    {:ok, album2} = Album.create(album_fixture(%{album_id: "album-b", name: "B", tracks: unique_tracks("b")}))
 
     session = session_fixture(%{user_id: streamer.id, status: :stopped, album_id: album.id})
 

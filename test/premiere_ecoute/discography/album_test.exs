@@ -15,6 +15,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
                provider: :spotify,
                album_id: "album123",
                name: "Sample Album",
+               slug: "sample-album",
                artist: "Sample Artist",
                release_date: ~D[2023-01-01],
                cover_url: "http://example.com/cover.jpg",

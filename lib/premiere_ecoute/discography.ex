@@ -18,6 +18,7 @@ defmodule PremiereEcoute.Discography do
   # Album
   defdelegate create_album(album), to: Album, as: :create
   defdelegate get_album(id), to: Album, as: :get
+  defdelegate get_album_by_slug(id), to: Album, as: :get_album_by_slug
   defdelegate list_albums(), to: Album, as: :all
 
   # Playlist
