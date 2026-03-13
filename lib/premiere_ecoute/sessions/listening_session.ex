@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       current_track: [],
       playlist: [:tracks],
       current_playlist_track: [],
-      single: [],
+      single: [:artists],
       track_markers: []
     ],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist, :single]
@@ -91,9 +91,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   defp put_album_artist(%__MODULE__{album: %Album{} = album} = session),
-    do: %{session | album: Album.put_artist(album)}
+    do: %{session | album: Album.put_artist(album)} |> put_single_artist()
 
-  defp put_album_artist(session), do: session
+  defp put_album_artist(session), do: put_single_artist(session)
+
+  defp put_single_artist(%__MODULE__{single: %Single{} = single} = session),
+    do: %{session | single: Single.put_artist(single)}
+
+  defp put_single_artist(session), do: session
 
   @doc """
   Creates changeset for listening session.
@@ -581,7 +586,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
             current_track: [],
             playlist: [:tracks],
             current_playlist_track: [],
-            single: [],
+            single: [:artists],
             track_markers: []
           )
     }
