@@ -98,6 +98,7 @@ defmodule PremiereEcoute.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:postgrex, "~> 0.21"},
       {:ecto_sql, "~> 3.10"},
+      {:ecto_autoslug_field, "~> 3.1"},
       {:cloak_ecto, "~> 1.3"},
       {:eventstore, "~> 1.4"},
       {:scrivener_ecto, "~> 3.0"},
