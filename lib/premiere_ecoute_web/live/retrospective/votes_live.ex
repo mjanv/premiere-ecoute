@@ -13,27 +13,16 @@ defmodule PremiereEcouteWeb.Retrospective.VotesLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    case socket.assigns.current_scope.user.twitch do
-      nil ->
-        socket
-        |> put_flash(:error, "Connect to Twitch")
-        |> push_navigate(to: ~p"/home")
-        |> then(fn socket -> {:ok, socket} end)
+    current_date = DateTime.utc_now()
 
-      _ ->
-        current_date = DateTime.utc_now()
-
-        socket =
-          socket
-          |> assign(:current_user, socket.assigns.current_scope.user)
-          |> assign(:selected_period, :month)
-          |> assign(:selected_year, current_date.year)
-          |> assign(:selected_month, current_date.month)
-          |> assign(:years_available, get_available_years())
-          |> assign(:selected_source, :album)
-
-        {:ok, socket}
-    end
+    socket
+    |> assign(:current_user, socket.assigns.current_scope.user)
+    |> assign(:selected_period, :month)
+    |> assign(:selected_year, current_date.year)
+    |> assign(:selected_month, current_date.month)
+    |> assign(:years_available, get_available_years())
+    |> assign(:selected_source, :album)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true

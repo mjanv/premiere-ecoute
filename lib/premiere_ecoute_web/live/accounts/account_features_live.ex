@@ -56,17 +56,17 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
   def handle_event("save_profile", %{"profile" => profile_params}, socket) do
     case Accounts.User.edit_user_profile(socket.assigns.current_user, profile_params) do
       {:ok, updated_user} ->
-        {:noreply,
          socket
          |> assign(:current_user, updated_user)
          |> assign(:profile_form, updated_user.profile |> Profile.changeset() |> to_form())
-         |> put_flash(:info, "Settings saved")}
+         |> put_flash(:info, "Settings saved")
+         |> then(fn socket -> {:noreply, socket} end)
 
       {:error, changeset} ->
-        {:noreply,
          socket
          |> assign(:profile_form, to_form(changeset))
-         |> put_flash(:error, "Failed to save settings")}
+         |> put_flash(:error, "Failed to save settings")
+         |> then(fn socket -> {:noreply, socket} end)
     end
   end
 
@@ -75,20 +75,24 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
     token = Accounts.generate_user_api_token(socket.assigns.current_user)
     tokens = Accounts.list_user_api_tokens(socket.assigns.current_user)
 
-    {:noreply,
-     socket
-     |> assign(:api_tokens, tokens)
-     |> assign(:new_api_token, token)}
+    socket
+    |> assign(:api_tokens, tokens)
+    |> assign(:new_api_token, token)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
   def handle_event("revoke_api_tokens", _params, socket) do
     Accounts.delete_user_api_tokens(socket.assigns.current_user)
 
-    {:noreply,
-     socket
-     |> assign(:api_tokens, [])
-     |> assign(:new_api_token, nil)}
+    socket
+    |> assign(:api_tokens, [])
+    |> assign(:new_api_token, nil)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  defp overlay_url(user_id, "collections") do
+    "#{PremiereEcouteWeb.Endpoint.url()}/collections/overlay/#{user_id}"
   end
 
   defp overlay_url(user_id, score_type) do

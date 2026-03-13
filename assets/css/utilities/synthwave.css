@@ -29,9 +29,9 @@
       to right,
       transparent 0%,
       transparent calc(100% - 1px),
-      rgba(255, 0, 255, 0.15) 100%
+      rgba(255, 0, 255, 0.2) 100%
     );
-  background-size: 50px 50px;
+  background-size: 30px 30px;
   pointer-events: none;
   z-index: 0;
 }

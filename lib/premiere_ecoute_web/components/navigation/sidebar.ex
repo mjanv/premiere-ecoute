@@ -45,7 +45,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
               <div class="mb-6">
                 <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-rectangle-stack" class="w-4 h-4 mr-2" />
+                  <.icon name="hero-microphone" class="w-4 h-4 mr-2" />
                   <span class="sidebar-link-text">{gettext("Playlists")}</span>
                 </h3>
                 <nav class="space-y-1">
@@ -53,7 +53,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     href={~p"/playlists"}
                     current_page={@current_page}
                     page_id="library"
-                    icon="hero-musical-note"
+                    icon="hero-inbox"
                     title={gettext("My Library")}
                   >
                     {gettext("My Library")}
@@ -94,12 +94,12 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Sessions section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:listening_sessions, for: @current_user) do %>
               <div class="mb-6">
                 <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-musical-note" class="w-4 h-4 mr-2" />
+                  <.icon name="hero-fire" class="w-4 h-4 mr-2" />
                   <span class="sidebar-link-text">{gettext("Sessions")}</span>
                 </h3>
                 <nav class="space-y-1">
@@ -109,7 +109,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                       href={~p"/sessions"}
                       current_page={@current_page}
                       page_id="my_sessions"
-                      icon="hero-rectangle-stack"
+                      icon="hero-tag"
                     >
                       {gettext("My Sessions")}
                     </.sidebar_link>
@@ -119,7 +119,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                       current_page={@current_page}
                       page_id="retrospective"
                       title={gettext("Retrospective")}
-                      icon="hero-chart-bar"
+                      icon="hero-magnifying-glass"
                     >
                       {gettext("Retrospective")}
                     </.sidebar_link>
@@ -146,12 +146,12 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Collections section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:collections, for: @current_user) do %>
               <div class="mb-6">
                 <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-star" class="w-4 h-4 mr-2" />
+                  <.icon name="hero-shopping-bag" class="w-4 h-4 mr-2" />
                   <span class="sidebar-link-text">{gettext("Collections")}</span>
                 </h3>
                 <nav class="space-y-1">
@@ -161,7 +161,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                       current_page={@current_page}
                       page_id="collections"
                       title={gettext("Collections")}
-                      icon="hero-queue-list"
+                      icon="hero-rectangle-stack"
                     >
                       {gettext("Collections")}
                     </.sidebar_link>
@@ -169,12 +169,12 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Discography section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:discography, for: @current_user) do %>
               <div class="mb-6">
                 <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-square-2-stack" class="w-4 h-4 mr-2" />
+                  <.icon name="hero-square-3-stack-3d" class="w-4 h-4 mr-2" />
                   <span class="sidebar-link-text">{gettext("Discography")}</span>
                 </h3>
                 <nav class="space-y-1">
@@ -190,12 +190,12 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Billboards section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
               <div class="mb-6">
                 <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-chart-bar-square" class="w-4 h-4 mr-2" />
+                  <.icon name="hero-newspaper" class="w-4 h-4 mr-2" />
                   <span class="sidebar-link-text">{gettext("Billboards")}</span>
                 </h3>
                 <nav class="space-y-1">
@@ -205,7 +205,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                       current_page={@current_page}
                       title={gettext("My Billboards")}
                       page_id="billboards"
-                      icon="hero-chart-bar-square"
+                      icon="hero-paper-clip"
                     >
                       {gettext("My Billboards")}
                     </.sidebar_link>
@@ -215,19 +215,19 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                     current_page={@current_page}
                     page_id="submissions"
                     title={gettext("My Submissions")}
-                    icon="hero-bookmark"
+                    icon="hero-pencil"
                   >
                     {gettext("My Submissions")}
                   </.sidebar_link>
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Festivals section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:festivals, for: @current_user) do %>
               <div class="mb-6">
                 <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                  <.icon name="hero-star" class="w-4 h-4 mr-2" />
+                  <.icon name="hero-ticket" class="w-4 h-4 mr-2" />
                   <span class="sidebar-link-text">{gettext("Festivals")}</span>
                 </h3>
                 <nav class="space-y-1">
@@ -245,13 +245,13 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 </nav>
               </div>
             <% end %>
-            
+
     <!-- Followed Channels section -->
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:follow_channels, for: @current_user) do %>
               <%= if has_loaded_channels?(@current_user) && !Enum.empty?(@current_user.channels) do %>
                 <div class="sidebar-followed-channels mb-6">
                   <h3 class="sidebar-section-title text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
-                    <.icon name="hero-user-group" class="w-4 h-4 mr-2" />
+                    <.icon name="hero-user" class="w-4 h-4 mr-2" />
                     <span class="sidebar-link-text">{gettext("Followed Channels")}</span>
                   </h3>
                   <nav class="space-y-1">
