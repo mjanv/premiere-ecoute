@@ -3443,7 +3443,7 @@ msgstr "Chapters"
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:223
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Export to Youtube"
-msgstr "Export to Spotify"
+msgstr "Export to Youtube"
 
 #: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:196
 #, elixir-autogen, elixir-format
