@@ -118,7 +118,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
                track: %Track{
                  name: "Getting Older",
                  track_number: 1,
-                 album: %Album{name: "Happier Than Ever", artist: "Billie Eilish"}
+                 album: %Album{name: "Happier Than Ever"}
                },
                score: "9",
                voted_at: %DateTime{}
@@ -128,7 +128,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
                track: %Track{
                  name: "I Didn't Change My Number",
                  track_number: 2,
-                 album: %Album{name: "Happier Than Ever", artist: "Billie Eilish"}
+                 album: %Album{name: "Happier Than Ever"}
                },
                score: "7",
                voted_at: %DateTime{}

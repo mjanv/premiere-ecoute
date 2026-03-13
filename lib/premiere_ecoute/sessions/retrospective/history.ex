@@ -136,13 +136,12 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: s.album_id == a.id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [s.id, a.id, a.name, a.artist, a.cover_url],
+        group_by: [s.id, a.id, a.name, a.cover_url],
         select: %{
           session_id: s.id,
           album: %Album{
             id: a.id,
             name: a.name,
-            artist: a.artist,
             cover_url: a.cover_url
           },
           score: fragment("ROUND(AVG(CAST(? AS DECIMAL)), 1)", v.value)
@@ -481,7 +480,6 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
             album: %Album{
               id: a.id,
               name: a.name,
-              artist: a.artist,
               cover_url: a.cover_url
             }
           },
@@ -529,7 +527,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: t.album_id == a.id and t.id == v.track_id,
         where: v.viewer_id == ^user_id,
         where: fragment("? ~ '^[0-9]+$'", v.value),
-        group_by: [t.id, t.name, t.album_id, a.name, a.artist],
+        group_by: [t.id, t.name, t.album_id, a.name],
         # on calcule le score moyen pour le ORDER BY uniquement
         select: %Album.Track{
           id: t.id,
@@ -537,8 +535,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
           album_id: t.album_id,
           track_id: t.track_id,
           album: %Album{
-            name: a.name,
-            artist: a.artist
+            name: a.name
           }
         },
         order_by: [desc: fragment("AVG(CAST(? AS DECIMAL))", v.value)],

@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Discography.AlbumFixtures do
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Artist
 
   @doc """
   Generates test album struct with default attributes and tracks.
@@ -15,11 +16,13 @@ defmodule PremiereEcoute.Discography.AlbumFixtures do
   """
   @spec album_fixture(map()) :: Album.t()
   def album_fixture(attrs \\ %{}) do
+    {:ok, artist} = Artist.create_if_not_exists(%{name: "Sample Artist"})
+
     %{
       provider: :spotify,
       album_id: "album123",
       name: "Sample Album",
-      artist: "Sample Artist",
+      artists: [artist],
       release_date: ~D[2023-01-01],
       cover_url: "http://example.com/cover.jpg",
       total_tracks: 2,
@@ -42,7 +45,7 @@ defmodule PremiereEcoute.Discography.AlbumFixtures do
     %Album{
       provider: :spotify,
       name: "HIT ME HARD AND SOFT",
-      artist: "Billie Eilish",
+      artists: [%Artist{name: "Billie Eilish"}],
       album_id: "7aJuG4TFXa2hmE4z1yxc3n",
       cover_url: "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
       release_date: ~D[2024-05-17],
@@ -90,7 +93,7 @@ defmodule PremiereEcoute.Discography.AlbumFixtures do
     %Album{
       provider: :spotify,
       name: "Happier Than Ever",
-      artist: "Billie Eilish",
+      artists: [%Artist{name: "Billie Eilish"}],
       cover_url: "https://i.scdn.co/image/ab67616d00001e02e1317227c6c759e01beae66e",
       release_date: ~D[2021-07-30],
       album_id: "5tzRuO6GP7WRvP3rEOPAO9",
@@ -186,7 +189,7 @@ defmodule PremiereEcoute.Discography.AlbumFixtures do
     %Album{
       provider: :spotify,
       name: "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
-      artist: "Billie Eilish",
+      artists: [%Artist{name: "Billie Eilish"}],
       cover_url: "https://i.scdn.co/image/ab67616d00001e0250a3147b4edd7701a876c6ce",
       release_date: ~D[2019-03-29],
       album_id: "0S0KGZnfBGSIssfF54WSJh",

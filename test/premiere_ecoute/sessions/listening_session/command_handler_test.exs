@@ -47,7 +47,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       assert session.album.album_id == "album123"
       assert session.album.name == "Sample Album"
-      assert session.album.artist == "Sample Artist"
+      assert session.album.artist.name == "Sample Artist"
     end
 
     test "returns SessionNotPrepared when SpotifyApi fails" do

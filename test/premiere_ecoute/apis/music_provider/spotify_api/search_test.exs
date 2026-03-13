@@ -43,6 +43,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
                  :__struct__,
                  :album_id,
                  :artist,
+                 :artists,
                  :cover_url,
                  :id,
                  :inserted_at,

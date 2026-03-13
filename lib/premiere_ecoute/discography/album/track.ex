@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Discography.Album.Track do
     json: [:id, :name, :track_number]
 
   defmodule Slug do
+    @moduledoc false
+
     use EctoAutoslugField.Slug, from: :name, to: :slug, always_change: true
   end
 

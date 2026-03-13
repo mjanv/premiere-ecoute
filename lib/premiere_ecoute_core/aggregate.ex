@@ -185,7 +185,18 @@ defmodule PremiereEcouteCore.Aggregate do
       @doc "Calculates sum of field across query results"
       def sum(query \\ __MODULE__, field), do: Repo.aggregate(query, :sum, field)
 
-      defoverridable create: 1, get: 1, update: 2, upsert: 2, delete: 1, delete_all: 1
+      defoverridable create: 1,
+                     create_if_not_exists: 1,
+                     all: 0,
+                     all: 1,
+                     get: 1,
+                     get_by: 1,
+                     get_by: 2,
+                     preload: 1,
+                     update: 2,
+                     upsert: 2,
+                     delete: 1,
+                     delete_all: 1
 
       defimpl Jason.Encoder, for: __MODULE__ do
         def encode(entity, opts) do

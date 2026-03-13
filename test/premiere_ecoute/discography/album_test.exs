@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
 
@@ -16,7 +17,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
                album_id: "album123",
                name: "Sample Album",
                slug: "sample-album",
-               artist: "Sample Artist",
+               artist: %Artist{name: "Sample Artist"},
                release_date: ~D[2023-01-01],
                cover_url: "http://example.com/cover.jpg",
                total_tracks: 2,
@@ -55,7 +56,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
                provider: :spotify,
                album_id: "album123",
                name: "Sample Album",
-               artist: "Sample Artist",
+               artist: %Artist{name: "Sample Artist"},
                release_date: ~D[2023-01-01],
                cover_url: "http://example.com/cover.jpg",
                total_tracks: 2,
@@ -86,7 +87,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
                provider: :spotify,
                album_id: "album123",
                name: "Sample Album",
-               artist: "Sample Artist",
+               artist: %Artist{name: "Sample Artist"},
                release_date: ~D[2023-01-01],
                cover_url: "http://example.com/cover.jpg",
                total_tracks: 2,
@@ -120,7 +121,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
                provider: :spotify,
                album_id: "album123",
                name: "Sample Album",
-               artist: "Sample Artist",
+               artist: %Artist{name: "Sample Artist"},
                release_date: ~D[2023-01-01],
                cover_url: "http://example.com/cover.jpg",
                total_tracks: 2,
@@ -160,7 +161,7 @@ defmodule PremiereEcoute.Discography.AlbumTest do
                provider: :spotify,
                album_id: "album123",
                name: "Sample Album",
-               artist: "Sample Artist",
+               artist: %Artist{name: "Sample Artist"},
                release_date: ~D[2023-01-01],
                cover_url: "http://example.com/cover.jpg",
                total_tracks: 2,

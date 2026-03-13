@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   use PremiereEcouteCore.Aggregate,
     root: [
       user: [:twitch, :spotify],
-      album: [:tracks],
+      album: [:tracks, :artists],
       current_track: [],
       playlist: [:tracks],
       current_playlist_track: [],
@@ -73,6 +73,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     timestamps(type: :utc_datetime)
   end
+
+  # AIDEV-NOTE: preload/1 override to populate Album.artist virtual field after association preload
+  def preload({:ok, entity}), do: {:ok, preload(entity)}
+  def preload({:error, reason}), do: {:error, reason}
+  def preload(nil), do: nil
+  def preload(entities) when is_list(entities), do: Enum.map(entities, &preload/1)
+
+  def preload(%__MODULE__{} = session) do
+    session
+    |> super()
+    |> put_album_artist()
+  end
+
+  def all(clauses \\ []) do
+    clauses |> super() |> Enum.map(&put_album_artist/1)
+  end
+
+  defp put_album_artist(%__MODULE__{album: %Album{} = album} = session),
+    do: %{session | album: Album.put_artist(album)}
+
+  defp put_album_artist(session), do: session
 
   @doc """
   Creates changeset for listening session.
@@ -235,7 +256,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   def next_track(%__MODULE__{source: :album} = session) do
-    session = Repo.preload(session, album: [:tracks], current_track: [])
+    session = Repo.preload(session, album: [:tracks, :artists], current_track: [])
     tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
 
     session.current_track
@@ -265,7 +286,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   """
   @spec previous_track(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
   def previous_track(%__MODULE__{source: :album} = session) do
-    session = Repo.preload(session, album: [:tracks], current_track: [])
+    session = Repo.preload(session, album: [:tracks, :artists], current_track: [])
     tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
 
     session.current_track
@@ -556,7 +577,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       | entries:
           Repo.preload(page.entries,
             user: [:twitch, :spotify],
-            album: [:tracks],
+            album: [:tracks, :artists],
             current_track: [],
             playlist: [:tracks],
             current_playlist_track: [],
