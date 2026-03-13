@@ -41,6 +41,9 @@ defmodule PremiereEcoute.Discography.Artist do
     def to_iodata(%{name: name}), do: name || ""
   end
 
+  @spec get_by_slug(String.t()) :: t() | nil
+  def get_by_slug(slug), do: get_by(slug: slug)
+
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(artist, attrs) do
     artist

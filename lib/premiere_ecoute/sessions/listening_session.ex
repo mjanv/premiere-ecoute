@@ -382,6 +382,38 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     all(where: [album_id: album_id, status: :stopped], order_by: [desc: :started_at])
   end
 
+  @spec list_for_single(integer()) :: [t()]
+  def list_for_single(single_id) do
+    all(where: [single_id: single_id, status: :stopped], order_by: [desc: :started_at])
+  end
+
+  @spec list_for_artist(integer()) :: [t()]
+  def list_for_artist(artist_id) do
+    # AIDEV-NOTE: sessions linked to an artist via album_artists or single_artists join tables
+    album_sessions =
+      from(s in __MODULE__,
+        join: aa in "album_artists",
+        on: aa.album_id == s.album_id,
+        where: aa.artist_id == ^artist_id and s.status == :stopped,
+        order_by: [desc: s.started_at]
+      )
+      |> Repo.all()
+      |> preload()
+
+    single_sessions =
+      from(s in __MODULE__,
+        join: sa in "single_artists",
+        on: sa.single_id == s.single_id,
+        where: sa.artist_id == ^artist_id and s.status == :stopped,
+        order_by: [desc: s.started_at]
+      )
+      |> Repo.all()
+      |> preload()
+
+    (album_sessions ++ single_sessions)
+    |> Enum.sort_by(& &1.started_at, {:desc, DateTime})
+  end
+
   @doc """
   Retrieves last stopped sessions for a user.
 

@@ -187,6 +187,24 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                   >
                     {gettext("Albums")}
                   </.sidebar_link>
+                  <.sidebar_link
+                    href={~p"/discography/singles"}
+                    current_page={@current_page}
+                    page_id="singles"
+                    title={gettext("Singles")}
+                    icon="hero-play-circle"
+                  >
+                    {gettext("Singles")}
+                  </.sidebar_link>
+                  <.sidebar_link
+                    href={~p"/discography/artists"}
+                    current_page={@current_page}
+                    page_id="artists"
+                    title={gettext("Artists")}
+                    icon="hero-user-group"
+                  >
+                    {gettext("Artists")}
+                  </.sidebar_link>
                 </nav>
               </div>
             <% end %>

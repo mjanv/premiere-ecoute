@@ -9,9 +9,15 @@ defmodule PremiereEcoute.Discography.Single do
   use PremiereEcouteCore.Aggregate,
     root: [:artists],
     identity: [:provider, :track_id],
-    json: [:id, :name, :artist, :cover_url, :duration_ms]
+    json: [:id, :name, :slug, :artist, :cover_url, :duration_ms]
+
+  defmodule Slug do
+    @moduledoc false
+    use EctoAutoslugField.Slug, from: :name, to: :slug, always_change: true
+  end
 
   alias PremiereEcoute.Discography.Artist
+  alias PremiereEcoute.Discography.Single.Slug
   alias PremiereEcoute.Discography.SingleArtist
   alias PremiereEcoute.Repo
 
@@ -20,6 +26,7 @@ defmodule PremiereEcoute.Discography.Single do
           provider: :spotify,
           track_id: String.t() | nil,
           name: String.t() | nil,
+          slug: String.t() | nil,
           artist: Artist.t() | nil,
           artists: entity([Artist.t()]),
           duration_ms: integer() | nil,
@@ -32,6 +39,7 @@ defmodule PremiereEcoute.Discography.Single do
     field :provider, Ecto.Enum, values: [:spotify]
     field :track_id, :string
     field :name, :string
+    field :slug, Slug.Type
     field :duration_ms, :integer
     field :cover_url, :string
 
@@ -103,7 +111,11 @@ defmodule PremiereEcoute.Discography.Single do
     |> validate_required([:provider, :track_id, :name])
     |> validate_inclusion(:provider, [:spotify])
     |> unique_constraint([:provider, :track_id])
+    |> Slug.maybe_generate_slug()
   end
+
+  @spec get_by_slug(String.t()) :: t() | nil
+  def get_by_slug(slug), do: get_by(slug: slug)
 
   # AIDEV-NOTE: custom Jason encoder to serialize :artist as name string
   defimpl Jason.Encoder do
