@@ -6,6 +6,6 @@ defmodule PremiereEcoute.Repo.Migrations.AddAlbumSlugs do
       add :slug, :string
     end
 
-    create unique_index(:albums, [:slug])
+    create index(:albums, [:slug])
   end
 end

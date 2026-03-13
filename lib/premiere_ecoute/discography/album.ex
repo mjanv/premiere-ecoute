@@ -68,7 +68,6 @@ defmodule PremiereEcoute.Discography.Album do
     )
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
     |> Slug.maybe_generate_slug()
-    |> Slug.unique_constraint()
   end
 
   @doc """

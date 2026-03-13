@@ -8,7 +8,12 @@ defmodule PremiereEcoute.Discography.Album.Track do
   use PremiereEcouteCore.Aggregate,
     json: [:id, :name, :track_number]
 
+  defmodule Slug do
+    use EctoAutoslugField.Slug, from: :name, to: :slug, always_change: true
+  end
+
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Album.Track.Slug
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -26,6 +31,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
     field :provider, Ecto.Enum, values: [:spotify, :deezer]
     field :track_id, :string
     field :name, :string
+    field :slug, Slug.Type
     field :track_number, :integer
     field :duration_ms, :integer
 
@@ -48,5 +54,6 @@ defmodule PremiereEcoute.Discography.Album.Track do
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
     |> validate_inclusion(:provider, [:twitch, :spotify])
     |> unique_constraint([:track_id, :provider])
+    |> Slug.maybe_generate_slug()
   end
 end
