@@ -196,7 +196,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
                   class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg"
                   style="background-color: var(--color-dark-800);"
                   phx-click="select_album"
-                  phx-value-album_id={album.album_id}
+                  phx-value-album_id={Map.get(album.provider_ids, :spotify)}
                 >
                   <AlbumTrackDisplay.album_display album={album} size="md" show_metadata={true} class="text-primary-300" />
                 </div>
@@ -638,7 +638,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
                 class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center space-x-3"
                 style="background-color: var(--color-dark-800);"
                 phx-click="select_track"
-                phx-value-track_id={track.track_id}
+                phx-value-track_id={Map.get(track.provider_ids, :spotify)}
               >
                 <%= if track.cover_url do %>
                   <img src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />

@@ -96,7 +96,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   def handle_event("select_track", %{"track_id" => track_id}, socket) do
     case socket.assigns.search_tracks do
       %{result: tracks} when is_list(tracks) ->
-        case Enum.find(tracks, fn t -> t.track_id == track_id end) do
+        case Enum.find(tracks, fn t -> Map.get(t.provider_ids, :spotify) == track_id end) do
           nil ->
             socket
             |> assign(:search_tracks, AsyncResult.ok([]))
@@ -190,7 +190,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     %PrepareListeningSession{
       source: :track,
       user_id: get_user_id(socket),
-      track_id: track.track_id,
+      track_id: Map.get(track.provider_ids, :spotify),
       vote_options: get_vote_options(socket.assigns)
     }
     |> PremiereEcoute.apply()
@@ -257,7 +257,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     %PrepareListeningSession{
       source: :album,
       user_id: get_user_id(socket),
-      album_id: album.album_id,
+      album_id: Map.get(album.provider_ids, :spotify),
       vote_options: vote_options
     }
     |> PremiereEcoute.apply()

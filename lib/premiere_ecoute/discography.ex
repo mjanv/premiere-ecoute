@@ -67,4 +67,13 @@ defmodule PremiereEcoute.Discography do
   def url(%Playlist{provider: :deezer, playlist_id: id}), do: "https://www.deezer.com/playlist/#{id}"
 
   def url(_), do: nil
+
+  @spec url(any(), atom()) :: String.t() | nil
+  def url(%Album{provider_ids: ids}, :spotify), do: "https://open.spotify.com/album/#{ids[:spotify]}"
+  def url(%Album{provider_ids: ids}, :deezer), do: "https://www.deezer.com/album/#{ids[:deezer]}"
+  def url(%Album.Track{provider_ids: ids}, :spotify), do: "https://open.spotify.com/track/#{ids[:spotify]}"
+  def url(%Album.Track{provider_ids: ids}, :deezer), do: "https://www.deezer.com/track/#{ids[:deezer]}"
+  def url(%Single{provider_ids: ids}, :spotify), do: "https://open.spotify.com/track/#{ids[:spotify]}"
+  def url(%Single{provider_ids: ids}, :deezer), do: "https://www.deezer.com/track/#{ids[:deezer]}"
+  def url(_, _), do: nil
 end

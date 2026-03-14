@@ -89,7 +89,7 @@
                       <button
                         type="button"
                         phx-click="select_album"
-                        phx-value-album_id={album.album_id}
+                        phx-value-album_id={Map.get(album.provider_ids, :spotify)}
                         class="flex-shrink-0 px-3 py-1.5 border border-white/20 hover:border-purple-400 text-gray-300 hover:text-white rounded-md text-xs font-medium transition-colors"
                       >
                         {gettext("Select")}

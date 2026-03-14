@@ -46,7 +46,7 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
 
     album =
       case socket.assigns.search_albums do
-        %{result: albums} when is_list(albums) -> Enum.find(albums, &(&1.album_id == album_id))
+        %{result: albums} when is_list(albums) -> Enum.find(albums, &(Map.get(&1.provider_ids, :spotify) == album_id))
         _ -> nil
       end
 
@@ -56,7 +56,7 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
 
       album ->
         attrs = %{
-          album_id: album.album_id,
+          album_id: Map.get(album.provider_ids, :spotify),
           name: album.name,
           artist: album.artist,
           cover_url: album.cover_url
