@@ -20,15 +20,15 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   alias PremiereEcouteCore.Cache
 
   @impl true
-  def mount(%{"id" => user_id}, _session, socket) do
-    user = PremiereEcoute.Accounts.get_user!(user_id)
+  def mount(%{"username" => username}, _session, socket) do
+    user = PremiereEcoute.Accounts.User.get_user_by_username(username)
     listening_session = ListeningSession.get_active_session(user)
 
     color_primary = Accounts.profile(user, [:widget_settings, :color_primary])
     color_secondary = Accounts.profile(user, [:widget_settings, :color_secondary])
 
     if connected?(socket) do
-      PremiereEcoute.PubSub.subscribe("playback:#{user_id}")
+      PremiereEcoute.PubSub.subscribe("playback:#{user.id}")
       {:ok, _} = Presence.join(user.id, :overlay)
     end
 
@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
         nil ->
           socket
           |> assign(:user, user)
-          |> assign(:user_id, user_id)
+          |> assign(:user_id, user.id)
           |> assign(:id, nil)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
@@ -85,7 +85,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
           socket
           |> assign(:user, user)
-          |> assign(:user_id, user_id)
+          |> assign(:user_id, user.id)
           |> assign(:id, session.id)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
@@ -241,7 +241,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   defp parse_score("viewer"), do: :viewer
   defp parse_score("streamer"), do: :streamer
-  defp parse_score("viewer streamer"), do: :both
+  defp parse_score("both"), do: :both
   defp parse_score("votes"), do: :votes
   defp parse_score(_), do: :player
 

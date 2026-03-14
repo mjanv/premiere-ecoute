@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify overlay is rendered with proper dimensions (default streamer width: 240px)
       assert has_element?(view, "div[style*='width: 240px']")
@@ -52,7 +52,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}?score=viewer")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=viewer")
 
       # Viewer score also uses 240px width
       assert has_element?(view, "div[style*='width: 240px']")
@@ -63,7 +63,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
   describe "mount/3 without active session" do
     test "displays default overlay when user has no active session", %{conn: conn, user: user} do
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Default overlay should render with streamer dimensions
       assert has_element?(view, "div[style*='width: 240px']")
@@ -78,7 +78,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Should show default overlay since preparing sessions don't count as active
       assert has_element?(view, "div[style*='width: 240px']")
@@ -94,7 +94,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.stop(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Should show default overlay since stopped sessions don't count as active
       assert has_element?(view, "div[style*='width: 240px']")
@@ -115,7 +115,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session2} = ListeningSession.start(session2)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify overlay renders for the most recent active session
       assert has_element?(view, "div[style*='width: 240px']")
@@ -135,7 +135,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify overlay renders initially
       assert html =~ "width: 240px"
@@ -158,7 +158,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       assert html =~ "width: 240px"
 
@@ -181,7 +181,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       assert html =~ "width: 240px"
 
@@ -201,7 +201,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       assert html =~ "width: 240px"
 
@@ -223,19 +223,19 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       conn = log_in_user(conn, user)
 
       # Default score (streamer) - width: 240px
-      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
       assert html =~ "width: 240px"
 
       # Viewer score - width: 240px
-      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.id}?score=viewer")
+      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=viewer")
       assert html =~ "width: 240px"
 
       # Both scores - width: 480px
-      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.id}?score=viewer+streamer")
+      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=both")
       assert html =~ "width: 480px"
 
       # Player score - width: 1200px (480 * 2.5)
-      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.id}?score=player")
+      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=player")
       assert html =~ "width: 1200px"
     end
   end
@@ -252,7 +252,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _active_session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify the overlay shows the active session with proper rendering
       assert has_element?(view, "div[style*='width: 240px']")
@@ -267,7 +267,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, session} = ListeningSession.start(session)
 
       conn = log_in_user(conn, user)
-      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify active session is displayed
       assert html =~ "width: 240px"
@@ -276,7 +276,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _} = ListeningSession.stop(session)
 
       # Reconnect to see updated state
-      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.id}")
+      {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Should still show overlay (default display for no active session)
       assert has_element?(view, "div[style*='width: 240px']")

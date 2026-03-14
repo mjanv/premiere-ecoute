@@ -174,7 +174,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:browser]
 
     live_session :overlays, on_mount: [{UserAuth, :current_scope}] do
-      live "/overlay/:id", OverlayLive, :show
+      live "/overlay/:username", OverlayLive, :show
     end
 
     live_session :retrospective, on_mount: [{UserAuth, :current_scope}] do

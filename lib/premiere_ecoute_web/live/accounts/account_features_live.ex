@@ -91,20 +91,11 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  defp overlay_url(user_id, "collections") do
-    "#{PremiereEcouteWeb.Endpoint.url()}/collections/overlay/#{user_id}"
+  defp overlay_url(username, "collections") do
+    "#{PremiereEcouteWeb.Endpoint.url()}/collections/overlay/#{username}"
   end
 
-  defp overlay_url(user_id, score_type) do
-    base = "#{PremiereEcouteWeb.Endpoint.url()}/sessions/overlay/#{user_id}"
-
-    case score_type do
-      "streamer" -> "#{base}?score=streamer"
-      "viewer" -> "#{base}?score=viewer"
-      "both" -> "#{base}?score=viewer+streamer"
-      "player" -> "#{base}?score=player"
-      "votes" -> "#{base}?score=votes"
-      _ -> base
-    end
+  defp overlay_url(username, score_type) do
+    "#{PremiereEcouteWeb.Endpoint.url()}/sessions/overlay/#{username}?score=#{score_type}"
   end
 end

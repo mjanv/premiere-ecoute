@@ -64,12 +64,12 @@
               <input
                 type="text"
                 readonly
-                value={overlay_url(@current_user.id, @overlay_score_type)}
+                value={overlay_url(@current_user.username, @overlay_score_type)}
                 class="w-full bg-white/5 border border-gray-700/50 rounded-lg pl-32 pr-10 py-2 text-white text-xs font-mono focus:outline-none"
               />
               <button
                 type="button"
-                onclick={"navigator.clipboard.writeText('#{overlay_url(@current_user.id, @overlay_score_type)}')"}
+                onclick={"navigator.clipboard.writeText('#{overlay_url(@current_user.username, @overlay_score_type)}')"}
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 title={gettext("Copy URL")}
               >
