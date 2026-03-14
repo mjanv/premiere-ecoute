@@ -43,72 +43,79 @@ defmodule PremiereEcouteWeb.Layouts do
   def app(assigns) do
     ~H"""
     <div class={"min-h-screen bg-gray-900 flex flex-col #{if @show_modal, do: "blur-sm", else: ""}"}>
-      <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
-      
-    <!-- Spotify connection notification for streamers -->
-      <%= if @current_scope && Map.get(@current_scope, :user) && Map.get(@current_scope, :user).role in [:streamer, :admin] && needs_spotify_connection?(Map.get(@current_scope, :user)) do %>
-        <div class="bg-green-600 px-6 py-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.48.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.32 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-              </svg>
-              <span class="text-white font-medium">
-                {gettext("Connect your Spotify account to manage music playback")}
-              </span>
-            </div>
-            <.link
-              href={~p"/auth/spotify"}
-              class="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
-            >
-              {gettext("Connect Spotify")}
-            </.link>
-          </div>
-        </div>
-      <% end %>
-      
-    <!-- Rate limit banners for circuit-broken APIs -->
-      <%= for {api, message, expires_at} <- @banners do %>
-        <div class="bg-yellow-600 px-6 py-2">
-          <div class="flex items-center space-x-3">
-            <svg
-              class="w-5 h-5 text-white flex-shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-              />
-            </svg>
-            <span class="text-white font-medium">
-              {gettext("%{api} API rate-limited", api: api |> to_string() |> String.capitalize())}
-              {" — "}
-              <span class="font-normal">{inspect(message)}</span>
-              <%= if expires_at do %>
-                {" — "}
-                {gettext("retrying at %{time}", time: Calendar.strftime(expires_at, "%H:%M:%S UTC"))}
-              <% end %>
-            </span>
-          </div>
-        </div>
-      <% end %>
-      
-    <!-- Layout with left sidebar for authenticated users -->
+      <!-- Layout with left sidebar for authenticated users -->
       <div class="flex flex-1">
         <.left_sidebar
           current_user={(@current_scope && Map.get(@current_scope, :user)) || nil}
           current_scope={@current_scope}
           current_page={@current_page}
         />
+        <!-- Spacer to reserve collapsed sidebar width -->
+        <%= if (@current_scope && Map.get(@current_scope, :user)) do %>
+          <div class="w-20 flex-shrink-0"></div>
+        <% end %>
         
+    <!-- Right column: header + banners + main content -->
+        <div class="flex flex-col flex-1 min-w-0">
+          <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
+          
+    <!-- Spotify connection notification for streamers -->
+          <%= if @current_scope && Map.get(@current_scope, :user) && Map.get(@current_scope, :user).role in [:streamer, :admin] && needs_spotify_connection?(Map.get(@current_scope, :user)) do %>
+            <div class="bg-green-600 px-6 py-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.48.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.32 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
+                  <span class="text-white font-medium">
+                    {gettext("Connect your Spotify account to manage music playback")}
+                  </span>
+                </div>
+                <.link
+                  href={~p"/auth/spotify"}
+                  class="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                >
+                  {gettext("Connect Spotify")}
+                </.link>
+              </div>
+            </div>
+          <% end %>
+          
+    <!-- Rate limit banners for circuit-broken APIs -->
+          <%= for {api, message, expires_at} <- @banners do %>
+            <div class="bg-yellow-600 px-6 py-2">
+              <div class="flex items-center space-x-3">
+                <svg
+                  class="w-5 h-5 text-white flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                  />
+                </svg>
+                <span class="text-white font-medium">
+                  {gettext("%{api} API rate-limited", api: api |> to_string() |> String.capitalize())}
+                  {" — "}
+                  <span class="font-normal">{inspect(message)}</span>
+                  <%= if expires_at do %>
+                    {" — "}
+                    {gettext("retrying at %{time}", time: Calendar.strftime(expires_at, "%H:%M:%S UTC"))}
+                  <% end %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+          
     <!-- Main content area -->
-        <main class="flex-1">
-          {render_slot(@inner_block)}
-        </main>
+          <main class="flex-1">
+            {render_slot(@inner_block)}
+          </main>
+        </div>
       </div>
       
     <!-- Footer - spans full width under both sidebar and content -->

@@ -39,7 +39,7 @@ defmodule PremiereEcouteWeb.Components.Header do
     <% end %>
 
     <header class="border-b px-6 py-4" style="background-color: var(--color-dark-900); border-color: var(--color-dark-800);">
-      <div class="flex items-center justify-between">
+      <div class="max-w-7xl mx-auto w-full flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: var(--color-primary-600);">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">

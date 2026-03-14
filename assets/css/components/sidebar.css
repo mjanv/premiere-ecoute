@@ -1,85 +1,44 @@
-/* Sidebar collapse animations and transitions */
+/* Sidebar - fixed, collapsed by default, expands over content on hover */
 
-/* Base sidebar styles with transition support */
 .sidebar {
-  width: 16rem; /* w-64 = 256px = 16rem */
+  width: 5rem;
   transition: width 300ms ease-in-out;
 }
 
-.sidebar-collapsed {
-  width: 5rem; /* ~w-20 for icon-only display */
+.sidebar:hover {
+  width: 16rem;
 }
 
-/* Section titles - hide with fade out when collapsed */
+/* Section titles - hidden by default, fade in on hover */
 .sidebar .sidebar-section-title {
-  opacity: 1;
+  opacity: 0;
   transition: opacity 200ms ease-in-out;
   white-space: nowrap;
   overflow: hidden;
-}
-
-.sidebar-collapsed .sidebar-section-title {
-  opacity: 0;
   pointer-events: none;
 }
 
-/* Link text - hide with fade out when collapsed */
+.sidebar:hover .sidebar-section-title {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Link text - hidden by default, fade in on hover */
 .sidebar .sidebar-link-text {
-  opacity: 1;
+  opacity: 0;
   transition: opacity 200ms ease-in-out;
   white-space: nowrap;
   overflow: hidden;
-}
-
-.sidebar-collapsed .sidebar-link-text {
-  opacity: 0;
   pointer-events: none;
 }
 
-/* Followed channels section - completely hidden when collapsed */
-.sidebar .sidebar-followed-channels {
-  max-height: 1000px;
+.sidebar:hover .sidebar-link-text {
   opacity: 1;
-  overflow: hidden;
-  transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out;
+  pointer-events: auto;
 }
 
-.sidebar-collapsed .sidebar-followed-channels {
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Sidebar toggle button */
-.sidebar-toggle-btn {
-  transition: all 200ms ease-in-out;
-}
-
-/* Icon is a span element, target it directly for rotation */
-.sidebar-toggle-btn .hero-chevron-left {
-  transition: transform 200ms ease-in-out;
-  display: inline-block;
-}
-
-/* Rotate chevron 180° when collapsed to point right */
-.sidebar-collapsed .sidebar-toggle-btn .hero-chevron-left {
-  transform: rotate(180deg);
-}
-
-/* Center button horizontally when collapsed */
-.sidebar-collapsed .sidebar-toggle-btn {
-  right: 50%;
-  transform: translateX(50%);
-}
-
-/* Adjust padding when collapsed */
-.sidebar-collapsed .flex-1 > div {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
-/* Icon positioning when collapsed - center the icons */
-.sidebar-collapsed .sidebar-link {
+/* Icons centered when collapsed */
+.sidebar .sidebar-link {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -87,24 +46,37 @@
   padding-right: 1rem;
 }
 
-.sidebar-collapsed .sidebar-link .icon {
-  margin-right: 0 !important;
-  margin-left: 0 !important;
-  width: 1.5rem !important;
-  height: 1.5rem !important;
+.sidebar:hover .sidebar-link {
+  justify-content: flex-start;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.sidebar .sidebar-link .icon {
+  margin-right: 0;
   flex-shrink: 0;
 }
 
-/* Center section title icons when collapsed */
-.sidebar-collapsed .sidebar-section-title {
+.sidebar:hover .sidebar-link .icon {
+  margin-right: 0.75rem;
+}
+
+/* Section title icons centered when collapsed */
+.sidebar .sidebar-section-title {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.sidebar-collapsed .sidebar-section-title .icon {
-  margin-right: 0 !important;
-  width: 1.25rem !important;
-  height: 1.25rem !important;
+.sidebar:hover .sidebar-section-title {
+  justify-content: flex-start;
+}
+
+.sidebar .sidebar-section-title .icon {
+  margin-right: 0;
   flex-shrink: 0;
+}
+
+.sidebar:hover .sidebar-section-title .icon {
+  margin-right: 0.5rem;
 }
