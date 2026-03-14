@@ -130,9 +130,20 @@
                 <h2 id="carousel-title" class="text-4xl md:text-5xl font-bold text-purple-300 drop-shadow-xl">
                   {get_session_title(@listening_session)}
                 </h2>
-                <p id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg">
-                  {get_session_artist(@listening_session)}
-                </p>
+                <%= case @listening_session do %>
+                  <% %{album: %{artist: %{slug: slug}}} when not is_nil(slug) -> %>
+                    <.link navigate={~p"/discography/artists/#{slug}"} id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg hover:text-purple-100 transition-colors">
+                      {get_session_artist(@listening_session)}
+                    </.link>
+                  <% %{single: %{artist: %{slug: slug}}} when not is_nil(slug) -> %>
+                    <.link navigate={~p"/discography/artists/#{slug}"} id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg hover:text-purple-100 transition-colors">
+                      {get_session_artist(@listening_session)}
+                    </.link>
+                  <% _ -> %>
+                    <p id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg">
+                      {get_session_artist(@listening_session)}
+                    </p>
+                <% end %>
               </div>
 
               <div id="histogram-carousel" class="overflow-hidden">

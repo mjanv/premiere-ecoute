@@ -8,9 +8,11 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack
   alias PremiereEcoute.Discography.Single
+  alias PremiereEcoute.Discography.SingleArtist
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
@@ -176,16 +178,20 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: v.session_id == s.id,
         join: sg in Single,
         on: s.single_id == sg.id,
+        left_join: sa in SingleArtist,
+        on: sa.single_id == sg.id,
+        left_join: ar in Artist,
+        on: ar.id == sa.artist_id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [s.id, sg.id, sg.name, sg.artist, sg.cover_url],
+        group_by: [s.id, sg.id, sg.name, sg.cover_url, ar.name],
         select: %{
           session_id: s.id,
           single: %Single{
             id: sg.id,
             name: sg.name,
-            artist: sg.artist,
-            cover_url: sg.cover_url
+            cover_url: sg.cover_url,
+            artist: ar.name
           },
           score: fragment("ROUND(AVG(CAST(? AS DECIMAL)), 1)", v.value)
         },
@@ -262,13 +268,17 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: v.session_id == s.id,
         join: sg in Single,
         on: s.single_id == sg.id,
+        left_join: sa in SingleArtist,
+        on: sa.single_id == sg.id,
+        left_join: ar in Artist,
+        on: ar.id == sa.artist_id,
         where: v.viewer_id == ^user_id,
         where: fragment("? ~ '^[0-9]+$'", v.value),
         select: %{
           single: %Single{
             id: sg.id,
             name: sg.name,
-            artist: sg.artist,
+            artist: ar.name,
             cover_url: sg.cover_url,
             duration_ms: sg.duration_ms
           },

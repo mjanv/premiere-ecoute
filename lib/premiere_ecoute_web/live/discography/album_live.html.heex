@@ -69,7 +69,13 @@
         <div class="flex-1 min-w-0">
           <div class="mb-8">
             <h1 class="text-4xl font-bold text-white leading-tight mb-1">{@album.name}</h1>
-            <p class="text-xl text-purple-300">{@album.artist}</p>
+            <%= if @album.artist && @album.artist.slug do %>
+              <.link navigate={~p"/discography/artists/#{@album.artist.slug}"} class="text-xl text-purple-300 hover:text-purple-100 transition-colors">
+                {@album.artist}
+              </.link>
+            <% else %>
+              <p class="text-xl text-purple-300">{@album.artist}</p>
+            <% end %>
             <div class="flex items-center gap-3 mt-3 text-sm text-slate-500">
               <%= if @album.release_date do %>
                 <span>{@album.release_date.year}</span>

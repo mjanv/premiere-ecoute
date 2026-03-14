@@ -107,6 +107,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
             socket
             |> assign(:search_tracks, AsyncResult.ok([]))
             |> assign(:selected_track, AsyncResult.ok(track))
+            |> update_state()
         end
 
       _ ->

@@ -69,7 +69,13 @@
         <div class="flex-1 min-w-0">
           <div class="mb-8">
             <h1 class="text-4xl font-bold text-white leading-tight mb-1">{@single.name}</h1>
-            <p class="text-xl text-cyan-300">{@single.artist}</p>
+            <%= if @single.artist && @single.artist.slug do %>
+              <.link navigate={~p"/discography/artists/#{@single.artist.slug}"} class="text-xl text-cyan-300 hover:text-cyan-100 transition-colors">
+                {@single.artist}
+              </.link>
+            <% else %>
+              <p class="text-xl text-cyan-300">{@single.artist}</p>
+            <% end %>
             <%= if @single.duration_ms do %>
               <div class="flex items-center gap-3 mt-3 text-sm text-slate-500">
                 <span>
