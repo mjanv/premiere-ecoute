@@ -34,8 +34,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :spotify,
-                 track_id: "1pKYYY0dkg23sQQXi0Q5zN",
+                 provider_ids: %{spotify: "1pKYYY0dkg23sQQXi0Q5zN"},
                  name: "Around the World",
                  track_number: 7,
                  duration_ms: 429_533
@@ -61,8 +60,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :spotify,
-                 track_id: "1pKYYY0dkg23sQQXi0Q5zN",
+                 provider_ids: %{spotify: "1pKYYY0dkg23sQQXi0Q5zN"},
                  name: "Around the World",
                  track_number: 7,
                  duration_ms: 429_533
@@ -88,8 +86,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :spotify,
-                 track_id: "0DiWol3AO6WpXZgp0goxAV",
+                 provider_ids: %{spotify: "0DiWol3AO6WpXZgp0goxAV"},
                  name: "One More Time",
                  track_number: 1,
                  duration_ms: 320_357
@@ -115,8 +112,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :spotify,
-                 track_id: "2LD2gT7gwAurzdQDQtILds",
+                 provider_ids: %{spotify: "2LD2gT7gwAurzdQDQtILds"},
                  name: "Veridis Quo",
                  track_number: 11,
                  duration_ms: 345_186

@@ -24,9 +24,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.TracksTest do
 
       assert %Track{
                id: nil,
-               provider: :deezer,
-               track_id: "3135556",
-               album_id: "302127",
+               provider_ids: %{deezer: "3135556"},
                name: "Harder, Better, Faster, Stronger",
                track_number: 4,
                duration_ms: 226_000

@@ -340,7 +340,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :remove_playlist_items, fn _scope, playlist_id, tracks ->
         assert playlist_id == session.origin_playlist.playlist_id
-        assert Enum.map(tracks, & &1.track_id) == ["kept_track"]
+        assert Enum.map(tracks, fn t -> Map.get(t.provider_ids, :spotify) end) == ["kept_track"]
         {:ok, %{}}
       end)
 
@@ -380,7 +380,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :remove_playlist_items, fn _scope, playlist_id, tracks ->
         assert playlist_id == session.origin_playlist.playlist_id
-        assert Enum.map(tracks, & &1.track_id) == ["rejected_track"]
+        assert Enum.map(tracks, fn t -> Map.get(t.provider_ids, :spotify) end) == ["rejected_track"]
         {:ok, %{}}
       end)
 

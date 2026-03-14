@@ -23,9 +23,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Tracks do
   @spec parse_track(map()) :: Track.t()
   defp parse_track(data) do
     %Track{
-      provider: :deezer,
-      track_id: data["id"],
-      album_id: data["album"]["id"],
+      provider_ids: %{deezer: data["id"]},
       name: data["title"],
       track_number: data["track_position"] || 0,
       duration_ms: 1_000 * String.to_integer(data["duration"] || "0")

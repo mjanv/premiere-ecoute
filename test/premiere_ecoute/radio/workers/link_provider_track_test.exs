@@ -60,8 +60,8 @@ defmodule PremiereEcoute.Radio.Workers.LinkProviderTrackTest do
       Mox.expect(SpotifyApi, :search_tracks, fn [query: "Daft Punk Around the World"] ->
         {:ok,
          [
-           %{
-             track_id: "1pKYYY0dkg23sQQXi0Q5zN",
+           %PremiereEcoute.Discography.Album.Track{
+             provider_ids: %{spotify: "1pKYYY0dkg23sQQXi0Q5zN"},
              name: "Around the World"
            }
          ]}

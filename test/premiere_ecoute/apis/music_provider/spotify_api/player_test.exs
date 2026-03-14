@@ -296,7 +296,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
   describe "start_playback/1" do
     setup do
-      {:ok, album} = Album.create(album_fixture(%{album_id: "5ht7ItJgpBH7W6vJ5BqpPr"}))
+      {:ok, album} = Album.create(album_fixture(%{provider_ids: %{spotify: "5ht7ItJgpBH7W6vJ5BqpPr"}}))
       {:ok, playlist} = Playlist.create(playlist_fixture())
 
       {:ok, %{album: album, playlist: playlist}}
@@ -504,7 +504,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
   describe "start_resume_playback/1" do
     setup do
-      {:ok, album} = Album.create(album_fixture(%{album_id: "5ht7ItJgpBH7W6vJ5BqpPr"}))
+      {:ok, album} = Album.create(album_fixture(%{provider_ids: %{spotify: "5ht7ItJgpBH7W6vJ5BqpPr"}}))
 
       {:ok, %{album: album}}
     end
@@ -540,7 +540,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
     end
 
     test "can start a single play in the player", %{scope: scope} do
-      single = %Single{provider: :spotify, track_id: "11dFghVXANMlKmJXsNCbNl"}
+      single = %Single{provider_ids: %{spotify: "11dFghVXANMlKmJXsNCbNl"}}
 
       ApiMock.expect(
         SpotifyApi,
@@ -558,7 +558,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
   describe "add_item_to_playback_queue/1" do
     setup do
-      {:ok, album} = Album.create(album_fixture(%{album_id: "5ht7ItJgpBH7W6vJ5BqpPr"}))
+      {:ok, album} = Album.create(album_fixture(%{provider_ids: %{spotify: "5ht7ItJgpBH7W6vJ5BqpPr"}}))
 
       {:ok, %{album: album}}
     end
@@ -574,13 +574,13 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
           {"content-type", "application/json"},
           {"content-length", "0"}
         ],
-        params: %{"uri" => "spotify:track:#{track.track_id}"},
+        params: %{"uri" => "spotify:track:#{Map.get(track.provider_ids, :spotify)}"},
         status: 204
       )
 
       {:ok, context_uri} = SpotifyApi.add_item_to_playback_queue(scope, track)
 
-      assert context_uri == "spotify:track:#{track.track_id}"
+      assert context_uri == "spotify:track:#{Map.get(track.provider_ids, :spotify)}"
     end
 
     test "can add an album in the player queue", %{scope: scope, album: album} do

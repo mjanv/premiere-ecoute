@@ -82,9 +82,8 @@ defmodule PremiereEcoute.Extension.Services.TrackLiker do
 
   defp add_track_to_playlist(spotify_scope, playlist, spotify_track_id) do
     track = %PremiereEcoute.Discography.Album.Track{
-      provider: :spotify,
-      track_id: spotify_track_id,
-      # We don't have track metadata here, just the ID
+      provider_ids: %{spotify: spotify_track_id},
+      # AIDEV-NOTE: only the provider ID is needed here to build the Spotify URI for the playlist API
       name: "Unknown",
       track_number: 1,
       duration_ms: 0

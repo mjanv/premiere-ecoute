@@ -8,7 +8,6 @@ defmodule PremiereEcoute.Discography.Single do
 
   use PremiereEcouteCore.Aggregate,
     root: [:artists],
-    identity: [:provider, :track_id],
     json: [:id, :name, :slug, :artist, :cover_url, :duration_ms]
 
   defmodule Slug do
@@ -23,8 +22,7 @@ defmodule PremiereEcoute.Discography.Single do
 
   @type t :: %__MODULE__{
           id: integer() | nil,
-          provider: :spotify,
-          track_id: String.t() | nil,
+          provider_ids: %{atom() => String.t()},
           name: String.t() | nil,
           slug: String.t() | nil,
           artist: Artist.t() | nil,
@@ -36,14 +34,11 @@ defmodule PremiereEcoute.Discography.Single do
         }
 
   schema "singles" do
-    field :provider, Ecto.Enum, values: [:spotify]
-    field :track_id, :string
+    field :provider_ids, PremiereEcouteCore.Ecto.Map, default: %{}
     field :name, :string
     field :slug, Slug.Type
     field :duration_ms, :integer
     field :cover_url, :string
-
-    # AIDEV-NOTE: :artist is a virtual field returning the first Artist struct
     field :artist, :any, virtual: true
 
     many_to_many :artists, Artist, join_through: SingleArtist, on_replace: :delete
@@ -96,22 +91,34 @@ defmodule PremiereEcoute.Discography.Single do
     |> preload()
   end
 
-  def create_if_not_exists(%__MODULE__{} = single) do
-    case get_by(Map.take(Map.from_struct(single), [:provider, :track_id])) do
+  def create_if_not_exists(%__MODULE__{provider_ids: provider_ids} = single) when map_size(provider_ids) > 0 do
+    # AIDEV-NOTE: lookup by first provider entry since there is no unique constraint on provider_ids
+    [{provider, id}] = Enum.take(provider_ids, 1)
+
+    result =
+      from(s in __MODULE__,
+        where: fragment("?->>? = ?", s.provider_ids, ^to_string(provider), ^id)
+      )
+      |> Repo.one()
+      |> preload()
+
+    case result do
       nil -> create(single)
       existing -> {:ok, existing}
     end
   end
 
+  def create_if_not_exists(%__MODULE__{} = single), do: create(single)
+
   @doc "Creates changeset for single validation."
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(single, attrs) do
     single
-    |> cast(attrs, [:provider, :track_id, :name, :duration_ms, :cover_url])
-    |> validate_required([:provider, :track_id, :name])
-    |> validate_inclusion(:provider, [:spotify])
-    |> unique_constraint([:provider, :track_id])
+    |> cast(attrs, [:provider_ids, :name, :duration_ms, :cover_url])
+    |> validate_required([:provider_ids, :name])
     |> Slug.maybe_generate_slug()
+    |> unique_constraint(:provider_ids, name: :singles_spotify_id_unique)
+    |> unique_constraint(:provider_ids, name: :singles_deezer_id_unique)
   end
 
   @spec get_by_slug(String.t()) :: t() | nil

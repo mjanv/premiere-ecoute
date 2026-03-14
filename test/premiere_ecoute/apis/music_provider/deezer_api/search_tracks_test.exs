@@ -23,8 +23,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :deezer,
-                 track_id: "67238732",
+                 provider_ids: %{deezer: "67238732"},
                  name: "Instant Crush (feat. Julian Casablancas)",
                  track_number: 0,
                  duration_ms: 337_000
@@ -47,8 +46,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :deezer,
-                 track_id: "1851933947",
+                 provider_ids: %{deezer: "1851933947"},
                  name: "Mine (feat. Brenden Praise, Da Capo & Chymamusique)",
                  track_number: 0,
                  duration_ms: 330_000
@@ -71,8 +69,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :deezer,
-                 track_id: "5981620",
+                 provider_ids: %{deezer: "5981620"},
                  name: "One More Time (As Made Famous By Daft Punk)",
                  track_number: 0,
                  duration_ms: 469_000
@@ -95,8 +92,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.SearchTracksTest do
 
       assert [
                %Track{
-                 provider: :deezer,
-                 track_id: "1099067",
+                 provider_ids: %{deezer: "1099067"},
                  name: "The Discovery (Album Version)",
                  track_number: 0,
                  duration_ms: 1_053_000

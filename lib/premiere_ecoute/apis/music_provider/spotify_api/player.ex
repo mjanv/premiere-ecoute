@@ -38,7 +38,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   Accepts album, playlist, or nil to resume current playback. Playback starts from beginning of context.
   """
   @spec start_playback(Scope.t(), Album.t() | Playlist.t() | nil) :: {:ok, :success} | {:error, String.t()}
-  def start_playback(%Scope{} = scope, %Album{album_id: id}) do
+  def start_playback(%Scope{} = scope, %Album{provider_ids: provider_ids}) do
+    id = Map.get(provider_ids, :spotify)
+
     scope
     |> SpotifyApi.api()
     |> Req.merge(
@@ -234,7 +236,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   Begins playback from the start of the context. Returns Spotify URI of the played content.
   """
   @spec start_resume_playback(Scope.t(), Album.t() | Track.t() | Playlist.t()) :: {:ok, String.t()} | {:error, term()}
-  def start_resume_playback(%Scope{} = scope, %Album{provider: :spotify, album_id: album_id}) do
+  def start_resume_playback(%Scope{} = scope, %Album{provider_ids: provider_ids}) do
+    album_id = Map.get(provider_ids, :spotify)
+
     scope
     |> SpotifyApi.api()
     |> Req.put(
@@ -244,7 +248,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
     |> SpotifyApi.handle(204, fn _ -> "spotify:album:#{album_id}" end)
   end
 
-  def start_resume_playback(%Scope{} = scope, %Track{provider: :spotify, track_id: track_id}) do
+  def start_resume_playback(%Scope{} = scope, %Track{provider_ids: provider_ids}) do
+    track_id = Map.get(provider_ids, :spotify)
+
     scope
     |> SpotifyApi.api()
     |> Req.put(
@@ -254,7 +260,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
     |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{track_id}" end)
   end
 
-  def start_resume_playback(%Scope{} = scope, %Single{provider: :spotify, track_id: track_id}) do
+  def start_resume_playback(%Scope{} = scope, %Single{provider_ids: provider_ids}) do
+    track_id = Map.get(provider_ids, :spotify)
+
     scope
     |> SpotifyApi.api()
     |> Req.put(
@@ -291,7 +299,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   """
   @spec add_item_to_playback_queue(Scope.t(), Track.t() | Album.t()) ::
           {:ok, String.t() | list(String.t())} | {:error, String.t()}
-  def add_item_to_playback_queue(%Scope{} = scope, %Track{provider: :spotify, track_id: track_id}) do
+  def add_item_to_playback_queue(%Scope{} = scope, %Track{provider_ids: provider_ids}) do
+    track_id = Map.get(provider_ids, :spotify)
+
     scope
     |> SpotifyApi.api()
     |> Req.merge(

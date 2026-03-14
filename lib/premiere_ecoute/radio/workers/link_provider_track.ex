@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Radio.Workers.LinkProviderTrack do
 
   defp resolve(track, target) do
     with {:ok, [result | _]} <- Apis.provider(target).search_tracks(query: "#{track.artist} #{track.name}"),
-         {:ok, _} <- Radio.add_provider(track, %{target => result.track_id}) do
+         {:ok, _} <- Radio.add_provider(track, %{target => Map.get(result.provider_ids, target)}) do
       {:cont, :ok}
     else
       {:ok, []} ->

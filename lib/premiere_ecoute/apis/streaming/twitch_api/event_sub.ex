@@ -142,4 +142,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.EventSub do
     do: %{broadcaster_user_id: user_id}
 
   defp condition(_, _), do: %{}
+
+  # https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionadd
+  # https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionupdate
 end

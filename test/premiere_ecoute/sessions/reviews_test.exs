@@ -10,8 +10,8 @@ defmodule PremiereEcoute.Sessions.ReviewsTest do
     viewer = user_fixture()
 
     # Persist albums for FK-linked reviews
-    {:ok, album} = Album.create(album_fixture(%{album_id: "album-a", name: "A"}))
-    {:ok, album2} = Album.create(album_fixture(%{album_id: "album-b", name: "B", tracks: unique_tracks("b")}))
+    {:ok, album} = Album.create(album_fixture(%{provider_ids: %{spotify: "album-a"}, name: "A"}))
+    {:ok, album2} = Album.create(album_fixture(%{provider_ids: %{spotify: "album-b"}, name: "B", tracks: unique_tracks("b")}))
 
     session = session_fixture(%{user_id: streamer.id, status: :stopped, album_id: album.id})
 
@@ -23,8 +23,8 @@ defmodule PremiereEcoute.Sessions.ReviewsTest do
     alias PremiereEcoute.Discography.Album.Track
 
     [
-      %Track{provider: :spotify, track_id: "track001-#{suffix}", name: "Track One", track_number: 1, duration_ms: 210_000},
-      %Track{provider: :spotify, track_id: "track002-#{suffix}", name: "Track Two", track_number: 2, duration_ms: 180_000}
+      %Track{provider_ids: %{spotify: "track001-#{suffix}"}, name: "Track One", track_number: 1, duration_ms: 210_000},
+      %Track{provider_ids: %{spotify: "track002-#{suffix}"}, name: "Track Two", track_number: 2, duration_ms: 180_000}
     ]
   end
 

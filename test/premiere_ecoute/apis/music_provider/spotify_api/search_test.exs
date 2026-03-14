@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
   alias PremiereEcouteCore.Cache
 
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Single
 
   setup {Req.Test, :set_req_test_to_shared}
@@ -41,14 +42,13 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
         assert Enum.sort(Map.keys(album)) == [
                  :__meta__,
                  :__struct__,
-                 :album_id,
                  :artist,
                  :artists,
                  :cover_url,
                  :id,
                  :inserted_at,
                  :name,
-                 :provider,
+                 :provider_ids,
                  :release_date,
                  :slug,
                  :total_tracks,
@@ -59,10 +59,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
 
       assert %Album{
                id: nil,
-               provider: :spotify,
-               album_id: "7aJuG4TFXa2hmE4z1yxc3n",
+               provider_ids: %{spotify: "7aJuG4TFXa2hmE4z1yxc3n"},
                name: "HIT ME HARD AND SOFT",
-               artist: "Billie Eilish",
+               artists: [%Artist{name: "Billie Eilish"}],
                release_date: ~D[2024-05-17],
                cover_url: "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
                tracks: [],
@@ -90,10 +89,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
       assert [
                %Single{
                  id: nil,
-                 provider: :spotify,
-                 track_id: "11dFghVXANMlKmJXsNCbNl",
+                 provider_ids: %{spotify: "11dFghVXANMlKmJXsNCbNl"},
                  name: "Cut To The Feeling",
-                 artist: "Carly Rae Jepsen",
+                 artists: [%Artist{name: "Carly Rae Jepsen"}],
                  duration_ms: 207_959,
                  cover_url: "https://i.scdn.co/image/ab67616d00001e027359994525d219f64872d3b1"
                }

@@ -54,8 +54,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionFixtures do
       {:ok, inserted_track} =
         %Track{}
         |> Track.changeset(%{
-          provider: track_data.provider,
-          track_id: "#{track_data.track_id}_#{System.unique_integer([:positive])}",
+          provider_ids: %{spotify: "track_#{System.unique_integer([:positive])}"},
           name: track_data.name,
           track_number: track_data.track_number,
           duration_ms: track_data.duration_ms,
@@ -72,8 +71,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionFixtures do
       {:ok, inserted_track} =
         %Track{}
         |> Track.changeset(%{
-          provider: track.provider,
-          track_id: track.track_id,
+          provider_ids: track.provider_ids,
           name: track.name,
           track_number: track.track_number,
           duration_ms: track.duration_ms,

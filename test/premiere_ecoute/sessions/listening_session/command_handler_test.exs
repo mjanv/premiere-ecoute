@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: album.album_id
+        album_id: Map.get(album.provider_ids, :spotify)
       }
 
       {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
@@ -45,7 +45,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert session.user_id == user.id
       assert session.status == :preparing
 
-      assert session.album.album_id == "album123"
+      assert Map.get(session.album.provider_ids, :spotify) == "album123"
       assert session.album.name == "Sample Album"
       assert session.album.artist.name == "Sample Artist"
     end
@@ -72,8 +72,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       album_id = "spotify:album:123"
 
       album = %Album{
-        provider: :spotify,
-        album_id: album_id,
+        provider_ids: %{spotify: album_id},
         # Invalid name to trigger creation failure
         name: nil,
         artist: "Test Artist",
@@ -105,7 +104,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: album.album_id
+        album_id: Map.get(album.provider_ids, :spotify)
       }
 
       {:ok, _, [event1]} = CommandBus.apply(command)
@@ -123,7 +122,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :track,
         user_id: user.id,
-        track_id: single.track_id
+        track_id: Map.get(single.provider_ids, :spotify)
       }
 
       {:ok, session, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -131,7 +130,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert session.user_id == user.id
       assert session.status == :preparing
       assert session.source == :track
-      assert session.single.track_id == single.track_id
+      assert session.single.provider_ids == single.provider_ids
       assert session.single.name == single.name
       assert session.single.artist == single.artist
       assert event.single_id == session.single_id
@@ -201,7 +200,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: album.album_id
+        album_id: Map.get(album.provider_ids, :spotify)
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -265,7 +264,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%PrepareListeningSession{
           source: :album,
           user_id: user.id,
-          album_id: album.album_id
+          album_id: Map.get(album.provider_ids, :spotify)
         })
 
       {:ok, _, [%SessionStarted{}]} =
@@ -276,7 +275,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%PrepareListeningSession{
           source: :album,
           user_id: user.id,
-          album_id: album.album_id
+          album_id: Map.get(album.provider_ids, :spotify)
         })
 
       # Try to start second session - should fail
@@ -368,7 +367,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :track, user_id: user.id, track_id: single.track_id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :track,
+          user_id: user.id,
+          track_id: Map.get(single.provider_ids, :spotify)
+        })
 
       {:ok, _, [%SessionStarted{} = event]} =
         CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
@@ -390,7 +393,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => false}]} end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :track, user_id: user.id, track_id: single.track_id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :track,
+          user_id: user.id,
+          track_id: Map.get(single.provider_ids, :spotify)
+        })
 
       {:error, reason} =
         CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
@@ -431,7 +438,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: album.album_id
+        album_id: Map.get(album.provider_ids, :spotify)
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -571,7 +578,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: album.album_id
+        album_id: Map.get(album.provider_ids, :spotify)
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -644,7 +651,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: album.album_id
+        album_id: Map.get(album.provider_ids, :spotify)
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -757,7 +764,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :track, user_id: user.id, track_id: single.track_id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :track,
+          user_id: user.id,
+          track_id: Map.get(single.provider_ids, :spotify)
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
@@ -880,7 +891,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
 
       expect(SpotifyApi, :get_playback_state, fn %Scope{user: ^user}, %{} ->
-        {:ok, %{"item" => %{"id" => single.track_id}, "is_playing" => true}}
+        {:ok, %{"item" => %{"id" => Map.get(single.provider_ids, :spotify)}, "is_playing" => true}}
       end)
 
       expect(SpotifyApi, :get_single, fn _track_id -> {:ok, single} end)
@@ -936,7 +947,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       stub(TwitchApi, :send_chat_message, fn _, _ -> :ok end)
 
       expect(SpotifyApi, :get_playback_state, fn _, _ ->
-        {:ok, %{"item" => %{"id" => single.track_id}, "is_playing" => true}}
+        {:ok, %{"item" => %{"id" => Map.get(single.provider_ids, :spotify)}, "is_playing" => true}}
       end)
 
       expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
@@ -993,7 +1004,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       stub(TwitchApi, :send_chat_message, fn _, _ -> :ok end)
 
       expect(SpotifyApi, :get_playback_state, fn _, _ ->
-        {:ok, %{"item" => %{"id" => single.track_id}, "is_playing" => true}}
+        {:ok, %{"item" => %{"id" => Map.get(single.provider_ids, :spotify)}, "is_playing" => true}}
       end)
 
       expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)

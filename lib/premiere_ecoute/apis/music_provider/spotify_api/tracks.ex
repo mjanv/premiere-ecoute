@@ -37,10 +37,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
   @spec parse_single(map()) :: Single.t()
   defp parse_single(data) do
     %Single{
-      provider: :spotify,
-      track_id: data["id"],
+      provider_ids: %{spotify: data["id"]},
       name: data["name"],
-      artist: Parser.parse_primary_artist(data["artists"]),
+      artists: Parser.parse_artists(data["artists"]),
       duration_ms: data["duration_ms"] || 0,
       cover_url: Parser.parse_album_cover_url(data["album"]["images"])
     }
@@ -49,9 +48,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
   @spec parse_track(map()) :: Track.t()
   defp parse_track(data) do
     %Track{
-      provider: :spotify,
-      track_id: data["id"],
-      album_id: data["album"]["id"],
+      provider_ids: %{spotify: data["id"]},
       name: data["name"],
       track_number: data["track_number"] || 0,
       duration_ms: data["duration_ms"] || 0

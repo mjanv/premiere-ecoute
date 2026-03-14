@@ -39,7 +39,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
            Scope.for_user(Accounts.get_user!(user_id)),
          session <- ListeningSession.get(session_id),
          {:ok, %{"item" => %{"id" => track_id}, "is_playing" => true}} <- Apis.spotify().get_playback_state(scope, %{}),
-         true <- track_id == session.single.track_id do
+         true <- track_id == Map.get(session.single.provider_ids, :spotify) do
       PremiereEcoute.apply(%StartListeningSession{source: :track, session_id: session_id, scope: scope, resume: true})
     else
       _ -> :ok

@@ -31,7 +31,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLikerTest do
       # Mock the Spotify API call to add the track
       expect(SpotifyApi, :add_items_to_playlist, fn %Scope{user: ^user}, playlist_id, tracks ->
         assert playlist_id == library_playlist.playlist_id
-        assert [%PremiereEcoute.Discography.Album.Track{track_id: ^spotify_track_id}] = tracks
+        assert [%PremiereEcoute.Discography.Album.Track{provider_ids: %{spotify: ^spotify_track_id}}] = tracks
         {:ok, %{"snapshot_id" => "snapshot_123"}}
       end)
 
@@ -85,7 +85,7 @@ defmodule PremiereEcoute.Extension.Services.TrackLikerTest do
       # Mock the Spotify API call to add the track
       expect(SpotifyApi, :add_items_to_playlist, fn %Scope{user: ^user}, playlist_id, tracks ->
         assert playlist_id == library_playlist.playlist_id
-        assert [%PremiereEcoute.Discography.Album.Track{track_id: ^spotify_track_id}] = tracks
+        assert [%PremiereEcoute.Discography.Album.Track{provider_ids: %{spotify: ^spotify_track_id}}] = tracks
         {:ok, %{"snapshot_id" => "snapshot_event"}}
       end)
 

@@ -17,8 +17,8 @@ defmodule PremiereEcoute.Festivals.Services.TrackSearchTest do
       festival = %Festival{name: "Test Festival"}
 
       tracks = [
-        %Track{provider: :spotify, track_id: "track1", name: "Song 1"},
-        %Track{provider: :spotify, track_id: "track2", name: "Song 2"}
+        %Track{provider_ids: %{spotify: "track1"}, name: "Song 1"},
+        %Track{provider_ids: %{spotify: "track2"}, name: "Song 2"}
       ]
 
       created_playlist = %LibraryPlaylist{

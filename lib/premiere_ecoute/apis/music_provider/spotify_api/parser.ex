@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser do
   Parses Spotify API responses extracting artist names, release dates, and album cover URLs.
   """
 
+  alias PremiereEcoute.Discography.Artist
+
   @doc """
   Extracts primary artist name from Spotify artists array.
 
@@ -13,6 +15,13 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser do
   @spec parse_primary_artist(list(map()) | any()) :: String.t()
   def parse_primary_artist([%{"name" => name} | _]), do: name
   def parse_primary_artist(_), do: "Unknown Artist"
+
+  @doc """
+  Extracts artists from Spotify artists array.
+  """
+  @spec parse_artists(list(map())) :: String.t()
+  def parse_artists([%{"name" => name} | tail]), do: [%Artist{name: name}] ++ parse_artists(tail)
+  def parse_artists([]), do: []
 
   @doc """
   Parses Spotify release date string into Date.

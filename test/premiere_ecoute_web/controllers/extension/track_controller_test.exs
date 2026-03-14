@@ -108,7 +108,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
       {:ok, _rule} = PlaylistRule.set_save_tracks_playlist(user, library_playlist)
 
       Mox.expect(SpotifyApi.Mock, :add_items_to_playlist, fn _scope, "playlist_123", tracks ->
-        assert [%PremiereEcoute.Discography.Album.Track{track_id: "4HCcvFdHfwR2u3WPPPVRv6"}] = tracks
+        assert [%PremiereEcoute.Discography.Album.Track{provider_ids: %{spotify: "4HCcvFdHfwR2u3WPPPVRv6"}}] = tracks
         {:ok, %{"snapshot_id" => "abc123"}}
       end)
 

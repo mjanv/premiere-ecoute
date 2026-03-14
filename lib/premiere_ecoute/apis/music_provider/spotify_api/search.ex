@@ -25,10 +25,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
     |> SpotifyApi.handle(200, fn %{"albums" => %{"items" => items}} ->
       Enum.map(items, fn item ->
         %Album{
-          provider: :spotify,
-          album_id: item["id"],
+          provider_ids: %{spotify: item["id"]},
           name: item["name"],
-          artist: Parser.parse_primary_artist(item["artists"]),
+          artists: Parser.parse_artists(item["artists"]),
           release_date: Parser.parse_release_date(item["release_date"]),
           cover_url: Parser.parse_album_cover_url(item["images"]),
           tracks: [],
@@ -87,10 +86,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   @spec parse_single(map()) :: Single.t()
   defp parse_single(data) do
     %Single{
-      provider: :spotify,
-      track_id: data["id"],
+      provider_ids: %{spotify: data["id"]},
       name: data["name"],
-      artist: Parser.parse_primary_artist(data["artists"]),
+      artists: Parser.parse_artists(data["artists"]),
       duration_ms: data["duration_ms"] || 0,
       cover_url: Parser.parse_album_cover_url(data["album"]["images"])
     }
@@ -109,8 +107,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   @spec parse_track(map()) :: Track.t()
   defp parse_track(data) do
     %Track{
-      provider: :spotify,
-      track_id: data["id"],
+      provider_ids: %{spotify: data["id"]},
       name: data["name"],
       track_number: data["track_number"] || 0,
       duration_ms: data["duration_ms"] || 0

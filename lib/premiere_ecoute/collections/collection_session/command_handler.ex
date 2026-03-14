@@ -201,7 +201,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
 
   defp remove_from_origin(scope, session, track_ids) do
     playlist_id = session.origin_playlist.playlist_id
-    tracks = Enum.map(track_ids, &%Track{provider: :spotify, track_id: &1})
+    tracks = Enum.map(track_ids, &%Track{provider_ids: %{spotify: &1}})
     Apis.spotify().remove_playlist_items(scope, playlist_id, tracks)
   end
 
@@ -209,7 +209,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
 
   defp sync_to_spotify(scope, session) do
     playlist_id = session.destination_playlist.playlist_id
-    tracks = Enum.map(session.kept, &%Track{provider: :spotify, track_id: &1})
+    tracks = Enum.map(session.kept, &%Track{provider_ids: %{spotify: &1}})
     Apis.spotify().add_items_to_playlist(scope, playlist_id, tracks)
   end
 end

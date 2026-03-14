@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.TracksTest do
   alias PremiereEcouteCore.Cache
 
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Single
 
   setup {Req.Test, :set_req_test_to_shared}
@@ -36,10 +37,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.TracksTest do
 
       assert %Single{
                id: nil,
-               provider: :spotify,
-               track_id: "11dFghVXANMlKmJXsNCbNl",
+               provider_ids: %{spotify: "11dFghVXANMlKmJXsNCbNl"},
                name: "Cut To The Feeling",
-               artist: "Carly Rae Jepsen",
+               artists: [%Artist{name: "Carly Rae Jepsen"}],
                duration_ms: 207_959,
                cover_url: "https://i.scdn.co/image/ab67616d00001e027359994525d219f64872d3b1"
              } = single
@@ -65,9 +65,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.TracksTest do
 
       assert %Track{
                id: nil,
-               provider: :spotify,
-               track_id: "11dFghVXANMlKmJXsNCbNl",
-               album_id: "0tGPJ0bkWOUmH7MEOR77qc",
+               provider_ids: %{spotify: "11dFghVXANMlKmJXsNCbNl"},
                name: "Cut To The Feeling",
                track_number: 1,
                duration_ms: 207_959

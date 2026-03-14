@@ -26,7 +26,7 @@ defmodule Mix.Tasks.Spotify.Search do
     case SpotifyApi.search_albums(query) do
       {:ok, albums} ->
         for album <- albums do
-          Mix.shell().info("#{album.name} - #{album.artist} (#{album.album_id})")
+          Mix.shell().info("#{album.name} - #{album.artist} (#{Map.get(album.provider_ids, :spotify)})")
         end
 
       {:error, reason} ->

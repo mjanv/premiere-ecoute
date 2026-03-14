@@ -41,12 +41,27 @@ defmodule PremiereEcoute.Discography do
   def title(_), do: nil
 
   @spec url(any()) :: String.t() | nil
-  def url(%Album{provider: :spotify, album_id: id}), do: "https://open.spotify.com/album/#{id}"
+  def url(%Album{provider_ids: ids}) do
+    cond do
+      id = Map.get(ids, :spotify) -> "https://open.spotify.com/album/#{id}"
+      true -> nil
+    end
+  end
 
-  def url(%Album.Track{provider: :spotify, track_id: id}), do: "https://open.spotify.com/track/#{id}"
-  def url(%Album.Track{provider: :deezer, track_id: id}), do: "https://www.deezer.com/track/#{id}"
+  def url(%Album.Track{provider_ids: ids}) do
+    cond do
+      id = Map.get(ids, :spotify) -> "https://open.spotify.com/track/#{id}"
+      id = Map.get(ids, :deezer) -> "https://www.deezer.com/track/#{id}"
+      true -> nil
+    end
+  end
 
-  def url(%Single{provider: :spotify, track_id: id}), do: "https://open.spotify.com/track/#{id}"
+  def url(%Single{provider_ids: ids}) do
+    cond do
+      id = Map.get(ids, :spotify) -> "https://open.spotify.com/track/#{id}"
+      true -> nil
+    end
+  end
 
   def url(%Playlist{provider: :spotify, playlist_id: id}), do: "https://open.spotify.com/playlist/#{id}"
   def url(%Playlist{provider: :deezer, playlist_id: id}), do: "https://www.deezer.com/playlist/#{id}"

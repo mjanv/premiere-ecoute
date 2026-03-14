@@ -27,8 +27,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Albums do
   @spec parse_album(map()) :: Album.t()
   def parse_album(data) do
     %Album{
-      provider: :deezer,
-      album_id: data["id"],
+      provider_ids: %{deezer: data["id"]},
       name: data["title"],
       artist: data["artist"]["name"],
       release_date: Parser.parse_release_date(data["release_date"]),
@@ -37,9 +36,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Albums do
       tracks:
         Enum.with_index(data["tracks"]["data"], fn track, i ->
           %Track{
-            provider: :deezer,
-            track_id: track["id"],
-            album_id: track["album"]["id"],
+            provider_ids: %{deezer: track["id"]},
             name: track["title"],
             track_number: i + 1,
             duration_ms: 1_000 * String.to_integer(track["duration"] || "0")

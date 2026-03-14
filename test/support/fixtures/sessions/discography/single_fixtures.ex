@@ -16,8 +16,7 @@ defmodule PremiereEcoute.Discography.SingleFixtures do
     {:ok, artist} = Artist.create_if_not_exists(%{name: "Sample Artist"})
 
     %{
-      provider: :spotify,
-      track_id: "track123",
+      provider_ids: %{spotify: "track123"},
       name: "Sample Track",
       artists: [artist],
       duration_ms: 210_000,

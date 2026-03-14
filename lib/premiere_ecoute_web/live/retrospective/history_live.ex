@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Discography.HistoryLive do
+defmodule PremiereEcouteWeb.Retrospective.HistoryLive do
   @moduledoc """
   LiveView for the streamer dashboard showing albums listened in time periods as a cover wall.
   """

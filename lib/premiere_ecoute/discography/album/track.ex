@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
 
   @type t :: %__MODULE__{
           id: integer() | nil,
-          track_id: String.t() | nil,
+          provider_ids: %{atom() => String.t()},
           name: String.t() | nil,
           track_number: integer() | nil,
           duration_ms: integer() | nil,
@@ -30,8 +30,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
         }
 
   schema "album_tracks" do
-    field :provider, Ecto.Enum, values: [:spotify, :deezer]
-    field :track_id, :string
+    field :provider_ids, PremiereEcouteCore.Ecto.Map, default: %{}
     field :name, :string
     field :slug, Slug.Type
     field :track_number, :integer
@@ -50,12 +49,12 @@ defmodule PremiereEcoute.Discography.Album.Track do
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(track, attrs) do
     track
-    |> cast(attrs, [:provider, :track_id, :name, :track_number, :duration_ms])
-    |> validate_required([:provider, :track_id, :name, :track_number])
+    |> cast(attrs, [:provider_ids, :name, :track_number, :duration_ms])
+    |> validate_required([:provider_ids, :name, :track_number])
     |> validate_number(:track_number, greater_than: 0)
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
-    |> validate_inclusion(:provider, [:twitch, :spotify])
-    |> unique_constraint([:track_id, :provider])
     |> Slug.maybe_generate_slug()
+    |> unique_constraint(:provider_ids, name: :album_tracks_spotify_id_unique)
+    |> unique_constraint(:provider_ids, name: :album_tracks_deezer_id_unique)
   end
 end

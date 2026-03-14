@@ -9,7 +9,6 @@ defmodule PremiereEcoute.Discography.Album do
 
   use PremiereEcouteCore.Aggregate,
     root: [:tracks, :artists],
-    identity: [:provider, :album_id],
     json: [:id, :name, :slug, :artist, :release_date, :cover_url, :total_tracks, :tracks]
 
   defmodule Slug do
@@ -26,10 +25,9 @@ defmodule PremiereEcoute.Discography.Album do
 
   @type t :: %__MODULE__{
           id: integer() | nil,
-          provider: :spotify | :deezer,
-          album_id: String.t() | nil,
+          provider_ids: %{atom() => String.t()},
           name: String.t() | nil,
-          artist: String.t() | nil,
+          artist: Artist.t() | String.t() | nil,
           release_date: Date.t() | nil,
           cover_url: String.t() | nil,
           total_tracks: integer() | nil,
@@ -40,8 +38,7 @@ defmodule PremiereEcoute.Discography.Album do
         }
 
   schema "albums" do
-    field :provider, Ecto.Enum, values: [:spotify, :deezer]
-    field :album_id, :string
+    field :provider_ids, PremiereEcouteCore.Ecto.Map, default: %{}
     field :name, :string
     field :slug, Slug.Type
     field :release_date, :date
@@ -63,17 +60,17 @@ defmodule PremiereEcoute.Discography.Album do
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(album, attrs) do
     album
-    |> cast(attrs, [:provider, :album_id, :name, :release_date, :cover_url, :total_tracks])
-    |> validate_required([:provider, :album_id, :name, :total_tracks])
+    |> cast(attrs, [:provider_ids, :name, :release_date, :cover_url, :total_tracks])
+    |> validate_required([:provider_ids, :name, :total_tracks])
     |> validate_number(:total_tracks, greater_than: 0)
-    |> validate_inclusion(:provider, [:twitch, :spotify])
-    |> unique_constraint([:album_id, :provider])
     |> foreign_key_constraint(:listening_sessions,
       name: :listening_sessions_album_id_fkey,
       message: "are still linked to this album"
     )
     |> cast_assoc(:tracks, with: &Track.changeset/2, required: true)
     |> Slug.maybe_generate_slug()
+    |> unique_constraint(:provider_ids, name: :albums_spotify_id_unique)
+    |> unique_constraint(:provider_ids, name: :albums_deezer_id_unique)
   end
 
   @doc """
@@ -130,12 +127,24 @@ defmodule PremiereEcoute.Discography.Album do
   end
 
   @spec create_if_not_exists(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def create_if_not_exists(%__MODULE__{} = album) do
-    case get_by(Map.take(Map.from_struct(album), [:provider, :album_id])) do
+  def create_if_not_exists(%__MODULE__{provider_ids: provider_ids} = album) when map_size(provider_ids) > 0 do
+    # AIDEV-NOTE: lookup by first provider entry since there is no unique constraint on provider_ids
+    [{provider, id}] = Enum.take(provider_ids, 1)
+
+    result =
+      from(a in __MODULE__,
+        where: fragment("?->>? = ?", a.provider_ids, ^to_string(provider), ^id)
+      )
+      |> Repo.one()
+      |> preload()
+
+    case result do
       nil -> create(album)
       existing -> {:ok, existing}
     end
   end
+
+  def create_if_not_exists(%__MODULE__{} = album), do: create(album)
 
   def get_by(query \\ __MODULE__, clauses), do: query |> Repo.get_by(clauses) |> preload()
 

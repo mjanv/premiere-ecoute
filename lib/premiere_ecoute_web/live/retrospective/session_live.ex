@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Discography.SessionLive do
+defmodule PremiereEcouteWeb.Retrospective.SessionLive do
   @moduledoc """
   Session detail page within the retrospective.
 

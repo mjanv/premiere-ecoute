@@ -25,7 +25,7 @@ defmodule Mix.Tasks.Spotify.Album do
 
     case SpotifyApi.get_album(id) do
       {:ok, album} ->
-        album = %{clean(album) | tracks: Enum.map(album.tracks, &clean(&1, [:album_id, :album]))}
+        album = %{clean(album) | tracks: Enum.map(album.tracks, &clean(&1, [:album]))}
         Mix.shell().info("#{inspect(album, pretty: true)}")
 
       {:error, reason} ->
