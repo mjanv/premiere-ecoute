@@ -38,6 +38,8 @@ defmodule PremiereEcoute.Accounts do
   @spec streamers() :: list(User.t())
   def streamers, do: User.all(where: [role: :streamer])
 
+  defdelegate page_members(page, page_size), to: User
+
   ## User Profile
   defdelegate profile(user, path, default \\ nil), to: Profile, as: :get
   defdelegate edit_user_profile(user, attrs), to: User

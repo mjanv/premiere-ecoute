@@ -207,6 +207,13 @@ defmodule PremiereEcoute.Accounts.User do
   @spec get_user_by_username(String.t()) :: t() | nil
   def get_user_by_username(username), do: get_by(username: username)
 
+  @doc "Returns a paginated page of members (viewer + admin roles)."
+  @spec page_members(integer(), integer()) :: Scrivener.Page.t()
+  def page_members(page_number, page_size) do
+    from(u in __MODULE__, where: u.role in [:viewer, :admin], order_by: [asc: u.inserted_at], preload: [:twitch])
+    |> Repo.paginate(page: page_number, page_size: page_size)
+  end
+
   @doc """
   Returns user counts grouped by role.
 

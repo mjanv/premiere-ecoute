@@ -47,6 +47,13 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     |> foreign_key_constraint(:session_id)
   end
 
+  @doc "Counts all votes cast by a viewer."
+  @spec count_for_viewer(String.t()) :: integer()
+  def count_for_viewer(viewer_id) do
+    from(v in __MODULE__, where: v.viewer_id == ^viewer_id)
+    |> Repo.aggregate(:count)
+  end
+
   @doc """
   Parses vote value from chat message against vote options.
 

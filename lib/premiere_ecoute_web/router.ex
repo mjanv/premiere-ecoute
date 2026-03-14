@@ -109,6 +109,8 @@ defmodule PremiereEcouteWeb.Router do
       live "/settings/confirm-email/:token", UserSettingsLive, :confirm_email
       live "/account", AccountLive, :index
       live "/account/features", AccountFeaturesLive, :index
+      live "/", UsersLive, :index
+      live "/:username", UserLive, :show
       live "/follows", FollowsLive, :index
     end
 

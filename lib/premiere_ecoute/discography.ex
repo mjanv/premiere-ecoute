@@ -44,6 +44,7 @@ defmodule PremiereEcoute.Discography do
   def url(%Album{provider_ids: ids}) do
     cond do
       id = Map.get(ids, :spotify) -> "https://open.spotify.com/album/#{id}"
+      id = Map.get(ids, :deezer) -> "https://www.deezer.com/album/#{id}"
       true -> nil
     end
   end
@@ -59,6 +60,7 @@ defmodule PremiereEcoute.Discography do
   def url(%Single{provider_ids: ids}) do
     cond do
       id = Map.get(ids, :spotify) -> "https://open.spotify.com/track/#{id}"
+      id = Map.get(ids, :deezer) -> "https://www.deezer.com/track/#{id}"
       true -> nil
     end
   end

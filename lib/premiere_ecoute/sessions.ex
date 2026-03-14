@@ -43,6 +43,14 @@ defmodule PremiereEcoute.Sessions do
   @doc "Retrieves all votes cast by viewer"
   @spec viewer_votes(PremiereEcoute.Accounts.User.t()) :: list(Scores.Vote.t())
   def viewer_votes(user), do: Scores.Vote.all(where: [viewer_id: user.twitch.user_id])
+
+  @doc "Counts all votes cast by a viewer"
+  @spec count_viewer_votes(PremiereEcoute.Accounts.User.t()) :: integer()
+  def count_viewer_votes(%{twitch: twitch}) when not is_nil(twitch),
+    do: Scores.Vote.count_for_viewer(twitch.user_id)
+
+  def count_viewer_votes(_user), do: 0
+
   defdelegate create_vote(vote), to: Scores.Vote, as: :create
   defdelegate get_track_votes_for_user(track_ids, viewer_id), to: Scores.Vote, as: :for_tracks_and_viewer
 

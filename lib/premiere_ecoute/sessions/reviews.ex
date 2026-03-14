@@ -15,6 +15,21 @@ defmodule PremiereEcoute.Sessions.Reviews do
   alias PremiereEcoute.Sessions.ListeningSession.ReviewLike
 
   @doc """
+  Returns the most recent reviews written by a user, preloading album, ordered by insertion date descending.
+  """
+  @spec list_for_user(integer(), integer()) :: [Review.t()]
+  def list_for_user(user_id, limit \\ 10) do
+    Review
+    |> from(as: :review)
+    |> where([r], r.user_id == ^user_id)
+    |> order_by([r], desc: r.inserted_at)
+    |> limit(^limit)
+    |> with_likes_count()
+    |> preload(:album)
+    |> Repo.all()
+  end
+
+  @doc """
   Returns all reviews for a session, preloading the associated user, ordered streamer-first then by insertion date.
   """
   @spec list_for_session(integer()) :: [Review.t()]
@@ -40,6 +55,16 @@ defmodule PremiereEcoute.Sessions.Reviews do
     |> with_likes_count()
     |> preload(:user)
     |> Repo.all()
+  end
+
+  @doc """
+  Returns the total number of reviews written by a user.
+  """
+  @spec count_for_user(integer()) :: integer()
+  def count_for_user(user_id) do
+    Review
+    |> where([r], r.user_id == ^user_id)
+    |> Repo.aggregate(:count)
   end
 
   @doc """

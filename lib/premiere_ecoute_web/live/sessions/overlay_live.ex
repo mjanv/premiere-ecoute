@@ -21,7 +21,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   @impl true
   def mount(%{"username" => username}, _session, socket) do
-    user = PremiereEcoute.Accounts.User.get_user_by_username(username)
+    user = Accounts.User.get_user_by_username(username)
     listening_session = ListeningSession.get_active_session(user)
 
     color_primary = Accounts.profile(user, [:widget_settings, :color_primary])

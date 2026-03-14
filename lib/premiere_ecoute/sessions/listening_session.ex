@@ -424,6 +424,33 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     all(where: [user_id: user.id, status: :stopped, source: :album], order_by: [desc: :started_at], limit: limit)
   end
 
+  @doc "Returns the total number of stopped sessions for a user."
+  @spec count_stopped_sessions(User.t()) :: integer()
+  def count_stopped_sessions(user) do
+    count(all_query(where: [user_id: user.id, status: :stopped]), :id)
+  end
+
+  @doc "Returns distinct stopped sessions a viewer has voted in, most recent first, up to limit."
+  @spec viewer_voted_sessions(String.t(), integer()) :: [t()]
+  def viewer_voted_sessions(twitch_user_id, limit \\ 12) do
+    alias PremiereEcoute.Sessions.Scores.Vote
+
+    session_ids =
+      from(v in Vote,
+        where: v.viewer_id == ^twitch_user_id,
+        select: v.session_id,
+        distinct: true
+      )
+      |> Repo.all()
+
+    __MODULE__
+    |> where([s], s.id in ^session_ids and s.status == :stopped)
+    |> order_by([s], desc: s.started_at)
+    |> limit(^limit)
+    |> preload(album: [:tracks, :artists])
+    |> Repo.all()
+  end
+
   @doc """
   Retrieves user's current session.
 

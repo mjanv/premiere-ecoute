@@ -132,11 +132,19 @@
                 </h2>
                 <%= case @listening_session do %>
                   <% %{album: %{artist: %{slug: slug}}} when not is_nil(slug) -> %>
-                    <.link navigate={~p"/discography/artists/#{slug}"} id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg hover:text-purple-100 transition-colors">
+                    <.link
+                      navigate={~p"/discography/artists/#{slug}"}
+                      id="carousel-subtitle"
+                      class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg hover:text-purple-100 transition-colors"
+                    >
                       {get_session_artist(@listening_session)}
                     </.link>
                   <% %{single: %{artist: %{slug: slug}}} when not is_nil(slug) -> %>
-                    <.link navigate={~p"/discography/artists/#{slug}"} id="carousel-subtitle" class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg hover:text-purple-100 transition-colors">
+                    <.link
+                      navigate={~p"/discography/artists/#{slug}"}
+                      id="carousel-subtitle"
+                      class="text-xl md:text-2xl text-purple-200 mt-2 drop-shadow-lg hover:text-purple-100 transition-colors"
+                    >
                       {get_session_artist(@listening_session)}
                     </.link>
                   <% _ -> %>

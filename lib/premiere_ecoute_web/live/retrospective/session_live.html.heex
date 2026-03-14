@@ -193,7 +193,10 @@
                 {PremiereEcoute.Discography.title(entity)}
               </h1>
               <%= if entity.artist && entity.artist.slug do %>
-                <.link navigate={~p"/discography/artists/#{entity.artist.slug}"} class="text-xl text-purple-300 hover:text-purple-100 transition-colors">
+                <.link
+                  navigate={~p"/discography/artists/#{entity.artist.slug}"}
+                  class="text-xl text-purple-300 hover:text-purple-100 transition-colors"
+                >
                   {entity.artist}
                 </.link>
               <% else %>
