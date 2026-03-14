@@ -11,7 +11,14 @@ defmodule PremiereEcouteWeb.Accounts.UsersLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :streamers, Accounts.streamers())}
+    current_user = socket.assigns.current_scope.user
+
+    follows =
+      if current_user,
+        do: Accounts.following_list(current_user.id),
+        else: []
+
+    {:ok, assign(socket, streamers: Accounts.streamers(), follows: follows)}
   end
 
   @impl true

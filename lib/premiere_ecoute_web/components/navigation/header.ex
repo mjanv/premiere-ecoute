@@ -54,8 +54,42 @@ defmodule PremiereEcouteWeb.Components.Header do
         <div class="flex items-center space-x-4">
           <%= if @current_user do %>
             <!-- Authenticated user navigation -->
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
+              <.link
+                href={~p"/playlists"}
+                class="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-colors mx-2"
+              >
+                {gettext("Playlists")}
+              </.link>
+            <% end %>
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:discography, for: @current_user) do %>
+              <.link
+                href={~p"/discography"}
+                class="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-colors mx-2"
+              >
+                {gettext("Discography")}
+              </.link>
+            <% end %>
+
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:festivals, for: @current_user) do %>
+              <.link
+                href={~p"/festivals/new"}
+                class="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-colors mx-2"
+              >
+                {gettext("Festivals")}
+              </.link>
+            <% end %>
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:users, for: @current_user) do %>
+              <.link
+                href={~p"/users"}
+                class="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-colors mx-2"
+              >
+                {gettext("Members")}
+              </.link>
+            <% end %>
+            <div class="w-px h-4 bg-gray-700 mx-2"></div>
             <!-- User Menu Dropdown -->
-            <div class="relative" x-data="{ open: false }">
+            <div class="relative mx-2" x-data="{ open: false }">
               <button
                 @click="open = !open"
                 class="inline-flex items-center px-3 py-2 border rounded-lg text-sm font-medium text-gray-300 hover:text-white transition-colors"

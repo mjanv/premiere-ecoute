@@ -61,8 +61,11 @@ defmodule PremiereEcoute.Accounts do
   defdelegate delete_all_oauth_tokens(user), to: OauthToken, as: :delete_all_tokens
 
   ## Follow
-  defdelegate follow(user, streamer, opts \\ %{}), to: Follow
-  defdelegate unfollow(user, streamer), to: Follow
+  defdelegate follow(follower, followed), to: Follow
+  defdelegate unfollow(follower, followed), to: Follow
+  defdelegate following?(follower_id, followed_id), to: Follow
+  defdelegate follower_count(user_id), to: Follow
+  defdelegate following_list(user_id), to: Follow
   defdelegate discover_follows(user), to: Follow
   defdelegate follow_streamer(scope, streamer), to: Services.AccountFollow
   defdelegate follow_streamers(scope), to: Services.AccountFollow

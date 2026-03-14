@@ -213,6 +213,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:browser]
 
     live_session :discography_pages, on_mount: [{UserAuth, :current_scope}] do
+      live "/", DiscographyLive, :index
       live "/albums", AlbumsLive, :index
       live "/albums/:slug", AlbumLive, :show
       live "/singles", SinglesLive, :index

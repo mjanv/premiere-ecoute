@@ -46,8 +46,8 @@ defmodule PremiereEcoute.Accounts.User do
     has_one :twitch, OauthToken, where: [provider: :twitch], foreign_key: :parent_id
     has_one :spotify, OauthToken, where: [provider: :spotify], foreign_key: :parent_id
 
-    has_many :follows, Follow, foreign_key: :user_id
-    has_many :channels, through: [:follows, :streamer]
+    has_many :follows, Follow, foreign_key: :follower_id
+    has_many :channels, through: [:follows, :followed]
 
     timestamps(type: :utc_datetime)
   end

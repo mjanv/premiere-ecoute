@@ -66,6 +66,10 @@
               <p class="text-3xl font-bold text-white leading-none">{@review_count}</p>
               <p class="text-xs text-slate-500 mt-0.5">reviews</p>
             </div>
+            <div class="text-center">
+              <p class="text-3xl font-bold text-white leading-none">{@follower_count}</p>
+              <p class="text-xs text-slate-500 mt-0.5">followers</p>
+            </div>
           </div>
 
           <div class="flex items-center gap-3">
@@ -77,18 +81,28 @@
                 <span class="hero-radio w-4 h-4 shrink-0 text-pink-400"></span> Radio
               </.link>
             <% end %>
-            <%!-- Follow button (inactive) --%>
-            <button
-              disabled
-              title="Coming soon"
-              class="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-slate-600 text-sm cursor-not-allowed"
-              style="background: rgba(255,255,255,0.03);"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Follow
-            </button>
+            <%!-- Follow button --%>
+            <%= if assigns[:current_scope] && assigns[:current_scope].user && assigns[:current_scope].user.id != @user.id do %>
+              <%= if @following do %>
+                <button
+                  phx-click="unfollow"
+                  class="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg border border-purple-500/50 bg-purple-600/20 hover:bg-red-900/20 hover:border-red-500/50 hover:text-red-400 text-purple-300 text-sm transition-all"
+                >
+                  <span class="hero-check w-3.5 h-3.5"></span>
+                  Following
+                </button>
+              <% else %>
+                <button
+                  phx-click="follow"
+                  class="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 hover:bg-purple-600/20 hover:border-purple-500/50 hover:text-purple-300 text-slate-400 text-sm transition-all"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Follow
+                </button>
+              <% end %>
+            <% end %>
           </div>
         </div>
       </div>
@@ -245,9 +259,7 @@
                     <p
                       id={"review-content-#{review.id}"}
                       class="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap line-clamp-4"
-                    >
-                      {review.content}
-                    </p>
+                    >{review.content}</p>
                     <button
                       id={"review-more-#{review.id}"}
                       phx-click={

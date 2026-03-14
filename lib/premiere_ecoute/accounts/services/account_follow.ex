@@ -36,8 +36,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
     def perform(%Oban.Job{args: %{"streamer_id" => streamer_id, "user_id" => user_id}}) do
       with scope <- Scope.for_user(Accounts.get_user!(user_id)),
            streamer <- Accounts.get_user!(streamer_id),
-           {:ok, %{"followed_at" => at}} <- Apis.twitch().get_followed_channel(scope, streamer) do
-        Accounts.follow(scope.user, streamer, %{followed_at: NaiveDateTime.from_iso8601!(at)})
+           {:ok, %{"followed_at" => _}} <- Apis.twitch().get_followed_channel(scope, streamer) do
+        Accounts.follow(scope.user, streamer)
       else
         _ -> {:error, :no_follow}
       end
@@ -51,13 +51,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollow do
   """
   @spec follow_streamer(Scope.t(), User.t()) :: {:ok, Follow.t()} | {:error, term()}
   def follow_streamer(scope, streamer) do
-    with {:ok, %{"followed_at" => followed_at}} <- Apis.twitch().get_followed_channel(scope, streamer),
-         followed_at <- NaiveDateTime.from_iso8601!(followed_at),
-         {:ok, follow} <- Accounts.follow(scope.user, streamer, %{followed_at: followed_at}) do
-      {:ok, follow}
-    else
-      _ -> Accounts.follow(scope.user, streamer, %{followed_at: nil})
-    end
+    Accounts.follow(scope.user, streamer)
   end
 
   @doc """

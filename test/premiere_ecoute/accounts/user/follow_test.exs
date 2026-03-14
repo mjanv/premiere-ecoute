@@ -5,51 +5,24 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
 
-  alias PremiereEcoute.Events.ChannelFollowed
-  alias PremiereEcoute.Events.ChannelUnfollowed
-  alias PremiereEcoute.Events.Store
+  describe "follow/2" do
+    test "any role can follow any other user" do
+      for role <- [:viewer, :streamer, :admin, :bot] do
+        %{id: follower_id} = follower = user_fixture(%{role: role})
+        %{id: followed_id} = followed = user_fixture(%{role: :streamer})
 
-  describe "follow/3" do
-    test "add a streamer to any role follow list" do
-      for role <- [:viewer, :streamer, :admin, :bot] ++ [:viewer, :streamer, :admin, :bot] do
-        %{id: user_id} =
-          user = user_fixture(%{role: role, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+        {:ok, follow} = Accounts.follow(follower, followed)
 
-        %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
-
-        {:ok, follow} = Accounts.follow(user, streamer)
-
-        assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: nil} = follow
-
-        assert Store.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
+        assert %Follow{follower_id: ^follower_id, followed_id: ^followed_id} = follow
       end
     end
 
-    test "add a followed_at date to the follow" do
-      %{id: streamer_id} =
-        streamer = user_fixture(%{role: :streamer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+    test "cannot follow yourself" do
+      user = user_fixture()
 
-      for role <- [:viewer, :streamer, :admin, :bot] do
-        %{id: user_id} =
-          user = user_fixture(%{role: role, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+      {:error, changeset} = Accounts.follow(user, user)
 
-        {:ok, follow} = Accounts.follow(user, streamer, %{followed_at: ~N[2020-07-18 07:59:47]})
-
-        assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: ~N[2020-07-18 07:59:47]} = follow
-
-        assert Store.last("user-#{user_id}") == %ChannelFollowed{id: user.id, streamer_id: streamer.id}
-      end
-    end
-
-    test "cannot add any role to a viewer follow list" do
-      for role <- [:viewer, :streamer, :admin, :bot] do
-        user = user_fixture(%{role: role})
-        viewer = user_fixture(%{role: :viewer})
-
-        {:error, changeset} = Accounts.follow(user, viewer)
-
-        assert Repo.traverse_errors(changeset) == %{streamer: ["must have the streamer role"]}
-      end
+      assert %{follower_id: _} = Repo.traverse_errors(changeset)
     end
 
     test "update the list of channels attached to a viewer" do
@@ -72,31 +45,22 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
   end
 
   describe "unfollow/2" do
-    test "unfollow a streamer from a viewer follow list" do
-      %{id: user_id} =
-        user = user_fixture(%{role: :viewer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
+    test "unfollow a user" do
+      %{id: follower_id} = follower = user_fixture(%{role: :viewer})
+      %{id: followed_id} = followed = user_fixture(%{role: :streamer})
 
-      %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
-      {:ok, follow} = Accounts.follow(user, streamer)
+      {:ok, follow} = Accounts.follow(follower, followed)
+      {:ok, unfollow} = Accounts.unfollow(follower, followed)
 
-      {:ok, unfollow} = Accounts.unfollow(user, streamer)
-
-      assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = follow
-      assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id} = unfollow
-
-      assert Store.last("user-#{user_id}", 2) == [
-               %ChannelFollowed{id: user.id, streamer_id: streamer.id},
-               %ChannelUnfollowed{id: user.id, streamer_id: streamer.id}
-             ]
+      assert %Follow{follower_id: ^follower_id, followed_id: ^followed_id} = follow
+      assert %Follow{follower_id: ^follower_id, followed_id: ^followed_id} = unfollow
     end
 
-    test "cannot unfollow a streamer not part of a viewer follow list" do
-      viewer = user_fixture(%{role: :viewer})
-      streamer = user_fixture(%{role: :streamer})
+    test "cannot unfollow a user not followed" do
+      follower = user_fixture(%{role: :viewer})
+      followed = user_fixture(%{role: :streamer})
 
-      {:error, changeset} = Accounts.unfollow(viewer, streamer)
-
-      assert Repo.traverse_errors(changeset) == %{streamer: ["You are not following this streamer"]}
+      assert {:error, :not_found} = Accounts.unfollow(follower, followed)
     end
 
     test "update the list of channels attached to a viewer" do

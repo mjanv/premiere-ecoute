@@ -71,10 +71,10 @@ defmodule PremiereEcoute.Events.ChannelFollowed do
 
   @type t :: %__MODULE__{
           id: String.t() | nil,
-          streamer_id: term()
+          followed_id: term()
         }
 
-  use PremiereEcouteCore.Event, fields: [:streamer_id]
+  use PremiereEcouteCore.Event, fields: [:followed_id]
 end
 
 defmodule PremiereEcoute.Events.ChannelUnfollowed do
@@ -84,10 +84,10 @@ defmodule PremiereEcoute.Events.ChannelUnfollowed do
 
   @type t :: %__MODULE__{
           id: String.t() | nil,
-          streamer_id: term()
+          followed_id: term()
         }
 
-  use PremiereEcouteCore.Event, fields: [:streamer_id]
+  use PremiereEcouteCore.Event, fields: [:followed_id]
 end
 
 defmodule PremiereEcoute.Events.TrackLiked do

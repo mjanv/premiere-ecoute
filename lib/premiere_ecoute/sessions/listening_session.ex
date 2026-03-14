@@ -352,8 +352,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     from(s in __MODULE__,
       where: s.status == :active,
       join: f in Follow,
-      on: f.streamer_id == s.user_id,
-      where: f.user_id == ^user.id
+      on: f.followed_id == s.user_id,
+      where: f.follower_id == ^user.id
     )
     |> Repo.all()
     |> preload()

@@ -6,6 +6,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
   use PremiereEcouteWeb, :live_view
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
@@ -17,11 +18,14 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   def mount(%{"id" => id}, _session, socket) do
     current_scope = socket.assigns[:current_scope]
 
-    with %ListeningSession{} = listening_session <- ListeningSession.get(id),
+    with %ListeningSession{user: user} = listening_session <- ListeningSession.get(id),
          :ok <- validate_session_stopped(listening_session),
          :ok <- validate_authorization(listening_session, current_scope) do
+
       socket
       |> assign(:listening_session, listening_session)
+      |> assign(:color_primary, Accounts.profile(user, [:widget_settings, :color_primary]))
+      |> assign(:color_secondary, Accounts.profile(user, [:widget_settings, :color_secondary]))
       |> assign(:reviews, Reviews.list_for_session(listening_session.id))
       |> assign(:review_modal_open, false)
       |> assign(:review_form, nil)

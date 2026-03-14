@@ -118,7 +118,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       # Those events will be generated in a production environment.
       assert [
                %{
-                 "details" => %{"streamer_id" => _},
+                 "details" => %{"followed_id" => _},
                  "event_id" => _,
                  "event_type" => "ChannelFollowed",
                  "timestamp" => _
@@ -141,8 +141,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert is_nil(User.get(viewer.id))
 
       assert Enum.empty?(Token.all(where: [user_id: viewer.id], order_by: [:id]))
-      assert Enum.empty?(Follow.all(where: [user_id: viewer.id]))
-      assert Enum.empty?(Follow.all(where: [streamer_id: viewer.id]))
+      assert Enum.empty?(Follow.all(where: [follower_id: viewer.id]))
+      assert Enum.empty?(Follow.all(where: [followed_id: viewer.id]))
       assert Enum.empty?(Vote.all(where: [viewer_id: viewer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: viewer.id]))
 
@@ -156,8 +156,8 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert is_nil(User.get(streamer.id))
 
       assert Enum.empty?(Token.all(where: [user_id: streamer.id], order_by: [:id]))
-      assert Enum.empty?(Follow.all(where: [user_id: streamer.id]))
-      assert Enum.empty?(Follow.all(where: [streamer_id: streamer.id]))
+      assert Enum.empty?(Follow.all(where: [follower_id: streamer.id]))
+      assert Enum.empty?(Follow.all(where: [followed_id: streamer.id]))
       assert Enum.empty?(Vote.all(where: [viewer_id: streamer.twitch.user_id]))
       assert Enum.empty?(ListeningSession.all(where: [user_id: streamer.id]))
 

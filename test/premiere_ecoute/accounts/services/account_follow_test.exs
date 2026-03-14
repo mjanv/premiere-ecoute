@@ -18,20 +18,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
       %{id: streamer_id} =
         streamer = user_fixture(%{role: :streamer, twitch: %{user_id: unique_user_id()}, spotify: %{user_id: unique_user_id()}})
 
-      expect(TwitchApi, :get_followed_channel, fn %Scope{user: ^user}, ^streamer ->
-        payload = %{
-          "broadcaster_id" => streamer.twitch.user_id,
-          "broadcaster_login" => "basketweaver101",
-          "broadcaster_name" => "BasketWeaver101",
-          "followed_at" => "2022-05-24T22:22:08Z"
-        }
-
-        {:ok, payload}
-      end)
-
       {:ok, follow} = Accounts.follow_streamer(scope, streamer)
 
-      assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: ~N[2022-05-24 22:22:08]} = follow
+      assert %Follow{follower_id: ^user_id, followed_id: ^streamer_id} = follow
     end
 
     test "add no followed at information to a follow" do
@@ -39,11 +28,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountFollowTest do
       scope = user_scope_fixture(user)
       %{id: streamer_id} = streamer = user_fixture(%{role: :streamer})
 
-      expect(TwitchApi, :get_followed_channel, fn %Scope{user: ^user}, ^streamer -> {:ok, %{"data" => []}} end)
-
       {:ok, follow} = Accounts.follow_streamer(scope, streamer)
 
-      assert %Follow{user_id: ^user_id, streamer_id: ^streamer_id, followed_at: nil} = follow
+      assert %Follow{follower_id: ^user_id, followed_id: ^streamer_id} = follow
     end
   end
 
