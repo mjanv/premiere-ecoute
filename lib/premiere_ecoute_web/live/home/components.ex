@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.HomeComponents do
+defmodule PremiereEcouteWeb.Home.Components do
   @moduledoc """
   Components specific to the HomeLive page.
 
@@ -57,12 +57,15 @@ defmodule PremiereEcouteWeb.HomeComponents do
 
   @doc """
   Renders a square album card with a cover image and a hover overlay showing name and artist.
+
+  Optionally accepts `navigate` to make the card a clickable link.
   """
   attr :album, :map, required: true
+  attr :navigate, :string, default: nil
 
   def album_square(assigns) do
     ~H"""
-    <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
+    <.link navigate={@navigate} class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg block">
       <%= if @album.cover_url do %>
         <img src={@album.cover_url} alt={@album.name} class="w-full h-full object-cover" loading="lazy" />
       <% else %>
@@ -76,7 +79,7 @@ defmodule PremiereEcouteWeb.HomeComponents do
         <p class="text-white text-xs font-semibold leading-tight truncate">{@album.name}</p>
         <p class="text-slate-300 text-xs truncate">{@album.artist}</p>
       </div>
-    </div>
+    </.link>
     """
   end
 
@@ -90,6 +93,43 @@ defmodule PremiereEcouteWeb.HomeComponents do
     <div class="relative flex-shrink-0 w-36 h-10 rounded-lg overflow-hidden border border-white/10 shadow-lg bg-white/5 flex flex-col justify-center px-2">
       <p class="text-white text-xs font-semibold leading-tight truncate">{@track.name}</p>
       <p class="text-slate-400 text-xs truncate">{@track.artist} · {Calendar.strftime(@track.started_at, "%H:%M")}</p>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a non-clickable upcoming session card as a square album cover with a status badge overlay.
+  """
+  attr :session, :map, required: true
+
+  def upcoming_session_card(assigns) do
+    ~H"""
+    <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
+      <%= if @session.album && @session.album.cover_url do %>
+        <img src={@session.album.cover_url} alt={ListeningSession.title(@session)} class="w-full h-full object-cover" loading="lazy" />
+      <% else %>
+        <div class="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
+          <svg class="w-10 h-10 text-white/40" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+          </svg>
+        </div>
+      <% end %>
+      <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2">
+        <p class="text-white text-xs font-semibold leading-tight truncate">{ListeningSession.title(@session)}</p>
+        <p class="text-slate-300 text-xs truncate">{ListeningSession.artist(@session)}</p>
+      </div>
+      <span class={[
+        "absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded font-medium",
+        case @session.status do
+          :active -> "bg-green-600/80 text-white"
+          :preparing -> "bg-indigo-600/80 text-white"
+        end
+      ]}>
+        {case @session.status do
+          :active -> "Live"
+          :preparing -> "Ready"
+        end}
+      </span>
     </div>
     """
   end

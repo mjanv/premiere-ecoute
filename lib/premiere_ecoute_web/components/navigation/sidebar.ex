@@ -26,16 +26,14 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
             <.sidebar_link href={~p"/"} page={@current_page} page_id="home" icon="hero-home">{gettext("Home")}</.sidebar_link>
 
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:discography, for: @current_user) do %>
-              <%= if @current_user.role in [:streamer, :admin] do %>
-                <.sidebar_link
-                  href={~p"/discography"}
-                  page={@current_page}
-                  page_id="discography"
-                  icon="hero-ticket"
-                >
-                  {gettext("Discography")}
-                </.sidebar_link>
-              <% end %>
+              <.sidebar_link
+                href={~p"/discography"}
+                page={@current_page}
+                page_id="discography"
+                icon="hero-ticket"
+              >
+                {gettext("Discography")}
+              </.sidebar_link>
             <% end %>
 
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>

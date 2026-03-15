@@ -1,0 +1,100 @@
+<Layouts.app flash={@flash} banners={assigns[:banners] || []} current_scope={assigns[:current_scope] || %{}}>
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-12">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="w-full">
+          <h2 class="text-4xl font-bold text-white mb-12 text-center">
+            {gettext("Hello, %{name}", name: @current_user.username)}
+          </h2>
+
+          <%!-- Radio links for followed streamers --%>
+          <%= if @current_user.channels != [] do %>
+            <section class="mb-12">
+              <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+                {gettext("Radio")}
+              </h3>
+              <div class="flex flex-wrap gap-3">
+                <%= for streamer <- @current_user.channels do %>
+                  <.link
+                    navigate={~p"/radio/#{streamer.username}"}
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all"
+                  >
+                    <svg class="w-3.5 h-3.5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h-3v2h8v-2h-3v-2.06A9 9 0 0 0 21 12v-2h-2z" />
+                    </svg>
+                    <span class="text-white text-sm font-medium">{streamer.username}</span>
+                  </.link>
+                <% end %>
+              </div>
+            </section>
+          <% end %>
+
+          <%!-- My last sessions (voted in) --%>
+          <section class="mb-12">
+            <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+              {gettext("My last sessions")}
+            </h3>
+            <.scroll_carousel id="my-sessions-carousel">
+              <%= for session <- @my_sessions do %>
+                <.album_square album={session.album} navigate={~p"/sessions/#{session}"} />
+              <% end %>
+              <%= if @my_sessions == [] do %>
+                <p class="text-slate-500 text-sm">{gettext("No sessions yet.")}</p>
+              <% end %>
+            </.scroll_carousel>
+          </section>
+
+          <%= if @sessions_per_streamer == [] do %>
+            <div class="flex flex-col items-center justify-center gap-3 py-16 text-center">
+              <p class="text-slate-500 text-sm">{gettext("You are not following any streamer yet.")}</p>
+              <.link navigate={~p"/users"} class="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+                {gettext("Follow a streamer")}
+              </.link>
+            </div>
+          <% end %>
+
+          <%!-- One section per followed streamer --%>
+          <% upcoming_by_streamer = Enum.group_by(@upcoming_sessions, & &1.user_id) %>
+          <%= for {streamer, sessions} <- @sessions_per_streamer do %>
+            <section class="mb-12">
+              <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+                {gettext("Recently listened by")}
+                <.link navigate={~p"/users/#{streamer.username}"} class="text-purple-400 hover:text-purple-300 transition-colors">
+                  {streamer.username}
+                </.link>
+              </h3>
+              <.scroll_carousel id={"album-carousel-#{streamer.id}"}>
+                <%= for session <- sessions do %>
+                  <.album_square album={session.album} navigate={~p"/sessions/#{session}"} />
+                <% end %>
+                <%= if sessions == [] do %>
+                  <p class="text-slate-500 text-sm">{gettext("No sessions yet.")}</p>
+                <% end %>
+              </.scroll_carousel>
+            </section>
+
+            <%= if Map.has_key?(upcoming_by_streamer, streamer.id) do %>
+              <section class="mb-12">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+                  {gettext("Upcoming events by")}
+                  <.link
+                    navigate={~p"/users/#{streamer.username}"}
+                    class="text-purple-400 hover:text-purple-300 transition-colors"
+                  >
+                    {streamer.username}
+                  </.link>
+                </h3>
+                <div class="flex flex-wrap gap-3">
+                  <%= for session <- Map.get(upcoming_by_streamer, streamer.id) do %>
+                    <.upcoming_session_card session={session} />
+                  <% end %>
+                </div>
+              </section>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

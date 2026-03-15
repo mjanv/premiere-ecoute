@@ -360,6 +360,24 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   @doc """
+  Retrieves upcoming (active and preparing) sessions from followed streamers.
+
+  Returns all active and preparing sessions for streamers that the user follows,
+  active sessions sorted first.
+  """
+  @spec upcoming_sessions_from_followed(User.t()) :: [t()]
+  def upcoming_sessions_from_followed(user) do
+    from(s in __MODULE__,
+      join: f in Follow,
+      on: f.followed_id == s.user_id,
+      where: f.follower_id == ^user.id and s.status in [:active, :preparing],
+      order_by: [fragment("CASE status WHEN 'active' THEN 0 ELSE 1 END"), asc: s.inserted_at]
+    )
+    |> Repo.all()
+    |> preload()
+  end
+
+  @doc """
   Retrieves upcoming sessions for a user.
 
   Returns all active and preparing listening sessions for the current user.
@@ -369,6 +387,22 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     from(s in __MODULE__,
       where: s.user_id == ^user.id and s.status in [:active, :preparing],
       order_by: [fragment("CASE status WHEN 'active' THEN 0 ELSE 1 END"), asc: s.inserted_at]
+    )
+    |> Repo.all()
+    |> preload()
+  end
+
+  @doc """
+  Returns the last stopped album sessions from streamers the given user follows, ordered by most recent first.
+  """
+  @spec stopped_sessions_from_followed(User.t(), integer()) :: [t()]
+  def stopped_sessions_from_followed(user, limit \\ 10) do
+    from(s in __MODULE__,
+      join: f in Follow,
+      on: f.followed_id == s.user_id,
+      where: f.follower_id == ^user.id and s.status == :stopped and s.source == :album,
+      order_by: [desc: s.started_at],
+      limit: ^limit
     )
     |> Repo.all()
     |> preload()
