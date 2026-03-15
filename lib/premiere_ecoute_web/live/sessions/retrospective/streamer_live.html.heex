@@ -2,7 +2,7 @@
   flash={@flash}
   banners={assigns[:banners] || []}
   current_scope={assigns[:current_scope] || %{}}
-  current_page="votes"
+  current_page="retrospective"
 >
   <div class="min-h-screen synthwave-bg text-white">
     <!-- Header -->
@@ -82,9 +82,9 @@
       </div>
     </div>
     
-<!-- Cover Wall with Votes -->
+<!-- Album Cover Wall -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-      <.async_result :let={votes_data} assign={@votes_data}>
+      <.async_result :let={albums_data} assign={@albums_data}>
         <:loading>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             <%= for _ <- 1..12 do %>
@@ -97,30 +97,39 @@
 
         <:failed>
           <div class="bg-red-900/20 border border-red-800 rounded-lg p-8 text-center">
-            <p class="text-red-400 text-lg">{gettext("Failed to load votes")}</p>
+            <p class="text-red-400 text-lg">{gettext("Failed to load albums")}</p>
             <p class="text-gray-400 mt-2">{gettext("Please try refreshing the page")}</p>
           </div>
         </:failed>
 
-        <%= if Enum.empty?(votes_data.items) do %>
+        <%= if Enum.empty?(albums_data.items) do %>
           <div class="p-8 text-center">
             <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
+              <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.367 4.367 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
             </svg>
-            <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Votes Found")}</h3>
-            <p class="text-gray-400">{gettext("No votes cast during this period")}</p>
+            <%= case albums_data.source do %>
+              <% :album -> %>
+                <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Albums Found")}</h3>
+                <p class="text-gray-400">{gettext("No albums listened during this period")}</p>
+              <% :track -> %>
+                <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Tracks Found")}</h3>
+                <p class="text-gray-400">{gettext("No tracks listened during this period")}</p>
+              <% :playlist -> %>
+                <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Playlists Found")}</h3>
+                <p class="text-gray-400">{gettext("No playlists listened during this period")}</p>
+            <% end %>
           </div>
         <% else %>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <%= case votes_data.source do %>
-              <% :album -> %>
-                <%= for vote_data <- votes_data.items do %>
+          <%= case albums_data.source do %>
+            <% :album -> %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <%= for item <- albums_data.items do %>
                   <.link
-                    href={~p"/retrospective/sessions/#{vote_data.session_id}"}
+                    navigate={~p"/sessions/#{item.session}"}
                     class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <img
-                      src={vote_data.album.cover_url}
+                      src={item.album.cover_url}
                       alt={gettext("Album cover")}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
                     />
@@ -131,25 +140,27 @@
                           class="text-white font-bold drop-shadow-2xl leading-none"
                           style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
                         >
-                          {vote_data.score}
+                          {item.report.session_summary["viewer_score"]}
                         </div>
                       </div>
                       <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <p class="text-white font-semibold truncate drop-shadow">{vote_data.album.name}</p>
-                        <p class="text-purple-300 text-sm truncate">{vote_data.album.artist}</p>
+                        <p class="text-white font-semibold truncate drop-shadow">{item.album.name}</p>
+                        <p class="text-purple-300 text-sm truncate">{item.album.artist}</p>
                       </div>
                     </div>
                   </.link>
                 <% end %>
-              <% :track -> %>
-                <%= for vote_data <- votes_data.items do %>
+              </div>
+            <% :track -> %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
+                <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/retrospective/sessions/#{vote_data.session_id}"}
-                    class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
+                    navigate={~p"/sessions/#{item.session}"}
+                    class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <img
-                      src={vote_data.single.cover_url}
-                      alt={gettext("Track cover")}
+                      src={item.single.cover_url}
+                      alt={item.single.name}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
                     />
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
@@ -159,25 +170,27 @@
                           class="text-white font-bold drop-shadow-2xl leading-none"
                           style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
                         >
-                          {vote_data.score}
+                          {item.report && item.report.session_summary["viewer_score"]}
                         </div>
                       </div>
                       <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <p class="text-white font-semibold truncate drop-shadow">{vote_data.single.name}</p>
-                        <p class="text-cyan-300 text-sm truncate">{vote_data.single.artist}</p>
+                        <p class="text-white font-semibold truncate drop-shadow">{item.single.name}</p>
+                        <p class="text-cyan-300 text-sm truncate">{item.single.artist}</p>
                       </div>
                     </div>
                   </.link>
                 <% end %>
-              <% :playlist -> %>
-                <%= for vote_data <- votes_data.items do %>
+              </div>
+            <% :playlist -> %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
+                <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/retrospective/sessions/#{vote_data.session_id}"}
-                    class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
+                    navigate={~p"/sessions/#{item.session}"}
+                    class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <img
-                      src={vote_data.playlist.cover_url}
-                      alt={gettext("Playlist cover")}
+                      src={item.playlist.cover_url}
+                      alt={item.playlist.title}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
                     />
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
@@ -187,18 +200,18 @@
                           class="text-white font-bold drop-shadow-2xl leading-none"
                           style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
                         >
-                          {vote_data.score}
+                          {item.report && item.report.session_summary["viewer_score"]}
                         </div>
                       </div>
                       <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <p class="text-white font-semibold truncate drop-shadow">{vote_data.playlist.title}</p>
-                        <p class="text-emerald-300 text-sm truncate">{vote_data.playlist.owner_name}</p>
+                        <p class="text-white font-semibold truncate drop-shadow">{item.playlist.title}</p>
+                        <p class="text-emerald-300 text-sm truncate">{item.playlist.owner_name}</p>
                       </div>
                     </div>
                   </.link>
                 <% end %>
-            <% end %>
-          </div>
+              </div>
+          <% end %>
         <% end %>
       </.async_result>
     </div>

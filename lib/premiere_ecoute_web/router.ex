@@ -175,37 +175,33 @@ defmodule PremiereEcouteWeb.Router do
   scope "/sessions", PremiereEcouteWeb.Sessions do
     pipe_through [:browser]
 
-    live_session :overlays, on_mount: [{UserAuth, :current_scope}] do
+    live_session :sessions_overlays, on_mount: [{UserAuth, :current_scope}] do
       live "/overlay/:username", OverlayLive, :show
     end
 
-    live_session :retrospective, on_mount: [{UserAuth, :current_scope}] do
+    live_session :sessions_retrospective, on_mount: [{UserAuth, :current_scope}] do
       live "/:id/retrospective", RetrospectiveLive, :show
     end
 
-    live_session :sessions, on_mount: [{UserAuth, :streamer}] do
-      live "/", SessionsLive, :index
-      live "/new", SessionSelectionLive, :index
-      live "/pick/albums", AlbumPickAdminLive, :index
-      live "/:id", SessionLive, :show
+    live_session :streamer_retrospective, on_mount: [{UserAuth, :streamer}] do
+      live "/retrospective", Retrospective.StreamerLive, :index
+    end
+
+    live_session :viewer_retrospective, on_mount: [{UserAuth, :viewer}] do
+      live "/retrospective/votes", Retrospective.VotesLive, :index
+      live "/retrospective/tops", Retrospective.TopsLive, :index
     end
 
     live_session :picks, on_mount: [{UserAuth, :current_scope}] do
       live "/pick/:user_id/submit", AlbumPickSubmissionLive, :new
     end
-  end
 
-  scope "/retrospective", PremiereEcouteWeb.Retrospective do
-    pipe_through [:browser]
-
-    live_session :retrospective_pages, on_mount: [{UserAuth, :current_scope}] do
-      live "/history", HistoryLive, :index
-      live "/sessions/:id", SessionLive, :show
-    end
-
-    live_session :viewer_retrospective, on_mount: [{UserAuth, :viewer}] do
-      live "/votes", VotesLive, :index
-      live "/tops", TopsLive, :index
+    live_session :sessions, on_mount: [{UserAuth, :streamer}] do
+      live "/", SessionsLive, :index
+      live "/new", SessionSelectionLive, :index
+      live "/:id", SessionLive, :show
+      live "/:id/dashboard", DashboardLive, :show
+      live "/pick/albums", AlbumPickAdminLive, :index
     end
   end
 

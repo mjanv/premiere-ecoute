@@ -196,7 +196,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     }
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}/dashboard")
       {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
     end
     |> then(fn socket -> {:noreply, socket} end)
@@ -212,7 +212,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     }
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}/dashboard")
       {:error, _} -> put_flash(socket, :error, gettext("Cannot create the listening session"))
     end
     |> then(fn socket -> {:noreply, socket} end)
@@ -263,7 +263,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     }
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}/dashboard")
       {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
     end
     |> then(fn socket -> {:noreply, socket} end)
@@ -283,7 +283,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     }
     |> PremiereEcoute.apply()
     |> case do
-      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}")
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session}/dashboard")
       {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
     end
     |> then(fn socket -> {:noreply, socket} end)

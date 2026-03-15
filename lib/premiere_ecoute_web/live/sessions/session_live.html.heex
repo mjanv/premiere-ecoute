@@ -2,543 +2,810 @@
   flash={@flash}
   banners={assigns[:banners] || []}
   current_scope={assigns[:current_scope] || %{}}
-  current_page="my_sessions"
+  current_page="retrospective"
 >
-  <div class="synthwave-bg min-h-screen text-white">
-    <div class="max-w-7xl mx-auto pt-12 pb-6 px-6 flex items-center">
-      <div class="w-2/3">
-        <.page_header
-          title={ListeningSession.title(@listening_session)}
-          subtitle={"#{@listening_session.user.username} - #{PremiereEcouteCore.Date.date(@listening_session.inserted_at)}"}
-        />
-      </div>
-      <div class="w-1/3">
-        <.source_details listening_session={@listening_session} />
-      </div>
-    </div>
+  <div class="relative min-h-screen text-white" style="background: #0a0010;">
+    <%= if @listening_session do %>
+      <%!-- Current viewer's Twitch ID for personal vote display --%>
+      <% my_twitch_id =
+        assigns[:current_scope] && assigns[:current_scope].user && assigns[:current_scope].user.twitch &&
+          assigns[:current_scope].user.twitch.user_id %>
 
-    <div class="max-w-7xl mx-auto px-6 flex h-screen">
-      <div class="w-1/3 p-6 overflow-y-auto">
-        <.gradient_bg class="p-6 mb-6" status={@listening_session.status} statutes={[:preparing, :active]}>
-          <.live_component
-            module={PremiereEcouteWeb.Sessions.Components.SpotifyPlayer}
-            id="spotify-player"
-            listening_session={@listening_session}
-            player_state={@player_state}
-            current_scope={@current_scope}
+      <% entity = PremiereEcoute.Sessions.ListeningSession.entity(@listening_session) %>
+
+      <%!-- Hero backdrop: absolute so it doesn't push content down --%>
+      <div class="absolute inset-x-0 top-0 h-[32rem]">
+        <div class="max-w-6xl mx-auto px-6 h-full relative overflow-hidden">
+          <img
+            src={entity.cover_url}
+            alt=""
+            aria-hidden="true"
+            class="w-full h-full object-cover object-top"
+            style="filter: blur(4px) brightness(0.9) saturate(1.8);"
           />
-        </.gradient_bg>
+        </div>
+        <div
+          class="absolute inset-0"
+          style="background: linear-gradient(to bottom, transparent 0%, rgba(10,0,16,0.3) 55%, #0a0010 85%);"
+        >
+        </div>
+      </div>
 
-        <.gradient_bg class="p-6">
-          <div class="flex items-center space-x-3 mb-4">
-            <div class="flex items-center w-full">
-              <.status_badge size="sm">{gettext("Vote Format")}: {vote_type_display(@listening_session)}</.status_badge>
-              <div class="flex-1"></div>
-              <.status_badge status={Atom.to_string(@listening_session.status)} size="sm" />
-            </div>
-          </div>
+      <%!-- Two-column layout --%>
+      <div class="max-w-6xl mx-auto px-6 pb-20 relative z-10 pt-72">
+        <div class="flex gap-10 items-start">
+          <%!-- Left column --%>
+          <div class="w-64 shrink-0 space-y-6">
+            <%!-- Back link --%>
+            <.link
+              id="back-link"
+              phx-hook="BackLink"
+              navigate={~p"/sessions/retrospective"}
+              class="inline-flex items-center gap-1.5 ml-6 px-2.5 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              {gettext("Back to history")}
+            </.link>
 
-          <div class="space-y-3">
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <.session_stat
-                show={@listening_session.options["scores"]}
-                report={@report}
-                base="10"
-                key="viewer_score"
-                legend={gettext("Viewers")}
-              />
-              <.session_stat
-                show={@listening_session.options["scores"]}
-                report={@report}
-                base="10"
-                key="streamer_score"
-                legend={gettext("Streamer")}
-              />
-              <.session_stat
-                show={@listening_session.options["votes"]}
-                report={@report}
-                key="unique_votes"
-                legend={gettext("Total Votes")}
-              />
-              <.session_stat
-                show={@listening_session.options["votes"]}
-                report={@report}
-                key="unique_voters"
-                legend={gettext("Unique Voters")}
-              />
-            </div>
+            <%!-- Cover --%>
+            <img
+              src={entity.cover_url}
+              alt={PremiereEcoute.Discography.title(entity)}
+              class="w-full aspect-square object-cover rounded-lg shadow-2xl"
+              style="box-shadow: 0 8px 40px rgba(0,0,0,0.7);"
+            />
 
-            <div class="flex justify-center space-x-6 pt-2">
-              <.session_toggle
-                phx-click="toggle"
-                phx-value-flag="votes"
-                checked={@listening_session.options["votes"]}
-                legend={gettext("Display votes")}
-              />
-              <.session_toggle
-                phx-click="toggle"
-                phx-value-flag="scores"
-                checked={@listening_session.options["scores"]}
-                legend={gettext("Display scores")}
-              />
-            </div>
-            
-<!-- Next Track Timer/Slider — not shown for :track or :free -->
-            <%= if @listening_session.source not in [:track, :free] do %>
-              <div class="mt-4 pt-4 border-t border-white/20 space-y-2">
-                <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
-              </div>
-            <% end %>
-            
-<!-- Free mode controls: capture + open/close vote window -->
-            <%= if @listening_session.source == :free && @listening_session.status == :active do %>
-              <div class="mt-4 pt-4 border-t border-white/20 space-y-2">
-                <button
-                  phx-click="capture_track"
-                  disabled={@open_vote}
-                  class={[
-                    "w-full py-2 px-4 rounded-lg font-medium text-sm flex items-center justify-center space-x-2 transition-colors",
-                    if(@open_vote,
-                      do: "bg-gray-700/50 text-gray-500 cursor-not-allowed",
-                      else: "bg-amber-600 hover:bg-amber-700 text-white"
-                    )
-                  ]}
-                >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 9.24a.75.75 0 00-1.1 1.02l3.25 3.5a.75.75 0 001.1 0l3.25-3.5a.75.75 0 10-1.1-1.02l-1.95 2.1V6.75z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  <span>{gettext("Capture current song")}</span>
-                </button>
-
-                <div class="flex space-x-2">
-                  <button
-                    phx-click="open_votes"
-                    disabled={@open_vote || is_nil(@listening_session.single_id)}
-                    class={[
-                      "flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center space-x-1 transition-colors",
-                      if(@open_vote || is_nil(@listening_session.single_id),
-                        do: "bg-gray-700/50 text-gray-500 cursor-not-allowed",
-                        else: "bg-green-600 hover:bg-green-700 text-white"
-                      )
-                    ]}
-                  >
-                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                    <span>{gettext("Open votes")}</span>
-                  </button>
-
-                  <button
-                    phx-click="close_votes"
-                    disabled={!@open_vote}
-                    class={[
-                      "flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center space-x-1 transition-colors",
-                      if(!@open_vote,
-                        do: "bg-gray-700/50 text-gray-500 cursor-not-allowed",
-                        else: "bg-orange-600 hover:bg-orange-700 text-white"
-                      )
-                    ]}
-                  >
-                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                    <span>{gettext("Close votes")}</span>
-                  </button>
-                </div>
-              </div>
-            <% end %>
-            
-<!-- Session control buttons and visibility selector -->
-            <div class="mt-4 pt-4 border-t border-white/20">
-              <div class="flex space-x-2">
-                <%= if @listening_session.status == :preparing do %>
-                  <button
-                    phx-click="start_session"
-                    class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-2 px-4 rounded-lg font-medium transition-all duration-200 text-sm flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
-                  >
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                    </svg>
-                    <span>{gettext("Start Session")}</span>
-                  </button>
-                <% end %>
-
-                <%= if @listening_session.status == :active do %>
-                  <button
-                    phx-click="stop_session"
-                    class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
-                  >
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                    <span>{gettext("End Session")}</span>
-                  </button>
-                <% end %>
-
-                <%= if @listening_session.status == :stopped do %>
-                  <.link
-                    navigate={~p"/sessions/#{@listening_session.id}/retrospective"}
-                    class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium text-sm flex items-center justify-center space-x-2 shadow-lg transition-all"
-                    target="_blank"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2V7a2 2 0 012-2h2a2 2 0 002 2v6a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 00-2 2h-2a2 2 0 00-2 2v6a2 2 0 01-2 2H9z"
-                      />
-                    </svg>
-                    <span>{gettext("View Retrospective")}</span>
-                  </.link>
-                <% end %>
-              </div>
-
-              <%= if @listening_session.status == :stopped do %>
-                <%= if length(@listening_session.track_markers) > 0 do %>
-                  <div class="mt-2">
+            <%!-- Replays --%>
+            <% replays = @listening_session.replays || [] %>
+            <% is_owner =
+              assigns[:current_scope] && assigns[:current_scope].user &&
+                assigns[:current_scope].user.id == @listening_session.user_id %>
+            <%= if replays != [] || is_owner do %>
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500">
+                    {gettext("Replays")}
+                  </h3>
+                  <%= if is_owner do %>
                     <button
-                      phx-click="open_youtube_modal"
-                      class="w-full bg-gradient-to-br from-red-500 via-orange-600 to-pink-600 hover:from-red-600 hover:via-orange-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium text-sm flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transition-all"
+                      phx-click="open_replays_modal"
+                      class="text-slate-600 hover:text-white transition-colors"
+                      title={gettext("Edit replays")}
                     >
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
                       </svg>
-                      <span>{gettext("Export to Youtube")}</span>
                     </button>
+                  <% end %>
+                </div>
+                <%= if replays == [] do %>
+                  <p class="text-slate-600 text-xs py-1">{gettext("No replays yet.")}</p>
+                <% else %>
+                  <div class="space-y-2">
+                    <%= for replay <- replays do %>
+                      <a
+                        href={replay["url"]}
+                        target="_blank"
+                        rel="noopener"
+                        class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm transition-all"
+                      >
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        {replay["label"] || replay["url"]}
+                      </a>
+                    <% end %>
                   </div>
                 <% end %>
+              </div>
+            <% end %>
 
-                <div class="mt-2">
-                  <.visibility_dropdown
-                    current_visibility={@listening_session.visibility}
-                    visibility_options={[
-                      %{
-                        value: :private,
-                        label: visibility_label(:private),
-                        description: visibility_description(:private)
-                      },
-                      %{
-                        value: :protected,
-                        label: visibility_label(:protected),
-                        description: visibility_description(:protected)
-                      },
-                      %{
-                        value: :public,
-                        label: visibility_label(:public),
-                        description: visibility_description(:public)
-                      }
-                    ]}
-                  />
-                </div>
-              <% end %>
+            <%!-- Where to listen --%>
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                {gettext("Where to listen")}
+              </h3>
+              <div class="space-y-2">
+                <%= for {provider, id} <- entity.provider_ids do %>
+                  <a
+                    href={PremiereEcoute.Discography.url(entity, provider)}
+                    target="_blank"
+                    rel="noopener"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-[#1DB954]/10 border border-white/10 hover:border-[#1DB954]/40 text-slate-300 hover:text-[#1DB954] text-sm transition-all"
+                  >
+                    <%= case provider do %>
+                      <% :spotify -> %>
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                        </svg>
+                        Spotify
+                      <% :deezer -> %>
+                        Deezer
+                      <% _ -> %>
+                        {String.capitalize(to_string(provider))}
+                    <% end %>
+                  </a>
+                <% end %>
+              </div>
+            </div>
+
+            <%!-- Links --%>
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                {gettext("Links")}
+              </h3>
+              <div class="space-y-2">
+                <.link
+                  navigate={~p"/sessions/#{@listening_session}/dashboard"}
+                  class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm transition-all"
+                >
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                    />
+                  </svg>
+                  {gettext("Dashboard")}
+                </.link>
+                <.link
+                  navigate={~p"/sessions/#{@listening_session.id}/retrospective"}
+                  class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm transition-all"
+                >
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                  </svg>
+                  {gettext("Retrospective")}
+                </.link>
+              </div>
             </div>
           </div>
-        </.gradient_bg>
-      </div>
-      
-<!-- Right Column - Track List (2/3) -->
-      <div class="w-2/3 p-6 overflow-y-auto">
-        <.vote_bar listening_session={@listening_session} open_vote={@open_vote} user_current_rating={@user_current_rating} />
 
-        <%= if @listening_session.options["scores"] && @listening_session.source != :track do %>
-          <.gradient_bg status={@listening_session.status} statutes={[:active, :stopped]}>
-            <.note_graph listening_session={@listening_session} trends={@vote_trends} />
-          </.gradient_bg>
-        <% end %>
+          <%!-- Right column --%>
+          <div class="flex-1 min-w-0">
+            <%!-- Title + artist --%>
+            <div class="mb-6">
+              <h1 class="text-4xl font-bold text-white leading-tight mb-1">
+                {PremiereEcoute.Discography.title(entity)}
+              </h1>
+              <%= if entity.artist && entity.artist.slug do %>
+                <.link
+                  navigate={~p"/discography/artists/#{entity.artist.slug}"}
+                  class="text-xl text-purple-300 hover:text-purple-100 transition-colors"
+                >
+                  {entity.artist}
+                </.link>
+              <% else %>
+                <p class="text-xl text-purple-300">{entity.artist}</p>
+              <% end %>
 
-        <div class="mb-6 mt-8">
-          <%= if @listening_session.source == :free do %>
-            <!-- Free mode: show captured track markers list + current captured track -->
-            <%= if @listening_session.single do %>
-              <div class={[
-                "rounded-lg overflow-hidden border-2 mb-4",
-                if(@open_vote, do: "border-green-500/50", else: "border-amber-500/50")
-              ]}>
-                <div class={[
-                  "p-4",
-                  if(@open_vote, do: "bg-green-600/20", else: "bg-amber-600/10")
-                ]}>
-                  <div class="flex items-center space-x-4">
-                    <%= if @listening_session.single.cover_url do %>
-                      <img src={@listening_session.single.cover_url} class="w-14 h-14 rounded-lg shadow-lg flex-shrink-0" />
+              <div class="flex items-center gap-3 mt-3 text-sm text-slate-500">
+                <%= case @listening_session.source do %>
+                  <% :album -> %>
+                    <%= if @listening_session.album.release_date do %>
+                      <span>{@listening_session.album.release_date.year}</span>
+                      <span>·</span>
                     <% end %>
-                    <div class="flex-1 min-w-0">
-                      <h4 class={["font-medium text-lg truncate", if(@open_vote, do: "text-green-300", else: "text-amber-300")]}>
-                        {@listening_session.single.name}
-                      </h4>
-                      <p class={["text-sm", if(@open_vote, do: "text-green-400", else: "text-amber-400")]}>
-                        {@listening_session.single.artist}
-                      </p>
-                    </div>
-                    <%= if @listening_session.status == :active do %>
-                      <div class={[
-                        "inline-flex items-center px-2 py-1 rounded text-xs font-medium flex-shrink-0",
-                        if(@open_vote, do: "bg-green-500/20 text-green-300", else: "bg-amber-500/20 text-amber-300")
-                      ]}>
-                        <%= if @open_vote do %>
-                          {gettext("Open votes")}
-                        <% else %>
-                          {gettext("Closed votes")}
+                    <% total_tracks = @listening_session.album.total_tracks || length(@listening_session.album.tracks) %>
+                    <%= if total_tracks > 0 do %>
+                      <span>{ngettext("1 track", "%{count} tracks", total_tracks, count: total_tracks)}</span>
+                      <span>·</span>
+                    <% end %>
+                  <% :playlist -> %>
+                    <% total_tracks = length(@listening_session.playlist.tracks) %>
+                    <%= if total_tracks > 0 do %>
+                      <span>{ngettext("1 track", "%{count} tracks", total_tracks, count: total_tracks)}</span>
+                      <span>·</span>
+                    <% end %>
+                  <% :track -> %>
+                <% end %>
+                <%= if @listening_session.started_at do %>
+                  <span>
+                    {gettext("Listened on %{date} by %{name}",
+                      date: Calendar.strftime(@listening_session.started_at, "%B %d, %Y"),
+                      name: @listening_session.user.username
+                    )}
+                  </span>
+                <% end %>
+              </div>
+            </div>
+
+            <%!-- Per-track votes for the current viewer --%>
+            <% my_votes =
+              if my_twitch_id && @report do
+                my_votes_by_track(@report, my_twitch_id)
+              end %>
+
+            <%!-- Scores --%>
+            <%= if @report && @report.session_summary do %>
+              <% viewer_dist = vote_distribution(@report, @listening_session, :viewer) %>
+              <% streamer_dist = vote_distribution(@report, @listening_session, :streamer) %>
+              <% my_session_score =
+                if my_votes && map_size(my_votes) > 0 do
+                  vals =
+                    my_votes
+                    |> Map.values()
+                    |> Enum.flat_map(fn v ->
+                      case Integer.parse(v) do
+                        {n, ""} -> [n]
+                        _ -> []
+                      end
+                    end)
+
+                  if vals != [], do: Float.round(Enum.sum(vals) / length(vals), 1)
+                end %>
+              <div class="flex gap-4 mb-8">
+                <div class="flex-1 bg-white/5 border border-white/10 rounded-xl p-4">
+                  <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">{gettext("Viewers")}</p>
+                  <div class="flex items-end gap-3">
+                    <p class="text-3xl font-bold text-purple-300 leading-none shrink-0">
+                      {@report.session_summary[:viewer_score]}
+                    </p>
+                    <%= if viewer_dist != [] do %>
+                      <div id="bar-viewer" phx-hook="BarBounce" class="flex items-end gap-px flex-1 h-8">
+                        <%= for {n, bar_pct, real_pct} <- viewer_dist do %>
+                          <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
+                            <div data-bar style="transform-origin: bottom;" class="w-full h-full bg-slate-600 rounded-sm"></div>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
+                              {n}: {real_pct}%
+                            </div>
+                          </div>
                         <% end %>
                       </div>
                     <% end %>
                   </div>
                 </div>
-                <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
-                  <div class="flex items-end justify-center h-32 mx-auto w-4/5">
-                    <.distribution_graph
-                      listening_session={@listening_session}
-                      report={@report}
-                      track={@listening_session.single}
-                    />
-                  </div>
-                </div>
-              </div>
-            <% end %>
-
-            <%= if length(@listening_session.track_markers) > 0 do %>
-              <div class="space-y-2">
-                <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">{gettext("Captured tracks")}</h3>
-                <%= for {marker, i} <- @listening_session.track_markers |> Enum.sort_by(& &1.track_number) |> Enum.with_index(1) do %>
-                  <div class="flex items-center space-x-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                    <span class="text-gray-400 text-sm w-5 text-right flex-shrink-0">{i}</span>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-white text-sm font-medium truncate">{marker.track_name || gettext("Unknown track")}</p>
-                    </div>
-                    <%= if @listening_session.options["votes"] do %>
-                      <.session_track_stat
-                        report={@report}
-                        track={%{id: marker.track_id}}
-                        key="unique_votes"
-                        color="purple"
-                        legend={gettext("Votes")}
-                      />
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-
-            <%= if is_nil(@listening_session.single) && length(@listening_session.track_markers) == 0 do %>
-              <div class="text-center py-16 text-gray-400">
-                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <p>{gettext("No tracks captured yet.")}</p>
-                <p class="text-sm mt-1 text-gray-500">{gettext("Use the \"Capture current song\" button to add tracks.")}</p>
-              </div>
-            <% end %>
-          <% end %>
-
-          <%= if @listening_session.source == :track do %>
-            <!-- Single track session: show the single prominently -->
-            <div class={[
-              "rounded-lg overflow-hidden border-2",
-              if(@open_vote, do: "border-green-500/50", else: "border-orange-500/50")
-            ]}>
-              <div class={[
-                "p-4",
-                if(@open_vote, do: "bg-green-600/20", else: "bg-orange-600/20")
-              ]}>
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-4 flex-1 min-w-0">
-                    <%= if @listening_session.single.cover_url do %>
-                      <img src={@listening_session.single.cover_url} class="w-14 h-14 rounded-lg shadow-lg flex-shrink-0" />
-                    <% end %>
-                    <div class="flex-1 min-w-0">
-                      <h4 class={["font-medium text-lg truncate", if(@open_vote, do: "text-green-300", else: "text-orange-300")]}>
-                        {@listening_session.single.name}
-                      </h4>
-                      <p class={["text-sm", if(@open_vote, do: "text-green-400", else: "text-orange-400")]}>
-                        {@listening_session.single.artist} · {PremiereEcouteCore.Duration.timer(
-                          @listening_session.single.duration_ms
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center space-x-8 text-sm flex-shrink-0">
-                    <%= if @listening_session.status == :active do %>
-                      <div class="text-center">
-                        <div class={[
-                          "inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-1",
-                          if(@open_vote, do: "bg-green-500/20 text-green-300", else: "bg-orange-500/20 text-orange-300")
-                        ]}>
-                          <%= if @open_vote do %>
-                            {gettext("Open votes")}
-                          <% else %>
-                            {gettext("Closed votes")}
-                          <% end %>
-                        </div>
+                <div class="flex-1 bg-white/5 border border-white/10 rounded-xl p-4">
+                  <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">{gettext("Streamer")}</p>
+                  <div class="flex items-end gap-3">
+                    <p class="text-3xl font-bold text-pink-300 leading-none shrink-0">
+                      {@report.session_summary[:streamer_score]}
+                    </p>
+                    <%= if streamer_dist != [] do %>
+                      <div id="bar-streamer" phx-hook="BarBounce" class="flex items-end gap-px flex-1 h-8">
+                        <%= for {n, bar_pct, real_pct} <- streamer_dist do %>
+                          <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
+                            <div data-bar style="transform-origin: bottom;" class="w-full h-full bg-slate-600 rounded-sm"></div>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
+                              {n}: {real_pct}%
+                            </div>
+                          </div>
+                        <% end %>
                       </div>
                     <% end %>
                   </div>
                 </div>
-              </div>
-
-              <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
-                <div class="flex items-end justify-center h-32 mx-auto w-4/5">
-                  <.distribution_graph listening_session={@listening_session} report={@report} track={@listening_session.single} />
-                </div>
-              </div>
-            </div>
-          <% else %>
-            <%= if @listening_session.source != :free && length(ListeningSession.tracks(@listening_session)) > 0 do %>
-              <div class="flex flex-col space-y-3">
-                <%= for {track, index} <- Enum.with_index(ListeningSession.tracks(@listening_session), 1) do %>
-                  <div class={[
-                    "rounded-lg transition-colors overflow-hidden",
-                    if(ListeningSession.current?(@listening_session, track),
-                      do:
-                        if(@open_vote,
-                          do: "order-first mb-3 border-2 border-green-500/50 hover:bg-green-300/30",
-                          else: "order-first mb-3 border-2 border-orange-500/50 hover:bg-orange-300/30"
-                        ),
-                      else: "border-purple-300/50 border-2 hover:bg-purple-300/30"
-                    )
-                  ]}>
-                    <div class={[
-                      "p-4 transition-colors",
-                      if(ListeningSession.current?(@listening_session, track),
-                        do:
-                          if(@open_vote,
-                            do: "bg-green-600/20 hover:bg-green-600/30",
-                            else: "bg-orange-600/20 hover:bg-orange-600/30"
-                          ),
-                        else: ""
-                      )
-                    ]}>
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4 flex-1 min-w-0">
-                          <%= if ListeningSession.current?(@listening_session, track) do %>
-                            <span class={[
-                              "text-lg w-8 flex-shrink-0 font-medium",
-                              if(@open_vote, do: "text-green-400", else: "text-orange-400")
-                            ]}>
-                              {index}
-                            </span>
-                          <% else %>
-                            <span class="text-lg text-gray-400 w-8 flex-shrink-0">{Map.get(track, :track_number, index)}</span>
-                          <% end %>
-                          <div class="flex-1 min-w-0">
-                            <h4 class={[
-                              "font-medium text-lg truncate",
-                              if(ListeningSession.current?(@listening_session, track),
-                                do: if(@open_vote, do: "text-green-300", else: "text-orange-300"),
-                                else: "text-white"
-                              )
-                            ]}>
-                              {track.name}
-                            </h4>
-                            <p class={[
-                              "text-sm",
-                              if(ListeningSession.current?(@listening_session, track),
-                                do: if(@open_vote, do: "text-green-400", else: "text-orange-400"),
-                                else: "text-gray-400"
-                              )
-                            ]}>
-                              {PremiereEcouteCore.Duration.timer(track.duration_ms)}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div class="flex items-center space-x-8 text-sm flex-shrink-0">
-                          <%= if @listening_session.status == :active && ListeningSession.current?(@listening_session, track) do %>
-                            <div class="text-center">
-                              <div class={[
-                                "inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-1",
-                                if(@open_vote, do: "bg-green-500/20 text-green-300", else: "bg-orange-500/20 text-orange-300")
-                              ]}>
-                                <%= if @open_vote do %>
-                                  {gettext("Open votes")}
-                                <% else %>
-                                  {gettext("Closed votes")}
-                                <% end %>
+                <%= if my_session_score do %>
+                  <% my_dist = my_vote_distribution(my_votes, @listening_session) %>
+                  <div class="flex-1 bg-white/5 border border-cyan-400/20 rounded-xl p-4">
+                    <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">{gettext("Me")}</p>
+                    <div class="flex items-end gap-3">
+                      <p class="text-3xl font-bold text-cyan-300 leading-none shrink-0">{my_session_score}</p>
+                      <%= if my_dist != [] do %>
+                        <div id="bar-me" phx-hook="BarBounce" class="flex items-end gap-px flex-1 h-8">
+                          <%= for {n, bar_pct, real_pct} <- my_dist do %>
+                            <div class="relative flex-1 group/bar" style={"height: #{max(bar_pct, 4)}%;"}>
+                              <div data-bar style="transform-origin: bottom;" class="w-full h-full bg-slate-600 rounded-sm"></div>
+                              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 rounded bg-slate-800 text-white text-xs whitespace-nowrap opacity-0 group-hover/bar:opacity-100 pointer-events-none transition-opacity z-10">
+                                {n}: {real_pct}%
                               </div>
                             </div>
                           <% end %>
-                          <%= if @listening_session.options["votes"] do %>
-                            <.session_track_stat
-                              report={@report}
-                              track={track}
-                              key="unique_votes"
-                              color="purple"
-                              legend={gettext("Votes")}
-                            />
-                          <% end %>
-                          <%= if @listening_session.options["scores"] do %>
-                            <.session_track_stat
-                              report={@report}
-                              track={track}
-                              key="viewer_score"
-                              color="pink"
-                              legend={gettext("Score")}
-                            />
-                            <.session_track_stat
-                              report={@report}
-                              track={track}
-                              key="streamer_score"
-                              color="emerald"
-                              legend={gettext("My Score")}
-                            />
-                          <% end %>
                         </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+
+            <%!-- Track list --%>
+            <%= if @listening_session.source in [:album, :playlist] && @tracks != [] do %>
+              <section>
+                <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                  {gettext("Tracks")}
+                </h2>
+                <div class="space-y-1">
+                  <%= for track <- @tracks do %>
+                    <% track_name =
+                      case @listening_session.source do
+                        :album -> track.track_album.name
+                        :playlist -> track.playlist_track && track.playlist_track.name
+                      end %>
+                    <% track_number =
+                      case @listening_session.source do
+                        :album -> track.track_album.track_number
+                        :playlist -> nil
+                      end %>
+                    <div class="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group">
+                      <div class="flex items-center gap-4 min-w-0">
+                        <%= if track_number do %>
+                          <span class="text-slate-600 group-hover:text-slate-400 font-mono text-base w-5 text-right shrink-0 transition-colors">
+                            {track_number}
+                          </span>
+                        <% end %>
+                        <p class="text-slate-200 group-hover:text-white text-base truncate transition-colors">
+                          {track_name}
+                        </p>
+                      </div>
+                      <% track_id = track.track_summary[:track_id] || track.track_summary["track_id"] %>
+                      <% my_track_score = my_votes && Map.get(my_votes, track_id) %>
+                      <div class="flex items-center gap-2 shrink-0 ml-4">
+                        <%= if my_track_score do %>
+                          <span class="text-sm text-slate-500 mr-1">{gettext("me")}</span>
+                          <span class="text-base font-semibold text-cyan-300 w-8 text-right">
+                            {my_track_score}
+                          </span>
+                          <span class="text-slate-700 mx-1">·</span>
+                        <% end %>
+                        <span class="text-sm text-slate-500 mr-1">{gettext("viewers")}</span>
+                        <span class="text-base font-semibold text-purple-300 w-8 text-right">
+                          {track.track_summary[:viewer_score] || track.track_summary["viewer_score"]}
+                        </span>
+                        <span class="text-slate-700 mx-1">·</span>
+                        <span class="text-sm text-slate-500 mr-1">{gettext("streamer")}</span>
+                        <span class="text-base font-semibold text-pink-300 w-8 text-right">
+                          {track.track_summary[:streamer_score] || track.track_summary["streamer_score"]}
+                        </span>
                       </div>
                     </div>
+                  <% end %>
+                </div>
+              </section>
+            <% end %>
 
-                    <%= if ListeningSession.current?(@listening_session, track) || @listening_session.status == :stopped do %>
-                      <div class="px-4 pt-4 pb-2 bg-gradient-to-br from-slate-900/30 to-gray-900/30 border-t border-slate-500/20">
-                        <div class="flex items-end justify-center h-32 mx-auto w-4/5">
-                          <.distribution_graph listening_session={@listening_session} report={@report} track={track} />
+            <%!-- Reviews section --%>
+            <%= if assigns[:current_scope] && assigns[:current_scope].user && PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_reviews, for: assigns[:current_scope].user) do %>
+              <div class="mt-8">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500">
+                    {gettext("Reviews")}
+                  </h2>
+                  <%= if !Reviews.get_for_user_and_session(@listening_session.id, assigns[:current_scope].user.id) do %>
+                    <button
+                      phx-click="open_review_modal"
+                      class="px-3 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium transition-all"
+                    >
+                      {gettext("Write a review")}
+                    </button>
+                  <% end %>
+                </div>
+
+                <%= if @reviews == [] do %>
+                  <p class="text-slate-600 text-sm py-4">{gettext("No reviews yet.")}</p>
+                <% else %>
+                  <div class="space-y-4">
+                    <%= for review <- @reviews do %>
+                      <div class={"rounded-xl p-5 #{if review.role == :streamer, do: "bg-purple-900/20 border border-purple-500/40", else: "bg-white/5 border border-white/10"}"}>
+                        <div class="flex items-start justify-between gap-4">
+                          <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                              {String.first(review.user.username || "?")}
+                            </div>
+                            <div>
+                              <p class="font-semibold text-white text-sm">{review.user.username}</p>
+                              <p class="text-xs text-slate-500">
+                                {Calendar.strftime(review.inserted_at, "%B %d, %Y")} ·
+                                <span class={"#{if review.role == :streamer, do: "text-purple-400", else: "text-pink-400"}"}>
+                                  {if review.role == :streamer, do: gettext("Streamer"), else: gettext("Viewer")}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-3 shrink-0">
+                            <%= if review.rating && review.rating > 0 do %>
+                              <div class="flex items-center gap-0.5">
+                                <%= for star <- 1..5 do %>
+                                  <svg class="w-4 h-4" viewBox="0 0 24 24">
+                                    <defs>
+                                      <clipPath id={"card-star-left-#{review.id}-#{star}"}>
+                                        <rect x="0" y="0" width="12" height="24" />
+                                      </clipPath>
+                                      <clipPath id={"card-star-right-#{review.id}-#{star}"}>
+                                        <rect x="12" y="0" width="12" height="24" />
+                                      </clipPath>
+                                    </defs>
+                                    <path
+                                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                      class="text-slate-700"
+                                      fill="currentColor"
+                                    />
+                                    <%= if review.rating >= star - 0.5 do %>
+                                      <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                        class="text-yellow-400"
+                                        fill="currentColor"
+                                        clip-path={"url(#card-star-left-#{review.id}-#{star})"}
+                                      />
+                                    <% end %>
+                                    <%= if review.rating >= star do %>
+                                      <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                        class="text-yellow-400"
+                                        fill="currentColor"
+                                        clip-path={"url(#card-star-right-#{review.id}-#{star})"}
+                                      />
+                                    <% end %>
+                                  </svg>
+                                <% end %>
+                              </div>
+                            <% end %>
+                            <%= if review.like != nil do %>
+                              <svg
+                                class={"w-5 h-5 #{if review.like, do: "text-red-500 fill-red-500", else: "text-slate-500 fill-none"}"}
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                />
+                              </svg>
+                            <% end %>
+                            <%= if assigns[:current_scope] && assigns[:current_scope].user && assigns[:current_scope].user.id == review.user_id do %>
+                              <button
+                                phx-click="open_review_modal"
+                                class="text-slate-600 hover:text-white transition-colors"
+                                title={gettext("Edit")}
+                              >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
+                                </svg>
+                              </button>
+                              <button
+                                phx-click="delete_review"
+                                phx-value-id={review.id}
+                                data-confirm={gettext("Delete your review?")}
+                                class="text-slate-600 hover:text-red-400 transition-colors"
+                                title={gettext("Delete")}
+                              >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
+                                </svg>
+                              </button>
+                            <% end %>
+                          </div>
+                        </div>
+                        <%= if review.content && review.content != "" do %>
+                          <p class="mt-3 text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{review.content}</p>
+                        <% end %>
+                        <%= if review.tags && review.tags != [] do %>
+                          <div class="mt-3 flex flex-wrap gap-1.5">
+                            <%= for tag <- review.tags do %>
+                              <span class="px-2 py-0.5 bg-purple-900/40 text-purple-300 text-xs rounded-full border border-purple-400/20">
+                                {tag}
+                              </span>
+                            <% end %>
+                          </div>
+                        <% end %>
+                        <div class="mt-2 flex items-center gap-2 text-xs text-slate-600">
+                          <%!-- Like button --%>
+                          <% liked = MapSet.member?(@liked_ids, review.id) %>
+                          <% like_count = review.likes_count %>
+                          <%= if assigns[:current_scope] && assigns[:current_scope].user do %>
+                            <button
+                              phx-click="toggle_like_review"
+                              phx-value-id={review.id}
+                              class={"flex items-center gap-1 transition-colors #{if liked, do: "text-pink-400", else: "text-slate-600 hover:text-pink-400"}"}
+                              title={if liked, do: gettext("Unlike"), else: gettext("Like")}
+                            >
+                              <svg
+                                id={"like-heart-#{review.id}"}
+                                phx-hook="LikeHeart"
+                                class="w-4 h-4"
+                                fill={if liked, do: "currentColor", else: "none"}
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                />
+                              </svg>
+                              <span>{like_count}</span>
+                            </button>
+                          <% end %>
+                          <%= if review.watched_on do %>
+                            <span>•</span>
+                            <span>{gettext("Listened on")} {Calendar.strftime(review.watched_on, "%B %d, %Y")}</span>
+                          <% end %>
                         </div>
                       </div>
                     <% end %>
                   </div>
                 <% end %>
               </div>
-            <% else %>
-              <%= if @listening_session.source != :free do %>
-                <div class="text-center py-16 text-gray-400">
-                  <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                  </svg>
-                  <p>{gettext("No tracks found for this session.")}</p>
-                </div>
-              <% end %>
             <% end %>
-          <% end %>
+          </div>
         </div>
       </div>
-    </div>
+
+      <%!-- Replays modal --%>
+      <%= if @replays_modal_open do %>
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-lg shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-bold text-white">{gettext("Edit replays")}</h3>
+              <button phx-click="close_replays_modal" class="text-slate-500 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form phx-submit="save_replays" class="space-y-3">
+              <%= for {entry, index} <- Enum.with_index(@replays_entries) do %>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="text"
+                    name={"replays[#{index}][label]"}
+                    value={entry["label"]}
+                    placeholder={gettext("Label (e.g. YouTube VOD)")}
+                    class="w-32 shrink-0 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                  />
+                  <input
+                    type="url"
+                    name={"replays[#{index}][url]"}
+                    value={entry["url"]}
+                    placeholder="https://..."
+                    class="flex-1 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                  />
+                  <button
+                    type="button"
+                    phx-click="remove_replay_entry"
+                    phx-value-index={index}
+                    class="text-slate-600 hover:text-red-400 transition-colors shrink-0"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              <% end %>
+
+              <button
+                type="button"
+                phx-click="add_replay_entry"
+                class="flex items-center gap-1.5 text-slate-500 hover:text-white text-sm transition-colors"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                {gettext("Add link")}
+              </button>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                >
+                  {gettext("Save")}
+                </button>
+                <button
+                  type="button"
+                  phx-click="close_replays_modal"
+                  class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                >
+                  {gettext("Cancel")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      <% end %>
+
+      <%!-- Review modal --%>
+      <%= if @review_modal_open && @review_form do %>
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-2xl shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-bold text-white">
+                {if @editing_review, do: gettext("Edit your review"), else: gettext("Write a review")}
+              </h3>
+              <button phx-click="close_review_modal" class="text-slate-500 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <.form for={@review_form} phx-submit="save_review" phx-change="update_review_form" class="space-y-4">
+              <input type="hidden" name="review[role]" value={@review_form[:role].value} />
+
+              <%!-- Line 1: Watched on + Watched before --%>
+              <div class="flex items-end gap-4">
+                <div class="flex items-center gap-3">
+                  <label class="text-xs font-medium text-slate-400 shrink-0">{gettext("Listened on")}</label>
+                  <input
+                    type="date"
+                    name="review[watched_on]"
+                    value={to_string(@review_form[:watched_on].value || Date.utc_today())}
+                    class="bg-black/40 border border-white/20 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-purple-400"
+                  />
+                </div>
+                <div class="flex items-center gap-2 pb-2">
+                  <input
+                    type="checkbox"
+                    name="review[watched_before]"
+                    id="watched_before_modal"
+                    value="true"
+                    checked={@review_form[:watched_before].value}
+                    class="w-4 h-4 accent-purple-500"
+                  />
+                  <label for="watched_before_modal" class="text-xs text-slate-400">{gettext("Knew it before")}</label>
+                </div>
+              </div>
+
+              <%!-- Line 2: Content --%>
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Your thoughts")}</label>
+                <textarea
+                  name="review[content]"
+                  rows="10"
+                  class="w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400 resize-none"
+                  placeholder={gettext("Share your thoughts about this session...")}
+                >{@review_form[:content].value}</textarea>
+              </div>
+
+              <%!-- Line 3: Tags + Rating + Like --%>
+              <div class="flex items-end gap-4">
+                <div class="flex-1">
+                  <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Tags")}</label>
+                  <input
+                    type="text"
+                    name="review[tags_input]"
+                    value={@review_form[:tags_input].value || Enum.join(@review_form[:tags].value || [], ", ")}
+                    class="w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                    placeholder={gettext("jazz, chill...")}
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Rating")}</label>
+                  <% rating_val =
+                    (@review_form[:rating].value || 0.0) |> then(&if(is_binary(&1), do: String.to_float(&1), else: &1 * 1.0)) %>
+                  <input type="hidden" name="review[rating]" value={rating_val} />
+                  <div class="flex items-center gap-0.5">
+                    <%= for star <- 1..5 do %>
+                      <div class="relative w-8 h-8 cursor-pointer">
+                        <svg class="w-8 h-8 absolute inset-0 pointer-events-none" viewBox="0 0 24 24">
+                          <defs>
+                            <clipPath id={"star-left-#{star}"}>
+                              <rect x="0" y="0" width="12" height="24" />
+                            </clipPath>
+                            <clipPath id={"star-right-#{star}"}>
+                              <rect x="12" y="0" width="12" height="24" />
+                            </clipPath>
+                          </defs>
+                          <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                            class="text-slate-700"
+                            fill="currentColor"
+                          />
+                          <%= if rating_val >= star - 0.5 do %>
+                            <path
+                              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                              class="text-yellow-400"
+                              fill="currentColor"
+                              clip-path={"url(#star-left-#{star})"}
+                            />
+                          <% end %>
+                          <%= if rating_val >= star do %>
+                            <path
+                              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                              class="text-yellow-400"
+                              fill="currentColor"
+                              clip-path={"url(#star-right-#{star})"}
+                            />
+                          <% end %>
+                        </svg>
+                        <button
+                          type="button"
+                          phx-click="set_review_rating"
+                          phx-value-rating={star - 0.5}
+                          class="absolute inset-y-0 left-0 w-1/2"
+                        />
+                        <button
+                          type="button"
+                          phx-click="set_review_rating"
+                          phx-value-rating={star}
+                          class="absolute inset-y-0 right-0 w-1/2"
+                        />
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="flex flex-col items-center">
+                  <label class="text-xs font-medium text-slate-400 mb-1.5">{gettext("Like")}</label>
+                  <% like_val = @review_form[:like].value %>
+                  <input type="hidden" name="review[like]" value={if like_val == nil, do: "", else: to_string(like_val)} />
+                  <button
+                    type="button"
+                    phx-click="toggle_review_like"
+                    class="flex items-center justify-center w-8 h-8 transition-transform active:scale-90"
+                  >
+                    <svg
+                      class={"w-8 h-8 transition-colors #{if like_val == true, do: "fill-red-500 text-red-500", else: "fill-none text-slate-400 hover:text-red-400"}"}
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-1">
+                <button
+                  type="submit"
+                  class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                >
+                  {gettext("Save")}
+                </button>
+                <button
+                  type="button"
+                  phx-click="close_review_modal"
+                  class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                >
+                  {gettext("Cancel")}
+                </button>
+              </div>
+            </.form>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="max-w-6xl mx-auto px-6 py-20 text-center">
+        <p class="text-slate-400 mb-4">{gettext("Session not found")}</p>
+        <.link
+          navigate={~p"/sessions/retrospective"}
+          class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 text-sm"
+        >
+          {gettext("Back to history")}
+        </.link>
+      </div>
+    <% end %>
   </div>
-  
-<!-- YouTube Chapters Modal - Outside all layout containers for proper overlay -->
-  <%= if @show_youtube_modal do %>
-    <.live_component
-      module={PremiereEcouteWeb.Sessions.Components.YoutubeMetadata}
-      id="youtube-chapters-modal"
-      listening_session={@listening_session}
-    />
-  <% end %>
 </Layouts.app>

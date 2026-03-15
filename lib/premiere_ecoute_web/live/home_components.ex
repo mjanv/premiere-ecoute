@@ -102,7 +102,7 @@ defmodule PremiereEcouteWeb.HomeComponents do
 
   def session_row(assigns) do
     ~H"""
-    <.link href={~p"/sessions/#{@session.id}"} class="group block">
+    <.link href={~p"/sessions/#{@session}/dashboard"} class="group block">
       <div class={[
         "flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-all border-l-2",
         if(@session.status == :active, do: "border-l-green-500", else: "border-l-transparent")

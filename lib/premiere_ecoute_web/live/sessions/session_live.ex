@@ -1,630 +1,409 @@
 defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @moduledoc """
-  Individual session management LiveView.
+  Session detail page
 
-  Manages listening session lifecycle with real-time Spotify player integration, vote window controls, track navigation, visibility settings, live statistics with vote trends charts, overlay configuration, and automatic track advancement with scheduled workers.
+  Displays album metadata, session-level scores (viewer and streamer),
+  and a per-track score breakdown. Reachable from the history cover wall
+  at /retrospective/sessions/:id.
   """
 
   use PremiereEcouteWeb, :live_view
 
-  require Logger
-
-  import PremiereEcouteWeb.Sessions.Components.SessionComponents
-  import PremiereEcouteWeb.Components.Backgrounds
-
-  alias PremiereEcoute.Apis.PlayerSupervisor
-  alias PremiereEcoute.Discography.Playlist
-  alias PremiereEcoute.Events.Chat.MessageSent
-  alias PremiereEcoute.Presence
-  alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Commands.CaptureCurrentTrackListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Commands.CloseVoteWindowListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Commands.OpenVoteWindowListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
-  alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
-  alias PremiereEcoute.Sessions.ListeningSessionWorker
+  alias PremiereEcoute.Sessions.ListeningSession.Review
   alias PremiereEcoute.Sessions.Retrospective.Report
-  alias PremiereEcoute.Sessions.Retrospective.VoteTrends
-  alias PremiereEcouteCore.Cache
+  alias PremiereEcoute.Sessions.ReviewLikes
+  alias PremiereEcoute.Sessions.Reviews
 
   @impl true
-  def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
-    session_id = String.to_integer(id)
+  def mount(%{"id" => session_id}, _session, socket) do
+    session_id_int = String.to_integer(session_id)
 
-    with spotify when not is_nil(spotify) <- current_scope && current_scope.user && current_scope.user.spotify,
-         listening_session when not is_nil(listening_session) <- ListeningSession.get(session_id) do
-      if connected?(socket) do
-        Process.send_after(self(), :refresh, 100)
-        {:ok, _} = Presence.join(current_scope.user.id, :overlay)
-        PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{session_id}"])
+    listening_session =
+      session_id_int
+      |> ListeningSession.get()
+      |> Repo.preload(report: [:votes, :polls])
 
-        if listening_session.status != :stopped do
-          PlayerSupervisor.start(current_scope.user.id)
-        end
-      end
+    {:ok, report} = Report.generate(listening_session)
+    tracks = build_tracks(listening_session, report)
 
-      {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
+    reviews = Reviews.list_for_session(session_id_int)
+    review_ids = Enum.map(reviews, & &1.id)
 
+    current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
+
+    liked_ids =
+      if current_user,
+        do: ReviewLikes.liked_review_ids(review_ids, current_user.id),
+        else: MapSet.new()
+
+    socket =
       socket
       |> assign(:listening_session, listening_session)
-      |> assign(:open_vote, !is_nil(cached_session))
-      |> assign(:player_state, nil)
-      |> assign(:session_id, session_id)
-      |> assign(:user_current_rating, nil)
-      |> assign(:report, nil)
-      |> assign(:vote_trends, nil)
-      |> assign(:next_track_at, nil)
-      |> assign(:show_youtube_modal, false)
-      |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
-      |> assign_async(:vote_trends, fn ->
-        {:ok, %{vote_trends: VoteTrends.rolling_average(session_id, :minute)}}
-      end)
-      |> then(fn socket -> {:ok, socket} end)
+      |> assign(:report, report)
+      |> assign(:tracks, tracks)
+      |> assign(:reviews, reviews)
+      |> assign(:liked_ids, liked_ids)
+      |> assign(:review_modal_open, false)
+      |> assign(:review_form, nil)
+      |> assign(:editing_review, nil)
+      |> assign(:replays_modal_open, false)
+      |> assign(:replays_entries, [])
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(_params, _url, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("open_review_modal", _params, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session_id = socket.assigns.listening_session.id
+
+    existing =
+      if current_scope && current_scope.user do
+        Reviews.get_for_user_and_session(session_id, current_scope.user.id)
+      end
+
+    role =
+      if current_scope && current_scope.user do
+        session = socket.assigns.listening_session
+        if current_scope.user.id == session.user_id, do: :streamer, else: :viewer
+      else
+        :viewer
+      end
+
+    changeset =
+      if existing do
+        Review.changeset(existing, Map.from_struct(existing))
+      else
+        Review.changeset(%Review{}, %{role: role, watched_on: Date.utc_today()})
+      end
+
+    {:noreply,
+     socket
+     |> assign(:review_modal_open, true)
+     |> assign(:review_form, Phoenix.Component.to_form(changeset, as: :review))
+     |> assign(:editing_review, existing)}
+  end
+
+  @impl true
+  def handle_event("close_review_modal", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:review_modal_open, false)
+     |> assign(:review_form, nil)
+     |> assign(:editing_review, nil)}
+  end
+
+  @impl true
+  def handle_event("set_review_rating", %{"rating" => rating}, socket) do
+    {value, _} = Float.parse(rating)
+    changeset = Ecto.Changeset.put_change(socket.assigns.review_form.source, :rating, value)
+    {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+  end
+
+  @impl true
+  def handle_event("toggle_review_like", _params, socket) do
+    form = socket.assigns.review_form
+    next = if form[:like].value == true, do: nil, else: true
+    changeset = Ecto.Changeset.put_change(form.source, :like, next)
+    {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+  end
+
+  @impl true
+  def handle_event("update_review_form", %{"review" => params}, socket) do
+    # AIDEV-NOTE: cast all user-editable fields to keep the form consistent between phx-change events
+    changeset =
+      Ecto.Changeset.cast(socket.assigns.review_form.source, params, [
+        :content,
+        :tags_input,
+        :watched_on,
+        :watched_before,
+        :rating,
+        :like,
+        :role
+      ])
+
+    {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+  end
+
+  @impl true
+  def handle_event("save_review", %{"review" => params}, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session_id = socket.assigns.listening_session.id
+
+    if current_scope && current_scope.user do
+      # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
+      params = normalize_review_params(params)
+
+      session = socket.assigns.listening_session
+
+      result =
+        case socket.assigns.editing_review do
+          nil ->
+            # AIDEV-NOTE: link review to both the session and its album (when album-sourced)
+            extra = %{"session_id" => session_id, "album_id" => session.album_id}
+            Reviews.create(current_scope.user, Map.merge(params, extra))
+
+          review ->
+            Reviews.update(review, params)
+        end
+
+      case result do
+        {:ok, _} ->
+          {:noreply,
+           socket
+           |> reload_reviews(session_id, current_scope.user)
+           |> assign(:review_modal_open, false)
+           |> assign(:review_form, nil)
+           |> assign(:editing_review, nil)
+           |> put_flash(:info, gettext("Review saved"))}
+
+        {:error, changeset} ->
+          {:noreply, assign(socket, :review_form, Phoenix.Component.to_form(changeset, as: :review))}
+      end
     else
-      _ ->
-        socket
-        |> put_flash(:error, gettext("Session not found or connect to Spotify"))
-        |> redirect(to: ~p"/sessions")
-        |> then(fn socket -> {:ok, socket} end)
+      {:noreply, put_flash(socket, :error, gettext("You must be logged in to write a review"))}
     end
   end
 
   @impl true
-  def terminate(_reason, %{assigns: assigns}) do
-    Presence.unjoin(assigns.current_scope.user.id, :overlay)
-    :ok
-  end
+  def handle_event("delete_review", %{"id" => id}, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session_id = socket.assigns.listening_session.id
 
-  @impl true
-  def handle_params(_params, url, socket) do
-    {:noreply, assign(socket, :current_path, URI.parse(url).path || "/")}
-  end
+    if current_scope && current_scope.user do
+      case Reviews.delete(String.to_integer(id), current_scope.user) do
+        {:ok, _} ->
+          {:noreply,
+           socket
+           |> reload_reviews(session_id, current_scope.user)
+           |> put_flash(:info, gettext("Review deleted"))}
 
-  @impl true
-  def handle_event(
-        "start_session",
-        _params,
-        %{assigns: %{listening_session: %{source: :free} = session, current_scope: scope}} = socket
-      ) do
-    case PremiereEcoute.apply(%StartListeningSession{source: :free, session_id: session.id, scope: scope}) do
-      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
-      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
-    end
-  end
-
-  def handle_event(
-        "start_session",
-        _params,
-        %{assigns: %{listening_session: %{source: :track} = session, current_scope: scope}} = socket
-      ) do
-    case PremiereEcoute.apply(%StartListeningSession{source: :track, session_id: session.id, scope: scope}) do
-      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
-      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
-    end
-  end
-
-  def handle_event(
-        "start_session",
-        _params,
-        %{assigns: %{listening_session: session, current_scope: scope}} = socket
-      ) do
-    with {:ok, session, _} <-
-           PremiereEcoute.apply(%StartListeningSession{source: session.source, session_id: session.id, scope: scope}),
-         :ok <- :timer.sleep(1_000),
-         {:ok, session, _} <-
-           PremiereEcoute.apply(%SkipNextTrackListeningSession{source: session.source, session_id: session.id, scope: scope}) do
-      {:noreply, assign(socket, :listening_session, session)}
+        {:error, :not_found} ->
+          {:noreply, put_flash(socket, :error, gettext("Review not found"))}
+      end
     else
-      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
-    end
-  end
-
-  def handle_event(
-        "stop_session",
-        _params,
-        %{assigns: %{listening_session: session, current_scope: scope}} = socket
-      ) do
-    PremiereEcoute.PubSub.unsubscribe("playback:#{scope.user.id}")
-
-    %StopListeningSession{source: session.source, session_id: session.id, scope: scope}
-    |> PremiereEcoute.apply()
-    |> case do
-      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
-      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot stop session"))}
+      {:noreply, put_flash(socket, :error, gettext("You must be logged in to delete a review"))}
     end
   end
 
   @impl true
-  def handle_event("toggle", %{"flag" => flag}, %{assigns: assigns} = socket) do
-    options = Map.update(assigns.listening_session.options, flag, true, fn v -> !v end)
-    {:ok, listening_session} = ListeningSession.update(assigns.listening_session, %{options: options})
-    {:noreply, assign(socket, :listening_session, listening_session)}
-  end
+  def handle_event("toggle_like_review", %{"id" => id}, socket) do
+    current_scope = socket.assigns[:current_scope]
 
-  @impl true
-  def handle_event("update_next_track", %{"next_track" => value}, %{assigns: assigns} = socket) do
-    {value, _} = Integer.parse(value)
-    # value = if value in 1..4, do: 0, else: value
-    options = Map.update(assigns.listening_session.options, "next_track", 0, fn _ -> value end)
-    {:ok, listening_session} = ListeningSession.update(assigns.listening_session, %{options: options})
-    {:noreply, assign(socket, :listening_session, listening_session)}
-  end
-
-  @impl true
-  def handle_event("update_visibility", %{"visibility" => visibility}, %{assigns: assigns} = socket) do
-    {:ok, listening_session} =
-      ListeningSession.update(assigns.listening_session, %{visibility: String.to_existing_atom(visibility)})
-
-    {:noreply, assign(socket, :listening_session, listening_session)}
-  end
-
-  @impl true
-  def handle_event("vote_track", %{"rating" => rating}, socket) do
-    user_id = socket.assigns.current_scope.user.twitch.user_id
-
-    Sessions.publish_message(%MessageSent{
-      broadcaster_id: user_id,
-      user_id: user_id,
-      message: rating,
-      is_streamer: true
-    })
-
-    {:noreply, assign(socket, :user_current_rating, rating)}
-  end
-
-  @impl true
-  def handle_event("open_youtube_modal", _params, socket) do
-    {:noreply, assign(socket, :show_youtube_modal, true)}
-  end
-
-  @impl true
-  def handle_event("close_youtube_modal", _params, socket) do
-    {:noreply, assign(socket, :show_youtube_modal, false)}
-  end
-
-  @impl true
-  def handle_event(
-        "capture_track",
-        _params,
-        %{assigns: %{listening_session: session, current_scope: scope}} = socket
-      ) do
-    case PremiereEcoute.apply(%CaptureCurrentTrackListeningSession{session_id: session.id, scope: scope}) do
-      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
-      {:error, :no_active_playback} -> {:noreply, put_flash(socket, :info, gettext("Nothing is playing on Spotify."))}
-      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot capture track"))}
+    if current_scope && current_scope.user do
+      {:ok, _} = ReviewLikes.toggle(String.to_integer(id), current_scope.user)
+      {:noreply, reload_reviews(socket, socket.assigns.listening_session.id, current_scope.user)}
+    else
+      {:noreply, put_flash(socket, :error, gettext("You must be logged in to like a review"))}
     end
   end
 
   @impl true
-  def handle_event(
-        "open_votes",
-        _params,
-        %{assigns: %{listening_session: session, current_scope: scope}} = socket
-      ) do
-    case PremiereEcoute.apply(%OpenVoteWindowListeningSession{session_id: session.id, scope: scope}) do
-      {:ok, _, _} -> {:noreply, socket}
-      {:error, :no_captured_track} -> {:noreply, put_flash(socket, :error, gettext("Capture a track first."))}
-      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot open vote window"))}
+  def handle_event("open_replays_modal", _params, socket) do
+    replays = socket.assigns.listening_session.replays || []
+    entries = if replays == [], do: [%{"label" => "", "url" => ""}], else: replays
+
+    {:noreply,
+     socket
+     |> assign(:replays_modal_open, true)
+     |> assign(:replays_entries, entries)}
+  end
+
+  @impl true
+  def handle_event("close_replays_modal", _params, socket) do
+    {:noreply, assign(socket, :replays_modal_open, false)}
+  end
+
+  @impl true
+  def handle_event("add_replay_entry", _params, socket) do
+    entries = socket.assigns.replays_entries ++ [%{"label" => "", "url" => ""}]
+    {:noreply, assign(socket, :replays_entries, entries)}
+  end
+
+  @impl true
+  def handle_event("remove_replay_entry", %{"index" => index}, socket) do
+    entries = List.delete_at(socket.assigns.replays_entries, String.to_integer(index))
+    entries = if entries == [], do: [%{"label" => "", "url" => ""}], else: entries
+    {:noreply, assign(socket, :replays_entries, entries)}
+  end
+
+  @impl true
+  def handle_event("save_replays", %{"replays" => params}, socket) do
+    current_scope = socket.assigns[:current_scope]
+    session = socket.assigns.listening_session
+
+    if current_scope && current_scope.user && current_scope.user.id == session.user_id do
+      # AIDEV-NOTE: params arrive as %{"0" => %{"label" => ..., "url" => ...}, "1" => ...}
+      replays = params |> Enum.sort_by(fn {k, _} -> String.to_integer(k) end) |> Enum.map(&elem(&1, 1))
+
+      case ListeningSession.update_replays(session, replays) do
+        {:ok, updated_session} ->
+          {:noreply,
+           socket
+           |> assign(:listening_session, %{session | replays: updated_session.replays})
+           |> assign(:replays_modal_open, false)
+           |> put_flash(:info, gettext("Replays saved"))}
+
+        {:error, _changeset} ->
+          {:noreply, put_flash(socket, :error, gettext("Failed to save replays"))}
+      end
+    else
+      {:noreply, put_flash(socket, :error, gettext("Not authorized"))}
     end
   end
 
-  @impl true
-  def handle_event(
-        "close_votes",
-        _params,
-        %{assigns: %{listening_session: session, current_scope: scope}} = socket
-      ) do
-    case PremiereEcoute.apply(%CloseVoteWindowListeningSession{session_id: session.id, scope: scope}) do
-      {:ok, _, _} -> {:noreply, socket}
-      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
-      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot close vote window"))}
-    end
-  end
-
-  @impl true
-  def handle_event(event, _params, socket) do
-    {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
-  end
-
-  @impl true
-  def handle_info({:track_captured, _single}, %{assigns: %{session_id: session_id}} = socket) do
-    session = ListeningSession.get(session_id)
+  defp reload_reviews(socket, session_id, user) do
+    reviews = Reviews.list_for_session(session_id)
+    review_ids = Enum.map(reviews, & &1.id)
 
     socket
-    |> assign(:listening_session, session)
-    |> then(fn socket -> {:noreply, socket} end)
+    |> assign(:reviews, reviews)
+    |> assign(:liked_ids, ReviewLikes.liked_review_ids(review_ids, user.id))
   end
 
-  @impl true
-  def handle_info({:next_track_started, session}, socket) do
-    socket
-    |> assign(:listening_session, session)
-    |> assign(:user_current_rating, nil)
-    |> then(fn socket -> {:noreply, socket} end)
+  defp normalize_review_params(params) do
+    tags =
+      params
+      |> Map.get("tags_input", "")
+      |> String.split(",")
+      |> Enum.map(&String.trim/1)
+      |> Enum.reject(&(&1 == ""))
+
+    like =
+      case Map.get(params, "like") do
+        "true" -> true
+        "false" -> false
+        _ -> nil
+      end
+
+    params
+    |> Map.put("tags", tags)
+    |> Map.delete("tags_input")
+    |> Map.put("like", like)
   end
 
-  @impl true
-  def handle_info(:vote_open, socket) do
-    socket
-    |> assign(:open_vote, true)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info(:vote_close, socket) do
-    socket
-    |> assign(:open_vote, false)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info(:refresh, %{assigns: %{current_scope: current_scope}} = socket) do
-    Process.send_after(self(), :refresh, 1_000)
-
-    case Cache.get(:sessions, current_scope.user.twitch.user_id) do
-      {:ok, session} -> assign(socket, :open_vote, !is_nil(session))
-      {:error, _reason} -> socket
-    end
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info({:session_summary, _}, socket) do
-    session_id = socket.assigns.session_id
-
-    socket
-    |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
-    |> assign_async(:vote_trends, fn ->
-      vote_data = VoteTrends.rolling_average(session_id, :minute)
-      {:ok, %{vote_trends: vote_data}}
+  # AIDEV-NOTE: builds [{track_album|playlist_track, track_summary}] from report summaries + preloaded tracks.
+  defp build_tracks(%ListeningSession{source: :album} = session, report) do
+    Enum.map(report.track_summaries, fn summary ->
+      id = summary[:track_id] || summary["track_id"]
+      %{track_album: Enum.find(session.album.tracks, &(&1.id == id)), track_summary: summary}
     end)
-    |> then(fn socket -> {:noreply, socket} end)
   end
 
-  @impl true
-  def handle_info({:flash, level, message}, socket) do
-    {:noreply, put_flash(socket, level, message)}
+  defp build_tracks(%ListeningSession{source: :playlist} = session, report) do
+    Enum.map(report.track_summaries, fn summary ->
+      id = summary[:track_id] || summary["track_id"]
+      %{playlist_track: Enum.find(session.playlist.tracks, &(&1.id == id)), track_summary: summary}
+    end)
   end
 
-  @impl true
-  def handle_info({:youtube_chapters_modal_closed}, socket) do
-    {:noreply, assign(socket, :show_youtube_modal, false)}
+  defp build_tracks(_session, _report), do: []
+
+  # AIDEV-NOTE: builds vote distribution for a single viewer's votes (my_votes map from my_votes_by_track).
+  def my_vote_distribution(my_votes, session) do
+    votes = Enum.map(my_votes, fn {_track_id, value} -> %{value: value, is_streamer: false} end)
+    individual = build_individual_distribution(votes, session)
+    merge_distributions(individual, %{}, session)
   end
 
-  @impl true
-  def handle_info({:player, :start_track, state}, %{assigns: %{listening_session: session}} = socket) do
-    case state do
-      %{"context" => %{"type" => "playlist", "uri" => "spotify:playlist:" <> _playlist_id}} = payload
-      when not is_nil(session.playlist) ->
-        case Playlist.add_track_to_playlist(session.playlist, payload) do
-          {:ok, _} ->
-            session = ListeningSession.get(session.id)
-            {:ok, session} = ListeningSession.next_track(session)
+  # AIDEV-NOTE: returns %{track_id => score_string} for a specific Twitch viewer from report votes.
+  def my_votes_by_track(report, twitch_user_id) do
+    report.votes
+    |> Enum.reject(& &1.is_streamer)
+    |> Enum.filter(&(&1.viewer_id == twitch_user_id))
+    |> Map.new(fn v -> {v.track_id, v.value} end)
+  end
 
-            assign(socket, :listening_session, session)
+  # AIDEV-NOTE: builds distribution from report votes + polls for all vote options.
+  # Returns [{label, pct}] normalized 0-100 relative to max bucket, or [] if no votes.
+  def vote_distribution(report, session, :viewer) do
+    individual =
+      report.votes
+      |> Enum.reject(& &1.is_streamer)
+      |> build_individual_distribution(session)
 
-          {:error, _} ->
-            socket
-        end
+    poll =
+      report.polls
+      |> build_poll_distribution()
+
+    merge_distributions(individual, poll, session)
+  end
+
+  def vote_distribution(report, session, :streamer) do
+    individual =
+      report.votes
+      |> Enum.filter(& &1.is_streamer)
+      |> build_individual_distribution(session)
+
+    merge_distributions(individual, %{}, session)
+  end
+
+  defp build_individual_distribution(votes, session) do
+    votes
+    |> Enum.group_by(fn vote ->
+      if vote_options_numeric?(session),
+        do: String.to_integer(vote.value),
+        else: vote.value
+    end)
+    |> Map.new(fn {value, vs} -> {value, length(vs)} end)
+  end
+
+  defp build_poll_distribution(polls) do
+    polls
+    |> Enum.reduce(%{}, fn poll, acc ->
+      Enum.reduce(poll.votes, acc, fn {rating_str, count}, inner ->
+        rating =
+          if String.match?(rating_str, ~r/^\d+$/),
+            do: String.to_integer(rating_str),
+            else: rating_str
+
+        Map.update(inner, rating, count, &(&1 + count))
+      end)
+    end)
+  end
+
+  defp merge_distributions(individual, poll, session) do
+    counts =
+      for option <- vote_options(session) do
+        {option, Map.get(individual, option, 0) + Map.get(poll, option, 0)}
+      end
+
+    max_count = counts |> Enum.map(&elem(&1, 1)) |> Enum.max(fn -> 0 end)
+    total = counts |> Enum.map(&elem(&1, 1)) |> Enum.sum()
+
+    if max_count == 0 do
+      []
+    else
+      Enum.map(counts, fn {option, count} ->
+        bar_pct = round(count / max_count * 100)
+        real_pct = round(count / total * 100)
+        {option, bar_pct, real_pct}
+      end)
+    end
+  end
+
+  defp vote_options(session) do
+    case session.vote_options do
+      options when is_list(options) and length(options) > 0 ->
+        if vote_options_numeric?(session),
+          do: Enum.map(options, &String.to_integer/1),
+          else: options
 
       _ ->
-        socket
-    end
-    |> assign(:next_track_at, nil)
-    |> assign(:player_state, state)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info(
-        {:player, {:percent, percent}, state},
-        %{assigns: %{listening_session: %ListeningSession{status: :active, source: source}, current_scope: scope}} = socket
-      )
-      when source != :free do
-    duration_ms = state["item"]["duration_ms"]
-    threshold = round(100 * (1 - 30_000 / duration_ms))
-
-    if duration_ms >= 60_000 and abs(percent - threshold) <= 1 do
-      ListeningSessionWorker.in_seconds(%{action: "votes_closing", user_id: scope.user.id}, 0)
-    end
-
-    {:noreply, assign(socket, :player_state, state)}
-  end
-
-  @impl true
-  def handle_info(
-        {:player, :end_track, state},
-        %{assigns: %{listening_session: %ListeningSession{status: :active} = session, current_scope: scope}} = socket
-      ) do
-    next_track = Map.get(session.options, "next_track", 0)
-
-    if next_track > 0 do
-      action = if session.source == :album, do: "next_track", else: "next_playlist_track"
-
-      {:ok, job} =
-        ListeningSessionWorker.in_seconds(%{action: action, session_id: session.id, user_id: scope.user.id}, next_track)
-
-      assign(socket, :next_track_at, job.scheduled_at)
-    else
-      socket
-    end
-    |> assign(:player_state, state)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info({:player, {:error, reason}, _state}, socket) do
-    socket
-    |> clear_flash()
-    |> put_flash(:error, gettext("Spotify down: %{reason}", reason: inspect(reason)))
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info({:player, _event, state}, socket) do
-    {:noreply, assign(socket, :player_state, state)}
-  end
-
-  @impl true
-  def handle_info({event, _track}, socket) when event in [:next_track, :previous_track] do
-    session = ListeningSession.get(socket.assigns.session_id)
-
-    socket
-    |> assign(:listening_session, session)
-    |> assign(:user_current_rating, nil)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info(:stop, socket) do
-    session = ListeningSession.get(socket.assigns.session_id)
-
-    socket
-    |> assign(:listening_session, session)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_info(_event, socket) do
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_async(:report, {:ok, %{report: report}}, socket) do
-    {:noreply, assign(socket, :report, report)}
-  end
-
-  @impl true
-  def handle_async(:vote_trends, {:ok, %{vote_trends: vote_trends}}, socket) do
-    {:noreply, assign(socket, :vote_trends, vote_trends)}
-  end
-
-  @impl true
-  def handle_async(:vote_trends, {:exit, reason}, socket) do
-    Logger.error("Failed to load vote trends: #{inspect(reason)}")
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_async(:report, {:exit, reason}, socket) do
-    Logger.error("Failed to load session report: #{inspect(reason)}")
-    {:noreply, socket}
-  end
-
-  @doc """
-  Returns CSS classes for session status badge.
-
-  Maps session status (preparing/active/stopped) to corresponding gradient background and styling classes.
-  """
-  @spec session_status_class(atom()) :: String.t()
-  def session_status_class(:preparing),
-    do: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
-
-  def session_status_class(:active),
-    do: "bg-gradient-primary text-white shadow-md"
-
-  def session_status_class(:stopped),
-    do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"
-
-  @doc """
-  Returns number of tracks rated in session.
-
-  Extracts rated track count from session report, or 0 if report unavailable.
-  """
-  @spec session_tracks_rated(map() | nil) :: integer()
-  def session_tracks_rated(nil), do: 0
-  def session_tracks_rated(report), do: report.session_summary["tracks_rated"]
-
-  @doc """
-  Returns display label for vote type.
-
-  Converts vote options array to human-readable format (0-10, 1-5, Smash or Pass, or custom).
-  """
-  @spec vote_type_display(ListeningSession.t() | nil) :: String.t()
-  def vote_type_display(nil), do: "0-10"
-
-  def vote_type_display(%{vote_options: vote_options}) when is_list(vote_options) do
-    cond do
-      vote_options == ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] -> "0-10"
-      vote_options == ["1", "2", "3", "4", "5"] -> "1-5"
-      vote_options == ["smash", "pass"] -> gettext("Smash or Pass")
-      true -> gettext("Custom (%{count} options)", count: length(vote_options))
+        Enum.to_list(1..10)
     end
   end
 
-  def vote_type_display(_), do: "0-10"
-
-  @doc """
-  Returns session's overall streamer score.
-
-  Extracts and formats streamer score from session report, or "N/A" if unavailable.
-  """
-  @spec session_streamer_score(map() | nil) :: String.t() | float()
-  def session_streamer_score(nil), do: "N/A"
-
-  def session_streamer_score(report) do
-    case report.session_summary do
-      %{"streamer_score" => score} when is_number(score) -> Float.round(score, 1)
-      %{"streamer_score" => score} when is_binary(score) -> score
-      _ -> "N/A"
-    end
+  defp vote_options_numeric?(session) do
+    Enum.all?(session.vote_options || [], fn o ->
+      match?({_, ""}, Integer.parse(o))
+    end)
   end
-
-  @doc """
-  Returns streamer score for a specific track.
-
-  Finds track in report and extracts formatted streamer score, or "N/A" if unavailable.
-  """
-  @spec track_streamer_score(String.t(), map() | nil) :: String.t() | float()
-  def track_streamer_score(_track_id, nil), do: "N/A"
-
-  def track_streamer_score(track_id, report) do
-    case Enum.find(report.track_summaries, &(&1["track_id"] == track_id)) do
-      nil ->
-        "N/A"
-
-      track_summary ->
-        case track_summary["streamer_score"] do
-          score when is_number(score) -> Float.round(score, 1)
-          score when is_binary(score) -> score
-          _ -> "N/A"
-        end
-    end
-  end
-
-  @doc """
-  Returns maximum vote count for any rating option on a track.
-
-  Calculates the highest vote count among all rating options for the specified track.
-  """
-  @spec track_max_votes(String.t(), map() | nil, ListeningSession.t()) :: integer()
-  def track_max_votes(_track_id, nil, _session), do: 0
-
-  def track_max_votes(track_id, report, session) do
-    track_vote_distribution(track_id, report, session)
-    |> Enum.map(&elem(&1, 1))
-    |> Enum.max(fn -> 0 end)
-  end
-
-  @doc """
-  Returns Tailwind color class for vote option.
-
-  Maps vote options to color gradient based on position and total options, with special handling for smash/pass.
-  """
-  @spec vote_option_color(String.t(), ListeningSession.t()) :: String.t()
-  def vote_option_color(vote_option, session) do
-    vote_options = session.vote_options
-    total_options = length(vote_options)
-
-    # Find the index of this vote option
-    index = Enum.find_index(vote_options, &(&1 == vote_option)) || 0
-
-    cond do
-      # Special handling for smash/pass
-      vote_option == "smash" ->
-        "bg-green-500"
-
-      vote_option == "pass" ->
-        "bg-red-500"
-
-      # For numeric options, use gradient based on position
-      total_options <= 5 ->
-        # For 1-5 scale, use yellow to green gradient
-        case index do
-          0 -> "bg-red-500"
-          1 -> "bg-orange-500"
-          2 -> "bg-yellow-500"
-          3 -> "bg-green-400"
-          4 -> "bg-green-500"
-          _ -> "bg-blue-400"
-        end
-
-      total_options <= 10 ->
-        case index do
-          0 -> "bg-red-600"
-          1 -> "bg-red-500"
-          2 -> "bg-red-400"
-          3 -> "bg-orange-500"
-          4 -> "bg-yellow-500"
-          5 -> "bg-yellow-400"
-          6 -> "bg-green-400"
-          7 -> "bg-blue-400"
-          8 -> "bg-blue-500"
-          9 -> "bg-blue-600"
-          _ -> "bg-purple-400"
-        end
-
-      true ->
-        colors = [
-          "bg-red-500",
-          "bg-orange-500",
-          "bg-yellow-500",
-          "bg-green-500",
-          "bg-blue-500",
-          "bg-purple-500",
-          "bg-pink-500",
-          "bg-indigo-500"
-        ]
-
-        Enum.at(colors, rem(index, length(colors)), "bg-gray-500")
-    end
-  end
-
-  @doc """
-  Returns human-readable label for visibility level.
-
-  Converts visibility atom (private/protected/public) to capitalized display string.
-  """
-  @spec visibility_label(atom()) :: String.t()
-  def visibility_label(:private), do: gettext("Private")
-  def visibility_label(:protected), do: gettext("Protected")
-  def visibility_label(:public), do: gettext("Public")
-
-  @doc """
-  Returns SVG icon for visibility level.
-
-  Provides appropriate lock/shield/globe icon based on visibility setting.
-  """
-  @spec visibility_icon(atom()) :: String.t()
-  def visibility_icon(:private) do
-    ~S"""
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-    </svg>
-    """
-  end
-
-  def visibility_icon(:protected) do
-    ~S"""
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-    </svg>
-    """
-  end
-
-  def visibility_icon(:public) do
-    ~S"""
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-    </svg>
-    """
-  end
-
-  @doc """
-  Returns description text for visibility level.
-
-  Explains who can view the session retrospective based on visibility setting.
-  """
-  @spec visibility_description(atom()) :: String.t()
-  def visibility_description(:private), do: gettext("Only you can view the retrospective")
-  def visibility_description(:protected), do: gettext("Authenticated users can view the retrospective")
-  def visibility_description(:public), do: gettext("Anyone with the link can view the retrospective")
 end

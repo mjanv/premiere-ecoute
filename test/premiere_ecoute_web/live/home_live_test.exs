@@ -34,13 +34,13 @@ defmodule PremiereEcouteWeb.HomeLiveTest do
       assert html =~ "Premiere Ecoute"
 
       # Streamer action buttons
-      assert html =~ "My Sessions"
+      assert html =~ "Sessions"
       assert html =~ "Retrospective"
 
       # Check button links
       assert html =~ "href=\"/sessions/new\""
       assert html =~ "href=\"/sessions\""
-      assert html =~ "href=\"/retrospective/history\""
+      assert html =~ "href=\"/sessions/retrospective\""
     end
   end
 end

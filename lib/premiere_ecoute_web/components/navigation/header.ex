@@ -54,23 +54,22 @@ defmodule PremiereEcouteWeb.Components.Header do
         <div class="flex items-center space-x-4">
           <%= if @current_user do %>
             <!-- Authenticated user navigation -->
-            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
+            <%= if @current_user.role in [:streamer, :admin] and PremiereEcouteCore.FeatureFlag.enabled?(:radio, for: @current_user) do %>
               <.link
-                href={~p"/playlists"}
+                href={~p"/radio/#{@current_user.username}"}
                 class="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-colors mx-2"
               >
-                {gettext("Playlists")}
+                {gettext("Radio")}
               </.link>
             <% end %>
-            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:discography, for: @current_user) do %>
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:billboards, for: @current_user) do %>
               <.link
-                href={~p"/discography"}
+                href={~p"/billboards"}
                 class="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-colors mx-2"
               >
-                {gettext("Discography")}
+                {gettext("Billboards")}
               </.link>
             <% end %>
-
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:festivals, for: @current_user) do %>
               <.link
                 href={~p"/festivals/new"}

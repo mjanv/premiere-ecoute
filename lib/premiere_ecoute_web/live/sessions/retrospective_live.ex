@@ -21,7 +21,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     with %ListeningSession{user: user} = listening_session <- ListeningSession.get(id),
          :ok <- validate_session_stopped(listening_session),
          :ok <- validate_authorization(listening_session, current_scope) do
-
       socket
       |> assign(:listening_session, listening_session)
       |> assign(:color_primary, Accounts.profile(user, [:widget_settings, :color_primary]))
