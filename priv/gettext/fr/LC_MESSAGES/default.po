@@ -2900,22 +2900,21 @@ msgid_plural "artists"
 msgstr[0] "artiste"
 msgstr[1] "artistes"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:279
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:298
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:284
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:303
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La première écoute de %{name} est terminée"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:33
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:49
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:81
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:65
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:97
 #, elixir-autogen, elixir-format
 msgid "Votes are open !"
 msgstr "Les votes sont ouverts !"
 
 #: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:139
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:66
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:82
 #, elixir-autogen, elixir-format
 msgid "Welcome to the premiere of %{name} by %{artist}"
 msgstr "Bienvenue à la première écoute de %{name} par %{artist}"
@@ -3021,12 +3020,12 @@ msgstr "Les pistes de votre extension ne seront pas aimées sans règle de playl
 msgid "Tracks liked from your extension will be added to this playlist"
 msgstr "Les pistes aimées depuis votre extension seront ajoutées à cette playlist"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:95
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:111
 #, elixir-autogen, elixir-format
 msgid "Votes close in 30 seconds !"
 msgstr "Les votes ferment dans 30 secondes !"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:140
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:156
 #, elixir-autogen, elixir-format
 msgid "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account"
 msgstr "Vous pouvez retrouver toutes vos notes en vous inscrivant sur premiere-ecoute.fr avec votre compte Twitch"
@@ -3572,7 +3571,7 @@ msgstr "Depuis toujours"
 msgid "Failed to load top tracks"
 msgstr "Échec du chargement des meilleurs morceaux"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:262
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:267
 #, elixir-autogen, elixir-format
 msgid "%{name} by %{artist} is over"
 msgstr "%{name} de %{artist} est terminé"
@@ -4140,7 +4139,7 @@ msgstr "Démarrer la radio"
 msgid "Stop radio"
 msgstr "Arrêter la radio"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:433
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:438
 #, elixir-autogen, elixir-format
 msgid "The free session %{name} is over"
 msgstr "La session libre %{name} est terminée"
@@ -4165,12 +4164,12 @@ msgstr "Événements à venir"
 msgid "Use the \"Capture current song\" button to add tracks."
 msgstr "Utilisez le bouton \"Capturer le morceau actuel\" pour ajouter des morceaux."
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:191
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:207
 #, elixir-autogen, elixir-format
 msgid "Vote in the poll for %{name}!"
 msgstr "Votez dans le sondage pour %{name} !"
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:159
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:175
 #, elixir-autogen, elixir-format
 msgid "Votes are open for %{name}!"
 msgstr "Les votes sont ouverts pour %{name} !"
@@ -4885,3 +4884,13 @@ msgstr "avis de session"
 #, elixir-autogen, elixir-format
 msgid "votes"
 msgstr "votes"
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{duration})"
+msgstr "Bienvenue à la première écoute de %{name} par %{artist}"
+
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:31
+#, elixir-autogen, elixir-format
+msgid "You can vote between 0 and 10 included and without comma. The note is a single message or at the end of a message"
+msgstr "Vous pouvez voter entre 0 et 10 inclus et sans virgule. La note est un seul message ou à la fin d'un message"

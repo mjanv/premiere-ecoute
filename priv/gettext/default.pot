@@ -2899,22 +2899,21 @@ msgid_plural "artists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:279
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:298
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:284
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:303
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:33
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:49
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:81
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:65
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:97
 #, elixir-autogen, elixir-format
 msgid "Votes are open !"
 msgstr ""
 
 #: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:139
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:66
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:82
 #, elixir-autogen, elixir-format
 msgid "Welcome to the premiere of %{name} by %{artist}"
 msgstr ""
@@ -3020,12 +3019,12 @@ msgstr ""
 msgid "Tracks liked from your extension will be added to this playlist"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:95
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:111
 #, elixir-autogen, elixir-format
 msgid "Votes close in 30 seconds !"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:140
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:156
 #, elixir-autogen, elixir-format
 msgid "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account"
 msgstr ""
@@ -3571,7 +3570,7 @@ msgstr ""
 msgid "Failed to load top tracks"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:262
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:267
 #, elixir-autogen, elixir-format
 msgid "%{name} by %{artist} is over"
 msgstr ""
@@ -4139,7 +4138,7 @@ msgstr ""
 msgid "Stop radio"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:433
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:438
 #, elixir-autogen, elixir-format
 msgid "The free session %{name} is over"
 msgstr ""
@@ -4164,12 +4163,12 @@ msgstr ""
 msgid "Use the \"Capture current song\" button to add tracks."
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:191
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:207
 #, elixir-autogen, elixir-format
 msgid "Vote in the poll for %{name}!"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:159
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:175
 #, elixir-autogen, elixir-format
 msgid "Votes are open for %{name}!"
 msgstr ""
@@ -4883,4 +4882,14 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/collections/components/session_components.ex:78
 #, elixir-autogen, elixir-format
 msgid "votes"
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
+#, elixir-autogen, elixir-format
+msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{duration})"
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:31
+#, elixir-autogen, elixir-format
+msgid "You can vote between 0 and 10 included and without comma. The note is a single message or at the end of a message"
 msgstr ""
