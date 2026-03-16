@@ -22,6 +22,22 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   alias PremiereEcouteCore.Cache
 
   @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"action" => "send_instructions", "user_id" => user_id}}) do
+    scope = Scope.for_user(User.get(user_id))
+
+    Apis.twitch().send_chat_message(
+      scope,
+      Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+        gettext(
+          "You can vote between 0 and 10 included and without comma. The note is a single message or at the end of a message"
+        )
+      end)
+    )
+
+    :ok
+  end
+
+  @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "open_track", "user_id" => user_id, "session_id" => session_id}}) do
     with scope <- Scope.for_user(User.get(user_id)),
          session <- ListeningSession.get(session_id),

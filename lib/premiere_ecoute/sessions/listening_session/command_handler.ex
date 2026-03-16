@@ -164,7 +164,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
          message <-
            PremiereEcoute.Gettext.t(scope, fn ->
-             gettext("Welcome to the premiere of %{name} by %{artist}", name: album.name, artist: album.artist)
+             gettext("Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{duration})",
+               name: album.name,
+               artist: album.artist,
+               tracks: album.total_tracks,
+               duration: PremiereEcouteCore.Duration.duration(Album.total_duration(album))
+             )
            end),
          :ok <- Apis.twitch().send_chat_message(scope, message) do
       {:ok, session, [%SessionStarted{source: :album, session_id: session.id, user_id: scope.user.id}]}
@@ -212,7 +217,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}"
+             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name} (#{PremiereEcouteCore.Duration.timer(session.current_track.duration_ms)})"
            ) do
       {:ok, session,
        [%NextTrackStarted{source: :album, session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
@@ -246,7 +251,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name}"
+             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name} (#{PremiereEcouteCore.Duration.timer(session.current_track.duration_ms)})"
            ) do
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
     else

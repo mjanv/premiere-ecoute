@@ -30,6 +30,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
       expect(TwitchApi, :resubscribe, fn %Scope{}, "channel.chat.message" -> {:ok, %{}} end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, _message -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, _instructions -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, _promo -> :ok end)
 
       {:ok, session, _} =
