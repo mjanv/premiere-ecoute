@@ -6,6 +6,7 @@ defmodule PremiereEcouteWeb.Discography.ArtistLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Discography
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Sessions.ListeningSession
 
   @impl true

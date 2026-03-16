@@ -61,7 +61,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
                id: nil,
                provider_ids: %{spotify: "7aJuG4TFXa2hmE4z1yxc3n"},
                name: "HIT ME HARD AND SOFT",
-               artists: [%Artist{name: "Billie Eilish"}],
+               artists: [%Artist{name: "Billie Eilish", provider_ids: %{spotify: "6qqNVTkY8uBg9cP3Jd7DAH"}}],
                release_date: ~D[2024-05-17],
                cover_url: "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
                tracks: [],

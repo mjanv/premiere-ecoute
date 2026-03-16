@@ -40,6 +40,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Discography.Album
     alias PremiereEcoute.Discography.Album.Track
+    alias PremiereEcoute.Discography.Artist
     alias PremiereEcoute.Discography.LibraryPlaylist
     alias PremiereEcoute.Discography.Playlist
     alias PremiereEcoute.Discography.Single
@@ -48,6 +49,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     @callback get_single(track_id :: String.t()) :: {:ok, Single.t()} | {:error, term()}
 
     # Artists
+    @callback get_artist(artist_id :: String.t()) :: {:ok, Artist.t()} | {:error, term()}
+    @callback get_artist_albums(artist_id :: String.t()) :: {:ok, [map()]} | {:error, term()}
     @callback get_artist_top_track(artist_id :: String.t()) :: {:ok, Playlist.Track.t()} | {:error, term()}
 
     # Player
@@ -165,6 +168,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
   defdelegate get_single(track_id), to: __MODULE__.Tracks
 
   # Artists
+  defdelegate get_artist(artist_id), to: __MODULE__.Artists
+  defdelegate get_artist_albums(artist_id), to: __MODULE__.Artists
   defdelegate get_artist_top_track(artist_id), to: __MODULE__.Artists
 
   # Player

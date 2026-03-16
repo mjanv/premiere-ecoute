@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Discography.Artist do
 
   @type t :: %__MODULE__{
           id: integer() | nil,
-          provider_ids: %{atom() => String.t()},
+          provider_ids: %{optional(atom()) => String.t()},
           name: String.t() | nil,
           slug: String.t() | nil,
           images: [Image.t()],
@@ -70,6 +70,19 @@ defmodule PremiereEcoute.Discography.Artist do
     |> Map.from_struct()
     |> Map.update(:images, [], fn images -> Enum.map(images, &Map.from_struct/1) end)
     |> then(fn attrs -> %__MODULE__{} |> changeset(attrs) |> Repo.insert() end)
+  end
+
+  def create(attrs) when is_map(attrs) do
+    %__MODULE__{} |> changeset(attrs) |> Repo.insert()
+  end
+
+  @doc "Returns the image URL closest to the given size, or nil if no images."
+  @spec image_url(t(), non_neg_integer()) :: String.t() | nil
+  def image_url(%__MODULE__{images: []}, _size), do: nil
+
+  def image_url(%__MODULE__{images: images}, size) do
+    %Image{url: url} = Enum.min_by(images, fn img -> abs((img.height || 0) - size) end)
+    url
   end
 
   @spec get_by_slug(String.t()) :: t() | nil

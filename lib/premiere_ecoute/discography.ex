@@ -74,6 +74,14 @@ defmodule PremiereEcoute.Discography do
   def title(_), do: nil
 
   @spec url(any()) :: String.t() | nil
+  def url(%Artist{provider_ids: ids}) do
+    cond do
+      id = Map.get(ids, :spotify) -> "https://open.spotify.com/artist/#{id}"
+      id = Map.get(ids, :deezer) -> "https://www.deezer.com/artist/#{id}"
+      true -> nil
+    end
+  end
+
   def url(%Album{provider_ids: ids}) do
     cond do
       id = Map.get(ids, :spotify) -> "https://open.spotify.com/album/#{id}"

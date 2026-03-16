@@ -6,6 +6,7 @@ defmodule PremiereEcouteWeb.Discography.ArtistsLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Discography
+  alias PremiereEcoute.Discography.Artist
 
   @impl true
   def mount(_params, _session, socket) do
