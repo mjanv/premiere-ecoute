@@ -1043,11 +1043,6 @@ msgstr ""
 msgid "Manage your profile, connections, and privacy settings"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:29
-#, elixir-autogen, elixir-format
-msgid "Member since"
-msgstr ""
-
 #: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:5
 #, elixir-autogen, elixir-format
 msgid "New Listening Session"
@@ -4614,6 +4609,8 @@ msgid "Listening sessions"
 msgstr ""
 
 #: lib/premiere_ecoute_web/components/navigation/header.ex:86
+#: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:29
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Members"
 msgstr ""
@@ -4884,12 +4881,54 @@ msgstr ""
 msgid "votes"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
-#, elixir-autogen, elixir-format
-msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{duration})"
-msgstr ""
-
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:31
 #, elixir-autogen, elixir-format
 msgid "You can vote between 0 and 10 included and without comma. The note is a single message or at the end of a message"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:44
+#, elixir-autogen, elixir-format
+msgid "1 total"
+msgid_plural "%{count} total"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:12
+#, elixir-autogen, elixir-format
+msgid "Featured members"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:6
+#, elixir-autogen, elixir-format
+msgid "Find your next favorite member"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:105
+#, elixir-autogen, elixir-format
+msgid "Following"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:96
+#, elixir-autogen, elixir-format
+msgid "Next →"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:48
+#, elixir-autogen, elixir-format
+msgid "No members yet."
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:109
+#, elixir-autogen, elixir-format
+msgid "Not following anyone yet"
+msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
+#, elixir-autogen, elixir-format
+msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:89
+#, elixir-autogen, elixir-format
+msgid "← Prev"
 msgstr ""

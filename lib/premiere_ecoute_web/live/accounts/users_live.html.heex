@@ -3,13 +3,13 @@
     <div class="max-w-6xl mx-auto px-6 pb-20 pt-10">
       <%!-- Page header --%>
       <div class="mb-10">
-        <h1 class="text-4xl font-bold text-white mb-1">Find your next favorite member</h1>
+        <h1 class="text-4xl font-bold text-white mb-1">{gettext("Find your next favorite member")}</h1>
       </div>
 
       <%!-- Featured members --%>
       <%= if not Enum.empty?(@streamers) do %>
         <section class="mb-10">
-          <h2 class="text-s font-semibold uppercase tracking-widest text-slate-500 mb-4">Featured members</h2>
+          <h2 class="text-s font-semibold uppercase tracking-widest text-slate-500 mb-4">{gettext("Featured members")}</h2>
 
           <div class="flex gap-7 overflow-x-auto pb-2" style="-ms-overflow-style: none; scrollbar-width: none;">
             <%= for streamer <- @streamers do %>
@@ -40,94 +40,102 @@
         <%!-- Members list (2/3) --%>
         <div class="col-span-2">
           <div class="flex items-center gap-3 mb-3">
-            <h2 class="text-s font-semibold uppercase tracking-widest text-slate-500">Members</h2>
-            <span class="text-xs text-slate-600 ml-auto">{@page.total_entries} total</span>
+            <h2 class="text-s font-semibold uppercase tracking-widest text-slate-500">{gettext("Members")}</h2>
+            <span class="text-xs text-slate-600 ml-auto">
+              {ngettext("1 total", "%{count} total", @page.total_entries, count: @page.total_entries)}
+            </span>
           </div>
 
           <%= if Enum.empty?(@page.entries) do %>
-            <p class="text-slate-600 text-sm py-4">No members yet.</p>
+            <div class="rounded-lg bg-white/5 border border-white/10 flex flex-col items-center justify-center py-8 px-4 text-center">
+              <p class="text-slate-600 text-sm">{gettext("No members yet.")}</p>
+            </div>
           <% else %>
-            <div class="space-y-1 mb-4">
-              <%= for {user, idx} <- Enum.with_index(@page.entries) do %>
-                <.link
-                  navigate={~p"/users/#{user.username}"}
-                  class="flex items-center gap-2 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group"
-                >
-                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                    {user.username |> String.first() |> String.upcase()}
-                  </div>
+            <div class="rounded-lg bg-white/5 border border-white/10 overflow-hidden">
+              <div class="space-y-1 p-4 mb-0">
+                <%= for {user, idx} <- Enum.with_index(@page.entries) do %>
+                  <.link
+                    navigate={~p"/users/#{user.username}"}
+                    class="flex items-center gap-2 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group"
+                  >
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                      {user.username |> String.first() |> String.upcase()}
+                    </div>
 
-                  <span class="text-slate-200 group-hover:text-white text-sm flex-1 min-w-0 truncate transition-colors">
-                    {user.username}
-                  </span>
-
-                  <%= if user.role == :admin do %>
-                    <span class="text-xs text-purple-400 shrink-0">{Atom.to_string(user.role)}</span>
-                  <% end %>
-
-                  <%= if user.twitch do %>
-                    <span class="flex items-center gap-1 text-xs text-slate-500 shrink-0">
-                      <svg class="w-3 h-3 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                      </svg>
+                    <span class="text-slate-200 group-hover:text-white text-sm flex-1 min-w-0 truncate transition-colors">
+                      {user.username}
                     </span>
-                  <% end %>
 
-                  <span class="text-xs text-slate-600 shrink-0 ml-2">
-                    {Calendar.strftime(user.inserted_at, "%b %Y")}
-                  </span>
-                </.link>
+                    <%= if user.role == :admin do %>
+                      <span class="text-xs text-purple-400 shrink-0">{Atom.to_string(user.role)}</span>
+                    <% end %>
+
+                    <%= if user.twitch do %>
+                      <span class="flex items-center gap-1 text-xs text-slate-500 shrink-0">
+                        <svg class="w-3 h-3 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                        </svg>
+                      </span>
+                    <% end %>
+
+                    <span class="text-xs text-slate-600 shrink-0 ml-2">
+                      {Calendar.strftime(user.inserted_at, "%b %Y")}
+                    </span>
+                  </.link>
+                <% end %>
+              </div>
+
+              <%= if @page.total_pages > 1 do %>
+                <div class="flex items-center gap-3 px-4 pb-4 pt-0 border-t border-white/10">
+                  <.link
+                    patch={~p"/users?page=#{@page.page_number - 1}"}
+                    class={"px-3 py-1.5 rounded-md text-xs border transition-colors #{if @page.page_number == 1, do: "border-white/5 text-slate-700 pointer-events-none", else: "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"}"}
+                  >
+                    {gettext("← Prev")}
+                  </.link>
+                  <span class="text-xs text-slate-600">{@page.page_number} / {@page.total_pages}</span>
+                  <.link
+                    patch={~p"/users?page=#{@page.page_number + 1}"}
+                    class={"px-3 py-1.5 rounded-md text-xs border transition-colors #{if @page.page_number == @page.total_pages, do: "border-white/5 text-slate-700 pointer-events-none", else: "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"}"}
+                  >
+                    {gettext("Next →")}
+                  </.link>
+                </div>
               <% end %>
             </div>
-
-            <%= if @page.total_pages > 1 do %>
-              <div class="flex items-center gap-3">
-                <.link
-                  patch={~p"/users?page=#{@page.page_number - 1}"}
-                  class={"px-3 py-1.5 rounded-md text-xs border transition-colors #{if @page.page_number == 1, do: "border-white/5 text-slate-700 pointer-events-none", else: "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"}"}
-                >
-                  ← Prev
-                </.link>
-                <span class="text-xs text-slate-600">{@page.page_number} / {@page.total_pages}</span>
-                <.link
-                  patch={~p"/users?page=#{@page.page_number + 1}"}
-                  class={"px-3 py-1.5 rounded-md text-xs border transition-colors #{if @page.page_number == @page.total_pages, do: "border-white/5 text-slate-700 pointer-events-none", else: "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"}"}
-                >
-                  Next →
-                </.link>
-              </div>
-            <% end %>
           <% end %>
         </div>
 
         <%!-- Right 1/3: coming soon --%>
         <div class="col-span-1">
-          <h2 class="text-s font-semibold uppercase tracking-widest text-slate-500 mb-3">Following</h2>
+          <h2 class="text-s font-semibold uppercase tracking-widest text-slate-500 mb-3">{gettext("Following")}</h2>
 
           <%= if Enum.empty?(@follows) do %>
-            <div class="rounded-lg border border-dashed border-white/10 flex flex-col items-center justify-center py-12 px-4 text-center gap-2">
-              <p class="text-xs uppercase tracking-widest text-slate-600">Not following anyone yet</p>
+            <div class="rounded-lg bg-white/5 border border-white/10 flex flex-col items-center justify-center py-12 px-4 text-center gap-2">
+              <p class="text-xs uppercase tracking-widest text-slate-600">{gettext("Not following anyone yet")}</p>
             </div>
           <% else %>
-            <div class="space-y-1">
-              <%= for user <- @follows do %>
-                <.link
-                  navigate={~p"/users/#{user.username}"}
-                  class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors group"
-                >
-                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                    {user.username |> String.first() |> String.upcase()}
-                  </div>
-                  <span class="text-slate-300 group-hover:text-white text-sm truncate transition-colors">
-                    {user.username}
-                  </span>
-                  <%= if user.twitch do %>
-                    <svg class="w-3 h-3 text-purple-400 shrink-0 ml-auto" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                    </svg>
-                  <% end %>
-                </.link>
-              <% end %>
+            <div class="rounded-lg bg-white/5 border border-white/10 overflow-hidden">
+              <div class="space-y-1 p-4">
+                <%= for user <- @follows do %>
+                  <.link
+                    navigate={~p"/users/#{user.username}"}
+                    class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors group"
+                  >
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                      {user.username |> String.first() |> String.upcase()}
+                    </div>
+                    <span class="text-slate-300 group-hover:text-white text-sm truncate transition-colors">
+                      {user.username}
+                    </span>
+                    <%= if user.twitch do %>
+                      <svg class="w-3 h-3 text-purple-400 shrink-0 ml-auto" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.429h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                      </svg>
+                    <% end %>
+                  </.link>
+                <% end %>
+              </div>
             </div>
           <% end %>
         </div>

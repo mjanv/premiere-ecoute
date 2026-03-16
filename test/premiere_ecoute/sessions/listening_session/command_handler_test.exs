@@ -188,7 +188,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
       expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
+                                               "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
         :ok
       end)
 
@@ -251,7 +252,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :toggle_playback_shuffle, fn %Scope{user: ^user}, false -> {:ok, :success} end)
       expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
+                                               "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
         :ok
       end)
 
@@ -441,7 +443,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track002"} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
+                                               "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
         :ok
       end)
 
@@ -584,7 +587,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track002"} end)
       expect(SpotifyApi, :start_resume_playback, fn %Scope{user: ^user}, _ -> {:ok, "spotify:track:track001"} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
+                                               "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
         :ok
       end)
 
@@ -662,7 +666,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :set_repeat_mode, fn %Scope{user: ^user}, :off -> {:ok, :success} end)
       expect(SpotifyApi, :pause_playback, fn _ -> {:ok, :success} end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user},
+                                               "Welcome to the premiere of Sample Album by Sample Artist (2 tracks - 06:30)" ->
         :ok
       end)
 

@@ -1044,11 +1044,6 @@ msgstr "Gestisci le tue informazioni personali e account"
 msgid "Manage your profile, connections, and privacy settings"
 msgstr "Gestisci il tuo account, connessioni e preferenze"
 
-#: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:29
-#, elixir-autogen, elixir-format
-msgid "Member since"
-msgstr "Membro dal"
-
 #: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:5
 #, elixir-autogen, elixir-format
 msgid "New Listening Session"
@@ -4615,9 +4610,11 @@ msgid "Listening sessions"
 msgstr "Sessione di Ascolto"
 
 #: lib/premiere_ecoute_web/components/navigation/header.ex:86
+#: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:29
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Members"
-msgstr "Membro dal"
+msgstr "Membro"
 
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:25
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:70
@@ -4885,12 +4882,54 @@ msgstr "recensione sessione"
 msgid "votes"
 msgstr "I miei voti"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
-#, elixir-autogen, elixir-format, fuzzy
-msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{duration})"
-msgstr "Benvenuti alla prima di %{name} di %{artist}"
-
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:31
 #, elixir-autogen, elixir-format
 msgid "You can vote between 0 and 10 included and without comma. The note is a single message or at the end of a message"
 msgstr "Puoi votare tra 0 e 10 inclusi e senza virgola. Il voto è un singolo messaggio o alla fine di un messaggio"
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:44
+#, elixir-autogen, elixir-format
+msgid "1 total"
+msgid_plural "%{count} total"
+msgstr[0] "1 totale"
+msgstr[1] "%{count} totali"
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:12
+#, elixir-autogen, elixir-format
+msgid "Featured members"
+msgstr "Membri in evidenza"
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:6
+#, elixir-autogen, elixir-format
+msgid "Find your next favorite member"
+msgstr "Trova il tuo prossimo membro preferito"
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:105
+#, elixir-autogen, elixir-format
+msgid "Following"
+msgstr "Seguendo"
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:96
+#, elixir-autogen, elixir-format
+msgid "Next →"
+msgstr "Successivo →"
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:48
+#, elixir-autogen, elixir-format
+msgid "No members yet."
+msgstr "Nessun membro per ora."
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:109
+#, elixir-autogen, elixir-format
+msgid "Not following anyone yet"
+msgstr "Non stai ancora seguendo nessuno"
+
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})"
+msgstr "Benvenuti alla prima di %{name} di %{artist}"
+
+#: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:89
+#, elixir-autogen, elixir-format
+msgid "← Prev"
+msgstr "← Prec"
