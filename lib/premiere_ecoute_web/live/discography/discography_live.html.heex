@@ -7,33 +7,124 @@
   <div class="relative min-h-screen text-white" style="background: #0a0010;">
     <div class="max-w-6xl mx-auto px-6 py-12">
       <h1 class="text-3xl font-bold text-white mb-2">{gettext("Discography")}</h1>
-      <p class="text-slate-500 text-sm mb-10">{gettext("Browse albums, singles, and artists.")}</p>
+      <p class="text-slate-500 text-sm mb-12">{gettext("Browse albums, singles, and artists.")}</p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <.link
-          navigate={~p"/discography/albums"}
-          class="group block rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors p-8"
-        >
-          <div class="text-4xl font-bold text-white mb-1">{@album_count}</div>
-          <div class="text-slate-400 text-sm uppercase tracking-widest">{gettext("Albums")}</div>
-        </.link>
+      <%!-- Artists section --%>
+      <section class="mb-14">
+        <div class="flex items-baseline justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-semibold text-white">{gettext("Artists")}</h2>
+            <p class="text-slate-500 text-xs mt-0.5">
+              {ngettext("1 artist", "%{count} artists", @artist_count, count: @artist_count)}
+            </p>
+          </div>
+          <.link
+            navigate={~p"/discography/artists"}
+            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+          >
+            {gettext("More →")}
+          </.link>
+        </div>
 
-        <.link
-          navigate={~p"/discography/singles"}
-          class="group block rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors p-8"
-        >
-          <div class="text-4xl font-bold text-white mb-1">{@single_count}</div>
-          <div class="text-slate-400 text-sm uppercase tracking-widest">{gettext("Singles")}</div>
-        </.link>
+        <%= if @last_artists == [] do %>
+          <p class="text-slate-600 text-sm">{gettext("No artists yet.")}</p>
+        <% else %>
+          <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 gap-4">
+            <%= for artist <- @last_artists do %>
+              <.link navigate={~p"/discography/artists/#{artist.slug}"} class="group block">
+                <div class="relative aspect-square overflow-hidden rounded-full shadow-lg mb-2 bg-purple-900/30 flex items-center justify-center border border-purple-500/20">
+                  <span class="text-2xl font-bold text-purple-300 group-hover:text-white transition-colors">
+                    {String.upcase(String.first(artist.name || "?"))}
+                  </span>
+                </div>
+                <p class="text-white text-xs font-medium truncate text-center group-hover:text-purple-300 transition-colors">
+                  {artist.name}
+                </p>
+              </.link>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
 
-        <.link
-          navigate={~p"/discography/artists"}
-          class="group block rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors p-8"
-        >
-          <div class="text-4xl font-bold text-white mb-1">{@artist_count}</div>
-          <div class="text-slate-400 text-sm uppercase tracking-widest">{gettext("Artists")}</div>
-        </.link>
-      </div>
+      <%!-- Albums section --%>
+      <section class="mb-14">
+        <div class="flex items-baseline justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-semibold text-white">{gettext("Albums")}</h2>
+            <p class="text-slate-500 text-xs mt-0.5">
+              {ngettext("1 album", "%{count} albums", @album_count, count: @album_count)}
+            </p>
+          </div>
+          <.link
+            navigate={~p"/discography/albums"}
+            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+          >
+            {gettext("More →")}
+          </.link>
+        </div>
+
+        <%= if @last_albums == [] do %>
+          <p class="text-slate-600 text-sm">{gettext("No albums yet.")}</p>
+        <% else %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+            <%= for album <- @last_albums do %>
+              <.link navigate={~p"/discography/albums/#{album.slug}"} class="group block">
+                <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
+                  <img
+                    src={album.cover_url}
+                    alt={album.name}
+                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <p class="text-white text-sm font-semibold truncate group-hover:text-purple-300 transition-colors">
+                  {album.name}
+                </p>
+                <p class="text-slate-500 text-xs truncate mt-0.5">{album.artist}</p>
+              </.link>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+
+      <%!-- Singles section --%>
+      <section class="mb-14">
+        <div class="flex items-baseline justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-semibold text-white">{gettext("Singles")}</h2>
+            <p class="text-slate-500 text-xs mt-0.5">
+              {ngettext("1 single", "%{count} singles", @single_count, count: @single_count)}
+            </p>
+          </div>
+          <.link
+            navigate={~p"/discography/singles"}
+            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+          >
+            {gettext("More →")}
+          </.link>
+        </div>
+
+        <%= if @last_singles == [] do %>
+          <p class="text-slate-600 text-sm">{gettext("No singles yet.")}</p>
+        <% else %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+            <%= for single <- @last_singles do %>
+              <.link navigate={~p"/discography/singles/#{single.slug}"} class="group block">
+                <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
+                  <img
+                    src={single.cover_url}
+                    alt={single.name}
+                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <p class="text-white text-sm font-semibold truncate group-hover:text-cyan-300 transition-colors">
+                  {single.name}
+                </p>
+                <p class="text-slate-500 text-xs truncate mt-0.5">{single.artist}</p>
+              </.link>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
     </div>
   </div>
 </Layouts.app>

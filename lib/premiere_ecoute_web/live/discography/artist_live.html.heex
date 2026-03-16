@@ -34,6 +34,59 @@
             <h1 class="text-4xl font-bold text-white leading-tight">{@artist.name}</h1>
           </div>
 
+          <%!-- Albums --%>
+          <%= if @albums != [] do %>
+            <section class="mb-10">
+              <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+                {gettext("Albums")}
+              </h2>
+              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                <%= for album <- @albums do %>
+                  <.link navigate={~p"/discography/albums/#{album.slug}"} class="group block">
+                    <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-2">
+                      <img
+                        src={album.cover_url}
+                        alt={album.name}
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <p class="text-white text-xs font-semibold truncate group-hover:text-purple-300 transition-colors">
+                      {album.name}
+                    </p>
+                    <%= if album.release_date do %>
+                      <p class="text-slate-500 text-xs mt-0.5">{album.release_date.year}</p>
+                    <% end %>
+                  </.link>
+                <% end %>
+              </div>
+            </section>
+          <% end %>
+
+          <%!-- Singles --%>
+          <%= if @singles != [] do %>
+            <section class="mb-10">
+              <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+                {gettext("Singles")}
+              </h2>
+              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                <%= for single <- @singles do %>
+                  <.link navigate={~p"/discography/singles/#{single.slug}"} class="group block">
+                    <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-2">
+                      <img
+                        src={single.cover_url}
+                        alt={single.name}
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <p class="text-white text-xs font-semibold truncate group-hover:text-cyan-300 transition-colors">
+                      {single.name}
+                    </p>
+                  </.link>
+                <% end %>
+              </div>
+            </section>
+          <% end %>
+
           <%!-- Sessions --%>
           <%= if @sessions != [] do %>
             <section class="mb-10">

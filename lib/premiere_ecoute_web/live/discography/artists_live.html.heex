@@ -6,7 +6,10 @@
 >
   <div class="relative min-h-screen text-white" style="background: #0a0010;">
     <div class="max-w-6xl mx-auto px-6 py-12">
-      <h1 class="text-3xl font-bold text-white mb-2">{gettext("Artists")}</h1>
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-3xl font-bold text-white">{gettext("Artists")}</h1>
+        <.button navigate={~p"/discography"}>← {gettext("Discography")}</.button>
+      </div>
       <p class="text-slate-500 text-sm mb-10">
         {ngettext("1 artist", "%{count} artists", length(@artists), count: length(@artists))}
       </p>

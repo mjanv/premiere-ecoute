@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser do
   """
 
   alias PremiereEcoute.Discography.Artist
+  alias PremiereEcoute.Discography.Artist.Image
 
   @doc """
   Extracts primary artist name from Spotify artists array.
@@ -19,9 +20,29 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser do
   @doc """
   Extracts artists from Spotify artists array.
   """
-  @spec parse_artists(list(map())) :: String.t()
-  def parse_artists([%{"name" => name} | tail]), do: [%Artist{name: name}] ++ parse_artists(tail)
+  @spec parse_artists(list(map())) :: [Artist.t()]
+  def parse_artists([%{"id" => id, "name" => name} = data | tail]) do
+    [%Artist{name: name, provider_ids: %{spotify: id}, images: parse_artist_images(data["images"])}] ++
+      parse_artists(tail)
+  end
+
+  def parse_artists([%{"name" => name} | tail]),
+    do: [%Artist{name: name}] ++ parse_artists(tail)
+
   def parse_artists([]), do: []
+
+  @doc """
+  Parses Spotify images array into Artist.Image structs.
+  """
+  @spec parse_artist_images(list(map()) | nil) :: [Image.t()]
+  def parse_artist_images(nil), do: []
+  def parse_artist_images([]), do: []
+
+  def parse_artist_images(images) when is_list(images) do
+    Enum.map(images, fn img ->
+      %Image{url: img["url"], height: img["height"], width: img["width"]}
+    end)
+  end
 
   @doc """
   Parses Spotify release date string into Date.

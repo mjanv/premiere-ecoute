@@ -16,11 +16,15 @@ defmodule PremiereEcouteWeb.Discography.ArtistLive do
       {:ok, push_navigate(socket, to: ~p"/discography/artists")}
     else
       sessions = ListeningSession.list_for_artist(artist.id)
+      albums = Discography.list_albums_for_artist(artist.id)
+      singles = Discography.list_singles_for_artist(artist.id)
 
       {:ok,
        socket
        |> assign(:artist, artist)
-       |> assign(:sessions, sessions)}
+       |> assign(:sessions, sessions)
+       |> assign(:albums, albums)
+       |> assign(:singles, singles)}
     end
   end
 
