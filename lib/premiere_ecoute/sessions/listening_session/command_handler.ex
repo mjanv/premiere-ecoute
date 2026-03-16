@@ -164,11 +164,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
          message <-
            PremiereEcoute.Gettext.t(scope, fn ->
-             gettext("Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{duration})",
+             gettext("Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})",
                name: album.name,
                artist: album.artist,
                tracks: album.total_tracks,
-               duration: PremiereEcouteCore.Duration.duration(Album.total_duration(album))
+               timer: PremiereEcouteCore.Duration.timer(Album.total_duration(album))
              )
            end),
          :ok <- Apis.twitch().send_chat_message(scope, message) do
