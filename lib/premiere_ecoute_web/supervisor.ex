@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Supervisor do
       {DNSCluster, query: Application.get_env(:premiere_ecoute, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: PremiereEcoute.PubSub},
       PremiereEcoute.Presence,
-      PremiereEcouteWeb.Endpoint
+      PremiereEcouteWeb.Endpoint,
+      PremiereEcouteWeb.Mcp.Supervisor
     ]
 end

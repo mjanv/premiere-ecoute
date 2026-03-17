@@ -330,6 +330,10 @@ defmodule PremiereEcouteWeb.Router do
     forward "/", FunWithFlags.UI.Router, namespace: "feature-flags"
   end
 
+  scope "/mcp" do
+    forward "/", Hermes.Server.Transport.StreamableHTTP.Plug, server: PremiereEcouteWeb.Mcp.Server
+  end
+
   if Application.compile_env(:premiere_ecoute, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 

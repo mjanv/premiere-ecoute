@@ -114,10 +114,12 @@ defmodule PremiereEcoute.MixProject do
       {:resend, "~> 0.4"},
       {:broadway, "~> 1.2"},
       {:xml_builder, "~> 2.1"},
-      {:instructor, "~> 0.1.0"},
       {:jose, "~> 1.11"},
       {:hammer, "~> 7.0"},
       {:explorer, "~> 0.9"},
+      # Data
+      {:instructor, "~> 0.1"},
+      {:hermes_mcp, "~> 0.14"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},

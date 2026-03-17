@@ -174,6 +174,10 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 config :phoenix, :logger, false
 
+config :mime, :types, %{
+  "text/event-stream" => ["sse"]
+}
+
 config :instructor,
   adapter: Instructor.Adapters.OpenAI
 
