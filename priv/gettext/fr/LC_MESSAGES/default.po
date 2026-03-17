@@ -4620,8 +4620,8 @@ msgstr "Membres"
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:70
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:110
 #, elixir-autogen, elixir-format
-msgid "More →"
-msgstr "Plus →"
+msgid "More"
+msgstr "Plus"
 
 #: lib/premiere_ecoute_web/live/collections/collection_session_live.html.heex:409
 #, elixir-autogen, elixir-format

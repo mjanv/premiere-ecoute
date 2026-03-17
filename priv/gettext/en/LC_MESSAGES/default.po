@@ -3977,7 +3977,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:49
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Both"
-msgstr "Bot"
+msgstr "Both"
 
 #: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:201
 #, elixir-autogen, elixir-format
@@ -4620,7 +4620,7 @@ msgstr "Members"
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:70
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:110
 #, elixir-autogen, elixir-format
-msgid "More →"
+msgid "More"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/collections/collection_session_live.html.heex:409

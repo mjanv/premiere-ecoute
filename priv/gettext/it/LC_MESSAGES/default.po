@@ -3977,7 +3977,7 @@ msgstr "(massimo 5 opzioni)"
 #: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:49
 #, elixir-autogen, elixir-format
 msgid "Both"
-msgstr "Bot"
+msgstr "Due"
 
 #: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:201
 #, elixir-autogen, elixir-format
@@ -4620,8 +4620,8 @@ msgstr "Membro"
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:70
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:110
 #, elixir-autogen, elixir-format
-msgid "More →"
-msgstr "Altro →"
+msgid "More"
+msgstr "Altro"
 
 #: lib/premiere_ecoute_web/live/collections/collection_session_live.html.heex:409
 #, elixir-autogen, elixir-format
