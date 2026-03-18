@@ -8,5 +8,6 @@ defmodule PremiereEcouteWeb.Mcp.Server do
     version: "1.0.0",
     capabilities: [:tools]
 
-  component Components.Greeter
+  component(Components.Greeter)
+  component(Components.AlbumSearch)
 end
