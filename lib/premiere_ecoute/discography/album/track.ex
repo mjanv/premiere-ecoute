@@ -57,4 +57,6 @@ defmodule PremiereEcoute.Discography.Album.Track do
     |> unique_constraint(:provider_ids, name: :album_tracks_spotify_id_unique)
     |> unique_constraint(:provider_ids, name: :album_tracks_deezer_id_unique)
   end
+
+  def provider(%__MODULE__{provider_ids: providers_ids}, provider), do: Map.get(providers_ids, provider)
 end

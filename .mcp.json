@@ -2,7 +2,7 @@
   "mcpServers": {
     "premiere-ecoute": {
       "type": "http",
-      "url": "http://localhost:4000/mcp"
+      "url": "https://premiere-ecoute.fr/mcp"
     },
     "tidewave": {
       "type": "sse",

@@ -109,7 +109,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     |> SpotifyApi.api()
     |> SpotifyApi.post(
       url: "/playlists/#{id}/tracks",
-      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.track_id}" end)}
+      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{Track.provider(t, :spotify)}" end)}
     )
     |> SpotifyApi.handle(201, fn body -> body end)
   end
@@ -125,7 +125,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     |> SpotifyApi.api()
     |> SpotifyApi.put(
       url: "/playlists/#{id}/tracks",
-      json: %{"uris" => Enum.map(tracks, fn t -> "spotify:track:#{t.track_id}" end)}
+      json: %{"uris" => Enum.map(tracks, fn t -> "spotify:track:#{Track.provider(t, :spotify)}" end)}
     )
     |> SpotifyApi.handle(200, fn body -> body end)
   end
@@ -142,7 +142,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     |> SpotifyApi.delete(
       url: "/playlists/#{id}/tracks",
       json: %{
-        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{t.track_id}"} end)
+        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{Track.provider(t, :spotify)}"} end)
       }
     )
     |> SpotifyApi.handle(200, fn body -> body end)
