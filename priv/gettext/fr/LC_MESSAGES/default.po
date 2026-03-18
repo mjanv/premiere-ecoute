@@ -4927,7 +4927,7 @@ msgstr "Vous ne suivez personne pour le moment"
 #: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:167
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})"
-msgstr "Bienvenue à la première écoute de %{name} par %{artist}"
+msgstr "Bienvenue à la première écoute de %{name} par %{artist} (%{tracks} tracks - %{timer})"
 
 #: lib/premiere_ecoute_web/live/accounts/users_live.html.heex:89
 #, elixir-autogen, elixir-format
