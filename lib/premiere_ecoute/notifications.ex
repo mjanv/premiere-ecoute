@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Notifications do
   The system is channel-agnostic: types declare their channels, the dispatcher routes.
   """
 
-  alias PremiereEcoute.Notifications.{Dispatcher, Notification}
+  alias PremiereEcoute.Notifications.{Dispatcher, Notification, Registry}
 
   @doc "Persists and dispatches a notification struct. Returns `{:error, :unknown_type}` for unknown types."
   defdelegate dispatch(user, notification), to: Dispatcher
@@ -22,4 +22,7 @@ defmodule PremiereEcoute.Notifications do
 
   @doc "Marks all notifications for a user as read."
   defdelegate mark_all_read(user), to: Notification
+
+  @doc "Looks up a notification type module by its string key."
+  defdelegate get_type(type_string), to: Registry, as: :get_by_string
 end

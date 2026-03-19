@@ -49,8 +49,11 @@ defmodule PremiereEcoute.Notifications.Notification do
   @doc "Inserts a new notification for the given user."
   @spec insert(User.t(), String.t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def insert(user, type, data) do
+    # AIDEV-NOTE: stringify keys so data always has string keys, matching DB reload behaviour
+    string_data = Map.new(data, fn {k, v} -> {to_string(k), v} end)
+
     %__MODULE__{}
-    |> changeset(%{user_id: user.id, type: type, data: data})
+    |> changeset(%{user_id: user.id, type: type, data: string_data})
     |> Repo.insert()
   end
 

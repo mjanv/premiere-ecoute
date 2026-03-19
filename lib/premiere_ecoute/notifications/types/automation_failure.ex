@@ -23,7 +23,10 @@ defmodule PremiereEcoute.Notifications.Types.AutomationFailure do
   def channels, do: [:pubsub]
 
   @impl true
-  def render(%__MODULE__{automation_name: name, run_id: run_id, automation_id: auto_id}) do
+  def render(%__MODULE__{automation_name: name, run_id: run_id, automation_id: auto_id}),
+    do: render(%{"automation_name" => name, "run_id" => run_id, "automation_id" => auto_id})
+
+  def render(%{"automation_name" => name, "run_id" => run_id, "automation_id" => auto_id}) do
     %{
       title: "Automation failed: #{name}",
       body: "One or more steps encountered an error and the run was stopped.",

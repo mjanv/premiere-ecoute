@@ -2,12 +2,13 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
   use PremiereEcoute.DataCase
 
   alias Hermes.Server.Frame
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcouteWeb.Mcp.Components.AlbumSearch
 
   test "album search returns matching album" do
     # Create test album
     album = album_fixture(%{name: "Test Album", release_date: ~D[2023-06-15], total_tracks: 12})
-    {:ok, _} = PremiereEcoute.Discography.Album.create(album)
+    {:ok, _} = Album.create(album)
 
     frame = %Frame{}
 
@@ -41,7 +42,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
         provider_ids: %{spotify: "kind_of_blue_1959"}
       })
 
-    {:ok, _} = PremiereEcoute.Discography.Album.create(album)
+    {:ok, _} = Album.create(album)
 
     frame = %Frame{}
 
@@ -56,7 +57,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
 
   test "album search response includes only required fields" do
     album = album_fixture(%{name: "My Album"})
-    {:ok, _} = PremiereEcoute.Discography.Album.create(album)
+    {:ok, _} = Album.create(album)
 
     frame = %Frame{}
 

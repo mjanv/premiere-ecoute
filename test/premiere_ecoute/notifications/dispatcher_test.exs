@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Notifications.DispatcherTest do
       assert notification.id
       assert notification.user_id == user.id
       assert notification.type == "automation_failure"
-      assert notification.data == %{automation_id: 1, automation_name: "My automation", run_id: 99}
+      assert notification.data == %{"automation_id" => 1, "automation_name" => "My automation", "run_id" => 99}
       assert is_nil(notification.read_at)
     end
 
@@ -25,7 +25,7 @@ defmodule PremiereEcoute.Notifications.DispatcherTest do
 
       {:ok, notification} = Dispatcher.dispatch(user, @struct)
 
-      assert_receive {:notification, ^notification, rendered}
+      assert_receive {:user_notification, ^notification, rendered}
       assert rendered.title == "Automation failed: My automation"
       assert rendered.path == "/playlists/automations/1?run=99"
     end

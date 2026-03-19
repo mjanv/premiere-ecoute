@@ -87,6 +87,12 @@ defmodule PremiereEcouteWeb.Components.Header do
               </.link>
             <% end %>
             <div class="w-px h-4 bg-gray-700 mx-2"></div>
+            <!-- Notification bell -->
+            <.live_component
+              module={PremiereEcouteWeb.Live.Components.NotificationsComponent}
+              id="notifications"
+              current_user={@current_user}
+            />
             <!-- User Menu Dropdown -->
             <div class="relative mx-2" x-data="{ open: false }">
               <button

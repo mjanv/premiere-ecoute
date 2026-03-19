@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Notifications.Dispatcher do
   and `data` (map) for DB persistence. Channels receive the original struct for rendering.
   """
 
-  alias PremiereEcoute.Notifications.Channels.{EmailChannel, PubSubChannel, TwitchChatChannel}
+  alias PremiereEcoute.Notifications.Channels.PubSubChannel
   alias PremiereEcoute.Notifications.{Notification, Registry}
 
   @doc """

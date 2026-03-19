@@ -13,7 +13,7 @@ defmodule PremiereEcoute.Notifications.Channels.PubSubChannel do
 
     PremiereEcoute.PubSub.broadcast(
       "user:#{user.id}",
-      {:notification, record, rendered}
+      {:user_notification, record, rendered}
     )
   end
 end
