@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
           release_date: Date.t() | nil,
           duration_ms: integer() | nil,
           added_at: NaiveDateTime.t() | nil,
-          playlist_id: integer() | nil,
+          playlist_id: integer() | String.t() | nil,
           playlist: Playlist.t() | Ecto.Association.NotLoaded.t(),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil

@@ -109,6 +109,7 @@ defmodule PremiereEcoute.MixProject do
       {:makeup_elixir, ">= 0.0.0"},
       {:makeup_erlang, ">= 0.0.0"},
       {:oban, "~> 2.19"},
+      {:crontab, "~> 1.1"},
       {:oban_web, "~> 2.11"},
       {:swoosh, "~> 1.19"},
       {:resend, "~> 0.4"},

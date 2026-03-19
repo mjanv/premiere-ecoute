@@ -9,6 +9,7 @@ defmodule PremiereEcoute do
     deps: [PremiereEcouteCore],
     exports: [
       {Apis, except: []},
+      {Automations, except: []},
       {Accounts, except: []},
       {Billboard, except: []},
       {Collections, except: []},

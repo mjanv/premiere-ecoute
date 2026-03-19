@@ -120,7 +120,8 @@ config :premiere_ecoute, Oban,
      crontab: [
        {"@reboot", PremiereEcoute.Accounts.Workers.SubscribeStreamEvents},
        {"0 0,12 * * *", PremiereEcoute.Radio.Workers.CleanupOldTracks},
-       {"0 3 * * *", PremiereEcoute.Notifications.Workers.NotificationPruner}
+       {"0 3 * * *", PremiereEcoute.Notifications.Workers.NotificationPruner},
+       {"0 3 * * *", PremiereEcoute.Playlists.Automations.Workers.HistoryPrunerWorker}
      ]}
   ]
 
