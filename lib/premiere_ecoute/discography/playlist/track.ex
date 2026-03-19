@@ -57,4 +57,6 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
     |> unique_constraint([:provider, :playlist_id, :track_id], name: :playlist_tracks_playlist_id_track_id_provider_index)
   end
+
+  def provider(%__MODULE__{provider_ids: providers_ids}, provider), do: Map.get(providers_ids, provider)
 end
