@@ -108,7 +108,9 @@ config :premiere_ecoute, Oban,
     sessions: 1,
     twitch: 1,
     spotify: 1,
-    radio: 1
+    radio: 1,
+    automations: 5,
+    notifications: 1
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},
@@ -117,7 +119,8 @@ config :premiere_ecoute, Oban,
     {Oban.Plugins.Cron,
      crontab: [
        {"@reboot", PremiereEcoute.Accounts.Workers.SubscribeStreamEvents},
-       {"0 0,12 * * *", PremiereEcoute.Radio.Workers.CleanupOldTracks}
+       {"0 0,12 * * *", PremiereEcoute.Radio.Workers.CleanupOldTracks},
+       {"0 3 * * *", PremiereEcoute.Notifications.Workers.NotificationPruner}
      ]}
   ]
 
