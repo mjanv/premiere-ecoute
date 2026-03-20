@@ -109,7 +109,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     |> SpotifyApi.api()
     |> SpotifyApi.post(
       url: "/playlists/#{id}/tracks",
-      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{Track.provider(t, :spotify)}" end)}
+      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{track_id(t)}" end)}
     )
     |> SpotifyApi.handle(201, fn body -> body end)
   end
@@ -125,7 +125,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     |> SpotifyApi.api()
     |> SpotifyApi.put(
       url: "/playlists/#{id}/tracks",
-      json: %{"uris" => Enum.map(tracks, fn t -> "spotify:track:#{Track.provider(t, :spotify)}" end)}
+      json: %{"uris" => Enum.map(tracks, fn t -> "spotify:track:#{track_id(t)}" end)}
     )
     |> SpotifyApi.handle(200, fn body -> body end)
   end
@@ -142,11 +142,14 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     |> SpotifyApi.delete(
       url: "/playlists/#{id}/tracks",
       json: %{
-        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{Track.provider(t, :spotify)}"} end)
+        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{track_id(t)}"} end)
       }
     )
     |> SpotifyApi.handle(200, fn body -> body end)
   end
+
+  # AIDEV-NOTE: both Album.Track and Playlist.Track implement provider/2 on their own module
+  defp track_id(%{__struct__: mod} = track), do: mod.provider(track, :spotify)
 
   defp valid_track_item?(item), do: not is_nil(item["track"])
 
