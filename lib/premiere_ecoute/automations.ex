@@ -20,7 +20,6 @@ defmodule PremiereEcoute.Automations do
   defdelegate list_automations(user), to: Automation, as: :list_for_user
 
   @doc "Gets a single automation by id for a user, with virtual fields populated."
-  @spec get_automation(User.t(), integer()) :: Automation.t() | nil
   defdelegate get_automation(user, id), to: Automation, as: :get_with_virtual_fields
 
   @doc "Creates an automation and schedules its first run."
