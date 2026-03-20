@@ -42,7 +42,8 @@
             <%= if @automation.schedule_type == :manual do %>
               <button
                 phx-click="run_now"
-                class="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors"
+                disabled={not @automation.enabled}
+                class="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 {gettext("Run now")}
               </button>

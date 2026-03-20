@@ -15,6 +15,20 @@
             subtitle={gettext("Manage your saved playlists and discover new music")}
           >
             <:action>
+              <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_automations, for: @current_user) do %>
+                <a
+                  href={~p"/playlists/automations"}
+                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {gettext("Automations")}
+                </a>
+              <% end %>
+            </:action>
+
+            <:action>
               <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_rules, for: @current_user) do %>
                 <a
                   href={~p"/playlists/rules"}
@@ -114,6 +128,17 @@
                       <% end %>
                     </div>
                   </div>
+<!-- Automation count badge -->
+                  <%= if Map.get(assigns[:automation_counts] || %{}, playlist.playlist_id, 0) > 0 do %>
+                    <div class="absolute top-2 left-2">
+                      <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-purple-700/80 text-purple-200 backdrop-blur-sm">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {Map.get(@automation_counts, playlist.playlist_id)}
+                      </span>
+                    </div>
+                  <% end %>
                 </.link>
               <% end %>
             </div>

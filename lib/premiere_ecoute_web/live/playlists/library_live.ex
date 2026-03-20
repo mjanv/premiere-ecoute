@@ -12,6 +12,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Automations
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Playlists
 
@@ -29,7 +30,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
     |> assign(:loading_more, false)
     |> assign(:has_more_playlists, true)
     |> assign(:selected_playlist, nil)
-    |> assign(:library_playlists, Discography.LibraryPlaylist.all(where: [user_id: current_user.id]))
+    |> assign_library_playlists(current_user)
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -118,7 +119,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
       {:ok, _playlist} ->
         socket
         |> assign(:show_create_playlist_modal, false)
-        |> assign(:library_playlists, Discography.LibraryPlaylist.all(where: [user_id: current_scope.user.id]))
+        |> assign_library_playlists(current_scope.user)
         |> put_flash(:success, gettext("Playlist created successfully!"))
 
       {:error, reason} ->
@@ -155,7 +156,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
               socket
               |> assign(:selected_playlist, nil)
               |> assign(:show_playlist_modal, false)
-              |> assign(:library_playlists, Discography.LibraryPlaylist.all(where: [user_id: current_scope.user.id]))
+              |> assign_library_playlists(current_scope.user)
               |> put_flash(:success, gettext("Playlist added to your library!"))
 
             {:error, reason} ->
@@ -167,6 +168,16 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
           |> then(fn socket -> {:noreply, socket} end)
         end
     end
+  end
+
+  defp assign_library_playlists(socket, user) do
+    playlists = Discography.LibraryPlaylist.all(where: [user_id: user.id])
+    playlist_ids = Enum.map(playlists, & &1.playlist_id)
+    counts = Automations.automation_counts(user, playlist_ids)
+
+    socket
+    |> assign(:library_playlists, playlists)
+    |> assign(:automation_counts, counts)
   end
 
   @impl true

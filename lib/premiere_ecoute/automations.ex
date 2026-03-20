@@ -36,9 +36,49 @@ defmodule PremiereEcoute.Automations do
   @doc "Deletes an automation and cancels pending jobs."
   defdelegate delete_automation(automation), to: AutomationCreation, as: :delete
 
-  @doc "Triggers an immediate run for a manual automation."
+  @doc "Triggers an immediate run regardless of schedule type."
   @spec run_now(Automation.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
-  def run_now(%Automation{} = automation), do: AutomationScheduling.schedule(automation)
+  def run_now(%Automation{} = automation), do: AutomationScheduling.run_now(automation)
+
+  @doc "Lists automations that reference a given playlist_id in any step config."
+  @spec list_for_playlist(User.t(), String.t()) :: [Automation.t()]
+  def list_for_playlist(%User{id: user_id}, playlist_id) do
+    import Ecto.Query
+
+    Automation
+    |> where([a], a.user_id == ^user_id)
+    |> where(
+      [a],
+      fragment(
+        "EXISTS (SELECT 1 FROM jsonb_array_elements(?) AS step WHERE step->'config'->>'playlist_id' = ?)",
+        a.steps,
+        ^playlist_id
+      )
+    )
+    |> Repo.all()
+  end
+
+  @doc "Returns a map of playlist_id => automation count for a list of playlist_ids."
+  @spec automation_counts(User.t(), [String.t()]) :: %{String.t() => non_neg_integer()}
+  def automation_counts(%User{id: user_id}, playlist_ids) when playlist_ids != [] do
+    import Ecto.Query
+
+    rows =
+      Automation
+      |> where([a], a.user_id == ^user_id)
+      |> select([a], a.steps)
+      |> Repo.all()
+
+    Enum.reduce(rows, %{}, fn steps, acc ->
+      steps
+      |> Enum.flat_map(fn step -> [get_in(step, ["config", "playlist_id"])] end)
+      |> Enum.filter(&(&1 in playlist_ids))
+      |> Enum.uniq()
+      |> Enum.reduce(acc, fn pid, inner -> Map.update(inner, pid, 1, &(&1 + 1)) end)
+    end)
+  end
+
+  def automation_counts(_user, []), do: %{}
 
   @doc "Lists run history for an automation."
   defdelegate list_runs(automation), to: AutomationRun, as: :list_for_automation

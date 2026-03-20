@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Automations
   alias PremiereEcoute.Discography.LibraryPlaylist
 
   @impl true
@@ -32,8 +33,10 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
       |> assign(:deleting_tracks, false)
 
     if library_playlist do
+      user = socket.assigns.current_scope.user
+      automations = Automations.list_for_playlist(user, playlist_id)
       send(self(), :fetch_playlist_data)
-      {:ok, socket}
+      {:ok, socket |> assign(:automations, automations) |> assign(:show_automations_modal, false)}
     else
       {:ok, assign(socket, :error, gettext("Playlist not found in your library"))}
     end
@@ -42,6 +45,16 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("show_automations_modal", _params, socket) do
+    {:noreply, assign(socket, :show_automations_modal, true)}
+  end
+
+  @impl true
+  def handle_event("hide_automations_modal", _params, socket) do
+    {:noreply, assign(socket, :show_automations_modal, false)}
   end
 
   @impl true

@@ -15,6 +15,14 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationScheduling do
   alias PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorker
   alias PremiereEcoute.Repo
 
+  @doc "Triggers an immediate run regardless of schedule type."
+  @spec run_now(Automation.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
+  def run_now(%Automation{id: id}) do
+    %{automation_id: id}
+    |> AutomationRunWorker.new()
+    |> Oban.insert()
+  end
+
   @doc "Schedules an immediate run for a manual automation."
   @spec schedule(Automation.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
   def schedule(%Automation{id: id, schedule_type: :manual}) do

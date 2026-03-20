@@ -144,6 +144,15 @@
                         <span>•</span>
                         <span class="text-gray-500">{gettext("Private")}</span>
                       <% end %>
+                      <%= if assigns[:automations] do %>
+                        <span>•</span>
+                        <button
+                          phx-click="show_automations_modal"
+                          class="text-purple-400 hover:text-purple-300 transition-colors"
+                        >
+                          {ngettext("%{n} automation", "%{n} automations", length(@automations), n: length(@automations))}
+                        </button>
+                      <% end %>
                     </div>
                     
 <!-- Action Buttons -->
@@ -635,5 +644,51 @@
         <% end %>
       <% end %>
     <% end %>
+
   </div>
+
+  <!-- Automations modal -->
+  <%= if assigns[:show_automations_modal] do %>
+    <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" phx-click="hide_automations_modal">
+      <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 w-full max-w-md mx-4" phx-click-away="hide_automations_modal">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-semibold text-white">{gettext("Automations")}</h3>
+          <.link
+            navigate={~p"/playlists/automations/new"}
+            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+          >
+            {gettext("Create automation")}
+          </.link>
+        </div>
+        <%= if Enum.empty?(@automations) do %>
+          <p class="text-sm text-gray-500 italic">{gettext("No automations reference this playlist.")}</p>
+        <% else %>
+          <div class="space-y-2">
+            <%= for automation <- @automations do %>
+              <.link
+                navigate={~p"/playlists/automations/#{automation.id}"}
+                class="flex items-center justify-between p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <div>
+                  <p class="text-sm font-medium text-white">{automation.name}</p>
+                  <p class="text-xs text-gray-400">
+                    <PremiereEcouteWeb.Playlists.Components.AutomationComponents.schedule_summary automation={automation} />
+                  </p>
+                </div>
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </.link>
+            <% end %>
+          </div>
+        <% end %>
+        <button
+          phx-click="hide_automations_modal"
+          class="mt-4 w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
+        >
+          {gettext("Close")}
+        </button>
+      </div>
+    </div>
+  <% end %>
 </Layouts.app>
