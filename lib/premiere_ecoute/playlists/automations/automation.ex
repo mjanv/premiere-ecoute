@@ -67,7 +67,7 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
   @spec insert(User.t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def insert(%User{id: id}, attrs) do
     %__MODULE__{}
-    |> changeset(Map.put(attrs, :user_id, id))
+    |> changeset(Map.put(attrs, "user_id", id))
     |> Repo.insert()
   end
 

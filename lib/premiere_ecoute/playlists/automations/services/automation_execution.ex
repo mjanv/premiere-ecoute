@@ -10,10 +10,12 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
   outcomes recorded in automation_runs, not Oban job errors.
   """
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Notifications
   alias PremiereEcoute.Notifications.Types.AutomationFailure
+  alias PremiereEcoute.Notifications.Types.AutomationSuccess
   alias PremiereEcoute.Playlists.Automations.ActionRegistry
   alias PremiereEcoute.Playlists.Automations.Automation
   alias PremiereEcoute.Playlists.Automations.AutomationRun
@@ -22,8 +24,10 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
   @doc "Runs all steps of an automation, writes a run record, returns `:ok`."
   @spec run(Automation.t(), integer()) :: :ok
   def run(%Automation{} = automation, job_id) do
-    user = Repo.get!(User, automation.user_id)
-    scope = Scope.for_user(user)
+    # AIDEV-NOTE: preload tokens and renew if expired so API calls succeed
+    user = Repo.preload(Repo.get!(User, automation.user_id), [:spotify, :twitch])
+    scope = user |> Scope.for_user() |> then(&Accounts.maybe_renew_token(%{assigns: %{current_scope: &1}}, :spotify))
+    scope = Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :twitch)
 
     {:ok, run} =
       AutomationRun.insert(%{
@@ -34,7 +38,14 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
         started_at: DateTime.utc_now(:second)
       })
 
-    {status, step_results} = execute_steps(automation.steps, scope)
+    {status, step_results} =
+      try do
+        execute_steps(automation.steps, scope)
+      rescue
+        e ->
+          # AIDEV-NOTE: guard against unexpected crashes so run never stays :running
+          {:failed, [%{"error" => Exception.message(e), "status" => "failed"}]}
+      end
 
     AutomationRun.update(run, %{
       status: status,
@@ -42,13 +53,14 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
       finished_at: DateTime.utc_now(:second)
     })
 
-    if status == :failed do
-      Notifications.dispatch(user, %AutomationFailure{
-        automation_id: automation.id,
-        automation_name: automation.name,
-        run_id: run.id
-      })
-    end
+    notification =
+      if status == :failed do
+        %AutomationFailure{automation_id: automation.id, automation_name: automation.name, run_id: run.id}
+      else
+        %AutomationSuccess{automation_id: automation.id, automation_name: automation.name, run_id: run.id}
+      end
+
+    Notifications.dispatch(user, notification)
 
     :ok
   end

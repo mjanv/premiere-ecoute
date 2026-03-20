@@ -5,10 +5,12 @@ defmodule PremiereEcoute.Playlists.Automations.ActionRegistry do
   To add a new action: implement the `Action` behaviour, then add an entry here.
   """
 
+  alias PremiereEcoute.Playlists.Automations.Actions.CreatePlaylist
   alias PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylist
   alias PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicates
 
   @actions %{
+    "create_playlist" => CreatePlaylist,
     "empty_playlist" => EmptyPlaylist,
     "remove_duplicates" => RemoveDuplicates
   }

@@ -146,6 +146,10 @@ defmodule PremiereEcouteWeb.Router do
       live "/", LibraryLive, :index
       live "/rules", RulesLive, :index
       live "/workflows", WorkflowsLive, :index
+      live "/automations", AutomationsLive, :index
+      live "/automations/new", AutomationFormLive, :new
+      live "/automations/:id", AutomationLive, :show
+      live "/automations/:id/edit", AutomationFormLive, :edit
       live "/:id", PlaylistLive, :show
     end
   end

@@ -1,0 +1,170 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="automations"
+>
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-12">
+      <div class="max-w-2xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-8">
+          <.link navigate={~p"/playlists/automations"} class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </.link>
+          <.page_header
+            title={if @live_action == :new, do: gettext("New automation"), else: gettext("Edit automation")}
+            subtitle=""
+          />
+        </div>
+
+        <form phx-submit="save" phx-change="change" class="space-y-8">
+          
+<!-- Details -->
+          <div class="p-6 bg-gray-800/50 rounded-xl border border-gray-700">
+            <h3 class="text-base font-semibold mb-4">{gettext("Details")}</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">{gettext("Name")} <span class="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  name="name"
+                  value={@form_data["name"]}
+                  required
+                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+                  placeholder={gettext("e.g. Monthly fresh playlist")}
+                />
+                <%= if @errors[:name] do %>
+                  <p class="text-xs text-red-400 mt-1">{Enum.join(@errors[:name], ", ")}</p>
+                <% end %>
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">{gettext("Description")}</label>
+                <textarea
+                  name="description"
+                  rows="2"
+                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none resize-none"
+                  placeholder={gettext("Optional description")}
+                >{@form_data["description"]}</textarea>
+              </div>
+            </div>
+          </div>
+          
+<!-- Schedule -->
+          <div class="p-6 bg-gray-800/50 rounded-xl border border-gray-700">
+            <h3 class="text-base font-semibold mb-4">{gettext("Schedule")}</h3>
+
+            <div class="flex gap-3 mb-4">
+              <%= for {label, value} <- [{gettext("Manual"), "manual"}, {gettext("Once"), "once"}, {gettext("Recurring"), "recurring"}] do %>
+                <button
+                  type="button"
+                  phx-click="change_schedule_type"
+                  phx-value-schedule_type={value}
+                  class={"px-4 py-2 rounded-lg text-sm font-medium transition-colors #{if @schedule_type == value, do: "bg-purple-600 text-white", else: "bg-gray-700 text-gray-300 hover:bg-gray-600"}"}
+                >
+                  {label}
+                </button>
+              <% end %>
+            </div>
+
+            <%= case @schedule_type do %>
+              <% "once" -> %>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">{gettext("Run at")}</label>
+                  <input
+                    type="datetime-local"
+                    name="scheduled_at"
+                    value={@form_data["scheduled_at"]}
+                    class="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+                  />
+                </div>
+              <% "recurring" -> %>
+                <div class="space-y-2">
+                  <label class="block text-sm text-gray-400">{gettext("Cron expression")}</label>
+                  <input
+                    type="text"
+                    name="cron_expression"
+                    value={@form_data["cron_expression"]}
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm font-mono focus:border-purple-500 focus:outline-none"
+                    placeholder="0 9 1 * *"
+                  />
+                  <%= if @errors[:cron_expression] do %>
+                    <p class="text-xs text-red-400">{Enum.join(@errors[:cron_expression], ", ")}</p>
+                  <% end %>
+                  <p class="text-xs text-gray-500">{gettext("Standard 5-field cron: minute hour day month weekday")}</p>
+                </div>
+              <% _ -> %>
+                <p class="text-sm text-gray-400">{gettext("The automation will only run when triggered manually.")}</p>
+            <% end %>
+          </div>
+          
+<!-- Steps -->
+          <div class="p-6 bg-gray-800/50 rounded-xl border border-gray-700">
+            <h3 class="text-base font-semibold mb-4">{gettext("Steps")}</h3>
+            <PremiereEcouteWeb.Playlists.Components.AutomationComponents.step_builder
+              steps={@steps}
+              registry={@action_registry}
+              library_playlists={@library_playlists}
+            />
+          </div>
+          
+<!-- Footer -->
+          <div class="flex justify-end gap-3 pb-8">
+            <.link
+              navigate={~p"/playlists/automations"}
+              class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {gettext("Cancel")}
+            </.link>
+            <button
+              type="submit"
+              name="_action"
+              value="save"
+              phx-click="save"
+              class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {gettext("Save")}
+            </button>
+            <button
+              type="button"
+              phx-click="save_and_run"
+              class="px-5 py-2.5 bg-green-700 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {gettext("Save & run")}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+<!-- Add step modal -->
+  <%= if @show_add_step_modal do %>
+    <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" phx-click="hide_add_step">
+      <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 w-full max-w-sm" phx-click-away="hide_add_step">
+        <h3 class="text-base font-semibold mb-4">{gettext("Add step")}</h3>
+        <div class="space-y-2">
+          <%= for {action_type, _mod} <- @action_registry do %>
+            <button
+              type="button"
+              phx-click="add_step"
+              phx-value-action_type={action_type}
+              class="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm text-left transition-colors"
+            >
+              {humanize_action(action_type)}
+            </button>
+          <% end %>
+        </div>
+        <button
+          type="button"
+          phx-click="hide_add_step"
+          class="mt-4 w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
+        >
+          {gettext("Cancel")}
+        </button>
+      </div>
+    </div>
+  <% end %>
+</Layouts.app>
