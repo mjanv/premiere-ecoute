@@ -33,8 +33,6 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationRun do
     field :oban_job_id, :integer
     field :status, Ecto.Enum, values: @statuses
     field :trigger, Ecto.Enum, values: @triggers
-    # AIDEV-NOTE: steps snapshot from automation at run start; each element has
-    # position, action_type, status, output, error, started_at, finished_at
     field :steps, {:array, :map}, default: []
     field :started_at, :utc_datetime
     field :finished_at, :utc_datetime

@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
       user = user_fixture()
 
       assert {:ok, automation} =
-               AutomationCreation.create(user, %{name: "Test", schedule_type: :manual})
+               AutomationCreation.create(user, %{name: "Test", schedule: :manual})
 
       assert automation.id
       assert automation.name == "Test"
@@ -24,7 +24,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
     test "returns error for invalid attrs" do
       user = user_fixture()
 
-      assert {:error, changeset} = AutomationCreation.create(user, %{schedule_type: :manual})
+      assert {:error, changeset} = AutomationCreation.create(user, %{schedule: :manual})
       assert Keyword.has_key?(changeset.errors, :name)
     end
 
@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
       user = user_fixture()
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        {:ok, _} = AutomationCreation.create(user, %{name: "Manual", schedule_type: :manual})
+        {:ok, _} = AutomationCreation.create(user, %{name: "Manual", schedule: :manual})
         refute_enqueued worker: AutomationRunWorker
       end)
     end
@@ -44,7 +44,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
         {:ok, automation} =
           AutomationCreation.create(user, %{
             name: "Recurring",
-            schedule_type: :recurring,
+            schedule: :recurring,
             cron_expression: "0 9 * * *"
           })
 
@@ -61,7 +61,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
         {:ok, automation} =
           AutomationCreation.create(user, %{
             name: "Once",
-            schedule_type: :once,
+            schedule: :once,
             scheduled_at: at
           })
 
@@ -74,7 +74,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
   describe "update/2" do
     test "updates the automation" do
       user = user_fixture()
-      automation = insert_automation(user, %{name: "Old", schedule_type: :manual})
+      automation = insert_automation(user, %{name: "Old", schedule: :manual})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
         assert {:ok, updated} = AutomationCreation.update(automation, %{name: "New"})
@@ -89,7 +89,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
         {:ok, automation} =
           AutomationCreation.create(user, %{
             name: "Rec",
-            schedule_type: :recurring,
+            schedule: :recurring,
             cron_expression: "0 9 * * *"
           })
 
@@ -106,7 +106,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
 
       Oban.Testing.with_testing_mode(:manual, fn ->
         automation =
-          insert_automation(user, %{name: "Rec", schedule_type: :recurring, cron_expression: "0 9 * * *", enabled: false})
+          insert_automation(user, %{name: "Rec", schedule: :recurring, cron_expression: "0 9 * * *", enabled: false})
 
         {:ok, _} = AutomationCreation.update(automation, %{name: "Renamed"})
         refute_enqueued worker: AutomationRunWorker
@@ -117,7 +117,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
   describe "enable/1" do
     test "sets enabled to true" do
       user = user_fixture()
-      automation = insert_automation(user, %{name: "A", schedule_type: :manual, enabled: false})
+      automation = insert_automation(user, %{name: "A", schedule: :manual, enabled: false})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
         assert {:ok, updated} = AutomationCreation.enable(automation)
@@ -132,7 +132,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
         automation =
           insert_automation(user, %{
             name: "Rec",
-            schedule_type: :recurring,
+            schedule: :recurring,
             cron_expression: "0 9 * * *",
             enabled: false
           })
@@ -146,7 +146,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
   describe "disable/1" do
     test "sets enabled to false" do
       user = user_fixture()
-      automation = insert_automation(user, %{name: "A", schedule_type: :manual})
+      automation = insert_automation(user, %{name: "A", schedule: :manual})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
         assert {:ok, updated} = AutomationCreation.disable(automation)
@@ -158,7 +158,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationCreationTest d
   describe "delete/1" do
     test "removes the automation from the database" do
       user = user_fixture()
-      automation = insert_automation(user, %{name: "A", schedule_type: :manual})
+      automation = insert_automation(user, %{name: "A", schedule: :manual})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
         assert {:ok, _} = AutomationCreation.delete(automation)

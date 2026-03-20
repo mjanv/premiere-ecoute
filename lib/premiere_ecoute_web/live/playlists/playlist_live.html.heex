@@ -644,10 +644,9 @@
         <% end %>
       <% end %>
     <% end %>
-
   </div>
-
-  <!-- Automations modal -->
+  
+<!-- Automations modal -->
   <%= if assigns[:show_automations_modal] do %>
     <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" phx-click="hide_automations_modal">
       <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 w-full max-w-md mx-4" phx-click-away="hide_automations_modal">
@@ -672,7 +671,9 @@
                 <div>
                   <p class="text-sm font-medium text-white">{automation.name}</p>
                   <p class="text-xs text-gray-400">
-                    <PremiereEcouteWeb.Playlists.Components.AutomationComponents.schedule_summary automation={automation} />
+                    <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={
+                      automation
+                    } />
                   </p>
                 </div>
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -24,6 +24,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
     |> assign(:current_user, User.preload(current_user))
     |> assign(:show_playlist_modal, false)
     |> assign(:show_create_playlist_modal, false)
+    |> assign(:show_add_dropdown, false)
     |> assign(:playlists_loading, false)
     |> assign(:playlists, [])
     |> assign(:current_page, 1)
@@ -49,6 +50,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
     |> assign(:loading_more, false)
     |> assign(:has_more_playlists, true)
     |> assign(:selected_playlist, nil)
+    |> assign(:show_add_dropdown, false)
     |> tap(fn _ -> send(self(), :fetch_playlists) end)
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -89,9 +91,20 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
   end
 
   @impl true
+  def handle_event("toggle_add_dropdown", _params, socket) do
+    {:noreply, assign(socket, :show_add_dropdown, !socket.assigns.show_add_dropdown)}
+  end
+
+  @impl true
+  def handle_event("hide_add_dropdown", _params, socket) do
+    {:noreply, assign(socket, :show_add_dropdown, false)}
+  end
+
+  @impl true
   def handle_event("show_create_playlist_modal", _params, socket) do
     socket
     |> assign(:show_create_playlist_modal, true)
+    |> assign(:show_add_dropdown, false)
     |> then(fn socket -> {:noreply, socket} end)
   end
 

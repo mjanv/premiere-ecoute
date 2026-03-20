@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
+defmodule PremiereEcouteWeb.Playlists.Automations.FormLive do
   @moduledoc "Create (:new) and edit (:edit) form for automations."
 
   use PremiereEcouteWeb, :live_view
@@ -22,30 +22,26 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
   def handle_params(%{"id" => id}, _url, %{assigns: %{live_action: :edit}} = socket) do
     user = socket.assigns.current_scope.user
 
-    case Automations.get_automation(String.to_integer(id)) do
+    case Automations.get_automation(user, String.to_integer(id)) do
       nil ->
         socket
         |> put_flash(:error, gettext("Automation not found"))
         |> push_navigate(to: ~p"/playlists/automations")
         |> then(fn socket -> {:noreply, socket} end)
 
-      automation when automation.user_id == user.id ->
+      automation ->
         socket
         |> assign(:automation, automation)
         |> assign(:steps, automation.steps)
-        |> assign(:schedule_type, to_string(automation.schedule_type))
+        |> assign(:schedule, to_string(automation.schedule))
         |> assign(:form_data, %{
           "name" => automation.name,
           "description" => automation.description || "",
           "cron_expression" => automation.cron_expression || "",
-          "scheduled_at" => format_scheduled_at(automation)
+          "scheduled_date" => format_scheduled_date(automation.scheduled_at),
+          "scheduled_hour" => format_scheduled_hour(automation.scheduled_at),
+          "scheduled_minute" => format_scheduled_minute(automation.scheduled_at)
         })
-        |> then(fn socket -> {:noreply, socket} end)
-
-      _other ->
-        socket
-        |> put_flash(:error, gettext("Automation not found"))
-        |> push_navigate(to: ~p"/playlists/automations")
         |> then(fn socket -> {:noreply, socket} end)
     end
   end
@@ -54,8 +50,15 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
     socket
     |> assign(:automation, nil)
     |> assign(:steps, [])
-    |> assign(:schedule_type, "manual")
-    |> assign(:form_data, %{"name" => "", "description" => "", "cron_expression" => "", "scheduled_at" => ""})
+    |> assign(:schedule, "manual")
+    |> assign(:form_data, %{
+      "name" => "",
+      "description" => "",
+      "cron_expression" => "",
+      "scheduled_date" => "",
+      "scheduled_hour" => "09",
+      "scheduled_minute" => "00"
+    })
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -63,7 +66,7 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
   def handle_event("change", params, socket) do
     form_data =
       socket.assigns.form_data
-      |> Map.merge(Map.take(params, ["name", "description", "cron_expression", "scheduled_at"]))
+      |> Map.merge(Map.take(params, ["name", "description", "cron_expression"]))
 
     steps =
       case params["steps"] do
@@ -86,8 +89,13 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
   end
 
   @impl true
-  def handle_event("change_schedule_type", %{"schedule_type" => type}, socket) do
-    {:noreply, assign(socket, :schedule_type, type)}
+  def handle_event("change_schedule", %{"schedule" => type}, socket) do
+    {:noreply, assign(socket, :schedule, type)}
+  end
+
+  @impl true
+  def handle_event("ignore", _params, socket) do
+    {:noreply, socket}
   end
 
   @impl true
@@ -149,14 +157,18 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
   end
 
   @impl true
-  def handle_event("save", _params, socket) do
+  def handle_event("save", params, socket) do
     user = socket.assigns.current_scope.user
     steps = socket.assigns.steps
 
     attrs =
       socket.assigns.form_data
-      |> Map.take(["name", "description", "cron_expression", "scheduled_at"])
-      |> Map.put("schedule_type", socket.assigns.schedule_type)
+      |> Map.take(["name", "description", "cron_expression"])
+      |> Map.put(
+        "scheduled_at",
+        combine_scheduled_at(params["scheduled_date"], params["scheduled_hour"], params["scheduled_minute"])
+      )
+      |> Map.put("schedule", socket.assigns.schedule)
       |> Map.put("steps", steps)
 
     result =
@@ -190,7 +202,7 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
     attrs =
       socket.assigns.form_data
       |> Map.take(["name", "description", "cron_expression", "scheduled_at"])
-      |> Map.put("schedule_type", socket.assigns.schedule_type)
+      |> Map.put("schedule", socket.assigns.schedule)
       |> Map.put("steps", steps)
 
     result =
@@ -201,7 +213,7 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
 
     case result do
       {:ok, automation} ->
-        Automations.run_now(automation)
+        Automations.schedule(automation)
 
         socket
         |> put_flash(:info, gettext("Automation saved and run triggered"))
@@ -239,15 +251,20 @@ defmodule PremiereEcouteWeb.Playlists.AutomationFormLive do
 
   defp swap(list, _i, _j), do: list
 
-  defp humanize_action("create_playlist"), do: gettext("Create playlist")
-  defp humanize_action("empty_playlist"), do: gettext("Empty playlist")
-  defp humanize_action("remove_duplicates"), do: gettext("Remove duplicates")
-  defp humanize_action(other), do: other
+  defp format_scheduled_date(%DateTime{} = dt), do: Calendar.strftime(dt, "%Y-%m-%d")
+  defp format_scheduled_date(_), do: ""
 
-  defp format_scheduled_at(%{next_run_at: %DateTime{} = dt}),
-    do: Calendar.strftime(dt, "%Y-%m-%dT%H:%M")
+  defp format_scheduled_hour(%DateTime{} = dt), do: String.pad_leading(to_string(dt.hour), 2, "0")
+  defp format_scheduled_hour(_), do: "09"
 
-  defp format_scheduled_at(_), do: nil
+  defp format_scheduled_minute(%DateTime{} = dt), do: String.pad_leading(to_string(dt.minute), 2, "0")
+  defp format_scheduled_minute(_), do: "00"
+
+  defp combine_scheduled_at(date, hour, minute) when is_binary(date) and date != "" do
+    "#{date}T#{hour || "00"}:#{minute || "00"}"
+  end
+
+  defp combine_scheduled_at(_, _, _), do: nil
 
   defp changeset_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->

@@ -9,8 +9,7 @@ defmodule PremiereEcoute.Playlists.Automations.Workers.HistoryPrunerWorker do
 
   @impl Oban.Worker
   def perform(%Oban.Job{}) do
-    cutoff = DateTime.add(DateTime.utc_now(), -@retention_days, :day)
-    AutomationRun.delete_before(cutoff)
+    AutomationRun.delete_before(DateTime.add(DateTime.utc_now(), -@retention_days, :day))
     :ok
   end
 end

@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Playlists.AutomationLive do
+defmodule PremiereEcouteWeb.Playlists.Automations.ShowLive do
   @moduledoc "Show page for a single automation — steps summary + live run history."
 
   use PremiereEcouteWeb, :live_view
@@ -9,7 +9,7 @@ defmodule PremiereEcouteWeb.Playlists.AutomationLive do
   def mount(%{"id" => id}, _session, socket) do
     user = socket.assigns.current_scope.user
 
-    case load_automation(id, user) do
+    case Automations.get_automation(user, String.to_integer(id)) do
       nil ->
         socket
         |> put_flash(:error, gettext("Automation not found"))
@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Playlists.AutomationLive do
 
   @impl true
   def handle_event("run_now", _params, socket) do
-    case Automations.run_now(socket.assigns.automation) do
+    case Automations.schedule(socket.assigns.automation) do
       {:ok, _job} ->
         {:noreply, put_flash(socket, :info, gettext("Run triggered"))}
 
@@ -107,16 +107,5 @@ defmodule PremiereEcouteWeb.Playlists.AutomationLive do
   @impl true
   def handle_info({:run_created, run}, socket) do
     {:noreply, assign(socket, :runs, [run | socket.assigns.runs])}
-  end
-
-  defp load_automation(id_str, user) do
-    case Automations.get_automation(String.to_integer(id_str)) do
-      %{user_id: uid} = automation when uid == user.id ->
-        [automation] = Automations.with_virtual_fields(user, [automation])
-        automation
-
-      _ ->
-        nil
-    end
   end
 end

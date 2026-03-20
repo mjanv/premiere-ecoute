@@ -31,7 +31,7 @@ defmodule PremiereEcoute.Playlists.Automations.Workers.HistoryPrunerWorkerTest d
   describe "perform/1" do
     test "deletes runs older than 30 days" do
       user = user_fixture()
-      {:ok, automation} = Automation.insert(user, %{name: "A", schedule_type: :manual})
+      {:ok, automation} = Automation.insert(user, %{name: "A", schedule: :manual})
       run = insert_run(automation)
       backdate(run, 31)
 
@@ -41,7 +41,7 @@ defmodule PremiereEcoute.Playlists.Automations.Workers.HistoryPrunerWorkerTest d
 
     test "keeps runs within 30 days" do
       user = user_fixture()
-      {:ok, automation} = Automation.insert(user, %{name: "A", schedule_type: :manual})
+      {:ok, automation} = Automation.insert(user, %{name: "A", schedule: :manual})
       run = insert_run(automation)
       backdate(run, 10)
 

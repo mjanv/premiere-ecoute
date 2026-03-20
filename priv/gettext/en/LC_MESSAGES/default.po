@@ -4456,7 +4456,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/discography/discography_live.html.heex:16
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Artists"
-msgstr "Artist"
+msgstr "Artists"
 
 #: lib/premiere_ecoute_web/live/discography/album_live.html.heex:39
 #, elixir-autogen, elixir-format
@@ -4464,14 +4464,14 @@ msgid "Back to albums"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/artist_live.html.heex:21
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Back to artists"
-msgstr "Back to Donations"
+msgstr "Back to artists"
 
 #: lib/premiere_ecoute_web/live/collections/collection_session_live.html.heex:82
-#, elixir-autogen, elixir-format, fuzzy
+#, elixir-autogen, elixir-format
 msgid "Back to collections"
-msgstr "Back to Donations"
+msgstr "Back to collections"
 
 #: lib/premiere_ecoute_web/live/discography/single_live.html.heex:39
 #, elixir-autogen, elixir-format, fuzzy
@@ -4503,7 +4503,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:11
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Collections"
-msgstr "Connections"
+msgstr "Collections"
 
 #: lib/premiere_ecoute_web/live/collections/collection_session_live.html.heex:551
 #, elixir-autogen, elixir-format

@@ -38,18 +38,16 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
         started_at: DateTime.utc_now(:second)
       })
 
-    {status, step_results} =
+    {status, steps} =
       try do
         execute_steps(automation.steps, scope)
       rescue
-        e ->
-          # AIDEV-NOTE: guard against unexpected crashes so run never stays :running
-          {:failed, [%{"error" => Exception.message(e), "status" => "failed"}]}
+        e -> {:failed, [%{"error" => Exception.message(e), "status" => "failed"}]}
       end
 
     AutomationRun.update(run, %{
       status: status,
-      steps: step_results,
+      steps: steps,
       finished_at: DateTime.utc_now(:second)
     })
 

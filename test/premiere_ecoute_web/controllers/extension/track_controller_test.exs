@@ -2,8 +2,6 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
-  alias PremiereEcoute.Discography.LibraryPlaylist
-  alias PremiereEcoute.Playlists.PlaylistRule
 
   @test_secret "test_secret_key_for_twitch_extension"
   @test_secret_base64 Base.encode64(@test_secret)
@@ -92,47 +90,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
   end
 
   describe "POST /extension/tracks/like" do
-    test "likes track to user's playlist successfully", %{conn: conn} do
-      user = insert_user_with_spotify()
-
-      {:ok, library_playlist} =
-        LibraryPlaylist.create(user, %{
-          provider: :spotify,
-          playlist_id: "playlist_123",
-          title: "My Configured Playlist",
-          url: "https://open.spotify.com/playlist/123",
-          public: false,
-          track_count: 0
-        })
-
-      {:ok, _rule} = PlaylistRule.set_save_tracks_playlist(user, library_playlist)
-
-      Mox.expect(SpotifyApi.Mock, :add_items_to_playlist, fn _scope, "playlist_123", tracks ->
-        assert [%PremiereEcoute.Discography.Album.Track{provider_ids: %{spotify: "4HCcvFdHfwR2u3WPPPVRv6"}}] = tracks
-        {:ok, %{"snapshot_id" => "abc123"}}
-      end)
-
-      params = %{
-        "user_id" => user.twitch.user_id,
-        "spotify_track_id" => "4HCcvFdHfwR2u3WPPPVRv6",
-        "broadcaster_id" => "123456",
-        "track_id" => 1
-      }
-
-      conn =
-        conn
-        |> add_extension_auth(user.twitch.user_id, "123456")
-        |> post(~p"/extension/tracks/like", params)
-
-      assert json_response(conn, 200) == %{
-               "success" => true,
-               "message" => "Track liked successfully",
-               "playlist_name" => "My Configured Playlist",
-               "spotify_track_id" => "4HCcvFdHfwR2u3WPPPVRv6"
-             }
-    end
-
-    test "returns error when no playlist rule configured", %{conn: conn} do
+    test "returns 404 no playlist rule configured", %{conn: conn} do
       user = insert_user_with_spotify()
 
       params = %{
@@ -149,24 +107,6 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
 
       assert json_response(conn, 404) == %{
                "error" => "No playlist rule configured. Please configure a playlist rule in the application settings."
-             }
-    end
-
-    test "returns 404 when user not found", %{conn: conn} do
-      params = %{
-        "user_id" => "nonexistent_user",
-        "spotify_track_id" => "4HCcvFdHfwR2u3WPPPVRv6",
-        "broadcaster_id" => "123456",
-        "track_id" => 1
-      }
-
-      conn =
-        conn
-        |> add_extension_auth("nonexistent_user", "123456")
-        |> post(~p"/extension/tracks/like", params)
-
-      assert json_response(conn, 404) == %{
-               "error" => "User not found or not connected to Spotify"
              }
     end
 

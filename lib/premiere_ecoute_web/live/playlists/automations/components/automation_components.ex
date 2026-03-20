@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Playlists.Components.AutomationComponents do
+defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents do
   @moduledoc "Reusable components for automation UI: step builder, run history, schedule summary."
 
   use Phoenix.Component
@@ -14,12 +14,12 @@ defmodule PremiereEcouteWeb.Playlists.Components.AutomationComponents do
   def schedule_summary(assigns) do
     ~H"""
     <span>
-      <%= case @automation.schedule_type do %>
+      <%= case @automation.schedule do %>
         <% :manual -> %>
           {gettext("Manual")}
         <% :once -> %>
-          <%= if @automation.next_run_at do %>
-            {gettext("Once at %{dt}", dt: format_datetime(@automation.next_run_at))}
+          <%= if @automation.scheduled_at do %>
+            {gettext("Once at %{dt}", dt: format_datetime(@automation.scheduled_at))}
           <% else %>
             {gettext("Once (not scheduled)")}
           <% end %>
@@ -147,6 +147,7 @@ defmodule PremiereEcouteWeb.Playlists.Components.AutomationComponents do
   attr :steps, :list, required: true
   attr :registry, :map, required: true
   attr :library_playlists, :list, required: true
+  attr :show_picker, :boolean, default: false
 
   def step_builder(assigns) do
     ~H"""
@@ -197,16 +198,31 @@ defmodule PremiereEcouteWeb.Playlists.Components.AutomationComponents do
         </div>
       <% end %>
 
-      <button
-        type="button"
-        phx-click="show_add_step"
-        class="w-full py-3 border-2 border-dashed border-gray-600 hover:border-purple-500 text-gray-400 hover:text-purple-400 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        {gettext("Add step")}
-      </button>
+      <%= if @show_picker do %>
+        <div class="border border-gray-600 rounded-lg overflow-hidden">
+          <%= for {action_type, _mod} <- @registry do %>
+            <button
+              type="button"
+              phx-click="add_step"
+              phx-value-action_type={action_type}
+              class="w-full px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-white text-sm text-left transition-colors border-b border-gray-700 last:border-0"
+            >
+              {humanize_action(action_type)}
+            </button>
+          <% end %>
+        </div>
+      <% else %>
+        <button
+          type="button"
+          phx-click="show_add_step"
+          class="w-full py-3 border-2 border-dashed border-gray-600 hover:border-purple-500 text-gray-400 hover:text-purple-400 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          {gettext("Add step")}
+        </button>
+      <% end %>
     </div>
     """
   end
@@ -308,9 +324,7 @@ defmodule PremiereEcouteWeb.Playlists.Components.AutomationComponents do
   defp config_summary(nil), do: ""
 
   defp config_summary(config) do
-    config
-    |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
-    |> Enum.join(", ")
+    Enum.map_join(config, ", ", fn {k, v} -> "#{k}: #{v}" end)
   end
 
   defp cron_label(nil), do: gettext("Recurring")
@@ -352,5 +366,5 @@ defmodule PremiereEcouteWeb.Playlists.Components.AutomationComponents do
   end
 
   defp output_summary(%{"removed_count" => n}), do: gettext("Removed %{n} tracks", n: n)
-  defp output_summary(map), do: map |> Enum.map(fn {k, v} -> "#{k}: #{v}" end) |> Enum.join(", ")
+  defp output_summary(map), do: Enum.map_join(map, ", ", fn {k, v} -> "#{k}: #{v}" end)
 end

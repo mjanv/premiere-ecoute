@@ -145,10 +145,10 @@ defmodule PremiereEcouteWeb.Router do
     live_session :playlists, on_mount: [{UserAuth, :viewer}] do
       live "/", LibraryLive, :index
       live "/workflows", WorkflowsLive, :index
-      live "/automations", AutomationsLive, :index
-      live "/automations/new", AutomationFormLive, :new
-      live "/automations/:id", AutomationLive, :show
-      live "/automations/:id/edit", AutomationFormLive, :edit
+      live "/automations", Automations.IndexLive, :index
+      live "/automations/new", Automations.FormLive, :new
+      live "/automations/:id", Automations.ShowLive, :show
+      live "/automations/:id/edit", Automations.FormLive, :edit
       live "/:id", PlaylistLive, :show
     end
   end

@@ -15,13 +15,13 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicatesTest do
   defp track(id),
     do: %Track{provider: :spotify, track_id: id, playlist_id: "pl1", added_at: ~N[2024-01-01 00:00:00]}
 
-  describe "validate_config/1" do
+  describe "validate/1" do
     test "valid with playlist_id" do
-      assert :ok = RemoveDuplicates.validate_config(%{"playlist_id" => "abc123"})
+      assert :ok = RemoveDuplicates.validate(%{"playlist_id" => "abc123"})
     end
 
     test "invalid without playlist_id" do
-      assert {:error, _} = RemoveDuplicates.validate_config(%{})
+      assert {:error, _} = RemoveDuplicates.validate(%{})
     end
   end
 

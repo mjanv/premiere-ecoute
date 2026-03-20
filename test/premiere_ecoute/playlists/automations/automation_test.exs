@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
                Automation.changeset(%Automation{}, %{
                  user_id: user.id,
                  name: "My automation",
-                 schedule_type: :manual
+                 schedule: :manual
                })
     end
 
@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
       user = user_fixture()
 
       assert %{valid?: false, errors: errors} =
-               Automation.changeset(%Automation{}, %{user_id: user.id, schedule_type: :manual})
+               Automation.changeset(%Automation{}, %{user_id: user.id, schedule: :manual})
 
       assert Keyword.has_key?(errors, :name)
     end
@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
       assert %{valid?: false, errors: errors} =
                Automation.changeset(%Automation{}, %{user_id: user.id, name: "Test"})
 
-      assert Keyword.has_key?(errors, :schedule_type)
+      assert Keyword.has_key?(errors, :schedule)
     end
 
     test "recurring requires valid cron_expression" do
@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
                Automation.changeset(%Automation{}, %{
                  user_id: user.id,
                  name: "Test",
-                 schedule_type: :recurring,
+                 schedule: :recurring,
                  cron_expression: "not a cron"
                })
 
@@ -54,7 +54,7 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
                Automation.changeset(%Automation{}, %{
                  user_id: user.id,
                  name: "Test",
-                 schedule_type: :recurring,
+                 schedule: :recurring,
                  cron_expression: "0 9 1 * *"
                })
     end
@@ -67,14 +67,14 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
       assert {:ok, automation} =
                Automation.insert(user, %{
                  name: "My automation",
-                 schedule_type: :manual,
+                 schedule: :manual,
                  steps: [%{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist_id" => "abc"}}]
                })
 
       assert automation.id
       assert automation.user_id == user.id
       assert automation.name == "My automation"
-      assert automation.schedule_type == :manual
+      assert automation.schedule == :manual
       assert automation.enabled == true
       assert length(automation.steps) == 1
     end
@@ -83,8 +83,8 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
   describe "list_for_user/1" do
     test "returns automations for the user" do
       user = user_fixture()
-      {:ok, _} = Automation.insert(user, %{name: "First", schedule_type: :manual})
-      {:ok, _} = Automation.insert(user, %{name: "Second", schedule_type: :manual})
+      {:ok, _} = Automation.insert(user, %{name: "First", schedule: :manual})
+      {:ok, _} = Automation.insert(user, %{name: "Second", schedule: :manual})
 
       automations = Automation.list_for_user(user)
       assert length(automations) == 2
@@ -93,7 +93,7 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
     test "does not return other users automations" do
       user = user_fixture()
       other = user_fixture()
-      {:ok, _} = Automation.insert(other, %{name: "Other", schedule_type: :manual})
+      {:ok, _} = Automation.insert(other, %{name: "Other", schedule: :manual})
 
       assert Automation.list_for_user(user) == []
     end
@@ -102,7 +102,7 @@ defmodule PremiereEcoute.Playlists.Automations.AutomationTest do
   describe "update/2" do
     test "updates the automation" do
       user = user_fixture()
-      {:ok, automation} = Automation.insert(user, %{name: "Original", schedule_type: :manual})
+      {:ok, automation} = Automation.insert(user, %{name: "Original", schedule: :manual})
 
       assert {:ok, updated} = Automation.update(automation, %{name: "Renamed"})
       assert updated.name == "Renamed"

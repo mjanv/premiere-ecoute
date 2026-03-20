@@ -27,20 +27,19 @@ defmodule PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorker do
       nil ->
         :ok
 
-      automation ->
-        handle_schedule(automation)
+      %Automation{schedule: :recurring} = automation ->
+        AutomationScheduling.schedule(automation)
+        AutomationExecution.run(automation, job_id)
+        :ok
+
+      %Automation{schedule: :once} = automation ->
+        Automation.update(automation, %{enabled: false})
+        AutomationExecution.run(automation, job_id)
+        :ok
+
+      %Automation{schedule: :manual} = automation ->
         AutomationExecution.run(automation, job_id)
         :ok
     end
   end
-
-  defp handle_schedule(%Automation{schedule_type: :recurring} = automation) do
-    AutomationScheduling.schedule_next(automation)
-  end
-
-  defp handle_schedule(%Automation{schedule_type: :once} = automation) do
-    Automation.update(automation, %{enabled: false})
-  end
-
-  defp handle_schedule(%Automation{schedule_type: :manual}), do: :ok
 end

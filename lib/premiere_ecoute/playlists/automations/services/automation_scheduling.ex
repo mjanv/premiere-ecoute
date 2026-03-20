@@ -15,33 +15,21 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationScheduling do
   alias PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorker
   alias PremiereEcoute.Repo
 
-  @doc "Triggers an immediate run regardless of schedule type."
-  @spec run_now(Automation.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
-  def run_now(%Automation{id: id}) do
-    %{automation_id: id}
-    |> AutomationRunWorker.new()
-    |> Oban.insert()
-  end
+  @doc "Schedules the appropriate job for an automation based on its schedule field."
+  @spec schedule(Automation.t()) :: :ok | {:ok, Oban.Job.t()} | {:error, term()}
+  def schedule(%Automation{enabled: false}), do: :ok
 
-  @doc "Schedules an immediate run for a manual automation."
-  @spec schedule(Automation.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
-  def schedule(%Automation{id: id, schedule_type: :manual}) do
-    %{automation_id: id}
-    |> AutomationRunWorker.new()
-    |> Oban.insert()
-  end
+  def schedule(%Automation{schedule: :manual}), do: :ok
 
-  @doc "Schedules a one-time run at the given datetime."
-  @spec schedule(Automation.t(), DateTime.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
-  def schedule(%Automation{id: id, schedule_type: :once}, at) do
+  def schedule(%Automation{schedule: :once, scheduled_at: nil}), do: :ok
+
+  def schedule(%Automation{id: id, schedule: :once, scheduled_at: at}) do
     %{automation_id: id}
     |> AutomationRunWorker.new(scheduled_at: at)
     |> Oban.insert()
   end
 
-  @doc "Schedules the next recurring run based on the cron expression."
-  @spec schedule_next(Automation.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
-  def schedule_next(%Automation{id: id, schedule_type: :recurring, cron_expression: expr}) do
+  def schedule(%Automation{id: id, schedule: :recurring, cron_expression: expr}) do
     %{automation_id: id}
     |> AutomationRunWorker.new(scheduled_at: next_run_at(expr))
     |> Oban.insert()
@@ -64,8 +52,10 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationScheduling do
   @doc "Computes the next run datetime for a cron expression."
   @spec next_run_at(String.t()) :: DateTime.t()
   def next_run_at(cron_expression) do
-    {:ok, expr} = CronExpression.Parser.parse(cron_expression)
-    naive = CrontabScheduler.get_next_run_date!(expr, NaiveDateTime.utc_now())
-    DateTime.from_naive!(naive, "Etc/UTC")
+    cron_expression
+    |> CronExpression.Parser.parse()
+    |> then(fn {:ok, expr} -> expr end)
+    |> CrontabScheduler.get_next_run_date!(NaiveDateTime.utc_now())
+    |> DateTime.from_naive!("Etc/UTC")
   end
 end

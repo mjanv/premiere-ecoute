@@ -12,19 +12,24 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CreatePlaylistTest do
   defp scope, do: user_scope_fixture(user_fixture())
 
   defp created_playlist(name),
-    do: %LibraryPlaylist{provider: :spotify, playlist_id: "new_pl_id", title: name}
+    do: %LibraryPlaylist{
+      provider: :spotify,
+      playlist_id: "new_pl_id",
+      title: name,
+      url: "https://open.spotify.com/playlist/new_pl_id"
+    }
 
-  describe "validate_config/1" do
+  describe "validate/1" do
     test "valid with name" do
-      assert :ok = CreatePlaylist.validate_config(%{"name" => "My Playlist"})
+      assert :ok = CreatePlaylist.validate(%{"name" => "My Playlist"})
     end
 
     test "invalid when name is missing" do
-      assert {:error, _} = CreatePlaylist.validate_config(%{})
+      assert {:error, _} = CreatePlaylist.validate(%{})
     end
 
     test "invalid when name is empty string" do
-      assert {:error, _} = CreatePlaylist.validate_config(%{"name" => ""})
+      assert {:error, _} = CreatePlaylist.validate(%{"name" => ""})
     end
   end
 
@@ -98,7 +103,13 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CreatePlaylistTest do
   describe "execute/3 — output" do
     test "returns created_playlist_id and playlist_name" do
       expect(SpotifyApi, :create_playlist, fn _scope, pl ->
-        {:ok, %LibraryPlaylist{provider: :spotify, playlist_id: "sp123", title: pl.title}}
+        {:ok,
+         %LibraryPlaylist{
+           provider: :spotify,
+           playlist_id: "sp123",
+           title: pl.title,
+           url: "https://open.spotify.com/playlist/sp123"
+         }}
       end)
 
       assert {:ok, %{"created_playlist_id" => "sp123", "playlist_name" => "My Playlist"}} =

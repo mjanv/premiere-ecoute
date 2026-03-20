@@ -18,10 +18,15 @@
               <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_automations, for: @current_user) do %>
                 <a
                   href={~p"/playlists/automations"}
-                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+                  class="px-4 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white rounded-lg transition-colors font-medium flex items-center gap-2"
                 >
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   {gettext("Automations")}
                 </a>
@@ -29,40 +34,63 @@
             </:action>
 
             <:action>
-              <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_workflows, for: @current_user) do %>
-                <a
-                  href={~p"/playlists/workflows"}
-                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
+              <div class="relative" phx-click-away="hide_add_dropdown">
+                <button
+                  phx-click="toggle_add_dropdown"
+                  class="px-4 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white rounded-lg transition-colors font-medium flex items-center gap-2"
                 >
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  {gettext("Workflows")}
-                </a>
-              <% end %>
-            </:action>
-
-            <:action>
-              <button
-                phx-click="show_create_playlist_modal"
-                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
-              >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                {gettext("Create Playlist")}
-              </button>
-            </:action>
-            <:action>
-              <button
-                phx-click="show_playlist_modal"
-                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium shadow-lg flex items-center"
-              >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                {gettext("Load Playlist")}
-              </button>
+                  {gettext("Add")}
+                  <svg
+                    class={"w-3.5 h-3.5 text-gray-400 transition-transform #{if @show_add_dropdown, do: "rotate-180"}"}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <%= if @show_add_dropdown do %>
+                  <div class="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-10 overflow-hidden">
+                    <button
+                      phx-click="show_create_playlist_modal"
+                      class="w-full px-4 py-3 text-sm text-left text-white hover:bg-gray-700 transition-colors flex items-center gap-2"
+                    >
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      {gettext("Create Playlist")}
+                    </button>
+                    <button
+                      phx-click="show_playlist_modal"
+                      class="w-full px-4 py-3 text-sm text-left text-white hover:bg-gray-700 transition-colors flex items-center gap-2 border-t border-gray-700"
+                    >
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                        />
+                      </svg>
+                      {gettext("Load Playlist")}
+                    </button>
+                    <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlist_workflows, for: @current_user) do %>
+                      <a
+                        href={~p"/playlists/workflows"}
+                        class="w-full px-4 py-3 text-sm text-left text-white hover:bg-gray-700 transition-colors flex items-center gap-2 border-t border-gray-700"
+                      >
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                        {gettext("Transfer Playlist")}
+                      </a>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
             </:action>
           </.page_header>
           
@@ -114,12 +142,22 @@
                       <% end %>
                     </div>
                   </div>
-<!-- Automation count badge -->
+                  <!-- Automation count badge -->
                   <%= if Map.get(assigns[:automation_counts] || %{}, playlist.playlist_id, 0) > 0 do %>
                     <div class="absolute top-2 left-2">
                       <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-purple-700/80 text-purple-200 backdrop-blur-sm">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                          /><path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
                         </svg>
                         {Map.get(@automation_counts, playlist.playlist_id)}
                       </span>

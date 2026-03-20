@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorkerTest d
   alias PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorker
 
   defp build_manual_automation(user) do
-    {:ok, a} = Automation.insert(user, %{name: "Test", schedule_type: :manual, steps: []})
+    {:ok, a} = Automation.insert(user, %{name: "Test", schedule: :manual, steps: []})
     a
   end
 
@@ -27,7 +27,7 @@ defmodule PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorkerTest d
 
     test "disables a :once automation after running" do
       user = user_fixture()
-      {:ok, automation} = Automation.insert(user, %{name: "Once", schedule_type: :once, steps: []})
+      {:ok, automation} = Automation.insert(user, %{name: "Once", schedule: :once, steps: []})
 
       assert :ok = perform_job(AutomationRunWorker, %{automation_id: automation.id})
 

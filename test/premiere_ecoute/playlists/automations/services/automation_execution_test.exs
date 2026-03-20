@@ -15,7 +15,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecutionTest 
     {:ok, automation} =
       Automation.insert(user, %{
         name: "Test automation",
-        schedule_type: :manual,
+        schedule: :manual,
         steps: steps
       })
 

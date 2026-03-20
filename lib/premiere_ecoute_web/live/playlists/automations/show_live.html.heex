@@ -30,7 +30,7 @@
                 <% end %>
               </div>
               <p class="text-sm text-gray-400 mt-0.5">
-                <PremiereEcouteWeb.Playlists.Components.AutomationComponents.schedule_summary automation={@automation} />
+                <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={@automation} />
                 <%= if @automation.next_run_at do %>
                   · {gettext("Next: %{dt}", dt: Calendar.strftime(@automation.next_run_at, "%d %b %Y %H:%M"))}
                 <% end %>
@@ -39,7 +39,7 @@
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
-            <%= if @automation.schedule_type == :manual do %>
+            <%= if @automation.schedule == :manual do %>
               <button
                 phx-click="run_now"
                 disabled={not @automation.enabled}
@@ -90,7 +90,7 @@
 <!-- Steps -->
         <div class="mb-8 p-6 bg-gray-800/50 rounded-xl border border-gray-700">
           <h2 class="text-base font-semibold mb-4">{gettext("Steps")}</h2>
-          <PremiereEcouteWeb.Playlists.Components.AutomationComponents.steps_list
+          <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.steps_list
             steps={@automation.steps}
             registry={Automations.action_registry()}
           />
@@ -111,7 +111,7 @@
             </div>
             <div class="space-y-2">
               <%= for run <- @runs do %>
-                <PremiereEcouteWeb.Playlists.Components.AutomationComponents.run_row
+                <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.run_row
                   run={run}
                   expanded={@expanded_run_id == run.id}
                   on_toggle="toggle_run"

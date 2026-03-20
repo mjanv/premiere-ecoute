@@ -50,7 +50,10 @@
         <% else %>
           <div class="space-y-3">
             <%= for automation <- @automations do %>
-              <.link navigate={~p"/playlists/automations/#{automation.id}"} class="block p-5 bg-gray-800/50 rounded-xl border border-gray-700 hover:border-purple-500 hover:bg-gray-800/70 transition-colors cursor-pointer">
+              <.link
+                navigate={~p"/playlists/automations/#{automation.id}"}
+                class="block p-5 bg-gray-800/50 rounded-xl border border-gray-700 hover:border-purple-500 hover:bg-gray-800/70 transition-colors cursor-pointer"
+              >
                 <div class="flex items-center justify-between gap-4">
                   <div class="flex-1 min-w-0">
                     <p class="font-semibold text-white truncate mb-1">{automation.name}</p>
@@ -64,7 +67,9 @@
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        <PremiereEcouteWeb.Playlists.Components.AutomationComponents.schedule_summary automation={automation} />
+                        <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={
+                          automation
+                        } />
                       </span>
                       <span>{gettext("%{n} steps", n: length(automation.steps))}</span>
                     </div>
@@ -82,7 +87,9 @@
                         </span>
                       <% end %>
                       <%= if automation.last_run_at do %>
-                        <span class="text-xs text-gray-500">{gettext("Last run: %{dt}", dt: format_dt(automation.last_run_at))}</span>
+                        <span class="text-xs text-gray-500">
+                          {gettext("Last run: %{dt}", dt: format_dt(automation.last_run_at))}
+                        </span>
                       <% end %>
                     </div>
 

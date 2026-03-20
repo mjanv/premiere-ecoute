@@ -11,12 +11,13 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
   """
 
   use PremiereEcouteCore.Aggregate,
-    json: [:id, :user_id, :name, :schedule_type, :enabled]
+    json: [:id, :user_id, :name, :schedule, :enabled]
 
   alias Crontab.CronExpression
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Playlists.Automations.AutomationRun
 
-  @schedule_types [:manual, :once, :recurring]
+  @schedules [:manual, :once, :recurring]
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -25,7 +26,8 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
           name: String.t() | nil,
           description: String.t() | nil,
           enabled: boolean(),
-          schedule_type: :manual | :once | :recurring | nil,
+          schedule: :manual | :once | :recurring | nil,
+          scheduled_at: DateTime.t() | nil,
           cron_expression: String.t() | nil,
           steps: [map()],
           next_run_at: DateTime.t() | nil,
@@ -38,10 +40,9 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
     field :name, :string
     field :description, :string
     field :enabled, :boolean, default: true
-    field :schedule_type, Ecto.Enum, values: @schedule_types
+    field :schedule, Ecto.Enum, values: @schedules
+    field :scheduled_at, :utc_datetime
     field :cron_expression, :string
-    # AIDEV-NOTE: steps is a plain jsonb array; each element is a map with
-    # position (integer), action_type (string), config (map)
     field :steps, {:array, :map}, default: []
 
     field :next_run_at, :utc_datetime, virtual: true
@@ -56,9 +57,9 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(automation, attrs) do
     automation
-    |> cast(attrs, [:user_id, :name, :description, :enabled, :schedule_type, :cron_expression, :steps])
-    |> validate_required([:user_id, :name, :schedule_type])
-    |> validate_inclusion(:schedule_type, @schedule_types)
+    |> cast(attrs, [:user_id, :name, :description, :enabled, :schedule, :scheduled_at, :cron_expression, :steps])
+    |> validate_required([:user_id, :name, :schedule])
+    |> validate_inclusion(:schedule, @schedules)
     |> validate_cron_expression()
     |> foreign_key_constraint(:user_id)
   end
@@ -66,8 +67,15 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
   @doc "Inserts a new automation for the given user."
   @spec insert(User.t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def insert(%User{id: id}, attrs) do
+    # AIDEV-NOTE: stringify all keys to avoid mixed atom/string key crash in Ecto.Changeset.cast
+    attrs =
+      attrs
+      |> Enum.map(fn {k, v} -> {to_string(k), v} end)
+      |> Map.new()
+      |> Map.put("user_id", id)
+
     %__MODULE__{}
-    |> changeset(Map.put(attrs, "user_id", id))
+    |> changeset(attrs)
     |> Repo.insert()
   end
 
@@ -79,17 +87,53 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
     |> Repo.update()
   end
 
-  @doc "Lists all automations for a user, most recently updated first."
+  @doc "Lists all automations for a user with virtual fields populated, most recently updated first."
   @spec list_for_user(User.t()) :: [t()]
   def list_for_user(%User{id: id}) do
-    __MODULE__
+    with_virtual_fields_query()
     |> where([a], a.user_id == ^id)
     |> order_by([a], desc: a.updated_at)
     |> Repo.all()
   end
 
+  @doc "Gets a single automation by id with virtual fields populated."
+  @spec get_with_virtual_fields(User.t(), t()) :: t() | nil
+  def get_with_virtual_fields(%User{} = user, id) when is_integer(id) do
+    get_with_virtual_fields(user, %__MODULE__{id: id})
+  end
+
+  def get_with_virtual_fields(%User{id: user_id}, %__MODULE__{id: id}) do
+    with_virtual_fields_query()
+    |> where([a], a.user_id == ^user_id and a.id == ^id)
+    |> Repo.one()
+  end
+
+  # AIDEV-NOTE: subqueries for last_run_at/next_run_at avoid N+1; used by both list and get
+  defp with_virtual_fields_query do
+    worker = "PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorker"
+
+    last_run_subquery =
+      AutomationRun
+      |> group_by([r], r.automation_id)
+      |> select([r], %{automation_id: r.automation_id, last_run_at: max(r.inserted_at)})
+
+    next_run_subquery =
+      Oban.Job
+      |> where([j], j.worker == ^worker and j.state in ["scheduled", "available"])
+      |> group_by([j], fragment("(?->>'automation_id')::bigint", j.args))
+      |> select([j], %{
+        automation_id: fragment("(?->>'automation_id')::bigint", j.args),
+        next_run_at: min(j.scheduled_at)
+      })
+
+    __MODULE__
+    |> join(:left, [a], lr in subquery(last_run_subquery), on: lr.automation_id == a.id)
+    |> join(:left, [a], nr in subquery(next_run_subquery), on: nr.automation_id == a.id, prefix: "oban")
+    |> select([a, lr, nr], %{a | last_run_at: lr.last_run_at, next_run_at: nr.next_run_at})
+  end
+
   defp validate_cron_expression(changeset) do
-    case get_field(changeset, :schedule_type) do
+    case get_field(changeset, :schedule) do
       :recurring ->
         validate_change(changeset, :cron_expression, fn _field, expr ->
           case CronExpression.Parser.parse(expr || "") do

@@ -10,8 +10,8 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicates do
   def id, do: "remove_duplicates"
 
   @impl true
-  def validate_config(%{"playlist_id" => id}) when is_binary(id) and id != "", do: :ok
-  def validate_config(_), do: {:error, ["playlist_id is required"]}
+  def validate(%{"playlist_id" => id}) when is_binary(id) and id != "", do: :ok
+  def validate(_), do: {:error, ["playlist_id is required"]}
 
   @impl true
   def execute(%{"playlist_id" => playlist_id}, _context, scope) do

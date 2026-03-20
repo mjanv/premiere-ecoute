@@ -29,9 +29,22 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationSchedulingTest
   end
 
   describe "schedule/1 (manual)" do
-    test "enqueues an available job for a manual automation" do
+    test "is a no-op for a manual automation" do
       user = user_fixture()
-      automation = insert_automation(user, %{name: "M", schedule_type: :manual})
+      automation = insert_automation(user, %{name: "M", schedule: :manual})
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        assert :ok = AutomationScheduling.schedule(automation)
+        refute_enqueued worker: AutomationRunWorker
+      end)
+    end
+  end
+
+  describe "schedule/1 (once)" do
+    test "enqueues a scheduled job at the given datetime" do
+      user = user_fixture()
+      at = DateTime.add(DateTime.utc_now(), 3600, :second)
+      automation = insert_automation(user, %{name: "O", schedule: :once, scheduled_at: at})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
         assert {:ok, _job} = AutomationScheduling.schedule(automation)
@@ -40,32 +53,19 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationSchedulingTest
     end
   end
 
-  describe "schedule/2 (once)" do
-    test "enqueues a scheduled job at the given datetime" do
-      user = user_fixture()
-      automation = insert_automation(user, %{name: "O", schedule_type: :once})
-      at = DateTime.add(DateTime.utc_now(), 3600, :second)
-
-      Oban.Testing.with_testing_mode(:manual, fn ->
-        assert {:ok, _job} = AutomationScheduling.schedule(automation, at)
-        assert_enqueued worker: AutomationRunWorker, args: %{"automation_id" => automation.id}
-      end)
-    end
-  end
-
-  describe "schedule_next/1 (recurring)" do
+  describe "schedule/1 (recurring)" do
     test "enqueues a future job based on cron expression" do
       user = user_fixture()
 
       automation =
         insert_automation(user, %{
           name: "R",
-          schedule_type: :recurring,
+          schedule: :recurring,
           cron_expression: "0 9 * * *"
         })
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        assert {:ok, job} = AutomationScheduling.schedule_next(automation)
+        assert {:ok, job} = AutomationScheduling.schedule(automation)
         assert DateTime.compare(job.scheduled_at, DateTime.utc_now()) == :gt
         assert_enqueued worker: AutomationRunWorker, args: %{"automation_id" => automation.id}
       end)
@@ -75,10 +75,10 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationSchedulingTest
   describe "cancel/1" do
     test "cancels pending jobs for the automation" do
       user = user_fixture()
-      automation = insert_automation(user, %{name: "R", schedule_type: :recurring, cron_expression: "0 9 * * *"})
+      automation = insert_automation(user, %{name: "R", schedule: :recurring, cron_expression: "0 9 * * *"})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        {:ok, _} = AutomationScheduling.schedule_next(automation)
+        {:ok, _} = AutomationScheduling.schedule(automation)
         assert length(all_enqueued(worker: AutomationRunWorker)) == 1
 
         AutomationScheduling.cancel(automation)
@@ -88,12 +88,12 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationSchedulingTest
 
     test "does not cancel jobs for other automations" do
       user = user_fixture()
-      a1 = insert_automation(user, %{name: "A1", schedule_type: :recurring, cron_expression: "0 9 * * *"})
-      a2 = insert_automation(user, %{name: "A2", schedule_type: :recurring, cron_expression: "0 9 * * *"})
+      a1 = insert_automation(user, %{name: "A1", schedule: :recurring, cron_expression: "0 9 * * *"})
+      a2 = insert_automation(user, %{name: "A2", schedule: :recurring, cron_expression: "0 9 * * *"})
 
       Oban.Testing.with_testing_mode(:manual, fn ->
-        {:ok, _} = AutomationScheduling.schedule_next(a1)
-        {:ok, _} = AutomationScheduling.schedule_next(a2)
+        {:ok, _} = AutomationScheduling.schedule(a1)
+        {:ok, _} = AutomationScheduling.schedule(a2)
 
         AutomationScheduling.cancel(a1)
 
