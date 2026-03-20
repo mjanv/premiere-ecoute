@@ -1,0 +1,163 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="automations"
+>
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-8">
+      <div class="max-w-xl mx-auto px-4">
+        <div class="flex items-center gap-2 mb-6">
+          <.link navigate={~p"/playlists/automations"} class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </.link>
+          <h2 class="text-lg font-semibold">
+            {if @live_action == :new, do: gettext("New automation"), else: gettext("Edit automation")}
+          </h2>
+        </div>
+
+        <form phx-submit="save" phx-change="change" class="space-y-4">
+          <%!-- Details + Schedule --%>
+          <div class="p-4 bg-gray-800/50 rounded-xl border border-gray-700 space-y-3">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">{gettext("Name")} <span class="text-red-400">*</span></label>
+              <input
+                type="text"
+                name="name"
+                value={@form_data["name"]}
+                required
+                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+                placeholder={gettext("e.g. Monthly fresh playlist")}
+              />
+              <%= if @errors[:name] do %>
+                <p class="text-xs text-red-400 mt-1">{Enum.join(@errors[:name], ", ")}</p>
+              <% end %>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">{gettext("Description")}</label>
+              <textarea
+                name="description"
+                rows="2"
+                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none resize-none"
+                placeholder={gettext("Optional")}
+              >{@form_data["description"]}</textarea>
+            </div>
+
+            <div class="border-t border-gray-700 pt-3 space-y-3">
+              <div class="flex gap-2">
+                <%= for {label, value} <- [{gettext("Manual"), "manual"}, {gettext("Once"), "once"}, {gettext("Recurring"), "recurring"}] do %>
+                  <button
+                    type="button"
+                    phx-click="change_schedule"
+                    phx-value-schedule={value}
+                    class={"px-3 py-1.5 rounded-lg text-xs font-medium transition-colors #{if @schedule == value, do: "bg-purple-600 text-white", else: "bg-gray-700 text-gray-300 hover:bg-gray-600"}"}
+                  >
+                    {label}
+                  </button>
+                <% end %>
+              </div>
+
+              <%= case @schedule do %>
+                <% "once" -> %>
+                  <div class="flex gap-2">
+                    <div class="flex-1">
+                      <label class="block text-xs text-gray-400 mb-1">{gettext("Date")}</label>
+                      <input
+                        type="date"
+                        name="scheduled_date"
+                        value={@form_data["scheduled_date"] || ""}
+                        phx-change="ignore"
+                        style="color-scheme: dark"
+                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+                    <div class="flex gap-1 items-end">
+                      <div>
+                        <label class="block text-xs text-gray-400 mb-1">{gettext("Hour")}</label>
+                        <select
+                          name="scheduled_hour"
+                          class="px-2 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+                        >
+                          <%= for h <- 0..23 do %>
+                            <option
+                              value={String.pad_leading(to_string(h), 2, "0")}
+                              selected={@form_data["scheduled_hour"] == String.pad_leading(to_string(h), 2, "0")}
+                            >
+                              {String.pad_leading(to_string(h), 2, "0")}
+                            </option>
+                          <% end %>
+                        </select>
+                      </div>
+                      <span class="pb-2 text-gray-400">:</span>
+                      <div>
+                        <label class="block text-xs text-gray-400 mb-1">{gettext("Min")}</label>
+                        <select
+                          name="scheduled_minute"
+                          class="px-2 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+                        >
+                          <%= for m <- [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] do %>
+                            <option
+                              value={String.pad_leading(to_string(m), 2, "0")}
+                              selected={@form_data["scheduled_minute"] == String.pad_leading(to_string(m), 2, "0")}
+                            >
+                              {String.pad_leading(to_string(m), 2, "0")}
+                            </option>
+                          <% end %>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                <% "recurring" -> %>
+                  <div class="space-y-1">
+                    <label class="block text-xs text-gray-400">{gettext("Cron expression")}</label>
+                    <input
+                      type="text"
+                      name="cron_expression"
+                      value={@form_data["cron_expression"]}
+                      class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm font-mono focus:border-purple-500 focus:outline-none"
+                      placeholder="0 9 1 * *"
+                    />
+                    <%= if @errors[:cron_expression] do %>
+                      <p class="text-xs text-red-400">{Enum.join(@errors[:cron_expression], ", ")}</p>
+                    <% end %>
+                    <p class="text-xs text-gray-500">{gettext("minute hour day month weekday")}</p>
+                  </div>
+                <% _ -> %>
+                  <p class="text-xs text-gray-400">{gettext("Runs only when triggered manually.")}</p>
+              <% end %>
+            </div>
+          </div>
+
+          <%!-- Steps --%>
+          <div class="p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+            <p class="text-xs text-gray-400 uppercase tracking-wide mb-3">{gettext("Steps")}</p>
+            <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.step_builder
+              steps={@steps}
+              registry={@action_registry}
+              library_playlists={@library_playlists}
+              show_picker={@show_add_step_modal}
+            />
+          </div>
+
+          <%!-- Footer --%>
+          <div class="flex justify-end gap-2 pb-6">
+            <.link
+              navigate={~p"/playlists/automations"}
+              class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {gettext("Cancel")}
+            </.link>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {gettext("Save")}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

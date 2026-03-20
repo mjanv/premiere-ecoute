@@ -1,0 +1,108 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+  current_page="automations"
+>
+  <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
+    <div class="flex-1 py-12">
+      <div class="max-w-5xl mx-auto px-6">
+        <div class="flex items-center justify-between mb-8">
+          <.page_header
+            title={gettext("Automations")}
+            subtitle={gettext("Define sequences of playlist operations that run on a schedule or on demand")}
+          />
+          <.link
+            navigate={~p"/playlists/automations/new"}
+            class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm inline-flex items-center gap-2 flex-shrink-0"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            {gettext("New automation")}
+          </.link>
+        </div>
+
+        <%= if Enum.empty?(@automations) do %>
+          <div class="text-center py-20 bg-gray-800/30 rounded-xl border border-gray-700">
+            <svg class="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <p class="text-gray-400 mb-2 font-medium">{gettext("No automations yet")}</p>
+            <p class="text-gray-500 text-sm mb-6">
+              {gettext("Create your first automation to run playlist operations on a schedule.")}
+            </p>
+            <.link
+              navigate={~p"/playlists/automations/new"}
+              class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm inline-flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              {gettext("Create first automation")}
+            </.link>
+          </div>
+        <% else %>
+          <div class="space-y-3">
+            <%= for automation <- @automations do %>
+              <.link
+                navigate={~p"/playlists/automations/#{automation.id}"}
+                class="block p-5 bg-gray-800/50 rounded-xl border border-gray-700 hover:border-purple-500 hover:bg-gray-800/70 transition-colors cursor-pointer"
+              >
+                <div class="flex items-center justify-between gap-4">
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-white truncate mb-1">{automation.name}</p>
+                    <div class="flex items-center gap-4 text-sm text-gray-400">
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={
+                          automation
+                        } />
+                      </span>
+                      <span>{gettext("%{n} steps", n: length(automation.steps))}</span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-4 flex-shrink-0">
+                    <div class="flex flex-col items-end gap-1">
+                      <%= if automation.enabled do %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900/60 text-green-300">
+                          {gettext("Enabled")}
+                        </span>
+                      <% else %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-400">
+                          {gettext("Disabled")}
+                        </span>
+                      <% end %>
+                      <%= if automation.last_run_at do %>
+                        <span class="text-xs text-gray-500">
+                          {gettext("Last run: %{dt}", dt: format_dt(automation.last_run_at))}
+                        </span>
+                      <% end %>
+                    </div>
+
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </.link>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</Layouts.app>

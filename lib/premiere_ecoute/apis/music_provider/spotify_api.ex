@@ -45,6 +45,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     alias PremiereEcoute.Discography.Playlist
     alias PremiereEcoute.Discography.Single
 
+    @type any_track :: Track.t() | Playlist.Track.t()
+
     # Tracks
     @callback get_single(track_id :: String.t()) :: {:ok, Single.t()} | {:error, term()}
 
@@ -75,11 +77,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     # Playlists
     @callback get_library_playlists(scope :: Scope.t()) :: {:ok, [LibraryPlaylist.t()]} | {:error, term()}
     @callback create_playlist(scope :: Scope.t(), library :: map()) :: {:ok, LibraryPlaylist.t()} | {:error, term()}
-    @callback add_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
+    @callback add_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [any_track()]) ::
                 {:ok, map()} | {:error, term()}
-    @callback replace_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
+    @callback replace_items_to_playlist(scope :: Scope.t(), id :: String.t(), tracks :: [any_track()]) ::
                 {:ok, map()} | {:error, term()}
-    @callback remove_playlist_items(scope :: Scope.t(), id :: String.t(), tracks :: [Track.t()]) ::
+    @callback remove_playlist_items(scope :: Scope.t(), id :: String.t(), tracks :: [any_track()]) ::
                 {:ok, map()} | {:error, term()}
 
     # Search

@@ -161,7 +161,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
 
       scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
-      tracks = [%Track{track_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{track_id: "6TGd66r0nlPaYm3KIoI7ET"}]
+      tracks = [
+        %Track{provider: :spotify, track_id: "3QaPy1KgI7nu9FJEQUgn6h"},
+        %Track{provider: :spotify, track_id: "6TGd66r0nlPaYm3KIoI7ET"}
+      ]
 
       {:ok, snapshot} = SpotifyApi.add_items_to_playlist(scope, id, tracks)
 
@@ -187,7 +190,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
 
       scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
-      tracks = [%Track{track_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{track_id: "6TGd66r0nlPaYm3KIoI7ET"}]
+      tracks = [
+        %Track{provider: :spotify, track_id: "3QaPy1KgI7nu9FJEQUgn6h"},
+        %Track{provider: :spotify, track_id: "6TGd66r0nlPaYm3KIoI7ET"}
+      ]
 
       {:ok, snapshot} = SpotifyApi.replace_items_to_playlist(scope, id, tracks)
 
@@ -213,7 +219,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
 
       scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
 
-      tracks = [%Track{track_id: "3QaPy1KgI7nu9FJEQUgn6h"}, %Track{track_id: "6TGd66r0nlPaYm3KIoI7ET"}]
+      tracks = [
+        %Track{provider: :spotify, track_id: "3QaPy1KgI7nu9FJEQUgn6h"},
+        %Track{provider: :spotify, track_id: "6TGd66r0nlPaYm3KIoI7ET"}
+      ]
 
       {:ok, snapshot} = SpotifyApi.remove_playlist_items(scope, id, tracks)
 

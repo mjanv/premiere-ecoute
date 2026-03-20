@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearch do
   use Hermes.Server.Component, type: :tool
 
   alias Hermes.Server.Response
+  alias PremiereEcoute.Discography.Album
 
   schema do
     field :name, :string, required: true
@@ -12,7 +13,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearch do
   @impl true
   def execute(%{name: name}, frame) do
     albums =
-      PremiereEcoute.Discography.Album.all(where: [name: name])
+      Album.all(where: [name: name])
       |> Enum.map(fn album -> Map.take(album, [:name, :release_date, :total_tracks]) end)
 
     {:reply, Response.json(Response.tool(), albums), frame}
