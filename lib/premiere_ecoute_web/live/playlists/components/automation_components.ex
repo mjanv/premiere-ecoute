@@ -4,8 +4,6 @@ defmodule PremiereEcouteWeb.Playlists.Components.AutomationComponents do
   use Phoenix.Component
   use Gettext, backend: PremiereEcoute.Gettext
 
-  import PremiereEcouteWeb.CoreComponents
-
   # ---------------------------------------------------------------------------
   # Schedule summary
   # ---------------------------------------------------------------------------
