@@ -16,6 +16,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
 
   @limit 10
   @tracks_limit 100
+  @items_limit 100
 
   @doc """
   Fetches a Spotify playlist by ID.
@@ -102,16 +103,25 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
   Adds tracks to a playlist.
 
   Inserts tracks at the beginning of the playlist. Tracks are added in the order provided.
+  Handles more than 100 items by splitting into multiple requests (Spotify API limit).
   """
   @spec add_items_to_playlist(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def add_items_to_playlist(scope, id, tracks) do
-    scope
-    |> SpotifyApi.api()
-    |> SpotifyApi.post(
-      url: "/playlists/#{id}/tracks",
-      json: %{"position" => 0, "uris" => Enum.map(tracks, fn t -> "spotify:track:#{track_id(t)}" end)}
-    )
-    |> SpotifyApi.handle(201, fn body -> body end)
+    tracks
+    |> Enum.chunk_every(@items_limit)
+    |> Enum.reduce_while({:ok, %{}}, fn chunk, _acc ->
+      scope
+      |> SpotifyApi.api()
+      |> SpotifyApi.post(
+        url: "/playlists/#{id}/tracks",
+        json: %{"position" => 0, "uris" => Enum.map(chunk, fn t -> "spotify:track:#{track_id(t)}" end)}
+      )
+      |> SpotifyApi.handle(201, fn body -> body end)
+      |> case do
+        {:ok, _} = ok -> {:cont, ok}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
   end
 
   @doc """
@@ -134,18 +144,27 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
   Removes tracks from a playlist.
 
   Deletes specified tracks from the playlist by their track IDs.
+  Handles more than 100 items by splitting into multiple requests (Spotify API limit).
   """
   @spec remove_playlist_items(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def remove_playlist_items(scope, id, tracks) do
-    scope
-    |> SpotifyApi.api()
-    |> SpotifyApi.delete(
-      url: "/playlists/#{id}/tracks",
-      json: %{
-        "tracks" => Enum.map(tracks, fn t -> %{"uri" => "spotify:track:#{track_id(t)}"} end)
-      }
-    )
-    |> SpotifyApi.handle(200, fn body -> body end)
+    tracks
+    |> Enum.chunk_every(@items_limit)
+    |> Enum.reduce_while({:ok, %{}}, fn chunk, _acc ->
+      scope
+      |> SpotifyApi.api()
+      |> SpotifyApi.delete(
+        url: "/playlists/#{id}/tracks",
+        json: %{
+          "tracks" => Enum.map(chunk, fn t -> %{"uri" => "spotify:track:#{track_id(t)}"} end)
+        }
+      )
+      |> SpotifyApi.handle(200, fn body -> body end)
+      |> case do
+        {:ok, _} = ok -> {:cont, ok}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
   end
 
   # AIDEV-NOTE: both Album.Track and Playlist.Track implement provider/2 on their own module

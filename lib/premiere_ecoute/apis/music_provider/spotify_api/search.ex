@@ -60,13 +60,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   """
   @spec search_tracks(Keyword.t()) :: {:ok, [Track.t()]} | {:error, term()}
   def search_tracks(query) when is_list(query) do
-    q = build_track_query(query)
-
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/search", params: [q: q, type: "track", limit: 20])
-    |> SpotifyApi.handle(200, fn %{"items" => items} ->
-      Enum.map(items, &parse_track/1)
-    end)
+    |> SpotifyApi.get(url: "/search", params: [q: build_track_query(query), type: "track", limit: 20])
+    |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_track/1) end)
   end
 
   @doc """
@@ -78,9 +74,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   def search_singles(query) when is_binary(query) do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/search", params: [q: query, type: "track", limit: 20])
-    |> SpotifyApi.handle(200, fn %{"tracks" => %{"items" => items}} ->
-      Enum.map(items, &parse_single/1)
-    end)
+    |> SpotifyApi.handle(200, fn %{"tracks" => %{"items" => items}} -> Enum.map(items, &parse_single/1) end)
   end
 
   @spec parse_single(map()) :: Single.t()

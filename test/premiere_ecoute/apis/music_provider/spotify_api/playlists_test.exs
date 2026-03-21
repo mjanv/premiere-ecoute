@@ -170,6 +170,28 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
 
       assert snapshot == %{"snapshot_id" => "abc"}
     end
+
+    test "add more than 100 items to a user's playlist in multiple requests" do
+      ApiMock.expect(
+        SpotifyApi,
+        n: 2,
+        path: {:post, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        response: "spotify_api/playlists/add_items_to_playlist/response.json",
+        status: 201
+      )
+
+      id = "2gW4sqiC2OXZLe9m0yDQX7"
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
+      tracks = Enum.map(1..101, fn i -> %Track{provider: :spotify, track_id: "track#{i}"} end)
+
+      {:ok, snapshot} = SpotifyApi.add_items_to_playlist(scope, id, tracks)
+
+      assert snapshot == %{"snapshot_id" => "abc"}
+    end
   end
 
   describe "replace_items_to_playlist/1" do
@@ -223,6 +245,28 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
         %Track{provider: :spotify, track_id: "3QaPy1KgI7nu9FJEQUgn6h"},
         %Track{provider: :spotify, track_id: "6TGd66r0nlPaYm3KIoI7ET"}
       ]
+
+      {:ok, snapshot} = SpotifyApi.remove_playlist_items(scope, id, tracks)
+
+      assert snapshot == %{"snapshot_id" => "def"}
+    end
+
+    test "remove more than 100 items from a user's playlist in multiple requests" do
+      ApiMock.expect(
+        SpotifyApi,
+        n: 2,
+        path: {:delete, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        headers: [
+          {"authorization", "Bearer access_token"},
+          {"content-type", "application/json"}
+        ],
+        response: "spotify_api/playlists/remove_playlist_items/response.json",
+        status: 200
+      )
+
+      id = "2gW4sqiC2OXZLe9m0yDQX7"
+      scope = user_scope_fixture(user_fixture(%{spotify: %{access_token: "access_token"}}))
+      tracks = Enum.map(1..101, fn i -> %Track{provider: :spotify, track_id: "track#{i}"} end)
 
       {:ok, snapshot} = SpotifyApi.remove_playlist_items(scope, id, tracks)
 
