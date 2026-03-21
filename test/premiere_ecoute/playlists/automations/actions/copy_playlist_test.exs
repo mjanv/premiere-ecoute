@@ -17,19 +17,19 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CopyPlaylistTest do
 
   describe "validate/1" do
     test "valid with both playlist IDs" do
-      assert :ok = CopyPlaylist.validate(%{"source_playlist_id" => "src", "target_playlist_id" => "tgt"})
+      assert :ok = CopyPlaylist.validate(%{"source" => "src", "target" => "tgt"})
     end
 
     test "valid with $created_playlist_id reference" do
-      assert :ok = CopyPlaylist.validate(%{"source_playlist_id" => "src", "target_playlist_id" => "$created_playlist_id"})
+      assert :ok = CopyPlaylist.validate(%{"source" => "src", "target" => "$created_playlist_id"})
     end
 
     test "invalid without source_playlist_id" do
-      assert {:error, _} = CopyPlaylist.validate(%{"target_playlist_id" => "tgt"})
+      assert {:error, _} = CopyPlaylist.validate(%{"target" => "tgt"})
     end
 
     test "invalid without target_playlist_id" do
-      assert {:error, _} = CopyPlaylist.validate(%{"source_playlist_id" => "src"})
+      assert {:error, _} = CopyPlaylist.validate(%{"source" => "src"})
     end
 
     test "invalid with empty config" do
@@ -45,7 +45,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CopyPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, playlist} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "tgt", ^tracks -> {:ok, %{}} end)
 
-      config = %{"source_playlist_id" => "src", "target_playlist_id" => "tgt"}
+      config = %{"source" => "src", "target" => "tgt"}
       assert {:ok, %{copied_count: 3}} = CopyPlaylist.execute(config, %{}, scope())
     end
 
@@ -55,7 +55,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CopyPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, playlist} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "tgt", [] -> {:ok, %{}} end)
 
-      config = %{"source_playlist_id" => "src", "target_playlist_id" => "tgt"}
+      config = %{"source" => "src", "target" => "tgt"}
       assert {:ok, %{copied_count: 0}} = CopyPlaylist.execute(config, %{}, scope())
     end
 
@@ -66,7 +66,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CopyPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, playlist} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "ctx_pl_id", ^tracks -> {:ok, %{}} end)
 
-      config = %{"source_playlist_id" => "src", "target_playlist_id" => "$created_playlist_id"}
+      config = %{"source" => "src", "target" => "$created_playlist_id"}
       context = %{"created_playlist_id" => "ctx_pl_id"}
       assert {:ok, %{copied_count: 1}} = CopyPlaylist.execute(config, context, scope())
     end
@@ -74,7 +74,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CopyPlaylistTest do
     test "propagates API error on get_playlist" do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:error, :not_found} end)
 
-      config = %{"source_playlist_id" => "src", "target_playlist_id" => "tgt"}
+      config = %{"source" => "src", "target" => "tgt"}
       assert {:error, :not_found} = CopyPlaylist.execute(config, %{}, scope())
     end
 
@@ -85,7 +85,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CopyPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, playlist} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "tgt", _tracks -> {:error, :api_error} end)
 
-      config = %{"source_playlist_id" => "src", "target_playlist_id" => "tgt"}
+      config = %{"source" => "src", "target" => "tgt"}
       assert {:error, :api_error} = CopyPlaylist.execute(config, %{}, scope())
     end
   end

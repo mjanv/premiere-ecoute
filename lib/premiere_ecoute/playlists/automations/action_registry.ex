@@ -1,27 +1,23 @@
 defmodule PremiereEcoute.Playlists.Automations.ActionRegistry do
   @moduledoc """
-  Compile-time registry mapping action_type strings to action modules.
+  Compile-time registry of action modules.
 
-  To add a new action: implement the `Action` behaviour, then add an entry here.
+  String keys are derived from each module's `id/0` — no manual string mapping.
+  To add a new action: implement `use Action`, then add the module to @modules below.
   """
 
-  alias PremiereEcoute.Playlists.Automations.Actions.CopyPlaylist
-  alias PremiereEcoute.Playlists.Automations.Actions.CreatePlaylist
-  alias PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylist
-  alias PremiereEcoute.Playlists.Automations.Actions.MergePlaylists
-  alias PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicates
-  alias PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylist
-  alias PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylist
+  # AIDEV-NOTE: only the module list needs updating when adding a new action
+  @modules [
+    PremiereEcoute.Playlists.Automations.Actions.CopyPlaylist,
+    PremiereEcoute.Playlists.Automations.Actions.CreatePlaylist,
+    PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylist,
+    PremiereEcoute.Playlists.Automations.Actions.MergePlaylists,
+    PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicates,
+    PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylist,
+    PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylist
+  ]
 
-  @actions %{
-    "copy_playlist" => CopyPlaylist,
-    "create_playlist" => CreatePlaylist,
-    "empty_playlist" => EmptyPlaylist,
-    "merge_playlists" => MergePlaylists,
-    "remove_duplicates" => RemoveDuplicates,
-    "shuffle_playlist" => ShufflePlaylist,
-    "snapshot_playlist" => SnapshotPlaylist
-  }
+  @actions Map.new(@modules, fn mod -> {mod.id(), mod} end)
 
   @doc "Returns `{:ok, module}` for a registered action_type, `:error` otherwise."
   @spec get(String.t()) :: {:ok, module()} | :error
@@ -30,4 +26,8 @@ defmodule PremiereEcoute.Playlists.Automations.ActionRegistry do
   @doc "Returns all registered actions as a map of action_type => module."
   @spec all() :: %{String.t() => module()}
   def all, do: @actions
+
+  @doc "Returns metadata for all registered actions, keyed by action_type."
+  @spec all_meta() :: %{String.t() => PremiereEcoute.Playlists.Automations.Action.meta()}
+  def all_meta, do: Map.new(@modules, fn mod -> {mod.id(), mod.meta()} end)
 end

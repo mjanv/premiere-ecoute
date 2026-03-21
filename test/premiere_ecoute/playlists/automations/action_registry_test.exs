@@ -19,8 +19,8 @@ defmodule PremiereEcoute.Playlists.Automations.ActionRegistryTest do
   end
 
   describe "all/0" do
-    test "returns all 3 actions" do
-      assert map_size(ActionRegistry.all()) == 3
+    test "returns all 7 actions" do
+      assert map_size(ActionRegistry.all()) == 7
     end
 
     test "every registered module's id/0 matches its registry key" do

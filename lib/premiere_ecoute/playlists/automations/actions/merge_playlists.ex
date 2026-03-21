@@ -1,35 +1,40 @@
 defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylists do
   @moduledoc """
-  Merges tracks from multiple source playlists into a target playlist.
-
-  Fetches all source playlists, deduplicates tracks by Spotify track ID (keeping
-  the first occurrence), then appends unique tracks to the target.
-
-  The `target_playlist_id` field accepts either a literal Spotify playlist ID or
-  `"$created_playlist_id"` to reference the playlist created by a preceding
-  `create_playlist` step via the pipeline context.
+  `target` accepts a literal Spotify ID or `"$created_playlist_id"` to reference
+  the playlist created by a preceding `create_playlist` step.
   """
 
-  @behaviour PremiereEcoute.Playlists.Automations.Action
+  use PremiereEcoute.Playlists.Automations.Action
 
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Playlist.Track
 
-  @impl true
-  def id, do: "merge_playlists"
+  action "merge_playlists" do
+    description("Merges tracks from multiple source playlists into a target, deduplicating by track ID.")
 
+    inputs do
+      input(:sources, :playlist_id_list, required: true, description: "Playlists to merge (at least 2)")
+      input(:target, :playlist_id, required: true, description: "Playlist to merge into (or $created_playlist_id)")
+    end
+
+    outputs do
+      output(:merged_count, :integer, description: "Number of unique tracks added to the target")
+    end
+  end
+
+  # AIDEV-NOTE: overrides generated validate/1 to enforce the minimum-2 list constraint
   @impl true
-  def validate(%{"source_playlist_ids" => ids, "target_playlist_id" => tgt})
+  def validate(%{"sources" => ids, "target" => tgt})
       when is_list(ids) and length(ids) >= 2 and is_binary(tgt) and tgt != "",
       do: :ok
 
-  def validate(%{"source_playlist_ids" => ids}) when is_list(ids) and length(ids) < 2,
-    do: {:error, ["source_playlist_ids must contain at least 2 playlist IDs"]}
+  def validate(%{"sources" => ids}) when is_list(ids) and length(ids) < 2,
+    do: {:error, ["sources must contain at least 2 playlist IDs"]}
 
-  def validate(_), do: {:error, ["source_playlist_ids (list) and target_playlist_id are required"]}
+  def validate(_), do: {:error, ["sources (list) and target are required"]}
 
   @impl true
-  def execute(%{"source_playlist_ids" => source_ids, "target_playlist_id" => target_id_or_ref}, context, scope) do
+  def execute(%{"sources" => source_ids, "target" => target_id_or_ref}, context, scope) do
     target_id = resolve_id(target_id_or_ref, context)
 
     # AIDEV-NOTE: fetch all sources, halt on first error

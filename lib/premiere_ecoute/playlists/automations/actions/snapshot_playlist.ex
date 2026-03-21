@@ -1,46 +1,37 @@
 defmodule PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylist do
   @moduledoc """
-  Creates a dated snapshot of a playlist.
+  `name` supports Template date placeholders: `%{month}`, `%{next_month}`,
+  `%{previous_month}`, `%{year}`.
 
-  Creates a new Spotify playlist with the given name (supports Template date
-  placeholders) and copies all tracks from the source playlist into it.
-
-  The created playlist's Spotify ID is stored in context under
-  `"created_playlist_id"` so subsequent steps can reference it.
-
-  Supported name placeholders (resolved at execution time):
-
-    - `%{month}`          — current month name (e.g. "March")
-    - `%{next_month}`     — next month name
-    - `%{previous_month}` — previous month name
-    - `%{year}`           — current 4-digit year (e.g. "2026")
+  Stores `created_playlist_id` in context so subsequent steps can reference it.
   """
 
-  @behaviour PremiereEcoute.Playlists.Automations.Action
+  use PremiereEcoute.Playlists.Automations.Action
 
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.Automations.Template
   alias PremiereEcoute.Playlists.Services.PlaylistCreation
 
-  @impl true
-  def id, do: "snapshot_playlist"
+  action "snapshot_playlist" do
+    description("Creates a dated snapshot of a playlist under a new name.")
+
+    inputs do
+      input(:source, :playlist_id, required: true, description: "Playlist to snapshot")
+      input(:name, :string, required: true, description: "Snapshot name (supports date placeholders)")
+      input(:description, :string, required: false, description: "Snapshot playlist description")
+      input(:public, :boolean, required: false, description: "Whether the snapshot is public")
+    end
+
+    outputs do
+      output(:created_playlist_id, :playlist_id, description: "Spotify ID of the created snapshot")
+      output(:playlist_name, :string, description: "Resolved name of the snapshot")
+      output(:track_count, :integer, description: "Number of tracks copied into the snapshot")
+    end
+  end
 
   @impl true
-  def validate(%{"source_playlist_id" => src, "name" => name})
-      when is_binary(src) and src != "" and is_binary(name) and name != "",
-      do: :ok
-
-  def validate(%{"source_playlist_id" => src}) when is_binary(src) and src != "",
-    do: {:error, ["name is required"]}
-
-  def validate(%{"name" => name}) when is_binary(name) and name != "",
-    do: {:error, ["source_playlist_id is required"]}
-
-  def validate(_), do: {:error, ["source_playlist_id and name are required"]}
-
-  @impl true
-  def execute(%{"source_playlist_id" => source_id, "name" => name_template} = config, _context, scope) do
+  def execute(%{"source" => source_id, "name" => name_template} = config, _context, scope) do
     name = Template.resolve(name_template)
     description = Map.get(config, "description", "")
     public = Map.get(config, "public", false)

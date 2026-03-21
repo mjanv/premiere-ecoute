@@ -1,19 +1,22 @@
 defmodule PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylist do
-  @moduledoc "Removes all tracks from a playlist."
-
-  @behaviour PremiereEcoute.Playlists.Automations.Action
+  use PremiereEcoute.Playlists.Automations.Action
 
   alias PremiereEcoute.Apis
 
-  @impl true
-  def id, do: "empty_playlist"
+  action "empty_playlist" do
+    description("Removes all tracks from a playlist.")
+
+    inputs do
+      input(:playlist, :playlist_id, required: true, description: "Playlist to empty")
+    end
+
+    outputs do
+      output(:removed_count, :integer, description: "Number of tracks removed")
+    end
+  end
 
   @impl true
-  def validate(%{"playlist_id" => id}) when is_binary(id) and id != "", do: :ok
-  def validate(_), do: {:error, ["playlist_id is required"]}
-
-  @impl true
-  def execute(%{"playlist_id" => playlist_id}, _context, scope) do
+  def execute(%{"playlist" => playlist_id}, _context, scope) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id) do
       case playlist.tracks do
         [] ->

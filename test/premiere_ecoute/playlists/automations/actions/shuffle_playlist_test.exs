@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylistTest do
 
   describe "validate/1" do
     test "valid with playlist_id" do
-      assert :ok = ShufflePlaylist.validate(%{"playlist_id" => "abc123"})
+      assert :ok = ShufflePlaylist.validate(%{"playlist" => "abc123"})
     end
 
     test "invalid without playlist_id" do
@@ -25,7 +25,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylistTest do
     end
 
     test "invalid with empty playlist_id" do
-      assert {:error, _} = ShufflePlaylist.validate(%{"playlist_id" => ""})
+      assert {:error, _} = ShufflePlaylist.validate(%{"playlist" => ""})
     end
   end
 
@@ -35,7 +35,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylistTest do
 
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
 
-      assert {:ok, %{track_count: 0}} = ShufflePlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{track_count: 0}} = ShufflePlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "shuffles tracks and returns track_count" do
@@ -50,13 +50,13 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylistTest do
         {:ok, %{}}
       end)
 
-      assert {:ok, %{track_count: 3}} = ShufflePlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{track_count: 3}} = ShufflePlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "propagates API error on get_playlist" do
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:error, :not_found} end)
 
-      assert {:error, :not_found} = ShufflePlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:error, :not_found} = ShufflePlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "handles playlists with more than 100 tracks" do
@@ -71,7 +71,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylistTest do
         {:ok, %{}}
       end)
 
-      assert {:ok, %{track_count: 150}} = ShufflePlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{track_count: 150}} = ShufflePlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "propagates API error on replace_items_to_playlist" do
@@ -81,7 +81,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
       expect(SpotifyApi, :replace_items_to_playlist, fn _scope, "pl1", _shuffled -> {:error, :api_error} end)
 
-      assert {:error, :api_error} = ShufflePlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:error, :api_error} = ShufflePlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
   end
 end

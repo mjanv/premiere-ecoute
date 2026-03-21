@@ -1,20 +1,23 @@
 defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicates do
-  @moduledoc "Removes duplicate tracks from a playlist (by ISRC, falling back to provider track ID)."
-
-  @behaviour PremiereEcoute.Playlists.Automations.Action
+  use PremiereEcoute.Playlists.Automations.Action
 
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Playlist.Track
 
-  @impl true
-  def id, do: "remove_duplicates"
+  action "remove_duplicates" do
+    description("Removes duplicate tracks from a playlist (by Spotify track ID).")
+
+    inputs do
+      input(:playlist, :playlist_id, required: true, description: "Playlist to deduplicate")
+    end
+
+    outputs do
+      output(:removed_count, :integer, description: "Number of duplicate tracks removed")
+    end
+  end
 
   @impl true
-  def validate(%{"playlist_id" => id}) when is_binary(id) and id != "", do: :ok
-  def validate(_), do: {:error, ["playlist_id is required"]}
-
-  @impl true
-  def execute(%{"playlist_id" => playlist_id}, _context, scope) do
+  def execute(%{"playlist" => playlist_id}, _context, scope) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id) do
       duplicates = find_duplicates(playlist.tracks)
 

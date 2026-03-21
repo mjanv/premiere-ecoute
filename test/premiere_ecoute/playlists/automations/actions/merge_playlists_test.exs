@@ -12,28 +12,28 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylistsTest do
 
   defp scope, do: user_scope_fixture(user_fixture())
 
-  defp track(id, playlist_id \\ "pl"),
+  defp track(id, playlist_id),
     do: %Track{provider: :spotify, track_id: id, playlist_id: playlist_id, added_at: ~N[2024-01-01 00:00:00]}
 
   describe "validate/1" do
     test "valid with two source IDs and a target" do
-      assert :ok = MergePlaylists.validate(%{"source_playlist_ids" => ["a", "b"], "target_playlist_id" => "tgt"})
+      assert :ok = MergePlaylists.validate(%{"sources" => ["a", "b"], "target" => "tgt"})
     end
 
     test "valid with $created_playlist_id reference as target" do
       assert :ok =
                MergePlaylists.validate(%{
-                 "source_playlist_ids" => ["a", "b"],
-                 "target_playlist_id" => "$created_playlist_id"
+                 "sources" => ["a", "b"],
+                 "target" => "$created_playlist_id"
                })
     end
 
     test "invalid with only one source" do
-      assert {:error, _} = MergePlaylists.validate(%{"source_playlist_ids" => ["a"], "target_playlist_id" => "tgt"})
+      assert {:error, _} = MergePlaylists.validate(%{"sources" => ["a"], "target" => "tgt"})
     end
 
     test "invalid without target_playlist_id" do
-      assert {:error, _} = MergePlaylists.validate(%{"source_playlist_ids" => ["a", "b"]})
+      assert {:error, _} = MergePlaylists.validate(%{"sources" => ["a", "b"]})
     end
 
     test "invalid with empty config" do
@@ -56,7 +56,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylistsTest do
         {:ok, %{}}
       end)
 
-      config = %{"source_playlist_ids" => ["pl1", "pl2"], "target_playlist_id" => "tgt"}
+      config = %{"sources" => ["pl1", "pl2"], "target" => "tgt"}
       assert {:ok, %{merged_count: 4}} = MergePlaylists.execute(config, %{}, scope())
     end
 
@@ -74,7 +74,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylistsTest do
         {:ok, %{}}
       end)
 
-      config = %{"source_playlist_ids" => ["pl1", "pl2"], "target_playlist_id" => "tgt"}
+      config = %{"sources" => ["pl1", "pl2"], "target" => "tgt"}
       assert {:ok, %{merged_count: 3}} = MergePlaylists.execute(config, %{}, scope())
     end
 
@@ -86,7 +86,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylistsTest do
       expect(SpotifyApi, :get_playlist, fn "pl2" -> {:ok, pl2} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "ctx_pl_id", _tracks -> {:ok, %{}} end)
 
-      config = %{"source_playlist_ids" => ["pl1", "pl2"], "target_playlist_id" => "$created_playlist_id"}
+      config = %{"sources" => ["pl1", "pl2"], "target" => "$created_playlist_id"}
       context = %{"created_playlist_id" => "ctx_pl_id"}
       assert {:ok, %{merged_count: 2}} = MergePlaylists.execute(config, context, scope())
     end
@@ -94,7 +94,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylistsTest do
     test "halts and propagates error on first failing source fetch" do
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:error, :not_found} end)
 
-      config = %{"source_playlist_ids" => ["pl1", "pl2"], "target_playlist_id" => "tgt"}
+      config = %{"sources" => ["pl1", "pl2"], "target" => "tgt"}
       assert {:error, :not_found} = MergePlaylists.execute(config, %{}, scope())
     end
 
@@ -106,7 +106,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylistsTest do
       expect(SpotifyApi, :get_playlist, fn "pl2" -> {:ok, pl2} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "tgt", _tracks -> {:error, :api_error} end)
 
-      config = %{"source_playlist_ids" => ["pl1", "pl2"], "target_playlist_id" => "tgt"}
+      config = %{"sources" => ["pl1", "pl2"], "target" => "tgt"}
       assert {:error, :api_error} = MergePlaylists.execute(config, %{}, scope())
     end
   end

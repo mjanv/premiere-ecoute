@@ -1,19 +1,22 @@
 defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylist do
-  @moduledoc "Shuffles all tracks in a playlist by replacing them in a random order."
-
-  @behaviour PremiereEcoute.Playlists.Automations.Action
+  use PremiereEcoute.Playlists.Automations.Action
 
   alias PremiereEcoute.Apis
 
-  @impl true
-  def id, do: "shuffle_playlist"
+  action "shuffle_playlist" do
+    description("Shuffles all tracks in a playlist by replacing them in a random order.")
+
+    inputs do
+      input(:playlist, :playlist_id, required: true, description: "Playlist to shuffle")
+    end
+
+    outputs do
+      output(:track_count, :integer, description: "Number of tracks shuffled")
+    end
+  end
 
   @impl true
-  def validate(%{"playlist_id" => id}) when is_binary(id) and id != "", do: :ok
-  def validate(_), do: {:error, ["playlist_id is required"]}
-
-  @impl true
-  def execute(%{"playlist_id" => playlist_id}, _context, scope) do
+  def execute(%{"playlist" => playlist_id}, _context, scope) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id) do
       case playlist.tracks do
         [] ->

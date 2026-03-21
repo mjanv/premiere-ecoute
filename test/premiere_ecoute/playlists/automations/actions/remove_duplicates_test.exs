@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicatesTest do
 
   describe "validate/1" do
     test "valid with playlist_id" do
-      assert :ok = RemoveDuplicates.validate(%{"playlist_id" => "abc123"})
+      assert :ok = RemoveDuplicates.validate(%{"playlist" => "abc123"})
     end
 
     test "invalid without playlist_id" do
@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicatesTest do
 
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
 
-      assert {:ok, %{removed_count: 0}} = RemoveDuplicates.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{removed_count: 0}} = RemoveDuplicates.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "removes duplicate tracks and returns removed_count" do
@@ -49,7 +49,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicatesTest do
         {:ok, %{}}
       end)
 
-      assert {:ok, %{removed_count: 1}} = RemoveDuplicates.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{removed_count: 1}} = RemoveDuplicates.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "returns removed_count 0 when playlist is empty" do
@@ -57,13 +57,13 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicatesTest do
 
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
 
-      assert {:ok, %{removed_count: 0}} = RemoveDuplicates.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{removed_count: 0}} = RemoveDuplicates.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "propagates API error on get_playlist" do
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:error, :not_found} end)
 
-      assert {:error, :not_found} = RemoveDuplicates.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:error, :not_found} = RemoveDuplicates.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "propagates API error on remove_playlist_items" do
@@ -74,7 +74,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicatesTest do
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
       expect(SpotifyApi, :remove_playlist_items, fn _scope, "pl1", _dups -> {:error, :api_error} end)
 
-      assert {:error, :api_error} = RemoveDuplicates.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:error, :api_error} = RemoveDuplicates.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
   end
 end

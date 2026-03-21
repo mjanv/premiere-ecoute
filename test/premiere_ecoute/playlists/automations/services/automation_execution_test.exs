@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecutionTest 
 
       automation =
         build_automation(user, [
-          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist_id" => "pl1"}}
+          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist" => "pl1"}}
         ])
 
       assert :ok = AutomationExecution.run(automation, 999)
@@ -53,8 +53,8 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecutionTest 
 
       automation =
         build_automation(user, [
-          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist_id" => "pl1"}},
-          %{"position" => 2, "action_type" => "empty_playlist", "config" => %{"playlist_id" => "pl2"}}
+          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist" => "pl1"}},
+          %{"position" => 2, "action_type" => "empty_playlist", "config" => %{"playlist" => "pl2"}}
         ])
 
       assert :ok = AutomationExecution.run(automation, 999)
@@ -73,7 +73,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecutionTest 
 
       automation =
         build_automation(user, [
-          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist_id" => "pl1"}}
+          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist" => "pl1"}}
         ])
 
       AutomationExecution.run(automation, 999)
@@ -93,8 +93,8 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecutionTest 
 
       automation =
         build_automation(user, [
-          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist_id" => "pl1"}},
-          %{"position" => 2, "action_type" => "empty_playlist", "config" => %{"playlist_id" => "pl2"}}
+          %{"position" => 1, "action_type" => "empty_playlist", "config" => %{"playlist" => "pl1"}},
+          %{"position" => 2, "action_type" => "empty_playlist", "config" => %{"playlist" => "pl2"}}
         ])
 
       assert :ok = AutomationExecution.run(automation, 999)

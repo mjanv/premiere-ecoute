@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylistTest do
 
   describe "validate/1" do
     test "valid with playlist_id" do
-      assert :ok = EmptyPlaylist.validate(%{"playlist_id" => "abc123"})
+      assert :ok = EmptyPlaylist.validate(%{"playlist" => "abc123"})
     end
 
     test "invalid without playlist_id" do
@@ -33,7 +33,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
       expect(SpotifyApi, :remove_playlist_items, fn _scope, "pl1", ^tracks -> {:ok, %{}} end)
 
-      assert {:ok, %{removed_count: 2}} = EmptyPlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{removed_count: 2}} = EmptyPlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "returns removed_count 0 when playlist is already empty" do
@@ -41,13 +41,13 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylistTest do
 
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
 
-      assert {:ok, %{removed_count: 0}} = EmptyPlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:ok, %{removed_count: 0}} = EmptyPlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
 
     test "propagates API error" do
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:error, :not_found} end)
 
-      assert {:error, :not_found} = EmptyPlaylist.execute(%{"playlist_id" => "pl1"}, %{}, scope())
+      assert {:error, :not_found} = EmptyPlaylist.execute(%{"playlist" => "pl1"}, %{}, scope())
     end
   end
 end

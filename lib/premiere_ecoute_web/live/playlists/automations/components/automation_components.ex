@@ -253,9 +253,9 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     ~H"""
     <div class="space-y-2">
       <.playlist_select
-        name={"steps[#{@index}][config][playlist_id]"}
+        name={"steps[#{@index}][config][playlist]"}
         label={gettext("Playlist to empty")}
-        value={get_in(@step, ["config", "playlist_id"])}
+        value={get_in(@step, ["config", "playlist"])}
         playlists={@library_playlists}
       />
     </div>
@@ -266,9 +266,9 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     ~H"""
     <div class="space-y-2">
       <.playlist_select
-        name={"steps[#{@index}][config][playlist_id]"}
+        name={"steps[#{@index}][config][playlist]"}
         label={gettext("Playlist to deduplicate")}
-        value={get_in(@step, ["config", "playlist_id"])}
+        value={get_in(@step, ["config", "playlist"])}
         playlists={@library_playlists}
       />
     </div>
@@ -279,9 +279,9 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     ~H"""
     <div class="space-y-2">
       <.playlist_select
-        name={"steps[#{@index}][config][playlist_id]"}
+        name={"steps[#{@index}][config][playlist]"}
         label={gettext("Playlist to shuffle")}
-        value={get_in(@step, ["config", "playlist_id"])}
+        value={get_in(@step, ["config", "playlist"])}
         playlists={@library_playlists}
       />
     </div>
@@ -292,15 +292,15 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     ~H"""
     <div class="space-y-2">
       <.playlist_select
-        name={"steps[#{@index}][config][source_playlist_id]"}
+        name={"steps[#{@index}][config][source]"}
         label={gettext("Source playlist")}
-        value={get_in(@step, ["config", "source_playlist_id"])}
+        value={get_in(@step, ["config", "source"])}
         playlists={@library_playlists}
       />
       <.playlist_select
-        name={"steps[#{@index}][config][target_playlist_id]"}
+        name={"steps[#{@index}][config][target]"}
         label={gettext("Target playlist")}
-        value={get_in(@step, ["config", "target_playlist_id"])}
+        value={get_in(@step, ["config", "target"])}
         playlists={@library_playlists}
       />
     </div>
@@ -313,16 +313,16 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
       <div>
         <label class="block text-xs text-gray-400 mb-1">{gettext("Source playlist IDs (one per line)")}</label>
         <textarea
-          name={"steps[#{@index}][config][source_playlist_ids]"}
+          name={"steps[#{@index}][config][sources]"}
           rows="3"
           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none font-mono"
           placeholder="4hnx...&#10;7kzp..."
-        >{get_in(@step, ["config", "source_playlist_ids"]) |> List.wrap() |> Enum.join("\n")}</textarea>
+        >{get_in(@step, ["config", "sources"]) |> List.wrap() |> Enum.join("\n")}</textarea>
       </div>
       <.playlist_select
-        name={"steps[#{@index}][config][target_playlist_id]"}
+        name={"steps[#{@index}][config][target]"}
         label={gettext("Target playlist")}
-        value={get_in(@step, ["config", "target_playlist_id"])}
+        value={get_in(@step, ["config", "target"])}
         playlists={@library_playlists}
       />
     </div>
@@ -333,9 +333,9 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     ~H"""
     <div class="space-y-2">
       <.playlist_select
-        name={"steps[#{@index}][config][source_playlist_id]"}
+        name={"steps[#{@index}][config][source]"}
         label={gettext("Playlist to snapshot")}
-        value={get_in(@step, ["config", "source_playlist_id"])}
+        value={get_in(@step, ["config", "source"])}
         playlists={@library_playlists}
       />
       <div>

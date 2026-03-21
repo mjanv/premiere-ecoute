@@ -1,31 +1,31 @@
 defmodule PremiereEcoute.Playlists.Automations.Actions.CreatePlaylist do
   @moduledoc """
-  Creates an empty Spotify playlist for the user.
+  The `name` field supports date placeholders: `%{month}`, `%{next_month}`,
+  `%{previous_month}`, `%{year}`, resolved at execution time.
 
-  The `name` config field supports date placeholders that are resolved at
-  execution time:
-
-    - `%{month}`          — current month name (e.g. "March")
-    - `%{next_month}`     — next month name
-    - `%{previous_month}` — previous month name
-    - `%{year}`           — current 4-digit year (e.g. "2026")
-
-  The created playlist's Spotify ID is stored in the context under
-  `"created_playlist_id"` so subsequent steps can reference it.
+  Stores `created_playlist_id` in context so subsequent steps can reference it.
   """
 
-  @behaviour PremiereEcoute.Playlists.Automations.Action
+  use PremiereEcoute.Playlists.Automations.Action
 
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.Automations.Template
   alias PremiereEcoute.Playlists.Services.PlaylistCreation
 
-  @impl true
-  def id, do: "create_playlist"
+  action "create_playlist" do
+    description("Creates an empty Spotify playlist for the user.")
 
-  @impl true
-  def validate(%{"name" => name}) when is_binary(name) and name != "", do: :ok
-  def validate(_), do: {:error, ["name is required"]}
+    inputs do
+      input(:name, :string, required: true, description: "Playlist name (supports date placeholders)")
+      input(:description, :string, required: false, description: "Playlist description")
+      input(:public, :boolean, required: false, description: "Whether the playlist is public")
+    end
+
+    outputs do
+      output(:created_playlist_id, :playlist_id, description: "Spotify ID of the created playlist")
+      output(:playlist_name, :string, description: "Resolved name of the created playlist")
+    end
+  end
 
   @impl true
   def execute(%{"name" => name_template} = config, _context, scope) do

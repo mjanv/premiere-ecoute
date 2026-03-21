@@ -27,7 +27,6 @@ defmodule PremiereEcouteWeb.Playlists.Automations.ShowLive do
         |> assign(:automation, automation)
         |> assign(:runs, runs)
         |> assign(:expanded_run_id, nil)
-        |> assign(:confirm_delete, false)
         |> then(fn socket -> {:ok, socket} end)
     end
   end
@@ -62,16 +61,6 @@ defmodule PremiereEcouteWeb.Playlists.Automations.ShowLive do
       {:error, _} ->
         {:noreply, put_flash(socket, :error, gettext("Failed to update automation"))}
     end
-  end
-
-  @impl true
-  def handle_event("confirm_delete", _params, socket) do
-    {:noreply, assign(socket, :confirm_delete, true)}
-  end
-
-  @impl true
-  def handle_event("cancel_delete", _params, socket) do
-    {:noreply, assign(socket, :confirm_delete, false)}
   end
 
   @impl true

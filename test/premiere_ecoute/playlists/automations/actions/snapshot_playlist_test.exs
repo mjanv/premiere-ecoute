@@ -17,15 +17,20 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylistTest do
     do: %Track{provider: :spotify, track_id: id, playlist_id: "src", added_at: ~N[2024-01-01 00:00:00]}
 
   defp created_playlist(name),
-    do: %LibraryPlaylist{provider: :spotify, playlist_id: "snap_id", title: name}
+    do: %LibraryPlaylist{
+      provider: :spotify,
+      playlist_id: "snap_id",
+      title: name,
+      url: "https://open.spotify.com/playlist/snap_id"
+    }
 
   describe "validate/1" do
     test "valid with source_playlist_id and name" do
-      assert :ok = SnapshotPlaylist.validate(%{"source_playlist_id" => "src", "name" => "Snapshot %{month}"})
+      assert :ok = SnapshotPlaylist.validate(%{"source" => "src", "name" => "Snapshot %{month}"})
     end
 
     test "invalid without name" do
-      assert {:error, _} = SnapshotPlaylist.validate(%{"source_playlist_id" => "src"})
+      assert {:error, _} = SnapshotPlaylist.validate(%{"source" => "src"})
     end
 
     test "invalid without source_playlist_id" do
@@ -49,7 +54,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, source} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "snap_id", ^tracks -> {:ok, %{}} end)
 
-      config = %{"source_playlist_id" => "src", "name" => "Snap March"}
+      config = %{"source" => "src", "name" => "Snap March"}
 
       assert {:ok, %{"created_playlist_id" => "snap_id", "track_count" => 2}} =
                SnapshotPlaylist.execute(config, %{}, scope())
@@ -68,7 +73,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, source} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "snap_id", _tracks -> {:ok, %{}} end)
 
-      config = %{"source_playlist_id" => "src", "name" => "Archive %{year}"}
+      config = %{"source" => "src", "name" => "Archive %{year}"}
 
       assert {:ok, %{"playlist_name" => "Archive " <> ^year}} =
                SnapshotPlaylist.execute(config, %{}, scope())
@@ -81,14 +86,14 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, source} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "snap_id", [] -> {:ok, %{}} end)
 
-      config = %{"source_playlist_id" => "src", "name" => "Empty Snapshot"}
+      config = %{"source" => "src", "name" => "Empty Snapshot"}
       assert {:ok, %{"track_count" => 0}} = SnapshotPlaylist.execute(config, %{}, scope())
     end
 
     test "propagates error when playlist creation fails" do
       expect(SpotifyApi, :create_playlist, fn _scope, _pl -> {:error, :unauthorized} end)
 
-      config = %{"source_playlist_id" => "src", "name" => "Snap"}
+      config = %{"source" => "src", "name" => "Snap"}
       assert {:error, :unauthorized} = SnapshotPlaylist.execute(config, %{}, scope())
     end
 
@@ -96,7 +101,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylistTest do
       expect(SpotifyApi, :create_playlist, fn _scope, pl -> {:ok, created_playlist(pl.title)} end)
       expect(SpotifyApi, :get_playlist, fn "src" -> {:error, :not_found} end)
 
-      config = %{"source_playlist_id" => "src", "name" => "Snap"}
+      config = %{"source" => "src", "name" => "Snap"}
       assert {:error, :not_found} = SnapshotPlaylist.execute(config, %{}, scope())
     end
 
@@ -108,7 +113,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.SnapshotPlaylistTest do
       expect(SpotifyApi, :get_playlist, fn "src" -> {:ok, source} end)
       expect(SpotifyApi, :add_items_to_playlist, fn _scope, "snap_id", _tracks -> {:error, :api_error} end)
 
-      config = %{"source_playlist_id" => "src", "name" => "Snap"}
+      config = %{"source" => "src", "name" => "Snap"}
       assert {:error, :api_error} = SnapshotPlaylist.execute(config, %{}, scope())
     end
   end
