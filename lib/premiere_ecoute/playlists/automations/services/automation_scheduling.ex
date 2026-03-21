@@ -15,6 +15,14 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationScheduling do
   alias PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorker
   alias PremiereEcoute.Repo
 
+  @doc "Inserts a job to run the automation immediately, regardless of schedule or enabled state."
+  @spec run_now(Automation.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
+  def run_now(%Automation{id: id}) do
+    %{automation_id: id}
+    |> AutomationRunWorker.new()
+    |> Oban.insert()
+  end
+
   @doc "Schedules the appropriate job for an automation based on its schedule field."
   @spec schedule(Automation.t()) :: :ok | {:ok, Oban.Job.t()} | {:error, term()}
   def schedule(%Automation{enabled: false}), do: :ok

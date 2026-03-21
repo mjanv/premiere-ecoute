@@ -128,16 +128,37 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
   Replaces all tracks in a playlist.
 
   Removes all existing tracks and replaces them with the provided tracks.
+  Handles more than 100 items by replacing with the first chunk (PUT) then
+  appending remaining chunks (POST), as required by the Spotify API limit.
   """
   @spec replace_items_to_playlist(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def replace_items_to_playlist(scope, id, tracks) do
-    scope
-    |> SpotifyApi.api()
-    |> SpotifyApi.put(
-      url: "/playlists/#{id}/tracks",
-      json: %{"uris" => Enum.map(tracks, fn t -> "spotify:track:#{track_id(t)}" end)}
-    )
-    |> SpotifyApi.handle(200, fn body -> body end)
+    # AIDEV-NOTE: Spotify PUT /playlists/:id/tracks accepts max 100 URIs; first chunk
+    # clears+sets the playlist, subsequent chunks are POSTed (appended) in order.
+    [first_chunk | rest_chunks] = Enum.chunk_every(tracks, @items_limit)
+
+    with {:ok, result} <-
+           scope
+           |> SpotifyApi.api()
+           |> SpotifyApi.put(
+             url: "/playlists/#{id}/tracks",
+             json: %{"uris" => Enum.map(first_chunk, fn t -> "spotify:track:#{track_id(t)}" end)}
+           )
+           |> SpotifyApi.handle(200, fn body -> body end) do
+      Enum.reduce_while(rest_chunks, {:ok, result}, fn chunk, _acc ->
+        scope
+        |> SpotifyApi.api()
+        |> SpotifyApi.post(
+          url: "/playlists/#{id}/tracks",
+          json: %{"uris" => Enum.map(chunk, fn t -> "spotify:track:#{track_id(t)}" end)}
+        )
+        |> SpotifyApi.handle(201, fn body -> body end)
+        |> case do
+          {:ok, _} = ok -> {:cont, ok}
+          {:error, _} = err -> {:halt, err}
+        end
+      end)
+    end
   end
 
   @doc """

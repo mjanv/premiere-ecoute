@@ -16,10 +16,10 @@ defmodule PremiereEcoute.Apis.Lyrics.GeniusApi.SongsTest do
         status: 200
       )
 
-      {:ok, song} = GeniusApi.get_song(71255)
+      {:ok, song} = GeniusApi.get_song(71_255)
 
       assert %{
-               id: 71255,
+               id: 71_255,
                title: "One More Time",
                full_title: "One More Time by\u00a0Daft\u00a0Punk (Ft.\u00a0Romanthony)",
                artist: "Daft Punk (Ft. Romanthony)",
@@ -42,7 +42,7 @@ defmodule PremiereEcoute.Apis.Lyrics.GeniusApi.SongsTest do
                  }
                ],
                primary_artist: %{
-                 id: 13585,
+                 id: 13_585,
                  name: "Daft Punk",
                  url: "https://genius.com/artists/Daft-punk"
                }

@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Apis.Lyrics.GeniusApi.SearchTest do
 
       assert [
                %{
-                 id: 71255,
+                 id: 71_255,
                  title: "One More Time",
                  artist: "Daft Punk",
                  url: "https://genius.com/Daft-punk-one-more-time-lyrics",

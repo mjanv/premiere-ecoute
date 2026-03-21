@@ -37,8 +37,8 @@ defmodule PremiereEcouteWeb.Playlists.Automations.ShowLive do
 
   @impl true
   def handle_event("run_now", _params, socket) do
-    case Automations.schedule(socket.assigns.automation) do
-      {:ok, _job} ->
+    case Automations.run_now(socket.assigns.automation) do
+      {:ok, _} ->
         {:noreply, put_flash(socket, :info, gettext("Run triggered"))}
 
       {:error, _} ->

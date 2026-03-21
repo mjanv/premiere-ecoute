@@ -275,6 +275,84 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     """
   end
 
+  def step_config_fields(%{step: %{"action_type" => "shuffle_playlist"}} = assigns) do
+    ~H"""
+    <div class="space-y-2">
+      <.playlist_select
+        name={"steps[#{@index}][config][playlist_id]"}
+        label={gettext("Playlist to shuffle")}
+        value={get_in(@step, ["config", "playlist_id"])}
+        playlists={@library_playlists}
+      />
+    </div>
+    """
+  end
+
+  def step_config_fields(%{step: %{"action_type" => "copy_playlist"}} = assigns) do
+    ~H"""
+    <div class="space-y-2">
+      <.playlist_select
+        name={"steps[#{@index}][config][source_playlist_id]"}
+        label={gettext("Source playlist")}
+        value={get_in(@step, ["config", "source_playlist_id"])}
+        playlists={@library_playlists}
+      />
+      <.playlist_select
+        name={"steps[#{@index}][config][target_playlist_id]"}
+        label={gettext("Target playlist")}
+        value={get_in(@step, ["config", "target_playlist_id"])}
+        playlists={@library_playlists}
+      />
+    </div>
+    """
+  end
+
+  def step_config_fields(%{step: %{"action_type" => "merge_playlists"}} = assigns) do
+    ~H"""
+    <div class="space-y-2">
+      <div>
+        <label class="block text-xs text-gray-400 mb-1">{gettext("Source playlist IDs (one per line)")}</label>
+        <textarea
+          name={"steps[#{@index}][config][source_playlist_ids]"}
+          rows="3"
+          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none font-mono"
+          placeholder="4hnx...&#10;7kzp..."
+        >{get_in(@step, ["config", "source_playlist_ids"]) |> List.wrap() |> Enum.join("\n")}</textarea>
+      </div>
+      <.playlist_select
+        name={"steps[#{@index}][config][target_playlist_id]"}
+        label={gettext("Target playlist")}
+        value={get_in(@step, ["config", "target_playlist_id"])}
+        playlists={@library_playlists}
+      />
+    </div>
+    """
+  end
+
+  def step_config_fields(%{step: %{"action_type" => "snapshot_playlist"}} = assigns) do
+    ~H"""
+    <div class="space-y-2">
+      <.playlist_select
+        name={"steps[#{@index}][config][source_playlist_id]"}
+        label={gettext("Playlist to snapshot")}
+        value={get_in(@step, ["config", "source_playlist_id"])}
+        playlists={@library_playlists}
+      />
+      <div>
+        <label class="block text-xs text-gray-400 mb-1">{gettext("Snapshot name")}</label>
+        <input
+          type="text"
+          name={"steps[#{@index}][config][name]"}
+          value={get_in(@step, ["config", "name"]) || ""}
+          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+          placeholder="e.g. Archive %{month} %{year}"
+        />
+        <p class="text-xs text-gray-500 mt-1">{"Available: %{month}, %{next_month}, %{previous_month}, %{year}"}</p>
+      </div>
+    </div>
+    """
+  end
+
   def step_config_fields(assigns) do
     ~H"""
     <p class="text-xs text-gray-500 italic">{gettext("Unknown action type: %{type}", type: @step["action_type"])}</p>
@@ -316,9 +394,13 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     end
   end
 
+  defp humanize_action("copy_playlist"), do: gettext("Copy playlist")
   defp humanize_action("create_playlist"), do: gettext("Create playlist")
   defp humanize_action("empty_playlist"), do: gettext("Empty playlist")
+  defp humanize_action("merge_playlists"), do: gettext("Merge playlists")
   defp humanize_action("remove_duplicates"), do: gettext("Remove duplicates")
+  defp humanize_action("shuffle_playlist"), do: gettext("Shuffle playlist")
+  defp humanize_action("snapshot_playlist"), do: gettext("Snapshot playlist")
   defp humanize_action(other), do: other
 
   defp config_summary(nil), do: ""
@@ -366,5 +448,8 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   end
 
   defp output_summary(%{"removed_count" => n}), do: gettext("Removed %{n} tracks", n: n)
+  defp output_summary(%{"copied_count" => n}), do: gettext("Copied %{n} tracks", n: n)
+  defp output_summary(%{"merged_count" => n}), do: gettext("Merged %{n} tracks", n: n)
+  defp output_summary(%{"track_count" => n}), do: gettext("%{n} tracks", n: n)
   defp output_summary(map), do: Enum.map_join(map, ", ", fn {k, v} -> "#{k}: #{v}" end)
 end

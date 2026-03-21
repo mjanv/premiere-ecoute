@@ -40,6 +40,9 @@ defmodule PremiereEcoute.Automations do
   @doc "Schedules the appropriate job for an automation based on its schedule field."
   defdelegate schedule(automation), to: AutomationScheduling
 
+  @doc "Runs an automation immediately, regardless of its schedule type."
+  defdelegate run_now(automation), to: AutomationScheduling
+
   @doc "Lists automations that reference a given playlist_id in any step config."
   @spec list_for_playlist(User.t(), String.t()) :: [Automation.t()]
   def list_for_playlist(%User{id: user_id}, playlist_id) do

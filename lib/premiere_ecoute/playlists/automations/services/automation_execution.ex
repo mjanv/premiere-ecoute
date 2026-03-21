@@ -19,6 +19,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
   alias PremiereEcoute.Playlists.Automations.ActionRegistry
   alias PremiereEcoute.Playlists.Automations.Automation
   alias PremiereEcoute.Playlists.Automations.AutomationRun
+  alias PremiereEcoute.PubSub
   alias PremiereEcoute.Repo
 
   @doc "Runs all steps of an automation, writes a run record, returns `:ok`."
@@ -38,6 +39,8 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
         started_at: DateTime.utc_now(:second)
       })
 
+    PubSub.broadcast("automation:#{automation.id}", {:run_created, run})
+
     {status, steps} =
       try do
         execute_steps(automation.steps, scope)
@@ -45,11 +48,14 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
         e -> {:failed, [%{"error" => Exception.message(e), "status" => "failed"}]}
       end
 
-    AutomationRun.update(run, %{
-      status: status,
-      steps: steps,
-      finished_at: DateTime.utc_now(:second)
-    })
+    {:ok, updated_run} =
+      AutomationRun.update(run, %{
+        status: status,
+        steps: steps,
+        finished_at: DateTime.utc_now(:second)
+      })
+
+    PubSub.broadcast("automation:#{automation.id}", {:run_updated, updated_run})
 
     notification =
       if status == :failed do

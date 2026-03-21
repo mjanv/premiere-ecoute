@@ -57,6 +57,18 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
     end
   end
 
+  defp notification_icon_bg("check-circle"), do: "bg-green-500/20"
+  defp notification_icon_bg(_), do: "bg-red-500/20"
+
+  defp notification_icon_color("check-circle"), do: "text-green-400"
+  defp notification_icon_color(_), do: "text-red-400"
+
+  defp notification_icon_path("check-circle"), do: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+
+  defp notification_icon_path(_),
+    do:
+      "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+
   defp render_notification(notification) do
     case Notifications.get_type(notification.type) do
       {:ok, type_module} -> type_module.render(notification.data)
@@ -148,13 +160,18 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
                     class="absolute inset-0"
                   />
                   <!-- Icon -->
-                  <div class="flex-shrink-0 w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center mt-0.5 relative z-10 pointer-events-none">
-                    <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class={"flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-0.5 relative z-10 pointer-events-none #{notification_icon_bg(rendered.icon)}"}>
+                    <svg
+                      class={"w-4 h-4 #{notification_icon_color(rendered.icon)}"}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        d={notification_icon_path(rendered.icon)}
                       />
                     </svg>
                   </div>
