@@ -6,7 +6,7 @@ defmodule PremiereEcouteWeb.Supervisor do
   use PremiereEcouteCore.Supervisor,
     children: [
       PremiereEcouteWeb.Telemetry,
-      {DNSCluster, query: Application.get_env(:premiere_ecoute, :dns_cluster_query) || :ignore},
+      # {DNSCluster, query: Application.get_env(:premiere_ecoute, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: PremiereEcoute.PubSub},
       PremiereEcoute.Presence,
       PremiereEcouteWeb.Endpoint,
