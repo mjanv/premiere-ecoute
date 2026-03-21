@@ -24,7 +24,8 @@ config :premiere_ecoute,
 
 config :premiere_ecoute,
   buymeacoffee_api_key: env!("BUYMEACOFFEE_API_KEY"),
-  youtube_data_api_key: env!("YOUTUBE_DATA_API_V3_KEY")
+  youtube_data_api_key: env!("YOUTUBE_DATA_API_V3_KEY"),
+  genius_access_token: env!("GENIUS_ACCESS_TOKEN")
 
 config :premiere_ecoute, :feature_flags,
   username: env!("AUTH_USERNAME"),

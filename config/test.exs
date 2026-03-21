@@ -47,6 +47,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   youtube: [
     api: PremiereEcoute.Apis.Video.YoutubeApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Video.YoutubeApi}]
+  ],
+  genius: [
+    api: PremiereEcoute.Apis.Lyrics.GeniusApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.Lyrics.GeniusApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

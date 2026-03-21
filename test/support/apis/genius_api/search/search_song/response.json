@@ -1,0 +1,629 @@
+{
+  "meta": {
+    "status": 200
+  },
+  "response": {
+    "hits": [
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 3,
+          "api_path": "/songs/71255",
+          "artist_names": "Daft Punk (Ft. Romanthony)",
+          "full_title": "One More Time by\u00a0Daft\u00a0Punk (Ft.\u00a0Romanthony)",
+          "header_image_thumbnail_url": "https://images.genius.com/4990083e3eacb207d17fc04ece010e1f.300x300x1.png",
+          "header_image_url": "https://images.genius.com/4990083e3eacb207d17fc04ece010e1f.1000x1000x1.png",
+          "id": 71255,
+          "lyrics_owner_id": 22190,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-one-more-time-lyrics",
+          "primary_artist_names": "Daft Punk",
+          "pyongs_count": 44,
+          "relationships_index_url": "https://genius.com/Daft-punk-one-more-time-sample",
+          "release_date_components": {
+            "year": 2000,
+            "month": 11,
+            "day": 13
+          },
+          "release_date_for_display": "November 13, 2000",
+          "release_date_with_abbreviated_month_for_display": "Nov. 13, 2000",
+          "song_art_image_thumbnail_url": "https://images.genius.com/4990083e3eacb207d17fc04ece010e1f.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/4990083e3eacb207d17fc04ece010e1f.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 1,
+            "hot": false,
+            "pageviews": 159526
+          },
+          "title": "One More Time",
+          "title_with_featured": "One More Time (Ft.\u00a0Romanthony)",
+          "url": "https://genius.com/Daft-punk-one-more-time-lyrics",
+          "featured_artists": [
+            {
+              "api_path": "/artists/51515",
+              "header_image_url": "https://images.genius.com/885ca7be5d8317ea6dcec0ba321dd23a.1000x493x1.png",
+              "id": 51515,
+              "image_url": "https://images.genius.com/8759373a806da8effed8a61e597bfa57.932x932x1.jpg",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Romanthony",
+              "url": "https://genius.com/artists/Romanthony"
+            }
+          ],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 0,
+          "api_path": "/songs/6546918",
+          "artist_names": "Genius T\u00fcrk\u00e7e \u00c7eviriler",
+          "full_title": "Daft Punk - One More Time (T\u00fcrk\u00e7e \u00c7eviri) by\u00a0Genius\u00a0T\u00fcrk\u00e7e \u00c7eviriler",
+          "header_image_thumbnail_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.300x300x1.png",
+          "header_image_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.1000x1000x1.png",
+          "id": 6546918,
+          "lyrics_owner_id": 7163065,
+          "lyrics_state": "complete",
+          "path": "/Genius-turkce-ceviriler-daft-punk-one-more-time-turkce-ceviri-lyrics",
+          "primary_artist_names": "Genius T\u00fcrk\u00e7e \u00c7eviriler",
+          "pyongs_count": null,
+          "relationships_index_url": "https://genius.com/Genius-turkce-ceviriler-daft-punk-one-more-time-turkce-ceviri-sample",
+          "release_date_components": {
+            "year": 2000,
+            "month": 11,
+            "day": 13
+          },
+          "release_date_for_display": "November 13, 2000",
+          "release_date_with_abbreviated_month_for_display": "Nov. 13, 2000",
+          "song_art_image_thumbnail_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "Daft Punk - One More Time (T\u00fcrk\u00e7e \u00c7eviri)",
+          "title_with_featured": "Daft Punk - One More Time (T\u00fcrk\u00e7e \u00c7eviri)",
+          "url": "https://genius.com/Genius-turkce-ceviriler-daft-punk-one-more-time-turkce-ceviri-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/569121",
+            "header_image_url": "https://images.genius.com/6f30793e5dcbf4ab19b04f3ffbc99ffb.1000x244x1.png",
+            "id": 569121,
+            "image_url": "https://images.genius.com/819b23743176d446430d07d83eb354e5.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Genius T\u00fcrk\u00e7e \u00c7eviriler",
+            "url": "https://genius.com/artists/Genius-turkce-ceviriler"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/569121",
+              "header_image_url": "https://images.genius.com/6f30793e5dcbf4ab19b04f3ffbc99ffb.1000x244x1.png",
+              "id": 569121,
+              "image_url": "https://images.genius.com/819b23743176d446430d07d83eb354e5.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Genius T\u00fcrk\u00e7e \u00c7eviriler",
+              "url": "https://genius.com/artists/Genius-turkce-ceviriler"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 1,
+          "api_path": "/songs/1191888",
+          "artist_names": "Daft Punk",
+          "full_title": "One More Time / Aerodynamic by\u00a0Daft\u00a0Punk",
+          "header_image_thumbnail_url": "https://images.genius.com/18d1d44c7bca1126360d1403486e8d69.300x300x1.png",
+          "header_image_url": "https://images.genius.com/18d1d44c7bca1126360d1403486e8d69.1000x1000x1.png",
+          "id": 1191888,
+          "lyrics_owner_id": 1549345,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-one-more-time-aerodynamic-lyrics",
+          "primary_artist_names": "Daft Punk",
+          "pyongs_count": null,
+          "relationships_index_url": "https://genius.com/Daft-punk-one-more-time-aerodynamic-sample",
+          "release_date_components": {
+            "year": 2007,
+            "month": 11,
+            "day": 19
+          },
+          "release_date_for_display": "November 19, 2007",
+          "release_date_with_abbreviated_month_for_display": "Nov. 19, 2007",
+          "song_art_image_thumbnail_url": "https://images.genius.com/18d1d44c7bca1126360d1403486e8d69.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/18d1d44c7bca1126360d1403486e8d69.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 1,
+            "hot": false
+          },
+          "title": "One More Time / Aerodynamic",
+          "title_with_featured": "One More Time / Aerodynamic",
+          "url": "https://genius.com/Daft-punk-one-more-time-aerodynamic-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 1,
+          "api_path": "/songs/363992",
+          "artist_names": "Daft Punk (Ft. Romanthony)",
+          "full_title": "One More Time (Romanthony's Unplugged) by\u00a0Daft\u00a0Punk (Ft.\u00a0Romanthony)",
+          "header_image_thumbnail_url": "https://images.genius.com/881a7404782067112fb57ab7fa7bb355.300x300x1.png",
+          "header_image_url": "https://images.genius.com/881a7404782067112fb57ab7fa7bb355.1000x1000x1.png",
+          "id": 363992,
+          "lyrics_owner_id": 116340,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-one-more-time-romanthonys-unplugged-lyrics",
+          "primary_artist_names": "Daft Punk",
+          "pyongs_count": 1,
+          "relationships_index_url": "https://genius.com/Daft-punk-one-more-time-romanthonys-unplugged-sample",
+          "release_date_components": {
+            "year": 2003,
+            "month": 12,
+            "day": 1
+          },
+          "release_date_for_display": "December 1, 2003",
+          "release_date_with_abbreviated_month_for_display": "Dec. 1, 2003",
+          "song_art_image_thumbnail_url": "https://images.genius.com/881a7404782067112fb57ab7fa7bb355.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/881a7404782067112fb57ab7fa7bb355.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "One More Time (Romanthony\u2019s Unplugged)",
+          "title_with_featured": "One More Time (Romanthony's Unplugged) (Ft.\u00a0Romanthony)",
+          "url": "https://genius.com/Daft-punk-one-more-time-romanthonys-unplugged-lyrics",
+          "featured_artists": [
+            {
+              "api_path": "/artists/51515",
+              "header_image_url": "https://images.genius.com/885ca7be5d8317ea6dcec0ba321dd23a.1000x493x1.png",
+              "id": 51515,
+              "image_url": "https://images.genius.com/8759373a806da8effed8a61e597bfa57.932x932x1.jpg",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Romanthony",
+              "url": "https://genius.com/artists/Romanthony"
+            }
+          ],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 1,
+          "api_path": "/songs/504860",
+          "artist_names": "Daft Punk",
+          "full_title": "One More Time / Aerodynamic / Aerodynamic Beats / Forget About the World by\u00a0Daft\u00a0Punk",
+          "header_image_thumbnail_url": "https://images.rapgenius.com/1fcb541ce0daf689f9561a22d67842f0.300x300x1.jpg",
+          "header_image_url": "https://images.rapgenius.com/1fcb541ce0daf689f9561a22d67842f0.500x500x1.jpg",
+          "id": 504860,
+          "lyrics_owner_id": 1077718,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-one-more-time-aerodynamic-aerodynamic-beats-forget-about-the-world-lyrics",
+          "primary_artist_names": "Daft Punk",
+          "pyongs_count": 1,
+          "relationships_index_url": "https://genius.com/Daft-punk-one-more-time-aerodynamic-aerodynamic-beats-forget-about-the-world-sample",
+          "release_date_components": {
+            "year": 2007,
+            "month": 12,
+            "day": 4
+          },
+          "release_date_for_display": "December 4, 2007",
+          "release_date_with_abbreviated_month_for_display": "Dec. 4, 2007",
+          "song_art_image_thumbnail_url": "https://images.rapgenius.com/1fcb541ce0daf689f9561a22d67842f0.300x300x1.jpg",
+          "song_art_image_url": "https://images.rapgenius.com/1fcb541ce0daf689f9561a22d67842f0.500x500x1.jpg",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "One More Time / Aerodynamic / Aerodynamic Beats / Forget About the World",
+          "title_with_featured": "One More Time / Aerodynamic / Aerodynamic Beats / Forget About the World",
+          "url": "https://genius.com/Daft-punk-one-more-time-aerodynamic-aerodynamic-beats-forget-about-the-world-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 0,
+          "api_path": "/songs/8029703",
+          "artist_names": "Genius Traducciones al Espa\u00f1ol",
+          "full_title": "Daft Punk - One More Time (Traducci\u00f3n al Espa\u00f1ol) by\u00a0Genius\u00a0Traducciones al Espa\u00f1ol",
+          "header_image_thumbnail_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.300x300x1.png",
+          "header_image_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.1000x1000x1.png",
+          "id": 8029703,
+          "lyrics_owner_id": 15640816,
+          "lyrics_state": "complete",
+          "path": "/Genius-traducciones-al-espanol-daft-punk-one-more-time-traduccion-al-espanol-lyrics",
+          "primary_artist_names": "Genius Traducciones al Espa\u00f1ol",
+          "pyongs_count": null,
+          "relationships_index_url": "https://genius.com/Genius-traducciones-al-espanol-daft-punk-one-more-time-traduccion-al-espanol-sample",
+          "release_date_components": {
+            "year": 2000,
+            "month": 11,
+            "day": 13
+          },
+          "release_date_for_display": "November 13, 2000",
+          "release_date_with_abbreviated_month_for_display": "Nov. 13, 2000",
+          "song_art_image_thumbnail_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/1f68dda22b514be9e8b0555a49ac372b.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "Daft Punk - One More Time (Traducci\u00f3n al Espa\u00f1ol)",
+          "title_with_featured": "Daft Punk - One More Time (Traducci\u00f3n al Espa\u00f1ol)",
+          "url": "https://genius.com/Genius-traducciones-al-espanol-daft-punk-one-more-time-traduccion-al-espanol-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/1376254",
+            "header_image_url": "https://images.genius.com/d43c9375eda8e9c8e8768a3a911b7d49.1000x213x44.gif",
+            "id": 1376254,
+            "image_url": "https://images.genius.com/766a687c3e07f9acd993d7f8ac3e9902.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Genius Traducciones al Espa\u00f1ol",
+            "url": "https://genius.com/artists/Genius-traducciones-al-espanol"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/1376254",
+              "header_image_url": "https://images.genius.com/d43c9375eda8e9c8e8768a3a911b7d49.1000x213x44.gif",
+              "id": 1376254,
+              "image_url": "https://images.genius.com/766a687c3e07f9acd993d7f8ac3e9902.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Genius Traducciones al Espa\u00f1ol",
+              "url": "https://genius.com/artists/Genius-traducciones-al-espanol"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 0,
+          "api_path": "/songs/5188135",
+          "artist_names": "Daft Punk",
+          "full_title": "One More Time - Short Radio Edit by\u00a0Daft\u00a0Punk",
+          "header_image_thumbnail_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.300x300x1.png",
+          "header_image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+          "id": 5188135,
+          "lyrics_owner_id": 9387139,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-one-more-time-short-radio-edit-lyrics",
+          "primary_artist_names": "Daft Punk",
+          "pyongs_count": null,
+          "relationships_index_url": "https://genius.com/Daft-punk-one-more-time-short-radio-edit-sample",
+          "release_date_components": null,
+          "release_date_for_display": null,
+          "release_date_with_abbreviated_month_for_display": null,
+          "song_art_image_thumbnail_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "One More Time - Short Radio Edit",
+          "title_with_featured": "One More Time - Short Radio Edit",
+          "url": "https://genius.com/Daft-punk-one-more-time-short-radio-edit-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 0,
+          "api_path": "/songs/9107757",
+          "artist_names": "Daft Punk & Rihanna",
+          "full_title": "One More Time / Disturbia (Mixed) by\u00a0Daft\u00a0Punk & Rihanna",
+          "header_image_thumbnail_url": "https://images.genius.com/5f7b596d5a46e550396054edefe410fb.300x300x1.png",
+          "header_image_url": "https://images.genius.com/5f7b596d5a46e550396054edefe410fb.1000x1000x1.png",
+          "id": 9107757,
+          "lyrics_owner_id": 4212581,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-and-rihanna-one-more-time-disturbia-mixed-lyrics",
+          "primary_artist_names": "Daft Punk & Rihanna",
+          "pyongs_count": null,
+          "relationships_index_url": "https://genius.com/Daft-punk-and-rihanna-one-more-time-disturbia-mixed-sample",
+          "release_date_components": {
+            "year": 2023,
+            "month": 5,
+            "day": 5
+          },
+          "release_date_for_display": "May 5, 2023",
+          "release_date_with_abbreviated_month_for_display": "May 5, 2023",
+          "song_art_image_thumbnail_url": "https://images.genius.com/5f7b596d5a46e550396054edefe410fb.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/5f7b596d5a46e550396054edefe410fb.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "One More Time / Disturbia (Mixed)",
+          "title_with_featured": "One More Time / Disturbia (Mixed)",
+          "url": "https://genius.com/Daft-punk-and-rihanna-one-more-time-disturbia-mixed-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            },
+            {
+              "api_path": "/artists/89",
+              "header_image_url": "https://images.genius.com/7fbc0f95ca9d7d24853328749c8affd1.1000x333x1.jpg",
+              "id": 89,
+              "image_url": "https://images.genius.com/ccba37ee9940591cf24eab7e18efcf66.1000x1000x1.png",
+              "is_meme_verified": true,
+              "is_verified": true,
+              "name": "Rihanna",
+              "url": "https://genius.com/artists/Rihanna",
+              "iq": 2340
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 0,
+          "api_path": "/songs/9415822",
+          "artist_names": "Daft Punk",
+          "full_title": "One More Time (Mixed) by\u00a0Daft\u00a0Punk",
+          "header_image_thumbnail_url": "https://images.genius.com/ba1d80f73e96d484536c25376a506e73.300x300x1.png",
+          "header_image_url": "https://images.genius.com/ba1d80f73e96d484536c25376a506e73.1000x1000x1.png",
+          "id": 9415822,
+          "lyrics_owner_id": 17955726,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-one-more-time-mixed-lyrics",
+          "primary_artist_names": "Daft Punk",
+          "pyongs_count": null,
+          "relationships_index_url": "https://genius.com/Daft-punk-one-more-time-mixed-sample",
+          "release_date_components": {
+            "year": 2023,
+            "month": 7,
+            "day": 28
+          },
+          "release_date_for_display": "July 28, 2023",
+          "release_date_with_abbreviated_month_for_display": "Jul. 28, 2023",
+          "song_art_image_thumbnail_url": "https://images.genius.com/ba1d80f73e96d484536c25376a506e73.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/ba1d80f73e96d484536c25376a506e73.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "One More Time (Mixed)",
+          "title_with_featured": "One More Time (Mixed)",
+          "url": "https://genius.com/Daft-punk-one-more-time-mixed-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            }
+          ]
+        }
+      },
+      {
+        "highlights": [],
+        "index": "song",
+        "type": "song",
+        "result": {
+          "annotation_count": 0,
+          "api_path": "/songs/9991226",
+          "artist_names": "Daft Punk",
+          "full_title": "One More Time (Remix) [Mixed] by\u00a0Daft\u00a0Punk",
+          "header_image_thumbnail_url": "https://images.genius.com/a060a7539070eb9d5b42281366e601e6.300x300x1.png",
+          "header_image_url": "https://images.genius.com/a060a7539070eb9d5b42281366e601e6.1000x1000x1.png",
+          "id": 9991226,
+          "lyrics_owner_id": 17955726,
+          "lyrics_state": "complete",
+          "path": "/Daft-punk-one-more-time-remix-mixed-lyrics",
+          "primary_artist_names": "Daft Punk",
+          "pyongs_count": null,
+          "relationships_index_url": "https://genius.com/Daft-punk-one-more-time-remix-mixed-sample",
+          "release_date_components": {
+            "year": 2023,
+            "month": 7,
+            "day": 29
+          },
+          "release_date_for_display": "July 29, 2023",
+          "release_date_with_abbreviated_month_for_display": "Jul. 29, 2023",
+          "song_art_image_thumbnail_url": "https://images.genius.com/a060a7539070eb9d5b42281366e601e6.300x300x1.png",
+          "song_art_image_url": "https://images.genius.com/a060a7539070eb9d5b42281366e601e6.1000x1000x1.png",
+          "stats": {
+            "unreviewed_annotations": 0,
+            "hot": false
+          },
+          "title": "One More Time (Remix) [Mixed]",
+          "title_with_featured": "One More Time (Remix) [Mixed]",
+          "url": "https://genius.com/Daft-punk-one-more-time-remix-mixed-lyrics",
+          "featured_artists": [],
+          "primary_artist": {
+            "api_path": "/artists/13585",
+            "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+            "id": 13585,
+            "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+            "is_meme_verified": false,
+            "is_verified": false,
+            "name": "Daft Punk",
+            "url": "https://genius.com/artists/Daft-punk"
+          },
+          "primary_artists": [
+            {
+              "api_path": "/artists/13585",
+              "header_image_url": "https://images.genius.com/65cd354bc41531872aca3356dc06eb83.1000x562x1.jpg",
+              "id": 13585,
+              "image_url": "https://images.genius.com/626f2887c30a9618cb1fbb383a16f8c1.1000x1000x1.png",
+              "is_meme_verified": false,
+              "is_verified": false,
+              "name": "Daft Punk",
+              "url": "https://genius.com/artists/Daft-punk"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

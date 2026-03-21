@@ -82,6 +82,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     urls: [
       api: "https://www.googleapis.com/youtube/v3"
     ]
+  ],
+  genius: [
+    api: PremiereEcoute.Apis.Lyrics.GeniusApi,
+    urls: [
+      api: "https://api.genius.com"
+    ]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30
