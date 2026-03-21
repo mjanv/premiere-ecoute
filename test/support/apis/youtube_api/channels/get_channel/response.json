@@ -1,0 +1,55 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "n5dFJHZH4T2zVUoVkpG0iT-2Axg",
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 5
+  },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "etag": "EVnBHqDNhBUXuP5Jlv4A45szV78",
+      "id": "UCsmECZ1G4vHMSmH-m6cJBWA",
+      "snippet": {
+        "title": "Flonflon",
+        "description": "Sur cette cha\u00eene, je partage ma passion : la musique. \n\nVous d\u00e9couvrirez du contenu original autour de mes d\u00e9couvertes et mes coups de coeur mais \u00e9galement des replays de mes lives Twitch (twitch.tv/flonflon).\n\nRestez curieux.se !",
+        "customUrl": "@flonflon",
+        "publishedAt": "2020-06-23T15:11:31.532321Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/j04CzvVlxLZAnNBmmONzQBhkITuRq06tzUWMxQ5CkMBBBOKaLr3_hVXQNGLF5XujKywa7PU3Kg=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/j04CzvVlxLZAnNBmmONzQBhkITuRq06tzUWMxQ5CkMBBBOKaLr3_hVXQNGLF5XujKywa7PU3Kg=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/j04CzvVlxLZAnNBmmONzQBhkITuRq06tzUWMxQ5CkMBBBOKaLr3_hVXQNGLF5XujKywa7PU3Kg=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Flonflon",
+          "description": "Sur cette cha\u00eene, je partage ma passion : la musique. \n\nVous d\u00e9couvrirez du contenu original autour de mes d\u00e9couvertes et mes coups de coeur mais \u00e9galement des replays de mes lives Twitch (twitch.tv/flonflon).\n\nRestez curieux.se !"
+        },
+        "country": "FR"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUsmECZ1G4vHMSmH-m6cJBWA"
+        }
+      },
+      "statistics": {
+        "viewCount": "1533553",
+        "subscriberCount": "8660",
+        "hiddenSubscriberCount": false,
+        "videoCount": "468"
+      }
+    }
+  ]
+}

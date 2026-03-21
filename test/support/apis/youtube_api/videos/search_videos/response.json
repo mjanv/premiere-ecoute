@@ -1,0 +1,352 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "cFIBuFY3rT1RV0PYGwuHxgTzcNw",
+  "nextPageToken": "CAoQAA",
+  "regionCode": "FR",
+  "pageInfo": {
+    "totalResults": 1000000,
+    "resultsPerPage": 10
+  },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "llIpKKWX3lYaQhhzl07t6_vCA8Y",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "FGBhQbmPwH8"
+      },
+      "snippet": {
+        "publishedAt": "2009-02-24T03:02:20Z",
+        "channelId": "UC_kRDKYrUlrbtrSiyu5Tflg",
+        "title": "Daft Punk - One More Time (Official Video)",
+        "description": "Listen, order & watch now: https://bio.to/daftpunk Official Music Video for \u201cOne More Time\u201d, taken from \u201cDiscovery\u201d available on all ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/FGBhQbmPwH8/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/FGBhQbmPwH8/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/FGBhQbmPwH8/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Daft Punk",
+        "liveBroadcastContent": "none",
+        "publishTime": "2009-02-24T03:02:20Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "XK2NtsxifrnYUXR0GYW7t4WX14U",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "A2VpR8HahKc"
+      },
+      "snippet": {
+        "publishedAt": "2015-06-11T17:08:40Z",
+        "channelId": "UC_kRDKYrUlrbtrSiyu5Tflg",
+        "title": "Daft Punk - One More Time (Official Audio)",
+        "description": "Listen, order & watch now: https://bio.to/daftpunk \"One More Time\" is taken from \u201cDiscovery\u201d available on all platforms: ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/A2VpR8HahKc/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/A2VpR8HahKc/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/A2VpR8HahKc/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Daft Punk",
+        "liveBroadcastContent": "none",
+        "publishTime": "2015-06-11T17:08:40Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "zuVfl2tUeJFUqg3lE64A9CmU4Qs",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "dGnK8wurld4"
+      },
+      "snippet": {
+        "publishedAt": "2021-10-30T02:14:44Z",
+        "channelId": "UCiXTAc8sxB6dJ_eotEOy-AQ",
+        "title": "Daft Punk - One More Time [4K Remastered 60fps]",
+        "description": "Daft Punk - One More Time [4K Remastered 60fps] Daft Punk - One More Time 4K Daft Punk - One More Time 4K HD HQ ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/dGnK8wurld4/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/dGnK8wurld4/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/dGnK8wurld4/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "elcoronelGOD",
+        "liveBroadcastContent": "none",
+        "publishTime": "2021-10-30T02:14:44Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "rTlHOZr8tjseo6DNuOxyjhRiOxs",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "BMC8nTo5oJo"
+      },
+      "snippet": {
+        "publishedAt": "2021-02-24T11:23:49Z",
+        "channelId": "UC6isex_888CTMxyNhPTnwQA",
+        "title": "Daft Punk   One More Time (Live)",
+        "description": "Daft Punk One More Time live from Chicago U.S.A.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/BMC8nTo5oJo/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/BMC8nTo5oJo/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/BMC8nTo5oJo/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "LD FOREVER PH Channel",
+        "liveBroadcastContent": "none",
+        "publishTime": "2021-02-24T11:23:49Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "jKolVfolLpN25TN2dRjddr1OMcs",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "fa5IWHDbftI"
+      },
+      "snippet": {
+        "publishedAt": "2014-11-06T03:30:55Z",
+        "channelId": "UCRr1xG_2WIDs18a6cIiCxeA",
+        "title": "One More Time",
+        "description": "Provided to YouTube by Daft Life Ltd./ADA France One More Time \u00b7 Daft Punk Discovery \u2117 2001 Daft Life Limited Drum Machine ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fa5IWHDbftI/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fa5IWHDbftI/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fa5IWHDbftI/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Daft Punk - Topic",
+        "liveBroadcastContent": "none",
+        "publishTime": "2014-11-06T03:30:55Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "zrPwerSYHp3TvUs0PPuNc8qg2LM",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "x7pPi_vo6_I"
+      },
+      "snippet": {
+        "publishedAt": "2024-01-05T16:30:08Z",
+        "channelId": "UCbm6w3nPP-tzZ-BnVQC16OQ",
+        "title": "Daft Punk &#39;One More Time&#39; (Live at The Domain 2023) | ProShot 4K",
+        "description": "Daft Punk 'One More Time' (Live at The Domain 2023) | ProShot 4K (Official Music Video) Watch The ULTIMATE SYNTHONY ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/x7pPi_vo6_I/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/x7pPi_vo6_I/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/x7pPi_vo6_I/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "SYNTHONY",
+        "liveBroadcastContent": "none",
+        "publishTime": "2024-01-05T16:30:08Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "FTgbuRiloxY5wrLJ_SXf-laJ8i8",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "evqx5HLm9iM"
+      },
+      "snippet": {
+        "publishedAt": "2015-06-11T17:07:57Z",
+        "channelId": "UC_kRDKYrUlrbtrSiyu5Tflg",
+        "title": "Daft Punk - One More Time / Aerodynamic (Live 2007 - Official Audio)",
+        "description": "Listen, order & watch now: https://bio.to/daftpunk \u201cOne More Time / Aerodynamic\u201d is taken from \u201cAlive 2007\u201d available on all ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/evqx5HLm9iM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/evqx5HLm9iM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/evqx5HLm9iM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Daft Punk",
+        "liveBroadcastContent": "none",
+        "publishTime": "2015-06-11T17:07:57Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "CCqePGL_bM33v8DYdP8g_puAu18",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "n6RTF4OPzf8"
+      },
+      "snippet": {
+        "publishedAt": "2011-07-14T11:18:11Z",
+        "channelId": "UCi9IQlazL5MB66--RUuGCSA",
+        "title": "Daft Punk - One More Time [HQ]",
+        "description": "Daft Punk - One More Time [HQ]",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/n6RTF4OPzf8/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/n6RTF4OPzf8/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/n6RTF4OPzf8/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Naf' Manson",
+        "liveBroadcastContent": "none",
+        "publishTime": "2011-07-14T11:18:11Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "BFGZTqSlAQdG17nC_-LGdn_8GTY",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "hVrVPBLqGfQ"
+      },
+      "snippet": {
+        "publishedAt": "2021-11-19T23:55:34Z",
+        "channelId": "UC_XgA-uBnnyO_PtrJ4VaKVA",
+        "title": "Daft Punk - One More Time (Lyrics)",
+        "description": "Daft Punk - One More Time (Lyrics)",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/hVrVPBLqGfQ/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/hVrVPBLqGfQ/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/hVrVPBLqGfQ/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "PitchPerfect Channel",
+        "liveBroadcastContent": "none",
+        "publishTime": "2021-11-19T23:55:34Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "_RqdBgZYEmDNmGa5XzS2MhV7jns",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "XrDKdZ2vvjA"
+      },
+      "snippet": {
+        "publishedAt": "2026-03-04T19:00:00Z",
+        "channelId": "UCGLIZ2FnwVo3dSDRV83NCQw",
+        "title": "Fred again.. x Thomas Bangalter (Daft Punk) \u2014 ONE MORE TIME | Ally Pally (USB002 Tour)",
+        "description": "Extracted from the USB002 Tour stop at Ally Pally in London, this clip captures an unforgettable live moment: Fred again..",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/XrDKdZ2vvjA/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/XrDKdZ2vvjA/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/XrDKdZ2vvjA/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Fred Again Content",
+        "liveBroadcastContent": "none",
+        "publishTime": "2026-03-04T19:00:00Z"
+      }
+    }
+  ]
+}

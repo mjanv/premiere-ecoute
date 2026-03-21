@@ -1,0 +1,93 @@
+{
+  "kind": "youtube#videoListResponse",
+  "etag": "gRoU-oMNFqm7f-EZqvLN97qKxuY",
+  "items": [
+    {
+      "kind": "youtube#video",
+      "etag": "OHwnhxn6jK-1h64CIDGHixNPJ7g",
+      "id": "fWxv_yPImZ4",
+      "snippet": {
+        "publishedAt": "2026-03-17T16:30:17Z",
+        "channelId": "UCsmECZ1G4vHMSmH-m6cJBWA",
+        "title": "PREMI\u00c8RE \u00c9COUTE : \"Feel So Good Around U\" de LB aka LABAT (React Live)",
+        "description": "Cette semaine j'ai \u00e9cout\u00e9 et r\u00e9agi \u00e0 chaud au nouvel album \"Feel So Good Around U\" de LB aka LABAT !\n\nNote du streamer: 7.1\nNote du chat: 7.3\n \n0:00 Introduction\n2:05 Feel So Good Around U\n6:41 Skin On The Side\n7:05 Take Me Home\n11:29 Fixated\n15:49 Rave Generator\n18:57 Ocean Drive\n23:10 Pedro In Paris\n23:24 I Never Party in Paris\n26:46 C'est la vie\n30:02 Hola LB\n30:22 C\u00f3mete\n34:07 Rainy Days (but it's all good)\n38:33 Forever Now\n42:27 See U\n50:46 Conclusion\n      \n      \nRESTEZ CURIEUX.SE !\n\n\u25ba ME FAIRE UN DON : https://streamlabs.com/flonflon\n\u25ba PATREON : https://www.patreon.com/flonflon_musique\n\n\u25ba TWITCH : https://www.twitch.tv/flonflon\n\u25ba INSTAGRAM : https://www.instagram.com/flonflon_musique\n\u25ba TWITTER : https://www.twitter.com/benjaminvalbon\u200b\u200b\u200b\n\n#lbakalabat #feelsogoodaroundu #electronicmusic #reviewalbum\u200b\u200b\u200b #critique #react\u200b",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fWxv_yPImZ4/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fWxv_yPImZ4/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fWxv_yPImZ4/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/fWxv_yPImZ4/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/fWxv_yPImZ4/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Flonflon",
+        "tags": [
+          "musique",
+          "review",
+          "react",
+          "album",
+          "twitch",
+          "replay",
+          "flonflon musique",
+          "flonflon",
+          "lb aka labat",
+          "feel so good around u",
+          "because music",
+          "skin on skin",
+          "memphis lk",
+          "amne",
+          "notinbed",
+          "kurt",
+          "mj nebreda",
+          "sam alfred",
+          "dj fuckoff"
+        ],
+        "categoryId": "10",
+        "liveBroadcastContent": "none",
+        "defaultLanguage": "fr",
+        "localized": {
+          "title": "PREMI\u00c8RE \u00c9COUTE : \"Feel So Good Around U\" de LB aka LABAT (React Live)",
+          "description": "Cette semaine j'ai \u00e9cout\u00e9 et r\u00e9agi \u00e0 chaud au nouvel album \"Feel So Good Around U\" de LB aka LABAT !\n\nNote du streamer: 7.1\nNote du chat: 7.3\n \n0:00 Introduction\n2:05 Feel So Good Around U\n6:41 Skin On The Side\n7:05 Take Me Home\n11:29 Fixated\n15:49 Rave Generator\n18:57 Ocean Drive\n23:10 Pedro In Paris\n23:24 I Never Party in Paris\n26:46 C'est la vie\n30:02 Hola LB\n30:22 C\u00f3mete\n34:07 Rainy Days (but it's all good)\n38:33 Forever Now\n42:27 See U\n50:46 Conclusion\n      \n      \nRESTEZ CURIEUX.SE !\n\n\u25ba ME FAIRE UN DON : https://streamlabs.com/flonflon\n\u25ba PATREON : https://www.patreon.com/flonflon_musique\n\n\u25ba TWITCH : https://www.twitch.tv/flonflon\n\u25ba INSTAGRAM : https://www.instagram.com/flonflon_musique\n\u25ba TWITTER : https://www.twitter.com/benjaminvalbon\u200b\u200b\u200b\n\n#lbakalabat #feelsogoodaroundu #electronicmusic #reviewalbum\u200b\u200b\u200b #critique #react\u200b"
+        },
+        "defaultAudioLanguage": "fr"
+      },
+      "contentDetails": {
+        "duration": "PT54M1S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "statistics": {
+        "viewCount": "225",
+        "likeCount": "13",
+        "favoriteCount": "0",
+        "commentCount": "6"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 1
+  }
+}

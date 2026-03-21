@@ -2,6 +2,7 @@ apis = [
   PremiereEcoute.Apis.Streaming.TwitchApi,
   PremiereEcoute.Apis.MusicProvider.SpotifyApi,
   PremiereEcoute.Apis.MusicProvider.DeezerApi,
+  PremiereEcoute.Apis.Video.YoutubeApi,
   PremiereEcoute.Accounts.Mailer,
   PremiereEcouteCore.CommandBus,
   PremiereEcoute.Sessions

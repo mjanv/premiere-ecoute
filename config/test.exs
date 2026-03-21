@@ -43,6 +43,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   buymeacoffee: [
     api: PremiereEcoute.Apis.Payments.BuyMeACoffeeApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Payments.BuyMeACoffeeApi}]
+  ],
+  youtube: [
+    api: PremiereEcoute.Apis.Video.YoutubeApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.Video.YoutubeApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

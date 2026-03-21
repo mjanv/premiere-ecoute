@@ -76,6 +76,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     urls: [
       api: "https://developers.buymeacoffee.com"
     ]
+  ],
+  youtube: [
+    api: PremiereEcoute.Apis.Video.YoutubeApi,
+    urls: [
+      api: "https://www.googleapis.com/youtube/v3"
+    ]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30
