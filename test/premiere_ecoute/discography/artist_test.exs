@@ -106,6 +106,44 @@ defmodule PremiereEcoute.Discography.ArtistTest do
     end
   end
 
+  describe "external_links" do
+    test "stores external links" do
+      {:ok, artist} =
+        Artist.create(artist_fixture(%{external_links: %{"wikipedia" => "https://en.wikipedia.org/wiki/Daft_Punk"}}))
+
+      assert artist.external_links == %{"wikipedia" => "https://en.wikipedia.org/wiki/Daft_Punk"}
+    end
+
+    test "stores multiple external links" do
+      {:ok, artist} =
+        Artist.create(
+          artist_fixture(%{
+            external_links: %{
+              "wikipedia" => "https://en.wikipedia.org/wiki/Daft_Punk",
+              "genius" => "https://genius.com/artists/Daft-punk"
+            }
+          })
+        )
+
+      assert artist.external_links == %{
+               "wikipedia" => "https://en.wikipedia.org/wiki/Daft_Punk",
+               "genius" => "https://genius.com/artists/Daft-punk"
+             }
+    end
+
+    test "defaults to empty map" do
+      {:ok, artist} = Artist.create(artist_fixture())
+
+      assert artist.external_links == %{}
+    end
+
+    test "rejects invalid URLs" do
+      {:error, changeset} = Artist.create(artist_fixture(%{external_links: %{"wikipedia" => "not-a-url"}}))
+
+      assert %{external_links: ["contains invalid URL: not-a-url"]} = Repo.traverse_errors(changeset)
+    end
+  end
+
   describe "delete/1" do
     test "deletes an existing artist" do
       {:ok, %Artist{} = artist} = Artist.create(artist_fixture())

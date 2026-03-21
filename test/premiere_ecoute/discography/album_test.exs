@@ -157,6 +157,79 @@ defmodule PremiereEcoute.Discography.AlbumTest do
     end
   end
 
+  describe "track external_links" do
+    test "stores external links on a track" do
+      {:ok, album} =
+        Album.create(
+          album_fixture(%{
+            tracks: [
+              %Track{
+                provider_ids: %{spotify: "track001"},
+                name: "Track One",
+                track_number: 1,
+                duration_ms: 210_000,
+                external_links: %{"genius" => "https://genius.com/Daft-punk-one-more-time-lyrics"}
+              }
+            ],
+            total_tracks: 1
+          })
+        )
+
+      assert [%Track{external_links: %{"genius" => "https://genius.com/Daft-punk-one-more-time-lyrics"}}] = album.tracks
+    end
+
+    test "rejects invalid URLs on a track" do
+      changeset =
+        Track.changeset(%Track{}, %{
+          provider_ids: %{spotify: "track001"},
+          name: "Track One",
+          track_number: 1,
+          duration_ms: 210_000,
+          external_links: %{"genius" => "not-a-url"}
+        })
+
+      assert %{external_links: ["contains invalid URL: not-a-url"]} = Repo.traverse_errors(changeset)
+    end
+  end
+
+  describe "external_links" do
+    test "stores external links" do
+      {:ok, album} =
+        Album.create(album_fixture(%{external_links: %{"wikipedia" => "https://en.wikipedia.org/wiki/Random_Access_Memories"}}))
+
+      assert album.external_links == %{"wikipedia" => "https://en.wikipedia.org/wiki/Random_Access_Memories"}
+    end
+
+    test "stores multiple external links" do
+      {:ok, album} =
+        Album.create(
+          album_fixture(%{
+            external_links: %{
+              "wikipedia" => "https://en.wikipedia.org/wiki/Random_Access_Memories",
+              "genius" => "https://genius.com/albums/Daft-punk/Random-access-memories"
+            }
+          })
+        )
+
+      assert album.external_links == %{
+               "wikipedia" => "https://en.wikipedia.org/wiki/Random_Access_Memories",
+               "genius" => "https://genius.com/albums/Daft-punk/Random-access-memories"
+             }
+    end
+
+    test "defaults to empty map" do
+      {:ok, album} = Album.create(album_fixture())
+
+      assert album.external_links == %{}
+    end
+
+    test "rejects invalid URLs" do
+      {:error, changeset} = Album.create(album_fixture(%{external_links: %{"wikipedia" => "not-a-url"}}))
+
+      assert %{external_links: ["contains invalid URL: not-a-url"]} = Repo.traverse_errors(changeset)
+    end
+  end
+
   describe "delete/1" do
     test "delete an existing album" do
       {:ok, %Album{} = album} = Album.create(album_fixture())

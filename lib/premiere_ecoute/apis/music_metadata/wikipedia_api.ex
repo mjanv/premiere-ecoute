@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
 
   use PremiereEcouteCore.Api, api: :wikipedia
 
-  @user_agent "PremièreEcoute/1.0 (maxime.janvier@gmail.com)"
+  @user_agent "PremiereEcoute/1.0 (maxime.janvier@gmail.com)"
 
   defmodule Behaviour do
     @moduledoc "Wikipedia API Behaviour"

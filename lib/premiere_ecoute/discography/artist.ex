@@ -39,6 +39,7 @@ defmodule PremiereEcoute.Discography.Artist do
   @type t :: %__MODULE__{
           id: integer() | nil,
           provider_ids: %{optional(atom()) => String.t()},
+          external_links: %{optional(String.t()) => String.t()},
           name: String.t() | nil,
           slug: String.t() | nil,
           images: [Image.t()],
@@ -48,6 +49,7 @@ defmodule PremiereEcoute.Discography.Artist do
 
   schema "artists" do
     field :provider_ids, PremiereEcouteCore.Ecto.Map, default: %{}
+    field :external_links, :map, default: %{}
     field :name, :string
     field :slug, Slug.Type
 
@@ -88,11 +90,29 @@ defmodule PremiereEcoute.Discography.Artist do
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 
+  defp validate_external_links(%Ecto.Changeset{} = changeset) do
+    case get_change(changeset, :external_links) do
+      nil -> changeset
+      links -> Enum.reduce(links, changeset, &validate_link/2)
+    end
+  end
+
+  defp validate_link({_key, nil}, changeset), do: changeset
+
+  defp validate_link({_key, url}, changeset) do
+    if url =~ ~r/\Ahttps?:\/\/.+/i do
+      changeset
+    else
+      add_error(changeset, :external_links, "contains invalid URL: #{url}")
+    end
+  end
+
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(artist, attrs) do
     artist
-    |> cast(attrs, [:provider_ids, :name])
+    |> cast(attrs, [:provider_ids, :external_links, :name])
     |> validate_required([:name])
+    |> validate_external_links()
     |> unique_constraint(:name)
     |> cast_embed(:images)
     |> Slug.maybe_generate_slug()

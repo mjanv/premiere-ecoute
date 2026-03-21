@@ -35,6 +35,26 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Artists do
   end
 
   @doc """
+  Searches Deezer for artists matching a name.
+
+  Returns up to 5 results with deezer_id, name, and nb_fan.
+  """
+  @spec search_artist(String.t()) :: {:ok, [map()]} | {:error, term()}
+  def search_artist(name) when is_binary(name) do
+    DeezerApi.api()
+    |> DeezerApi.get(url: "/search/artist", params: [q: name, limit: 5])
+    |> DeezerApi.handle(200, fn %{"data" => items} ->
+      Enum.map(items, fn a ->
+        %{
+          deezer_id: to_string(a["id"]),
+          name: a["name"],
+          nb_fan: a["nb_fan"]
+        }
+      end)
+    end)
+  end
+
+  @doc """
   Fetches albums for an artist by Deezer ID.
 
   Returns a list of album maps (without tracks).

@@ -26,6 +26,7 @@ defmodule PremiereEcoute.Discography.Album do
   @type t :: %__MODULE__{
           id: integer() | nil,
           provider_ids: %{atom() => String.t()},
+          external_links: %{optional(String.t()) => String.t()},
           name: String.t() | nil,
           artist: Artist.t() | String.t() | nil,
           release_date: Date.t() | nil,
@@ -39,6 +40,7 @@ defmodule PremiereEcoute.Discography.Album do
 
   schema "albums" do
     field :provider_ids, PremiereEcouteCore.Ecto.Map, default: %{}
+    field :external_links, :map, default: %{}
     field :name, :string
     field :slug, Slug.Type
     field :release_date, :date
@@ -60,8 +62,9 @@ defmodule PremiereEcoute.Discography.Album do
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(album, attrs) do
     album
-    |> cast(attrs, [:provider_ids, :name, :release_date, :cover_url, :total_tracks])
+    |> cast(attrs, [:provider_ids, :external_links, :name, :release_date, :cover_url, :total_tracks])
     |> validate_required([:provider_ids, :name, :total_tracks])
+    |> validate_external_links()
     |> validate_number(:total_tracks, greater_than: 0)
     |> foreign_key_constraint(:listening_sessions,
       name: :listening_sessions_album_id_fkey,
@@ -172,5 +175,22 @@ defmodule PremiereEcoute.Discography.Album do
     tracks
     |> Enum.map(&(&1.duration_ms || 0))
     |> Enum.sum()
+  end
+
+  defp validate_external_links(%Ecto.Changeset{} = changeset) do
+    case get_change(changeset, :external_links) do
+      nil -> changeset
+      links -> Enum.reduce(links, changeset, &validate_link/2)
+    end
+  end
+
+  defp validate_link({_key, nil}, changeset), do: changeset
+
+  defp validate_link({_key, url}, changeset) do
+    if url =~ ~r/\Ahttps?:\/\/.+/i do
+      changeset
+    else
+      add_error(changeset, :external_links, "contains invalid URL: #{url}")
+    end
   end
 end
