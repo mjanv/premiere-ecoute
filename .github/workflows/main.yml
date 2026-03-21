@@ -129,6 +129,8 @@ jobs:
           RESEND_API_KEY=${RESEND_API_KEY}
           OPENAI_API_KEY=${OPENAI_API_KEY}
           SENTRY_DSN=${SENTRY_DSN}
+          YOUTUBE_DATA_API_V3_KEY=${YOUTUBE_DATA_API_V3_KEY}
+          GENIUS_ACCESS_TOKEN=${GENIUS_ACCESS_TOKEN}
 
           # Feature Flags Auth
           AUTH_USERNAME=${AUTH_USERNAME}
@@ -159,6 +161,8 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          YOUTUBE_DATA_API_V3_KEY: ${{ secrets.YOUTUBE_DATA_API_V3_KEY }}
+          GENIUS_ACCESS_TOKEN: ${{ secrets.GENIUS_ACCESS_TOKEN }}
           AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
           GRAFANA_HOST: ${{ secrets.GRAFANA_HOST }}
