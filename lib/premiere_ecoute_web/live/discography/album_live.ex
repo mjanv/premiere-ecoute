@@ -6,6 +6,8 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
 
   use PremiereEcouteWeb, :live_view
 
+  alias PremiereEcoute.Apis.Lyrics.GeniusApi
+  alias PremiereEcoute.Apis.Video.YoutubeApi
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
@@ -38,7 +40,11 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
        |> assign(:liked_ids, liked_ids)
        |> assign(:review_modal_open, false)
        |> assign(:review_form, nil)
-       |> assign(:editing_review, nil)}
+       |> assign(:editing_review, nil)
+       |> assign(:track_modal_open, false)
+       |> assign(:selected_track, nil)
+       |> assign(:genius_result, nil)
+       |> assign(:youtube_video_id, nil)}
     end
   end
 
@@ -168,6 +174,48 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
     else
       {:noreply, put_flash(socket, :error, gettext("You must be logged in to like a review"))}
     end
+  end
+
+  @impl true
+  def handle_event("open_track_modal", %{"name" => name, "artist" => artist}, socket) do
+    # AIDEV-NOTE: runs Genius + YouTube searches in parallel via Task.async
+    genius_task =
+      Task.async(fn ->
+        with {:ok, [first | _]} <- GeniusApi.search_song("#{name} #{artist}"),
+             {:ok, song} <- GeniusApi.get_song(first.id) do
+          song
+        else
+          _ -> nil
+        end
+      end)
+
+    youtube_task =
+      Task.async(fn ->
+        case YoutubeApi.search_track_videos("#{name} #{artist} lyrics") do
+          {:ok, [first | _]} -> first.id
+          _ -> nil
+        end
+      end)
+
+    genius_result = Task.await(genius_task, 10_000)
+    youtube_video_id = Task.await(youtube_task, 10_000)
+
+    {:noreply,
+     socket
+     |> assign(:track_modal_open, true)
+     |> assign(:selected_track, %{name: name, artist: artist})
+     |> assign(:genius_result, genius_result)
+     |> assign(:youtube_video_id, youtube_video_id)}
+  end
+
+  @impl true
+  def handle_event("close_track_modal", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:track_modal_open, false)
+     |> assign(:selected_track, nil)
+     |> assign(:genius_result, nil)
+     |> assign(:youtube_video_id, nil)}
   end
 
   defp reload_reviews(socket, album_id, user) do

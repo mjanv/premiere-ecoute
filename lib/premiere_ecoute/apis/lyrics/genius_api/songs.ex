@@ -38,6 +38,7 @@ defmodule PremiereEcoute.Apis.Lyrics.GeniusApi.Songs do
         lyrics_owner_id: song["lyrics_owner_id"],
         lyrics_marked_complete_by: song["lyrics_marked_complete_by"],
         lyrics_marked_staff_approved_by: song["lyrics_marked_staff_approved_by"],
+        embed_content: song["embed_content"],
         translations:
           Enum.map(song["translation_songs"] || [], fn t ->
             %{id: t["id"], language: t["language"], title: t["title"], url: t["url"]}
