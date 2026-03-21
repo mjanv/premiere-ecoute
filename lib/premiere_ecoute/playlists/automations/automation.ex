@@ -97,7 +97,7 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
   end
 
   @doc "Gets a single automation by id with virtual fields populated."
-  @spec get_with_virtual_fields(User.t(), t()) :: t() | nil
+  @spec get_with_virtual_fields(User.t(), t() | integer()) :: t() | nil
   def get_with_virtual_fields(%User{} = user, id) when is_integer(id) do
     get_with_virtual_fields(user, %__MODULE__{id: id})
   end

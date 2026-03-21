@@ -16,6 +16,6 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearch do
       Album.all(where: [name: name])
       |> Enum.map(fn album -> Map.take(album, [:name, :release_date, :total_tracks]) end)
 
-    {:reply, Response.json(Response.tool(), albums), frame}
+    {:reply, Response.json(Response.tool(), %{albums: albums}), frame}
   end
 end

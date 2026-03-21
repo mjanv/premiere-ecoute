@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
   Runs each enrichment source independently. Returns `{:ok, artist}` with the
   final state of the artist after all sources have been attempted.
   """
-  @spec enrich_artist(Artist.t()) :: {:ok, Artist.t()}
+  @spec enrich_artist(Artist.t()) :: {:ok, Artist.t()} | {:error, term()}
   def enrich_artist(%Artist{} = artist) do
     {:ok, artist}
     |> enrich_wikipedia()
@@ -50,6 +50,8 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
   end
 
   # Genius — stores artist URL in external_links["genius"], nil sentinel on not found
+  defp enrich_genius({:error, _} = error), do: error
+
   defp enrich_genius({:ok, %Artist{external_links: %{"genius" => _}} = artist}) do
     {:ok, artist}
   end
@@ -70,6 +72,8 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
   end
 
   # Deezer — stores deezer ID in provider_ids[:deezer], nil sentinel on not found
+  defp enrich_deezer({:error, _} = error), do: error
+
   defp enrich_deezer({:ok, %Artist{provider_ids: %{deezer: _}} = artist}) do
     {:ok, artist}
   end
@@ -90,6 +94,8 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
   end
 
   # Spotify — stores spotify ID in provider_ids[:spotify], nil sentinel on not found
+  defp enrich_spotify({:error, _} = error), do: error
+
   defp enrich_spotify({:ok, %Artist{provider_ids: %{spotify: _}} = artist}) do
     {:ok, artist}
   end

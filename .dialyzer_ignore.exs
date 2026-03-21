@@ -1,20 +1,13 @@
 [
-  {"lib/premiere_ecoute/apis/music_provider/spotify_api/parser.ex", :unknown_type},
   {"lib/premiere_ecoute/collections/collection_session.ex", :call_without_opaque},
   {"lib/premiere_ecoute/discography/artist.ex", :call_without_opaque},
-  {"lib/premiere_ecoute/discography/artist.ex", :unknown_type},
   {"lib/premiere_ecoute/discography/single.ex", :call_without_opaque},
   {"lib/premiere_ecoute/discography/single.ex", :pattern_match},
-  {"lib/premiere_ecoute/notifications/dispatcher.ex", :unknown_type},
   {"lib/premiere_ecoute/notifications/notification.ex", :call_without_opaque},
   {"lib/premiere_ecoute/sessions/listening_session.ex", :pattern_match},
   {"lib/premiere_ecoute/sessions/listening_session/review.ex", :call_without_opaque},
   {"lib/premiere_ecoute/twitch/history/site_history/minute_watched.ex", :no_return},
   {"lib/premiere_ecoute/twitch/history/site_history/minute_watched.ex", :call},
-  {"lib/premiere_ecoute_web/controllers/extension/track_controller.ex", :pattern_match},
-  {"lib/premiere_ecoute_web/controllers/extension/track_controller.ex", :pattern_match_cov},
-  {"lib/premiere_ecoute_web/mcp/components/album_search.ex", :no_return},
-  {"lib/premiere_ecoute_web/mcp/components/album_search.ex", :call},
   {"lib/premiere_ecoute/gettext.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/user.ex", :call_without_opaque},
   {"lib/premiere_ecoute/accounts/user/consent.ex", :call_without_opaque},
@@ -45,8 +38,5 @@
   {"lib/premiere_ecoute/radio/radio_track.ex", :call_without_opaque},
   {"lib/premiere_ecoute_web/components/core_components.ex", :call_without_opaque},
   {"lib/premiere_ecoute_web/components/cards/modal.ex", :call_without_opaque},
-  {"lib/premiere_ecoute_web/layouts/layouts.ex", :call_with_opaque},
-  {"lib/premiere_ecoute_web/live/playlists/automations/form_live.ex", :call},
-  {"lib/premiere_ecoute_web/live/playlists/automations/show_live.ex", :no_return},
-  {"lib/premiere_ecoute_web/live/playlists/automations/show_live.ex", :call}
+  {"lib/premiere_ecoute_web/layouts/layouts.ex", :call_with_opaque}
 ]

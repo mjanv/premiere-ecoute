@@ -94,6 +94,7 @@ defmodule PremiereEcoute.Playlists.Automations.Action do
 
       Module.register_attribute(__MODULE__, :action_id, accumulate: false)
       Module.register_attribute(__MODULE__, :action_description, accumulate: false)
+      @action_description ""
       Module.register_attribute(__MODULE__, :action_inputs, accumulate: true)
       Module.register_attribute(__MODULE__, :action_outputs, accumulate: true)
 
@@ -173,7 +174,7 @@ defmodule PremiereEcoute.Playlists.Automations.Action do
       def meta do
         %{
           id: @action_id,
-          description: @action_description || "",
+          description: @action_description,
           inputs: Enum.reverse(@action_inputs),
           outputs: Enum.reverse(@action_outputs)
         }

@@ -15,7 +15,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
     # Search for the album
     assert {:reply, resp, ^frame} = AlbumSearch.execute(%{name: "Test Album"}, frame)
     assert %Hermes.Server.Response{type: :tool, content: [%{"text" => json_str, "type" => "text"}]} = resp
-    assert {:ok, albums} = Jason.decode(json_str)
+    assert {:ok, %{"albums" => albums}} = Jason.decode(json_str)
     assert [album_data] = albums
     assert album_data["name"] == "Test Album"
     assert album_data["total_tracks"] == 12
@@ -28,7 +28,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
     # Search for non-existent album
     assert {:reply, resp, ^frame} = AlbumSearch.execute(%{name: "Nonexistent Album"}, frame)
     assert %Hermes.Server.Response{type: :tool, content: [%{"text" => json_str, "type" => "text"}]} = resp
-    assert {:ok, albums} = Jason.decode(json_str)
+    assert {:ok, %{"albums" => albums}} = Jason.decode(json_str)
     assert albums == []
   end
 
@@ -49,7 +49,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
     # Search for the album with exact name
     assert {:reply, resp, ^frame} = AlbumSearch.execute(%{name: "Kind Of Blue"}, frame)
     assert %Hermes.Server.Response{type: :tool, content: [%{"text" => json_str, "type" => "text"}]} = resp
-    assert {:ok, albums} = Jason.decode(json_str)
+    assert {:ok, %{"albums" => albums}} = Jason.decode(json_str)
     assert [album_data] = albums
     assert album_data["name"] == "Kind Of Blue"
     assert album_data["total_tracks"] == 5
@@ -63,7 +63,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
 
     assert {:reply, resp, ^frame} = AlbumSearch.execute(%{name: "My Album"}, frame)
     assert %Hermes.Server.Response{type: :tool, content: [%{"text" => json_str, "type" => "text"}]} = resp
-    assert {:ok, [album_data]} = Jason.decode(json_str)
+    assert {:ok, %{"albums" => [album_data]}} = Jason.decode(json_str)
 
     # Verify only expected fields are present
     assert Map.has_key?(album_data, "name")

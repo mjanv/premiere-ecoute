@@ -24,6 +24,12 @@ defmodule PremiereEcoute.Discography.Artist do
     use Ecto.Schema
     import Ecto.Changeset
 
+    @type t :: %__MODULE__{
+            url: String.t() | nil,
+            height: integer() | nil,
+            width: integer() | nil
+          }
+
     @primary_key false
     embedded_schema do
       field :url, :string
