@@ -88,6 +88,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     urls: [
       api: "https://api.genius.com"
     ]
+  ],
+  musicbrainz: [
+    api: PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi,
+    urls: [
+      api: "https://musicbrainz.org/ws/2"
+    ]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 30

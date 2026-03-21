@@ -1,0 +1,1207 @@
+{
+  "id": "48117b90-a16e-34ca-a514-19c702df1158",
+  "secondary-type-ids": [],
+  "secondary-types": [],
+  "artist-credit": [
+    {
+      "name": "Daft Punk",
+      "joinphrase": "",
+      "artist": {
+        "name": "Daft Punk",
+        "disambiguation": "French electronic duo",
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "country": "FR",
+        "type": "Group",
+        "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+        "sort-name": "Daft Punk"
+      }
+    }
+  ],
+  "title": "Discovery",
+  "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+  "first-release-date": "2001-02-26",
+  "releases": [
+    {
+      "country": "AU",
+      "barcode": "934065017098",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "title": "Discovery",
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "date": "2001-02-26",
+      "release-events": [
+        {
+          "area": {
+            "type": null,
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "sort-name": "Australia",
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "disambiguation": "",
+            "name": "Australia",
+            "type-id": null
+          },
+          "date": "2001-02-26"
+        }
+      ],
+      "disambiguation": "",
+      "text-representation": {
+        "script": "Latn",
+        "language": null
+      },
+      "artist-credit": [
+        {
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo"
+          },
+          "joinphrase": "",
+          "name": "Daft Punk"
+        }
+      ],
+      "id": "bd3bb36e-16c8-438f-850e-dfbf4d1478f0"
+    },
+    {
+      "title": "Discovery",
+      "country": "FR",
+      "barcode": "724384960629",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "id": "d073287b-d1bd-4f11-a933-a4386f8cf701",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "type": "Group",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "iso-3166-1-codes": [
+              "FR"
+            ],
+            "type": null,
+            "id": "08310658-51eb-3801-80de-5a0739207115",
+            "sort-name": "France",
+            "name": "France",
+            "disambiguation": "",
+            "type-id": null
+          },
+          "date": "2001-02-26"
+        },
+        {
+          "date": "2001-03-12",
+          "area": {
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type": null,
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "sort-name": "Europe",
+            "name": "Europe",
+            "disambiguation": "",
+            "type-id": null
+          }
+        }
+      ],
+      "disambiguation": "",
+      "date": "2001-02-26"
+    },
+    {
+      "title": "Discovery",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "country": "XW",
+      "barcode": "0724384960650",
+      "id": "6cd30d99-4923-4d5e-8e51-9d87506976f1",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "joinphrase": "",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk"
+          }
+        }
+      ],
+      "date": "2001-03-07",
+      "release-events": [
+        {
+          "area": {
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+            "sort-name": "[Worldwide]",
+            "iso-3166-1-codes": [
+              "XW"
+            ],
+            "type": null,
+            "type-id": null,
+            "name": "[Worldwide]",
+            "disambiguation": ""
+          },
+          "date": "2001-03-07"
+        }
+      ],
+      "disambiguation": "",
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "packaging": "None",
+      "quality": "normal"
+    },
+    {
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "release-events": [
+        {
+          "date": "2001-03-10",
+          "area": {
+            "disambiguation": "",
+            "name": "Japan",
+            "type-id": null,
+            "type": null,
+            "iso-3166-1-codes": [
+              "JP"
+            ],
+            "sort-name": "Japan",
+            "id": "2db42837-c832-3c27-b4a3-08198f75693c"
+          }
+        }
+      ],
+      "disambiguation": "1st pressing",
+      "date": "2001-03-10",
+      "artist-credit": [
+        {
+          "artist": {
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk"
+          },
+          "joinphrase": "",
+          "name": "Daft Punk"
+        }
+      ],
+      "text-representation": {
+        "language": null,
+        "script": null
+      },
+      "id": "ab5ca495-8983-41b9-86b4-46a981d173be",
+      "country": "JP",
+      "barcode": "4988006788367",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "title": "Discovery"
+    },
+    {
+      "packaging": null,
+      "packaging-id": null,
+      "quality": "normal",
+      "date": "2001-03-10",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "date": "2001-03-10",
+          "area": {
+            "type-id": null,
+            "name": "Japan",
+            "disambiguation": "",
+            "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+            "sort-name": "Japan",
+            "iso-3166-1-codes": [
+              "JP"
+            ],
+            "type": null
+          }
+        }
+      ],
+      "id": "51467269-3122-3d7e-92b2-0f0a694d30c1",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk"
+          },
+          "name": "Daft Punk"
+        }
+      ],
+      "barcode": "4988006788367",
+      "country": "JP",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "title": "Discovery"
+    },
+    {
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "id": "098060d4-ba3c-469d-88b0-08642261c7ab",
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "date": "2001-03-12",
+          "area": {
+            "sort-name": "Europe",
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "type": null,
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type-id": null,
+            "disambiguation": "",
+            "name": "Europe"
+          }
+        }
+      ],
+      "date": "2001-03-12",
+      "title": "Discovery",
+      "barcode": "724354278228",
+      "country": "XE",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official"
+    },
+    {
+      "quality": "normal",
+      "packaging-id": null,
+      "packaging": null,
+      "date": "2001-03-12",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "area": {
+            "type": null,
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "sort-name": "Europe",
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "disambiguation": "",
+            "name": "Europe",
+            "type-id": null
+          },
+          "date": "2001-03-12"
+        }
+      ],
+      "text-representation": {
+        "script": null,
+        "language": null
+      },
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "type": "Group",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+          },
+          "name": "Daft Punk"
+        }
+      ],
+      "id": "4375a6b0-cd50-4f59-be32-13161c0fc448",
+      "country": "XE",
+      "barcode": "724384960629",
+      "status": null,
+      "status-id": null,
+      "title": "Discovery"
+    },
+    {
+      "barcode": "724381008829",
+      "country": "GB",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "title": "Discovery",
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "date": "2001-03-12",
+      "release-events": [
+        {
+          "area": {
+            "disambiguation": "",
+            "name": "United Kingdom",
+            "type-id": null,
+            "type": null,
+            "iso-3166-1-codes": [
+              "GB"
+            ],
+            "sort-name": "United Kingdom",
+            "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+          },
+          "date": "2001-03-12"
+        }
+      ],
+      "disambiguation": "",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "type": "Group",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+          },
+          "name": "Daft Punk"
+        }
+      ],
+      "id": "44e85a85-77d7-3e2e-8416-65a27d2aef68"
+    },
+    {
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "packaging": "Jewel Case",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "name": "United States",
+            "disambiguation": "",
+            "type-id": null,
+            "iso-3166-1-codes": [
+              "US"
+            ],
+            "type": null,
+            "id": "489ce91b-6658-3307-9877-795b68554c98",
+            "sort-name": "United States"
+          },
+          "date": "2001-03-13"
+        }
+      ],
+      "disambiguation": "",
+      "date": "2001-03-13",
+      "id": "5ad66522-edce-3a77-b5fa-7956ee879239",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "joinphrase": "",
+          "artist": {
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "type": "Group",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+          }
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "country": "US",
+      "barcode": "724384960629",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "title": "Discovery"
+    },
+    {
+      "barcode": "724384960612",
+      "country": "FR",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "title": "Discovery",
+      "quality": "normal",
+      "packaging": null,
+      "packaging-id": null,
+      "release-events": [
+        {
+          "date": "2001-10-03",
+          "area": {
+            "type-id": null,
+            "disambiguation": "",
+            "name": "France",
+            "sort-name": "France",
+            "id": "08310658-51eb-3801-80de-5a0739207115",
+            "type": null,
+            "iso-3166-1-codes": [
+              "FR"
+            ]
+          }
+        },
+        {
+          "area": {
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type": null,
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "sort-name": "Europe",
+            "name": "Europe",
+            "disambiguation": "",
+            "type-id": null
+          },
+          "date": "2001"
+        }
+      ],
+      "disambiguation": "",
+      "date": "2001-10-03",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "id": "ac7518c6-b630-4761-99c7-6a94cc35a594"
+    },
+    {
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "country": "CA",
+      "barcode": "724384960629",
+      "title": "Discovery",
+      "date": "2001",
+      "release-events": [
+        {
+          "area": {
+            "type-id": null,
+            "name": "Canada",
+            "disambiguation": "",
+            "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+            "sort-name": "Canada",
+            "iso-3166-1-codes": [
+              "CA"
+            ],
+            "type": null
+          },
+          "date": "2001"
+        }
+      ],
+      "disambiguation": "",
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "id": "6b6628a6-59a2-4284-86fc-8f2d24cb7b7e"
+    },
+    {
+      "title": "Discovery",
+      "barcode": "724384960605",
+      "country": "XE",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "joinphrase": "",
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group"
+          }
+        }
+      ],
+      "id": "30e45d86-707d-4042-9df5-93724557aadb",
+      "quality": "normal",
+      "packaging": null,
+      "packaging-id": null,
+      "date": "2001",
+      "release-events": [
+        {
+          "area": {
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "sort-name": "Europe",
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type": null,
+            "type-id": null,
+            "name": "Europe",
+            "disambiguation": ""
+          },
+          "date": "2001"
+        }
+      ],
+      "disambiguation": ""
+    },
+    {
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "packaging": "Jewel Case",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2001",
+          "area": {
+            "type-id": null,
+            "disambiguation": "",
+            "name": "Mexico",
+            "sort-name": "Mexico",
+            "id": "3e08b2cd-69f3-317c-b1e4-e71be581839e",
+            "type": null,
+            "iso-3166-1-codes": [
+              "MX"
+            ]
+          }
+        }
+      ],
+      "disambiguation": "",
+      "date": "2001",
+      "id": "5654ace8-fd02-4471-a14c-bd6781cf2277",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "type": "Group",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+          },
+          "name": "Daft Punk"
+        }
+      ],
+      "country": "MX",
+      "barcode": "724381001721",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "title": "Discovery"
+    },
+    {
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "barcode": "724381001721",
+      "country": "AU",
+      "title": "Discovery",
+      "release-events": [
+        {
+          "area": {
+            "type": null,
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "sort-name": "Australia",
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "disambiguation": "",
+            "name": "Australia",
+            "type-id": null
+          },
+          "date": "2005"
+        }
+      ],
+      "disambiguation": "",
+      "date": "2005",
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo"
+          },
+          "name": "Daft Punk"
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "id": "8343b377-ea18-4d64-b5f6-ffaf55d8f55b"
+    },
+    {
+      "title": "\u30c7\u30a3\u30b9\u30ab\u30d0\u30ea / Discovery",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "country": "JP",
+      "barcode": "4943674164011",
+      "text-representation": {
+        "script": "Jpan",
+        "language": "jpn"
+      },
+      "artist-credit": [
+        {
+          "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+          "joinphrase": "",
+          "artist": {
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "type": "Group",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+          }
+        }
+      ],
+      "id": "74ccb54a-1b24-41a6-a25f-a877e0774fc9",
+      "date": "2014-01-29",
+      "disambiguation": "Forever Young Campaign",
+      "release-events": [
+        {
+          "area": {
+            "name": "Japan",
+            "disambiguation": "",
+            "type-id": null,
+            "iso-3166-1-codes": [
+              "JP"
+            ],
+            "type": null,
+            "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+            "sort-name": "Japan"
+          },
+          "date": "2014-01-29"
+        }
+      ],
+      "quality": "normal",
+      "packaging": null,
+      "packaging-id": null
+    },
+    {
+      "release-events": [
+        {
+          "date": "2014",
+          "area": {
+            "id": "489ce91b-6658-3307-9877-795b68554c98",
+            "sort-name": "United States",
+            "iso-3166-1-codes": [
+              "US"
+            ],
+            "type": null,
+            "type-id": null,
+            "name": "United States",
+            "disambiguation": ""
+          }
+        }
+      ],
+      "disambiguation": "",
+      "date": "2014",
+      "quality": "normal",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "packaging": "Jewel Case",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "type": "Group",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "id": "c80cdcf0-0b8d-4c40-bbbb-54b286fd9a21",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "barcode": "724384960629",
+      "country": "US",
+      "title": "Discovery"
+    },
+    {
+      "quality": "normal",
+      "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+      "packaging": "Gatefold Cover",
+      "release-events": [
+        {
+          "area": {
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "sort-name": "Europe",
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type": null,
+            "type-id": null,
+            "name": "Europe",
+            "disambiguation": ""
+          },
+          "date": "2021-12-17"
+        }
+      ],
+      "disambiguation": "",
+      "date": "2021-12-17",
+      "text-representation": {
+        "language": null,
+        "script": null
+      },
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "type": "Group",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "id": "b078d70c-d2eb-489a-a8f8-e322af35dedf",
+      "country": "XE",
+      "barcode": "0190296617164",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "title": "Discovery"
+    },
+    {
+      "id": "488477d8-10b4-47fe-a482-549f011406a5",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "joinphrase": "",
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group"
+          }
+        }
+      ],
+      "disambiguation": "",
+      "release-events": [
+        {
+          "date": "2021",
+          "area": {
+            "sort-name": "Europe",
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "type": null,
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type-id": null,
+            "disambiguation": "",
+            "name": "Europe"
+          }
+        }
+      ],
+      "date": "2021",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "packaging": "Jewel Case",
+      "quality": "normal",
+      "title": "Discovery",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "barcode": "0190296610424",
+      "country": "XE"
+    },
+    {
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "release-events": [
+        {
+          "date": "2021",
+          "area": {
+            "type": null,
+            "iso-3166-1-codes": [
+              "DE"
+            ],
+            "sort-name": "Germany",
+            "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+            "disambiguation": "",
+            "name": "Germany",
+            "type-id": null
+          }
+        }
+      ],
+      "disambiguation": "",
+      "date": "2021",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "text-representation": {
+        "script": null,
+        "language": null
+      },
+      "id": "a1be7f50-6fbb-4251-8de3-3bb54d168d7f",
+      "barcode": "0190296610424",
+      "country": "DE",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "title": "Discovery"
+    },
+    {
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "barcode": "0190296617164",
+      "country": "XE",
+      "title": "Discovery",
+      "date": "2022",
+      "release-events": [
+        {
+          "area": {
+            "type": null,
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "sort-name": "Europe",
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "disambiguation": "",
+            "name": "Europe",
+            "type-id": null
+          },
+          "date": "2022"
+        }
+      ],
+      "disambiguation": "Made in Poland",
+      "packaging-id": null,
+      "packaging": null,
+      "quality": "normal",
+      "id": "fcbe492b-c203-48c6-b15e-ae60122404bd",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "artist-credit": [
+        {
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group"
+          },
+          "joinphrase": "",
+          "name": "Daft Punk"
+        }
+      ]
+    },
+    {
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "barcode": "0190296617164",
+      "country": "XE",
+      "title": "Discovery",
+      "date": "2023",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "area": {
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type": null,
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "sort-name": "Europe",
+            "name": "Europe",
+            "disambiguation": "",
+            "type-id": null
+          },
+          "date": "2023"
+        }
+      ],
+      "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+      "packaging": "Gatefold Cover",
+      "quality": "normal",
+      "id": "5125fa48-f5dc-4fe4-9e4e-8c0cb719ce03",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "joinphrase": "",
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group"
+          }
+        }
+      ]
+    },
+    {
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "type": "Group",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR"
+          },
+          "name": "Daft Punk"
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "id": "8d28a4da-8077-4cae-a0a1-2d16c4923775",
+      "quality": "normal",
+      "packaging": "None",
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "date": "2024-10-08",
+      "release-events": [
+        {
+          "area": {
+            "disambiguation": "",
+            "name": "[Worldwide]",
+            "type-id": null,
+            "type": null,
+            "iso-3166-1-codes": [
+              "XW"
+            ],
+            "sort-name": "[Worldwide]",
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f"
+          },
+          "date": "2024-10-08"
+        }
+      ],
+      "disambiguation": "Interstellar 5555 artwork",
+      "title": "Discovery",
+      "country": "XW",
+      "barcode": "724384960650",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+    },
+    {
+      "title": "\u30c7\u30a3\u30b9\u30ab\u30d0\u30ea\u30fc",
+      "barcode": "0085365227255",
+      "country": "XW",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "artist-credit": [
+        {
+          "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+          "joinphrase": "",
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "sort-name": "Daft Punk",
+            "type": "Group"
+          }
+        }
+      ],
+      "text-representation": {
+        "language": null,
+        "script": null
+      },
+      "id": "89643cd8-4664-4ea0-9cde-2564d26231a9",
+      "quality": "normal",
+      "packaging-id": null,
+      "packaging": null,
+      "date": "2024-12-13",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "date": "2024-12-13",
+          "area": {
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+            "sort-name": "[Worldwide]",
+            "iso-3166-1-codes": [
+              "XW"
+            ],
+            "type": null,
+            "type-id": null,
+            "name": "[Worldwide]",
+            "disambiguation": ""
+          }
+        }
+      ]
+    },
+    {
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "status": "Official",
+      "country": "XW",
+      "barcode": "724384960650",
+      "title": "Discovery",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "area": {
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+            "sort-name": "[Worldwide]",
+            "iso-3166-1-codes": [
+              "XW"
+            ],
+            "type": null,
+            "type-id": null,
+            "name": "[Worldwide]",
+            "disambiguation": ""
+          },
+          "date": ""
+        }
+      ],
+      "date": "",
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "packaging": "None",
+      "quality": "normal",
+      "id": "759badcf-306b-467a-8028-676c58324cfe",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      }
+    }
+  ],
+  "disambiguation": "",
+  "primary-type": "Album"
+}

@@ -51,6 +51,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   genius: [
     api: PremiereEcoute.Apis.Lyrics.GeniusApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Lyrics.GeniusApi}]
+  ],
+  musicbrainz: [
+    api: PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

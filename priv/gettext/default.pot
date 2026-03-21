@@ -327,7 +327,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_live.html.heex:7
 #, elixir-autogen, elixir-format
-msgid "Admin Dashboard"
+msgid "Dashboard"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:78

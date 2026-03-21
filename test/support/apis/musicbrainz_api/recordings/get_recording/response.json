@@ -1,0 +1,1257 @@
+{
+  "artist-credit": [
+    {
+      "name": "Daft Punk",
+      "artist": {
+        "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+        "type": "Group",
+        "disambiguation": "French electronic duo",
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "country": "FR",
+        "name": "Daft Punk",
+        "sort-name": "Daft Punk"
+      },
+      "joinphrase": ""
+    }
+  ],
+  "title": "One More Time",
+  "length": 320840,
+  "video": false,
+  "disambiguation": "",
+  "id": "60fa767a-d85d-4991-82bc-4294e0b11ae7",
+  "releases": [
+    {
+      "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "country": "GB",
+      "id": "4a9e65ec-c732-40a2-b824-4ccb49751717",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2000",
+          "area": {
+            "name": "United Kingdom",
+            "sort-name": "United Kingdom",
+            "type-id": null,
+            "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+            "iso-3166-1-codes": [
+              "GB"
+            ],
+            "type": null,
+            "disambiguation": ""
+          }
+        }
+      ],
+      "packaging": "Cardboard/Paper Sleeve",
+      "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+      "disambiguation": "",
+      "title": "One More Time",
+      "date": "2000",
+      "barcode": null,
+      "status": "Promotion",
+      "artist-credit": [
+        {
+          "artist": {
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR"
+          },
+          "name": "Daft Punk",
+          "joinphrase": ""
+        }
+      ]
+    },
+    {
+      "disambiguation": "",
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "id": "bd3bb36e-16c8-438f-850e-dfbf4d1478f0",
+      "release-events": [
+        {
+          "area": {
+            "type-id": null,
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "type": null,
+            "disambiguation": "",
+            "name": "Australia",
+            "sort-name": "Australia"
+          },
+          "date": "2001-02-26"
+        }
+      ],
+      "quality": "normal",
+      "country": "AU",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "script": "Latn",
+        "language": null
+      },
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Daft Punk",
+          "artist": {
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "disambiguation": "French electronic duo",
+            "type": "Group",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR"
+          }
+        }
+      ],
+      "title": "Discovery",
+      "date": "2001-02-26",
+      "status": "Official",
+      "barcode": "934065017098"
+    },
+    {
+      "status": "Official",
+      "barcode": "724384960629",
+      "title": "Discovery",
+      "date": "2001-02-26",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Daft Punk",
+          "artist": {
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk"
+          }
+        }
+      ],
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "country": "FR",
+      "release-events": [
+        {
+          "area": {
+            "id": "08310658-51eb-3801-80de-5a0739207115",
+            "iso-3166-1-codes": [
+              "FR"
+            ],
+            "type": null,
+            "disambiguation": "",
+            "type-id": null,
+            "name": "France",
+            "sort-name": "France"
+          },
+          "date": "2001-02-26"
+        },
+        {
+          "area": {
+            "name": "Europe",
+            "sort-name": "Europe",
+            "type-id": null,
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "type": null,
+            "disambiguation": ""
+          },
+          "date": "2001-03-12"
+        }
+      ],
+      "quality": "normal",
+      "id": "d073287b-d1bd-4f11-a933-a4386f8cf701",
+      "packaging": "Jewel Case",
+      "disambiguation": "",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+    },
+    {
+      "country": "XW",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging": "None",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "area": {
+            "name": "[Worldwide]",
+            "sort-name": "[Worldwide]",
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+            "iso-3166-1-codes": [
+              "XW"
+            ],
+            "disambiguation": "",
+            "type": null,
+            "type-id": null
+          },
+          "date": "2001-03-07"
+        }
+      ],
+      "quality": "normal",
+      "id": "6cd30d99-4923-4d5e-8e51-9d87506976f1",
+      "barcode": "0724384960650",
+      "status": "Official",
+      "title": "Discovery",
+      "date": "2001-03-07",
+      "artist-credit": [
+        {
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk"
+          },
+          "name": "Daft Punk",
+          "joinphrase": ""
+        }
+      ]
+    },
+    {
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "title": "Discovery",
+      "date": "2001-03-10",
+      "status": "Official",
+      "barcode": "4988006788367",
+      "id": "ab5ca495-8983-41b9-86b4-46a981d173be",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+            "iso-3166-1-codes": [
+              "JP"
+            ],
+            "type": null,
+            "disambiguation": "",
+            "type-id": null,
+            "name": "Japan",
+            "sort-name": "Japan"
+          },
+          "date": "2001-03-10"
+        }
+      ],
+      "packaging": "Jewel Case",
+      "disambiguation": "1st pressing",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "language": null,
+        "script": null
+      },
+      "country": "JP"
+    },
+    {
+      "barcode": "4988006788367",
+      "status": "Official",
+      "date": "2001-03-10",
+      "title": "Discovery",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "disambiguation": "French electronic duo",
+            "type": "Group",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk"
+          }
+        }
+      ],
+      "country": "JP",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "packaging-id": null,
+      "disambiguation": "",
+      "packaging": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "name": "Japan",
+            "sort-name": "Japan",
+            "type-id": null,
+            "iso-3166-1-codes": [
+              "JP"
+            ],
+            "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+            "type": null,
+            "disambiguation": ""
+          },
+          "date": "2001-03-10"
+        }
+      ],
+      "id": "51467269-3122-3d7e-92b2-0f0a694d30c1"
+    },
+    {
+      "title": "Discovery",
+      "date": "2001-03-12",
+      "status": "Official",
+      "barcode": "724381008829",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "country": "GB",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": "",
+      "id": "44e85a85-77d7-3e2e-8416-65a27d2aef68",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "type-id": null,
+            "type": null,
+            "disambiguation": "",
+            "iso-3166-1-codes": [
+              "GB"
+            ],
+            "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+            "sort-name": "United Kingdom",
+            "name": "United Kingdom"
+          },
+          "date": "2001-03-12"
+        }
+      ]
+    },
+    {
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "type": "Group",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "status": "Official",
+      "barcode": "724354278228",
+      "title": "Discovery",
+      "date": "2001-03-12",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2001-03-12",
+          "area": {
+            "sort-name": "Europe",
+            "name": "Europe",
+            "type-id": null,
+            "type": null,
+            "disambiguation": "",
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a"
+          }
+        }
+      ],
+      "id": "098060d4-ba3c-469d-88b0-08642261c7ab",
+      "disambiguation": "",
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "country": "XE"
+    },
+    {
+      "date": "2001-03-12",
+      "title": "Discovery",
+      "barcode": "724384960629",
+      "status": null,
+      "artist-credit": [
+        {
+          "artist": {
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "French electronic duo",
+            "type": "Group",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+          },
+          "name": "Daft Punk",
+          "joinphrase": ""
+        }
+      ],
+      "country": "XE",
+      "packaging-id": null,
+      "text-representation": {
+        "language": null,
+        "script": null
+      },
+      "status-id": null,
+      "packaging": null,
+      "disambiguation": "",
+      "id": "4375a6b0-cd50-4f59-be32-13161c0fc448",
+      "release-events": [
+        {
+          "area": {
+            "sort-name": "Europe",
+            "name": "Europe",
+            "type": null,
+            "disambiguation": "",
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "type-id": null
+          },
+          "date": "2001-03-12"
+        }
+      ],
+      "quality": "normal"
+    },
+    {
+      "barcode": "724384960629",
+      "status": "Official",
+      "date": "2001-03-13",
+      "title": "Discovery",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "type": "Group",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+          },
+          "name": "Daft Punk"
+        }
+      ],
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "country": "US",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2001-03-13",
+          "area": {
+            "name": "United States",
+            "sort-name": "United States",
+            "iso-3166-1-codes": [
+              "US"
+            ],
+            "id": "489ce91b-6658-3307-9877-795b68554c98",
+            "disambiguation": "",
+            "type": null,
+            "type-id": null
+          }
+        }
+      ],
+      "id": "5ad66522-edce-3a77-b5fa-7956ee879239",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging": "Jewel Case",
+      "disambiguation": ""
+    },
+    {
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": "",
+      "release-events": [
+        {
+          "area": {
+            "name": "Portugal",
+            "sort-name": "Portugal",
+            "type-id": null,
+            "iso-3166-1-codes": [
+              "PT"
+            ],
+            "id": "781b0c54-3d54-362d-a941-8a617def4992",
+            "type": null,
+            "disambiguation": ""
+          },
+          "date": "2001-06-21"
+        }
+      ],
+      "quality": "normal",
+      "id": "b4927a5a-1411-4bd3-86d5-2b2b0c80ce06",
+      "country": "PT",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "name": "Various Artists",
+            "sort-name": "Various Artists",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "country": null
+          },
+          "name": "Various Artists"
+        }
+      ],
+      "barcode": "724353440824",
+      "status": "Official",
+      "date": "2001-06-21",
+      "title": "Now 4"
+    },
+    {
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Daft Punk",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "type": "Group",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+          }
+        }
+      ],
+      "date": "2001-10-03",
+      "title": "Discovery",
+      "status": "Official",
+      "barcode": "724384960612",
+      "id": "ac7518c6-b630-4761-99c7-6a94cc35a594",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2001-10-03",
+          "area": {
+            "name": "France",
+            "sort-name": "France",
+            "iso-3166-1-codes": [
+              "FR"
+            ],
+            "id": "08310658-51eb-3801-80de-5a0739207115",
+            "type": null,
+            "disambiguation": "",
+            "type-id": null
+          }
+        },
+        {
+          "area": {
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "iso-3166-1-codes": [
+              "XE"
+            ],
+            "type": null,
+            "disambiguation": "",
+            "type-id": null,
+            "name": "Europe",
+            "sort-name": "Europe"
+          },
+          "date": "2001"
+        }
+      ],
+      "disambiguation": "",
+      "packaging": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging-id": null,
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "country": "FR"
+    },
+    {
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "country": null,
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "sort-name": "Various Artists",
+            "name": "Various Artists"
+          },
+          "name": "Various Artists"
+        }
+      ],
+      "status": "Official",
+      "barcode": "0724353707927",
+      "date": "2001",
+      "title": "100% Hits: Best of + Summer Hits 2001",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "name": "Australia",
+            "sort-name": "Australia",
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "type": null,
+            "disambiguation": "",
+            "type-id": null
+          },
+          "date": "2001"
+        }
+      ],
+      "id": "07e64996-7097-4f62-98fb-4b015f8cb43c",
+      "packaging": "Jewel Case",
+      "disambiguation": "",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "country": "AU"
+    },
+    {
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "country": "MX",
+      "id": "5654ace8-fd02-4471-a14c-bd6781cf2277",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2001",
+          "area": {
+            "sort-name": "Mexico",
+            "name": "Mexico",
+            "type-id": null,
+            "type": null,
+            "disambiguation": "",
+            "id": "3e08b2cd-69f3-317c-b1e4-e71be581839e",
+            "iso-3166-1-codes": [
+              "MX"
+            ]
+          }
+        }
+      ],
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": "",
+      "title": "Discovery",
+      "date": "2001",
+      "status": "Official",
+      "barcode": "724381001721",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+          },
+          "name": "Daft Punk"
+        }
+      ]
+    },
+    {
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "country": "CA",
+      "id": "6b6628a6-59a2-4284-86fc-8f2d24cb7b7e",
+      "release-events": [
+        {
+          "date": "2001",
+          "area": {
+            "type-id": null,
+            "iso-3166-1-codes": [
+              "CA"
+            ],
+            "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+            "type": null,
+            "disambiguation": "",
+            "name": "Canada",
+            "sort-name": "Canada"
+          }
+        }
+      ],
+      "quality": "normal",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging": "Jewel Case",
+      "disambiguation": "",
+      "date": "2001",
+      "title": "Discovery",
+      "barcode": "724384960629",
+      "status": "Official",
+      "artist-credit": [
+        {
+          "artist": {
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "disambiguation": "French electronic duo"
+          },
+          "name": "Daft Punk",
+          "joinphrase": ""
+        }
+      ]
+    },
+    {
+      "packaging-id": null,
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "country": "XE",
+      "id": "30e45d86-707d-4042-9df5-93724557aadb",
+      "release-events": [
+        {
+          "date": "2001",
+          "area": {
+            "sort-name": "Europe",
+            "name": "Europe",
+            "type-id": null,
+            "type": null,
+            "disambiguation": "",
+            "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+            "iso-3166-1-codes": [
+              "XE"
+            ]
+          }
+        }
+      ],
+      "quality": "normal",
+      "disambiguation": "",
+      "packaging": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "date": "2001",
+      "title": "Discovery",
+      "status": "Official",
+      "barcode": "724384960605",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "country": "FR",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "sort-name": "Daft Punk",
+            "name": "Daft Punk"
+          },
+          "joinphrase": ""
+        }
+      ]
+    },
+    {
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "country": "CN",
+      "id": "e99343ac-6470-4f41-8cac-b8d75c9fb8cc",
+      "release-events": [
+        {
+          "area": {
+            "sort-name": "China",
+            "name": "China",
+            "type-id": null,
+            "disambiguation": "",
+            "type": null,
+            "iso-3166-1-codes": [
+              "CN"
+            ],
+            "id": "7c81bb69-a99b-3487-b6d4-0f76d7a29ca0"
+          },
+          "date": "2001"
+        }
+      ],
+      "quality": "normal",
+      "disambiguation": "",
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "date": "2001",
+      "title": "Now That\u2019s What I Call Music! 7",
+      "status": "Official",
+      "barcode": null,
+      "artist-credit": [
+        {
+          "name": "Various Artists",
+          "artist": {
+            "country": null,
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "disambiguation": "add compilations to this artist",
+            "type": "Other",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "sort-name": "Various Artists",
+            "name": "Various Artists"
+          },
+          "joinphrase": ""
+        }
+      ]
+    },
+    {
+      "barcode": "044001700422",
+      "status": "Official",
+      "title": "Global Hits 2002",
+      "date": "2002-02-26",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Various Artists",
+          "artist": {
+            "sort-name": "Various Artists",
+            "name": "Various Artists",
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "country": null,
+            "type-id": "ac897045-5043-3294-969b-187360e45d86"
+          }
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "country": "US",
+      "release-events": [
+        {
+          "date": "2002-02-26",
+          "area": {
+            "id": "489ce91b-6658-3307-9877-795b68554c98",
+            "iso-3166-1-codes": [
+              "US"
+            ],
+            "type": null,
+            "disambiguation": "",
+            "type-id": null,
+            "name": "United States",
+            "sort-name": "United States"
+          }
+        }
+      ],
+      "quality": "normal",
+      "id": "0ad42b1e-0c4f-440b-a946-cf46bc3cd20a",
+      "disambiguation": "",
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+    },
+    {
+      "status": "Official",
+      "barcode": "9399032123629",
+      "date": "2002-03-25",
+      "title": "Triple J: Hottest 100, Volume 9",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Various Artists",
+          "artist": {
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "disambiguation": "add compilations to this artist",
+            "type": "Other",
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "country": null,
+            "name": "Various Artists",
+            "sort-name": "Various Artists"
+          }
+        }
+      ],
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "country": "AU",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "type": null,
+            "disambiguation": "",
+            "type-id": null,
+            "name": "Australia",
+            "sort-name": "Australia"
+          },
+          "date": "2002-03-25"
+        }
+      ],
+      "id": "34010573-6b6c-436e-9464-033d22f6be51",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging": "Jewel Case",
+      "disambiguation": ""
+    },
+    {
+      "status": "Official",
+      "barcode": "724354377723",
+      "date": "2002",
+      "title": "Birthday 21, Vol.2",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "name": "Various Artists",
+            "sort-name": "Various Artists",
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "country": null,
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "disambiguation": "add compilations to this artist",
+            "type": "Other"
+          },
+          "name": "Various Artists"
+        }
+      ],
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "packaging-id": null,
+      "country": "BE",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "type": null,
+            "disambiguation": "",
+            "id": "5b8a5ee5-0bb3-34cf-9a75-c27c44e341fc",
+            "iso-3166-1-codes": [
+              "BE"
+            ],
+            "type-id": null,
+            "sort-name": "Belgium",
+            "name": "Belgium"
+          },
+          "date": "2002"
+        }
+      ],
+      "id": "d4fc3caf-da46-4caa-9b2a-30166cfbb1b1",
+      "disambiguation": "",
+      "packaging": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+    },
+    {
+      "country": "AU",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": "",
+      "id": "4e79d688-7400-4c15-9b29-d3a17350d722",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2002",
+          "area": {
+            "sort-name": "Australia",
+            "name": "Australia",
+            "type": null,
+            "disambiguation": "",
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "type-id": null
+          }
+        }
+      ],
+      "title": "Class of 02: Songs for Schoolies",
+      "date": "2002",
+      "barcode": "9399700105209",
+      "status": "Official",
+      "artist-credit": [
+        {
+          "name": "Various Artists",
+          "artist": {
+            "name": "Various Artists",
+            "sort-name": "Various Artists",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "country": null
+          },
+          "joinphrase": ""
+        }
+      ]
+    },
+    {
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Various Artists",
+          "artist": {
+            "country": null,
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "sort-name": "Various Artists",
+            "name": "Various Artists"
+          }
+        }
+      ],
+      "title": "Dance Now 2002, Volume 1",
+      "date": "2002",
+      "status": "Official",
+      "barcode": "5021456110797",
+      "packaging": null,
+      "disambiguation": "",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "id": "5ca5058b-8ac5-4d11-a541-c341c82df5bc",
+      "quality": "normal",
+      "release-events": [
+        {
+          "area": {
+            "type-id": null,
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "type": null,
+            "disambiguation": "",
+            "name": "Australia",
+            "sort-name": "Australia"
+          },
+          "date": "2002"
+        }
+      ],
+      "country": "AU",
+      "packaging-id": null,
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      }
+    },
+    {
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging": null,
+      "disambiguation": "",
+      "id": "a4ec6652-4999-4a86-9eb5-ae1e88ec1ee3",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2002",
+          "area": {
+            "sort-name": "France",
+            "name": "France",
+            "type-id": null,
+            "type": null,
+            "disambiguation": "",
+            "id": "08310658-51eb-3801-80de-5a0739207115",
+            "iso-3166-1-codes": [
+              "FR"
+            ]
+          }
+        }
+      ],
+      "country": "FR",
+      "packaging-id": null,
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Daft Punk",
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "country": "FR",
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "type": "Group",
+            "disambiguation": "French electronic duo",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk"
+          }
+        }
+      ],
+      "date": "2002",
+      "title": "Homework / Discovery",
+      "barcode": "724381288726",
+      "status": "Official"
+    },
+    {
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "country": "AU",
+      "id": "7e514966-e15b-4170-9959-0bdf2e05ca2b",
+      "release-events": [
+        {
+          "date": "2002",
+          "area": {
+            "type-id": null,
+            "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+            "iso-3166-1-codes": [
+              "AU"
+            ],
+            "disambiguation": "",
+            "type": null,
+            "name": "Australia",
+            "sort-name": "Australia"
+          }
+        }
+      ],
+      "quality": "normal",
+      "packaging": "Jewel Case",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": "limited edition",
+      "title": "Pepsi Chart Hits, Volume 5",
+      "date": "2002",
+      "status": "Official",
+      "barcode": "9325425009546",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Various Artists",
+          "artist": {
+            "country": null,
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "sort-name": "Various Artists",
+            "name": "Various Artists"
+          }
+        }
+      ]
+    },
+    {
+      "packaging": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": "",
+      "quality": "normal",
+      "release-events": [
+        {
+          "date": "2002",
+          "area": {
+            "type": null,
+            "disambiguation": "",
+            "id": "471c46a7-afc5-31c4-923c-d0444f5053a4",
+            "iso-3166-1-codes": [
+              "ES"
+            ],
+            "type-id": null,
+            "sort-name": "Spain",
+            "name": "Spain"
+          }
+        }
+      ],
+      "id": "d45a32c5-4623-4f94-9496-31ead3faf2d7",
+      "country": "ES",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "packaging-id": null,
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "sort-name": "Various Artists",
+            "name": "Various Artists",
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "country": null,
+            "type-id": "ac897045-5043-3294-969b-187360e45d86"
+          },
+          "name": "Various Artists"
+        }
+      ],
+      "barcode": null,
+      "status": "Official",
+      "date": "2002",
+      "title": "The World's Best Deejays"
+    }
+  ],
+  "isrcs": [
+    "GBAHT1305744",
+    "GBDUW0000053"
+  ],
+  "first-release-date": "2000"
+}

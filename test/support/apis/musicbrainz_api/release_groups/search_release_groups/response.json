@@ -1,0 +1,916 @@
+{
+  "created": "2026-03-21T10:29:10.233Z",
+  "count": 7,
+  "offset": 0,
+  "release-groups": [
+    {
+      "id": "48117b90-a16e-34ca-a514-19c702df1158",
+      "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "score": 100,
+      "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "artist-credit-id": "2ad79928-9236-33a3-830c-cc909d38f0c7",
+      "count": 24,
+      "title": "Discovery",
+      "first-release-date": "2001-02-26",
+      "primary-type": "Album",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "aliases": [
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "daft punk",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Duft Punk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Duft Punk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Daft Punk",
+                "locale": "en",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Da Funk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Da Funk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "fcbe492b-c203-48c6-b15e-ae60122404bd",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "5125fa48-f5dc-4fe4-9e4e-8c0cb719ce03",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "6cd30d99-4923-4d5e-8e51-9d87506976f1",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "ab5ca495-8983-41b9-86b4-46a981d173be",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "4375a6b0-cd50-4f59-be32-13161c0fc448",
+          "title": "Discovery"
+        },
+        {
+          "id": "759badcf-306b-467a-8028-676c58324cfe",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "89643cd8-4664-4ea0-9cde-2564d26231a9",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "\u30c7\u30a3\u30b9\u30ab\u30d0\u30ea\u30fc",
+          "status": "Official"
+        },
+        {
+          "id": "8d28a4da-8077-4cae-a0a1-2d16c4923775",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "6b6628a6-59a2-4284-86fc-8f2d24cb7b7e",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "5654ace8-fd02-4471-a14c-bd6781cf2277",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "488477d8-10b4-47fe-a482-549f011406a5",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "44e85a85-77d7-3e2e-8416-65a27d2aef68",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "b078d70c-d2eb-489a-a8f8-e322af35dedf",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "ac7518c6-b630-4761-99c7-6a94cc35a594",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "a1be7f50-6fbb-4251-8de3-3bb54d168d7f",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "098060d4-ba3c-469d-88b0-08642261c7ab",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "bd3bb36e-16c8-438f-850e-dfbf4d1478f0",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "74ccb54a-1b24-41a6-a25f-a877e0774fc9",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "\u30c7\u30a3\u30b9\u30ab\u30d0\u30ea / Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "d073287b-d1bd-4f11-a933-a4386f8cf701",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "51467269-3122-3d7e-92b2-0f0a694d30c1",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "5ad66522-edce-3a77-b5fa-7956ee879239",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "30e45d86-707d-4042-9df5-93724557aadb",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "8343b377-ea18-4d64-b5f6-ffaf55d8f55b",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "c80cdcf0-0b8d-4c40-bbbb-54b286fd9a21",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Discovery",
+          "status": "Official"
+        }
+      ],
+      "tags": [
+        {
+          "count": 1,
+          "name": "trip-hop"
+        },
+        {
+          "count": 14,
+          "name": "electronic"
+        },
+        {
+          "count": 1,
+          "name": "downtempo"
+        },
+        {
+          "count": 0,
+          "name": "pop"
+        },
+        {
+          "count": 0,
+          "name": "french"
+        },
+        {
+          "count": 3,
+          "name": "dance"
+        },
+        {
+          "count": 20,
+          "name": "house"
+        },
+        {
+          "count": 3,
+          "name": "electro"
+        },
+        {
+          "count": 0,
+          "name": "techno"
+        },
+        {
+          "count": 2,
+          "name": "electronica"
+        },
+        {
+          "count": 1,
+          "name": "disco"
+        },
+        {
+          "count": 1,
+          "name": "tech house"
+        },
+        {
+          "count": 2,
+          "name": "dance-pop"
+        },
+        {
+          "count": 2,
+          "name": "funky house"
+        },
+        {
+          "count": 1,
+          "name": "boogie"
+        },
+        {
+          "count": 4,
+          "name": "progressive house"
+        },
+        {
+          "count": 0,
+          "name": "english"
+        },
+        {
+          "count": 1,
+          "name": "club"
+        },
+        {
+          "count": 1,
+          "name": "electro house"
+        },
+        {
+          "count": 8,
+          "name": "french house"
+        },
+        {
+          "count": 1,
+          "name": "electronica dance"
+        },
+        {
+          "count": 0,
+          "name": "dance and electronica"
+        },
+        {
+          "count": 2,
+          "name": "euro house"
+        },
+        {
+          "count": 0,
+          "name": "pop_electro_downtempo"
+        },
+        {
+          "count": 0,
+          "name": "electronic rock"
+        },
+        {
+          "count": 1,
+          "name": "dance music"
+        },
+        {
+          "count": 1,
+          "name": "nu-disco"
+        },
+        {
+          "count": 1,
+          "name": "left-field house"
+        },
+        {
+          "count": 5,
+          "name": "club/dance"
+        },
+        {
+          "count": 1,
+          "name": "house music"
+        },
+        {
+          "count": 2,
+          "name": "synth funk"
+        },
+        {
+          "count": 1,
+          "name": "electro-disco"
+        },
+        {
+          "count": 1,
+          "name": "offizielle charts"
+        },
+        {
+          "count": 1,
+          "name": "leftfield house"
+        },
+        {
+          "count": 0,
+          "name": "discogs/the most popular album released every year from 1950 to 2020"
+        },
+        {
+          "count": 1,
+          "name": "5+ wochen"
+        }
+      ]
+    },
+    {
+      "id": "2292c05e-299a-4c03-8688-3bf3d0a01277",
+      "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+      "score": 94,
+      "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "artist-credit-id": "2ad79928-9236-33a3-830c-cc909d38f0c7",
+      "count": 1,
+      "title": "Discovery Remixed",
+      "first-release-date": "2012-03-10",
+      "primary-type": "Album",
+      "secondary-types": [
+        "Remix",
+        "Mixtape/Street"
+      ],
+      "secondary-type-ids": [
+        "0c60f497-ff81-3818-befd-abfc84a4858b",
+        "15c1b1f5-d893-3375-a1db-e180c5ae15ed"
+      ],
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "aliases": [
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "daft punk",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Duft Punk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Duft Punk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Daft Punk",
+                "locale": "en",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Da Funk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Da Funk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "f3b06083-57ef-4909-aee8-da2e4f3cfcdf",
+          "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+          "title": "Discovery Remixed",
+          "status": "Bootleg"
+        }
+      ],
+      "tags": [
+        {
+          "count": 1,
+          "name": "trance"
+        },
+        {
+          "count": 1,
+          "name": "electronic"
+        },
+        {
+          "count": 1,
+          "name": "house"
+        },
+        {
+          "count": 1,
+          "name": "electro"
+        },
+        {
+          "count": 1,
+          "name": "techno"
+        }
+      ]
+    },
+    {
+      "id": "be3df8a5-39cb-4a8c-bb17-a079b13faf74",
+      "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+      "score": 94,
+      "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "artist-credit-id": "2ad79928-9236-33a3-830c-cc909d38f0c7",
+      "count": 1,
+      "title": "Re-Discovery",
+      "first-release-date": "2011-08-05",
+      "primary-type": "Album",
+      "secondary-types": [
+        "Remix"
+      ],
+      "secondary-type-ids": [
+        "0c60f497-ff81-3818-befd-abfc84a4858b"
+      ],
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "aliases": [
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "daft punk",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Duft Punk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Duft Punk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Daft Punk",
+                "locale": "en",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Da Funk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Da Funk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "ebace3d6-1193-4840-b395-ddfa1232c62a",
+          "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+          "title": "Re-Discovery",
+          "status": "Bootleg"
+        }
+      ]
+    },
+    {
+      "id": "1ed45c8c-9abd-4ec3-9ff6-43d264f0e6b7",
+      "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+      "score": 90,
+      "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "artist-credit-id": "2ad79928-9236-33a3-830c-cc909d38f0c7",
+      "count": 2,
+      "title": "Homework / Discovery",
+      "first-release-date": "2002",
+      "primary-type": "Album",
+      "secondary-types": [
+        "Compilation"
+      ],
+      "secondary-type-ids": [
+        "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+      ],
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "aliases": [
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "daft punk",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Duft Punk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Duft Punk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Daft Punk",
+                "locale": "en",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Da Funk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Da Funk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "a4ec6652-4999-4a86-9eb5-ae1e88ec1ee3",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Homework / Discovery",
+          "status": "Official"
+        },
+        {
+          "id": "9798415c-8f5f-47dd-9be2-3a06f3fc98cc",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "title": "Homework / Discovery",
+          "status": "Official"
+        }
+      ]
+    },
+    {
+      "id": "84216190-e46f-4cf1-8a28-76910183be38",
+      "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "score": 90,
+      "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "artist-credit-id": "2ad79928-9236-33a3-830c-cc909d38f0c7",
+      "count": 1,
+      "title": "Discovery (Beta Version)",
+      "primary-type": "Album",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "aliases": [
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "daft punk",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Duft Punk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Duft Punk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Daft Punk",
+                "locale": "en",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Da Funk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Da Funk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "7c3157ba-4f6f-4162-a6ec-93842c143877",
+          "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+          "title": "Discovery (Beta Version)",
+          "status": "Bootleg"
+        }
+      ]
+    },
+    {
+      "id": "df7d1104-7543-4868-b6c4-92ab83ad27f3",
+      "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+      "score": 86,
+      "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+      "artist-credit-id": "2ad79928-9236-33a3-830c-cc909d38f0c7",
+      "count": 1,
+      "title": "Discovery (Sample Bandit Bootlegs)",
+      "first-release-date": "2022-06-10",
+      "primary-type": "EP",
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "aliases": [
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "daft punk",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Duft Punk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Duft Punk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Daft Punk",
+                "locale": "en",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Da Funk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Da Funk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "b6713edb-5b34-4f7e-98b4-f668ed228f6e",
+          "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+          "title": "Discovery (Sample Bandit Bootlegs)",
+          "status": "Bootleg"
+        }
+      ]
+    },
+    {
+      "id": "2a7840ab-9567-37f4-85b8-3208db09434b",
+      "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+      "score": 84,
+      "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+      "artist-credit-id": "2ad79928-9236-33a3-830c-cc909d38f0c7",
+      "count": 1,
+      "title": "Discovery: Bonus Tracks From daftclub.com",
+      "first-release-date": "2001",
+      "primary-type": "Album",
+      "secondary-types": [
+        "Remix"
+      ],
+      "secondary-type-ids": [
+        "0c60f497-ff81-3818-befd-abfc84a4858b"
+      ],
+      "artist-credit": [
+        {
+          "name": "Daft Punk",
+          "artist": {
+            "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+            "name": "Daft Punk",
+            "sort-name": "Daft Punk",
+            "disambiguation": "French electronic duo",
+            "aliases": [
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "daft punk",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Duft Punk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Duft Punk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Daft Punk",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Daft Punk",
+                "locale": "en",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Da Funk",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Da Funk",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "76f2dad0-8235-4400-996e-f90132e6607c",
+          "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+          "title": "Discovery: Bonus Tracks From daftclub.com",
+          "status": "Promotion"
+        }
+      ]
+    }
+  ]
+}

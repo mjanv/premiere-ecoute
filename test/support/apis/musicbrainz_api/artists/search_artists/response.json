@@ -1,0 +1,195 @@
+{
+  "created": "2026-03-21T10:30:50.448Z",
+  "count": 2,
+  "offset": 0,
+  "artists": [
+    {
+      "id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+      "type": "Group",
+      "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+      "score": 100,
+      "name": "Daft Punk",
+      "sort-name": "Daft Punk",
+      "country": "FR",
+      "area": {
+        "id": "08310658-51eb-3801-80de-5a0739207115",
+        "type": "Country",
+        "type-id": "06dd0ae4-8c74-30bb-b43d-95dcedf961de",
+        "name": "France",
+        "sort-name": "France",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "begin-area": {
+        "id": "dc10c22b-e510-4006-8b7f-fecb4f36436e",
+        "type": "City",
+        "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+        "name": "Paris",
+        "sort-name": "Paris",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "disambiguation": "French electronic duo",
+      "ipis": [
+        "00711797335"
+      ],
+      "isnis": [
+        "0000000123531208"
+      ],
+      "life-span": {
+        "begin": "1993",
+        "end": "2021-02-22",
+        "ended": true
+      },
+      "aliases": [
+        {
+          "sort-name": "Daft Punk",
+          "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+          "name": "daft punk",
+          "locale": null,
+          "type": "Artist name",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "Duft Punk",
+          "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+          "name": "Duft Punk",
+          "locale": null,
+          "type": "Search hint",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "\u30c0\u30d5\u30c8 \u30d1\u30f3\u30af",
+          "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+          "name": "\u30c0\u30d5\u30c8\u30fb\u30d1\u30f3\u30af",
+          "locale": "ja",
+          "type": "Artist name",
+          "primary": true,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "Daft Punk",
+          "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+          "name": "Daft Punk",
+          "locale": "en",
+          "type": "Artist name",
+          "primary": true,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "Da Funk",
+          "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+          "name": "Da Funk",
+          "locale": null,
+          "type": "Search hint",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        }
+      ],
+      "tags": [
+        {
+          "count": 35,
+          "name": "electronic"
+        },
+        {
+          "count": 2,
+          "name": "synthpop"
+        },
+        {
+          "count": 7,
+          "name": "french"
+        },
+        {
+          "count": 2,
+          "name": "dance"
+        },
+        {
+          "count": 16,
+          "name": "house"
+        },
+        {
+          "count": 2,
+          "name": "vocoder"
+        },
+        {
+          "count": 2,
+          "name": "funk"
+        },
+        {
+          "count": 3,
+          "name": "disco"
+        },
+        {
+          "count": -1,
+          "name": "favourite"
+        },
+        {
+          "count": 0,
+          "name": "tech house"
+        },
+        {
+          "count": 2,
+          "name": "film score"
+        },
+        {
+          "count": -1,
+          "name": "wp musicians"
+        },
+        {
+          "count": 1,
+          "name": "electroclash"
+        },
+        {
+          "count": 1,
+          "name": "european"
+        },
+        {
+          "count": 2,
+          "name": "electro house"
+        },
+        {
+          "count": 1,
+          "name": "french touch"
+        },
+        {
+          "count": 13,
+          "name": "french house"
+        },
+        {
+          "count": 1,
+          "name": "dance and electronica"
+        },
+        {
+          "count": 0,
+          "name": "thomas bangalter"
+        },
+        {
+          "count": 1,
+          "name": "nu-disco"
+        },
+        {
+          "count": 2,
+          "name": "french electro"
+        }
+      ]
+    },
+    {
+      "id": "80846e42-6bba-4fed-9d08-f095b15f28ec",
+      "score": 66,
+      "name": "Daft Punk NFT",
+      "sort-name": "Daft Punk NFT",
+      "life-span": {
+        "ended": null
+      }
+    }
+  ]
+}
