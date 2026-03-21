@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
 
   require Logger
 
+  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
@@ -23,6 +24,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
   def enrich_artist(%Artist{} = artist) do
     {:ok, artist}
     |> enrich_wikipedia()
+    |> enrich_genius()
     |> enrich_deezer()
     |> enrich_spotify()
   end
@@ -43,6 +45,26 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
 
       {:error, reason} ->
         Logger.error("EnrichArtistLinks: wikipedia lookup failed for #{inspect(name)}: #{inspect(reason)}")
+        {:ok, artist}
+    end
+  end
+
+  # Genius — stores artist URL in external_links["genius"], nil sentinel on not found
+  defp enrich_genius({:ok, %Artist{external_links: %{"genius" => _}} = artist}) do
+    {:ok, artist}
+  end
+
+  defp enrich_genius({:ok, %Artist{name: name} = artist}) do
+    case GeniusApi.search_artist(name) do
+      {:ok, %{url: url}} ->
+        Artist.update(artist, %{external_links: Map.put(artist.external_links, "genius", url)})
+
+      {:ok, nil} ->
+        Logger.warning("EnrichArtistLinks: no genius page found for #{inspect(name)}")
+        Artist.update(artist, %{external_links: Map.put(artist.external_links, "genius", nil)})
+
+      {:error, reason} ->
+        Logger.error("EnrichArtistLinks: genius lookup failed for #{inspect(name)}: #{inspect(reason)}")
         {:ok, artist}
     end
   end

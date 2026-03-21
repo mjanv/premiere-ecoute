@@ -1033,7 +1033,7 @@ msgstr "Dernière activité"
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:424
 #, elixir-autogen, elixir-format
 msgid "Listening session history"
-msgstr "Session d'écoute"
+msgstr "Session d'écoutes"
 
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:386
 #, elixir-autogen, elixir-format

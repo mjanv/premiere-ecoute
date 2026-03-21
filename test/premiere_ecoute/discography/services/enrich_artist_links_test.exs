@@ -2,6 +2,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
+  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
@@ -35,6 +36,18 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     )
   end
 
+  defp expect_genius(response \\ "genius_api/artists/search_artist/response.json") do
+    ApiMock.expect(GeniusApi, path: {:get, "/search"}, response: response, status: 200)
+  end
+
+  defp expect_genius_empty do
+    ApiMock.expect(GeniusApi,
+      path: {:get, "/search"},
+      body: %{"meta" => %{"status" => 200}, "response" => %{"hits" => []}},
+      status: 200
+    )
+  end
+
   defp expect_deezer(response \\ "deezer_api/artists/search_artist/response.json") do
     ApiMock.expect(DeezerApi, path: {:get, "/search/artist"}, response: response, status: 200)
   end
@@ -63,6 +76,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "fetches wikipedia URL and stores it in external_links" do
       artist = artist_fixture()
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
@@ -73,6 +87,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "persists the wikipedia URL to the database" do
       artist = artist_fixture()
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
@@ -82,6 +97,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
 
     test "skips artist that already has a wikipedia link" do
       artist = artist_fixture(%{external_links: %{"wikipedia" => "https://en.wikipedia.org/wiki/Daft_Punk"}})
+      expect_genius()
       expect_deezer()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
@@ -91,6 +107,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
 
     test "skips artist previously confirmed as not found" do
       artist = artist_fixture(%{external_links: %{"wikipedia" => nil}})
+      expect_genius()
       expect_deezer()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
@@ -102,6 +119,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "stores nil sentinel when wikipedia has no results" do
       artist = artist_fixture()
       expect_wikipedia_empty()
+      expect_genius()
       expect_deezer()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
@@ -116,6 +134,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "fetches deezer ID and stores it in provider_ids" do
       artist = artist_fixture()
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
@@ -126,6 +145,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "persists the deezer ID to the database" do
       artist = artist_fixture()
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
@@ -136,6 +156,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "skips artist that already has a deezer ID" do
       artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", deezer: "1312"}})
       expect_wikipedia()
+      expect_genius()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -145,6 +166,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "stores nil sentinel when deezer has no results" do
       artist = artist_fixture()
       expect_wikipedia()
+      expect_genius()
       expect_deezer_empty()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
@@ -154,10 +176,57 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     end
   end
 
+  describe "enrich_artist/1 - genius" do
+    test "fetches genius URL and stores it in external_links" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+
+      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert updated.external_links["genius"] == "https://genius.com/artists/Daft-punk"
+    end
+
+    test "persists the genius URL to the database" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+
+      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert Artist.get(artist.id).external_links["genius"] == "https://genius.com/artists/Daft-punk"
+    end
+
+    test "skips artist that already has a genius link" do
+      artist = artist_fixture(%{external_links: %{"genius" => "https://genius.com/artists/Daft-punk"}})
+      expect_wikipedia()
+      expect_deezer()
+
+      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert returned.external_links["genius"] == "https://genius.com/artists/Daft-punk"
+    end
+
+    test "stores nil sentinel when genius has no results" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius_empty()
+      expect_deezer()
+
+      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert Map.has_key?(Artist.get(artist.id).external_links, "genius")
+      assert is_nil(updated.external_links["genius"])
+    end
+  end
+
   describe "enrich_artist/1 - spotify" do
     test "fetches spotify ID and stores it in provider_ids" do
       artist = artist_fixture(%{provider_ids: %{}})
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
       expect_spotify()
 
@@ -169,6 +238,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "persists the spotify ID to the database" do
       artist = artist_fixture(%{provider_ids: %{}})
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
       expect_spotify()
 
@@ -180,6 +250,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "skips artist that already has a spotify ID" do
       artist = artist_fixture()
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
@@ -190,6 +261,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     test "stores nil sentinel when spotify has no results" do
       artist = artist_fixture(%{provider_ids: %{}})
       expect_wikipedia()
+      expect_genius()
       expect_deezer()
       expect_spotify_empty()
 

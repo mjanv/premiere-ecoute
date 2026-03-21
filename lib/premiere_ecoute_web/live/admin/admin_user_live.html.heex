@@ -1,0 +1,207 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <%!-- Header --%>
+    <div class="flex items-center gap-4 mb-8">
+      <.link
+        navigate="/admin/users"
+        class="inline-flex items-center px-3 py-2 border border-gray-600 rounded-md text-sm text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-colors"
+      >
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        {gettext("Users")}
+      </.link>
+      <div class="flex-1 min-w-0">
+        <h1 class="text-2xl font-bold text-white truncate">{@user.email}</h1>
+        <%= if @user.twitch do %>
+          <p class="text-sm text-gray-400 mt-0.5">@{@user.twitch.username}</p>
+        <% end %>
+      </div>
+      <span class={[
+        "flex-shrink-0 inline-flex px-3 py-1 text-sm font-semibold rounded-full",
+        case @user.role do
+          :admin -> "bg-purple-100 text-purple-800"
+          :streamer -> "bg-blue-100 text-blue-800"
+          :viewer -> "bg-gray-100 text-gray-800"
+          :bot -> "bg-red-100 text-red-800"
+        end
+      ]}>
+        {String.capitalize(to_string(@user.role))}
+      </span>
+    </div>
+
+    <%!-- Two-column layout --%>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <%!-- Left column: identity + services --%>
+      <div class="lg:col-span-2 space-y-6">
+
+        <%!-- User info --%>
+        <div class="bg-gray-800 rounded-lg border border-gray-700">
+          <div class="px-6 py-4 border-b border-gray-700">
+            <h2 class="text-base font-semibold text-white">{gettext("Account")}</h2>
+          </div>
+          <dl class="divide-y divide-gray-700">
+            <div class="flex items-center justify-between px-6 py-3 text-sm">
+              <dt class="text-gray-400">{gettext("Email")}</dt>
+              <dd class="text-white font-mono">{@user.email}</dd>
+            </div>
+            <div class="flex items-center justify-between px-6 py-3 text-sm">
+              <dt class="text-gray-400">{gettext("Username")}</dt>
+              <dd class="text-white">{@user.username}</dd>
+            </div>
+            <div class="flex items-center justify-between px-6 py-3 text-sm">
+              <dt class="text-gray-400">{gettext("Member since")}</dt>
+              <dd class="text-white">{Calendar.strftime(@user.inserted_at, "%B %d, %Y")}</dd>
+            </div>
+            <div class="flex items-center justify-between px-6 py-3 text-sm">
+              <dt class="text-gray-400">{gettext("ID")}</dt>
+              <dd class="text-gray-500 font-mono">{@user.id}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <%!-- Connected services --%>
+        <div class="bg-gray-800 rounded-lg border border-gray-700">
+          <div class="px-6 py-4 border-b border-gray-700">
+            <h2 class="text-base font-semibold text-white">{gettext("Connected Services")}</h2>
+          </div>
+          <div class="divide-y divide-gray-700">
+            <div class="flex items-center justify-between px-6 py-4">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.481.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-white">Spotify</p>
+                  <%= if @user.spotify && @user.spotify.username do %>
+                    <p class="text-xs text-gray-500">{@user.spotify.username}</p>
+                  <% end %>
+                </div>
+              </div>
+              <span class={[
+                "px-2 py-0.5 text-xs font-medium rounded-full",
+                if @user.spotify && @user.spotify.access_token do
+                  "bg-green-900 text-green-300"
+                else
+                  "bg-gray-700 text-gray-500"
+                end
+              ]}>
+                {if @user.spotify && @user.spotify.access_token, do: gettext("Connected"), else: gettext("Not connected")}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between px-6 py-4">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-white">Twitch</p>
+                  <%= if @user.twitch && @user.twitch.username do %>
+                    <p class="text-xs text-gray-500">@{@user.twitch.username}</p>
+                  <% end %>
+                </div>
+              </div>
+              <span class={[
+                "px-2 py-0.5 text-xs font-medium rounded-full",
+                if @user.twitch && @user.twitch.access_token do
+                  "bg-green-900 text-green-300"
+                else
+                  "bg-gray-700 text-gray-500"
+                end
+              ]}>
+                {if @user.twitch && @user.twitch.access_token, do: gettext("Connected"), else: gettext("Not connected")}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <%!-- Right column: actions --%>
+      <div class="space-y-6">
+
+        <%!-- Role --%>
+        <div class="bg-gray-800 rounded-lg border border-gray-700">
+          <div class="px-6 py-4 border-b border-gray-700">
+            <h2 class="text-base font-semibold text-white">{gettext("Role")}</h2>
+          </div>
+          <div class="px-6 py-4">
+            <form phx-submit="change_role" class="space-y-3">
+              <select
+                name="role"
+                class="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="viewer" selected={@user.role == :viewer}>{gettext("Viewer")}</option>
+                <option value="streamer" selected={@user.role == :streamer}>{gettext("Streamer")}</option>
+                <option value="admin" selected={@user.role == :admin}>{gettext("Admin")}</option>
+                <option value="bot" selected={@user.role == :bot}>{gettext("Bot")}</option>
+              </select>
+              <button
+                type="submit"
+                class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors"
+              >
+                {gettext("Update role")}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <%!-- Impersonation --%>
+        <%= if @user.id != @current_scope.user.id && !Map.get(@current_scope, :impersonating?, false) do %>
+          <div class="bg-gray-800 rounded-lg border border-gray-700">
+            <div class="px-6 py-4 border-b border-gray-700">
+              <h2 class="text-base font-semibold text-white">{gettext("Impersonate")}</h2>
+            </div>
+            <div class="px-6 py-4">
+              <p class="text-sm text-gray-400 mb-3">
+                {gettext("View the app as this user. You can switch back at any time.")}
+              </p>
+              <form action="/admin/impersonation" method="post">
+                <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
+                <input type="hidden" name="user_id" value={@user.id} />
+                <button
+                  type="submit"
+                  class="w-full inline-flex items-center justify-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-md transition-colors"
+                  onclick={"return confirm('Impersonate #{@user.email}?')"}
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4-4m-4 4l4 4" />
+                  </svg>
+                  {gettext("Impersonate")}
+                </button>
+              </form>
+            </div>
+          </div>
+        <% end %>
+
+        <%!-- Danger zone --%>
+        <div class="bg-gray-800 rounded-lg border border-red-900/50">
+          <div class="px-6 py-4 border-b border-red-900/50">
+            <h2 class="text-base font-semibold text-red-400">{gettext("Danger Zone")}</h2>
+          </div>
+          <div class="px-6 py-4">
+            <p class="text-sm text-gray-400 mb-3">
+              {gettext("Permanently deletes the account and all associated data.")}
+            </p>
+            <button
+              phx-click="delete_user"
+              class="w-full inline-flex items-center justify-center px-4 py-2 bg-red-700 hover:bg-red-600 text-white text-sm font-medium rounded-md transition-colors"
+              data-confirm={gettext("Delete %{email}? This cannot be undone.", email: @user.email)}
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              {gettext("Delete account")}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

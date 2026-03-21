@@ -9,6 +9,7 @@ defmodule PremiereEcoute.Discography.Workers.EnrichArtistLinksWorker do
 
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichArtistLinks
+  alias PremiereEcoute.PubSub
   alias PremiereEcoute.Repo
 
   @impl Oban.Worker
@@ -28,6 +29,7 @@ defmodule PremiereEcoute.Discography.Workers.EnrichArtistLinksWorker do
       from(a in Artist,
         where:
           fragment("? \\? 'wikipedia' = false", a.external_links) or
+            fragment("? \\? 'genius' = false", a.external_links) or
             fragment("NOT (? \\? 'deezer')", a.provider_ids) or
             fragment("NOT (? \\? 'spotify')", a.provider_ids)
       )
@@ -49,8 +51,9 @@ defmodule PremiereEcoute.Discography.Workers.EnrichArtistLinksWorker do
     Logger.info("EnrichArtistLinks: enriching artist #{inspect(name)}")
 
     case EnrichArtistLinks.enrich_artist(artist) do
-      {:ok, _} ->
+      {:ok, enriched} ->
         Logger.info("EnrichArtistLinks: enriched #{inspect(name)}")
+        PubSub.broadcast("artist:#{artist.id}", {:artist_enriched, enriched})
         :ok
 
       {:error, reason} ->

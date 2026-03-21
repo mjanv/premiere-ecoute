@@ -13,6 +13,8 @@ defmodule PremiereEcoute.Apis.MusicMetadata.GeniusApi do
 
     @callback search_song(query :: String.t()) :: {:ok, [map()]} | {:error, term()}
     @callback get_song(id :: integer()) :: {:ok, map()} | {:error, term()}
+    @callback search_artist(query :: String.t()) :: {:ok, map() | nil} | {:error, term()}
+    @callback get_artist(id :: integer()) :: {:ok, map()} | {:error, term()}
   end
 
   @doc """
@@ -47,4 +49,8 @@ defmodule PremiereEcoute.Apis.MusicMetadata.GeniusApi do
 
   # Songs
   defdelegate get_song(id), to: __MODULE__.Songs
+
+  # Artists
+  defdelegate search_artist(query), to: __MODULE__.Artists
+  defdelegate get_artist(id), to: __MODULE__.Artists
 end

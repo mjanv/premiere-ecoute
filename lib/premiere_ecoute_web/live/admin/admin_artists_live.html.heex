@@ -1,0 +1,237 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-white">{gettext("Artists")}</h1>
+        <p class="mt-2 text-gray-400">{gettext("%{count} artists in the discography", count: @artists_count)}</p>
+      </div>
+      <div class="mt-4 sm:mt-0">
+        <.link
+          navigate="/admin"
+          class="inline-flex items-center px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          {gettext("Back to Dashboard")}
+        </.link>
+      </div>
+    </div>
+
+    <form phx-change="search" class="mb-4">
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+        </svg>
+        <input
+          type="text"
+          name="search"
+          value={@search}
+          placeholder={gettext("Search by name…")}
+          class="w-full pl-9 pr-4 py-2 bg-gray-800 border border-gray-600 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          phx-debounce="300"
+        />
+      </div>
+    </form>
+
+    <div class="bg-gray-800 rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-700">
+        <h2 class="text-xl font-semibold text-white">{gettext("Artists")} ({@page.total_entries})</h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Artist")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Slug")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Providers")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Links")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Added")}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <%= for artist <- @page.entries do %>
+              <tr class="hover:bg-gray-700 cursor-pointer" phx-click="show_artist" phx-value-id={artist.id}>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <%= if image_url = PremiereEcoute.Discography.Artist.image_url(artist, 64) do %>
+                      <img src={image_url} class="w-10 h-10 rounded-full object-cover flex-shrink-0" alt={artist.name} />
+                    <% else %>
+                      <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                    <% end %>
+                    <span class="text-sm font-medium text-white">{artist.name}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
+                  {artist.slug}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex flex-wrap gap-1">
+                    <%= for {provider, _id} <- artist.provider_ids do %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-900 text-blue-300 font-medium">
+                        {provider}
+                      </span>
+                    <% end %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex flex-wrap gap-1">
+                    <%= for {name, _url} <- artist.external_links do %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-700 text-gray-300">
+                        {name}
+                      </span>
+                    <% end %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                  {Calendar.strftime(artist.inserted_at, "%b %d, %Y")}
+                </td>
+              </tr>
+            <% end %>
+
+            <%= if @page.entries == [] do %>
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-gray-400">
+                  <p class="text-lg font-medium">{gettext("No artists found")}</p>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-6 flex items-center justify-center space-x-1">
+      <%= for page_item <- pagination_range(@page.page_number, @page.total_pages) do %>
+        <%= if page_item == :ellipsis do %>
+          <span class="px-2 py-1 text-sm text-gray-500">...</span>
+        <% else %>
+          <%= if page_item == @page.page_number do %>
+            <span class="px-3 py-1 text-sm font-medium text-white bg-purple-500 rounded border border-purple-500">
+              {page_item}
+            </span>
+          <% else %>
+            <.link
+              patch={~p"/admin/artists?page=#{page_item}&per_page=#{@page.page_size}"}
+              class="px-3 py-1 text-sm text-gray-400 hover:text-purple-400 hover:bg-gray-800 rounded transition-colors"
+            >
+              {page_item}
+            </.link>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= if @selected_artist do %>
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" phx-click="close_modal">
+    <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 flex flex-col" phx-click-away="close_modal">
+
+      <%!-- Header --%>
+      <div class="flex items-center gap-4 p-6 border-b border-gray-700">
+        <%= if image_url = Artist.image_url(@selected_artist, 128) do %>
+          <img src={image_url} class="w-16 h-16 rounded-full object-cover flex-shrink-0" alt={@selected_artist.name} />
+        <% else %>
+          <div class="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+        <% end %>
+        <div class="flex-1 min-w-0">
+          <h2 class="text-xl font-bold text-white truncate">{@selected_artist.name}</h2>
+          <p class="text-sm text-gray-500 font-mono mt-0.5">{@selected_artist.slug}</p>
+        </div>
+        <button phx-click="close_modal" class="text-gray-500 hover:text-white transition-colors flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <%!-- Body --%>
+      <div class="p-6 space-y-5">
+
+        <%!-- Provider IDs --%>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">{gettext("Providers")}</p>
+          <%= if map_size(@selected_artist.provider_ids) > 0 do %>
+            <div class="space-y-2">
+              <%= for {provider, id} <- @selected_artist.provider_ids do %>
+                <div class="flex items-center justify-between bg-gray-700 rounded-lg px-3 py-2">
+                  <span class="text-xs font-medium text-blue-300 uppercase">{provider}</span>
+                  <span class="text-xs text-gray-400 font-mono truncate max-w-xs ml-3">{id}</span>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-sm text-gray-600">{gettext("No providers linked.")}</p>
+          <% end %>
+        </div>
+
+        <%!-- External links --%>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">{gettext("External Links")}</p>
+          <%= if map_size(@selected_artist.external_links) > 0 do %>
+            <div class="flex flex-wrap gap-2">
+              <%= for {name, url} <- @selected_artist.external_links do %>
+                <%= if url do %>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-sm rounded-lg transition-colors"
+                  >
+                    {name}
+                    <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-sm text-gray-600">{gettext("No external links.")}</p>
+          <% end %>
+        </div>
+
+        <%!-- Meta + actions --%>
+        <div class="pt-4 border-t border-gray-700 flex items-center justify-between">
+          <div class="text-xs text-gray-600">
+            <span>{gettext("ID %{id}", id: @selected_artist.id)}</span>
+            <span class="mx-2">·</span>
+            <span>{gettext("Added %{date}", date: Calendar.strftime(@selected_artist.inserted_at, "%b %d, %Y"))}</span>
+          </div>
+          <button
+            phx-click="enrich_artist"
+            phx-value-slug={@selected_artist.slug}
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-medium rounded-md transition-colors"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {gettext("Enrich")}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+<% end %>

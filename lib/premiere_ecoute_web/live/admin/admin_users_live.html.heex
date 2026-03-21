@@ -104,6 +104,32 @@
       </div>
     </div>
 
+    <form phx-change="filter" class="flex gap-3 mb-4">
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+        </svg>
+        <input
+          type="text"
+          name="search"
+          value={@search}
+          placeholder={gettext("Search by email or username…")}
+          class="w-full pl-9 pr-4 py-2 bg-gray-800 border border-gray-600 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          phx-debounce="300"
+        />
+      </div>
+      <select
+        name="role"
+        class="bg-gray-800 border border-gray-600 rounded-md text-sm text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      >
+        <option value="" selected={@role_filter == ""}>{gettext("All roles")}</option>
+        <option value="viewer" selected={@role_filter == "viewer"}>{gettext("Viewer")}</option>
+        <option value="streamer" selected={@role_filter == "streamer"}>{gettext("Streamer")}</option>
+        <option value="admin" selected={@role_filter == "admin"}>{gettext("Admin")}</option>
+        <option value="bot" selected={@role_filter == "bot"}>{gettext("Bot")}</option>
+      </select>
+    </form>
+
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700">
         <h2 class="text-xl font-semibold text-white">{gettext("Users")} ({@page.total_entries})</h2>
@@ -132,7 +158,7 @@
           </thead>
           <tbody class="bg-gray-800 divide-y divide-gray-700">
             <%= for user <- @page.entries do %>
-              <tr class="hover:bg-gray-700 cursor-pointer" phx-click="show_user_modal" phx-value-user_id={user.id}>
+              <tr class="hover:bg-gray-700 cursor-pointer" phx-click={JS.navigate(~p"/admin/users/#{user.id}")}>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
@@ -190,14 +216,10 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {Calendar.strftime(user.inserted_at, "%b %d, %Y")}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    phx-click="show_user_modal"
-                    phx-value-user_id={user.id}
-                    class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-600 hover:bg-gray-700 text-white"
-                  >
-                    {gettext("Manage")}
-                  </button>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
                 </td>
               </tr>
             <% end %>
@@ -236,200 +258,3 @@
   </div>
 </div>
 
-<!-- User Modal -->
-<%= if @show_user_modal and @selected_user do %>
-  <div class="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" phx-click="close_user_modal">
-    <div class="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col" phx-click="modal_content_click">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-700">
-        <div class="flex items-center">
-          <div class="h-16 w-16 rounded-full bg-gray-600 flex items-center justify-center mr-4">
-            <span class="text-xl font-bold text-white">
-              {String.first(@selected_user.email) |> String.upcase()}
-            </span>
-          </div>
-          <div>
-            <h2 class="text-xl font-semibold text-white">{@selected_user.email}</h2>
-            <%= if @selected_user.twitch do %>
-              <p class="text-gray-400">@{@selected_user.twitch.username}</p>
-            <% end %>
-            <span class={[
-              "inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-2",
-              case @selected_user.role do
-                :admin -> "bg-purple-100 text-purple-800"
-                :streamer -> "bg-blue-100 text-blue-800"
-                :viewer -> "bg-gray-100 text-gray-800"
-                :bot -> "bg-red-100 text-red-800"
-              end
-            ]}>
-              {String.capitalize(to_string(@selected_user.role))}
-            </span>
-          </div>
-        </div>
-        <button phx-click="close_user_modal" class="text-gray-400 hover:text-white">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      
-<!-- Modal Content -->
-      <div class="flex-1 overflow-y-auto p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- User Information -->
-          <div>
-            <h3 class="text-lg font-medium text-white mb-4">{gettext("User Information")}</h3>
-            <div class="space-y-3">
-              <div>
-                <label class="block text-sm font-medium text-gray-300">{gettext("Email")}</label>
-                <p class="mt-1 text-sm text-gray-400">{@selected_user.email}</p>
-              </div>
-
-              <%= if @selected_user.twitch do %>
-                <div>
-                  <label class="block text-sm font-medium text-gray-300">{gettext("Twitch Username")}</label>
-                  <p class="mt-1 text-sm text-gray-400">@{@selected_user.twitch.username}</p>
-                </div>
-              <% end %>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-300">{gettext("Role")}</label>
-                <p class="mt-1 text-sm text-gray-400">{String.capitalize(to_string(@selected_user.role))}</p>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-300">{gettext("Member Since")}</label>
-                <p class="mt-1 text-sm text-gray-400">{Calendar.strftime(@selected_user.inserted_at, "%B %d, %Y")}</p>
-              </div>
-            </div>
-          </div>
-          
-<!-- Connected Services -->
-          <div>
-            <h3 class="text-lg font-medium text-white mb-4">{gettext("Connected Services")}</h3>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                <div class="flex items-center">
-                  <svg class="w-6 h-6 mr-3 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.481.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-                  </svg>
-                  <span class="text-white font-medium">Spotify</span>
-                </div>
-                <%= if @selected_user.spotify do %>
-                  <span class={[
-                    "px-2 py-1 text-xs font-medium rounded-full",
-                    if(@selected_user.spotify.access_token,
-                      do: "bg-green-900 text-green-200",
-                      else: "bg-red-900 text-red-200"
-                    )
-                  ]}>
-                    {if @selected_user.spotify.access_token, do: gettext("Connected"), else: gettext("Disconnected")}
-                  </span>
-                <% end %>
-              </div>
-
-              <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                <div class="flex items-center">
-                  <svg class="w-6 h-6 mr-3 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                  </svg>
-                  <span class="text-white font-medium">Twitch</span>
-                </div>
-                <%= if @selected_user.twitch do %>
-                  <span class={[
-                    "px-2 py-1 text-xs font-medium rounded-full",
-                    if(@selected_user.twitch.access_token,
-                      do: "bg-green-900 text-green-200",
-                      else: "bg-red-900 text-red-200"
-                    )
-                  ]}>
-                    {if @selected_user.twitch.access_token, do: gettext("Connected"), else: gettext("Disconnected")}
-                  </span>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-<!-- Actions -->
-        <div class="mt-6 pt-6 border-t border-gray-700">
-          <h3 class="text-lg font-medium text-white mb-4">{gettext("Actions")}</h3>
-          <form phx-submit="change_role">
-            <input type="hidden" name="user_id" value={@selected_user.id} />
-            <div class="flex items-end space-x-3">
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">{gettext("Change Role")}</label>
-                <select
-                  name="role"
-                  class="bg-gray-700 border border-gray-600 text-white text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                >
-                  <option value="viewer" selected={@selected_user.role == :viewer}>{gettext("Viewer")}</option>
-                  <option value="streamer" selected={@selected_user.role == :streamer}>{gettext("Streamer")}</option>
-                  <option value="admin" selected={@selected_user.role == :admin}>{gettext("Admin")}</option>
-                  <option value="bot" selected={@selected_user.role == :bot}>{gettext("Bot")}</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                {gettext("Update Role")}
-              </button>
-            </div>
-          </form>
-          
-<!-- Impersonation action - only show if not current user and not already impersonating -->
-          <%= if @selected_user.id != @current_scope.user.id && !Map.get(@current_scope, :impersonating?, false) do %>
-            <div class="mt-4 pt-4 border-t border-gray-700">
-              <form action="/admin/impersonation" method="post">
-                <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
-                <input type="hidden" name="user_id" value={@selected_user.id} />
-                <button
-                  type="submit"
-                  class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-yellow-600 hover:bg-yellow-700 text-white"
-                  onclick={"return confirm('Are you sure you want to impersonate #{@selected_user.email}?')"}
-                >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4-4m-4 4l4 4"
-                    />
-                  </svg>
-                  {gettext("Impersonate User")}
-                </button>
-                <p class="text-xs text-gray-400 mt-2">
-                  {gettext("This will allow you to view the application as this user. You can switch back at any time.")}
-                </p>
-              </form>
-            </div>
-          <% end %>
-          
-<!-- Delete account action - admin can delete any user account -->
-          <div class="mt-4 pt-4 border-t border-gray-700">
-            <button
-              phx-click="confirm_delete_user"
-              phx-value-user_id={@selected_user.id}
-              class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 text-white"
-              data-confirm="Are you sure you want to permanently delete your account ? This action cannot be undone and will delete all associated data."
-            >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              {gettext("Delete Account")}
-            </button>
-            <p class="text-xs text-gray-400 mt-2">
-              {gettext("Permanently delete this user account and all associated data. This action cannot be undone.")}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end %>
