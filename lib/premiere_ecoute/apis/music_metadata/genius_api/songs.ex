@@ -1,11 +1,11 @@
-defmodule PremiereEcoute.Apis.Lyrics.GeniusApi.Songs do
+defmodule PremiereEcoute.Apis.MusicMetadata.GeniusApi.Songs do
   @moduledoc """
   Genius songs API.
 
   Fetches detailed song information by Genius song ID.
   """
 
-  alias PremiereEcoute.Apis.Lyrics.GeniusApi
+  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
 
   @doc """
   Fetches details for a song by Genius ID.

@@ -49,12 +49,16 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Video.YoutubeApi}]
   ],
   genius: [
-    api: PremiereEcoute.Apis.Lyrics.GeniusApi,
-    req_options: [plug: {Req.Test, PremiereEcoute.Apis.Lyrics.GeniusApi}]
+    api: PremiereEcoute.Apis.MusicMetadata.GeniusApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.GeniusApi}]
   ],
   musicbrainz: [
     api: PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi}]
+  ],
+  wikipedia: [
+    api: PremiereEcoute.Apis.MusicMetadata.WikipediaApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.WikipediaApi}]
   ]
 
 config :premiere_ecoute, PremiereEcoute.Repo,

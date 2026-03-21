@@ -1,0 +1,59 @@
+{
+  "batchcomplete": "",
+  "continue": {
+    "sroffset": 5,
+    "continue": "-||"
+  },
+  "query": {
+    "searchinfo": {
+      "totalhits": 2415
+    },
+    "search": [
+      {
+        "ns": 0,
+        "title": "Daft Punk",
+        "pageid": 168310,
+        "size": 120525,
+        "wordcount": 10546,
+        "snippet": "<span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span> were a French electronic music duo formed in 1993 in Paris by Thomas Bangalter and Guy-Manuel de Homem-Christo. They achieved popularity in",
+        "timestamp": "2026-03-18T21:49:12Z"
+      },
+      {
+        "ns": 0,
+        "title": "Discovery (Daft Punk album)",
+        "pageid": 976189,
+        "size": 70989,
+        "wordcount": 5675,
+        "snippet": "Discovery is the second studio album by the French electronic music duo <span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span>, released on 12 March 2001 by Virgin Records. It marked a shift from the",
+        "timestamp": "2026-03-13T12:50:08Z"
+      },
+      {
+        "ns": 0,
+        "title": "Daft Punk discography",
+        "pageid": 4506577,
+        "size": 92385,
+        "wordcount": 4869,
+        "snippet": "French electronic music duo <span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span> released four studio albums, two live albums, one compilation album, one soundtrack album, five remix albums, two",
+        "timestamp": "2026-02-27T02:18:49Z"
+      },
+      {
+        "ns": 0,
+        "title": "Homework (Daft Punk album)",
+        "pageid": 962410,
+        "size": 54238,
+        "wordcount": 4858,
+        "snippet": "duo <span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span>, released on 20 January 1997 by Virgin Records and Soma Quality Recordings. It was released in the US on 25 March 1997.",
+        "timestamp": "2026-03-12T10:00:05Z"
+      },
+      {
+        "ns": 0,
+        "title": "Random Access Memories",
+        "pageid": 38898753,
+        "size": 165773,
+        "wordcount": 13295,
+        "snippet": "the fourth and final studio album by the French electronic music duo <span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span>, released on 17 May 2013 through Columbia Records.",
+        "timestamp": "2026-02-26T18:13:31Z"
+      }
+    ]
+  }
+}

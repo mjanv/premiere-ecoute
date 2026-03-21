@@ -1,0 +1,59 @@
+{
+  "batchcomplete": "",
+  "continue": {
+    "sroffset": 5,
+    "continue": "-||"
+  },
+  "query": {
+    "searchinfo": {
+      "totalhits": 370
+    },
+    "search": [
+      {
+        "ns": 0,
+        "title": "Random Access Memories",
+        "pageid": 38898753,
+        "size": 165773,
+        "wordcount": 13295,
+        "snippet": "<span class=\"searchmatch\">Random</span> <span class=\"searchmatch\">Access</span> <span class=\"searchmatch\">Memories</span> is the fourth and final studio <span class=\"searchmatch\">album</span> by the French electronic music duo <span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span>, released on 17 May 2013 through Columbia Records",
+        "timestamp": "2026-02-26T18:13:31Z"
+      },
+      {
+        "ns": 0,
+        "title": "Daft Punk",
+        "pageid": 168310,
+        "size": 120525,
+        "wordcount": 10546,
+        "snippet": " and included Discovery and <span class=\"searchmatch\">Random</span> <span class=\"searchmatch\">Access</span> <span class=\"searchmatch\">Memories</span> on their 2020 list of the 500 Greatest <span class=\"searchmatch\">Albums</span> of All Time.",
+        "timestamp": "2026-03-18T21:49:12Z"
+      },
+      {
+        "ns": 0,
+        "title": "List of songs recorded by Daft Punk",
+        "pageid": 55933977,
+        "size": 37701,
+        "wordcount": 1414,
+        "snippet": "on the Japanese edition of <span class=\"searchmatch\">Random</span> <span class=\"searchmatch\">Access</span> <span class=\"searchmatch\">Memories</span>.",
+        "timestamp": "2026-01-31T20:00:29Z"
+      },
+      {
+        "ns": 0,
+        "title": "Giorgio by Moroder",
+        "pageid": 39394103,
+        "size": 16471,
+        "wordcount": 1543,
+        "snippet": "electronic music duo <span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span> for their fourth studio <span class=\"searchmatch\">album</span>, <span class=\"searchmatch\">Random</span> <span class=\"searchmatch\">Access</span> <span class=\"searchmatch\">Memories</span> (2013).",
+        "timestamp": "2026-02-02T00:50:00Z"
+      },
+      {
+        "ns": 0,
+        "title": "Doin' It Right",
+        "pageid": 39354558,
+        "size": 18529,
+        "wordcount": 1662,
+        "snippet": "<span class=\"searchmatch\">Daft</span> <span class=\"searchmatch\">Punk</span> featuring the American musician Panda Bear of the band Animal Collective. It is a track on Daft Punk's fourth <span class=\"searchmatch\">album</span> <span class=\"searchmatch\">Random</span> <span class=\"searchmatch\">Access</span> <span class=\"searchmatch\">Memories</span> (2013)",
+        "timestamp": "2026-01-13T19:44:01Z"
+      }
+    ]
+  }
+}

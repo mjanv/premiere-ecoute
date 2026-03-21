@@ -6,7 +6,7 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Apis.Lyrics.GeniusApi
+  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
   alias PremiereEcoute.Apis.Video.YoutubeApi
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Sessions.ListeningSession

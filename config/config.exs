@@ -84,7 +84,7 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     ]
   ],
   genius: [
-    api: PremiereEcoute.Apis.Lyrics.GeniusApi,
+    api: PremiereEcoute.Apis.MusicMetadata.GeniusApi,
     urls: [
       api: "https://api.genius.com"
     ]
@@ -93,6 +93,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     api: PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi,
     urls: [
       api: "https://musicbrainz.org/ws/2"
+    ]
+  ],
+  wikipedia: [
+    api: PremiereEcoute.Apis.MusicMetadata.WikipediaApi,
+    urls: [
+      api: "https://en.wikipedia.org/w"
     ]
   ]
 

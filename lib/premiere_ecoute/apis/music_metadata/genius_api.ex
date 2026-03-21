@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Apis.Lyrics.GeniusApi do
+defmodule PremiereEcoute.Apis.MusicMetadata.GeniusApi do
   @moduledoc """
   Genius API client.
 

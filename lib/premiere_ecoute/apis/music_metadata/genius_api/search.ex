@@ -1,11 +1,11 @@
-defmodule PremiereEcoute.Apis.Lyrics.GeniusApi.Search do
+defmodule PremiereEcoute.Apis.MusicMetadata.GeniusApi.Search do
   @moduledoc """
   Genius search API.
 
   Searches for songs by query string.
   """
 
-  alias PremiereEcoute.Apis.Lyrics.GeniusApi
+  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
 
   @doc """
   Searches Genius for songs matching a query.

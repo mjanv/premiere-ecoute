@@ -1,8 +1,8 @@
-defmodule PremiereEcoute.Apis.Lyrics.GeniusApi.SearchTest do
+defmodule PremiereEcoute.Apis.MusicMetadata.GeniusApi.SearchTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Apis.Lyrics.GeniusApi
+  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
 
   setup {Req.Test, :verify_on_exit!}
 
