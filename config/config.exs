@@ -134,7 +134,8 @@ config :premiere_ecoute, Oban,
     spotify: 1,
     radio: 1,
     automations: 5,
-    notifications: 1
+    notifications: 1,
+    discography: 1
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},

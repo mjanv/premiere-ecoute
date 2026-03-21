@@ -10,8 +10,10 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Donations.Goal
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.Review
 
   @doc """
   Initializes admin dashboard with system statistics and event store browser.
@@ -25,6 +27,8 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
       users_count: User.count(:id),
       sessions_count: ListeningSession.count(:id),
       albums_count: Album.count(:id),
+      artists_count: Artist.count(:id),
+      reviews_count: Review.count(:id),
       billboards_count: Billboard.count(:id),
       goals_count: Goal.count(:id)
     })

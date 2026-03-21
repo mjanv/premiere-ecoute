@@ -235,7 +235,10 @@ defmodule PremiereEcouteWeb.Router do
     live_session :admin, on_mount: [{UserAuth, :admin}] do
       live "/", AdminLive, :index
       live "/users", AdminUsersLive, :index
+      live "/users/:id", AdminUserLive, :show
       live "/albums", AdminAlbumsLive, :index
+      live "/artists", AdminArtistsLive, :index
+      live "/reviews", AdminReviewsLive, :index
       live "/sessions", AdminSessionsLive, :index
       live "/billboards", AdminBillboardsLive, :index
       live "/donations", Donations.DonationsLive, :index

@@ -1,0 +1,253 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-white">{gettext("Reviews")}</h1>
+        <p class="mt-2 text-gray-400">{gettext("%{count} reviews written", count: @reviews_count)}</p>
+      </div>
+      <div class="mt-4 sm:mt-0">
+        <.link
+          navigate="/admin"
+          class="inline-flex items-center px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          {gettext("Back to Dashboard")}
+        </.link>
+      </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-700">
+        <h2 class="text-xl font-semibold text-white">{gettext("Reviews")} ({@page.total_entries})</h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("User")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Subject")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Rating")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Role")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Likes")}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                {gettext("Written")}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <%= for review <- @page.entries do %>
+              <tr class="hover:bg-gray-700 cursor-pointer" phx-click="show_review" phx-value-id={review.id}>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm text-white">{review.user && review.user.username}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-white">
+                    <%= cond do %>
+                      <% review.album != nil -> %>
+                        <span class="font-medium">{review.album.name}</span>
+                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-yellow-900 text-yellow-300">album</span>
+                      <% review.session_id != nil -> %>
+                        <span class="font-medium">Session #{review.session_id}</span>
+                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-900 text-green-300">session</span>
+                      <% true -> %>
+                        <span class="text-gray-500">—</span>
+                    <% end %>
+                  </div>
+                  <%= if review.content && review.content != "" do %>
+                    <p class="text-xs text-gray-500 mt-0.5 max-w-xs truncate">{review.content}</p>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <%= if review.rating && review.rating > 0 do %>
+                    <span class="text-sm font-semibold text-yellow-400">
+                      {Float.round(review.rating, 1)} / 5
+                    </span>
+                  <% else %>
+                    <span class="text-sm text-gray-600">—</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class={[
+                    "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium",
+                    if review.role == :streamer do
+                      "bg-purple-900 text-purple-300"
+                    else
+                      "bg-gray-700 text-gray-300"
+                    end
+                  ]}>
+                    {review.role}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                  {length(review.likes)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                  {Calendar.strftime(review.inserted_at, "%b %d, %Y")}
+                </td>
+              </tr>
+            <% end %>
+
+            <%= if @page.entries == [] do %>
+              <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                  <p class="text-lg font-medium">{gettext("No reviews found")}</p>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-6 flex items-center justify-center space-x-1">
+      <%= for page_item <- pagination_range(@page.page_number, @page.total_pages) do %>
+        <%= if page_item == :ellipsis do %>
+          <span class="px-2 py-1 text-sm text-gray-500">...</span>
+        <% else %>
+          <%= if page_item == @page.page_number do %>
+            <span class="px-3 py-1 text-sm font-medium text-white bg-purple-500 rounded border border-purple-500">
+              {page_item}
+            </span>
+          <% else %>
+            <.link
+              patch={~p"/admin/reviews?page=#{page_item}&per_page=#{@page.page_size}"}
+              class="px-3 py-1 text-sm text-gray-400 hover:text-purple-400 hover:bg-gray-800 rounded transition-colors"
+            >
+              {page_item}
+            </.link>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= if @selected_review do %>
+  <div class="fixed inset-0 backdrop-blur-sm bg-black/50 flex items-center justify-center z-50" phx-click="close_modal">
+    <div
+      class="bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 flex flex-col"
+      phx-click-away="close_modal"
+    >
+      <%!-- Header --%>
+      <div class="flex items-start justify-between p-6 border-b border-gray-700">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class={[
+              "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium",
+              if @selected_review.role == :streamer do
+                "bg-purple-900 text-purple-300"
+              else
+                "bg-gray-700 text-gray-300"
+              end
+            ]}>
+              {@selected_review.role}
+            </span>
+            <%= cond do %>
+              <% @selected_review.album != nil -> %>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-yellow-900 text-yellow-300">album</span>
+              <% @selected_review.session_id != nil -> %>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-900 text-green-300">session</span>
+              <% true -> %>
+            <% end %>
+          </div>
+          <h2 class="text-lg font-semibold text-white">
+            <%= cond do %>
+              <% @selected_review.album != nil -> %>
+                {@selected_review.album.name}
+              <% @selected_review.session_id != nil -> %>
+                {gettext("Session #%{id}", id: @selected_review.session_id)}
+              <% true -> %>
+                {gettext("Review")}
+            <% end %>
+          </h2>
+          <p class="text-sm text-gray-400 mt-0.5">
+            {gettext("by %{user}", user: @selected_review.user && @selected_review.user.username)}
+            · {Calendar.strftime(@selected_review.inserted_at, "%b %d, %Y")}
+          </p>
+        </div>
+        <button phx-click="close_modal" class="text-gray-400 hover:text-white ml-4 flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <%!-- Body --%>
+      <div class="p-6 space-y-4">
+        <%!-- Rating + likes --%>
+        <div class="flex items-center gap-6">
+          <%= if @selected_review.rating && @selected_review.rating > 0 do %>
+            <div>
+              <p class="text-xs text-gray-500 mb-0.5">{gettext("Rating")}</p>
+              <p class="text-2xl font-bold text-yellow-400">
+                {Float.round(@selected_review.rating, 1)}<span class="text-sm text-gray-500 font-normal"> / 5</span>
+              </p>
+            </div>
+          <% end %>
+          <div>
+            <p class="text-xs text-gray-500 mb-0.5">{gettext("Likes")}</p>
+            <p class="text-xl font-semibold text-white">{length(@selected_review.likes)}</p>
+          </div>
+          <%= if @selected_review.watched_before do %>
+            <div>
+              <p class="text-xs text-gray-500 mb-0.5">{gettext("Listened before")}</p>
+              <p class="text-sm text-white">{gettext("Yes")}</p>
+            </div>
+          <% end %>
+          <%= if @selected_review.tags != [] do %>
+            <div class="flex flex-wrap gap-1">
+              <%= for tag <- @selected_review.tags do %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-700 text-gray-300">{tag}</span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <%!-- Content --%>
+        <%= if @selected_review.content && @selected_review.content != "" do %>
+          <div>
+            <p class="text-xs text-gray-500 mb-1">{gettext("Content")}</p>
+            <p class="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">{@selected_review.content}</p>
+          </div>
+        <% else %>
+          <p class="text-sm text-gray-600 italic">{gettext("No written content.")}</p>
+        <% end %>
+      </div>
+
+      <%!-- Footer --%>
+      <div class="flex items-center justify-between px-6 py-4 border-t border-gray-700">
+        <button
+          phx-click="close_modal"
+          class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+        >
+          {gettext("Close")}
+        </button>
+        <button
+          phx-click="delete_review"
+          phx-value-id={@selected_review.id}
+          class="inline-flex items-center px-4 py-2 bg-red-700 hover:bg-red-600 text-white text-sm font-medium rounded-md transition-colors"
+          data-confirm={gettext("Delete this review? This cannot be undone.")}
+        >
+          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          {gettext("Delete")}
+        </button>
+      </div>
+    </div>
+  </div>
+<% end %>

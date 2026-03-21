@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.SearchTest do
       ApiMock.expect(
         WikipediaApi,
         path: {:get, "/w/api.php"},
-        headers: [{"user-agent", "PremièreEcoute/1.0 (maxime.janvier@gmail.com)"}],
+        headers: [{"user-agent", "PremiereEcoute/1.0 (maxime.janvier@gmail.com)"}],
         response: "wikipedia_api/search/search_artist/response.json",
         status: 200
       )
@@ -36,7 +36,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.SearchTest do
       ApiMock.expect(
         WikipediaApi,
         path: {:get, "/w/api.php"},
-        headers: [{"user-agent", "PremièreEcoute/1.0 (maxime.janvier@gmail.com)"}],
+        headers: [{"user-agent", "PremiereEcoute/1.0 (maxime.janvier@gmail.com)"}],
         response: "wikipedia_api/search/search_album/response.json",
         status: 200
       )

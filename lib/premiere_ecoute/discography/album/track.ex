@@ -20,6 +20,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
   @type t :: %__MODULE__{
           id: integer() | nil,
           provider_ids: %{atom() => String.t()},
+          external_links: %{optional(String.t()) => String.t()},
           name: String.t() | nil,
           track_number: integer() | nil,
           duration_ms: integer() | nil,
@@ -31,6 +32,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
 
   schema "album_tracks" do
     field :provider_ids, PremiereEcouteCore.Ecto.Map, default: %{}
+    field :external_links, :map, default: %{}
     field :name, :string
     field :slug, Slug.Type
     field :track_number, :integer
@@ -49,8 +51,9 @@ defmodule PremiereEcoute.Discography.Album.Track do
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(track, attrs) do
     track
-    |> cast(attrs, [:provider_ids, :name, :track_number, :duration_ms])
+    |> cast(attrs, [:provider_ids, :external_links, :name, :track_number, :duration_ms])
     |> validate_required([:provider_ids, :name, :track_number])
+    |> validate_external_links()
     |> validate_number(:track_number, greater_than: 0)
     |> validate_number(:duration_ms, greater_than_or_equal_to: 0)
     |> Slug.maybe_generate_slug()
@@ -59,4 +62,21 @@ defmodule PremiereEcoute.Discography.Album.Track do
   end
 
   def provider(%__MODULE__{provider_ids: providers_ids}, provider), do: Map.get(providers_ids, provider)
+
+  defp validate_external_links(%Ecto.Changeset{} = changeset) do
+    case get_change(changeset, :external_links) do
+      nil -> changeset
+      links -> Enum.reduce(links, changeset, &validate_link/2)
+    end
+  end
+
+  defp validate_link({_key, nil}, changeset), do: changeset
+
+  defp validate_link({_key, url}, changeset) do
+    if url =~ ~r/\Ahttps?:\/\/.+/i do
+      changeset
+    else
+      add_error(changeset, :external_links, "contains invalid URL: #{url}")
+    end
+  end
 end

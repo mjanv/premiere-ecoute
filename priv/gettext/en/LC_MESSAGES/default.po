@@ -4188,7 +4188,7 @@ msgstr[1] ""
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:808
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Back to history"
-msgstr "Back to Library"
+msgstr "Back to history"
 
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:154
 #, elixir-autogen, elixir-format
@@ -4603,7 +4603,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/discography/single_live.html.heex:99
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Listening sessions"
-msgstr "Listening session history"
+msgstr "Listening sessions"
 
 #: lib/premiere_ecoute_web/components/navigation/header.ex:86
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:29
