@@ -59,10 +59,14 @@
                     <%= cond do %>
                       <% review.album != nil -> %>
                         <span class="font-medium">{review.album.name}</span>
-                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-yellow-900 text-yellow-300">album</span>
+                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-yellow-900 text-yellow-300">
+                          album
+                        </span>
                       <% review.session_id != nil -> %>
                         <span class="font-medium">Session #{review.session_id}</span>
-                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-900 text-green-300">session</span>
+                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-900 text-green-300">
+                          session
+                        </span>
                       <% true -> %>
                         <span class="text-gray-500">—</span>
                     <% end %>
@@ -175,8 +179,10 @@
             <% end %>
           </h2>
           <p class="text-sm text-gray-400 mt-0.5">
-            {gettext("by %{user}", user: @selected_review.user && @selected_review.user.username)}
-            · {Calendar.strftime(@selected_review.inserted_at, "%b %d, %Y")}
+            {gettext("by %{user}", user: @selected_review.user && @selected_review.user.username)} · {Calendar.strftime(
+              @selected_review.inserted_at,
+              "%b %d, %Y"
+            )}
           </p>
         </div>
         <button phx-click="close_modal" class="text-gray-400 hover:text-white ml-4 flex-shrink-0">
@@ -243,7 +249,12 @@
           data-confirm={gettext("Delete this review? This cannot be undone.")}
         >
           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
           </svg>
           {gettext("Delete")}
         </button>

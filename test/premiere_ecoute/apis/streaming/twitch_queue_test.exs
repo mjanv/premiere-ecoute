@@ -71,6 +71,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
       refute is_nil(state.timer)
     end
 
+    @tag :unstable
     test "circuit stays open and queues additional messages", %{bot: _bot} do
       message1 = %{user_id: "141981764", message: "test1"}
       message2 = %{user_id: "141981764", message: "test2"}

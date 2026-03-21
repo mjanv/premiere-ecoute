@@ -1,4 +1,6 @@
 defmodule PremiereEcoute.Playlists.Automations.Actions.ShufflePlaylist do
+  @moduledoc false
+
   use PremiereEcoute.Playlists.Automations.Action
 
   alias PremiereEcoute.Apis

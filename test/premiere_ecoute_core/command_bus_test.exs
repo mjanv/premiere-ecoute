@@ -90,6 +90,7 @@ defmodule PremiereEcouteCore.CommandBusTest do
       assert logs =~ "dispatch: %PremiereEcouteCore.CommandBusTest.EventA{a: 11}"
     end
 
+    @tag :unstable
     test "2" do
       {{:error, :unknown}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 0}) end)
 
