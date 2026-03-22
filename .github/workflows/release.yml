@@ -33,9 +33,10 @@ jobs:
 
       - name: Package plugins
         run: |
-          cd apps/streamdeck
-          zip -r com.maxime-janvier.premiere-ecoute-streamer.streamDeckPlugin com.maxime-janvier.premiere-ecoute-streamer.sdPlugin
-          zip -r com.maxime-janvier.premiere-ecoute-viewer.streamDeckPlugin com.maxime-janvier.premiere-ecoute-viewer.sdPlugin
+          cd apps/streamdeck/com.maxime-janvier.premiere-ecoute-streamer.sdPlugin
+          zip -r ../com.maxime-janvier.premiere-ecoute-streamer.streamDeckPlugin .
+          cd ../com.maxime-janvier.premiere-ecoute-viewer.sdPlugin
+          zip -r ../com.maxime-janvier.premiere-ecoute-viewer.streamDeckPlugin .
 
       - name: Extract release notes
         id: notes
