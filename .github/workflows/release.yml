@@ -27,8 +27,16 @@ jobs:
         run: npm ci
         working-directory: apps/streamdeck
 
-      - name: Build and package plugins
-        run: npm run release
+      - name: Build plugins
+        run: npm run build
+        working-directory: apps/streamdeck
+
+      - name: Package streamer plugin
+        run: npx streamdeck pack com.maxime-janvier.premiere-ecoute-streamer.sdPlugin --force
+        working-directory: apps/streamdeck
+
+      - name: Package viewer plugin
+        run: npx streamdeck pack com.maxime-janvier.premiere-ecoute-viewer.sdPlugin --force
         working-directory: apps/streamdeck
 
       - name: Extract release notes
