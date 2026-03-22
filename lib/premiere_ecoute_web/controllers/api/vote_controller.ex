@@ -54,8 +54,7 @@ defmodule PremiereEcouteWeb.Api.VoteController do
   Submits a vote for the current track (0–10).
   """
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def create(%{assigns: %{current_scope: %{user: %{role: :streamer, twitch: %{user_id: user_id}}}}} = conn, %{"rating" => rating})
-      when rating in 0..10 do
+  def create(%{assigns: %{current_scope: %{user: %{role: :streamer, twitch: %{user_id: user_id}}}}} = conn, %{"rating" => rating}) when rating in 1..10 do
     Sessions.impl().publish_message(%MessageSent{
       broadcaster_id: user_id,
       user_id: user_id,
@@ -66,11 +65,11 @@ defmodule PremiereEcouteWeb.Api.VoteController do
     json(conn, %{ok: true, rating: rating})
   end
 
-  def create(%{assigns: %{current_scope: %{user: %{role: :viewer} = caller}}} = conn, %{
+  def create(%{assigns: %{current_scope: %{user: %{role: role} = caller}}} = conn, %{
         "rating" => rating,
         "username" => username
       })
-      when rating in 0..10 do
+      when role in [:viewer, :admin] and rating in 1..10 do
     case Accounts.get_user_by_username(username) do
       nil ->
         conn |> put_status(:not_found) |> json(%{error: "Broadcaster not found"})
@@ -88,6 +87,6 @@ defmodule PremiereEcouteWeb.Api.VoteController do
   end
 
   def create(conn, _params) do
-    conn |> put_status(:unprocessable_entity) |> json(%{error: "rating must be an integer between 0 and 10"})
+    conn |> put_status(:unprocessable_entity) |> json(%{error: "cannot process vote"})
   end
 end

@@ -1,8 +1,12 @@
 # Stream Deck Plugin — Première Écoute
 
-Controls a Première Écoute listening session from a Stream Deck.
+Controls a Première Écoute listening session from a Stream Deck. Two plugins are available: one for streamers, one for viewers.
 
-## Actions
+## Plugins
+
+### Streamer (`com.maxime-janvier.premiere-ecoute-streamer`)
+
+Full session control.
 
 | Action | Description |
 |---|---|
@@ -11,34 +15,40 @@ Controls a Première Écoute listening session from a Stream Deck.
 | **Stop Session** | Stops the current session |
 | **Next Track** | Skips to the next track |
 | **Previous Track** | Goes back to the previous track |
+| **Vote / Vote Up / Vote Down** | Submit a rating for the current track |
+
+### Viewer (`com.maxime-janvier.premiere-ecoute-viewer`)
+
+Vote-only access, targeting a streamer's session.
+
+| Action | Description |
+|---|---|
+| **Vote / Vote Up / Vote Down** | Submit a rating for the current track |
+
+## Installation
+
+Download the latest `.streamDeckPlugin` files from the [GitHub releases](https://github.com/mjanv/premiere-ecoute/releases) and double-click to install.
 
 ## Setup
 
 ### Prerequisites
 
-- Stream Deck software installed on Windows
-- Node.js 20+
+- Stream Deck software installed on Windows or macOS
 - A running Première Écoute instance
-- An API token (see below)
-
-### Generate an API token
-
-Stop the server, then run:
-
-```bash
-mix run --eval '
-user = PremiereEcoute.Repo.get_by!(PremiereEcoute.Accounts.User, username: "YOUR_USERNAME")
-token = PremiereEcoute.Accounts.generate_user_api_token(user)
-IO.puts(token)
-'
-```
+- An API token
 
 ### Configure the plugin
 
 Click any action in the Stream Deck property inspector and fill in:
 
+**Streamer plugin:**
 - **Server URL** — e.g. `https://premiere-ecoute.fr` (defaults to `http://localhost:4000`)
 - **API Token** — the token generated above
+
+**Viewer plugin:**
+- **Server URL** — e.g. `https://premiere-ecoute.fr`
+- **API Token** — the token generated above
+- **Broadcaster Username** — the Première Écoute username of the streamer to vote for
 
 Settings are global and shared across all actions.
 
@@ -48,25 +58,8 @@ This plugin is developed from WSL. The build output is rsynced directly to the W
 
 ```bash
 npm run build    # one-off build
-npm run deploy   # build + rsync + restart Stream Deck
+npm run release  # build + package both plugins as .streamDeckPlugin files
+npm run deploy   # build + rsync + restart Stream Deck (streamer only)
 npm run watch    # rebuild and redeploy on every file change
 ```
 
-### Project structure
-
-```
-src/
-  actions/
-    session-status.ts     # polls GET /api/session every 5s
-    session-start.ts      # POST /api/session/start
-    session-stop.ts       # POST /api/session/stop
-    session-next.ts       # POST /api/session/next
-    session-previous.ts   # POST /api/session/previous
-  api-client.ts           # fetch wrapper, reads global settings
-  plugin.ts               # entry point, registers all actions
-com.maxime-janvier.premiere-ecoute.sdPlugin/
-  manifest.json
-  ui/global-settings.html # property inspector (server URL + API token)
-  imgs/
-  bin/                    # compiled output (git-ignored)
-```

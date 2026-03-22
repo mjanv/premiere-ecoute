@@ -81,7 +81,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountComplianceTest do
       assert %{
                "generated_at" => _,
                "host" => "localhost",
-               "version" => "1.0.0"
+               "version" => "0.1.0"
              } = metadata
 
       assert %{
