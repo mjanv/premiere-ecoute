@@ -31,10 +31,13 @@ jobs:
         run: npm run build
         working-directory: apps/streamdeck
 
-      - name: Package plugins
-        run: |
-          cd apps/streamdeck/com.maxime-janvier.premiere-ecoute-streamer.sdPlugin && zip -r ../com.maxime-janvier.premiere-ecoute-streamer.streamDeckPlugin .
-          cd apps/streamdeck/com.maxime-janvier.premiere-ecoute-viewer.sdPlugin && zip -r ../com.maxime-janvier.premiere-ecoute-viewer.streamDeckPlugin .
+      - name: Package streamer plugin
+        run: cd com.maxime-janvier.premiere-ecoute-streamer.sdPlugin && zip -r ../com.maxime-janvier.premiere-ecoute-streamer.streamDeckPlugin .
+        working-directory: apps/streamdeck
+
+      - name: Package viewer plugin
+        run: cd com.maxime-janvier.premiere-ecoute-viewer.sdPlugin && zip -r ../com.maxime-janvier.premiere-ecoute-viewer.streamDeckPlugin .
+        working-directory: apps/streamdeck
 
       - name: Extract release notes
         id: notes
