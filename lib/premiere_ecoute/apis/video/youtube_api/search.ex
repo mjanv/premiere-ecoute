@@ -8,6 +8,38 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.Search do
   alias PremiereEcoute.Apis.Video.YoutubeApi
 
   @doc """
+  Searches YouTube for a music artist channel by name.
+
+  Uses the search endpoint with type=channel, filtered to Music category (ID 10).
+  Returns only exact name matches (case-insensitive) as maps with channel_id and name.
+  The channel_id can be used to build a YouTube Music URL: https://music.youtube.com/channel/{id}
+  """
+  @spec search_artist(String.t()) :: {:ok, [map()]} | {:error, term()}
+  def search_artist(name) when is_binary(name) do
+    name_downcase = String.downcase(name)
+
+    YoutubeApi.api()
+    |> YoutubeApi.get(
+      url: "/search",
+      params: [
+        q: name,
+        part: "snippet",
+        type: "channel",
+        maxResults: 10
+      ]
+    )
+    |> YoutubeApi.handle(200, fn %{"items" => items} ->
+      items
+      |> Enum.filter(fn %{"snippet" => snippet} ->
+        String.downcase(snippet["channelTitle"]) == name_downcase
+      end)
+      |> Enum.map(fn %{"id" => %{"channelId" => channel_id}, "snippet" => snippet} ->
+        %{channel_id: channel_id, name: snippet["channelTitle"]}
+      end)
+    end)
+  end
+
+  @doc """
   Searches YouTube for videos matching a track query.
 
   Filters to Music category (ID 10), ordered by relevance.

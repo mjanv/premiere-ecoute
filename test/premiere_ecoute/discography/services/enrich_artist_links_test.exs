@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.TidalApi
+  alias PremiereEcoute.Apis.Video.YoutubeApi
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichArtistLinks
   alias PremiereEcouteCore.Cache
@@ -86,6 +87,18 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     )
   end
 
+  defp expect_youtube_music(response \\ "youtube_api/search/search_artist/response.json") do
+    ApiMock.expect(YoutubeApi, path: {:get, "/youtube/v3/search"}, response: response, status: 200)
+  end
+
+  defp expect_youtube_music_empty do
+    ApiMock.expect(YoutubeApi,
+      path: {:get, "/youtube/v3/search"},
+      body: %{"items" => []},
+      status: 200
+    )
+  end
+
   describe "enrich_artist/1 - wikipedia" do
     test "fetches wikipedia URL and stores it in external_links" do
       artist = artist_fixture()
@@ -93,6 +106,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -105,6 +119,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -116,6 +131,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -127,6 +143,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -140,6 +157,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -156,6 +174,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -168,6 +187,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -179,6 +199,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -191,6 +212,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer_empty()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -206,6 +228,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -218,6 +241,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -229,6 +253,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -241,6 +266,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius_empty()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -257,6 +283,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_deezer()
       expect_spotify()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -270,6 +297,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_deezer()
       expect_spotify()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -282,6 +310,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -295,6 +324,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_deezer()
       expect_spotify_empty()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -310,6 +340,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -322,6 +353,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal()
+      expect_youtube_music()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -333,6 +365,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_youtube_music()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -345,11 +378,66 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_tidal_empty()
+      expect_youtube_music()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).provider_ids, :tidal)
       assert is_nil(updated.provider_ids[:tidal])
+    end
+  end
+
+  describe "enrich_artist/1 - youtube_music" do
+    test "fetches youtube channel ID and stores it in provider_ids" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_tidal()
+      expect_youtube_music()
+
+      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert updated.provider_ids[:youtube_music] == "UC_kRDKYrUlrbtrSiyu5Tflg"
+    end
+
+    test "persists the youtube channel ID to the database" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_tidal()
+      expect_youtube_music()
+
+      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert Artist.get(artist.id).provider_ids[:youtube_music] == "UC_kRDKYrUlrbtrSiyu5Tflg"
+    end
+
+    test "skips artist that already has a youtube_music ID" do
+      artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", youtube_music: "UC_kRDKYrUlrbtrSiyu5Tflg"}})
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_tidal()
+
+      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert returned.provider_ids[:youtube_music] == "UC_kRDKYrUlrbtrSiyu5Tflg"
+    end
+
+    test "stores nil sentinel when youtube_music has no results" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_tidal()
+      expect_youtube_music_empty()
+
+      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert Map.has_key?(Artist.get(artist.id).provider_ids, :youtube_music)
+      assert is_nil(updated.provider_ids[:youtube_music])
     end
   end
 end

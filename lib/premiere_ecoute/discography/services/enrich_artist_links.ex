@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.TidalApi
+  alias PremiereEcoute.Apis.Video.YoutubeApi
   alias PremiereEcoute.Discography.Artist
 
   @doc """
@@ -29,6 +30,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
     |> enrich_deezer()
     |> enrich_spotify()
     |> enrich_tidal()
+    |> enrich_youtube()
   end
 
   # Wikipedia — stores URL in external_links["wikipedia"], nil sentinel on not found
@@ -113,6 +115,28 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
 
       {:error, reason} ->
         Logger.error("EnrichArtistLinks: tidal lookup failed for #{inspect(name)}: #{inspect(reason)}")
+        {:ok, artist}
+    end
+  end
+
+  # YouTube Music — stores YouTube channel ID in provider_ids[:youtube_music], nil sentinel on not found
+  defp enrich_youtube({:error, _} = error), do: error
+
+  defp enrich_youtube({:ok, %Artist{provider_ids: %{youtube_music: _}} = artist}) do
+    {:ok, artist}
+  end
+
+  defp enrich_youtube({:ok, %Artist{name: name} = artist}) do
+    case YoutubeApi.search_artist(name) do
+      {:ok, [first | _]} ->
+        Artist.update(artist, %{provider_ids: Map.put(artist.provider_ids, :youtube_music, first.channel_id)})
+
+      {:ok, []} ->
+        Logger.warning("EnrichArtistLinks: no youtube channel found for #{inspect(name)}")
+        Artist.update(artist, %{provider_ids: Map.put(artist.provider_ids, :youtube_music, nil)})
+
+      {:error, reason} ->
+        Logger.error("EnrichArtistLinks: youtube lookup failed for #{inspect(name)}: #{inspect(reason)}")
         {:ok, artist}
     end
   end

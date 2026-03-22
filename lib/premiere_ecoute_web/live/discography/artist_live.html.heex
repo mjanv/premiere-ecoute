@@ -62,7 +62,7 @@
             </div>
           <% end %>
           <%!-- Where to listen --%>
-          <%= if @artist.provider_ids[:spotify] || @artist.provider_ids[:deezer] || @artist.provider_ids[:tidal] do %>
+          <%= if @artist.provider_ids[:spotify] || @artist.provider_ids[:deezer] || @artist.provider_ids[:tidal] || @artist.provider_ids[:youtube_music] do %>
             <div>
               <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
                 {gettext("Where to listen")}
@@ -99,6 +99,16 @@
                     class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-[#000000]/30 border border-white/10 hover:border-white/40 text-slate-300 hover:text-white text-sm transition-all"
                   >
                     <img src="https://tidal.com/favicon.ico" class="w-4 h-4 shrink-0" alt="Tidal" /> Tidal
+                  </a>
+                <% end %>
+                <%= if id = @artist.provider_ids[:youtube_music] do %>
+                  <a
+                    href={"https://music.youtube.com/channel/#{id}"}
+                    target="_blank"
+                    rel="noopener"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-[#FF0000]/10 border border-white/10 hover:border-[#FF0000]/40 text-slate-300 hover:text-[#FF0000] text-sm transition-all"
+                  >
+                    <img src="https://music.youtube.com/favicon.ico" class="w-4 h-4 shrink-0" alt="YouTube Music" /> YouTube Music
                   </a>
                 <% end %>
               </div>

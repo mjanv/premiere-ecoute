@@ -21,6 +21,8 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi do
                 {:ok, [map()]} | {:error, term()}
     @callback search_track_videos(query :: String.t()) ::
                 {:ok, [map()]} | {:error, term()}
+    @callback search_artist(name :: String.t()) ::
+                {:ok, [map()]} | {:error, term()}
   end
 
   @doc """
@@ -61,4 +63,5 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi do
 
   # Search
   defdelegate search_track_videos(query), to: __MODULE__.Search
+  defdelegate search_artist(name), to: __MODULE__.Search
 end
