@@ -61,5 +61,4 @@ apps/digital_ocean/backups/
 docs/plans
 
 # Streamdeck
-*.sdPlugin
 *.streamDeckPlugin

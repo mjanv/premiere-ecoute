@@ -1,0 +1,73 @@
+{
+	"Name": "Première Écoute Viewer",
+	"Version": "0.1.0.0",
+	"Author": "Maxime Janvier",
+	"Actions": [
+		{
+			"Name": "Vote",
+			"UUID": "com.maxime-janvier.premiere-ecoute.session-vote",
+			"Icon": "imgs/actions/counter/icon",
+			"Tooltip": "Submit the current vote rating for the track.",
+			"PropertyInspectorPath": "ui/global-settings.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/counter/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Vote Up",
+			"UUID": "com.maxime-janvier.premiere-ecoute.session-vote-up",
+			"Icon": "imgs/actions/counter/icon",
+			"Tooltip": "Increase the vote rating by 1.",
+			"PropertyInspectorPath": "ui/global-settings.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/counter/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Vote Down",
+			"UUID": "com.maxime-janvier.premiere-ecoute.session-vote-down",
+			"Icon": "imgs/actions/counter/icon",
+			"Tooltip": "Decrease the vote rating by 1.",
+			"PropertyInspectorPath": "ui/global-settings.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/counter/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		}
+	],
+	"Category": "Première Écoute Viewer",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "Vote on tracks during a Première Écoute listening session.",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "6.9"
+	},
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "12"
+		},
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Nodejs": {
+		"Version": "20",
+		"Debug": "enabled"
+	},
+	"UUID": "com.maxime-janvier.premiere-ecoute-viewer"
+}
