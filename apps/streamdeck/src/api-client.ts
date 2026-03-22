@@ -3,6 +3,7 @@ import streamDeck from "@elgato/streamdeck";
 export type GlobalSettings = {
 	serverUrl?: string;
 	apiToken?: string;
+	broadcasterUsername?: string;
 };
 
 export type Session = {
@@ -95,5 +96,9 @@ export const api = {
 	stopSession: () => request<{ ok: boolean }>("POST", "/api/session/stop"),
 	nextTrack: () => request<{ ok: boolean }>("POST", "/api/session/next"),
 	previousTrack: () => request<{ ok: boolean }>("POST", "/api/session/previous"),
-	voteTrack: (rating: number) => requestWithBody<{ ok: boolean; rating: number }>("POST", "/api/session/vote", { rating }),
+	voteTrack: (rating: number) => {
+		const body: { rating: number; username?: string } = { rating };
+		if (cachedSettings.broadcasterUsername) body.username = cachedSettings.broadcasterUsername;
+		return requestWithBody<{ ok: boolean; rating: number }>("POST", "/api/session/vote", body);
+	},
 };

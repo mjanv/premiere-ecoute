@@ -278,7 +278,7 @@ defmodule PremiereEcouteWeb.Router do
     post "/session/stop", SessionController, :stop
     post "/session/next", SessionController, :next
     post "/session/previous", SessionController, :previous
-    post "/session/vote", SessionController, :vote
+    post "/session/vote", VoteController, :create
   end
 
   scope "/extension", PremiereEcouteWeb.Extension do

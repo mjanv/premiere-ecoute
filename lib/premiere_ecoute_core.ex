@@ -14,6 +14,7 @@ defmodule PremiereEcouteCore do
       Api,
       Api.CircuitBreaker,
       Cache,
+      Channel,
       CommandBus,
       CommandBus.Handler,
       Context,

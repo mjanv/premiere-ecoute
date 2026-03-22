@@ -1,8 +1,6 @@
 defmodule PremiereEcouteWeb.Api.SessionControllerTest do
   use PremiereEcouteWeb.ApiCase, async: false
 
-  alias PremiereEcoute.Events.Chat.MessageSent
-  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
@@ -132,52 +130,6 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       |> auth(user)
       |> post(~p"/api/session/previous")
       |> json_response(404)
-    end
-  end
-
-  describe "POST /api/session/vote" do
-    test "publishes MessageSent with the given rating and returns ok", %{conn: conn} do
-      user = user_fixture(%{twitch: %{user_id: "streamer123"}})
-
-      expect(Sessions.Mock, :publish_message, fn %MessageSent{
-                                                   broadcaster_id: broadcaster_id,
-                                                   user_id: user_id,
-                                                   message: message,
-                                                   is_streamer: is_streamer
-                                                 } ->
-        assert broadcaster_id == "streamer123"
-        assert user_id == "streamer123"
-        assert message == "7"
-        assert is_streamer == true
-        :ok
-      end)
-
-      response =
-        conn
-        |> auth(user)
-        |> post(~p"/api/session/vote", %{rating: 7})
-        |> response(200, op(SessionController, :vote))
-
-      assert response["ok"] == true
-      assert response["rating"] == 7
-    end
-
-    test "returns 422 when rating is out of range", %{conn: conn} do
-      user = user_fixture(%{twitch: %{user_id: "streamer123"}})
-
-      conn
-      |> auth(user)
-      |> post(~p"/api/session/vote", %{rating: 11})
-      |> json_response(422)
-    end
-
-    test "returns 422 when rating param is missing", %{conn: conn} do
-      user = user_fixture(%{twitch: %{user_id: "streamer123"}})
-
-      conn
-      |> auth(user)
-      |> post(~p"/api/session/vote", %{})
-      |> json_response(422)
     end
   end
 

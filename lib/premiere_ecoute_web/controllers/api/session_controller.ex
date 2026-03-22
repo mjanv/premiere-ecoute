@@ -10,7 +10,6 @@ defmodule PremiereEcouteWeb.Api.SessionController do
   use OpenApiSpex.ControllerSpecs
 
   alias OpenApiSpex.Schema
-  alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
@@ -228,55 +227,6 @@ defmodule PremiereEcouteWeb.Api.SessionController do
         |> PremiereEcoute.apply()
         |> command_response(conn)
     end
-  end
-
-  operation(:vote,
-    summary: "Vote on current track",
-    description: "Submits a rating (0–10) for the current track in the session.",
-    tags: ["Session"],
-    security: [%{"bearer" => []}],
-    request_body:
-      {"Vote payload", "application/json",
-       %Schema{
-         type: :object,
-         required: [:rating],
-         properties: %{rating: %Schema{type: :integer, minimum: 0, maximum: 10}}
-       }, required: true},
-    responses: [
-      ok:
-        {"Vote accepted", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{
-             ok: %Schema{type: :boolean, example: true},
-             rating: %Schema{type: :integer}
-           }
-         }},
-      unprocessable_entity: {"Invalid rating", "application/json", @error_response},
-      unauthorized: "Missing or invalid Authorization header"
-    ]
-  )
-
-  @doc """
-  Submits a vote for the current track (0–10).
-  """
-  @spec vote(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def vote(conn, %{"rating" => rating}) when rating in 0..10 do
-    user = conn.assigns.current_scope.user
-    user_id = user.twitch.user_id
-
-    Sessions.impl().publish_message(%MessageSent{
-      broadcaster_id: user_id,
-      user_id: user_id,
-      message: to_string(rating),
-      is_streamer: true
-    })
-
-    json(conn, %{ok: true, rating: rating})
-  end
-
-  def vote(conn, _params) do
-    conn |> put_status(:unprocessable_entity) |> json(%{error: "rating must be an integer between 0 and 10"})
   end
 
   defp command_response({:ok, _session, _events}, conn) do

@@ -1,7 +1,8 @@
 {
     "scripts": {
         "build": "rollup -c",
-        "deploy": "rsync -a --delete com.maxime-janvier.premiere-ecoute.sdPlugin/ \"/mnt/c/Users/lanfe/AppData/Roaming/Elgato/StreamDeck/Plugins/com.maxime-janvier.premiere-ecoute.sdPlugin/\" && powershell.exe -Command \"Stop-Process -Name 'StreamDeck' -ErrorAction SilentlyContinue; Start-Sleep 1; Start-Process 'C:/Program Files/Elgato/StreamDeck/StreamDeck.exe'\"",
+        "release": "npm run build && streamdeck pack com.maxime-janvier.premiere-ecoute-streamer.sdPlugin --force && streamdeck pack com.maxime-janvier.premiere-ecoute-viewer.sdPlugin --force",
+        "deploy": "rsync -a --delete com.maxime-janvier.premiere-ecoute-streamer.sdPlugin/ \"/mnt/c/Users/lanfe/AppData/Roaming/Elgato/StreamDeck/Plugins/com.maxime-janvier.premiere-ecoute-streamer.sdPlugin/\" && powershell.exe -Command \"Stop-Process -Name 'StreamDeck' -ErrorAction SilentlyContinue; Start-Sleep 1; Start-Process 'C:/Program Files/Elgato/StreamDeck/StreamDeck.exe'\"",
         "watch": "rollup -c -w --watch.onEnd=\"npm run deploy\"",
         "lint": "eslint src"
     },
