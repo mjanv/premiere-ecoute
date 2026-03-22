@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Streamdeck.Release do
   This task:
 
   1. Builds the plugin with rollup (production)
-  2. Packages it as a `.streamDeckPlugin` file using the Elgato CLI
+  2. Packages both plugins as `.streamDeckPlugin` zip files
 
   ## Usage
 
