@@ -54,7 +54,8 @@ defmodule PremiereEcouteWeb.Api.VoteController do
   Submits a vote for the current track (0–10).
   """
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def create(%{assigns: %{current_scope: %{user: %{role: :streamer, twitch: %{user_id: user_id}}}}} = conn, %{"rating" => rating}) when rating in 1..10 do
+  def create(%{assigns: %{current_scope: %{user: %{role: :streamer, twitch: %{user_id: user_id}}}}} = conn, %{"rating" => rating})
+      when rating in 1..10 do
     Sessions.impl().publish_message(%MessageSent{
       broadcaster_id: user_id,
       user_id: user_id,

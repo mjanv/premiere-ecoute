@@ -21,7 +21,9 @@ config :premiere_ecoute,
   discord_bot_token: env!("DISCORD_BOT_TOKEN"),
   buymeacoffee_api_key: env!("BUYMEACOFFEE_API_KEY"),
   youtube_data_api_key: env!("YOUTUBE_DATA_API_V3_KEY"),
-  genius_access_token: env!("GENIUS_ACCESS_TOKEN")
+  genius_access_token: env!("GENIUS_ACCESS_TOKEN"),
+  tidal_client_id: env!("TIDAL_CLIENT_ID"),
+  tidal_client_secret: env!("TIDAL_CLIENT_SECRET")
 
 config :premiere_ecoute, :feature_flags,
   username: env!("AUTH_USERNAME"),

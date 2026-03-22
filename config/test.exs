@@ -32,6 +32,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     api: PremiereEcoute.Apis.MusicProvider.DeezerApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.DeezerApi}]
   ],
+  tidal: [
+    api: PremiereEcoute.Apis.MusicProvider.TidalApi,
+    req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.TidalApi}]
+  ],
   frankfurter: [
     api: PremiereEcoute.Apis.Payments.FrankfurterApi,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Payments.FrankfurterApi}]

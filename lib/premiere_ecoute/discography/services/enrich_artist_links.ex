@@ -12,6 +12,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.TidalApi
   alias PremiereEcoute.Discography.Artist
 
   @doc """
@@ -27,6 +28,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
     |> enrich_genius()
     |> enrich_deezer()
     |> enrich_spotify()
+    |> enrich_tidal()
   end
 
   # Wikipedia — stores URL in external_links["wikipedia"], nil sentinel on not found
@@ -89,6 +91,28 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinks do
 
       {:error, reason} ->
         Logger.error("EnrichArtistLinks: deezer lookup failed for #{inspect(name)}: #{inspect(reason)}")
+        {:ok, artist}
+    end
+  end
+
+  # Tidal — stores tidal ID in provider_ids[:tidal], nil sentinel on not found
+  defp enrich_tidal({:error, _} = error), do: error
+
+  defp enrich_tidal({:ok, %Artist{provider_ids: %{tidal: _}} = artist}) do
+    {:ok, artist}
+  end
+
+  defp enrich_tidal({:ok, %Artist{name: name} = artist}) do
+    case TidalApi.search_artist(name) do
+      {:ok, [first | _]} ->
+        Artist.update(artist, %{provider_ids: Map.put(artist.provider_ids, :tidal, first.tidal_id)})
+
+      {:ok, []} ->
+        Logger.warning("EnrichArtistLinks: no tidal page found for #{inspect(name)}")
+        Artist.update(artist, %{provider_ids: Map.put(artist.provider_ids, :tidal, nil)})
+
+      {:error, reason} ->
+        Logger.error("EnrichArtistLinks: tidal lookup failed for #{inspect(name)}: #{inspect(reason)}")
         {:ok, artist}
     end
   end

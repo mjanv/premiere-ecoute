@@ -1,0 +1,161 @@
+{
+  "data": [
+    {
+      "id": "7804",
+      "type": "artists",
+      "attributes": {
+        "name": "JAŸ-Z",
+        "popularity": 0.9614253085579615,
+        "externalLinks": [
+          {
+            "href": "https://www.facebook.com/JayZ",
+            "meta": {
+              "type": "FACEBOOK"
+            }
+          },
+          {
+            "href": "https://www.instagram.com/jayz",
+            "meta": {
+              "type": "INSTAGRAM"
+            }
+          },
+          {
+            "href": "https://twitter.com/SC",
+            "meta": {
+              "type": "TWITTER"
+            }
+          },
+          {
+            "href": "https://tidal.com/browse/artist/7804",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "ownerType": "LABEL"
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/7804/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/7804/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/7804/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/7804/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/7804/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/7804/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/7804/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "data": [
+            {
+              "id": "9Uwk47MKGp9QKQu",
+              "type": "artworks"
+            }
+          ],
+          "links": {
+            "self": "/artists/7804/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/7804/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/7804/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/7804/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/7804/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    }
+  ],
+  "links": {
+    "self": "/artists?filter%5Bid%5D=7804&include=profileArt&countryCode=US"
+  },
+  "included": [
+    {
+      "id": "9Uwk47MKGp9QKQu",
+      "type": "artworks",
+      "attributes": {
+        "mediaType": "IMAGE",
+        "files": [
+          {
+            "href": "https://resources.tidal.com/images/83d34f7b/38ba/4898/bfe9/1d9ba9cd934d/750x750.jpg",
+            "meta": {
+              "width": 750,
+              "height": 750
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/83d34f7b/38ba/4898/bfe9/1d9ba9cd934d/480x480.jpg",
+            "meta": {
+              "width": 480,
+              "height": 480
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/83d34f7b/38ba/4898/bfe9/1d9ba9cd934d/320x320.jpg",
+            "meta": {
+              "width": 320,
+              "height": 320
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/83d34f7b/38ba/4898/bfe9/1d9ba9cd934d/160x160.jpg",
+            "meta": {
+              "width": 160,
+              "height": 160
+            }
+          }
+        ],
+        "visualMetadata": {
+          "selectedPaletteColor": "#6E4B44",
+          "blurHash": "URDuf6RlW;V[~Baexaaf%MayoLWB9]fkWCof",
+          "status": "OK"
+        }
+      },
+      "relationships": {
+        "owners": {
+          "links": {
+            "self": "/artworks/9Uwk47MKGp9QKQu/relationships/owners?countryCode=US"
+          }
+        }
+      }
+    }
+  ]
+}

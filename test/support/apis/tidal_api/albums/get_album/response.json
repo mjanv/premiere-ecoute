@@ -1,0 +1,1995 @@
+{
+  "data": [
+    {
+      "id": "21161733",
+      "type": "albums",
+      "attributes": {
+        "title": "Magna Carta... Holy Grail",
+        "barcodeId": "00857018004175",
+        "numberOfVolumes": 1,
+        "numberOfItems": 16,
+        "duration": "PT58M55S",
+        "explicit": false,
+        "releaseDate": "2013-07-09",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "popularity": 0.6155850498654908,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/21161733",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM",
+        "version": "",
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/21161733/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "data": [
+            {
+              "id": "7804",
+              "type": "artists"
+            }
+          ],
+          "links": {
+            "self": "/albums/21161733/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/21161733/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/21161733/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/21161733/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "data": [
+            {
+              "id": "iWOu0yW0IP6FlmLI9yMt",
+              "type": "artworks"
+            }
+          ],
+          "links": {
+            "self": "/albums/21161733/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "data": [
+            {
+              "id": "21161734",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 1
+              }
+            },
+            {
+              "id": "21161735",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 2
+              }
+            },
+            {
+              "id": "21161736",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 3
+              }
+            },
+            {
+              "id": "21161737",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 4
+              }
+            },
+            {
+              "id": "21161738",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 5
+              }
+            },
+            {
+              "id": "21161739",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 6
+              }
+            },
+            {
+              "id": "21161740",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 7
+              }
+            },
+            {
+              "id": "21161741",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 8
+              }
+            },
+            {
+              "id": "21161742",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 9
+              }
+            },
+            {
+              "id": "21161743",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 10
+              }
+            },
+            {
+              "id": "21161744",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 11
+              }
+            },
+            {
+              "id": "21161745",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 12
+              }
+            },
+            {
+              "id": "21161746",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 13
+              }
+            },
+            {
+              "id": "21161747",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 14
+              }
+            },
+            {
+              "id": "21161748",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 15
+              }
+            },
+            {
+              "id": "21161749",
+              "type": "tracks",
+              "meta": {
+                "volumeNumber": 1,
+                "trackNumber": 16
+              }
+            }
+          ],
+          "links": {
+            "self": "/albums/21161733/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/21161733/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    }
+  ],
+  "links": {
+    "self": "/albums?filter%5Bid%5D=21161733&include=artists%2CcoverArt%2Citems&countryCode=US"
+  },
+  "included": [
+    {
+      "id": "7804",
+      "type": "artists",
+      "attributes": {
+        "name": "JAŸ-Z",
+        "popularity": 0.9614253085579615,
+        "externalLinks": [
+          {
+            "href": "https://www.facebook.com/JayZ",
+            "meta": {
+              "type": "FACEBOOK"
+            }
+          },
+          {
+            "href": "https://www.instagram.com/jayz",
+            "meta": {
+              "type": "INSTAGRAM"
+            }
+          },
+          {
+            "href": "https://twitter.com/SC",
+            "meta": {
+              "type": "TWITTER"
+            }
+          },
+          {
+            "href": "https://tidal.com/browse/artist/7804",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "ownerType": "LABEL"
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/7804/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/7804/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/7804/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/7804/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/7804/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/7804/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/7804/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/7804/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/7804/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/7804/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/7804/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/7804/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "iWOu0yW0IP6FlmLI9yMt",
+      "type": "artworks",
+      "attributes": {
+        "mediaType": "IMAGE",
+        "files": [
+          {
+            "href": "https://resources.tidal.com/images/6f520354/d497/4309/bc2f/ca3e941cd9ef/1280x1280.jpg",
+            "meta": {
+              "width": 1280,
+              "height": 1280
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/6f520354/d497/4309/bc2f/ca3e941cd9ef/1080x1080.jpg",
+            "meta": {
+              "width": 1080,
+              "height": 1080
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/6f520354/d497/4309/bc2f/ca3e941cd9ef/750x750.jpg",
+            "meta": {
+              "width": 750,
+              "height": 750
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/6f520354/d497/4309/bc2f/ca3e941cd9ef/640x640.jpg",
+            "meta": {
+              "width": 640,
+              "height": 640
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/6f520354/d497/4309/bc2f/ca3e941cd9ef/320x320.jpg",
+            "meta": {
+              "width": 320,
+              "height": 320
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/6f520354/d497/4309/bc2f/ca3e941cd9ef/160x160.jpg",
+            "meta": {
+              "width": 160,
+              "height": 160
+            }
+          },
+          {
+            "href": "https://resources.tidal.com/images/6f520354/d497/4309/bc2f/ca3e941cd9ef/80x80.jpg",
+            "meta": {
+              "width": 80,
+              "height": 80
+            }
+          }
+        ],
+        "visualMetadata": {
+          "selectedPaletteColor": "#000000",
+          "blurHash": "U7F~gcIU00~q9Gof?a9F~q9FD%WB%M-;WB%M",
+          "status": "OK"
+        }
+      },
+      "relationships": {
+        "owners": {
+          "links": {
+            "self": "/artworks/iWOu0yW0IP6FlmLI9yMt/relationships/owners?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161734",
+      "type": "tracks",
+      "attributes": {
+        "title": "Holy Grail",
+        "version": null,
+        "isrc": "QMJMT1300042",
+        "duration": "PT5M38S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.611715336231243,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161734",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161734/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161734/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161734/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161734/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161734/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161734/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161734/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161734/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161734/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161734/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161734/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161734/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161734/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161735",
+      "type": "tracks",
+      "attributes": {
+        "title": "Picasso Baby",
+        "version": null,
+        "isrc": "QMJMT1300043",
+        "duration": "PT4M5S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.545091695313673,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161735",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161735/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161735/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161735/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161735/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161735/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161735/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161735/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161735/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161735/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161735/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161735/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161735/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161735/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161736",
+      "type": "tracks",
+      "attributes": {
+        "title": "Tom Ford",
+        "version": null,
+        "isrc": "QMJMT1300044",
+        "duration": "PT3M9S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5751877802203857,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161736",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161736/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161736/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161736/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161736/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161736/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161736/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161736/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161736/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161736/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161736/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161736/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161736/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161736/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161737",
+      "type": "tracks",
+      "attributes": {
+        "title": "F*ckwithmeyouknowigotit",
+        "version": null,
+        "isrc": "QMJMT1300045",
+        "duration": "PT4M3S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5828203139660441,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161737",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161737/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161737/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161737/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161737/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161737/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161737/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161737/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161737/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161737/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161737/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161737/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161737/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161737/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161738",
+      "type": "tracks",
+      "attributes": {
+        "title": "Oceans",
+        "version": null,
+        "isrc": "QMJMT1300046",
+        "duration": "PT3M57S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5588734140184018,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161738",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161738/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161738/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161738/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161738/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161738/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161738/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161738/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161738/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161738/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161738/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161738/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161738/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161738/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161739",
+      "type": "tracks",
+      "attributes": {
+        "title": "F.U.T.W.",
+        "version": null,
+        "isrc": "QMJMT1300047",
+        "duration": "PT4M2S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5210255490130098,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161739",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161739/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161739/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161739/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161739/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161739/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161739/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161739/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161739/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161739/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161739/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161739/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161739/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161739/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161740",
+      "type": "tracks",
+      "attributes": {
+        "title": "Somewhereinamerica",
+        "version": null,
+        "isrc": "QMJMT1300048",
+        "duration": "PT2M28S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5282565653899625,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161740",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161740/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161740/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161740/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161740/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161740/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161740/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161740/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161740/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161740/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161740/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161740/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161740/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161740/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161741",
+      "type": "tracks",
+      "attributes": {
+        "title": "Crown",
+        "version": null,
+        "isrc": "QMJMT1300049",
+        "duration": "PT4M34S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5258048302151375,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161741",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161741/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161741/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161741/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161741/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161741/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161741/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161741/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161741/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161741/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161741/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161741/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161741/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161741/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161742",
+      "type": "tracks",
+      "attributes": {
+        "title": "Heaven",
+        "version": null,
+        "isrc": "QMJMT1300050",
+        "duration": "PT4M2S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5056392032492243,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161742",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161742/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161742/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161742/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161742/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161742/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161742/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161742/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161742/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161742/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161742/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161742/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161742/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161742/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161743",
+      "type": "tracks",
+      "attributes": {
+        "title": "Versus",
+        "version": null,
+        "isrc": "QMJMT1300051",
+        "duration": "PT51S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.42528662342570506,
+        "accessType": "PUBLIC",
+        "availability": [
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161743",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161743/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161743/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161743/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161743/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161743/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161743/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161743/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161743/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161743/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161743/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161743/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161743/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161743/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161744",
+      "type": "tracks",
+      "attributes": {
+        "title": "Part II (On The Run)",
+        "version": null,
+        "isrc": "QMJMT1300052",
+        "duration": "PT5M33S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5824441805289686,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161744",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161744/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161744/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161744/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161744/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161744/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161744/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161744/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161744/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161744/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161744/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161744/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161744/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161744/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161745",
+      "type": "tracks",
+      "attributes": {
+        "title": "Beach Is Better",
+        "version": null,
+        "isrc": "QMJMT1300053",
+        "duration": "PT55S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.45470982099744656,
+        "accessType": "PUBLIC",
+        "availability": [
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161745",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161745/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161745/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161745/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161745/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161745/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161745/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161745/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161745/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161745/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161745/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161745/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161745/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161745/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161746",
+      "type": "tracks",
+      "attributes": {
+        "title": "BBC",
+        "version": null,
+        "isrc": "QMJMT1300054",
+        "duration": "PT3M12S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5103200891240098,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161746",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161746/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161746/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161746/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161746/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161746/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161746/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161746/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161746/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161746/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161746/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161746/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161746/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161746/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161747",
+      "type": "tracks",
+      "attributes": {
+        "title": "JAY Z Blue",
+        "version": null,
+        "isrc": "QMJMT1300055",
+        "duration": "PT3M50S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.49923499955529305,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161747",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161747/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161747/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161747/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161747/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161747/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161747/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161747/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161747/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161747/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161747/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161747/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161747/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161747/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161748",
+      "type": "tracks",
+      "attributes": {
+        "title": "La Familia",
+        "version": null,
+        "isrc": "QMJMT1300056",
+        "duration": "PT3M33S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.5107510545699032,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161748",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161748/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161748/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161748/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161748/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161748/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161748/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161748/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161748/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161748/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161748/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161748/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161748/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161748/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161749",
+      "type": "tracks",
+      "attributes": {
+        "title": "Nickels And Dimes",
+        "version": null,
+        "isrc": "QMJMT1300057",
+        "duration": "PT5M3S",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "explicit": false,
+        "popularity": 0.49802735680266436,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/track/21161749",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "spotlighted": false,
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "albums": {
+          "links": {
+            "self": "/tracks/21161749/relationships/albums?countryCode=US"
+          }
+        },
+        "similarTracks": {
+          "links": {
+            "self": "/tracks/21161749/relationships/similarTracks?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/tracks/21161749/relationships/owners?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/tracks/21161749/relationships/radio?countryCode=US"
+          }
+        },
+        "shares": {
+          "links": {
+            "self": "/tracks/21161749/relationships/shares?countryCode=US"
+          }
+        },
+        "credits": {
+          "links": {
+            "self": "/tracks/21161749/relationships/credits?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/tracks/21161749/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/tracks/21161749/relationships/genres?countryCode=US"
+          }
+        },
+        "lyrics": {
+          "links": {
+            "self": "/tracks/21161749/relationships/lyrics?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/tracks/21161749/relationships/providers?countryCode=US"
+          }
+        },
+        "trackStatistics": {
+          "links": {
+            "self": "/tracks/21161749/relationships/trackStatistics?countryCode=US"
+          }
+        },
+        "sourceFile": {
+          "links": {
+            "self": "/tracks/21161749/relationships/sourceFile?countryCode=US"
+          }
+        },
+        "metadataStatus": {
+          "links": {
+            "self": "/tracks/21161749/relationships/metadataStatus?countryCode=US"
+          }
+        }
+      }
+    }
+  ]
+}

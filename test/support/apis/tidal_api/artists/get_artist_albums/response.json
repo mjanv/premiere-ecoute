@@ -1,0 +1,1740 @@
+{
+  "data": [
+    {
+      "id": "7804",
+      "type": "artists",
+      "attributes": {
+        "name": "JAŸ-Z",
+        "popularity": 0.9614253085579615,
+        "externalLinks": [
+          {
+            "href": "https://www.facebook.com/JayZ",
+            "meta": {
+              "type": "FACEBOOK"
+            }
+          },
+          {
+            "href": "https://www.instagram.com/jayz",
+            "meta": {
+              "type": "INSTAGRAM"
+            }
+          },
+          {
+            "href": "https://twitter.com/SC",
+            "meta": {
+              "type": "TWITTER"
+            }
+          },
+          {
+            "href": "https://tidal.com/browse/artist/7804",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "ownerType": "LABEL"
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/7804/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "data": [
+            {
+              "id": "500495428",
+              "type": "albums"
+            },
+            {
+              "id": "289678295",
+              "type": "albums"
+            },
+            {
+              "id": "289678302",
+              "type": "albums"
+            },
+            {
+              "id": "289678310",
+              "type": "albums"
+            },
+            {
+              "id": "289678299",
+              "type": "albums"
+            },
+            {
+              "id": "245973780",
+              "type": "albums"
+            },
+            {
+              "id": "189252994",
+              "type": "albums"
+            },
+            {
+              "id": "135832471",
+              "type": "albums"
+            },
+            {
+              "id": "113655760",
+              "type": "albums"
+            },
+            {
+              "id": "75712979",
+              "type": "albums"
+            },
+            {
+              "id": "75413011",
+              "type": "albums"
+            },
+            {
+              "id": "66743406",
+              "type": "albums"
+            },
+            {
+              "id": "62792027",
+              "type": "albums"
+            },
+            {
+              "id": "334022557",
+              "type": "albums"
+            },
+            {
+              "id": "21164134",
+              "type": "albums"
+            },
+            {
+              "id": "76465836",
+              "type": "albums"
+            },
+            {
+              "id": "21161733",
+              "type": "albums"
+            },
+            {
+              "id": "91108967",
+              "type": "albums"
+            },
+            {
+              "id": "35360165",
+              "type": "albums"
+            },
+            {
+              "id": "35360196",
+              "type": "albums"
+            }
+          ],
+          "links": {
+            "self": "/artists/7804/relationships/albums?countryCode=US",
+            "next": "/artists/7804/relationships/albums?countryCode=US&page%5Bcursor%5D=3nI1Esi",
+            "meta": {
+              "nextCursor": "3nI1Esi"
+            }
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/7804/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/7804/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/7804/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/7804/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/7804/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/7804/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/7804/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/7804/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/7804/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/7804/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    }
+  ],
+  "links": {
+    "self": "/artists?filter%5Bid%5D=7804&include=albums&countryCode=US"
+  },
+  "included": [
+    {
+      "id": "113655760",
+      "type": "albums",
+      "attributes": {
+        "title": "MOOD 4 EVA (feat. Oumou Sangaré) (Extended Version)",
+        "barcodeId": "886447869406",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT5M15S",
+        "explicit": false,
+        "releaseDate": "2019-07-19",
+        "copyright": {
+          "text": "(P) 2019 Parkwood Entertainment LLC, under exclusive license to Columbia Records, a Division of Sony Music Entertainment"
+        },
+        "popularity": 0.6887828857647637,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "HIRES_LOSSLESS",
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/113655760",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/113655760/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/113655760/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/113655760/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/113655760/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/113655760/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/113655760/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/113655760/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/113655760/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "135832471",
+      "type": "albums",
+      "attributes": {
+        "title": "Holy Grail (Unreleased)",
+        "barcodeId": "TIDAL9578",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT5M43S",
+        "explicit": true,
+        "releaseDate": "2020-03-29",
+        "popularity": 0.28742387369058425,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "HIRES_LOSSLESS",
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/135832471",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/135832471/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/135832471/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/135832471/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/135832471/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/135832471/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/135832471/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/135832471/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/135832471/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "189252994",
+      "type": "albums",
+      "attributes": {
+        "title": "TIDAL Talk: A Conversation with Jack Dorsey and JAY-Z",
+        "barcodeId": "TIDAL12247",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT34M49S",
+        "explicit": false,
+        "releaseDate": "2021-06-28",
+        "popularity": 0.277620163375979,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/189252994",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/189252994/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/189252994/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/189252994/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/189252994/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/189252994/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/189252994/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/189252994/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/189252994/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21161733",
+      "type": "albums",
+      "attributes": {
+        "title": "Magna Carta... Holy Grail",
+        "barcodeId": "00857018004175",
+        "numberOfVolumes": 1,
+        "numberOfItems": 16,
+        "duration": "PT58M55S",
+        "explicit": false,
+        "releaseDate": "2013-07-09",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "popularity": 0.6155850498654908,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/21161733",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM",
+        "version": "",
+        "createdAt": "2013-07-05T09:34:26Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/21161733/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/21161733/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/21161733/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/21161733/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/21161733/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/21161733/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/21161733/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/21161733/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "21164134",
+      "type": "albums",
+      "attributes": {
+        "title": "Magna Carta... Holy Grail",
+        "barcodeId": "00857018004168",
+        "numberOfVolumes": 1,
+        "numberOfItems": 16,
+        "duration": "PT58M55S",
+        "explicit": true,
+        "releaseDate": "2013-07-09",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "popularity": 0.9001050701133906,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/21164134",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM",
+        "version": ""
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/21164134/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/21164134/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/21164134/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/21164134/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/21164134/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/21164134/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/21164134/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/21164134/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "245973780",
+      "type": "albums",
+      "attributes": {
+        "title": "HOV DID",
+        "barcodeId": "810058342560",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT11M50S",
+        "explicit": false,
+        "releaseDate": "2022-08-31",
+        "copyright": {
+          "text": "2022 S Carter Enterprises"
+        },
+        "popularity": 0.5023975757847899,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/245973780",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/245973780/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/245973780/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/245973780/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/245973780/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/245973780/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/245973780/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/245973780/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/245973780/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "289678295",
+      "type": "albums",
+      "attributes": {
+        "title": "NEW YORK (CONCEPT DE PARIS)",
+        "barcodeId": "00810133750297",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT4M5S",
+        "explicit": false,
+        "releaseDate": "2023-04-16",
+        "copyright": {
+          "text": "© 2023 The Estate of Jean-Michel Basquiat. Licensed by Artestar , New-York / The Andy Warhol Foundation for the Visual Arts, Inc. Licensed by ADAGP, Paris 2023."
+        },
+        "popularity": 0.32157833298463123,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "HIRES_LOSSLESS",
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/289678295",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE",
+        "createdAt": "2023-04-16T22:06:49Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/289678295/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/289678295/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/289678295/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/289678295/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/289678295/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/289678295/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/289678295/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/289678295/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "289678299",
+      "type": "albums",
+      "attributes": {
+        "title": "NEW YORK (CONCEPT DE PARIS)",
+        "barcodeId": "00810133750280",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT4M6S",
+        "explicit": true,
+        "releaseDate": "2023-04-16",
+        "copyright": {
+          "text": "© 2023 The Estate of Jean-Michel Basquiat. Licensed by Artestar , New-York / The Andy Warhol Foundation for the Visual Arts, Inc. Licensed by ADAGP, Paris 2023."
+        },
+        "popularity": 0.5485286963088606,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "HIRES_LOSSLESS",
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/289678299",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE",
+        "createdAt": "2023-04-16T22:06:52Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/289678299/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/289678299/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/289678299/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/289678299/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/289678299/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/289678299/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/289678299/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/289678299/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "289678302",
+      "type": "albums",
+      "attributes": {
+        "title": "NEW YORK (CONCEPT DE PARIS)",
+        "barcodeId": "00810133750273",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT4M5S",
+        "explicit": false,
+        "releaseDate": "2023-04-16",
+        "copyright": {
+          "text": "© 2023 The Estate of Jean-Michel Basquiat. Licensed by Artestar , New-York / The Andy Warhol Foundation for the Visual Arts, Inc. Licensed by ADAGP, Paris 2023."
+        },
+        "popularity": 0.19660452372620724,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/289678302",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE",
+        "createdAt": "2023-04-16T22:06:55Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/289678302/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/289678302/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/289678302/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/289678302/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/289678302/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/289678302/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/289678302/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/289678302/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "289678310",
+      "type": "albums",
+      "attributes": {
+        "title": "NEW YORK (CONCEPT DE PARIS)",
+        "barcodeId": "00810133750266",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT4M6S",
+        "explicit": true,
+        "releaseDate": "2023-04-16",
+        "copyright": {
+          "text": "© 2023 The Estate of Jean-Michel Basquiat. Licensed by Artestar , New-York / The Andy Warhol Foundation for the Visual Arts, Inc. Licensed by ADAGP, Paris 2023."
+        },
+        "popularity": 0.19385415273133003,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/289678310",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE",
+        "createdAt": "2023-04-16T22:06:57Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/289678310/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/289678310/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/289678310/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/289678310/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/289678310/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/289678310/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/289678310/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/289678310/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "334022557",
+      "type": "albums",
+      "attributes": {
+        "title": "All The Way Up (Remix) (feat. French Montana & Infared)",
+        "barcodeId": "197342445474",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT4M45S",
+        "explicit": true,
+        "releaseDate": "2016-05-27",
+        "copyright": {
+          "text": "2016 RNG / EMPIRE"
+        },
+        "popularity": 0.35547462638004773,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "DOLBY_ATMOS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/334022557",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/334022557/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/334022557/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/334022557/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/334022557/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/334022557/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/334022557/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/334022557/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/334022557/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "35360165",
+      "type": "albums",
+      "attributes": {
+        "title": "Magna Carta... Holy Grail",
+        "barcodeId": "00857018004120",
+        "numberOfVolumes": 1,
+        "numberOfItems": 16,
+        "duration": "PT58M55S",
+        "explicit": true,
+        "releaseDate": "2013-07-09",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC., Distributed by Roc Nation"
+        },
+        "popularity": 0.7326345881589051,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/35360165",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM",
+        "createdAt": "2014-09-24T01:18:37Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/35360165/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/35360165/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/35360165/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/35360165/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/35360165/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/35360165/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/35360165/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/35360165/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "35360196",
+      "type": "albums",
+      "attributes": {
+        "title": "Magna Carta... Holy Grail",
+        "barcodeId": "00857018004137",
+        "numberOfVolumes": 1,
+        "numberOfItems": 16,
+        "duration": "PT58M55S",
+        "explicit": false,
+        "releaseDate": "2013-07-09",
+        "copyright": {
+          "text": "(C) 2013 S. Carter Enterprises, LLC, Distributed by Roc Nation"
+        },
+        "popularity": 0.6451669828423942,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/35360196",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM",
+        "createdAt": "2014-09-24T01:18:53Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/35360196/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/35360196/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/35360196/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/35360196/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/35360196/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/35360196/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/35360196/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/35360196/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "500495428",
+      "type": "albums",
+      "attributes": {
+        "title": "Dead Presidents",
+        "barcodeId": "8721465976762",
+        "numberOfVolumes": 1,
+        "numberOfItems": 3,
+        "duration": "PT10M38S",
+        "explicit": true,
+        "releaseDate": "2026-02-20",
+        "copyright": {
+          "text": "ROC NATION"
+        },
+        "popularity": 0.7388619929552078,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "HIRES_LOSSLESS",
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/500495428",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE",
+        "createdAt": "2026-02-19T18:32:54Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/500495428/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/500495428/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/500495428/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/500495428/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/500495428/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/500495428/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/500495428/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/500495428/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "62792027",
+      "type": "albums",
+      "attributes": {
+        "title": "spiritual",
+        "barcodeId": "TIDAL1283",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT3M31S",
+        "explicit": true,
+        "releaseDate": "2016-07-07",
+        "popularity": 0.62945169111702,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/62792027",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/62792027/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/62792027/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/62792027/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/62792027/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/62792027/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/62792027/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/62792027/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/62792027/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "66743406",
+      "type": "albums",
+      "attributes": {
+        "title": "OPEN LETTER",
+        "barcodeId": "TIDAL1644",
+        "numberOfVolumes": 1,
+        "numberOfItems": 1,
+        "duration": "PT2M37S",
+        "explicit": true,
+        "releaseDate": "2016-11-03",
+        "copyright": {
+          "text": "2016 Roc Nation"
+        },
+        "popularity": 0.6834815755919481,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/66743406",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "SINGLE",
+        "albumType": "SINGLE"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/66743406/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/66743406/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/66743406/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/66743406/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/66743406/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/66743406/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/66743406/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/66743406/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "75413011",
+      "type": "albums",
+      "attributes": {
+        "title": "4:44",
+        "barcodeId": "00854242007552",
+        "numberOfVolumes": 1,
+        "numberOfItems": 13,
+        "duration": "PT46M17S",
+        "explicit": true,
+        "releaseDate": "2017-06-30",
+        "copyright": {
+          "text": "(p)(c) 2017 S. CARTER ENTERPRISES, LLC. MARKETED BY ROC NATION & DISTRIBUTED BY ROC NATION/UMG RECORDINGS INC."
+        },
+        "popularity": 0.952300592423279,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/75413011",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/75413011/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/75413011/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/75413011/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/75413011/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/75413011/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/75413011/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/75413011/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/75413011/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "75712979",
+      "type": "albums",
+      "attributes": {
+        "title": "4:44",
+        "barcodeId": "00854242007576",
+        "numberOfVolumes": 1,
+        "numberOfItems": 13,
+        "duration": "PT46M17S",
+        "explicit": false,
+        "releaseDate": "2017-06-30",
+        "copyright": {
+          "text": "(p)(c) 2017 S. CARTER ENTERPRISES, LLC. MARKETED BY ROC NATION & DISTRIBUTED BY ROC NATION/UMG RECORDINGS INC."
+        },
+        "popularity": 0.7723843883139219,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/75712979",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/75712979/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/75712979/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/75712979/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/75712979/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/75712979/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/75712979/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/75712979/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/75712979/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "76465836",
+      "type": "albums",
+      "attributes": {
+        "title": "Magna Carta... Holy Grail",
+        "barcodeId": "00859026007131",
+        "numberOfVolumes": 1,
+        "numberOfItems": 16,
+        "duration": "PT58M55S",
+        "explicit": true,
+        "releaseDate": "2013-07-09",
+        "copyright": {
+          "text": "© 2013 S. Carter Enterprises"
+        },
+        "popularity": 0.7135006861951098,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/76465836",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM",
+        "createdAt": "2017-07-19T18:35:14Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/76465836/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/76465836/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/76465836/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/76465836/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/76465836/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/76465836/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/76465836/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/76465836/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "91108967",
+      "type": "albums",
+      "attributes": {
+        "title": "Magna Carta... Holy Grail",
+        "barcodeId": "00857018004243",
+        "numberOfVolumes": 1,
+        "numberOfItems": 16,
+        "duration": "PT58M55S",
+        "explicit": true,
+        "releaseDate": "2013-07-09",
+        "copyright": {
+          "text": "© 2013 S. Carter Enterprises"
+        },
+        "popularity": 0.570653546700221,
+        "accessType": "PUBLIC",
+        "availability": [
+          "STREAM",
+          "DJ"
+        ],
+        "mediaTags": [
+          "LOSSLESS"
+        ],
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/album/91108967",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "type": "ALBUM",
+        "albumType": "ALBUM",
+        "createdAt": "2018-06-28T09:18:38Z"
+      },
+      "relationships": {
+        "similarAlbums": {
+          "links": {
+            "self": "/albums/91108967/relationships/similarAlbums?countryCode=US"
+          }
+        },
+        "artists": {
+          "links": {
+            "self": "/albums/91108967/relationships/artists?countryCode=US"
+          }
+        },
+        "genres": {
+          "links": {
+            "self": "/albums/91108967/relationships/genres?countryCode=US"
+          }
+        },
+        "suggestedCoverArts": {
+          "links": {
+            "self": "/albums/91108967/relationships/suggestedCoverArts?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/albums/91108967/relationships/owners?countryCode=US"
+          }
+        },
+        "coverArt": {
+          "links": {
+            "self": "/albums/91108967/relationships/coverArt?countryCode=US"
+          }
+        },
+        "items": {
+          "links": {
+            "self": "/albums/91108967/relationships/items?countryCode=US"
+          }
+        },
+        "providers": {
+          "links": {
+            "self": "/albums/91108967/relationships/providers?countryCode=US"
+          }
+        }
+      }
+    }
+  ]
+}

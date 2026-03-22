@@ -1,0 +1,1706 @@
+{
+  "data": {
+    "id": "daft%20punk",
+    "type": "searchResults",
+    "attributes": {
+      "trackingId": "1a8354c3-8a7e-402a-8d3b-a031888d88bc"
+    },
+    "relationships": {
+      "albums": {
+        "links": {
+          "self": "/searchResults/daft%20punk/relationships/albums?countryCode=US&explicitFilter=INCLUDE"
+        }
+      },
+      "artists": {
+        "data": [
+          {
+            "id": "8847",
+            "type": "artists"
+          },
+          {
+            "id": "27343",
+            "type": "artists"
+          },
+          {
+            "id": "57425",
+            "type": "artists"
+          },
+          {
+            "id": "9101",
+            "type": "artists"
+          },
+          {
+            "id": "16053482",
+            "type": "artists"
+          },
+          {
+            "id": "3615702",
+            "type": "artists"
+          },
+          {
+            "id": "3998350",
+            "type": "artists"
+          },
+          {
+            "id": "37190695",
+            "type": "artists"
+          },
+          {
+            "id": "3580799",
+            "type": "artists"
+          },
+          {
+            "id": "3523887",
+            "type": "artists"
+          },
+          {
+            "id": "7345075",
+            "type": "artists"
+          },
+          {
+            "id": "3566370",
+            "type": "artists"
+          },
+          {
+            "id": "3996314",
+            "type": "artists"
+          },
+          {
+            "id": "26130",
+            "type": "artists"
+          },
+          {
+            "id": "4158487",
+            "type": "artists"
+          },
+          {
+            "id": "18250",
+            "type": "artists"
+          },
+          {
+            "id": "2196",
+            "type": "artists"
+          },
+          {
+            "id": "4089556",
+            "type": "artists"
+          },
+          {
+            "id": "3795252",
+            "type": "artists"
+          },
+          {
+            "id": "7377692",
+            "type": "artists"
+          }
+        ],
+        "links": {
+          "self": "/searchResults/daft%20punk/relationships/artists?countryCode=US&explicitFilter=INCLUDE",
+          "next": "/searchResults/daft%20punk/relationships/artists?countryCode=US&explicitFilter=INCLUDE&page%5Bcursor%5D=3nI1Esi",
+          "meta": {
+            "nextCursor": "3nI1Esi"
+          }
+        }
+      },
+      "playlists": {
+        "links": {
+          "self": "/searchResults/daft%20punk/relationships/playlists?countryCode=US&explicitFilter=INCLUDE"
+        }
+      },
+      "videos": {
+        "links": {
+          "self": "/searchResults/daft%20punk/relationships/videos?countryCode=US&explicitFilter=INCLUDE"
+        }
+      },
+      "topHits": {
+        "links": {
+          "self": "/searchResults/daft%20punk/relationships/topHits?countryCode=US&explicitFilter=INCLUDE"
+        }
+      },
+      "tracks": {
+        "links": {
+          "self": "/searchResults/daft%20punk/relationships/tracks?countryCode=US&explicitFilter=INCLUDE"
+        }
+      }
+    }
+  },
+  "links": {
+    "self": "/searchResults/daft%20punk?include=artists&countryCode=US&explicitFilter=INCLUDE"
+  },
+  "included": [
+    {
+      "id": "16053482",
+      "type": "artists",
+      "attributes": {
+        "name": "Stardust",
+        "popularity": 0.7497183680534363,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/16053482",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/16053482/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/16053482/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/16053482/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/16053482/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/16053482/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/16053482/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/16053482/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/16053482/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/16053482/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/16053482/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/16053482/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/16053482/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "18250",
+      "type": "artists",
+      "attributes": {
+        "name": "DJ Mehdi",
+        "popularity": 0.6020537614822388,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/18250",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/18250/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/18250/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/18250/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/18250/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/18250/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/18250/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/18250/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/18250/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/18250/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/18250/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/18250/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/18250/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "2196",
+      "type": "artists",
+      "attributes": {
+        "name": "The Supermen Lovers",
+        "popularity": 0.6224979670344585,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/2196",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/2196/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/2196/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/2196/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/2196/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/2196/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/2196/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/2196/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/2196/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/2196/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/2196/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/2196/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/2196/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "26130",
+      "type": "artists",
+      "attributes": {
+        "name": "Deep Dish",
+        "popularity": 0.6132370829582214,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/26130",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/26130/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/26130/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/26130/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/26130/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/26130/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/26130/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/26130/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/26130/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/26130/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/26130/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/26130/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/26130/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "27343",
+      "type": "artists",
+      "attributes": {
+        "name": "David Guetta",
+        "popularity": 0.921000312865376,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/27343",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/27343/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/27343/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/27343/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/27343/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/27343/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/27343/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/27343/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/27343/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/27343/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/27343/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/27343/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/27343/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "3523887",
+      "type": "artists",
+      "attributes": {
+        "name": "Soulwax",
+        "popularity": 0.685535728931427,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/3523887",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/3523887/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/3523887/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/3523887/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/3523887/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/3523887/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/3523887/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/3523887/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/3523887/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/3523887/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/3523887/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/3523887/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/3523887/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "3566370",
+      "type": "artists",
+      "attributes": {
+        "name": "Todd Edwards",
+        "popularity": 0.6459432028979841,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/3566370",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/3566370/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/3566370/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/3566370/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/3566370/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/3566370/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/3566370/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/3566370/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/3566370/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/3566370/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/3566370/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/3566370/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/3566370/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "3580799",
+      "type": "artists",
+      "attributes": {
+        "name": "Gesaffelstein",
+        "popularity": 0.7454722935078552,
+        "externalLinks": [
+          {
+            "href": "https://www.facebook.com/gesaffelsteinmusic/",
+            "meta": {
+              "type": "FACEBOOK"
+            }
+          },
+          {
+            "href": "https://tidal.com/browse/artist/3580799",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/3580799/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/3580799/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/3580799/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/3580799/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/3580799/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/3580799/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/3580799/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/3580799/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/3580799/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/3580799/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/3580799/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/3580799/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "3615702",
+      "type": "artists",
+      "attributes": {
+        "name": "Plastik Funk",
+        "popularity": 0.5583896040916443,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/3615702",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/3615702/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/3615702/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/3615702/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/3615702/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/3615702/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/3615702/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/3615702/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/3615702/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/3615702/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/3615702/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/3615702/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/3615702/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "37190695",
+      "type": "artists",
+      "attributes": {
+        "name": "Duft Punk",
+        "popularity": 0.24576815962791443,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/37190695",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/37190695/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/37190695/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/37190695/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/37190695/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/37190695/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/37190695/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/37190695/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/37190695/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/37190695/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/37190695/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/37190695/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/37190695/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "3795252",
+      "type": "artists",
+      "attributes": {
+        "name": "Tony Romera",
+        "popularity": 0.5651172995567322,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/3795252",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/3795252/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/3795252/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/3795252/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/3795252/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/3795252/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/3795252/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/3795252/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/3795252/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/3795252/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/3795252/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/3795252/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/3795252/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "3996314",
+      "type": "artists",
+      "attributes": {
+        "name": "Dirtyphonics",
+        "popularity": 0.5883520841598511,
+        "externalLinks": [
+          {
+            "href": "https://dirtyphonics.com",
+            "meta": {
+              "type": "OFFICIAL_HOMEPAGE"
+            }
+          },
+          {
+            "href": "https://tidal.com/browse/artist/3996314",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "ownerType": "MIXED"
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/3996314/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/3996314/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/3996314/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/3996314/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/3996314/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/3996314/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/3996314/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/3996314/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/3996314/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/3996314/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/3996314/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/3996314/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "3998350",
+      "type": "artists",
+      "attributes": {
+        "name": "Daft Funk",
+        "popularity": 0.34776952862739563,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/3998350",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/3998350/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/3998350/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/3998350/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/3998350/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/3998350/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/3998350/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/3998350/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/3998350/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/3998350/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/3998350/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/3998350/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/3998350/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "4089556",
+      "type": "artists",
+      "attributes": {
+        "name": "Busy P",
+        "popularity": 0.5689214468002319,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/4089556",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/4089556/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/4089556/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/4089556/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/4089556/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/4089556/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/4089556/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/4089556/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/4089556/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/4089556/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/4089556/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/4089556/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/4089556/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "4158487",
+      "type": "artists",
+      "attributes": {
+        "name": "DJs From Mars",
+        "popularity": 0.6062307357788086,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/4158487",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/4158487/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/4158487/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/4158487/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/4158487/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/4158487/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/4158487/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/4158487/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/4158487/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/4158487/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/4158487/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/4158487/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/4158487/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "57425",
+      "type": "artists",
+      "attributes": {
+        "name": "Justice",
+        "popularity": 0.8095836043357849,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/57425",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/57425/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/57425/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/57425/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/57425/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/57425/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/57425/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/57425/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/57425/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/57425/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/57425/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/57425/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/57425/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "7345075",
+      "type": "artists",
+      "attributes": {
+        "name": "Cassius",
+        "popularity": 0.6887244582176208,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/7345075",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/7345075/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/7345075/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/7345075/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/7345075/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/7345075/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/7345075/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/7345075/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/7345075/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/7345075/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/7345075/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/7345075/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/7345075/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "7377692",
+      "type": "artists",
+      "attributes": {
+        "name": "justICE",
+        "popularity": 0.5644010392960765,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/7377692",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/7377692/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/7377692/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/7377692/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/7377692/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/7377692/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/7377692/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/7377692/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/7377692/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/7377692/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/7377692/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/7377692/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/7377692/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "8847",
+      "type": "artists",
+      "attributes": {
+        "name": "Daft Punk",
+        "popularity": 0.9363624453544617,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/8847",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ],
+        "ownerType": "LABEL"
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/8847/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/8847/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/8847/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/8847/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/8847/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/8847/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/8847/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/8847/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/8847/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/8847/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/8847/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/8847/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    },
+    {
+      "id": "9101",
+      "type": "artists",
+      "attributes": {
+        "name": "Air",
+        "popularity": 0.7962890267372131,
+        "externalLinks": [
+          {
+            "href": "https://tidal.com/browse/artist/9101",
+            "meta": {
+              "type": "TIDAL_SHARING"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "similarArtists": {
+          "links": {
+            "self": "/artists/9101/relationships/similarArtists?countryCode=US"
+          }
+        },
+        "albums": {
+          "links": {
+            "self": "/artists/9101/relationships/albums?countryCode=US"
+          }
+        },
+        "followers": {
+          "links": {
+            "self": "/artists/9101/relationships/followers?countryCode=US"
+          }
+        },
+        "following": {
+          "links": {
+            "self": "/artists/9101/relationships/following?countryCode=US"
+          }
+        },
+        "roles": {
+          "links": {
+            "self": "/artists/9101/relationships/roles?countryCode=US"
+          }
+        },
+        "videos": {
+          "links": {
+            "self": "/artists/9101/relationships/videos?countryCode=US"
+          }
+        },
+        "owners": {
+          "links": {
+            "self": "/artists/9101/relationships/owners?countryCode=US"
+          }
+        },
+        "profileArt": {
+          "links": {
+            "self": "/artists/9101/relationships/profileArt?countryCode=US"
+          }
+        },
+        "trackProviders": {
+          "links": {
+            "self": "/artists/9101/relationships/trackProviders?countryCode=US"
+          }
+        },
+        "tracks": {
+          "links": {
+            "self": "/artists/9101/relationships/tracks?countryCode=US"
+          }
+        },
+        "radio": {
+          "links": {
+            "self": "/artists/9101/relationships/radio?countryCode=US"
+          }
+        },
+        "biography": {
+          "links": {
+            "self": "/artists/9101/relationships/biography?countryCode=US"
+          }
+        }
+      }
+    }
+  ]
+}

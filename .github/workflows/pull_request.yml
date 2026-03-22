@@ -111,6 +111,8 @@ jobs:
       POSTGRES_ENCRYPTION_KEY: dGVzdF9rZXlfMzJfYnl0ZXNfX19fX19fX19fX19fX18=
       SPOTIFY_CLIENT_ID: fake_spotify_client_id
       SPOTIFY_CLIENT_SECRET: fake_spotify_client_secret
+      TIDAL_CLIENT_ID: fake_tidal_client_id
+      TIDAL_CLIENT_SECRET: fake_tidal_client_secret
       SPOTIFY_REDIRECT_URI: http://localhost:4000/auth/spotify/callback
       TWITCH_CLIENT_ID: fake_twitch_client_id
       TWITCH_CLIENT_SECRET: fake_twitch_client_secret

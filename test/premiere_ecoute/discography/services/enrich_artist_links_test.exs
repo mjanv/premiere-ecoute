@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.TidalApi
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichArtistLinks
   alias PremiereEcouteCore.Cache
@@ -14,6 +15,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
 
   setup do
     Cache.put(:tokens, :spotify, "test_spotify_token")
+    Cache.put(:tokens, :tidal, "test_tidal_token")
     :ok
   end
 
@@ -72,12 +74,25 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     )
   end
 
+  defp expect_tidal(response \\ "tidal_api/artists/search_artist/response.json") do
+    ApiMock.expect(TidalApi, path: {:get, "/v2/searchResults/Daft%20Punk"}, response: response, status: 200)
+  end
+
+  defp expect_tidal_empty do
+    ApiMock.expect(TidalApi,
+      path: {:get, "/v2/searchResults/Daft%20Punk"},
+      body: %{"data" => [], "included" => [], "links" => %{}},
+      status: 200
+    )
+  end
+
   describe "enrich_artist/1 - wikipedia" do
     test "fetches wikipedia URL and stores it in external_links" do
       artist = artist_fixture()
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -89,6 +104,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -99,6 +115,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       artist = artist_fixture(%{external_links: %{"wikipedia" => "https://en.wikipedia.org/wiki/Daft_Punk"}})
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -109,6 +126,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       artist = artist_fixture(%{external_links: %{"wikipedia" => nil}})
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -121,6 +139,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia_empty()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -136,6 +155,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -147,6 +167,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -157,6 +178,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", deezer: "1312"}})
       expect_wikipedia()
       expect_genius()
+      expect_tidal()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -168,6 +190,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer_empty()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -182,6 +205,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -193,6 +217,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -203,6 +228,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       artist = artist_fixture(%{external_links: %{"genius" => "https://genius.com/artists/Daft-punk"}})
       expect_wikipedia()
       expect_deezer()
+      expect_tidal()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -214,6 +240,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius_empty()
       expect_deezer()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -229,6 +256,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_spotify()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -241,6 +269,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_spotify()
+      expect_tidal()
 
       {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -252,6 +281,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_tidal()
 
       {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
 
@@ -264,11 +294,62 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_genius()
       expect_deezer()
       expect_spotify_empty()
+      expect_tidal()
 
       {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).provider_ids, :spotify)
       assert is_nil(updated.provider_ids[:spotify])
+    end
+  end
+
+  describe "enrich_artist/1 - tidal" do
+    test "fetches tidal ID and stores it in provider_ids" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_tidal()
+
+      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert updated.provider_ids[:tidal] == "8847"
+    end
+
+    test "persists the tidal ID to the database" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_tidal()
+
+      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert Artist.get(artist.id).provider_ids[:tidal] == "8847"
+    end
+
+    test "skips artist that already has a tidal ID" do
+      artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", tidal: "8847"}})
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+
+      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert returned.provider_ids[:tidal] == "8847"
+    end
+
+    test "stores nil sentinel when tidal has no results" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_tidal_empty()
+
+      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+
+      assert Map.has_key?(Artist.get(artist.id).provider_ids, :tidal)
+      assert is_nil(updated.provider_ids[:tidal])
     end
   end
 end
