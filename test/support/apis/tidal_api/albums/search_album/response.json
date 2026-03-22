@@ -1,0 +1,55 @@
+{
+  "data": {
+    "id": "random%20access%20memories%20daft%20punk",
+    "type": "searchResults",
+    "attributes": {
+      "trackingId": "2b7265d4-9b8f-513b-9e4c-b142999e99cd"
+    },
+    "relationships": {
+      "albums": {
+        "data": [
+          {
+            "id": "77646169",
+            "type": "albums"
+          }
+        ],
+        "links": {
+          "self": "/searchResults/random%20access%20memories%20daft%20punk/relationships/albums?countryCode=US&explicitFilter=INCLUDE"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "id": "77646169",
+      "type": "albums",
+      "attributes": {
+        "title": "Random Access Memories",
+        "barcodeId": "00888837137522",
+        "numberOfVolumes": 1,
+        "numberOfItems": 13,
+        "duration": "PT1H14M24S",
+        "explicit": false,
+        "releaseDate": "2013-05-17",
+        "popularity": 0.92,
+        "accessType": "PUBLIC"
+      }
+    },
+    {
+      "id": "77646170",
+      "type": "albums",
+      "attributes": {
+        "title": "Random Access Memories (Drumless Edition)",
+        "barcodeId": "00602448640512",
+        "numberOfVolumes": 1,
+        "numberOfItems": 13,
+        "duration": "PT1H14M24S",
+        "explicit": false,
+        "releaseDate": "2023-11-17",
+        "popularity": 0.45,
+        "accessType": "PUBLIC"
+      }
+    }
+  ],
+  "links": {}
+}

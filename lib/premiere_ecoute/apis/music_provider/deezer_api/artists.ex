@@ -55,6 +55,29 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Artists do
   end
 
   @doc """
+  Searches Deezer for albums matching a title and artist name.
+
+  Returns only exact title matches (case-insensitive) with deezer_id and name.
+  """
+  @spec search_album(String.t(), String.t()) :: {:ok, [map()]} | {:error, term()}
+  def search_album(title, artist) when is_binary(title) and is_binary(artist) do
+    title_downcase = String.downcase(title)
+
+    DeezerApi.api()
+    |> DeezerApi.get(url: "/search/album", params: [q: "#{title} #{artist}", limit: 10])
+    |> DeezerApi.handle(200, fn %{"data" => items} ->
+      items
+      |> Enum.filter(&(String.downcase(&1["title"]) == title_downcase))
+      |> Enum.map(fn a ->
+        %{
+          deezer_id: to_string(a["id"]),
+          name: a["title"]
+        }
+      end)
+    end)
+  end
+
+  @doc """
   Fetches albums for an artist by Deezer ID.
 
   Returns a list of album maps (without tracks).

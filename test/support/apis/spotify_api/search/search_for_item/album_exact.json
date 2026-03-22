@@ -1,0 +1,54 @@
+{
+  "albums": {
+    "href": "https://api.spotify.com/v1/search?offset=0&limit=20&query=Random+Access+Memories+Daft+Punk&type=album",
+    "limit": 20,
+    "offset": 0,
+    "total": 3,
+    "items": [
+      {
+        "album_type": "album",
+        "total_tracks": 13,
+        "is_playable": true,
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/4m2880jivSbbyEGAKfITCa"
+        },
+        "href": "https://api.spotify.com/v1/albums/4m2880jivSbbyEGAKfITCa",
+        "id": "4m2880jivSbbyEGAKfITCa",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273b33d46dfa2b840f6888f1e5a",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02b33d46dfa2b840f6888f1e5a",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851b33d46dfa2b840f6888f1e5a",
+            "width": 64
+          }
+        ],
+        "name": "Random Access Memories",
+        "release_date": "2013-05-17",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:4m2880jivSbbyEGAKfITCa",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/4tZwfgrHOc3mvqYlEYSvVi"
+            },
+            "href": "https://api.spotify.com/v1/artists/4tZwfgrHOc3mvqYlEYSvVi",
+            "id": "4tZwfgrHOc3mvqYlEYSvVi",
+            "name": "Daft Punk",
+            "type": "artist",
+            "uri": "spotify:artist:4tZwfgrHOc3mvqYlEYSvVi"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -65,6 +65,34 @@ defmodule PremiereEcoute.Apis.MusicProvider.TidalApi.Artists do
   end
 
   @doc """
+  Searches Tidal for albums matching a title and artist name.
+
+  Uses GET /v2/searchResults/{query}?include=albums. Returns only exact title matches
+  (case-insensitive) with tidal_id and name.
+  """
+  @spec search_album(String.t(), String.t()) :: {:ok, [map()]} | {:error, term()}
+  def search_album(title, artist) when is_binary(title) and is_binary(artist) do
+    title_downcase = String.downcase(title)
+    query = "#{title} #{artist}"
+
+    TidalApi.api()
+    |> TidalApi.get(
+      url: "/searchResults/#{URI.encode(query)}",
+      params: [{"include", "albums"}, {"explicitFilter", "INCLUDE"}, {"countryCode", "US"}]
+    )
+    |> TidalApi.handle(200, fn data ->
+      (data["included"] || [])
+      |> Enum.filter(&(&1["type"] == "albums" && String.downcase(&1["attributes"]["title"]) == title_downcase))
+      |> Enum.map(fn a ->
+        %{
+          tidal_id: a["id"],
+          name: a["attributes"]["title"]
+        }
+      end)
+    end)
+  end
+
+  @doc """
   Fetches albums for an artist by Tidal ID.
 
   Returns a list of album maps (without tracks). Cover URL is derived from the album's

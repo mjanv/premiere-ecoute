@@ -62,7 +62,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.TidalApi do
   defdelegate get_track(track_id), to: __MODULE__.Tracks
 
   # Artists
-  defdelegate search_artist(artist_id), to: __MODULE__.Artists
+  defdelegate search_artist(name), to: __MODULE__.Artists
+  defdelegate search_album(title, artist), to: __MODULE__.Artists
   defdelegate get_artist(artist_id), to: __MODULE__.Artists
   defdelegate get_artist_albums(artist_id), to: __MODULE__.Artists
 end

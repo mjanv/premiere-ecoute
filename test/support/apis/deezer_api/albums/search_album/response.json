@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "id": 25834745,
+      "title": "Random Access Memories",
+      "link": "https://www.deezer.com/album/25834745",
+      "cover": "https://api.deezer.com/album/25834745/image",
+      "cover_small": "https://cdn-images.dzcdn.net/images/cover/2e018122cb56986277102d2041a592c8/56x56-000000-80-0-0.jpg",
+      "cover_medium": "https://cdn-images.dzcdn.net/images/cover/2e018122cb56986277102d2041a592c8/250x250-000000-80-0-0.jpg",
+      "cover_big": "https://cdn-images.dzcdn.net/images/cover/2e018122cb56986277102d2041a592c8/500x500-000000-80-0-0.jpg",
+      "cover_xl": "https://cdn-images.dzcdn.net/images/cover/2e018122cb56986277102d2041a592c8/1000x1000-000000-80-0-0.jpg",
+      "nb_tracks": 13,
+      "release_date": "2013-05-17",
+      "record_type": "album",
+      "tracklist": "https://api.deezer.com/album/25834745/tracks",
+      "explicit_lyrics": false,
+      "type": "album"
+    }
+  ],
+  "total": 1
+}

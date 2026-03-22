@@ -49,6 +49,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
 
   # Artists
   defdelegate search_artist(name), to: __MODULE__.Artists
+  defdelegate search_album(title, artist), to: __MODULE__.Artists
   defdelegate get_artist(artist_id), to: __MODULE__.Artists
   defdelegate get_artist_albums(artist_id), to: __MODULE__.Artists
 
