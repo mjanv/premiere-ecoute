@@ -32,11 +32,11 @@ jobs:
         working-directory: apps/streamdeck
 
       - name: Package streamer plugin
-        run: npx streamdeck pack com.maxime-janvier.premiere-ecoute-streamer.sdPlugin --force
+        run: npx streamdeck pack com.maxime-janvier.premiere-ecoute-streamer.sdPlugin --force --no-update-check
         working-directory: apps/streamdeck
 
       - name: Package viewer plugin
-        run: npx streamdeck pack com.maxime-janvier.premiere-ecoute-viewer.sdPlugin --force
+        run: npx streamdeck pack com.maxime-janvier.premiere-ecoute-viewer.sdPlugin --force --no-update-check
         working-directory: apps/streamdeck
 
       - name: Extract release notes
