@@ -32,11 +32,11 @@ jobs:
         working-directory: apps/streamdeck
 
       - name: Package streamer plugin
-        run: cd com.maxime-janvier.premiere-ecoute-streamer.sdPlugin && zip -r ../com.maxime-janvier.premiere-ecoute-streamer.streamDeckPlugin .
+        run: zip -r com.maxime-janvier.premiere-ecoute-streamer.streamDeckPlugin com.maxime-janvier.premiere-ecoute-streamer.sdPlugin --exclude "*.gitignore"
         working-directory: apps/streamdeck
 
       - name: Package viewer plugin
-        run: cd com.maxime-janvier.premiere-ecoute-viewer.sdPlugin && zip -r ../com.maxime-janvier.premiere-ecoute-viewer.streamDeckPlugin .
+        run: zip -r com.maxime-janvier.premiere-ecoute-viewer.streamDeckPlugin com.maxime-janvier.premiere-ecoute-viewer.sdPlugin --exclude "*.gitignore"
         working-directory: apps/streamdeck
 
       - name: Extract release notes
