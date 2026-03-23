@@ -138,6 +138,10 @@ defmodule PremiereEcoute.MixProject do
       {:lazy_html, "~> 0.1", only: :test},
       {:bypass, "~> 2.1", only: :test},
       {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
+      # Audio / ML (dev only)
+      {:bumblebee, "~> 0.6"},
+      {:nx, "~> 0.9.0"},
+      {:exla, "~> 0.9.0"},
       # Development
       {:doctor, "~> 0.22", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
