@@ -22,10 +22,9 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
       <canvas
         id="waveform"
         phx-hook="Microphone"
+        phx-update="ignore"
         data-endianness={System.endianness()}
-        class="w-full rounded-xl border border-gray-800"
-        height="160"
-        style="height: 160px;"
+        class="rounded-xl border border-gray-800 block"
       >
       </canvas>
 

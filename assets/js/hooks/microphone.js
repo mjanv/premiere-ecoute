@@ -14,8 +14,13 @@ export const Microphone = {
     this.recording = false;
     this.SAMPLES_PER_PX = 133; // ~10s visible at 16kHz on a 1200px canvas
 
-    this.el.width = this.el.parentElement.clientWidth;
-    this.el.height = 160;
+    const h = 160;
+    const w = Math.floor(this.el.parentElement.getBoundingClientRect().width);
+    this.W = w;
+    this.H = h;
+    this.el.width = w;
+    this.el.height = h;
+    this.el.style.cssText = `width:${w}px;height:${h}px;display:block;`;
     this.ctx = this.el.getContext("2d");
     this.clearCanvas();
 
@@ -31,7 +36,6 @@ export const Microphone = {
   startRecording() {
     this.allSamples = new Float32Array(0);
     this.recording = true;
-    this.clearCanvas();
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
       this.stream = stream;
@@ -86,8 +90,8 @@ export const Microphone = {
   // No canvas resize ever, so no flicker.
   drawWaveform(samples) {
     const S = this.SAMPLES_PER_PX;
-    const w = this.el.width;
-    const h = this.el.height;
+    const w = this.W;
+    const h = this.H;
     const mid = h / 2;
 
     // How many samples fit in the canvas
@@ -133,8 +137,8 @@ export const Microphone = {
   },
 
   clearCanvas() {
-    const w = this.el.width;
-    const h = this.el.height;
+    const w = this.W || this.el.width;
+    const h = this.H || this.el.height;
     this.ctx.fillStyle = "#111827";
     this.ctx.fillRect(0, 0, w, h);
     this.ctx.strokeStyle = "#1f2937";
