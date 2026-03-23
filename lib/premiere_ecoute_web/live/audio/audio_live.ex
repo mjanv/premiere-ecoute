@@ -10,7 +10,7 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, recording: false, transcript: "", chunks_received: 0)}
+    {:ok, assign(socket, recording: false, chunks_received: 0, segments: [])}
   end
 
   @impl true
@@ -48,29 +48,42 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
         <% end %>
       </button>
 
-      <%!-- Live transcript --%>
+      <%!-- Speech segments --%>
       <div class="w-full max-w-xl">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-gray-500 uppercase tracking-widest">Transcript</span>
-          <span :if={@chunks_received > 0} class="text-xs text-gray-600">
-            {@chunks_received} chunk(s)
-          </span>
+          <span class="text-xs font-medium text-gray-500 uppercase tracking-widest">Segments</span>
+          <span class="text-xs text-gray-600">{length(@segments)} detected</span>
         </div>
-        <div class="rounded-xl bg-gray-900 border border-gray-800 p-4 min-h-[80px] text-white whitespace-pre-wrap">
-          <%= if @transcript == "" do %>
-            <span class="text-gray-600 text-sm">Record something to see the transcript here.</span>
-          <% else %>
-            {@transcript}
-          <% end %>
+        <div class="rounded-xl bg-gray-900 border border-gray-800 p-4 min-h-[80px] space-y-1">
+          <div :if={@segments == []} class="text-gray-600 text-sm">No segments yet.</div>
+          <div
+            :for={{seg, i} <- Enum.with_index(@segments)}
+            class="flex items-center gap-3 text-sm font-mono"
+          >
+            <span class="text-gray-500">{i + 1}</span>
+            <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+            <span class="text-white">
+              {format_ms(seg.start_ms)} – {format_ms(seg.end_ms)}
+            </span>
+            <span class="text-gray-500 text-xs">
+              {seg.end_ms - seg.start_ms}ms
+            </span>
+          </div>
         </div>
       </div>
     </div>
     """
   end
 
+  defp format_ms(ms) do
+    s = div(ms, 1000)
+    m = div(s, 60)
+    :io_lib.format("~2..0B:~2..0B.~3..0B", [m, rem(s, 60), rem(ms, 1000)])
+  end
+
   @impl true
   def handle_event("recording_started", _params, socket) do
-    {:noreply, assign(socket, recording: true, transcript: "", chunks_received: 0)}
+    {:noreply, assign(socket, recording: true, chunks_received: 0, segments: [])}
   end
 
   @impl true
@@ -79,12 +92,13 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
   end
 
   @impl true
-  def handle_event("audio_chunk", %{"data" => base64}, socket) do
-    binary = Base.decode64!(base64)
-    byte_count = byte_size(binary)
-    sample_count = div(byte_count, 4)
-    IO.puts("[audio] chunk #{socket.assigns.chunks_received + 1}: #{sample_count} samples (#{byte_count} bytes)")
-
+  def handle_event("audio_chunk", _params, socket) do
     {:noreply, update(socket, :chunks_received, &(&1 + 1))}
+  end
+
+  @impl true
+  def handle_event("segment_detected", %{"start_ms" => start_ms, "end_ms" => end_ms}, socket) do
+    segment = %{start_ms: round(start_ms), end_ms: round(end_ms)}
+    {:noreply, update(socket, :segments, &(&1 ++ [segment]))}
   end
 end

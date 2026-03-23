@@ -35,7 +35,9 @@ export const Microphone = {
 
   startRecording() {
     this.allSamples = new Float32Array(0);
-    this.allFrames = []; // {rms, isSpeech} per 30ms frame
+    this.allFrames = [];
+    this.totalFrames = 0;      // absolute frame counter since recording start
+    this.segmentStart = null;  // frame index where current speech segment started
     this.recording = true;
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
@@ -51,14 +53,36 @@ export const Microphone = {
         if (!this.recording) return;
         const { samples: newSamples, frames: newFrames } = event.data;
 
-        // Accumulate samples
-        const merged = new Float32Array(this.allSamples.length + newSamples.length);
-        merged.set(this.allSamples);
-        merged.set(newSamples, this.allSamples.length);
-        this.allSamples = merged;
+        // Keep only the visible window of samples — no unbounded growth
+        const maxSamples = this.W * this.SAMPLES_PER_PX;
+        const combined = new Float32Array(this.allSamples.length + newSamples.length);
+        combined.set(this.allSamples);
+        combined.set(newSamples, this.allSamples.length);
+        this.allSamples = combined.length > maxSamples
+          ? combined.slice(combined.length - maxSamples)
+          : combined;
 
-        // Accumulate VAD frames
-        this.allFrames.push(...newFrames);
+        // Detect completed segments (speech → silence transitions)
+        const FRAME_MS = 30;
+        const completedSegments = [];
+        for (let i = 0; i < newFrames.length; i++) {
+          const absFrame = this.totalFrames + i;
+          if (newFrames[i].isSpeech && this.segmentStart === null) {
+            this.segmentStart = absFrame;
+          } else if (!newFrames[i].isSpeech && this.segmentStart !== null) {
+            completedSegments.push({
+              start_ms: this.segmentStart * FRAME_MS,
+              end_ms: absFrame * FRAME_MS
+            });
+            this.segmentStart = null;
+          }
+        }
+        this.totalFrames += newFrames.length;
+
+        // Cap frames to visible window
+        for (let i = 0; i < newFrames.length; i++) this.allFrames.push(newFrames[i]);
+        const maxFrames = Math.ceil(maxSamples / 480);
+        if (this.allFrames.length > maxFrames) this.allFrames.splice(0, this.allFrames.length - maxFrames);
 
         this.drawWaveform(this.allSamples, this.allFrames);
 
@@ -68,6 +92,9 @@ export const Microphone = {
         let binary = "";
         for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
         this.pushEvent("audio_chunk", { data: btoa(binary) });
+        for (const seg of completedSegments) {
+          this.pushEvent("segment_detected", seg);
+        }
       };
 
       source.connect(worklet);
