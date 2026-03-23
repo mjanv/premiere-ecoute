@@ -2,7 +2,7 @@
 // Accumulates raw float32 PCM samples and posts them to the main thread
 // every CHUNK_SAMPLES frames for waveform drawing and server upload.
 
-const CHUNK_SAMPLES = 16000 * 2; // 2 seconds at 16 kHz
+const CHUNK_SAMPLES = 16000 * 0.5; // 0.5 seconds at 16 kHz
 
 class PcmProcessor extends AudioWorkletProcessor {
   constructor() {

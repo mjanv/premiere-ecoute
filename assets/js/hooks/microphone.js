@@ -11,19 +11,16 @@ export const Microphone = {
     this.audioCtx = null;
     this.stream = null;
     this.allSamples = new Float32Array(0);
-    this.animationId = null;
     this.recording = false;
+    this.SAMPLES_PER_PX = 133; // ~10s visible at 16kHz on a 1200px canvas
 
-    /** @type {CanvasRenderingContext2D} */
+    this.el.width = this.el.parentElement.clientWidth;
+    this.el.height = 160;
     this.ctx = this.el.getContext("2d");
     this.clearCanvas();
 
     this.el.addEventListener("microphone:toggle", () => {
-      if (this.recording) {
-        this.stopRecording();
-      } else {
-        this.startRecording();
-      }
+      if (this.recording) this.stopRecording(); else this.startRecording();
     });
   },
 
@@ -34,6 +31,7 @@ export const Microphone = {
   startRecording() {
     this.allSamples = new Float32Array(0);
     this.recording = true;
+    this.clearCanvas();
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
       this.stream = stream;
@@ -80,57 +78,70 @@ export const Microphone = {
     if (this.audioCtx) { this.audioCtx.close(); this.audioCtx = null; }
     if (this.stream) { this.stream.getTracks().forEach((t) => t.stop()); this.stream = null; }
     this.pushEvent("recording_stopped", {});
+    // Redraw so the waveform stays visible after stopping
+    if (this.allSamples.length > 0) this.drawWaveform(this.allSamples);
   },
 
-  // Draw the exact PCM samples — one pixel column per downsampled bucket
+  // Fixed-width canvas, scrolling window — always shows the most recent audio.
+  // No canvas resize ever, so no flicker.
   drawWaveform(samples) {
-    const { width, height } = this.el;
-    const mid = height / 2;
+    const S = this.SAMPLES_PER_PX;
+    const w = this.el.width;
+    const h = this.el.height;
+    const mid = h / 2;
+
+    // How many samples fit in the canvas
+    const visibleSamples = w * S;
+    const startSample = Math.max(0, samples.length - visibleSamples);
+    const startCol = Math.floor(startSample / S);
+    const totalCols = Math.ceil(samples.length / S);
+    const displayCols = totalCols - startCol;
 
     this.ctx.fillStyle = "#111827";
-    this.ctx.fillRect(0, 0, width, height);
+    this.ctx.fillRect(0, 0, w, h);
 
-    this.ctx.lineWidth = 1.5;
-    this.ctx.strokeStyle = "#6366f1";
+    this.ctx.strokeStyle = "#1f2937";
+    this.ctx.lineWidth = 1;
     this.ctx.beginPath();
+    this.ctx.moveTo(0, mid);
+    this.ctx.lineTo(w, mid);
+    this.ctx.stroke();
 
-    const bucketSize = Math.max(1, Math.floor(samples.length / width));
-
-    for (let col = 0; col < width; col++) {
-      const start = col * bucketSize;
-      const end = Math.min(start + bucketSize, samples.length);
-
-      // Find min/max in the bucket to preserve peaks
+    this.ctx.strokeStyle = "#6366f1";
+    this.ctx.lineWidth = 1;
+    for (let i = 0; i < displayCols; i++) {
+      const col = startCol + i;
+      const s0 = col * S, s1 = Math.min(s0 + S, samples.length);
       let min = 0, max = 0;
-      for (let i = start; i < end; i++) {
-        if (samples[i] < min) min = samples[i];
-        if (samples[i] > max) max = samples[i];
+      for (let j = s0; j < s1; j++) {
+        if (samples[j] < min) min = samples[j];
+        if (samples[j] > max) max = samples[j];
       }
-
-      const yTop = mid - max * mid;
-      const yBot = mid - min * mid;
-
-      if (col === 0) {
-        this.ctx.moveTo(col, yTop);
-      } else {
-        this.ctx.lineTo(col, yTop);
-        this.ctx.lineTo(col, yBot);
-      }
+      this.ctx.beginPath();
+      this.ctx.moveTo(i + 0.5, mid - max * mid);
+      this.ctx.lineTo(i + 0.5, mid - min * mid || mid + 1);
+      this.ctx.stroke();
     }
 
+    // Playhead at right edge of data
+    const playheadX = Math.min(displayCols, w - 1);
+    this.ctx.strokeStyle = "#ef4444";
+    this.ctx.beginPath();
+    this.ctx.moveTo(playheadX + 0.5, 0);
+    this.ctx.lineTo(playheadX + 0.5, h);
     this.ctx.stroke();
   },
 
   clearCanvas() {
-    const { width, height } = this.el;
+    const w = this.el.width;
+    const h = this.el.height;
     this.ctx.fillStyle = "#111827";
-    this.ctx.fillRect(0, 0, width, height);
-
-    this.ctx.lineWidth = 1.5;
-    this.ctx.strokeStyle = "#374151";
+    this.ctx.fillRect(0, 0, w, h);
+    this.ctx.strokeStyle = "#1f2937";
+    this.ctx.lineWidth = 1;
     this.ctx.beginPath();
-    this.ctx.moveTo(0, height / 2);
-    this.ctx.lineTo(width, height / 2);
+    this.ctx.moveTo(0, h / 2);
+    this.ctx.lineTo(w, h / 2);
     this.ctx.stroke();
   },
 

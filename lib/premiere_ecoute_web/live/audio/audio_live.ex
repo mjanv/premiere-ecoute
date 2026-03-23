@@ -19,14 +19,13 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
     <div class="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-8 p-8">
       <h1 class="text-2xl font-semibold text-white tracking-tight">Audio recorder</h1>
 
-      <%!-- Waveform canvas --%>
       <canvas
         id="waveform"
         phx-hook="Microphone"
         data-endianness={System.endianness()}
-        width="600"
-        height="120"
-        class="rounded-xl bg-gray-900 border border-gray-800"
+        class="w-full rounded-xl border border-gray-800"
+        height="160"
+        style="height: 160px;"
       >
       </canvas>
 
@@ -81,7 +80,12 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
   end
 
   @impl true
-  def handle_event("audio_chunk", _params, socket) do
+  def handle_event("audio_chunk", %{"data" => base64}, socket) do
+    binary = Base.decode64!(base64)
+    byte_count = byte_size(binary)
+    sample_count = div(byte_count, 4)
+    IO.puts("[audio] chunk #{socket.assigns.chunks_received + 1}: #{sample_count} samples (#{byte_count} bytes)")
+
     {:noreply, update(socket, :chunks_received, &(&1 + 1))}
   end
 end
