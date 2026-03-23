@@ -7,9 +7,9 @@ const CHUNK_SAMPLES = SAMPLE_RATE * 0.5;  // 500ms chunks
 const FRAME_SAMPLES = SAMPLE_RATE * 0.03; // 30ms VAD frames
 
 // Hysteresis thresholds — tune for clean close-mic
-const SPEECH_ON  = 0.02;  // RMS to open speech gate
-const SPEECH_OFF = 0.008; // RMS to close speech gate (lower to avoid clipping words)
-const HANG_FRAMES = 8;    // hold speech state for N frames after dropping below threshold
+const SPEECH_ON  = 0.008; // RMS to open speech gate
+const SPEECH_OFF = 0.003; // RMS to close speech gate
+const HANG_FRAMES = 33;   // ~1s hangover at 30ms frames — long tail, avoids cutting words
 
 class PcmProcessor extends AudioWorkletProcessor {
   constructor() {
