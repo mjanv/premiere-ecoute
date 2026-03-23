@@ -35,6 +35,7 @@ export const Microphone = {
 
   startRecording() {
     this.allSamples = new Float32Array(0);
+    this.allFrames = []; // {rms, isSpeech} per 30ms frame
     this.recording = true;
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
@@ -48,15 +49,18 @@ export const Microphone = {
 
       worklet.port.onmessage = (event) => {
         if (!this.recording) return;
-        const newSamples = event.data.samples;
+        const { samples: newSamples, frames: newFrames } = event.data;
 
-        // Accumulate
+        // Accumulate samples
         const merged = new Float32Array(this.allSamples.length + newSamples.length);
         merged.set(this.allSamples);
         merged.set(newSamples, this.allSamples.length);
         this.allSamples = merged;
 
-        this.drawWaveform(this.allSamples);
+        // Accumulate VAD frames
+        this.allFrames.push(...newFrames);
+
+        this.drawWaveform(this.allSamples, this.allFrames);
 
         const endianness = this.el.dataset.endianness;
         const converted = this.convertEndianness32(newSamples.buffer, this.getEndianness(), endianness);
@@ -83,27 +87,31 @@ export const Microphone = {
     if (this.stream) { this.stream.getTracks().forEach((t) => t.stop()); this.stream = null; }
     this.pushEvent("recording_stopped", {});
     // Redraw so the waveform stays visible after stopping
-    if (this.allSamples.length > 0) this.drawWaveform(this.allSamples);
+    if (this.allSamples.length > 0) this.drawWaveform(this.allSamples, this.allFrames);
   },
 
   // Fixed-width canvas, scrolling window — always shows the most recent audio.
   // No canvas resize ever, so no flicker.
-  drawWaveform(samples) {
+  // AIDEV-NOTE: h is split: top 140px = waveform, bottom 16px = VAD segment bar
+  drawWaveform(samples, frames = []) {
     const S = this.SAMPLES_PER_PX;
+    const FRAME_SAMPLES = 480; // 30ms at 16kHz — must match pcm-processor.js
     const w = this.W;
     const h = this.H;
-    const mid = h / 2;
+    const waveH = h - 16;  // waveform area height
+    const mid = waveH / 2;
 
-    // How many samples fit in the canvas
     const visibleSamples = w * S;
     const startSample = Math.max(0, samples.length - visibleSamples);
     const startCol = Math.floor(startSample / S);
     const totalCols = Math.ceil(samples.length / S);
-    const displayCols = totalCols - startCol;
+    const displayCols = Math.min(totalCols - startCol, w);
 
+    // Background
     this.ctx.fillStyle = "#111827";
     this.ctx.fillRect(0, 0, w, h);
 
+    // Center line
     this.ctx.strokeStyle = "#1f2937";
     this.ctx.lineWidth = 1;
     this.ctx.beginPath();
@@ -111,6 +119,25 @@ export const Microphone = {
     this.ctx.lineTo(w, mid);
     this.ctx.stroke();
 
+    // VAD segment bar (bottom 16px)
+    // Each pixel column maps to a sample range → find corresponding frames
+    const SAMPLES_PER_FRAME = FRAME_SAMPLES;
+    for (let i = 0; i < displayCols; i++) {
+      const s0 = (startCol + i) * S;
+      const s1 = s0 + S;
+      const f0 = Math.floor(s0 / SAMPLES_PER_FRAME);
+      const f1 = Math.ceil(s1 / SAMPLES_PER_FRAME);
+      let speechCount = 0, total = 0;
+      for (let f = f0; f < f1 && f < frames.length; f++) {
+        if (frames[f].isSpeech) speechCount++;
+        total++;
+      }
+      const isSpeech = total > 0 && speechCount / total > 0.5;
+      this.ctx.fillStyle = isSpeech ? "#22c55e" : "#1f2937";
+      this.ctx.fillRect(i, waveH + 2, 1, 12);
+    }
+
+    // Waveform bars
     this.ctx.strokeStyle = "#6366f1";
     this.ctx.lineWidth = 1;
     for (let i = 0; i < displayCols; i++) {
@@ -127,12 +154,13 @@ export const Microphone = {
       this.ctx.stroke();
     }
 
-    // Playhead at right edge of data
+    // Playhead
     const playheadX = Math.min(displayCols, w - 1);
     this.ctx.strokeStyle = "#ef4444";
+    this.ctx.lineWidth = 1;
     this.ctx.beginPath();
     this.ctx.moveTo(playheadX + 0.5, 0);
-    this.ctx.lineTo(playheadX + 0.5, h);
+    this.ctx.lineTo(playheadX + 0.5, waveH);
     this.ctx.stroke();
   },
 
