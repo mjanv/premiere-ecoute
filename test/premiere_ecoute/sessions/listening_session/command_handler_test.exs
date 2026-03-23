@@ -458,9 +458,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         :ok
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One (03:30)" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "[1/2] Track One (03:30)" -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(2/2) Track Two (03:00)" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "[2/2] Track Two (03:00)" -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       command = %PrepareListeningSession{
@@ -602,11 +602,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         :ok
       end)
 
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One (03:30)" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "[1/2] Track One (03:30)" -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(2/2) Track Two (03:00)" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "[2/2] Track Two (03:00)" -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
-      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "(1/2) Track One (03:30)" -> :ok end)
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "[1/2] Track One (03:30)" -> :ok end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
 
       command = %PrepareListeningSession{

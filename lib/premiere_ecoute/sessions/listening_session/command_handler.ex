@@ -217,7 +217,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name} (#{PremiereEcouteCore.Duration.timer(session.current_track.duration_ms)})"
+             "[#{session.current_track.track_number}/#{session.album.total_tracks}] #{session.current_track.name} (#{PremiereEcouteCore.Duration.timer(session.current_track.duration_ms)})"
            ) do
       {:ok, session,
        [%NextTrackStarted{source: :album, session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
@@ -251,7 +251,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          :ok <-
            Apis.twitch().send_chat_message(
              scope,
-             "(#{session.current_track.track_number}/#{session.album.total_tracks}) #{session.current_track.name} (#{PremiereEcouteCore.Duration.timer(session.current_track.duration_ms)})"
+             "[#{session.current_track.track_number}/#{session.album.total_tracks}] #{session.current_track.name} (#{PremiereEcouteCore.Duration.timer(session.current_track.duration_ms)})"
            ) do
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
     else
