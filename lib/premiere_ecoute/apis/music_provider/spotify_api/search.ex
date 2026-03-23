@@ -33,6 +33,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
           tracks: [],
           total_tracks: item["total_tracks"]
         }
+        |> Album.put_artist()
       end)
     end)
   end
