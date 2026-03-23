@@ -986,6 +986,7 @@ msgid "Export includes:"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:54
+#: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:80
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:110
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:140
 #, elixir-autogen, elixir-format
@@ -2699,11 +2700,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:499
 #, elixir-autogen, elixir-format
 msgid "Choose a playlist..."
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:80
-#, elixir-autogen, elixir-format
-msgid "From your Spotify"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:135

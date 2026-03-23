@@ -77,7 +77,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
           </svg>
           <div>
             <h3 class="font-semibold">{gettext("Playlist")}</h3>
-            <p class="text-sm opacity-70">{gettext("From your Spotify")}</p>
+            <p class="text-sm opacity-70">{gettext("From Spotify")}</p>
           </div>
         </div>
       </button>
