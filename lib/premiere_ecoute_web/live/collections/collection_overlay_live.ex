@@ -8,13 +8,13 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcouteCore.Cache
 
   @impl true
-  def mount(%{"user_id" => user_id}, _session, socket) do
-    user = Accounts.get_user!(user_id)
-    broadcaster_id = user.twitch && user.twitch.user_id
+  def mount(%{"username" => username}, _session, socket) do
+    user = User.get_user_by_username(username)
+    broadcaster_id = user && user.twitch && user.twitch.user_id
 
     {session_id, votes_a, votes_b, vote_open} = load_state(broadcaster_id)
 
@@ -22,8 +22,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
       PremiereEcoute.PubSub.subscribe("collection:#{session_id}")
     end
 
-    if connected?(socket) do
-      PremiereEcoute.PubSub.subscribe("playback:#{user_id}")
+    if connected?(socket) && user do
+      PremiereEcoute.PubSub.subscribe("playback:#{user.id}")
     end
 
     socket =
