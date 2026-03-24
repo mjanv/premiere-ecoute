@@ -19,7 +19,7 @@ defmodule PremiereEcouteWeb.Audio.WhisperServing do
     }
   end
 
-  @model "openai/whisper-small"
+  @model "openai/whisper-tiny"
 
   def start_link do
     require Logger

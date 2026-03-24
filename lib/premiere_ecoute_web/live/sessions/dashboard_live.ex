@@ -59,6 +59,8 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       |> assign(:show_youtube_modal, false)
       |> assign(:show_premiere_modal, false)
       |> assign(:microphone_active, false)
+      |> assign(:recording_started_at, nil)
+      |> assign(:last_segment, nil)
       |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
       |> assign_async(:vote_trends, fn ->
         {:ok, %{vote_trends: VoteTrends.rolling_average(session_id, :minute)}}
@@ -238,37 +240,64 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
 
   @impl true
   def handle_event("recording_started", _params, socket) do
-    {:noreply, assign(socket, :microphone_active, true)}
+    # AIDEV-NOTE: Capture wall clock at recording start. Used to convert JS frame-counter
+    # offsets (relative to record click) into session-relative offsets without network jitter.
+    {:noreply, assign(socket, microphone_active: true, recording_started_at: DateTime.utc_now())}
   end
 
   @impl true
   def handle_event("recording_stopped", _params, socket) do
-    {:noreply, assign(socket, :microphone_active, false)}
+    {:noreply, assign(socket, microphone_active: false, recording_started_at: nil)}
   end
 
   @impl true
   def handle_event(
         "segment_detected",
-        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => true},
-        %{assigns: %{listening_session: session}} = socket
+        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => true} = params,
+        %{assigns: %{listening_session: session, recording_started_at: recording_started_at}} = socket
       )
-      when not is_nil(session.started_at) do
-    # AIDEV-NOTE: Only clean speech segments are persisted. Noisy segments are discarded.
-    # Offsets are relative to the session wall clock, not the recording start.
-    recording_start_ms = DateTime.diff(DateTime.utc_now(), session.started_at, :millisecond)
-    segment_duration = end_ms - start_ms
-    abs_end_ms = recording_start_ms
-    abs_start_ms = abs_end_ms - segment_duration
+      when not is_nil(session.started_at) and not is_nil(recording_started_at) do
+    # AIDEV-NOTE: JS start_ms/end_ms are offsets from record-click (frame counter * 30ms).
+    # recording_offset_ms anchors the recording start to the session timeline — one-time
+    # latency on recording_started event, consistent across all segments (no per-segment jitter).
+    recording_offset_ms = DateTime.diff(recording_started_at, session.started_at, :millisecond)
+    abs_start_ms = recording_offset_ms + start_ms
+    abs_end_ms = recording_offset_ms + end_ms
+
+    pid = self()
+
+    transcribe = session.options["transcribe"] in [1, true]
+    audio_b64 = params["audio"]
 
     Task.start(fn ->
-      ListeningSession.add_speech_marker(session, abs_start_ms, abs_end_ms)
+      case ListeningSession.add_speech_marker(session, abs_start_ms, abs_end_ms) do
+        {:ok, marker} ->
+          send(pid, :speech_marker_added)
+
+          if transcribe && is_binary(audio_b64) do
+            transcribe_marker(marker, audio_b64)
+          end
+
+        _ ->
+          :ok
+      end
     end)
 
-    {:noreply, socket}
+    {:noreply, assign(socket, :last_segment, %{is_clean: true, duration_ms: end_ms - start_ms})}
+  end
+
+  @impl true
+  def handle_event("segment_detected", %{"start_ms" => start_ms, "end_ms" => end_ms}, socket) do
+    {:noreply, assign(socket, :last_segment, %{is_clean: false, duration_ms: end_ms - start_ms})}
   end
 
   @impl true
   def handle_event("segment_detected", _params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("audio_chunk", _params, socket) do
     {:noreply, socket}
   end
 
@@ -345,6 +374,12 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   @impl true
   def handle_info(:premiere_export_modal_closed, socket) do
     {:noreply, assign(socket, :show_premiere_modal, false)}
+  end
+
+  @impl true
+  def handle_info(:speech_marker_added, %{assigns: %{session_id: session_id}} = socket) do
+    session = ListeningSession.get(session_id)
+    {:noreply, assign(socket, :listening_session, session)}
   end
 
   @impl true
@@ -656,6 +691,32 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
     </svg>
     """
+  end
+
+  # AIDEV-NOTE: Runs Whisper on a speech marker's audio then updates the DB text field.
+  # Called only when session.options["transcribe"] == 1. Fire-and-forget — no LiveView update.
+  defp transcribe_marker(marker, audio_b64) do
+    binary = Base.decode64!(audio_b64)
+    floats = for <<f::float-little-32 <- binary>>, do: f
+    samples = Nx.tensor(floats, type: :f32)
+    require Logger
+    Logger.info("[transcription] sending marker=#{marker.id} start=#{marker.start_ms}ms samples=#{Nx.size(samples)}")
+
+    case Nx.Serving.batched_run(PremiereEcouteWeb.Audio.WhisperServing, samples) do
+      %{chunks: [%{text: text} | _]} ->
+        text = String.trim(text)
+        require Logger
+        Logger.info("[transcription] marker=#{marker.id} start=#{marker.start_ms}ms \"#{text}\"")
+        ListeningSession.update_speech_marker_text(marker, text)
+
+      _ ->
+        :ok
+    end
+  rescue
+    e ->
+      require Logger
+      Logger.warning("[transcription] failed marker=#{marker.id}: #{inspect(e)}")
+      :ok
   end
 
   def visibility_icon(:public) do

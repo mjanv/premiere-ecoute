@@ -249,7 +249,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
       <label class="flex items-center cursor-pointer">
         <input type="checkbox" {@rest} checked={@checked} class="sr-only" />
         <div class={[
-          "relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ease-in-out mr-3",
+          "relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ease-in-out mr-2",
           if(@checked, do: "bg-purple-500", else: "bg-white/20")
         ]}>
           <span class={[

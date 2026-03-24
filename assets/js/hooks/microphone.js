@@ -15,7 +15,10 @@ export const Microphone = {
     this.SAMPLES_PER_PX = 133; // ~10s visible at 16kHz on a 1200px canvas
 
     const h = 160;
-    const w = Math.floor(this.el.parentElement.getBoundingClientRect().width);
+    const parent = this.el.parentElement;
+    const parentStyle = window.getComputedStyle(parent);
+    const parentPadding = parseFloat(parentStyle.paddingLeft) + parseFloat(parentStyle.paddingRight);
+    const w = Math.floor(parent.getBoundingClientRect().width - parentPadding);
     this.W = w;
     this.H = h;
     this.el.width = w;
@@ -197,12 +200,15 @@ export const Microphone = {
     const totalCols = Math.ceil(samples.length / S);
     const displayCols = Math.min(totalCols - startCol, w);
 
-    // Background
-    this.ctx.fillStyle = "#111827";
+    // Background: dark violet-to-slate gradient
+    const bgGrad = this.ctx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, "#1e1333");
+    bgGrad.addColorStop(1, "#161b2e");
+    this.ctx.fillStyle = bgGrad;
     this.ctx.fillRect(0, 0, w, h);
 
-    // Center line
-    this.ctx.strokeStyle = "#1f2937";
+    // Center line: faint purple
+    this.ctx.strokeStyle = "rgba(139, 92, 246, 0.15)";
     this.ctx.lineWidth = 1;
     this.ctx.beginPath();
     this.ctx.moveTo(0, mid);
@@ -210,7 +216,6 @@ export const Microphone = {
     this.ctx.stroke();
 
     // VAD segment bar (bottom 16px)
-    // Each pixel column maps to a sample range → find corresponding frames
     const SAMPLES_PER_FRAME = FRAME_SAMPLES;
     for (let i = 0; i < displayCols; i++) {
       const s0 = (startCol + i) * S;
@@ -223,19 +228,25 @@ export const Microphone = {
         total++;
       }
       const isSpeech = total > 0 && speechCount / total > 0.5;
-      let color = "#1f2937"; // silence
+      let color = "rgba(139, 92, 246, 0.08)"; // silence: very faint purple
       if (isSpeech) {
         const midFrame = Math.floor((f0 + f1) / 2);
         const mf = midFrame < frames.length ? frames[midFrame] : null;
         const isHangover = mf && mf.rms < 0.006;
-        color = isHangover ? "#ef4444" : (this.smoothedClean(frames, midFrame) ? "#22c55e" : "#eab308");
+        color = isHangover ? "rgba(239, 68, 68, 0.7)" : (this.smoothedClean(frames, midFrame) ? "rgba(52, 211, 153, 0.8)" : "rgba(251, 191, 36, 0.75)");
       }
       this.ctx.fillStyle = color;
       this.ctx.fillRect(i, waveH + 2, 1, 12);
     }
 
-    // Waveform bars
-    this.ctx.strokeStyle = "#6366f1";
+    // Waveform bars: violet-to-fuchsia vertical gradient
+    const waveGrad = this.ctx.createLinearGradient(0, 0, 0, waveH);
+    waveGrad.addColorStop(0, "#e879f9");   // fuchsia at top peak
+    waveGrad.addColorStop(0.4, "#a855f7"); // purple mid
+    waveGrad.addColorStop(0.5, "rgba(139, 92, 246, 0.4)"); // violet at center (quiet)
+    waveGrad.addColorStop(0.6, "#a855f7");
+    waveGrad.addColorStop(1, "#e879f9");
+    this.ctx.strokeStyle = waveGrad;
     this.ctx.lineWidth = 1;
     for (let i = 0; i < displayCols; i++) {
       const col = startCol + i;
@@ -251,9 +262,9 @@ export const Microphone = {
       this.ctx.stroke();
     }
 
-    // Playhead
+    // Playhead: soft fuchsia
     const playheadX = Math.min(displayCols, w - 1);
-    this.ctx.strokeStyle = "#ef4444";
+    this.ctx.strokeStyle = "rgba(232, 121, 249, 0.7)";
     this.ctx.lineWidth = 1;
     this.ctx.beginPath();
     this.ctx.moveTo(playheadX + 0.5, 0);
@@ -264,9 +275,12 @@ export const Microphone = {
   clearCanvas() {
     const w = this.W || this.el.width;
     const h = this.H || this.el.height;
-    this.ctx.fillStyle = "#111827";
+    const bgGrad = this.ctx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, "#1e1333");
+    bgGrad.addColorStop(1, "#161b2e");
+    this.ctx.fillStyle = bgGrad;
     this.ctx.fillRect(0, 0, w, h);
-    this.ctx.strokeStyle = "#1f2937";
+    this.ctx.strokeStyle = "rgba(139, 92, 246, 0.15)";
     this.ctx.lineWidth = 1;
     this.ctx.beginPath();
     this.ctx.moveTo(0, h / 2);

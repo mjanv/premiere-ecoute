@@ -30,55 +30,6 @@
           />
         </.gradient_bg>
 
-        <%= if @listening_session.status == :active do %>
-          <.gradient_bg class="p-4 mb-6">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-2">
-                <svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <span class="text-sm font-medium text-gray-300">{gettext("Speech markers")}</span>
-                <%= if @microphone_active do %>
-                  <span class="flex items-center space-x-1">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    <span class="text-xs text-red-400">{gettext("Recording")}</span>
-                  </span>
-                <% end %>
-              </div>
-              <button
-                type="button"
-                id="dashboard-mic-btn"
-                phx-click={JS.dispatch("microphone:toggle", to: "#dashboard-waveform")}
-                class={[
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200",
-                  if(@microphone_active,
-                    do: "bg-red-500 hover:bg-red-600 text-white ring-2 ring-red-500/30",
-                    else: "bg-indigo-600 hover:bg-indigo-700 text-white"
-                  )
-                ]}
-              >
-                <%= if @microphone_active do %>
-                  <span class="w-2 h-2 rounded-sm bg-white"></span>{gettext("Stop")}
-                <% else %>
-                  <span class="w-2 h-2 rounded-full bg-white"></span>{gettext("Record")}
-                <% end %>
-              </button>
-            </div>
-            <canvas
-              id="dashboard-waveform"
-              phx-hook="Microphone"
-              phx-update="ignore"
-              data-endianness={System.endianness()}
-              class="rounded-lg block w-full"
-            >
-            </canvas>
-          </.gradient_bg>
-        <% end %>
-
         <.gradient_bg class="p-6">
           <div class="flex items-center space-x-3 mb-4">
             <div class="flex items-center w-full">
@@ -206,6 +157,76 @@
                     </svg>
                     <span>{gettext("Close votes")}</span>
                   </button>
+                </div>
+              </div>
+            <% end %>
+            
+<!-- Speech markers / waveform -->
+            <%= if @listening_session.status == :active do %>
+              <div class="mt-4 pt-4 border-t border-white/20">
+                <%!-- Single header row: label + segment count | last badge | transcribe toggle | mic button --%>
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-sm font-medium text-purple-200 tracking-wide">{gettext("Speech segments")}</span>
+                  <span class="text-sm font-bold text-purple-400 tabular-nums">{length(@listening_session.speech_markers)}</span>
+                  <div class="flex-1"></div>
+                  <%= if @last_segment do %>
+                    <span class={[
+                      "text-xs px-2 py-0.5 rounded-full font-medium",
+                      if(@last_segment.is_clean, do: "bg-green-500/20 text-green-400", else: "bg-yellow-500/20 text-yellow-400")
+                    ]}>
+                      {:erlang.float_to_binary(@last_segment.duration_ms / 1000, decimals: 1)}s
+                    </span>
+                  <% end %>
+                  <.session_toggle
+                    phx-click="toggle"
+                    phx-value-flag="transcribe"
+                    checked={@listening_session.options["transcribe"]}
+                    legend=""
+                  />
+                  <button
+                    type="button"
+                    id="dashboard-mic-btn"
+                    phx-click={JS.dispatch("microphone:toggle", to: "#dashboard-waveform")}
+                    class={[
+                      "flex items-center justify-center w-7 h-7 rounded-lg transition-all",
+                      if(@microphone_active,
+                        do: "bg-red-600 hover:bg-red-700 ring-2 ring-red-500/40",
+                        else: "bg-white/10 hover:bg-white/20"
+                      )
+                    ]}
+                  >
+                    <%= if @microphone_active do %>
+                      <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fill-rule="evenodd"
+                          d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    <% else %>
+                      <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fill-rule="evenodd"
+                          d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    <% end %>
+                  </button>
+                </div>
+                <%!-- AIDEV-NOTE: canvas must stay in DOM so the hook mounts with correct width.
+                     Height collapses to 0 when not recording via overflow-hidden + max-h. --%>
+                <div class={
+                  if(@microphone_active, do: "mt-3 max-h-48 overflow-hidden rounded-lg", else: "max-h-0 overflow-hidden")
+                }>
+                  <canvas
+                    id="dashboard-waveform"
+                    phx-hook="Microphone"
+                    phx-update="ignore"
+                    data-endianness={System.endianness()}
+                    class="rounded-lg w-full"
+                  >
+                  </canvas>
                 </div>
               </div>
             <% end %>

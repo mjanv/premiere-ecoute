@@ -260,6 +260,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   @doc """
+  Updates the transcription text of an existing speech marker.
+  """
+  @spec update_speech_marker_text(SpeechMarker.t(), String.t()) ::
+          {:ok, SpeechMarker.t()} | {:error, Ecto.Changeset.t()}
+  def update_speech_marker_text(%SpeechMarker{} = marker, text) do
+    marker
+    |> SpeechMarker.changeset(%{text: text})
+    |> Repo.update()
+  end
+
+  @doc """
   Advances to the next track in the session.
 
   For albums, moves to the next track by track number. For playlists, uses track order. Returns error if no more tracks available.

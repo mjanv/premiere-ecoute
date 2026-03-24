@@ -21,14 +21,16 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
     <div class="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-8 p-8">
       <h1 class="text-2xl font-semibold text-white tracking-tight">Audio recorder</h1>
 
-      <canvas
-        id="waveform"
-        phx-hook="Microphone"
-        phx-update="ignore"
-        data-endianness={System.endianness()}
-        class="rounded-xl border border-gray-800 block"
-      >
-      </canvas>
+      <div class="w-full max-w-xl overflow-hidden">
+        <canvas
+          id="waveform"
+          phx-hook="Microphone"
+          phx-update="ignore"
+          data-endianness={System.endianness()}
+          class="rounded-xl border border-gray-800 block max-w-full"
+        >
+        </canvas>
+      </div>
 
       <%!-- Record button --%>
       <button
