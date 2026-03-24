@@ -54,19 +54,25 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
           <span class="text-xs font-medium text-gray-500 uppercase tracking-widest">Segments</span>
           <span class="text-xs text-gray-600">{length(@segments)} detected</span>
         </div>
-        <div class="rounded-xl bg-gray-900 border border-gray-800 p-4 min-h-[80px] space-y-1">
+        <div class="rounded-xl bg-gray-900 border border-gray-800 p-4 min-h-[80px] max-h-64 overflow-y-auto space-y-1">
           <div :if={@segments == []} class="text-gray-600 text-sm">No segments yet.</div>
           <div
             :for={{seg, i} <- Enum.with_index(@segments)}
             class="flex items-center gap-3 text-sm font-mono"
           >
             <span class="text-gray-500">{i + 1}</span>
-            <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+            <span class={["w-2 h-2 rounded-full shrink-0", if(seg.is_clean, do: "bg-green-500", else: "bg-yellow-500")]}></span>
             <span class="text-white">
               {format_ms(seg.start_ms)} – {format_ms(seg.end_ms)}
             </span>
             <span class="text-gray-500 text-xs">
               {seg.end_ms - seg.start_ms}ms
+            </span>
+            <span class={[
+              "text-xs px-1.5 py-0.5 rounded",
+              if(seg.is_clean, do: "bg-green-900 text-green-400", else: "bg-yellow-900 text-yellow-400")
+            ]}>
+              {if seg.is_clean, do: "speech", else: "noisy"}
             </span>
           </div>
         </div>
@@ -97,8 +103,8 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
   end
 
   @impl true
-  def handle_event("segment_detected", %{"start_ms" => start_ms, "end_ms" => end_ms}, socket) do
-    segment = %{start_ms: round(start_ms), end_ms: round(end_ms)}
+  def handle_event("segment_detected", %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean}, socket) do
+    segment = %{start_ms: round(start_ms), end_ms: round(end_ms), is_clean: is_clean}
     {:noreply, update(socket, :segments, &(&1 ++ [segment]))}
   end
 end

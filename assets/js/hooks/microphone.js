@@ -37,7 +37,8 @@ export const Microphone = {
     this.allSamples = new Float32Array(0);
     this.allFrames = [];
     this.totalFrames = 0;      // absolute frame counter since recording start
-    this.segmentStart = null;  // frame index where current speech segment started
+    this.segmentStart = null;        // absolute frame index where current speech segment started
+    this.segmentStartFrameIdx = null; // index into allFrames where segment started
     this.recording = true;
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
@@ -62,27 +63,50 @@ export const Microphone = {
           ? combined.slice(combined.length - maxSamples)
           : combined;
 
+        // Append new frames first so smoothedClean has full context
+        let framesOffsetBeforeAppend = this.allFrames.length;
+        for (let i = 0; i < newFrames.length; i++) this.allFrames.push(newFrames[i]);
+        const maxFrames = Math.ceil(maxSamples / 480);
+        if (this.allFrames.length > maxFrames) {
+          const evicted = this.allFrames.length - maxFrames;
+          this.allFrames.splice(0, evicted);
+          framesOffsetBeforeAppend = Math.max(0, framesOffsetBeforeAppend - evicted);
+          if (this.segmentStartFrameIdx !== null) {
+            this.segmentStartFrameIdx = Math.max(0, this.segmentStartFrameIdx - evicted);
+          }
+        }
+
         // Detect completed segments (speech → silence transitions)
+        // AIDEV-NOTE: is_clean is evaluated post-hoc at segment close via a full pass over
+        // allFrames — avoids stale context from incremental smoothedClean calls mid-chunk.
         const FRAME_MS = 30;
         const completedSegments = [];
         for (let i = 0; i < newFrames.length; i++) {
           const absFrame = this.totalFrames + i;
           if (newFrames[i].isSpeech && this.segmentStart === null) {
             this.segmentStart = absFrame;
+            this.segmentStartFrameIdx = framesOffsetBeforeAppend + i;
           } else if (!newFrames[i].isSpeech && this.segmentStart !== null) {
-            completedSegments.push({
+            // Post-hoc pass: evaluate smoothed clean over the segment's frames in allFrames
+            const segEndFrameIdx = framesOffsetBeforeAppend + i;
+            let cleanCount = 0, totalCount = 0;
+            for (let f = this.segmentStartFrameIdx; f < segEndFrameIdx && f < this.allFrames.length; f++) {
+              if (this.allFrames[f].rms >= 0.006) {
+                if (this.smoothedClean(this.allFrames, f)) cleanCount++;
+                totalCount++;
+              }
+            }
+            const cleanRatio = totalCount > 0 ? cleanCount / totalCount : 0;
+completedSegments.push({
               start_ms: this.segmentStart * FRAME_MS,
-              end_ms: absFrame * FRAME_MS
+              end_ms: absFrame * FRAME_MS,
+              is_clean: cleanRatio > 0.5
             });
             this.segmentStart = null;
+            this.segmentStartFrameIdx = null;
           }
         }
         this.totalFrames += newFrames.length;
-
-        // Cap frames to visible window
-        for (let i = 0; i < newFrames.length; i++) this.allFrames.push(newFrames[i]);
-        const maxFrames = Math.ceil(maxSamples / 480);
-        if (this.allFrames.length > maxFrames) this.allFrames.splice(0, this.allFrames.length - maxFrames);
 
         this.drawWaveform(this.allSamples, this.allFrames);
 
@@ -115,6 +139,28 @@ export const Microphone = {
     this.pushEvent("recording_stopped", {});
     // Redraw so the waveform stays visible after stopping
     if (this.allSamples.length > 0) this.drawWaveform(this.allSamples, this.allFrames);
+  },
+
+  // AIDEV-NOTE: Majority-vote smoothing over ±SMOOTH_HALF frames for isCleanSpeech.
+  // Absorbs short noisy bursts (plosives, fricatives) inside speech segments.
+  // Only counts frames above RMS_MIN — hangover-tail frames (near-silence) are excluded
+  // to avoid garbage flatness/attack values skewing the segment classification.
+  smoothedClean(frames, idx, half = 3) {
+    const RMS_MIN = 0.006;
+    let clean = 0, total = 0;
+    for (let f = Math.max(0, idx - half); f <= Math.min(frames.length - 1, idx + half); f++) {
+      // Only count frames that are active speech with enough energy — excludes silence
+      // neighbours and hangover-tail frames from biasing the vote
+      if (frames[f].isSpeech && frames[f].rms >= RMS_MIN) {
+        if (frames[f].isCleanSpeech) clean++;
+        total++;
+      }
+    }
+    // If no qualifying neighbours, fall back to the frame itself (avoids false noisy on isolated frames)
+    if (total === 0 && frames[idx] && frames[idx].rms >= RMS_MIN) {
+      return frames[idx].isCleanSpeech;
+    }
+    return total > 0 && clean / total > 0.5;
   },
 
   // Fixed-width canvas, scrolling window — always shows the most recent audio.
@@ -160,7 +206,14 @@ export const Microphone = {
         total++;
       }
       const isSpeech = total > 0 && speechCount / total > 0.5;
-      this.ctx.fillStyle = isSpeech ? "#22c55e" : "#1f2937";
+      let color = "#1f2937"; // silence
+      if (isSpeech) {
+        const midFrame = Math.floor((f0 + f1) / 2);
+        const mf = midFrame < frames.length ? frames[midFrame] : null;
+        const isHangover = mf && mf.rms < 0.006;
+        color = isHangover ? "#ef4444" : (this.smoothedClean(frames, midFrame) ? "#22c55e" : "#eab308");
+      }
+      this.ctx.fillStyle = color;
       this.ctx.fillRect(i, waveH + 2, 1, 12);
     }
 
