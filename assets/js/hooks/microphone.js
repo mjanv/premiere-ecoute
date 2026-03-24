@@ -39,6 +39,7 @@ export const Microphone = {
     this.totalFrames = 0;      // absolute frame counter since recording start
     this.segmentStart = null;        // absolute frame index where current speech segment started
     this.segmentStartFrameIdx = null; // index into allFrames where segment started
+    this.segmentSamples = [];        // raw Float32 samples accumulated for current segment
     this.recording = true;
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
@@ -86,7 +87,14 @@ export const Microphone = {
           if (newFrames[i].isSpeech && this.segmentStart === null) {
             this.segmentStart = absFrame;
             this.segmentStartFrameIdx = framesOffsetBeforeAppend + i;
-          } else if (!newFrames[i].isSpeech && this.segmentStart !== null) {
+            this.segmentSamples = [];
+          }
+          // Accumulate samples for the current open segment (speech + hangover)
+          if (this.segmentStart !== null) {
+            const fStart = i * 480, fEnd = Math.min(fStart + 480, newSamples.length);
+            for (let s = fStart; s < fEnd; s++) this.segmentSamples.push(newSamples[s]);
+          }
+          if (!newFrames[i].isSpeech && this.segmentStart !== null) {
             // Post-hoc pass: evaluate smoothed clean over the segment's frames in allFrames
             const segEndFrameIdx = framesOffsetBeforeAppend + i;
             let cleanCount = 0, totalCount = 0;
@@ -97,13 +105,15 @@ export const Microphone = {
               }
             }
             const cleanRatio = totalCount > 0 ? cleanCount / totalCount : 0;
-completedSegments.push({
+            completedSegments.push({
               start_ms: this.segmentStart * FRAME_MS,
               end_ms: absFrame * FRAME_MS,
-              is_clean: cleanRatio > 0.5
+              is_clean: cleanRatio > 0.5,
+              samples: new Float32Array(this.segmentSamples)
             });
             this.segmentStart = null;
             this.segmentStartFrameIdx = null;
+            this.segmentSamples = [];
           }
         }
         this.totalFrames += newFrames.length;
@@ -117,6 +127,13 @@ completedSegments.push({
         for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
         this.pushEvent("audio_chunk", { data: btoa(binary) });
         for (const seg of completedSegments) {
+          if (seg.samples) {
+            const bytes = new Uint8Array(seg.samples.buffer);
+            let binary = "";
+            for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+            seg.audio = btoa(binary);
+            delete seg.samples;
+          }
           this.pushEvent("segment_detected", seg);
         }
       };

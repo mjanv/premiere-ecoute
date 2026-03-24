@@ -19,20 +19,29 @@ defmodule PremiereEcouteWeb.Audio.WhisperServing do
     }
   end
 
+  @model "openai/whisper-small"
+
   def start_link do
-    {:ok, model_info} = Bumblebee.load_model({:hf, "openai/whisper-tiny"})
-    {:ok, featurizer} = Bumblebee.load_featurizer({:hf, "openai/whisper-tiny"})
-    {:ok, tokenizer} = Bumblebee.load_tokenizer({:hf, "openai/whisper-tiny"})
-    {:ok, generation_config} = Bumblebee.load_generation_config({:hf, "openai/whisper-tiny"})
+    require Logger
+    Logger.info("[whisper_serving] starting...")
+
+    {:ok, model_info} = Bumblebee.load_model({:hf, @model})
+    {:ok, featurizer} = Bumblebee.load_featurizer({:hf, @model})
+    {:ok, tokenizer} = Bumblebee.load_tokenizer({:hf, @model})
+    {:ok, generation_config} = Bumblebee.load_generation_config({:hf, @model})
 
     serving =
       Bumblebee.Audio.speech_to_text_whisper(
         model_info,
         featurizer,
         tokenizer,
-        generation_config
+        generation_config,
+        defn_options: [compiler: EXLA, client: :host]
       )
 
-    Nx.Serving.start_link(serving: serving, name: __MODULE__, batch_timeout: 100)
+    Logger.info("[whisper_serving] model loaded, starting Nx.Serving...")
+    result = Nx.Serving.start_link(serving: serving, name: __MODULE__, batch_timeout: 100)
+    Logger.info("[whisper_serving] Nx.Serving.start_link result=#{inspect(result)}")
+    result
   end
 end

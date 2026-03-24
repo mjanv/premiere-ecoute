@@ -8,6 +8,8 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
 
   use PremiereEcouteWeb, :live_view
 
+  @sample_rate 16_000
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, assign(socket, recording: false, chunks_received: 0, segments: [])}
@@ -57,23 +59,32 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
         <div class="rounded-xl bg-gray-900 border border-gray-800 p-4 min-h-[80px] max-h-64 overflow-y-auto space-y-1">
           <div :if={@segments == []} class="text-gray-600 text-sm">No segments yet.</div>
           <div
-            :for={{seg, i} <- Enum.with_index(@segments)}
-            class="flex items-center gap-3 text-sm font-mono"
+            :for={{seg, i} <- Enum.with_index(Enum.reverse(@segments))}
+            class="flex flex-col gap-0.5 py-1"
           >
-            <span class="text-gray-500">{i + 1}</span>
-            <span class={["w-2 h-2 rounded-full shrink-0", if(seg.is_clean, do: "bg-green-500", else: "bg-yellow-500")]}></span>
-            <span class="text-white">
-              {format_ms(seg.start_ms)} – {format_ms(seg.end_ms)}
-            </span>
-            <span class="text-gray-500 text-xs">
-              {seg.end_ms - seg.start_ms}ms
-            </span>
-            <span class={[
-              "text-xs px-1.5 py-0.5 rounded",
-              if(seg.is_clean, do: "bg-green-900 text-green-400", else: "bg-yellow-900 text-yellow-400")
-            ]}>
-              {if seg.is_clean, do: "speech", else: "noisy"}
-            </span>
+            <div class="flex items-center gap-3 text-sm font-mono">
+              <span class="text-gray-500">{i + 1}</span>
+              <span class={["w-2 h-2 rounded-full shrink-0", if(seg.is_clean, do: "bg-green-500", else: "bg-yellow-500")]}></span>
+              <span class="text-white">
+                {format_ms(seg.start_ms)} – {format_ms(seg.end_ms)}
+              </span>
+              <span class="text-gray-500 text-xs">
+                {seg.end_ms - seg.start_ms}ms
+              </span>
+              <span class={[
+                "text-xs px-1.5 py-0.5 rounded",
+                if(seg.is_clean, do: "bg-green-900 text-green-400", else: "bg-yellow-900 text-yellow-400")
+              ]}>
+                {if seg.is_clean, do: "speech", else: "noisy"}
+              </span>
+            </div>
+            <div :if={seg.is_clean} class="pl-8 text-sm">
+              <%= if seg.text do %>
+                <span class="text-gray-200 italic">{seg.text}</span>
+              <% else %>
+                <span class="text-gray-600 animate-pulse">transcribing…</span>
+              <% end %>
+            </div>
           </div>
         </div>
       </div>
@@ -103,8 +114,66 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
   end
 
   @impl true
-  def handle_event("segment_detected", %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean}, socket) do
-    segment = %{start_ms: round(start_ms), end_ms: round(end_ms), is_clean: is_clean}
+  def handle_event("segment_detected", %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean} = params, socket) do
+    require Logger
+
+    Logger.info(
+      "[seg] is_clean=#{is_clean} has_audio=#{is_binary(params["audio"])} audio_size=#{if is_binary(params["audio"]), do: byte_size(params["audio"]), else: 0}"
+    )
+
+    id = System.unique_integer([:positive])
+    segment = %{id: id, start_ms: round(start_ms), end_ms: round(end_ms), is_clean: is_clean, text: nil}
+
+    if is_clean, do: transcribe_async(id, params["audio"], self())
+
     {:noreply, update(socket, :segments, &(&1 ++ [segment]))}
+  end
+
+  @impl true
+  def handle_info({:transcription, id, text}, socket) do
+    segments =
+      Enum.map(socket.assigns.segments, fn
+        %{id: ^id} = seg -> %{seg | text: text}
+        seg -> seg
+      end)
+
+    {:noreply, assign(socket, :segments, segments)}
+  end
+
+  defp transcribe_async(id, audio_b64, pid) when is_binary(audio_b64) do
+    require Logger
+    Logger.info("[whisper] transcribe_async called, b64 size=#{byte_size(audio_b64)}")
+    # AIDEV-NOTE: Runs Whisper in a separate task to avoid blocking the LiveView process.
+    Task.start(fn ->
+      Logger.info("[whisper] task started id=#{id}")
+      samples = decode_audio(audio_b64)
+      Logger.info("[whisper] decoded samples shape=#{inspect(Nx.shape(samples))}")
+      serving_pid = Process.whereis(PremiereEcouteWeb.Audio.WhisperServing)
+      Logger.info("[whisper] serving pid=#{inspect(serving_pid)} alive=#{is_pid(serving_pid) && Process.alive?(serving_pid)}")
+      t0 = System.monotonic_time(:millisecond)
+      result = Nx.Serving.batched_run(PremiereEcouteWeb.Audio.WhisperServing, samples)
+      Logger.info("[whisper] inference took #{System.monotonic_time(:millisecond) - t0}ms")
+      require Logger
+      Logger.info("[whisper] result=#{inspect(result)}")
+
+      text =
+        case result do
+          %{chunks: [%{text: t} | _]} -> t
+          %{chunks: []} -> "(empty)"
+          other -> inspect(other)
+        end
+
+      send(pid, {:transcription, id, String.trim(text)})
+    end)
+  end
+
+  defp transcribe_async(_id, _audio_b64, _pid), do: :ok
+
+  defp decode_audio(b64) do
+    # AIDEV-NOTE: Browser sends raw little-endian Float32 PCM at 16kHz.
+    # Decode bytes → list of floats → Nx tensor shaped {1, num_samples}.
+    binary = Base.decode64!(b64)
+    floats = for <<f::float-little-32 <- binary>>, do: f
+    Nx.tensor(floats, type: :f32)
   end
 end
