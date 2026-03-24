@@ -13,7 +13,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       playlist: [:tracks],
       current_playlist_track: [],
       single: [:artists],
-      track_markers: []
+      track_markers: [],
+      speech_markers: []
     ],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist, :single]
 
@@ -24,6 +25,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions.ListeningSession.SpeechMarker
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.Retrospective.Report
 
@@ -70,6 +72,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     has_one :report, Report, foreign_key: :session_id
     has_many :track_markers, TrackMarker, foreign_key: :listening_session_id
+    has_many :speech_markers, SpeechMarker, foreign_key: :listening_session_id
 
     timestamps(type: :utc_datetime)
   end
@@ -228,6 +231,32 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   def add_track_marker(%__MODULE__{} = _session) do
     {:error, :no_current_track}
+  end
+
+  @doc """
+  Records a transcribed speech segment against a session.
+
+  `start_ms` and `end_ms` are millisecond offsets from the session's `started_at` timestamp.
+  `text` is the Whisper transcription result; it may be nil when the segment is inserted
+  immediately and filled in asynchronously.
+  """
+  @spec add_speech_marker(t(), integer(), integer(), String.t() | nil) ::
+          {:ok, SpeechMarker.t()} | {:error, Ecto.Changeset.t()}
+  def add_speech_marker(%__MODULE__{} = session, start_ms, end_ms, text \\ nil) do
+    started_at =
+      session.started_at
+      |> DateTime.add(start_ms, :millisecond)
+      |> DateTime.truncate(:second)
+
+    %SpeechMarker{}
+    |> SpeechMarker.changeset(%{
+      listening_session_id: session.id,
+      started_at: started_at,
+      start_ms: start_ms,
+      end_ms: end_ms,
+      text: text
+    })
+    |> Repo.insert()
   end
 
   @doc """

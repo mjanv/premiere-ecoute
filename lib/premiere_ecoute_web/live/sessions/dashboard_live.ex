@@ -57,6 +57,8 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       |> assign(:vote_trends, nil)
       |> assign(:next_track_at, nil)
       |> assign(:show_youtube_modal, false)
+      |> assign(:show_premiere_modal, false)
+      |> assign(:microphone_active, false)
       |> assign_async(:report, fn -> {:ok, %{report: Report.get_by(session_id: session_id)}} end)
       |> assign_async(:vote_trends, fn ->
         {:ok, %{vote_trends: VoteTrends.rolling_average(session_id, :minute)}}
@@ -230,6 +232,47 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   end
 
   @impl true
+  def handle_event("open_premiere_modal", _params, socket) do
+    {:noreply, assign(socket, :show_premiere_modal, true)}
+  end
+
+  @impl true
+  def handle_event("recording_started", _params, socket) do
+    {:noreply, assign(socket, :microphone_active, true)}
+  end
+
+  @impl true
+  def handle_event("recording_stopped", _params, socket) do
+    {:noreply, assign(socket, :microphone_active, false)}
+  end
+
+  @impl true
+  def handle_event(
+        "segment_detected",
+        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => true},
+        %{assigns: %{listening_session: session}} = socket
+      )
+      when not is_nil(session.started_at) do
+    # AIDEV-NOTE: Only clean speech segments are persisted. Noisy segments are discarded.
+    # Offsets are relative to the session wall clock, not the recording start.
+    recording_start_ms = DateTime.diff(DateTime.utc_now(), session.started_at, :millisecond)
+    segment_duration = end_ms - start_ms
+    abs_end_ms = recording_start_ms
+    abs_start_ms = abs_end_ms - segment_duration
+
+    Task.start(fn ->
+      ListeningSession.add_speech_marker(session, abs_start_ms, abs_end_ms)
+    end)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("segment_detected", _params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
   end
@@ -297,6 +340,11 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   @impl true
   def handle_info({:youtube_chapters_modal_closed}, socket) do
     {:noreply, assign(socket, :show_youtube_modal, false)}
+  end
+
+  @impl true
+  def handle_info(:premiere_export_modal_closed, socket) do
+    {:noreply, assign(socket, :show_premiere_modal, false)}
   end
 
   @impl true
