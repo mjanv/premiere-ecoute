@@ -40,9 +40,11 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
            {:ok, [page | _]} <- WikipediaApi.search(query),
            _ <- :timer.sleep(1_000),
            {:ok, summary} <- WikipediaApi.summary(page),
+           _ <- :timer.sleep(1_000),
            {:ok, toc} <- WikipediaApi.table_of_contents(page) do
         {:ok, {summary, toc}}
       else
+        {:error, :idle} -> {:error, :idle}
         _ -> {:error, :not_found}
       end
     end)
@@ -68,8 +70,8 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_async(:fetch, {:ok, {:error, :not_found}}, socket) do
-    {:noreply, assign(socket, :status, :not_found)}
+  def handle_async(:fetch, {:ok, {:error, status}}, socket) when status in [:idle, :not_found] do
+    {:noreply, assign(socket, :status, status)}
   end
 
   def handle_async(:fetch, _, socket) do
@@ -190,5 +192,5 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
 
   defp to_query(%{artist: artist, album: album}), do: {:ok, [artist: artist, album: album]}
   defp to_query(%{artist: artist}), do: {:ok, [artist: artist]}
-  defp to_query(_), do: :error
+  defp to_query(_), do: {:error, :idle}
 end
