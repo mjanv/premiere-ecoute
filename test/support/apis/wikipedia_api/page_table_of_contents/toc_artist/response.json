@@ -1,0 +1,232 @@
+{
+  "parse": {
+    "title": "Daft Punk",
+    "pageid": 168310,
+    "tocdata": {
+      "sections": [
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "History",
+          "number": "1",
+          "index": "1",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 4580,
+          "anchor": "History"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "1987\u20131992: Early career and Darlin'",
+          "number": "1.1",
+          "index": "2",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 4592,
+          "anchor": "1987\u20131992:_Early_career_and_Darlin'"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "1993\u20131996: First performances and singles",
+          "number": "1.2",
+          "index": "3",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 9005,
+          "anchor": "1993\u20131996:_First_performances_and_singles"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "1997\u20131999: <i>Homework</i>",
+          "number": "1.3",
+          "index": "4",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 12043,
+          "anchor": "1997\u20131999:_Homework"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "1999\u20132003: <i>Discovery</i>",
+          "number": "1.4",
+          "index": "5",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 15395,
+          "anchor": "1999\u20132003:_Discovery"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "2004\u20132007: <i>Human After All</i> and <i>Alive 2007</i>",
+          "number": "1.5",
+          "index": "6",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 20056,
+          "anchor": "2004\u20132007:_Human_After_All_and_Alive_2007"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "2008\u20132011: <i>Tron: Legacy</i>",
+          "number": "1.6",
+          "index": "7",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 26574,
+          "anchor": "2008\u20132011:_Tron:_Legacy"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "2011\u20132015: <i>Random Access Memories</i>",
+          "number": "1.7",
+          "index": "8",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 35364,
+          "anchor": "2011\u20132015:_Random_Access_Memories"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "2016\u20132020: Final projects and appearances",
+          "number": "1.8",
+          "index": "9",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 48733,
+          "anchor": "2016\u20132020:_Final_projects_and_appearances"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "2021\u2013present: Disbandment",
+          "number": "1.9",
+          "index": "10",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 57391,
+          "anchor": "2021\u2013present:_Disbandment"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Artistry",
+          "number": "2",
+          "index": "11",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 74561,
+          "anchor": "Artistry"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Music",
+          "number": "2.1",
+          "index": "12",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 74575,
+          "anchor": "Music"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Image",
+          "number": "2.2",
+          "index": "13",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 84615,
+          "anchor": "Image"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Media appearances",
+          "number": "2.3",
+          "index": "14",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 93588,
+          "anchor": "Media_appearances"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Legacy",
+          "number": "3",
+          "index": "15",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 101827,
+          "anchor": "Legacy"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Covers and samples",
+          "number": "3.1",
+          "index": "16",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 109297,
+          "anchor": "Covers_and_samples"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Discography",
+          "number": "4",
+          "index": "17",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 115750,
+          "anchor": "Discography"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Concert tours",
+          "number": "5",
+          "index": "18",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 116031,
+          "anchor": "Concert_tours"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Awards and nominations",
+          "number": "6",
+          "index": "19",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 116122,
+          "anchor": "Awards_and_nominations"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "See also",
+          "number": "7",
+          "index": "20",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 117317,
+          "anchor": "See_also"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "References",
+          "number": "8",
+          "index": "21",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 117385,
+          "anchor": "References"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "External links",
+          "number": "9",
+          "index": "22",
+          "fromTitle": "Daft_Punk",
+          "codepointOffset": 118363,
+          "anchor": "External_links"
+        }
+      ],
+      "extensionData": []
+    },
+    "showtoc": ""
+  }
+}

@@ -9,15 +9,18 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
   use PremiereEcouteCore.Api, api: :wikipedia
 
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.PageSummary
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.PageTableOfContents
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Search
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Page
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Summary
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.TableOfContents
 
   defmodule Behaviour do
     @moduledoc "Wikipedia API Behaviour"
 
     @callback search(query :: Search.query()) :: {:ok, [Page.t()]} | {:error, term()}
     @callback summary(page :: Page.t()) :: {:ok, Summary.t()} | {:error, term()}
+    @callback table_of_contents(page :: Page.t()) :: {:ok, TableOfContents.t()} | {:error, term()}
   end
 
   @doc """
@@ -67,4 +70,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
 
   # PageSummary
   defdelegate summary(page), to: PageSummary
+
+  # PageTableOfContents
+  defdelegate table_of_contents(page), to: PageTableOfContents
 end

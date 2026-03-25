@@ -25,4 +25,29 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types do
 
     defstruct [:title, :extract, :thumbnail_url, :page_url]
   end
+
+  defmodule Section do
+    @moduledoc false
+
+    @type t() :: %__MODULE__{
+            number: String.t(),
+            title: String.t(),
+            level: pos_integer(),
+            anchor: String.t()
+          }
+
+    defstruct [:number, :title, :level, :anchor]
+  end
+
+  defmodule TableOfContents do
+    @moduledoc false
+
+    @type t() :: %__MODULE__{
+            title: String.t(),
+            page_id: pos_integer(),
+            sections: [Section.t()]
+          }
+
+    defstruct [:title, :page_id, :sections]
+  end
 end

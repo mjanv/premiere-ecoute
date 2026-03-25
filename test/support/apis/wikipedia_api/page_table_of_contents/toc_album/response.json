@@ -1,0 +1,292 @@
+{
+  "parse": {
+    "title": "Random Access Memories",
+    "pageid": 38898753,
+    "tocdata": {
+      "sections": [
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Background",
+          "number": "1",
+          "index": "1",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 4721,
+          "anchor": "Background"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Recording",
+          "number": "2",
+          "index": "2",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 15302,
+          "anchor": "Recording"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Music",
+          "number": "3",
+          "index": "3",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 26615,
+          "anchor": "Music"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Theme and influences",
+          "number": "3.1",
+          "index": "4",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 26628,
+          "anchor": "Theme_and_influences"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Composition",
+          "number": "3.2",
+          "index": "5",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 30495,
+          "anchor": "Composition"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Promotion and release",
+          "number": "4",
+          "index": "6",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 46629,
+          "anchor": "Promotion_and_release"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Artwork packaging",
+          "number": "4.1",
+          "index": "7",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 60296,
+          "anchor": "Artwork_packaging"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "<i>The Collaborators</i>",
+          "number": "4.2",
+          "index": "8",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 65183,
+          "anchor": "The_Collaborators"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Global album launch",
+          "number": "4.3",
+          "index": "9",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 80295,
+          "anchor": "Global_album_launch"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Re-releases",
+          "number": "4.4",
+          "index": "10",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 82724,
+          "anchor": "Re-releases"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Critical reception",
+          "number": "5",
+          "index": "11",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 87320,
+          "anchor": "Critical_reception"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Retrospective reviews",
+          "number": "5.1",
+          "index": "12",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 99447,
+          "anchor": "Retrospective_reviews"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Legacy",
+          "number": "5.2",
+          "index": "13",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 101103,
+          "anchor": "Legacy"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Industry awards",
+          "number": "6",
+          "index": "14",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 102389,
+          "anchor": "Industry_awards"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Sales",
+          "number": "7",
+          "index": "15",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 106420,
+          "anchor": "Sales"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Track listing",
+          "number": "8",
+          "index": "16",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 119573,
+          "anchor": "Track_listing"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Personnel",
+          "number": "9",
+          "index": "17",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 122343,
+          "anchor": "Personnel"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Featured artists",
+          "number": "9.1",
+          "index": "18",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 122415,
+          "anchor": "Featured_artists"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Additional musicians",
+          "number": "9.2",
+          "index": "19",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 123294,
+          "anchor": "Additional_musicians"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Orchestra",
+          "number": "9.3",
+          "index": "20",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 123964,
+          "anchor": "Orchestra"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Production",
+          "number": "9.4",
+          "index": "21",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 125688,
+          "anchor": "Production"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Charts",
+          "number": "10",
+          "index": "22",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 126075,
+          "anchor": "Charts"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Weekly charts",
+          "number": "10.1",
+          "index": "23",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 126113,
+          "anchor": "Weekly_charts"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Year-end charts",
+          "number": "10.2",
+          "index": "24",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 132529,
+          "anchor": "Year-end_charts"
+        },
+        {
+          "tocLevel": 2,
+          "hLevel": 3,
+          "line": "Decade-end charts",
+          "number": "10.3",
+          "index": "25",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 158820,
+          "anchor": "Decade-end_charts"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "Certifications and sales",
+          "number": "11",
+          "index": "26",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 160301,
+          "anchor": "Certifications_and_sales"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "References",
+          "number": "12",
+          "index": "27",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 164424,
+          "anchor": "References"
+        },
+        {
+          "tocLevel": 1,
+          "hLevel": 2,
+          "line": "External links",
+          "number": "13",
+          "index": "28",
+          "fromTitle": "Random_Access_Memories",
+          "codepointOffset": 164454,
+          "anchor": "External_links"
+        }
+      ],
+      "extensionData": []
+    },
+    "showtoc": ""
+  }
+}
