@@ -25,5 +25,5 @@ defmodule PremiereEcouteCore.Ecto.Map do
 
   defp to_atom(m) when is_map(m), do: Map.new(m, fn {k, v} -> {to_atom(k), v} end)
   defp to_atom(a) when is_atom(a), do: a
-  defp to_atom(b) when is_binary(b), do: String.to_existing_atom(b)
+  defp to_atom(b) when is_binary(b), do: String.to_atom(b)
 end

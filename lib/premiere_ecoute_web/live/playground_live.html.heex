@@ -1,7 +1,85 @@
 <Layouts.app flash={@flash} banners={assigns[:banners] || []} current_scope={assigns[:current_scope] || %{}}>
-  <div class="min-h-screen bg-gray-950 flex items-center justify-center">
-    <div id="motion-demo" phx-hook="MotionDemo">
-      <div data-cube class="w-16 h-16 rounded-xl bg-purple-500"></div>
+  <div class="min-h-screen bg-base-200 flex flex-col items-center justify-center gap-6 p-8">
+    <h1 class="text-2xl font-bold text-base-content">Drawer Demo</h1>
+
+    <div class="flex flex-wrap gap-4">
+      <button class="btn btn-primary" phx-click={Drawer.show_drawer("info-drawer")}>
+        Open drawer
+      </button>
+      <button class="btn btn-outline" phx-click={Drawer.show_drawer("form-drawer")}>
+        Open drawer with footer
+      </button>
     </div>
+
+    <p class="text-base-content/50 text-sm max-w-md text-center">
+      Slides in from the right without pushing content.
+      Close with ✕ or click the backdrop.
+    </p>
   </div>
+
+  <%!-- Basic drawer --%>
+  <Drawer.drawer id="info-drawer">
+    <:header>Wikipedia — Elixir (programming language)</:header>
+
+    <div class="prose prose-sm max-w-none text-base-content/80 space-y-4">
+      <p>
+        <strong>Elixir</strong> is a dynamic, functional language designed for building scalable and
+        maintainable applications. Elixir leverages the Erlang VM, known for running low-latency,
+        distributed and fault-tolerant systems.
+      </p>
+      <p>
+        Elixir builds on top of Erlang and shares the same abstractions for building distributed,
+        fault-tolerant applications. It also provides tooling and an extensible design, including
+        macros for metaprogramming and first-class support for pattern matching.
+      </p>
+      <h2 class="text-base-content font-semibold mt-4">History</h2>
+      <p>
+        Elixir was created by José Valim, a member of the Ruby on Rails core team, as a research
+        and development project of Plataformatec. His goals were to enable higher extensibility and
+        productivity in the Erlang VM while keeping compatibility with Erlang's ecosystem.
+      </p>
+      <h2 class="text-base-content font-semibold mt-4">Features</h2>
+      <ul class="list-disc list-inside space-y-1">
+        <li>Compiles to bytecode for the BEAM virtual machine</li>
+        <li>Everything is an expression</li>
+        <li>Erlang functions can be called from Elixir without runtime impact</li>
+        <li>Meta-programming via macros</li>
+        <li>Polymorphism via protocols</li>
+        <li>Support for documentation via docstrings</li>
+      </ul>
+      <p>
+        Processes in Elixir do not share memory and communicate via message passing.
+        You can spawn millions of them on a single machine.
+      </p>
+    </div>
+  </Drawer.drawer>
+
+  <%!-- Drawer with sticky footer --%>
+  <Drawer.drawer id="form-drawer">
+    <:header>Create new project</:header>
+
+    <div class="space-y-5">
+      <div class="form-control">
+        <label class="label"><span class="label-text">Project name</span></label>
+        <input type="text" placeholder="My awesome project" class="input input-bordered w-full" />
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text">Description</span></label>
+        <textarea class="textarea textarea-bordered w-full" rows="4" placeholder="What is it about?"></textarea>
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text">Visibility</span></label>
+        <select class="select select-bordered w-full">
+          <option>Public</option>
+          <option>Private</option>
+          <option>Team only</option>
+        </select>
+      </div>
+    </div>
+
+    <:footer>
+      <button class="btn btn-ghost" phx-click={Drawer.hide_drawer("form-drawer")}>Cancel</button>
+      <button class="btn btn-primary">Create project</button>
+    </:footer>
+  </Drawer.drawer>
 </Layouts.app>

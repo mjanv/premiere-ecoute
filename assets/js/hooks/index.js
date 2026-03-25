@@ -19,6 +19,7 @@ import { BackLink } from "./back_link";
 import { ScrollToActive } from "./scroll_to_active";
 import { ClampText } from "./clamp_text";
 import { Microphone } from "./microphone";
+import { Drawer } from "./drawer";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -41,5 +42,6 @@ export const Hooks = {
   BackLink: BackLink,
   ScrollToActive: ScrollToActive,
   ClampText: ClampText,
-  Microphone: Microphone
+  Microphone: Microphone,
+  Drawer: Drawer
 };
