@@ -34,12 +34,14 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
     |> assign(:id, id)
     |> assign(:status, :loading)
     |> assign(:result, nil)
+    |> assign(:toc, nil)
     |> start_async(:fetch, fn ->
       with {:ok, query} <- to_query(assigns),
            {:ok, [page | _]} <- WikipediaApi.search(query),
            _ <- :timer.sleep(1_000),
-           {:ok, summary} <- WikipediaApi.summary(page) do
-        {:ok, summary}
+           {:ok, summary} <- WikipediaApi.summary(page),
+           {:ok, toc} <- WikipediaApi.table_of_contents(page) do
+        {:ok, {summary, toc}}
       else
         _ -> {:error, :not_found}
       end
@@ -52,14 +54,16 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
     |> assign(:id, assigns.id)
     |> assign_new(:status, fn -> :idle end)
     |> assign_new(:result, fn -> nil end)
+    |> assign_new(:toc, fn -> nil end)
     |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
-  def handle_async(:fetch, {:ok, {:ok, summary}}, %{assigns: %{id: id}} = socket) do
+  def handle_async(:fetch, {:ok, {:ok, {summary, toc}}}, %{assigns: %{id: id}} = socket) do
     socket
     |> assign(:status, :ok)
     |> assign(:result, summary)
+    |> assign(:toc, toc)
     |> push_event("wiki-drawer:open:#{drawer_id(id)}", %{})
     |> then(fn socket -> {:noreply, socket} end)
   end
@@ -106,7 +110,26 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
             <% end %>
             <div>
               <div class="text-white font-semibold">{if @result, do: @result.title, else: ""}</div>
-              <div class="text-xs text-gray-500 font-normal">Wikipedia</div>
+              <%= if @result && @result.page_url do %>
+                <a
+                  href={@result.page_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                >
+                  Wikipedia
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              <% else %>
+                <div class="text-xs text-gray-500 font-normal">Wikipedia</div>
+              <% end %>
             </div>
           </div>
         </:header>
@@ -123,23 +146,33 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
               </div>
             <% :ok -> %>
               <p class="text-gray-300">{@result.extract}</p>
-              <%= if @result.page_url do %>
-                <a
-                  href={@result.page_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors mt-2"
+              <%= if @toc && @toc.sections != [] do %>
+                <div
+                  class="mt-4 pt-4"
+                  style="border-top: 1px solid var(--color-dark-700);"
                 >
-                  Read full article on Wikipedia
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
+                  <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                    Contents
+                  </div>
+                  <nav class="space-y-0.5">
+                    <%= for section <- @toc.sections do %>
+                      <a
+                        href={"#{@result.page_url}##{section.anchor}"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class={[
+                          "block text-xs py-0.5 hover:text-purple-300 transition-colors truncate",
+                          if(section.level == 1,
+                            do: "text-gray-300 font-medium",
+                            else: "text-gray-500 pl-4"
+                          )
+                        ]}
+                      >
+                        {section.number}&nbsp;{section.title}
+                      </a>
+                    <% end %>
+                  </nav>
+                </div>
               <% end %>
             <% :not_found -> %>
               <p class="text-gray-500">No Wikipedia article found.</p>
