@@ -118,9 +118,12 @@ defmodule PremiereEcoute.MixProject do
       {:jose, "~> 1.11"},
       {:hammer, "~> 7.0"},
       {:explorer, "~> 0.9"},
-      # Data
+      # Data / Machine Learning
       {:instructor, "~> 0.1"},
       {:hermes_mcp, "~> 0.14"},
+      {:bumblebee, "~> 0.6"},
+      {:nx, "~> 0.9.0"},
+      {:exla, "~> 0.9.0"},
       # Observability
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},

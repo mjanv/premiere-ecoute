@@ -15,6 +15,7 @@ defmodule PremiereEcoute.Supervisor do
       PremiereEcoute.Billboards.Supervisor,
       PremiereEcoute.Sessions.Supervisor,
       PremiereEcoute.Collections.Supervisor,
+      PremiereEcoute.Models.Supervisor,
       PremiereEcoute.Radio.EventHandler
     ]
 end

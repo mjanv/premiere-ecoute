@@ -18,6 +18,7 @@ import { BarBounce } from "./bar_bounce";
 import { BackLink } from "./back_link";
 import { ScrollToActive } from "./scroll_to_active";
 import { ClampText } from "./clamp_text";
+import { Microphone } from "./microphone";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -39,5 +40,6 @@ export const Hooks = {
   BarBounce: BarBounce,
   BackLink: BackLink,
   ScrollToActive: ScrollToActive,
-  ClampText: ClampText
+  ClampText: ClampText,
+  Microphone: Microphone
 };
