@@ -3,10 +3,11 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.SearchTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Page
 
   setup {Req.Test, :verify_on_exit!}
 
-  describe "search_artist/1" do
+  describe "search/1" do
     test "returns page results for an artist name" do
       ApiMock.expect(
         WikipediaApi,
@@ -16,11 +17,11 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.SearchTest do
         status: 200
       )
 
-      {:ok, results} = WikipediaApi.search_artist("Daft Punk")
+      {:ok, results} = WikipediaApi.search(artist: "Daft Punk")
 
       assert [
-               %{
-                 page_id: 168_310,
+               %Page{
+                 id: 168_310,
                  title: "Daft Punk",
                  url: "https://en.wikipedia.org/wiki/Daft%20Punk"
                }
@@ -29,9 +30,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.SearchTest do
 
       assert length(results) == 5
     end
-  end
 
-  describe "search_album/2" do
     test "returns page results for an album title and artist" do
       ApiMock.expect(
         WikipediaApi,
@@ -41,11 +40,11 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.SearchTest do
         status: 200
       )
 
-      {:ok, results} = WikipediaApi.search_album("Random Access Memories", "Daft Punk")
+      {:ok, results} = WikipediaApi.search(artist: "Daft Punk", album: "Random Access Memories")
 
       assert [
-               %{
-                 page_id: 38_898_753,
+               %Page{
+                 id: 38_898_753,
                  title: "Random Access Memories",
                  url: "https://en.wikipedia.org/wiki/Random%20Access%20Memories"
                }

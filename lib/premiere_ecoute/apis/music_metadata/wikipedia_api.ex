@@ -8,15 +8,16 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
 
   use PremiereEcouteCore.Api, api: :wikipedia
 
-  @user_agent "PremiereEcoute/1.0 (maxime.janvier@gmail.com)"
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.PageSummary
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Search
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Page
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Summary
 
   defmodule Behaviour do
     @moduledoc "Wikipedia API Behaviour"
 
-    @callback search_artist(name :: String.t()) :: {:ok, [map()]} | {:error, term()}
-    @callback search_album(title :: String.t(), artist :: String.t()) ::
-                {:ok, [map()]} | {:error, term()}
-    @callback get_summary(title :: String.t()) :: {:ok, map()} | {:error, term()}
+    @callback search(query :: Search.query()) :: {:ok, [Page.t()]} | {:error, term()}
+    @callback summary(page :: Page.t()) :: {:ok, Summary.t()} | {:error, term()}
   end
 
   @doc """
@@ -45,9 +46,8 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
   def client_credentials, do: {:ok, %{"access_token" => "", "expires_in" => 0}}
 
   # Search
-  defdelegate search_artist(name), to: __MODULE__.Search
-  defdelegate search_album(title, artist), to: __MODULE__.Search
+  defdelegate search(query), to: Search
 
-  # Summary
-  defdelegate get_summary(title), to: __MODULE__.Summary, as: :get
+  # PageSummary
+  defdelegate summary(page), to: PageSummary
 end

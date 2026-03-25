@@ -29,6 +29,8 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   alias PremiereEcoute.Sessions.Retrospective.VoteTrends
   alias PremiereEcouteCore.Cache
 
+  alias PremiereEcouteWeb.Components.WikipediaDrawer
+
   @impl true
   def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
     session_id = String.to_integer(id)
@@ -293,9 +295,14 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   end
 
   @impl true
-  def handle_event("open_wikipedia", %{"query" => query} = params, socket) do
-    opts = [id: "wiki", query: query] ++ if artist = params["artist"], do: [artist: artist], else: []
-    send_update(PremiereEcouteWeb.Components.WikipediaDrawer, opts)
+  def handle_event("open_wikipedia", %{"artist" => artist, "album" => album}, socket) do
+    send_update(WikipediaDrawer, id: "wiki", artist: artist, album: album)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("open_wikipedia", %{"artist" => artist}, socket) do
+    send_update(WikipediaDrawer, id: "wiki", artist: artist)
     {:noreply, socket}
   end
 

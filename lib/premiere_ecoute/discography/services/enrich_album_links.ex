@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinks do
   defp enrich_wikipedia({:ok, %Album{name: name} = album}) do
     artist = artist_name(album)
 
-    case WikipediaApi.search_album(name, artist) do
+    case WikipediaApi.search(artist: artist, album: name) do
       {:ok, [first | _]} ->
         Album.update(album, %{external_links: Map.put(album.external_links, "wikipedia", first.url)})
 

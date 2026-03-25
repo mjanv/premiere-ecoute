@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
             <button
               class="font-medium text-white hover:text-purple-300 transition-colors text-left"
               phx-click="open_wikipedia"
-              phx-value-query={@album.artist}
+              phx-value-artist={@album.artist}
             >
               {@album.artist}
             </button>
@@ -83,7 +83,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
             <button
               class="font-medium text-white hover:text-purple-300 transition-colors text-left"
               phx-click="open_wikipedia"
-              phx-value-query={@single.artist}
+              phx-value-artist={@single.artist}
             >
               {@single.artist}
             </button>

@@ -39,6 +39,8 @@ defmodule PremiereEcouteCore.Api do
         @behaviour behaviour
       end
 
+      @user_agent Application.compile_env(unquote(app), :user_agent, "")
+
       @doc "Retrieves entire API configuration"
       @spec env() :: keyword()
       def env, do: Application.get_env(unquote(app), PremiereEcoute.Apis)

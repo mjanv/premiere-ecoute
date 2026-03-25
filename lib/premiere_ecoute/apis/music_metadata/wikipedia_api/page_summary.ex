@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Summary do
+defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.PageSummary do
   @moduledoc """
   Wikipedia REST API — page summary endpoint.
 
@@ -7,15 +7,11 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Summary do
   which is separate from the MediaWiki action API.
   """
 
-  @rest_base "https://en.wikipedia.org/api/rest_v1/page/summary"
-  @user_agent "PremiereEcoute/1.0 (maxime.janvier@gmail.com)"
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Page
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Summary
 
-  @type summary :: %{
-          title: String.t(),
-          extract: String.t(),
-          thumbnail_url: String.t() | nil,
-          page_url: String.t() | nil
-        }
+  @base_url "https://en.wikipedia.org/api/rest_v1/page/summary"
+  @user_agent Application.compile_env(:premiere_ecoute, :user_agent, "")
 
   @doc """
   Fetches the summary for a Wikipedia page by its exact title.
@@ -23,11 +19,9 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Summary do
   Returns `{:ok, summary}` on success, `{:error, :not_found}` when no page
   matches, or `{:error, reason}` for other failures.
   """
-  @spec get(String.t()) :: {:ok, summary()} | {:error, term()}
-  def get(title) when is_binary(title) do
-    encoded = URI.encode(title)
-
-    case Req.get("#{@rest_base}/#{encoded}", headers: [{"User-Agent", @user_agent}]) do
+  @spec summary(Page.t()) :: {:ok, Summary.t()} | {:error, term()}
+  def summary(%Page{title: title}) do
+    case Req.get("#{@base_url}/#{URI.encode(title)}", headers: [{"User-Agent", @user_agent}]) do
       {:ok, %{status: 200, body: body}} -> {:ok, parse(body)}
       {:ok, %{status: 404}} -> {:error, :not_found}
       {:ok, %{status: status}} -> {:error, {:http_error, status}}
@@ -36,7 +30,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Summary do
   end
 
   defp parse(body) do
-    %{
+    %Summary{
       title: body["title"],
       extract: body["extract"],
       thumbnail_url: get_in(body, ["thumbnail", "source"]),

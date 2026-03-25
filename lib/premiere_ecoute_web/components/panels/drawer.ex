@@ -96,17 +96,12 @@ defmodule PremiereEcouteWeb.Components.Drawer do
   @doc "Shows the drawer with a slide-in animation."
   @spec show_drawer(JS.t(), String.t()) :: JS.t()
   def show_drawer(js \\ %JS{}, id) when is_binary(id) do
-    # AIDEV-NOTE: dispatch only — the hook owns all visibility/animation state.
-    # Do NOT call JS.show here; it sets an inline style that fights with the
-    # hook's classList.add("hidden") on close, breaking subsequent opens.
-    js
-    |> JS.dispatch("drawer:open", to: "##{id}")
+    JS.dispatch(js, "drawer:open", to: "##{id}")
   end
 
   @doc "Hides the drawer with a slide-out animation."
   @spec hide_drawer(JS.t(), String.t()) :: JS.t()
   def hide_drawer(js \\ %JS{}, id) when is_binary(id) do
-    js
-    |> JS.dispatch("drawer:close", to: "##{id}")
+    JS.dispatch(js, "drawer:close", to: "##{id}")
   end
 end

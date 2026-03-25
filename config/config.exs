@@ -2,6 +2,7 @@ import Config
 
 config :premiere_ecoute,
   environment: config_env(),
+  user_agent: "PremiereEcoute/1.0 (maxime.janvier@gmail.com)",
   ecto_repos: [PremiereEcoute.Repo],
   event_stores: [PremiereEcoute.Events.Store],
   generators: [timestamp_type: :utc_datetime],

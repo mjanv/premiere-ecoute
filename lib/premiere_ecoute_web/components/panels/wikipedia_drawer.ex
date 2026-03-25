@@ -29,55 +29,46 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
   alias PremiereEcouteWeb.Components.Drawer
 
   @impl true
-  def update(%{query: query} = assigns, socket) when is_binary(query) and query != "" do
-    artist = Map.get(assigns, :artist)
-
-    socket =
-      socket
-      |> assign(:id, assigns.id)
-      |> assign(:status, :loading)
-      |> assign(:result, nil)
-      |> assign(:query, query)
-      |> start_async(:fetch, fn -> fetch(query, artist) end)
-
-    {:ok, socket}
+  def update(%{id: id} = assigns, socket) do
+    socket
+    |> assign(:id, id)
+    |> assign(:status, :loading)
+    |> assign(:result, nil)
+    |> start_async(:fetch, fn ->
+      with {:ok, query} <- to_query(assigns),
+           {:ok, [page | _]} <- WikipediaApi.search(query),
+           _ <- :timer.sleep(1_000),
+           {:ok, summary} <- WikipediaApi.summary(page) do
+        {:ok, summary}
+      else
+        _ -> {:error, :not_found}
+      end
+    end)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   def update(assigns, socket) do
-    socket =
-      socket
-      |> assign(:id, assigns.id)
-      |> assign_new(:status, fn -> :idle end)
-      |> assign_new(:result, fn -> nil end)
-      |> assign_new(:query, fn -> nil end)
-
-    {:ok, socket}
+    socket
+    |> assign(:id, assigns.id)
+    |> assign_new(:status, fn -> :idle end)
+    |> assign_new(:result, fn -> nil end)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
-  def handle_async(:fetch, {:ok, {:ok, summary}}, socket) do
-    drawer_id = drawer_id(socket.assigns.id)
-
-    socket =
-      socket
-      |> assign(:status, :ok)
-      |> assign(:result, summary)
-      # AIDEV-NOTE: push_event targets the WikipediaDrawerHook on the wrapper div,
-      # which then dispatches the native "drawer:open" DOM event to the drawer element.
-      |> push_event("wiki-drawer:open:#{drawer_id}", %{})
-
-    {:noreply, socket}
+  def handle_async(:fetch, {:ok, {:ok, summary}}, %{assigns: %{id: id}} = socket) do
+    socket
+    |> assign(:status, :ok)
+    |> assign(:result, summary)
+    |> push_event("wiki-drawer:open:#{drawer_id(id)}", %{})
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   def handle_async(:fetch, {:ok, {:error, :not_found}}, socket) do
     {:noreply, assign(socket, :status, :not_found)}
   end
 
-  def handle_async(:fetch, {:ok, {:error, _reason}}, socket) do
-    {:noreply, assign(socket, :status, :error)}
-  end
-
-  def handle_async(:fetch, {:exit, _reason}, socket) do
+  def handle_async(:fetch, _, socket) do
     {:noreply, assign(socket, :status, :error)}
   end
 
@@ -86,7 +77,6 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
     assigns = assign(assigns, :drawer_id, drawer_id(assigns.id))
 
     ~H"""
-    <%!-- AIDEV-NOTE: WikipediaDrawerHook bridges push_event → native DOM drawer:open event --%>
     <div id={@id} phx-hook="WikipediaDrawer" data-drawer-id={@drawer_id}>
       <%!-- Loading toast --%>
       <%= if @status == :loading do %>
@@ -104,7 +94,7 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
           class="fixed bottom-6 right-6 z-50 px-4 py-2 rounded-lg text-sm text-gray-400"
           style="background-color: var(--color-dark-800); border: 1px solid var(--color-dark-700);"
         >
-          No Wikipedia article found for "{@query}"
+          No Wikipedia article found
         </div>
       <% end %>
 
@@ -115,7 +105,7 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
               <img src={@result.thumbnail_url} class="w-10 h-10 rounded object-cover flex-shrink-0" />
             <% end %>
             <div>
-              <div class="text-white font-semibold">{if @result, do: @result.title, else: @query}</div>
+              <div class="text-white font-semibold">{if @result, do: @result.title, else: ""}</div>
               <div class="text-xs text-gray-500 font-normal">Wikipedia</div>
             </div>
           </div>
@@ -152,7 +142,7 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
                 </a>
               <% end %>
             <% :not_found -> %>
-              <p class="text-gray-500">No Wikipedia article found for "{@query}".</p>
+              <p class="text-gray-500">No Wikipedia article found.</p>
             <% :error -> %>
               <p class="text-gray-500">Could not load Wikipedia article. Try again later.</p>
             <% _ -> %>
@@ -165,15 +155,7 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
 
   defp drawer_id(id), do: "wiki-drawer-#{id}"
 
-  defp fetch(query, nil) do
-    with {:ok, [first | _]} <- WikipediaApi.search_artist(query) do
-      WikipediaApi.get_summary(first.title)
-    end
-  end
-
-  defp fetch(query, artist) when is_binary(artist) do
-    with {:ok, [first | _]} <- WikipediaApi.search_album(query, artist) do
-      WikipediaApi.get_summary(first.title)
-    end
-  end
+  defp to_query(%{artist: artist, album: album}), do: {:ok, [artist: artist, album: album]}
+  defp to_query(%{artist: artist}), do: {:ok, [artist: artist]}
+  defp to_query(_), do: :error
 end
