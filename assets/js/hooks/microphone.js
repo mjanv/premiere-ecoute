@@ -49,7 +49,7 @@ export const Microphone = {
       this.stream = stream;
       this.audioCtx = new AudioContext({ sampleRate: SAMPLING_RATE });
 
-      await this.audioCtx.audioWorklet.addModule("/assets/pcm-processor.js");
+      await this.audioCtx.audioWorklet.addModule("/assets/js/pcm-processor.js");
 
       const source = this.audioCtx.createMediaStreamSource(stream);
       const worklet = new AudioWorkletNode(this.audioCtx, "pcm-processor");
