@@ -360,8 +360,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
   defp percent_encode(path) do
     path
     |> String.split("/")
-    |> Enum.map(&URI.encode/1)
-    |> Enum.join("/")
+    |> Enum.map_join("/", &URI.encode/1)
   end
 
   defp xml_escape(text) do

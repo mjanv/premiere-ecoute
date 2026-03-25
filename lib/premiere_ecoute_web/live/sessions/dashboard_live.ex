@@ -253,42 +253,38 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   @impl true
   def handle_event(
         "segment_detected",
-        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => true} = params,
+        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => true, "audio" => audio},
         %{assigns: %{listening_session: session, recording_started_at: recording_started_at}} = socket
       )
       when not is_nil(session.started_at) and not is_nil(recording_started_at) do
-    # AIDEV-NOTE: JS start_ms/end_ms are offsets from record-click (frame counter * 30ms).
-    # recording_offset_ms anchors the recording start to the session timeline — one-time
+    # JS start_ms/end_ms are offsets from record-click (frame counter * 30ms).
+    # offset_ms anchors the recording start to the session timeline — one-time
     # latency on recording_started event, consistent across all segments (no per-segment jitter).
-    recording_offset_ms = DateTime.diff(recording_started_at, session.started_at, :millisecond)
-    abs_start_ms = recording_offset_ms + start_ms
-    abs_end_ms = recording_offset_ms + end_ms
+    offset_ms = DateTime.diff(recording_started_at, session.started_at, :millisecond)
+    segment = PremiereEcoute.Models.new_segment(offset_ms + start_ms, offset_ms + end_ms, true, audio)
+    {:ok, marker} = ListeningSession.add_speech_marker(session, segment.start_ms, segment.end_ms)
 
-    pid = self()
-
-    transcribe = session.options["transcribe"] in [1, true]
-    audio_b64 = params["audio"]
-
-    Task.start(fn ->
-      case ListeningSession.add_speech_marker(session, abs_start_ms, abs_end_ms) do
-        {:ok, marker} ->
-          send(pid, :speech_marker_added)
-
-          if transcribe && is_binary(audio_b64) do
-            transcribe_marker(marker, audio_b64)
-          end
-
-        _ ->
-          :ok
+    socket
+    |> then(fn socket ->
+      if session.options["transcribe"] in [1, true] do
+        start_async(socket, :transcribe, fn -> {marker, PremiereEcoute.Models.run(segment)} end)
+      else
+        socket
       end
     end)
-
-    {:noreply, assign(socket, :last_segment, %{is_clean: true, duration_ms: end_ms - start_ms})}
+    |> assign(:listening_session, ListeningSession.get(session.id))
+    |> assign(:last_segment, segment)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
-  def handle_event("segment_detected", %{"start_ms" => start_ms, "end_ms" => end_ms}, socket) do
-    {:noreply, assign(socket, :last_segment, %{is_clean: false, duration_ms: end_ms - start_ms})}
+  def handle_event(
+        "segment_detected",
+        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean, "audio" => audio},
+        socket
+      ) do
+    segment = PremiereEcoute.Models.new_segment(start_ms, end_ms, is_clean, audio)
+    {:noreply, assign(socket, :last_segment, segment)}
   end
 
   @impl true
@@ -297,13 +293,40 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   end
 
   @impl true
-  def handle_event("audio_chunk", _params, socket) do
+  def handle_event(event, _params, socket) do
+    {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
+  end
+
+  @impl true
+  def handle_async(:transcribe, {:ok, {marker, segment}}, %{assigns: %{listening_session: session}} = socket) do
+    ListeningSession.update_speech_marker_text(marker, segment.text)
+    {:noreply, assign(socket, :listening_session, ListeningSession.get(session.id))}
+  end
+
+  def handle_async(:transcribe, {:exit, _reason}, socket) do
     {:noreply, socket}
   end
 
   @impl true
-  def handle_event(event, _params, socket) do
-    {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
+  def handle_async(:report, {:ok, %{report: report}}, socket) do
+    {:noreply, assign(socket, :report, report)}
+  end
+
+  @impl true
+  def handle_async(:vote_trends, {:ok, %{vote_trends: vote_trends}}, socket) do
+    {:noreply, assign(socket, :vote_trends, vote_trends)}
+  end
+
+  @impl true
+  def handle_async(:vote_trends, {:exit, reason}, socket) do
+    Logger.error("Failed to load vote trends: #{inspect(reason)}")
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_async(:report, {:exit, reason}, socket) do
+    Logger.error("Failed to load session report: #{inspect(reason)}")
+    {:noreply, socket}
   end
 
   @impl true
@@ -374,12 +397,6 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   @impl true
   def handle_info(:premiere_export_modal_closed, socket) do
     {:noreply, assign(socket, :show_premiere_modal, false)}
-  end
-
-  @impl true
-  def handle_info(:speech_marker_added, %{assigns: %{session_id: session_id}} = socket) do
-    session = ListeningSession.get(session_id)
-    {:noreply, assign(socket, :listening_session, session)}
   end
 
   @impl true
@@ -477,28 +494,6 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
 
   @impl true
   def handle_info(_event, socket) do
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_async(:report, {:ok, %{report: report}}, socket) do
-    {:noreply, assign(socket, :report, report)}
-  end
-
-  @impl true
-  def handle_async(:vote_trends, {:ok, %{vote_trends: vote_trends}}, socket) do
-    {:noreply, assign(socket, :vote_trends, vote_trends)}
-  end
-
-  @impl true
-  def handle_async(:vote_trends, {:exit, reason}, socket) do
-    Logger.error("Failed to load vote trends: #{inspect(reason)}")
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_async(:report, {:exit, reason}, socket) do
-    Logger.error("Failed to load session report: #{inspect(reason)}")
     {:noreply, socket}
   end
 
@@ -677,6 +672,14 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   Provides appropriate lock/shield/globe icon based on visibility setting.
   """
   @spec visibility_icon(atom()) :: String.t()
+  def visibility_icon(:public) do
+    ~S"""
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    """
+  end
+
   def visibility_icon(:private) do
     ~S"""
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -689,40 +692,6 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
     ~S"""
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-    </svg>
-    """
-  end
-
-  # AIDEV-NOTE: Runs Whisper on a speech marker's audio then updates the DB text field.
-  # Called only when session.options["transcribe"] == 1. Fire-and-forget — no LiveView update.
-  defp transcribe_marker(marker, audio_b64) do
-    binary = Base.decode64!(audio_b64)
-    floats = for <<f::float-little-32 <- binary>>, do: f
-    samples = Nx.tensor(floats, type: :f32)
-    require Logger
-    Logger.info("[transcription] sending marker=#{marker.id} start=#{marker.start_ms}ms samples=#{Nx.size(samples)}")
-
-    case Nx.Serving.batched_run(PremiereEcouteWeb.Audio.WhisperServing, samples) do
-      %{chunks: [%{text: text} | _]} ->
-        text = String.trim(text)
-        require Logger
-        Logger.info("[transcription] marker=#{marker.id} start=#{marker.start_ms}ms \"#{text}\"")
-        ListeningSession.update_speech_marker_text(marker, text)
-
-      _ ->
-        :ok
-    end
-  rescue
-    e ->
-      require Logger
-      Logger.warning("[transcription] failed marker=#{marker.id}: #{inspect(e)}")
-      :ok
-  end
-
-  def visibility_icon(:public) do
-    ~S"""
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
     </svg>
     """
   end

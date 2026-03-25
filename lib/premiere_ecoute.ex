@@ -19,6 +19,7 @@ defmodule PremiereEcoute do
       {Events, except: []},
       {Extension, except: []},
       {Festivals, except: []},
+      {Models, except: []},
       {Notifications, except: []},
       {Playlists, except: []},
       {Radio, except: []},

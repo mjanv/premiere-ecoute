@@ -1,6 +1,7 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.SpeechMarkerTest do
   use PremiereEcoute.DataCase, async: true
 
+  alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.SpeechMarker
 
@@ -94,7 +95,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.SpeechMarkerTest do
   describe "add_speech_marker/4" do
     setup do
       user = user_fixture(%{role: :streamer})
-      {:ok, album} = PremiereEcoute.Discography.Album.create(album_fixture())
+      {:ok, album} = Album.create(album_fixture())
 
       {:ok, session} =
         ListeningSession.create(%{

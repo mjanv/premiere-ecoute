@@ -17,8 +17,7 @@ defmodule PremiereEcoute.Application do
 
     optionals =
       case Application.get_env(:premiere_ecoute, :environment) do
-        # AIDEV-NOTE: WhisperServing requires bumblebee/exla which are dev-only deps
-        :dev -> [PremiereEcouteMock.Supervisor, PremiereEcouteWeb.Audio.WhisperServing]
+        :dev -> [PremiereEcouteMock.Supervisor]
         _ -> []
       end
 

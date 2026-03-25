@@ -128,7 +128,6 @@ export const Microphone = {
         const bytes = new Uint8Array(converted);
         let binary = "";
         for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-        this.pushEvent("audio_chunk", { data: btoa(binary) });
         for (const seg of completedSegments) {
           if (seg.samples) {
             const bytes = new Uint8Array(seg.samples.buffer);

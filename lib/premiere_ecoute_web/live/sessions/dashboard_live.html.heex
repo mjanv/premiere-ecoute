@@ -172,9 +172,12 @@
                   <%= if @last_segment do %>
                     <span class={[
                       "text-xs px-2 py-0.5 rounded-full font-medium",
-                      if(@last_segment.is_clean, do: "bg-green-500/20 text-green-400", else: "bg-yellow-500/20 text-yellow-400")
+                      if(@last_segment.class == :speech,
+                        do: "bg-green-500/20 text-green-400",
+                        else: "bg-yellow-500/20 text-yellow-400"
+                      )
                     ]}>
-                      {:erlang.float_to_binary(@last_segment.duration_ms / 1000, decimals: 1)}s
+                      {:erlang.float_to_binary((@last_segment.end_ms - @last_segment.start_ms) / 1000, decimals: 1)}s
                     </span>
                   <% end %>
                   <.session_toggle
