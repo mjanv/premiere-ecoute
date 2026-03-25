@@ -1,0 +1,49 @@
+{
+  "type": "standard",
+  "title": "Random Access Memories",
+  "displaytitle": "<i>Random Access Memories</i>",
+  "namespace": {
+    "id": 0,
+    "text": ""
+  },
+  "wikibase_item": "Q8119033",
+  "titles": {
+    "canonical": "Random_Access_Memories",
+    "normalized": "Random Access Memories",
+    "display": "<i>Random Access Memories</i>"
+  },
+  "pageid": 38898753,
+  "thumbnail": {
+    "source": "https://upload.wikimedia.org/wikipedia/en/2/26/Daft_Punk_-_Random_Access_Memories.png",
+    "width": 300,
+    "height": 300
+  },
+  "originalimage": {
+    "source": "https://upload.wikimedia.org/wikipedia/en/2/26/Daft_Punk_-_Random_Access_Memories.png",
+    "width": 300,
+    "height": 300
+  },
+  "lang": "en",
+  "dir": "ltr",
+  "revision": "1340617114",
+  "tid": "db19d972-133e-11f1-b3a1-f7f31689687c",
+  "timestamp": "2026-02-26T18:13:31Z",
+  "description": "2013 studio album by Daft Punk",
+  "description_source": "local",
+  "content_urls": {
+    "desktop": {
+      "page": "https://en.wikipedia.org/wiki/Random_Access_Memories",
+      "revisions": "https://en.wikipedia.org/wiki/Random_Access_Memories?action=history",
+      "edit": "https://en.wikipedia.org/wiki/Random_Access_Memories?action=edit",
+      "talk": "https://en.wikipedia.org/wiki/Talk:Random_Access_Memories"
+    },
+    "mobile": {
+      "page": "https://en.wikipedia.org/wiki/Random_Access_Memories",
+      "revisions": "https://en.wikipedia.org/wiki/Special:History/Random_Access_Memories",
+      "edit": "https://en.wikipedia.org/wiki/Random_Access_Memories?action=edit",
+      "talk": "https://en.wikipedia.org/wiki/Talk:Random_Access_Memories"
+    }
+  },
+  "extract": "Random Access Memories is the fourth and final studio album by the French electronic music duo Daft Punk, released on 17 May 2013 through Columbia Records. It pays tribute to late 1970s and early 1980s American music, particularly from Los Angeles. This theme is reflected in the packaging and promotional campaign, which included billboards, television advertisements and a web series. Recording sessions took place from 2008 to 2012 at Henson, Conway and Capitol Studios in California, Electric Lady Studios in New York City, and Gang Recording Studio in Paris, France.",
+  "extract_html": "<p><i><b>Random Access Memories</b></i> is the fourth and final studio album by the French electronic music duo Daft Punk, released on 17 May 2013 through Columbia Records. It pays tribute to late 1970s and early 1980s American music, particularly from Los Angeles. This theme is reflected in the packaging and promotional campaign, which included billboards, television advertisements and a web series. Recording sessions took place from 2008 to 2012 at Henson, Conway and Capitol Studios in California, Electric Lady Studios in New York City, and Gang Recording Studio in Paris, France.</p>"
+}

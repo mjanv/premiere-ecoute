@@ -1,0 +1,49 @@
+{
+  "type": "standard",
+  "title": "Daft Punk",
+  "displaytitle": "<span class=\"mw-page-title-main\">Daft Punk</span>",
+  "namespace": {
+    "id": 0,
+    "text": ""
+  },
+  "wikibase_item": "Q185828",
+  "titles": {
+    "canonical": "Daft_Punk",
+    "normalized": "Daft Punk",
+    "display": "<span class=\"mw-page-title-main\">Daft Punk</span>"
+  },
+  "pageid": 168310,
+  "thumbnail": {
+    "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Daft_Punk_in_2013_2-_centered.jpg/330px-Daft_Punk_in_2013_2-_centered.jpg",
+    "width": 330,
+    "height": 248
+  },
+  "originalimage": {
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/68/Daft_Punk_in_2013_2-_centered.jpg",
+    "width": 3600,
+    "height": 2700
+  },
+  "lang": "en",
+  "dir": "ltr",
+  "revision": "1344186878",
+  "tid": "4cccbd23-2314-11f1-9917-0fbd39bcbef3",
+  "timestamp": "2026-03-18T21:49:12Z",
+  "description": "French electronic music duo (1993–2021)",
+  "description_source": "local",
+  "content_urls": {
+    "desktop": {
+      "page": "https://en.wikipedia.org/wiki/Daft_Punk",
+      "revisions": "https://en.wikipedia.org/wiki/Daft_Punk?action=history",
+      "edit": "https://en.wikipedia.org/wiki/Daft_Punk?action=edit",
+      "talk": "https://en.wikipedia.org/wiki/Talk:Daft_Punk"
+    },
+    "mobile": {
+      "page": "https://en.wikipedia.org/wiki/Daft_Punk",
+      "revisions": "https://en.wikipedia.org/wiki/Special:History/Daft_Punk",
+      "edit": "https://en.wikipedia.org/wiki/Daft_Punk?action=edit",
+      "talk": "https://en.wikipedia.org/wiki/Talk:Daft_Punk"
+    }
+  },
+  "extract": "Daft Punk were a French electronic music duo formed in 1993 in Paris by Thomas Bangalter and Guy-Manuel de Homem-Christo. They achieved popularity in the late 1990s as part of the French house movement, combining house music, funk, disco, techno, rock and synth-pop. They are regarded as one of the most influential acts in electronic dance music.",
+  "extract_html": "<p><b>Daft Punk</b> were a French electronic music duo formed in 1993 in Paris by Thomas Bangalter and Guy-Manuel de Homem-Christo. They achieved popularity in the late 1990s as part of the French house movement, combining house music, funk, disco, techno, rock and synth-pop. They are regarded as one of the most influential acts in electronic dance music.</p>"
+}

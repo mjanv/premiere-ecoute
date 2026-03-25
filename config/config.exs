@@ -106,7 +106,8 @@ config :premiere_ecoute, PremiereEcoute.Apis,
   wikipedia: [
     api: PremiereEcoute.Apis.MusicMetadata.WikipediaApi,
     urls: [
-      api: "https://en.wikipedia.org/w"
+      api: "https://en.wikipedia.org/w",
+      rest: "https://en.wikipedia.org/api/rest_v1"
     ]
   ]
 

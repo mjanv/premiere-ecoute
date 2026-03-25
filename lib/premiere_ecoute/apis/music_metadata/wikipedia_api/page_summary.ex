@@ -7,26 +7,16 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.PageSummary do
   which is separate from the MediaWiki action API.
   """
 
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Page
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Summary
 
-  @base_url "https://en.wikipedia.org/api/rest_v1/page/summary"
-  @user_agent Application.compile_env(:premiere_ecoute, :user_agent, "")
-
-  @doc """
-  Fetches the summary for a Wikipedia page by its exact title.
-
-  Returns `{:ok, summary}` on success, `{:error, :not_found}` when no page
-  matches, or `{:error, reason}` for other failures.
-  """
+  @doc "Fetches the summary for a Wikipedia page by its exact title."
   @spec summary(Page.t()) :: {:ok, Summary.t()} | {:error, term()}
   def summary(%Page{title: title}) do
-    case Req.get("#{@base_url}/#{URI.encode(title)}", headers: [{"User-Agent", @user_agent}]) do
-      {:ok, %{status: 200, body: body}} -> {:ok, parse(body)}
-      {:ok, %{status: 404}} -> {:error, :not_found}
-      {:ok, %{status: status}} -> {:error, {:http_error, status}}
-      {:error, reason} -> {:error, reason}
-    end
+    WikipediaApi.rest_api()
+    |> WikipediaApi.get(url: "/page/summary/#{URI.encode(title)}")
+    |> WikipediaApi.handle(200, &parse/1)
   end
 
   defp parse(body) do

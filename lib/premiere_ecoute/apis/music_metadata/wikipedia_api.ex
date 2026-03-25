@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
   end
 
   @doc """
-  Creates a Req client for Wikipedia API.
+  Creates a Req client for the Wikipedia MediaWiki action API.
 
   Sets the mandatory User-Agent header and requests JSON responses.
   """
@@ -29,6 +29,23 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
   def api do
     [
       base_url: url(:api),
+      headers: [
+        {"User-Agent", @user_agent},
+        {"Accept", "application/json"}
+      ]
+    ]
+    |> new()
+  end
+
+  @doc """
+  Creates a Req client for the Wikipedia REST API v1.
+
+  Used for endpoints under /api/rest_v1 such as page summaries.
+  """
+  @spec rest_api :: Req.Request.t()
+  def rest_api do
+    [
+      base_url: url(:rest),
       headers: [
         {"User-Agent", @user_agent},
         {"Accept", "application/json"}
