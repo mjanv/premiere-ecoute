@@ -293,6 +293,13 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   end
 
   @impl true
+  def handle_event("open_wikipedia", %{"query" => query} = params, socket) do
+    opts = [id: "wiki", query: query] ++ if artist = params["artist"], do: [artist: artist], else: []
+    send_update(PremiereEcouteWeb.Components.WikipediaDrawer, opts)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event(event, _params, socket) do
     {:noreply, put_flash(socket, :info, gettext("Received event: %{event}", event: event))}
   end

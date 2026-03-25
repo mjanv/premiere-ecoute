@@ -8,10 +8,30 @@
   <div class="synthwave-bg min-h-screen text-white" phx-hook="FileDownload" id="dashboard-page">
     <div class="max-w-7xl mx-auto pt-12 pb-6 px-6 flex items-center">
       <div class="w-2/3">
-        <.page_header
-          title={ListeningSession.title(@listening_session)}
-          subtitle={"#{@listening_session.user.username} - #{PremiereEcouteCore.Date.date(@listening_session.inserted_at)}"}
-        />
+        <%= if @listening_session.source == :album do %>
+          <div class="mb-8">
+            <div class="flex items-center justify-between">
+              <div>
+                <button
+                  class="text-4xl font-bold text-white mb-2 hover:text-purple-300 transition-colors text-left"
+                  phx-click="open_wikipedia"
+                  phx-value-query={ListeningSession.title(@listening_session)}
+                  phx-value-artist={@listening_session.album.artist}
+                >
+                  {ListeningSession.title(@listening_session)}
+                </button>
+                <p class="text-slate-300/90 text-lg">
+                  {@listening_session.user.username} - {PremiereEcouteCore.Date.date(@listening_session.inserted_at)}
+                </p>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <.page_header
+            title={ListeningSession.title(@listening_session)}
+            subtitle={"#{@listening_session.user.username} - #{PremiereEcouteCore.Date.date(@listening_session.inserted_at)}"}
+          />
+        <% end %>
       </div>
       <div class="w-1/3">
         <.source_details listening_session={@listening_session} />
@@ -642,4 +662,6 @@
       listening_session={@listening_session}
     />
   <% end %>
+
+  <.live_component module={PremiereEcouteWeb.Components.WikipediaDrawer} id="wiki" />
 </Layouts.app>

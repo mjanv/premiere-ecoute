@@ -32,7 +32,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Search do
   """
   @spec search_album(String.t(), String.t()) :: {:ok, [map()]} | {:error, term()}
   def search_album(title, artist) when is_binary(title) and is_binary(artist) do
-    query = ~s("#{title}" "#{artist}" album)
+    query = ~s(intitle:"#{title}" "#{artist}" album)
 
     WikipediaApi.api()
     |> WikipediaApi.get(

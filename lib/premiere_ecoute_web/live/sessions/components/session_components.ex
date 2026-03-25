@@ -27,7 +27,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
         <div class="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span class="text-purple-200 block">{gettext("Artist")}</span>
-            <span class="font-medium text-white">{@album.artist}</span>
+            <button
+              class="font-medium text-white hover:text-purple-300 transition-colors text-left"
+              phx-click="open_wikipedia"
+              phx-value-query={@album.artist}
+            >
+              {@album.artist}
+            </button>
           </div>
           <div>
             <span class="text-purple-200 block">{gettext("Released")}</span>
@@ -74,7 +80,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
         <div class="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span class="text-purple-200 block">{gettext("Artist")}</span>
-            <span class="font-medium text-white">{@single.artist}</span>
+            <button
+              class="font-medium text-white hover:text-purple-300 transition-colors text-left"
+              phx-click="open_wikipedia"
+              phx-value-query={@single.artist}
+            >
+              {@single.artist}
+            </button>
           </div>
           <div>
             <span class="text-purple-200 block">{gettext("Provider")}</span>

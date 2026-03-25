@@ -16,6 +16,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
     @callback search_artist(name :: String.t()) :: {:ok, [map()]} | {:error, term()}
     @callback search_album(title :: String.t(), artist :: String.t()) ::
                 {:ok, [map()]} | {:error, term()}
+    @callback get_summary(title :: String.t()) :: {:ok, map()} | {:error, term()}
   end
 
   @doc """
@@ -46,4 +47,7 @@ defmodule PremiereEcoute.Apis.MusicMetadata.WikipediaApi do
   # Search
   defdelegate search_artist(name), to: __MODULE__.Search
   defdelegate search_album(title, artist), to: __MODULE__.Search
+
+  # Summary
+  defdelegate get_summary(title), to: __MODULE__.Summary, as: :get
 end

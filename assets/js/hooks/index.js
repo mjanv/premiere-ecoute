@@ -20,6 +20,7 @@ import { ScrollToActive } from "./scroll_to_active";
 import { ClampText } from "./clamp_text";
 import { Microphone } from "./microphone";
 import { Drawer } from "./drawer";
+import { WikipediaDrawer } from "./wikipedia_drawer";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -43,5 +44,6 @@ export const Hooks = {
   ScrollToActive: ScrollToActive,
   ClampText: ClampText,
   Microphone: Microphone,
-  Drawer: Drawer
+  Drawer: Drawer,
+  WikipediaDrawer: WikipediaDrawer
 };
