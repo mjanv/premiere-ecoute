@@ -20,13 +20,11 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
 
   @impl true
   def update(assigns, socket) do
-    socket =
-      socket
-      |> assign(assigns)
-      |> assign_new(:media_path, fn -> "" end)
-      |> assign_new(:frame_rate, fn -> "25" end)
-
-    {:ok, socket}
+    socket
+    |> assign(assigns)
+    |> assign_new(:media_path, fn -> "" end)
+    |> assign_new(:frame_rate, fn -> "25" end)
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
