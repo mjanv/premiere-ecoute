@@ -609,30 +609,47 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
 
   attr :current_visibility, :atom, required: true
   attr :visibility_options, :list, required: true
+  # AIDEV-NOTE: compact=true renders icon-only trigger (no text, no chevron) for use in split-button layouts
+  attr :compact, :boolean, default: false
 
   @spec visibility_dropdown(map()) :: Phoenix.LiveView.Rendered.t()
   def visibility_dropdown(assigns) do
     ~H"""
-    <div class="relative" id="visibility-dropdown" phx-hook="VisibilityDropdown">
+    <div class={["relative", if(@compact, do: "h-full", else: "")]} id="visibility-dropdown" phx-hook="VisibilityDropdown">
       <!-- Selected option display / Dropdown trigger -->
       <button
         type="button"
         id="visibility-dropdown-button"
-        class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between"
+        class={[
+          "bg-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center",
+          if(@compact,
+            do: "h-full px-3 justify-center hover:bg-white/20 transition-colors",
+            else: "w-full border border-white/20 rounded-lg px-3 py-2 justify-between"
+          )
+        ]}
       >
-        <div class="flex items-center space-x-2">
-          <.visibility_icon_svg visibility={@current_visibility} />
-          <span>{visibility_label(@current_visibility)}</span>
-        </div>
-        <svg class="w-4 h-4 transition-transform" id="dropdown-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
+        <%= if @compact do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        <% else %>
+          <div class="flex items-center space-x-2">
+            <.visibility_icon_svg visibility={@current_visibility} />
+            <span>{visibility_label(@current_visibility)}</span>
+          </div>
+          <svg class="w-4 h-4 transition-transform" id="dropdown-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        <% end %>
       </button>
       
     <!-- Dropdown menu -->
       <div
         id="visibility-dropdown-menu"
-        class="hidden absolute z-10 w-full mt-2 bg-gray-800 border border-white/20 rounded-lg shadow-lg overflow-hidden"
+        class={[
+          "hidden absolute z-10 mt-2 bg-gray-800 border border-white/20 rounded-lg shadow-lg overflow-hidden",
+          if(@compact, do: "right-0 w-56", else: "w-full")
+        ]}
       >
         <%= for %{value: value, label: label, description: description} <- @visibility_options do %>
           <button
