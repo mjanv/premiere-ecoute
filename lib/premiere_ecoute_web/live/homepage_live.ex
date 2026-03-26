@@ -7,8 +7,6 @@ defmodule PremiereEcouteWeb.HomepageLive do
 
   use PremiereEcouteWeb, :live_view
 
-  import PremiereEcouteWeb.Components.Modal
-
   @impl true
   def mount(_params, _session, socket) do
     if socket.assigns[:current_scope] && socket.assigns.current_scope.user do
