@@ -12,7 +12,12 @@ defmodule PremiereEcouteWeb.HomepageLive do
     if socket.assigns[:current_scope] && socket.assigns.current_scope.user do
       {:ok, redirect(socket, to: "/home")}
     else
-      {:ok, socket}
+      # AIDEV-NOTE: clear error flash — unauthenticated redirects from protected routes
+      # (require_authenticated_user) land here with "You must log in" which is misleading
+      # since the homepage already has Twitch login buttons. Auth-specific errors
+      # (e.g. "Twitch authentication failed") are intentional and kept as :error flashes
+      # but cleared here too since the user can simply retry via the buttons.
+      {:ok, clear_flash(socket, :error)}
     end
   end
 
