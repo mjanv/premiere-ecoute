@@ -5411,7 +5411,7 @@ msgstr "Exporter vers Premiere"
 #: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:128
 #, elixir-autogen, elixir-format
 msgid "Frame rate"
-msgstr "Fréquence d'images"
+msgstr "Frame rate"
 
 #: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:143
 #, elixir-autogen, elixir-format
