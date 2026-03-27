@@ -18,7 +18,19 @@ defmodule PremiereEcouteCore.Registry do
 
   require Logger
 
-  @handlers Application.compile_env(:premiere_ecoute, :handlers, [])
+  def init do
+    for h <- Application.get_env(:premiere_ecoute, :handlers, []) do
+      case Code.ensure_compiled(h) do
+        {:module, _} ->
+          for c <- h.commands_or_events() do
+            :persistent_term.put(c, h)
+          end
+
+        {:error, _} ->
+          :ok
+      end
+    end
+  end
 
   @doc """
   Retrieves the handler module for a command or event.
@@ -26,10 +38,5 @@ defmodule PremiereEcouteCore.Registry do
   Searches the configured handlers for one that handles the given command or event module. Returns nil if no handler is registered.
   """
   @spec get(module()) :: module() | nil
-  def get(command_or_event) do
-    Enum.find(@handlers, fn h ->
-      {status, _} = Code.ensure_compiled(h)
-      status == :module && command_or_event in h.commands_or_events()
-    end)
-  end
+  def get(command_or_event), do: :persistent_term.get(command_or_event, nil)
 end

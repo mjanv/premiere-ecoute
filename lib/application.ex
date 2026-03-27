@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Application do
   @impl true
   def start(_type, _args) do
     mandatory = [
+      {Task, &PremiereEcouteCore.Registry.init/0},
       PremiereEcouteWeb.Supervisor,
       PremiereEcoute.Supervisor
     ]

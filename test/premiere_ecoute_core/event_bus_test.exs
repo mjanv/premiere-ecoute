@@ -36,6 +36,12 @@ defmodule PremiereEcouteCore.EventBusTest do
     end
   end
 
+  setup_all do
+    PremiereEcouteCore.Registry.init()
+
+    :ok
+  end
+
   describe "dispatch/1" do
     test "1" do
       {:ok, logs} = with_log(fn -> EventBus.dispatch(%EventA{a: 5}) end)

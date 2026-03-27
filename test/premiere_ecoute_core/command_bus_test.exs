@@ -65,6 +65,12 @@ defmodule PremiereEcouteCore.CommandBusTest do
     end
   end
 
+  setup_all do
+    PremiereEcouteCore.Registry.init()
+
+    :ok
+  end
+
   describe "apply/1" do
     test "1a" do
       {{:ok, events}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 4}) end)
