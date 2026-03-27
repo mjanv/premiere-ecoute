@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Models.Audio.SpeechToTextWhisper do
+defmodule PremiereEcoute.Models.OpenAi.SpeechToTextWhisper do
   @moduledoc """
   Whisper speech-to-text transcription
   """

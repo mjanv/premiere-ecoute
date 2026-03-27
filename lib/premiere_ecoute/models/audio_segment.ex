@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Models.Audio.Segment do
+defmodule PremiereEcoute.Models.AudioSegment do
   @moduledoc false
 
   @type t :: %__MODULE__{

@@ -55,6 +55,7 @@ priv/request/
 priv/cache/
 apps/digital_ocean/backups/
 *.excalidraw
+*.mp3
 
 # Agents
 .claude/settings.local.json

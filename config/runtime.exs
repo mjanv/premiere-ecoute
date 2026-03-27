@@ -56,6 +56,8 @@ config :premiere_ecoute, PremiereEcoute.Repo.Vault,
 
 config :premiere_ecoute, PremiereEcoute.Accounts.Mailer, api_key: env!("RESEND_API_KEY")
 
+config :premiere_ecoute, :mistral, api_key: env!("MISTRAL_API_KEY", :string, "")
+
 config :ueberauth, Ueberauth.Strategy.Twitch.OAuth,
   client_id: env!("TWITCH_CLIENT_ID"),
   client_secret: env!("TWITCH_CLIENT_SECRET")

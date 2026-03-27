@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Audio.AudioLive do
+defmodule PremiereEcouteWeb.Models.AudioLive do
   @moduledoc """
   Dev-only LiveView for audio recording and speech-to-text transcription.
 
@@ -117,7 +117,7 @@ defmodule PremiereEcouteWeb.Audio.AudioLive do
         %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean, "audio" => audio},
         socket
       ) do
-    segment = PremiereEcoute.Models.new_segment(start_ms, end_ms, is_clean, audio)
+    segment = PremiereEcoute.Models.new_audio_segment(start_ms, end_ms, is_clean, audio)
 
     socket
     |> start_async(:transcribe, fn -> PremiereEcoute.Models.run(segment) end)

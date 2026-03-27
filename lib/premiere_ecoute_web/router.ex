@@ -349,7 +349,7 @@ defmodule PremiereEcouteWeb.Router do
       live_dashboard("/dashboard", metrics: PremiereEcouteWeb.Telemetry)
       live_storybook("/storybook", backend_module: PremiereEcouteWeb.Storybook)
       forward("/mailbox", Plug.Swoosh.MailboxPreview)
-      live("/audio", PremiereEcouteWeb.Audio.AudioLive)
+      live("/audio", PremiereEcouteWeb.Models.AudioLive)
     end
   end
 end

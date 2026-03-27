@@ -298,6 +298,7 @@ To enable automated deployments, configure the following secrets in your GitHub 
 - `BUYMEACOFFEE_API_KEY`: Buy Me a Coffee API key
 - `RESEND_API_KEY`: Resend API key (for email via Swoosh)
 - `OPENAI_API_KEY`: OpenAI API key
+- `MISTRAL_API_KEY`: Mistral API key
 - `SENTRY_DSN`: Sentry DSN for error tracking
 
 #### Feature Flags Authentication

@@ -3,14 +3,14 @@ defmodule PremiereEcoute.Models do
 
   require Logger
 
-  alias PremiereEcoute.Models.Audio.Segment
-  alias PremiereEcoute.Models.Audio.SpeechToTextWhisper
+  alias PremiereEcoute.Models.AudioSegment
+  alias PremiereEcoute.Models.OpenAi.SpeechToTextWhisper
 
-  defdelegate new_segment(start_ms, end_ms, is_clean, audio), to: Segment, as: :new
+  defdelegate new_audio_segment(start_ms, end_ms, is_clean, audio), to: AudioSegment, as: :new
 
-  def run(%Segment{class: :speech, audio: audio} = segment) do
+  def run(%AudioSegment{class: :speech, audio: audio} = segment) do
     audio
-    |> Segment.decode_audio()
+    |> AudioSegment.decode_audio()
     |> SpeechToTextWhisper.run()
     |> case do
       %{chunks: [%{text: text} | _]} ->

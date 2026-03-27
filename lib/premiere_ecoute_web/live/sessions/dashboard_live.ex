@@ -263,7 +263,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
     # offset_ms anchors the recording start to the session timeline — one-time
     # latency on recording_started event, consistent across all segments (no per-segment jitter).
     offset_ms = DateTime.diff(recording_started_at, session.started_at, :millisecond)
-    segment = PremiereEcoute.Models.new_segment(offset_ms + start_ms, offset_ms + end_ms, true, audio)
+    segment = PremiereEcoute.Models.new_audio_segment(offset_ms + start_ms, offset_ms + end_ms, true, audio)
     {:ok, marker} = ListeningSession.add_speech_marker(session, segment.start_ms, segment.end_ms)
 
     socket
@@ -285,7 +285,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
         %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean, "audio" => audio},
         socket
       ) do
-    segment = PremiereEcoute.Models.new_segment(start_ms, end_ms, is_clean, audio)
+    segment = PremiereEcoute.Models.new_audio_segment(start_ms, end_ms, is_clean, audio)
     {:noreply, assign(socket, :last_segment, segment)}
   end
 
