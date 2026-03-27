@@ -343,6 +343,11 @@
                         :album -> track.track_album.track_number
                         :playlist -> nil
                       end %>
+                    <% track_duration =
+                      case @listening_session.source do
+                        :album -> track.track_album.duration_ms
+                        :playlist -> track.playlist_track && track.playlist_track.duration_ms
+                      end %>
                     <div class="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group">
                       <div class="flex items-center gap-4 min-w-0">
                         <%= if track_number do %>
@@ -352,6 +357,9 @@
                         <% end %>
                         <p class="text-slate-200 group-hover:text-white text-base truncate transition-colors">
                           {track_name}
+                        </p>
+                        <p class="text-slate-400 group-hover:text-white text-sm truncate transition-colors">
+                          ({PremiereEcouteCore.Duration.timer(track_duration)})
                         </p>
                       </div>
                       <% track_id = track.track_summary[:track_id] || track.track_summary["track_id"] %>
