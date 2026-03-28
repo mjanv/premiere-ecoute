@@ -19,29 +19,33 @@
               />
             </svg>
           </.link>
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-2xl font-bold text-white">
-                {if @session.origin_playlist, do: @session.origin_playlist.title}
-              </h1>
-              <span class="text-gray-400">→</span>
-              <span class="text-gray-300">
-                {if @session.destination_playlist, do: @session.destination_playlist.title}
-              </span>
-            </div>
-            <div class="flex items-center gap-2 mt-1">
-              <span class={[
-                "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border",
-                case @session.status do
-                  :pending -> "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
-                  :active -> "bg-green-600/20 text-green-400 border-green-500/30"
-                  :completed -> "bg-gray-600/20 text-gray-400 border-gray-500/30"
-                end
-              ]}>
-                {String.capitalize(to_string(@session.status))}
-              </span>
-            </div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold text-white">
+              {if @session.origin_playlist, do: @session.origin_playlist.title}
+            </h1>
+            <span class="text-gray-400">→</span>
+            <span class="text-gray-300">
+              {if @session.destination_playlist, do: @session.destination_playlist.title}
+            </span>
+            <span class={[
+              "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border",
+              case @session.status do
+                :pending -> "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
+                :active -> "bg-green-600/20 text-green-400 border-green-500/30"
+                :completed -> "bg-gray-600/20 text-gray-400 border-gray-500/30"
+              end
+            ]}>
+              {String.capitalize(to_string(@session.status))}
+            </span>
           </div>
+          <%= if @session.status == :active do %>
+            <button
+              phx-click="show_end_modal"
+              class="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-lg text-xs font-medium transition-colors"
+            >
+              {gettext("End session")}
+            </button>
+          <% end %>
         </div>
 
         <%!-- Completed --%>
@@ -137,45 +141,9 @@
                     </button>
                   </div>
                 <% else %>
-                  <%!-- Toolbar: playback + round settings --%>
-                  <div class="flex items-center gap-2 mb-4 flex-wrap">
-                    <button
-                      phx-click="show_end_modal"
-                      class="flex items-center gap-1.5 px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-lg text-xs font-medium transition-colors ml-auto"
-                    >
-                      {gettext("End session")}
-                    </button>
-                    <div class="w-px h-4 bg-white/20"></div>
-                    <%!-- Restore order --%>
-                    <button
-                      phx-click="restore"
-                      class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-colors"
-                      title={gettext("Restore original order")}
-                    >
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                      </svg>
-                      {gettext("Ordered")}
-                    </button>
-                    <%!-- Shuffle --%>
-                    <button
-                      phx-click="shuffle"
-                      class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-colors"
-                      title={gettext("Shuffle remaining tracks")}
-                    >
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4 6h5l2 3m4-3h5v2l-4 5 4 5v2h-5l-2-3m-4 3H4v-2l4-5-4-5V6z"
-                        />
-                      </svg>
-                      {gettext("Shuffle")}
-                    </button>
-
+                  <%!-- Toolbar: round settings left, player right --%>
+                  <div class="flex items-center gap-2 mb-4">
                     <%= if not @vote_open do %>
-                      <div class="w-px h-4 bg-white/20 mx-1"></div>
                       <%!-- Mode --%>
                       <%= for {mode, label} <- [{:streamer_choice, gettext("Streamer")}, {:viewer_vote, gettext("Vote")}, {:duel, gettext("Duel")}] do %>
                         <button
@@ -193,36 +161,19 @@
                           {label}
                         </button>
                       <% end %>
-                      <%!-- Duration — only for vote modes --%>
-                      <%= if @round_mode != :streamer_choice do %>
-                        <div class="w-px h-4 bg-white/20 mx-1"></div>
-                        <%= for {label, secs} <- [{"30s", 30}, {"1m", 60}, {"2m", 120}, {"5m", 300}] do %>
-                          <button
-                            phx-click="set_round_duration"
-                            phx-value-duration={secs}
-                            class={[
-                              "px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors",
-                              if @round_duration == secs do
-                                "bg-blue-600 text-white"
-                              else
-                                "bg-white/10 text-gray-300 hover:bg-white/20"
-                              end
-                            ]}
-                          >
-                            {label}
-                          </button>
-                        <% end %>
-                      <% end %>
                     <% end %>
+                    <div class="ml-auto w-1/2">
+                      <.player_bar player_state={@player_state} />
+                    </div>
                   </div>
 
                   <%!-- Duel --%>
                   <%= if @round_mode == :duel do %>
-                    <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div class="grid grid-cols-2 gap-6 mb-3 items-stretch">
                       <.track_card
                         track={Enum.at(@tracks, @session.current_index)}
                         label={gettext("Track A — vote 1")}
-                        accent="blue"
+                        color={@color_primary}
                         votes={@votes_a}
                         play_event="play_track_a"
                         playing_track_id={@playing_track_id}
@@ -230,7 +181,7 @@
                       <.track_card
                         track={Enum.at(@tracks, @session.current_index + 1)}
                         label={gettext("Track B — vote 2")}
-                        accent="amber"
+                        color={@color_secondary}
                         votes={@votes_b}
                         play_event="play_track_b"
                         playing_track_id={@playing_track_id}
@@ -238,33 +189,59 @@
                     </div>
 
                     <%= if @votes_a > 0 || @votes_b > 0 do %>
-                      <div class="mb-6 bg-white/5 rounded-xl p-4 border border-white/10">
-                        <div class="flex justify-between text-sm text-gray-400 mb-2">
-                          <span>A — {@votes_a}</span>
-                          <span>B — {@votes_b}</span>
+                      <div class="mb-3 bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex justify-between text-sm mb-2">
+                          <span style={"color: #{@color_primary};"}>A — {@votes_a}</span>
+                          <span style={"color: #{@color_secondary};"}>B — {@votes_b}</span>
                         </div>
                         <div class="h-3 bg-white/10 rounded-full overflow-hidden flex">
                           <div
-                            class="bg-blue-500 h-full rounded-l-full transition-all duration-300"
-                            style={"width: #{vote_bar_width(@votes_a, @votes_b, :a)}"}
+                            class="h-full rounded-l-full transition-all duration-300"
+                            style={"width: #{vote_bar_width(@votes_a, @votes_b, :a)}; background-color: #{@color_primary};"}
                           >
                           </div>
                           <div
-                            class="bg-amber-500 h-full rounded-r-full transition-all duration-300"
-                            style={"width: #{vote_bar_width(@votes_a, @votes_b, :b)}"}
+                            class="h-full rounded-r-full transition-all duration-300"
+                            style={"width: #{vote_bar_width(@votes_a, @votes_b, :b)}; background-color: #{@color_secondary};"}
                           >
                           </div>
                         </div>
                       </div>
                     <% end %>
 
-                    <.vote_controls
-                      vote_open={@vote_open}
-                      countdown={@countdown}
-                      mode={@round_mode}
-                      votes_a={@votes_a}
-                      votes_b={@votes_b}
-                    />
+                    <div class="flex items-center gap-2 mt-3">
+                      <.vote_controls
+                        vote_open={@vote_open}
+                        countdown={@countdown}
+                        mode={@round_mode}
+                        votes_a={@votes_a}
+                        votes_b={@votes_b}
+                        round_duration={Map.get(@round_durations, :duel, 60)}
+                        color_primary={@color_primary}
+                        color_secondary={@color_secondary}
+                      />
+                      <%= if not @vote_open do %>
+                        <form phx-change="set_round_duration" id="duration-form-duel" class="flex items-center gap-1">
+                          <input
+                            type="number"
+                            name="value"
+                            id="round-duration-duel"
+                            value={Map.get(@round_durations, :duel, 60)}
+                            min="10"
+                            max="600"
+                            phx-debounce="300"
+                            class="w-16 px-2 py-1.5 bg-white/10 border border-white/20 rounded-lg text-xs text-white text-center focus:outline-none focus:border-blue-500"
+                          />
+                          <span class="text-xs text-gray-500">s</span>
+                        </form>
+                        <button
+                          phx-click="open_vote"
+                          class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
+                        >
+                          {gettext("Open vote")}
+                        </button>
+                      <% end %>
+                    </div>
                   <% else %>
                     <%!-- Viewer vote --%>
                     <%= if @round_mode == :viewer_vote do %>
@@ -297,13 +274,37 @@
                         </div>
                       <% end %>
 
-                      <.vote_controls
-                        vote_open={@vote_open}
-                        countdown={@countdown}
-                        mode={@round_mode}
-                        votes_a={@votes_a}
-                        votes_b={@votes_b}
-                      />
+                      <div class="flex items-center gap-2 mt-3">
+                        <.vote_controls
+                          vote_open={@vote_open}
+                          countdown={@countdown}
+                          mode={@round_mode}
+                          votes_a={@votes_a}
+                          votes_b={@votes_b}
+                          round_duration={Map.get(@round_durations, :viewer_vote, 60)}
+                        />
+                        <%= if not @vote_open do %>
+                          <form phx-change="set_round_duration" id="duration-form-viewer-vote" class="flex items-center gap-1">
+                            <input
+                              type="number"
+                              name="value"
+                              id="round-duration-viewer-vote"
+                              value={Map.get(@round_durations, :viewer_vote, 60)}
+                              min="10"
+                              max="600"
+                              phx-debounce="300"
+                              class="w-16 px-2 py-1.5 bg-white/10 border border-white/20 rounded-lg text-xs text-white text-center focus:outline-none focus:border-blue-500"
+                            />
+                            <span class="text-xs text-gray-500">s</span>
+                          </form>
+                          <button
+                            phx-click="open_vote"
+                            class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
+                          >
+                            {gettext("Open vote")}
+                          </button>
+                        <% end %>
+                      </div>
                     <% else %>
                       <%!-- Streamer choice --%>
                       <.track_card
@@ -350,12 +351,33 @@
                   <h3 class="font-semibold text-white">
                     {if @session.origin_playlist, do: @session.origin_playlist.title}
                   </h3>
-                  <button
-                    phx-click="toggle_hide_decided"
-                    class="text-xs text-gray-400 hover:text-white transition-colors"
-                  >
-                    {if @hide_decided, do: gettext("Show all"), else: gettext("Hide decided")}
-                  </button>
+                  <div class="flex items-center gap-2">
+                    <button
+                      phx-click="restore"
+                      class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 rounded text-xs font-medium transition-colors"
+                    >
+                      {gettext("Restore")}
+                    </button>
+                    <button
+                      phx-click="shuffle"
+                      class="px-2 py-1 bg-violet-600/30 hover:bg-violet-600/50 text-violet-300 rounded text-xs font-medium transition-colors"
+                    >
+                      {gettext("Shuffle")}
+                    </button>
+                    <button
+                      phx-click="toggle_hide_decided"
+                      class={[
+                        "px-2 py-1 rounded text-xs font-medium transition-colors",
+                        if @hide_decided do
+                          "bg-amber-600/40 hover:bg-amber-600/60 text-amber-300"
+                        else
+                          "bg-amber-600/20 hover:bg-amber-600/40 text-amber-400"
+                        end
+                      ]}
+                    >
+                      {if @hide_decided, do: gettext("Show all"), else: gettext("Hide decided")}
+                    </button>
+                  </div>
                 </div>
                 <p class="text-xs text-gray-500 mb-4">
                   {gettext("%{done}/%{total} reviewed",
@@ -395,7 +417,7 @@
                             <button
                               phx-click="move_up"
                               phx-value-index={idx}
-                              class="p-1 text-gray-600 hover:text-white transition-colors"
+                              class="p-1 rounded text-cyan-400 hover:text-white hover:bg-cyan-500/30 drop-shadow-[0_0_4px_rgba(34,211,238,0.6)] hover:drop-shadow-[0_0_8px_rgba(34,211,238,1)] transition-all"
                               title={gettext("Move up")}
                             >
                               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,7 +427,7 @@
                             <button
                               phx-click="move_down"
                               phx-value-index={idx}
-                              class="p-1 text-gray-600 hover:text-white transition-colors"
+                              class="p-1 rounded text-cyan-400 hover:text-white hover:bg-cyan-500/30 drop-shadow-[0_0_4px_rgba(34,211,238,0.6)] hover:drop-shadow-[0_0_8px_rgba(34,211,238,1)] transition-all"
                               title={gettext("Move down")}
                             >
                               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -415,7 +437,7 @@
                             <button
                               phx-click="move_to_top"
                               phx-value-index={idx}
-                              class="p-1 text-gray-600 hover:text-white transition-colors"
+                              class="p-1 rounded text-fuchsia-400 hover:text-white hover:bg-fuchsia-500/30 drop-shadow-[0_0_4px_rgba(232,121,249,0.6)] hover:drop-shadow-[0_0_8px_rgba(232,121,249,1)] transition-all"
                               title={gettext("Move to top")}
                             >
                               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

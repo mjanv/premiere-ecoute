@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
 
   use PremiereEcouteWeb, :live_view
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
   alias PremiereEcouteCore.Cache
 
@@ -33,6 +34,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
       |> assign(:votes_a, votes_a)
       |> assign(:votes_b, votes_b)
       |> assign(:vote_open, vote_open)
+      |> assign(:color_primary, Accounts.profile(user, [:widget_settings, :color_primary]) || "#3b82f6")
+      |> assign(:color_secondary, Accounts.profile(user, [:widget_settings, :color_secondary]) || "#f59e0b")
 
     {:ok, socket}
   end

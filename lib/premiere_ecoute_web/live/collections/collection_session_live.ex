@@ -17,7 +17,10 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   require Logger
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player, as: SpotifyPlayer
+  alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.CloseVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.CompleteCollectionSession
@@ -41,6 +44,11 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     else
       if connected?(socket) do
         PremiereEcoute.PubSub.subscribe("collection:#{session_id}")
+        PremiereEcoute.PubSub.subscribe("playback:#{scope.user.id}")
+
+        if session.status == :active do
+          PlayerSupervisor.start(scope.user.id)
+        end
       end
 
       broadcaster_id = scope.user.twitch.user_id
@@ -59,11 +67,14 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:votes_b, votes_b)
       |> assign(:vote_open, vote_open)
       |> assign(:countdown, nil)
+      |> assign(:player_state, if(session.status == :active, do: SpotifyPlayer.default(), else: nil))
       |> assign(:playing_track_id, nil)
       |> assign(:hide_decided, false)
       |> assign(:show_end_modal, false)
       |> assign(:round_mode, :streamer_choice)
-      |> assign(:round_duration, 60)
+      |> assign(:round_durations, %{viewer_vote: 60, duel: 60})
+      |> assign(:color_primary, Accounts.profile(scope.user, [:widget_settings, :color_primary]) || "#3b82f6")
+      |> assign(:color_secondary, Accounts.profile(scope.user, [:widget_settings, :color_secondary]) || "#f59e0b")
       |> then(fn socket -> {:ok, socket} end)
     end
   end
@@ -144,6 +155,28 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   def handle_info({:collection_started, _session_id}, socket), do: {:noreply, socket}
 
   @impl true
+  def handle_info({:player, :start_track, state}, socket) do
+    track_uri = get_in(state, ["item", "uri"])
+    track_id = track_uri && String.replace(track_uri, "spotify:track:", "")
+    {:noreply, assign(socket, player_state: state, playing_track_id: track_id)}
+  end
+
+  @impl true
+  def handle_info({:player, :stop, state}, socket) do
+    {:noreply, assign(socket, player_state: state, playing_track_id: nil)}
+  end
+
+  @impl true
+  def handle_info({:player, :no_device, state}, socket) do
+    {:noreply, assign(socket, player_state: state, playing_track_id: nil)}
+  end
+
+  @impl true
+  def handle_info({:player, _event, state}, socket) do
+    {:noreply, assign(socket, :player_state, state)}
+  end
+
+  @impl true
   def handle_info(:tick, %{assigns: %{countdown: nil}} = socket), do: {:noreply, socket}
   def handle_info(:tick, %{assigns: %{countdown: 0}} = socket), do: {:noreply, socket}
 
@@ -161,7 +194,10 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     |> case do
       {:ok, started, _events} ->
         {tracks, _, _, _, _, _} = load_cache(socket.assigns.broadcaster_id)
-        {:noreply, assign(socket, session: started, tracks: tracks, original_tracks: tracks)}
+        PlayerSupervisor.start(socket.assigns.scope.user.id)
+
+        {:noreply,
+         assign(socket, session: started, tracks: tracks, original_tracks: tracks, player_state: SpotifyPlayer.default())}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, inspect(reason))}
@@ -174,8 +210,10 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   @impl true
-  def handle_event("set_round_duration", %{"duration" => duration}, socket) do
-    {:noreply, assign(socket, round_duration: String.to_integer(duration))}
+  def handle_event("set_round_duration", %{"value" => duration}, socket) do
+    mode = socket.assigns.round_mode
+    round_durations = Map.put(socket.assigns.round_durations, mode, String.to_integer(duration))
+    {:noreply, assign(socket, round_durations: round_durations)}
   end
 
   @impl true
@@ -185,7 +223,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_event("open_vote", _params, %{assigns: assigns} = socket) do
-    %{session: session, scope: scope, tracks: tracks, round_mode: round_mode, round_duration: round_duration} = assigns
+    %{session: session, scope: scope, tracks: tracks, round_mode: round_mode, round_durations: round_durations} = assigns
+    round_duration = Map.get(round_durations, round_mode, 60)
     track = Enum.at(tracks, session.current_index)
     duel = if round_mode == :duel, do: Enum.at(tracks, session.current_index + 1)
 
@@ -380,11 +419,22 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   @impl true
   def handle_event("stop_playback", _params, %{assigns: %{scope: scope}} = socket) do
     case SpotifyApi.pause_playback(scope) do
-      {:ok, _} ->
-        {:noreply, assign(socket, :playing_track_id, nil)}
+      {:ok, _} -> {:noreply, socket}
+      {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
+    end
+  end
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, inspect(reason))}
+  @impl true
+  def handle_event("toggle_playback", _params, %{assigns: %{scope: scope, player_state: state}} = socket) do
+    result =
+      case state do
+        %{"is_playing" => true} -> SpotifyPlayer.pause_playback(scope)
+        _ -> SpotifyPlayer.start_playback(scope, nil)
+      end
+
+    case result do
+      {:ok, _} -> {:noreply, socket}
+      {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
     end
   end
 
@@ -405,7 +455,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   defp play(track, scope, socket) do
     case SpotifyApi.start_resume_playback(scope, track) do
-      {:ok, _} -> {:noreply, assign(socket, :playing_track_id, track.track_id)}
+      {:ok, _} -> {:noreply, socket}
       {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
     end
   end

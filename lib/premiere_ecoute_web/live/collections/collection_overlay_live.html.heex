@@ -1,19 +1,18 @@
 <%!-- AIDEV-NOTE: OBS browser source overlay. Always visible: dark bg when inactive, colored bar when vote open, dimmed when closed. --%>
 <% pct_a = bar_pct(@votes_a, @votes_b, :a)
-pct_b = bar_pct(@votes_a, @votes_b, :b)
-color_a = if @vote_open, do: "#3b82f6", else: "#1e3a5f"
-color_b = if @vote_open, do: "#f59e0b", else: "#78350f"
+color_a = if @vote_open, do: @color_primary, else: @color_primary <> "55"
+color_b = if @vote_open, do: @color_secondary, else: @color_secondary <> "55"
 text_opacity = if @vote_open, do: "1", else: "0.4" %>
 <div style="width: 100%; height: 100%; background: #111827; display: flex; align-items: flex-end;">
-  <div style="width: 100%; height: 48px; display: flex; overflow: hidden;">
-    <%!-- Side A --%>
-    <div style={"width: #{pct_a}%; background: #{color_a}; display: flex; align-items: center; justify-content: flex-start; padding: 0 12px; transition: width 0.5s ease, background 0.4s ease; overflow: hidden;"}>
+  <div style="width: 100%; height: 48px; display: flex;">
+    <%!-- Side A: percentage width, min-width so text is never hidden --%>
+    <div style={"width: #{pct_a}%; min-width: fit-content; background: #{color_a}; display: flex; align-items: center; justify-content: flex-start; padding: 0 12px; transition: width 0.5s ease, background 0.4s ease;"}>
       <span style={"font-size: 20px; font-weight: 800; color: white; opacity: #{text_opacity}; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.6); transition: opacity 0.4s ease;"}>
         1 · {@votes_a}
       </span>
     </div>
-    <%!-- Side B --%>
-    <div style={"width: #{pct_b}%; background: #{color_b}; display: flex; align-items: center; justify-content: flex-end; padding: 0 12px; transition: width 0.5s ease, background 0.4s ease; overflow: hidden;"}>
+    <%!-- Side B: flex:1 fills remaining space to avoid any gap from integer truncation --%>
+    <div style={"flex: 1; min-width: fit-content; background: #{color_b}; display: flex; align-items: center; justify-content: flex-end; padding: 0 12px; transition: background 0.4s ease;"}>
       <span style={"font-size: 20px; font-weight: 800; color: white; opacity: #{text_opacity}; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.6); transition: opacity 0.4s ease;"}>
         {@votes_b} · 2
       </span>
