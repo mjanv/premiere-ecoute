@@ -123,4 +123,19 @@ defmodule PremiereEcoute.Discography.Artist do
     |> cast_embed(:images)
     |> Slug.maybe_generate_slug()
   end
+
+  @doc "Returns a random artist with missing informations"
+  @spec random :: nil | t()
+  def random do
+    from(a in __MODULE__,
+      where:
+        fragment("? \\? 'wikipedia' = false", a.external_links) or
+          fragment("? \\? 'genius' = false", a.external_links) or
+          fragment("NOT (? \\? 'deezer')", a.provider_ids) or
+          fragment("NOT (? \\? 'spotify')", a.provider_ids)
+    )
+    |> order_by(fragment("RANDOM()"))
+    |> limit(1)
+    |> Repo.one()
+  end
 end

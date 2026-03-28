@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Artists do
   @spec get_artist_albums(String.t()) :: {:ok, [map()]} | {:error, term()}
   def get_artist_albums(artist_id) when is_binary(artist_id) do
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/artists/#{artist_id}/albums")
+    |> SpotifyApi.get(url: "/artists/#{artist_id}/albums?include_groups=album")
     |> SpotifyApi.handle(200, fn %{"items" => items} ->
       Enum.map(items, fn data ->
         %{

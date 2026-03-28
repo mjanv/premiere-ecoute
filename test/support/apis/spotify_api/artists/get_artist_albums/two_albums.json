@@ -1,0 +1,40 @@
+{
+  "href": "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH/albums",
+  "limit": 20,
+  "next": null,
+  "offset": 0,
+  "previous": null,
+  "total": 2,
+  "items": [
+    {
+      "album_type": "album",
+      "total_tracks": 10,
+      "id": "7aJuG4TFXa2hmE4z1yxc3n",
+      "name": "HIT ME HARD AND SOFT",
+      "release_date": "2024-05-17",
+      "release_date_precision": "day",
+      "images": [
+        {"url": "https://i.scdn.co/image/ab67616d0000b27371d62ea7ea8a5be92d3c1f62", "height": 640, "width": 640}
+      ],
+      "artists": [
+        {"id": "6qqNVTkY8uBg9cP3Jd7DAH", "name": "Billie Eilish", "type": "artist"}
+      ],
+      "album_group": "album"
+    },
+    {
+      "album_type": "album",
+      "total_tracks": 16,
+      "id": "5tzRuO6GP7WRvP3rEOPAO9",
+      "name": "Happier Than Ever",
+      "release_date": "2021-07-30",
+      "release_date_precision": "day",
+      "images": [
+        {"url": "https://i.scdn.co/image/ab67616d0000b273e1317227c6c759e01beae66e", "height": 640, "width": 640}
+      ],
+      "artists": [
+        {"id": "6qqNVTkY8uBg9cP3Jd7DAH", "name": "Billie Eilish", "type": "artist"}
+      ],
+      "album_group": "album"
+    }
+  ]
+}

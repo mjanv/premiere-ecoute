@@ -27,6 +27,7 @@ defmodule PremiereEcouteCore do
       EventBus.Handler,
       FeatureFlag,
       GoofyWords,
+      Registry,
       Search,
       Subscriber,
       Supervisor,

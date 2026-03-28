@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
   import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
 
   alias PremiereEcoute.Discography.Artist
-  alias PremiereEcoute.Discography.Workers.EnrichArtistLinksWorker
+  alias PremiereEcoute.Discography.Workers.EnrichArtistWorker
   alias PremiereEcoute.PubSub
   alias PremiereEcoute.Repo
 
@@ -54,15 +54,9 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
   end
 
   def handle_event("enrich_artist", %{"slug" => slug}, socket) do
-    %{"slug" => slug}
-    |> EnrichArtistLinksWorker.new()
-    |> Oban.insert()
-    |> case do
-      {:ok, _} ->
-        put_flash(socket, :info, gettext("Enrichment job queued for %{slug}", slug: slug))
-
-      {:error, _} ->
-        put_flash(socket, :error, gettext("Failed to queue enrichment job"))
+    case EnrichArtistWorker.now(%{"slug" => slug}) do
+      {:ok, _} -> put_flash(socket, :info, gettext("Enrichment job started"))
+      {:error, _} -> put_flash(socket, :error, gettext("Failed to start enrichment"))
     end
     |> then(fn socket -> {:noreply, socket} end)
   end

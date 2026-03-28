@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
+defmodule PremiereEcoute.Discography.Services.EnrichAlbumTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Artist
-  alias PremiereEcoute.Discography.Services.EnrichAlbumLinks
+  alias PremiereEcoute.Discography.Services.EnrichAlbum
   alias PremiereEcouteCore.Cache
 
   setup {Req.Test, :verify_on_exit!}
@@ -109,56 +109,50 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
-      assert updated.external_links["wikipedia"] == "https://en.wikipedia.org/wiki/Random%20Access%20Memories"
+      assert updated.external_links[:wikipedia] == "https://en.wikipedia.org/wiki/Random%20Access%20Memories"
     end
 
     test "persists the wikipedia URL to the database" do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, _} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, _} = EnrichAlbum.enrich_album(album)
 
       assert Album.get(album.id).external_links["wikipedia"] == "https://en.wikipedia.org/wiki/Random%20Access%20Memories"
     end
 
-    test "skips album that already has a wikipedia link" do
-      album = ram_fixture(%{external_links: %{"wikipedia" => "https://en.wikipedia.org/wiki/Random_Access_Memories"}})
+    test "overwrites existing wikipedia link with freshly fetched value" do
+      album = ram_fixture(%{external_links: %{wikipedia: "https://en.wikipedia.org/wiki/Random_Access_Memories"}})
+      expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, returned} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, returned} = EnrichAlbum.enrich_album(album)
 
-      assert returned.external_links["wikipedia"] == "https://en.wikipedia.org/wiki/Random_Access_Memories"
+      assert returned.external_links[:wikipedia] == "https://en.wikipedia.org/wiki/Random%20Access%20Memories"
     end
 
-    test "skips album previously confirmed as not found" do
-      album = ram_fixture(%{external_links: %{"wikipedia" => nil}})
-      expect_deezer()
-      expect_tidal()
-
-      {:ok, returned} = EnrichAlbumLinks.enrich_album(album)
-
-      assert Map.has_key?(returned.external_links, "wikipedia")
-      assert is_nil(returned.external_links["wikipedia"])
-    end
-
-    test "stores nil sentinel when wikipedia has no results" do
+    test "stores nil when wikipedia has no results" do
       album = ram_fixture()
       expect_wikipedia_empty()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
       assert Map.has_key?(Album.get(album.id).external_links, "wikipedia")
       assert is_nil(Album.get(album.id).external_links["wikipedia"])
-      assert updated.external_links["wikipedia"] == nil
+      assert updated.external_links[:wikipedia] == nil
     end
   end
 
@@ -167,9 +161,10 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
       assert updated.provider_ids[:deezer] == "25834745"
     end
@@ -178,30 +173,34 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, _} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, _} = EnrichAlbum.enrich_album(album)
 
       assert Album.get(album.id).provider_ids[:deezer] == "25834745"
     end
 
-    test "skips album that already has a deezer ID" do
+    test "overwrites existing deezer ID with freshly fetched value" do
       album = ram_fixture(%{provider_ids: %{spotify: "4m2880jivSbbyEGAKfITCa", deezer: "25834745"}})
       expect_wikipedia()
+      expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, returned} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, returned} = EnrichAlbum.enrich_album(album)
 
       assert returned.provider_ids[:deezer] == "25834745"
     end
 
-    test "stores nil sentinel when deezer has no results" do
+    test "stores nil when deezer has no results" do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer_empty()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
       assert Map.has_key?(Album.get(album.id).provider_ids, :deezer)
       assert is_nil(updated.provider_ids[:deezer])
@@ -216,7 +215,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
       expect_spotify()
       expect_tidal()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
       assert updated.provider_ids[:spotify] == "4m2880jivSbbyEGAKfITCa"
     end
@@ -228,30 +227,31 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
       expect_spotify()
       expect_tidal()
 
-      {:ok, _} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, _} = EnrichAlbum.enrich_album(album)
 
       assert Album.get(album.id).provider_ids[:spotify] == "4m2880jivSbbyEGAKfITCa"
     end
 
-    test "skips album that already has a spotify ID" do
+    test "overwrites existing spotify ID with freshly fetched value" do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, returned} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, returned} = EnrichAlbum.enrich_album(album)
 
       assert returned.provider_ids[:spotify] == "4m2880jivSbbyEGAKfITCa"
     end
 
-    test "stores nil sentinel when spotify has no results" do
+    test "stores nil when spotify has no results" do
       album = ram_fixture(%{provider_ids: %{}})
       expect_wikipedia()
       expect_deezer()
       expect_spotify_empty()
       expect_tidal()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
       assert Map.has_key?(Album.get(album.id).provider_ids, :spotify)
       assert is_nil(updated.provider_ids[:spotify])
@@ -263,9 +263,10 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
       assert updated.provider_ids[:tidal] == "77646169"
     end
@@ -274,30 +275,34 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbumLinksTest do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
 
-      {:ok, _} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, _} = EnrichAlbum.enrich_album(album)
 
       assert Album.get(album.id).provider_ids[:tidal] == "77646169"
     end
 
-    test "skips album that already has a tidal ID" do
+    test "overwrites existing tidal ID with freshly fetched value" do
       album = ram_fixture(%{provider_ids: %{spotify: "4m2880jivSbbyEGAKfITCa", tidal: "77646169"}})
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
+      expect_tidal()
 
-      {:ok, returned} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, returned} = EnrichAlbum.enrich_album(album)
 
       assert returned.provider_ids[:tidal] == "77646169"
     end
 
-    test "stores nil sentinel when tidal has no results" do
+    test "stores nil when tidal has no results" do
       album = ram_fixture()
       expect_wikipedia()
       expect_deezer()
+      expect_spotify()
       expect_tidal_empty()
 
-      {:ok, updated} = EnrichAlbumLinks.enrich_album(album)
+      {:ok, updated} = EnrichAlbum.enrich_album(album)
 
       assert Map.has_key?(Album.get(album.id).provider_ids, :tidal)
       assert is_nil(updated.provider_ids[:tidal])

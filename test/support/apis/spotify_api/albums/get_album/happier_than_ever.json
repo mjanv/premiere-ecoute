@@ -1,0 +1,40 @@
+{
+  "album_type": "album",
+  "total_tracks": 16,
+  "id": "5tzRuO6GP7WRvP3rEOPAO9",
+  "name": "Happier Than Ever",
+  "release_date": "2021-07-30",
+  "release_date_precision": "day",
+  "images": [
+    {"url": "https://i.scdn.co/image/ab67616d0000b273e1317227c6c759e01beae66e", "height": 640, "width": 640}
+  ],
+  "artists": [
+    {"id": "6qqNVTkY8uBg9cP3Jd7DAH", "name": "Billie Eilish", "type": "artist"}
+  ],
+  "tracks": {
+    "href": "https://api.spotify.com/v1/albums/5tzRuO6GP7WRvP3rEOPAO9/tracks",
+    "limit": 50,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total": 16,
+    "items": [
+      {"id": "42dosBqMOdtgxKw0KRFJF0", "name": "Getting Older", "track_number": 1, "duration_ms": 244221},
+      {"id": "1YWktsdm9IPZPyqVv1T8XS", "name": "I Didn't Change My Number", "track_number": 2, "duration_ms": 158463},
+      {"id": "2M4uqoBmF1vkhqDCTDS0M5", "name": "Billie Bossa Nova", "track_number": 3, "duration_ms": 196730},
+      {"id": "3w1Gt4zARUcd49De9okdiG", "name": "my future", "track_number": 4, "duration_ms": 210005},
+      {"id": "0UJAH9v2PmS7sBcuBquprR", "name": "Oxytocin", "track_number": 5, "duration_ms": 210232},
+      {"id": "3YO70voBXbq5ZsBxMtSN9h", "name": "GOLDWING", "track_number": 6, "duration_ms": 151536},
+      {"id": "1LdXpFzKjF7Jz6jA82DYs0", "name": "Lost Cause", "track_number": 7, "duration_ms": 212496},
+      {"id": "6MtqlolOMza4ehwgsAFJW7", "name": "Halley's Comet", "track_number": 8, "duration_ms": 234761},
+      {"id": "5C7K3RtgBbMW6HmO5v3Pk3", "name": "Not My Responsibility", "track_number": 9, "duration_ms": 227679},
+      {"id": "2ai00L1P6imz6RQ47gVLlm", "name": "OverHeated", "track_number": 10, "duration_ms": 214058},
+      {"id": "5pPga39odaQTwY0Y5HVWfF", "name": "Everybody Dies", "track_number": 11, "duration_ms": 206622},
+      {"id": "4XMWUYh2Y8TthKzu6NIRtF", "name": "Your Power", "track_number": 12, "duration_ms": 245896},
+      {"id": "0JdOW3PNgjpMAMNL4qOhe6", "name": "NDA", "track_number": 13, "duration_ms": 195776},
+      {"id": "1jH0zv5AstiEumMGIlygQo", "name": "Therefore I Am", "track_number": 14, "duration_ms": 173539},
+      {"id": "0gLXF5LtNkqDoeVVGjCsEu", "name": "Happier Than Ever", "track_number": 15, "duration_ms": 298899},
+      {"id": "13lUUFsU6GMvRDN432qKxX", "name": "Male Fantasy", "track_number": 16, "duration_ms": 194886}
+    ]
+  }
+}

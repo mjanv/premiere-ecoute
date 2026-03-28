@@ -108,11 +108,10 @@ defmodule PremiereEcoute.Discography.Album do
   """
   @spec create(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(%__MODULE__{artists: artists} = album) do
-    # AIDEV-NOTE: persist unpersisted Artist structs before put_assoc to avoid unique constraint errors
-    artist_list = if is_list(artists), do: artists, else: []
+    artists = if is_list(artists), do: artists, else: []
 
-    persisted_artists =
-      Enum.map(artist_list, fn
+    artists =
+      Enum.map(artists, fn
         %Artist{id: nil} = a -> elem(Artist.create_if_not_exists(Map.from_struct(a)), 1)
         %Artist{} = a -> a
       end)
@@ -123,7 +122,7 @@ defmodule PremiereEcoute.Discography.Album do
     |> then(fn attrs ->
       %__MODULE__{}
       |> changeset(attrs)
-      |> put_assoc(:artists, persisted_artists)
+      |> put_assoc(:artists, artists)
       |> Repo.insert()
     end)
     |> preload()
@@ -131,19 +130,16 @@ defmodule PremiereEcoute.Discography.Album do
 
   @spec create_if_not_exists(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create_if_not_exists(%__MODULE__{provider_ids: provider_ids} = album) when map_size(provider_ids) > 0 do
-    # AIDEV-NOTE: lookup by first provider entry since there is no unique constraint on provider_ids
     [{provider, id}] = Enum.take(provider_ids, 1)
 
-    result =
-      from(a in __MODULE__,
-        where: fragment("?->>? = ?", a.provider_ids, ^to_string(provider), ^id)
-      )
-      |> Repo.one()
-      |> preload()
-
-    case result do
+    from(a in __MODULE__,
+      where: fragment("?->>? = ?", a.provider_ids, ^to_string(provider), ^id)
+    )
+    |> Repo.one()
+    |> preload()
+    |> case do
       nil -> create(album)
-      existing -> {:ok, existing}
+      album -> {:ok, album}
     end
   end
 
@@ -192,5 +188,21 @@ defmodule PremiereEcoute.Discography.Album do
     else
       add_error(changeset, :external_links, "contains invalid URL: #{url}")
     end
+  end
+
+  @doc "Returns a random album with missing informations"
+  @spec random :: nil | t()
+  def random do
+    from(a in __MODULE__,
+      where:
+        fragment("? \\? 'wikipedia' = false", a.external_links) or
+          fragment("NOT (? \\? 'deezer')", a.provider_ids) or
+          fragment("NOT (? \\? 'spotify')", a.provider_ids) or
+          fragment("NOT (? \\? 'tidal')", a.provider_ids)
+    )
+    |> order_by(fragment("RANDOM()"))
+    |> limit(1)
+    |> Repo.one()
+    |> preload()
   end
 end

@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
+defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.ApiMock
@@ -9,7 +9,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
   alias PremiereEcoute.Apis.MusicProvider.TidalApi
   alias PremiereEcoute.Apis.Video.YoutubeApi
   alias PremiereEcoute.Discography.Artist
-  alias PremiereEcoute.Discography.Services.EnrichArtistLinks
+  alias PremiereEcoute.Discography.Services.EnrichArtist
   alias PremiereEcouteCore.Cache
 
   setup {Req.Test, :verify_on_exit!}
@@ -99,225 +99,177 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
     )
   end
 
+  defp expect_all do
+    expect_wikipedia()
+    expect_genius()
+    expect_deezer()
+    expect_spotify()
+    expect_tidal()
+    expect_youtube_music()
+  end
+
   describe "enrich_artist/1 - wikipedia" do
     test "fetches wikipedia URL and stores it in external_links" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
-      assert updated.external_links["wikipedia"] == "https://en.wikipedia.org/wiki/Daft%20Punk"
+      assert updated.external_links[:wikipedia] == "https://en.wikipedia.org/wiki/Daft%20Punk"
     end
 
     test "persists the wikipedia URL to the database" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, _} = EnrichArtist.enrich_artist(artist)
 
       assert Artist.get(artist.id).external_links["wikipedia"] == "https://en.wikipedia.org/wiki/Daft%20Punk"
     end
 
-    test "skips artist that already has a wikipedia link" do
-      artist = artist_fixture(%{external_links: %{"wikipedia" => "https://en.wikipedia.org/wiki/Daft_Punk"}})
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+    test "overwrites existing wikipedia link with freshly fetched value" do
+      artist = artist_fixture(%{external_links: %{wikipedia: "https://en.wikipedia.org/wiki/Daft_Punk"}})
+      expect_all()
 
-      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, returned} = EnrichArtist.enrich_artist(artist)
 
-      assert returned.external_links["wikipedia"] == "https://en.wikipedia.org/wiki/Daft_Punk"
+      assert returned.external_links[:wikipedia] == "https://en.wikipedia.org/wiki/Daft%20Punk"
     end
 
-    test "skips artist previously confirmed as not found" do
-      artist = artist_fixture(%{external_links: %{"wikipedia" => nil}})
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
-
-      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
-
-      assert Map.has_key?(returned.external_links, "wikipedia")
-      assert is_nil(returned.external_links["wikipedia"])
-    end
-
-    test "stores nil sentinel when wikipedia has no results" do
+    test "stores nil when wikipedia has no results" do
       artist = artist_fixture()
       expect_wikipedia_empty()
       expect_genius()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
       expect_youtube_music()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).external_links, "wikipedia")
       assert is_nil(Artist.get(artist.id).external_links["wikipedia"])
-      assert updated.external_links["wikipedia"] == nil
-    end
-  end
-
-  describe "enrich_artist/1 - deezer" do
-    test "fetches deezer ID and stores it in provider_ids" do
-      artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
-
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
-
-      assert updated.provider_ids[:deezer] == "1312"
-    end
-
-    test "persists the deezer ID to the database" do
-      artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
-
-      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
-
-      assert Artist.get(artist.id).provider_ids[:deezer] == "1312"
-    end
-
-    test "skips artist that already has a deezer ID" do
-      artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", deezer: "1312"}})
-      expect_wikipedia()
-      expect_genius()
-      expect_tidal()
-      expect_youtube_music()
-
-      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
-
-      assert returned.provider_ids[:deezer] == "1312"
-    end
-
-    test "stores nil sentinel when deezer has no results" do
-      artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer_empty()
-      expect_tidal()
-      expect_youtube_music()
-
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
-
-      assert Map.has_key?(Artist.get(artist.id).provider_ids, :deezer)
-      assert is_nil(updated.provider_ids[:deezer])
+      assert updated.external_links[:wikipedia] == nil
     end
   end
 
   describe "enrich_artist/1 - genius" do
     test "fetches genius URL and stores it in external_links" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
-      assert updated.external_links["genius"] == "https://genius.com/artists/Daft-punk"
+      assert updated.external_links[:genius] == "https://genius.com/artists/Daft-punk"
     end
 
     test "persists the genius URL to the database" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, _} = EnrichArtist.enrich_artist(artist)
 
       assert Artist.get(artist.id).external_links["genius"] == "https://genius.com/artists/Daft-punk"
     end
 
-    test "skips artist that already has a genius link" do
-      artist = artist_fixture(%{external_links: %{"genius" => "https://genius.com/artists/Daft-punk"}})
-      expect_wikipedia()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+    test "overwrites existing genius link with freshly fetched value" do
+      artist = artist_fixture(%{external_links: %{genius: "https://genius.com/artists/Daft-punk"}})
+      expect_all()
 
-      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, returned} = EnrichArtist.enrich_artist(artist)
 
-      assert returned.external_links["genius"] == "https://genius.com/artists/Daft-punk"
+      assert returned.external_links[:genius] == "https://genius.com/artists/Daft-punk"
     end
 
-    test "stores nil sentinel when genius has no results" do
+    test "stores nil when genius has no results" do
       artist = artist_fixture()
       expect_wikipedia()
       expect_genius_empty()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
       expect_youtube_music()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).external_links, "genius")
-      assert is_nil(updated.external_links["genius"])
+      assert is_nil(updated.external_links[:genius])
+    end
+  end
+
+  describe "enrich_artist/1 - deezer" do
+    test "fetches deezer ID and stores it in provider_ids" do
+      artist = artist_fixture()
+      expect_all()
+
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
+
+      assert updated.provider_ids[:deezer] == "1312"
+    end
+
+    test "persists the deezer ID to the database" do
+      artist = artist_fixture()
+      expect_all()
+
+      {:ok, _} = EnrichArtist.enrich_artist(artist)
+
+      assert Artist.get(artist.id).provider_ids[:deezer] == "1312"
+    end
+
+    test "overwrites existing deezer ID with freshly fetched value" do
+      artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", deezer: "1312"}})
+      expect_all()
+
+      {:ok, returned} = EnrichArtist.enrich_artist(artist)
+
+      assert returned.provider_ids[:deezer] == "1312"
+    end
+
+    test "stores nil when deezer has no results" do
+      artist = artist_fixture()
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer_empty()
+      expect_spotify()
+      expect_tidal()
+      expect_youtube_music()
+
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
+
+      assert Map.has_key?(Artist.get(artist.id).provider_ids, :deezer)
+      assert is_nil(updated.provider_ids[:deezer])
     end
   end
 
   describe "enrich_artist/1 - spotify" do
     test "fetches spotify ID and stores it in provider_ids" do
       artist = artist_fixture(%{provider_ids: %{}})
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_spotify()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert updated.provider_ids[:spotify] == "5OlAhdgR13gu6r0MZU8eKj"
     end
 
     test "persists the spotify ID to the database" do
       artist = artist_fixture(%{provider_ids: %{}})
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_spotify()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, _} = EnrichArtist.enrich_artist(artist)
 
       assert Artist.get(artist.id).provider_ids[:spotify] == "5OlAhdgR13gu6r0MZU8eKj"
     end
 
-    test "skips artist that already has a spotify ID" do
+    test "overwrites existing spotify ID with freshly fetched value" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, returned} = EnrichArtist.enrich_artist(artist)
 
-      assert returned.provider_ids[:spotify] == "4tZwfgrHOc3mvqYlEYSvVi"
+      assert returned.provider_ids[:spotify] == "5OlAhdgR13gu6r0MZU8eKj"
     end
 
-    test "stores nil sentinel when spotify has no results" do
+    test "stores nil when spotify has no results" do
       artist = artist_fixture(%{provider_ids: %{}})
       expect_wikipedia()
       expect_genius()
@@ -326,7 +278,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
       expect_tidal()
       expect_youtube_music()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).provider_ids, :spotify)
       assert is_nil(updated.provider_ids[:spotify])
@@ -336,51 +288,41 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
   describe "enrich_artist/1 - tidal" do
     test "fetches tidal ID and stores it in provider_ids" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert updated.provider_ids[:tidal] == "8847"
     end
 
     test "persists the tidal ID to the database" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, _} = EnrichArtist.enrich_artist(artist)
 
       assert Artist.get(artist.id).provider_ids[:tidal] == "8847"
     end
 
-    test "skips artist that already has a tidal ID" do
+    test "overwrites existing tidal ID with freshly fetched value" do
       artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", tidal: "8847"}})
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, returned} = EnrichArtist.enrich_artist(artist)
 
       assert returned.provider_ids[:tidal] == "8847"
     end
 
-    test "stores nil sentinel when tidal has no results" do
+    test "stores nil when tidal has no results" do
       artist = artist_fixture()
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_spotify()
       expect_tidal_empty()
       expect_youtube_music()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).provider_ids, :tidal)
       assert is_nil(updated.provider_ids[:tidal])
@@ -390,51 +332,41 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistLinksTest do
   describe "enrich_artist/1 - youtube_music" do
     test "fetches youtube channel ID and stores it in provider_ids" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert updated.provider_ids[:youtube_music] == "UC_kRDKYrUlrbtrSiyu5Tflg"
     end
 
     test "persists the youtube channel ID to the database" do
       artist = artist_fixture()
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
-      expect_youtube_music()
+      expect_all()
 
-      {:ok, _} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, _} = EnrichArtist.enrich_artist(artist)
 
       assert Artist.get(artist.id).provider_ids[:youtube_music] == "UC_kRDKYrUlrbtrSiyu5Tflg"
     end
 
-    test "skips artist that already has a youtube_music ID" do
+    test "overwrites existing youtube_music ID with freshly fetched value" do
       artist = artist_fixture(%{provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi", youtube_music: "UC_kRDKYrUlrbtrSiyu5Tflg"}})
-      expect_wikipedia()
-      expect_genius()
-      expect_deezer()
-      expect_tidal()
+      expect_all()
 
-      {:ok, returned} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, returned} = EnrichArtist.enrich_artist(artist)
 
       assert returned.provider_ids[:youtube_music] == "UC_kRDKYrUlrbtrSiyu5Tflg"
     end
 
-    test "stores nil sentinel when youtube_music has no results" do
+    test "stores nil when youtube_music has no results" do
       artist = artist_fixture()
       expect_wikipedia()
       expect_genius()
       expect_deezer()
+      expect_spotify()
       expect_tidal()
       expect_youtube_music_empty()
 
-      {:ok, updated} = EnrichArtistLinks.enrich_artist(artist)
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).provider_ids, :youtube_music)
       assert is_nil(updated.provider_ids[:youtube_music])

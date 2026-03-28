@@ -6,7 +6,10 @@ defmodule PremiereEcoute.Application do
   """
 
   use Application
-  use Boundary, top_level?: true, deps: [PremiereEcoute, PremiereEcouteWeb, PremiereEcouteMock, PremiereEcouteMix, Storybook]
+
+  use Boundary,
+    top_level?: true,
+    deps: [PremiereEcouteCore, PremiereEcoute, PremiereEcouteWeb, PremiereEcouteMock, PremiereEcouteMix, Storybook]
 
   @impl true
   def start(_type, _args) do
@@ -22,7 +25,7 @@ defmodule PremiereEcoute.Application do
         _ -> []
       end
 
-    Supervisor.start_link(mandatory ++ optionals, strategy: :one_for_one, name: PremiereEcoute.Application)
+    Supervisor.start_link(mandatory ++ optionals, strategy: :one_for_one, name: __MODULE__)
   end
 
   @impl true
