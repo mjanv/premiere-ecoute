@@ -336,6 +336,48 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     end
   end
 
+  # AIDEV-NOTE: duel "keep both" — applies two sequential DecideTrack commands (A then B), each advancing index by 1
+  @impl true
+  def handle_event(
+        "decide_both",
+        _params,
+        %{assigns: %{session: session, scope: scope, tracks: tracks}} = socket
+      ) do
+    a = Enum.at(tracks, session.current_index)
+    b = Enum.at(tracks, session.current_index + 1)
+
+    with {:ok, session_a, _} <-
+           CommandBus.apply(%DecideTrack{
+             session_id: session.id,
+             scope: scope,
+             track_id: a && a.track_id,
+             decision: :kept,
+             duel_track_id: nil
+           }),
+         {:ok, session_b, _} <-
+           CommandBus.apply(%DecideTrack{
+             session_id: session_a.id,
+             scope: scope,
+             track_id: b && b.track_id,
+             decision: :kept,
+             duel_track_id: nil
+           }) do
+      {:noreply,
+       assign(socket,
+         session: session_b,
+         votes_a: 0,
+         votes_b: 0,
+         vote_open: false,
+         active_track_id: nil,
+         duel_track_id: nil,
+         countdown: nil,
+         playing_track_id: nil
+       )}
+    else
+      {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
+    end
+  end
+
   @impl true
   def handle_event("complete", params, %{assigns: %{session: session, scope: scope}} = socket) do
     %CompleteCollectionSession{

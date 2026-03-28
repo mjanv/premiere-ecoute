@@ -209,6 +209,13 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
             {gettext("Pick A")}
           </button>
           <button
+            phx-click="decide_both"
+            class="px-3 py-1.5 text-white rounded-lg text-xs font-medium transition-opacity hover:opacity-80"
+            style={"background: linear-gradient(to right, #{@color_primary}, #{@color_secondary});"}
+          >
+            {gettext("Pick both")}
+          </button>
+          <button
             phx-click="decide"
             phx-value-decision="rejected"
             class="px-3 py-1.5 text-white rounded-lg text-xs font-medium transition-colors"
