@@ -51,6 +51,7 @@ node_modules/
 *.zip
 
 # Data files
+data/
 priv/request/
 priv/cache/
 apps/digital_ocean/backups/

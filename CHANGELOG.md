@@ -1,24 +1,34 @@
 # Changelog
 
+<!-- Last analyzed commit: d71db94 (2026-03-28) -->
+
 ## March 2026
 
-* [Feature] Collection sessions: take two playlists and pick between pairs of tracks — using streamer choice, audience vote (1 vs 2 in chat), or head-to-head duels — to collaboratively build a new playlist. Great for building "best of" and festival playlists.
-* [Feature] Speech markers: the browser detects when you are speaking during a session. Each segment is timestamped and can be exported as an Adobe Premiere Pro XMEML file for automatic chapter markers in your recording.
-* [Feature] Wikipedia drawer: click any artist or album name in the session dashboard to see a Wikipedia summary with thumbnail, without leaving the page.
-* [Feature] Playlist automations: create rules that run on your playlists on a schedule (create, empty, remove duplicates), with in-app notifications when they succeed or fail.
+* [Feature] Collection sessions: take two playlists and build a new one by choosing between pairs of tracks — using streamer choice, audience vote (1 vs 2 in chat), or head-to-head track duels. Perfect for building "best of" or festival playlists collaboratively.
+* [Feature] Speech markers: the browser microphone detects when you are speaking during a session. Each detected speech segment is timestamped and can be exported as an Adobe Premiere Pro XMEML file for automatic video chapter markers in your recording.
+* [Feature] Wikipedia drawer: click any artist or album name in the session to see a Wikipedia summary with thumbnail, without leaving the page. Artist names in collection sessions are now clickable too.
+* [Feature] Playlist automations: create rules that automatically run on your playlists on a schedule or on demand (create new playlist, empty playlist, remove duplicates), with in-app notifications when they succeed or fail.
 * [Feature] Tidal music provider added: album pages now automatically enrich themselves with links to Spotify, Deezer, Tidal, and Wikipedia in the background.
 * [Feature] YouTube Music, Genius, and MusicBrainz APIs integrated for music metadata enrichment.
-* [Feature] Stream Deck plugin split into two distributions: a streamer plugin (full session control) and a viewer plugin (vote-only), with automated GitHub release workflow to publish both.
-* [Feature] New homepage showing recent sessions, active sessions, and radio status with manual start/stop.
+* [Feature] Stream Deck plugins split into two separate distributions: a streamer plugin (full session control) and a viewer plugin (vote-only), with automated GitHub release workflow.
+* [Feature] New homepage showing recent listening sessions, ongoing sessions, and radio status with manual start/stop.
 * [Feature] Dedicated retrospective page per album/session: track scores, streamer/viewer notes, replay links (YouTube/podcast), and a like/review system for viewers.
-* [Feature] Viewer home page: a dedicated landing page showing active sessions to vote in and your own voting history.
-* [Feature] Artist pages, single-track detail pages, and a users listing page added to the discography section.
-* [Feature] Mistral AI integration: chat completions, content moderation, and French audio transcription alongside existing OpenAI/Whisper support.
-* [Improvement] Homepage redesigned with two direct login buttons ("Streamer with Twitch" / "Viewer with Twitch") — no intermediate role-selection step.
-* [Improvement] Session dashboard redesigned: Premiere Pro export button with official logo, "View Retrospective" with sparkles icon, visibility selector integrated as a compact split-button.
+* [Feature] Viewer home page: a dedicated landing page showing active sessions they can participate in and their voting history.
+* [Feature] Artist pages, single-track detail pages, and users listing page added to the discography section.
+* [Feature] Mistral AI integration: chat completions, content moderation, and French audio transcription via Mistral API, alongside existing OpenAI/Whisper support.
+* [Feature] Single-track listening sessions: start a session on just one Spotify track (not a full album), useful for reviewing or voting on a specific song.
+* [Feature] Playlist sessions: browse forward/backward through a playlist with full voting support per track.
+* [Feature] Random album pick pool: build a curated pool of albums (added by streamer or submitted by viewers), then spin a wheel to randomly pick one for the next listening session.
+* [Feature] Duel mode now includes 'Pick both' button to keep both tracks A and B in collection sessions, with button gradient using profile primary/secondary colors.
+* [Improvement] Homepage redesigned with two direct Twitch login buttons ("Streamer with Twitch" / "Viewer with Twitch") — no intermediate role-selection step.
+* [Improvement] Session dashboard redesigned: Premiere Pro export button with official Adobe logo, "View Retrospective" with sparkles icon, visibility control integrated as compact split-button.
+* [Improvement] Collection session refactored to use PlayerSupervisor for playback control, with player state bar showing device, artist-track, progress timer, and playback toggle.
 * [Improvement] Wikipedia drawer enhanced with table of contents navigation.
+* [Improvement] Handler registry optimized from O(n) to O(1) lookup using persistent_term caching, improving command/event bus performance.
+* [Improvement] Oban upgraded to v14 with improved message pipeline batching (timeout increased to 1000ms for stability).
+* [Fix] OAuth flash issue fixed: misleading "We can't find the internet" error no longer appears during successful Twitch redirect.
 * [Fix] Artist field now correctly populated in album search results.
-* [Fix] Collection overlay route now correctly accepts the streamer username.
+* [Fix] Collection overlay route now accepts username as parameter.
 
 ## February 2026
 
