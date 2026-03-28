@@ -38,7 +38,7 @@
   {"lib/premiere_ecoute/radio/radio_track.ex", :call_without_opaque},
   {"lib/premiere_ecoute_web/components/core_components.ex", :call_without_opaque},
   {"lib/premiere_ecoute_web/components/cards/modal.ex", :call_without_opaque},
-  {"lib/premiere_ecoute_web/components/panels/wikipedia_drawer.ex", :pattern_match},
+  # {"lib/premiere_ecoute_web/components/panels/wikipedia_drawer.ex", :pattern_match},
   {"lib/premiere_ecoute_web/layouts/layouts.ex", :call_with_opaque},
   {"lib/premiere_ecoute_web/components/panels/drawer.ex", :call_without_opaque}
 ]
