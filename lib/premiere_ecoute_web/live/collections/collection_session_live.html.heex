@@ -402,7 +402,13 @@
                       >
                         <div class="min-w-0 flex-1">
                           <p class="text-white truncate">{track.name}</p>
-                          <p class="text-xs text-gray-500 truncate">{track.artist}</p>
+                          <button
+                            phx-click="open_wikipedia"
+                            phx-value-query={track.artist}
+                            class="text-xs text-gray-500 truncate hover:text-purple-400 transition-colors text-left"
+                          >
+                            {track.artist}
+                          </button>
                         </div>
                         <%= if not is_nil(decision) do %>
                           <span class={[
@@ -582,4 +588,5 @@
       </div>
     </div>
   </div>
+  <.live_component module={PremiereEcouteWeb.Components.WikipediaDrawer} id="wiki" />
 </Layouts.app>

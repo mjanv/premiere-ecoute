@@ -142,7 +142,13 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
           {@label}
         </p>
         <p class="text-white font-semibold leading-tight">{@track.name}</p>
-        <p class="text-gray-400 text-sm">{@track.artist}</p>
+        <button
+          phx-click="open_wikipedia"
+          phx-value-query={@track.artist}
+          class="text-gray-400 text-sm hover:text-purple-400 transition-colors text-left"
+        >
+          {@track.artist}
+        </button>
       </div>
       <%= if @play_event do %>
         <% playing = @playing_track_id == @track.track_id %>

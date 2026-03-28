@@ -379,6 +379,12 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   @impl true
+  def handle_event("open_wikipedia", %{"query" => query}, socket) do
+    send_update(PremiereEcouteWeb.Components.WikipediaDrawer, id: "wiki", artist: query)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("complete", params, %{assigns: %{session: session, scope: scope}} = socket) do
     %CompleteCollectionSession{
       session_id: session.id,
