@@ -58,14 +58,14 @@ defmodule PremiereEcouteWeb.Home.Components do
   @doc """
   Renders a square album card with a cover image and a hover overlay showing name and artist.
 
-  Optionally accepts `navigate` to make the card a clickable link.
+  Optionally accepts `href` to make the card a clickable link.
   """
   attr :album, :map, required: true
-  attr :navigate, :string, default: nil
+  attr :href, :string, default: nil
 
   def album_square(assigns) do
     ~H"""
-    <.link navigate={@navigate} class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg block">
+    <.link href={@href} class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg block">
       <%= if @album.cover_url do %>
         <img src={@album.cover_url} alt={@album.name} class="w-full h-full object-cover" loading="lazy" />
       <% else %>

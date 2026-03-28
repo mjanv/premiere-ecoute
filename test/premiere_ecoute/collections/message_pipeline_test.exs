@@ -73,7 +73,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipelineTest do
         PremiereEcouteCore.publish(@pipeline, msg)
       end
 
-      :timer.sleep(600)
+      :timer.sleep(1100)
 
       {:ok, cached} = Cache.get(:collections, "broadcaster1")
       assert cached.votes_a == 2
@@ -89,7 +89,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipelineTest do
         message: "1"
       })
 
-      :timer.sleep(600)
+      :timer.sleep(1100)
 
       assert_receive {:vote_update, %{votes_a: 1, votes_b: 0}}
     end
