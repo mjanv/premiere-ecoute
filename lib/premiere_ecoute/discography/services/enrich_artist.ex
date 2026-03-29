@@ -9,12 +9,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
 
   require Logger
 
-  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
-  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
-  alias PremiereEcoute.Apis.MusicProvider.DeezerApi
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
-  alias PremiereEcoute.Apis.MusicProvider.TidalApi
-  alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Supervisor
 
@@ -40,7 +35,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   end
 
   defp enrich(:wikipedia, %Artist{name: name}) do
-    case WikipediaApi.search(artist: name) do
+    case Apis.wikipedia().search(artist: name) do
       {:ok, [%{url: url} | _]} -> url
       {:ok, []} -> nil
       {:error, _reason} -> nil
@@ -48,7 +43,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   end
 
   defp enrich(:genius, %Artist{name: name}) do
-    case GeniusApi.search_artist(name) do
+    case Apis.genius().search_artist(name) do
       {:ok, %{url: url}} -> url
       {:ok, nil} -> nil
       {:error, _reason} -> nil
@@ -56,7 +51,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   end
 
   defp enrich(:deezer, %Artist{name: name}) do
-    case DeezerApi.search_artist(name) do
+    case Apis.deezer().search_artist(name) do
       {:ok, [%{deezer_id: deezer_id} | _]} -> deezer_id
       {:ok, []} -> nil
       {:error, _reason} -> nil
@@ -64,7 +59,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   end
 
   defp enrich(:spotify, %Artist{name: name}) do
-    case SpotifyApi.search_artist(name) do
+    case Apis.spotify().search_artist(name) do
       {:ok, %{id: id}} -> id
       {:ok, nil} -> nil
       {:error, _reason} -> nil
@@ -72,7 +67,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   end
 
   defp enrich(:tidal, %Artist{name: name}) do
-    case TidalApi.search_artist(name) do
+    case Apis.tidal().search_artist(name) do
       {:ok, [%{tidal_id: tidal_id} | _]} -> tidal_id
       {:ok, []} -> nil
       {:error, _reason} -> nil
@@ -80,7 +75,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   end
 
   defp enrich(:youtube_music, %Artist{name: name}) do
-    case YoutubeApi.search_artist(name) do
+    case Apis.youtube().search_artist(name) do
       {:ok, [%{channel_id: channel_id} | _]} -> channel_id
       {:ok, []} -> nil
       {:error, _reason} -> nil

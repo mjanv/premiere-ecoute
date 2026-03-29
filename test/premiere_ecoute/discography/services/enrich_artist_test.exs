@@ -1,24 +1,15 @@
 defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
   use PremiereEcoute.DataCase, async: true
 
-  alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
-  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
-  alias PremiereEcoute.Apis.MusicProvider.DeezerApi
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
-  alias PremiereEcoute.Apis.MusicProvider.TidalApi
-  alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi.Mock, as: GeniusApi
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Mock, as: WikipediaApi
+  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Types.Page
+  alias PremiereEcoute.Apis.MusicProvider.DeezerApi.Mock, as: DeezerApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.TidalApi.Mock, as: TidalApi
+  alias PremiereEcoute.Apis.Video.YoutubeApi.Mock, as: YoutubeApi
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichArtist
-  alias PremiereEcouteCore.Cache
-
-  setup {Req.Test, :verify_on_exit!}
-
-  setup do
-    Cache.put(:tokens, :spotify, "test_spotify_token")
-    Cache.put(:tokens, :tidal, "test_tidal_token")
-    :ok
-  end
 
   defp artist_fixture(attrs \\ %{}) do
     {:ok, artist} =
@@ -27,76 +18,62 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
     artist
   end
 
-  defp expect_wikipedia(response \\ "wikipedia_api/search/search_artist/response.json") do
-    ApiMock.expect(WikipediaApi, path: {:get, "/w/api.php"}, response: response, status: 200)
+  defp expect_wikipedia do
+    expect(WikipediaApi, :search, fn _query ->
+      {:ok, [%Page{id: "168310", title: "Daft Punk", url: "https://en.wikipedia.org/wiki/Daft%20Punk"}]}
+    end)
   end
 
   defp expect_wikipedia_empty do
-    ApiMock.expect(WikipediaApi,
-      path: {:get, "/w/api.php"},
-      body: %{"batchcomplete" => "", "query" => %{"searchinfo" => %{"totalhits" => 0}, "search" => []}},
-      status: 200
-    )
+    expect(WikipediaApi, :search, fn _query -> {:ok, []} end)
   end
 
-  defp expect_genius(response \\ "genius_api/artists/search_artist/response.json") do
-    ApiMock.expect(GeniusApi, path: {:get, "/search"}, response: response, status: 200)
+  defp expect_genius do
+    expect(GeniusApi, :search_artist, fn _query ->
+      {:ok, %{url: "https://genius.com/artists/Daft-punk", name: "Daft Punk"}}
+    end)
   end
 
   defp expect_genius_empty do
-    ApiMock.expect(GeniusApi,
-      path: {:get, "/search"},
-      body: %{"meta" => %{"status" => 200}, "response" => %{"hits" => []}},
-      status: 200
-    )
+    expect(GeniusApi, :search_artist, fn _query -> {:ok, nil} end)
   end
 
-  defp expect_deezer(response \\ "deezer_api/artists/search_artist/response.json") do
-    ApiMock.expect(DeezerApi, path: {:get, "/search/artist"}, response: response, status: 200)
+  defp expect_deezer do
+    expect(DeezerApi, :search_artist, fn _query ->
+      {:ok, [%{deezer_id: "1312", name: "Daft Punk"}]}
+    end)
   end
 
   defp expect_deezer_empty do
-    ApiMock.expect(DeezerApi,
-      path: {:get, "/search/artist"},
-      body: %{"data" => [], "total" => 0},
-      status: 200
-    )
+    expect(DeezerApi, :search_artist, fn _query -> {:ok, []} end)
   end
 
-  defp expect_spotify(response \\ "spotify_api/search/search_for_item/artist.json") do
-    ApiMock.expect(SpotifyApi, path: {:get, "/v1/search"}, response: response, status: 200)
+  defp expect_spotify do
+    expect(SpotifyApi, :search_artist, fn _query -> {:ok, %{id: "5OlAhdgR13gu6r0MZU8eKj"}} end)
   end
 
   defp expect_spotify_empty do
-    ApiMock.expect(SpotifyApi,
-      path: {:get, "/v1/search"},
-      body: %{"artists" => %{"items" => [], "total" => 0}},
-      status: 200
-    )
+    expect(SpotifyApi, :search_artist, fn _query -> {:error, :not_found} end)
   end
 
-  defp expect_tidal(response \\ "tidal_api/artists/search_artist/response.json") do
-    ApiMock.expect(TidalApi, path: {:get, "/v2/searchResults/Daft%20Punk"}, response: response, status: 200)
+  defp expect_tidal do
+    expect(TidalApi, :search_artist, fn _query ->
+      {:ok, [%{tidal_id: "8847", name: "Daft Punk"}]}
+    end)
   end
 
   defp expect_tidal_empty do
-    ApiMock.expect(TidalApi,
-      path: {:get, "/v2/searchResults/Daft%20Punk"},
-      body: %{"data" => [], "included" => [], "links" => %{}},
-      status: 200
-    )
+    expect(TidalApi, :search_artist, fn _query -> {:ok, []} end)
   end
 
-  defp expect_youtube_music(response \\ "youtube_api/search/search_artist/response.json") do
-    ApiMock.expect(YoutubeApi, path: {:get, "/youtube/v3/search"}, response: response, status: 200)
+  defp expect_youtube_music do
+    expect(YoutubeApi, :search_artist, fn _query ->
+      {:ok, [%{channel_id: "UC_kRDKYrUlrbtrSiyu5Tflg", name: "Daft Punk"}]}
+    end)
   end
 
   defp expect_youtube_music_empty do
-    ApiMock.expect(YoutubeApi,
-      path: {:get, "/youtube/v3/search"},
-      body: %{"items" => []},
-      status: 200
-    )
+    expect(YoutubeApi, :search_artist, fn _query -> {:ok, []} end)
   end
 
   defp expect_all do

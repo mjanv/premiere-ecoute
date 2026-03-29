@@ -6,8 +6,7 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
-  alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
@@ -178,33 +177,21 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
 
   @impl true
   def handle_event("open_track_modal", %{"name" => name, "artist" => artist}, socket) do
-    # AIDEV-NOTE: runs Genius + YouTube searches in parallel via Task.async
-    genius_task =
-      Task.async(fn ->
-        with {:ok, [first | _]} <- GeniusApi.search_song("#{name} #{artist}"),
-             {:ok, song} <- GeniusApi.get_song(first.id) do
-          song
-        else
-          _ -> nil
-        end
-      end)
-
     youtube_task =
       Task.async(fn ->
-        case YoutubeApi.search_track_videos("#{name} #{artist} lyrics") do
+        case Apis.youtube().search_track_videos("#{name} #{artist} lyrics") do
           {:ok, [first | _]} -> first.id
           _ -> nil
         end
       end)
 
-    genius_result = Task.await(genius_task, 10_000)
     youtube_video_id = Task.await(youtube_task, 10_000)
 
     {:noreply,
      socket
      |> assign(:track_modal_open, true)
      |> assign(:selected_track, %{name: name, artist: artist})
-     |> assign(:genius_result, genius_result)
+     |> assign(:genius_result, nil)
      |> assign(:youtube_video_id, youtube_video_id)}
   end
 

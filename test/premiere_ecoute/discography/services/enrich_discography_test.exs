@@ -1,19 +1,10 @@
 defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
   use PremiereEcoute.DataCase, async: true
 
-  alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichDiscography
-  alias PremiereEcouteCore.Cache
-
-  setup {Req.Test, :verify_on_exit!}
-
-  setup do
-    Cache.put(:tokens, :spotify, "test_spotify_token")
-    :ok
-  end
 
   # Billie Eilish spotify ID used in fixtures
   @artist_spotify_id "6qqNVTkY8uBg9cP3Jd7DAH"
@@ -27,25 +18,88 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
     artist
   end
 
-  defp expect_get_artist_albums(response \\ "spotify_api/artists/get_artist_albums/two_albums.json") do
-    ApiMock.expect(SpotifyApi,
-      path: {:get, "/v1/artists/#{@artist_spotify_id}/albums"},
-      response: response,
-      status: 200
-    )
+  defp expect_get_artist_albums do
+    expect(SpotifyApi, :get_artist_albums, fn _id ->
+      {:ok,
+       [
+         %{provider_ids: %{spotify: @album_id_1}},
+         %{provider_ids: %{spotify: @album_id_2}}
+       ]}
+    end)
   end
 
   # AIDEV-NOTE: album fetches run in parallel via TaskSupervisor; stub (not expect) is required
-  # to avoid FIFO queue ordering issues when both tasks consume from the same plug mock queue.
+  # to avoid FIFO queue ordering issues when both tasks consume from the same mock queue.
   defp stub_get_albums do
-    responses = %{
-      "/v1/albums/#{@album_id_1}" => ApiMock.payload("spotify_api/albums/get_album/response.json"),
-      "/v1/albums/#{@album_id_2}" => ApiMock.payload("spotify_api/albums/get_album/happier_than_ever.json")
+    album_1 = %Album{
+      provider_ids: %{spotify: @album_id_1},
+      name: "HIT ME HARD AND SOFT",
+      release_date: ~D[2024-05-17],
+      cover_url: "https://i.scdn.co/image/ab67616d0000b27371d62ea7ea8a5be92d3c1f62",
+      total_tracks: 10,
+      tracks: [
+        %Album.Track{provider_ids: %{spotify: "1CsMKhwEmNnmvHUuO5nryA"}, name: "SKINNY", track_number: 1, duration_ms: 219_733},
+        %Album.Track{provider_ids: %{spotify: "629DixmZGHc7ILtEntuiWE"}, name: "LUNCH", track_number: 2, duration_ms: 179_586},
+        %Album.Track{provider_ids: %{spotify: "7BRD7x5pt8Lqa1eGYC4dzj"}, name: "CHIHIRO", track_number: 3, duration_ms: 303_440},
+        %Album.Track{
+          provider_ids: %{spotify: "6dOtVTDdiauQNBQEDOtlAB"},
+          name: "BIRDS OF A FEATHER",
+          track_number: 4,
+          duration_ms: 210_373
+        },
+        %Album.Track{
+          provider_ids: %{spotify: "3QaPy1KgI7nu9FJEQUgn6h"},
+          name: "WILDFLOWER",
+          track_number: 5,
+          duration_ms: 261_466
+        },
+        %Album.Track{
+          provider_ids: %{spotify: "6TGd66r0nlPaYm3KIoI7ET"},
+          name: "THE GREATEST",
+          track_number: 6,
+          duration_ms: 293_840
+        },
+        %Album.Track{
+          provider_ids: %{spotify: "6fPan2saHdFaIHuTSatORv"},
+          name: "L'AMOUR DE MA VIE",
+          track_number: 7,
+          duration_ms: 333_986
+        },
+        %Album.Track{
+          provider_ids: %{spotify: "1LLUoftvmTjVNBHZoQyveF"},
+          name: "THE DINER",
+          track_number: 8,
+          duration_ms: 186_346
+        },
+        %Album.Track{
+          provider_ids: %{spotify: "7DpUoxGSdlDHfqCYj0otzU"},
+          name: "BITTERSUITE",
+          track_number: 9,
+          duration_ms: 298_440
+        },
+        %Album.Track{provider_ids: %{spotify: "2prqm9sPLj10B4Wg0wE5x9"}, name: "BLUE", track_number: 10, duration_ms: 343_120}
+      ]
     }
 
-    Req.Test.stub(SpotifyApi, fn conn ->
-      body = Map.fetch!(responses, conn.request_path)
-      conn |> Plug.Conn.put_status(200) |> Req.Test.json(body)
+    album_2 = %Album{
+      provider_ids: %{spotify: @album_id_2},
+      name: "Happier Than Ever",
+      release_date: ~D[2021-07-30],
+      cover_url: "https://i.scdn.co/image/ab67616d0000b273e1317227c6c759e01beae66e",
+      total_tracks: 1,
+      tracks: [
+        %Album.Track{
+          provider_ids: %{spotify: "5SjTgj5CiqLEAMfNVX6LGT"},
+          name: "Getting Older",
+          track_number: 1,
+          duration_ms: 243_907
+        }
+      ]
+    }
+
+    stub(SpotifyApi, :get_album, fn
+      "7aJuG4TFXa2hmE4z1yxc3n" -> {:ok, album_1}
+      "5tzRuO6GP7WRvP3rEOPAO9" -> {:ok, album_2}
     end)
   end
 
@@ -102,11 +156,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
     test "returns empty list when spotify returns no albums" do
       artist = artist_fixture()
 
-      ApiMock.expect(SpotifyApi,
-        path: {:get, "/v1/artists/#{@artist_spotify_id}/albums"},
-        body: %{"href" => "...", "limit" => 20, "next" => nil, "offset" => 0, "previous" => nil, "total" => 0, "items" => []},
-        status: 200
-      )
+      expect(SpotifyApi, :get_artist_albums, fn _id -> {:ok, []} end)
 
       {:ok, albums} = EnrichDiscography.enrich_discography(artist)
 

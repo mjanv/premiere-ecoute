@@ -11,10 +11,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbum do
 
   require Logger
 
-  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
-  alias PremiereEcoute.Apis.MusicProvider.DeezerApi
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
-  alias PremiereEcoute.Apis.MusicProvider.TidalApi
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Supervisor
 
@@ -40,7 +37,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbum do
   end
 
   defp enrich(:wikipedia, %Album{name: name} = album) do
-    case WikipediaApi.search(artist: artist_name(album), album: name) do
+    case Apis.wikipedia().search(artist: artist_name(album), album: name) do
       {:ok, [%{url: url} | _]} -> url
       {:ok, []} -> nil
       {:error, _reason} -> nil
@@ -48,7 +45,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbum do
   end
 
   defp enrich(:deezer, %Album{name: name} = album) do
-    case DeezerApi.search_album(name, artist_name(album)) do
+    case Apis.deezer().search_album(name, artist_name(album)) do
       {:ok, [%{deezer_id: deezer_id} | _]} -> deezer_id
       {:ok, []} -> nil
       {:error, _reason} -> nil
@@ -59,7 +56,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbum do
     artist = artist_name(album)
     name_downcase = String.downcase(name)
 
-    case SpotifyApi.search_albums("#{name} #{artist}") do
+    case Apis.spotify().search_albums("#{name} #{artist}") do
       {:ok, results} ->
         case Enum.find(results, &(String.downcase(&1.name) == name_downcase)) do
           %Album{provider_ids: %{spotify: id}} -> id
@@ -74,7 +71,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbum do
   defp enrich(:tidal, %Album{name: name} = album) do
     artist = artist_name(album)
 
-    case TidalApi.search_album(name, artist) do
+    case Apis.tidal().search_album(name, artist) do
       {:ok, [%{tidal_id: tidal_id} | _]} -> tidal_id
       {:ok, []} -> nil
       {:error, _reason} -> nil

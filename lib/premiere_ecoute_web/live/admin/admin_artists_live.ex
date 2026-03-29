@@ -12,6 +12,7 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
 
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Workers.EnrichArtistWorker
+  alias PremiereEcoute.Discography.Workers.EnrichDiscographyWorker
   alias PremiereEcoute.PubSub
   alias PremiereEcoute.Repo
 
@@ -53,8 +54,16 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("enrich_artist", %{"slug" => slug}, socket) do
-    case EnrichArtistWorker.now(%{"slug" => slug}) do
+  def handle_event("enrich_artist", %{"id" => id}, socket) do
+    case EnrichArtistWorker.now(%{"id" => id}) do
+      {:ok, _} -> put_flash(socket, :info, gettext("Enrichment job started"))
+      {:error, _} -> put_flash(socket, :error, gettext("Failed to start enrichment"))
+    end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("enrich_discography", %{"id" => id}, socket) do
+    case EnrichDiscographyWorker.now(%{"id" => id}) do
       {:ok, _} -> put_flash(socket, :info, gettext("Enrichment job started"))
       {:error, _} -> put_flash(socket, :error, gettext("Failed to start enrichment"))
     end
@@ -67,6 +76,10 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
     |> assign(:selected_artist, artist)
     |> assign(:page, list_artists(search, page.page_number, page.page_size))
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_info(_, socket) do
+    {:noreply, socket}
   end
 
   defp list_artists(search, page_number, page_size) do

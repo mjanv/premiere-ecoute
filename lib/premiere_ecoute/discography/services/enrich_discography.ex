@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
   then each is created if not already present.
   """
 
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
 
@@ -20,11 +20,11 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
   @spec enrich_discography(Artist.t()) :: {:ok, [Album.t()]} | {:error, term()}
   def enrich_discography(%Artist{provider_ids: %{spotify: spotify_id}} = _artist)
       when is_binary(spotify_id) do
-    with {:ok, albums} <- SpotifyApi.get_artist_albums(spotify_id) do
+    with {:ok, albums} <- Apis.spotify().get_artist_albums(spotify_id) do
       albums =
         PremiereEcoute.Discography.TaskSupervisor
         |> Task.Supervisor.async_stream(albums, fn %{provider_ids: %{spotify: id}} ->
-          with {:ok, album} <- SpotifyApi.get_album(id) do
+          with {:ok, album} <- Apis.spotify().get_album(id) do
             Album.create_if_not_exists(album)
           end
         end)

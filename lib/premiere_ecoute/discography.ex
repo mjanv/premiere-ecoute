@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Discography do
     Album
     |> join(:inner, [a], aa in "album_artists", on: aa.album_id == a.id)
     |> where([_a, aa], aa.artist_id == ^artist_id)
-    |> order_by([a, _aa], desc: a.inserted_at)
+    |> order_by([a, _aa], desc: a.release_date)
     |> PremiereEcoute.Repo.all()
     |> Album.preload()
     |> Enum.map(&Album.put_artist/1)

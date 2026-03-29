@@ -17,6 +17,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi do
   defmodule Behaviour do
     @moduledoc "Deezer API Behaviour"
 
+    @callback search_artist(name :: String.t()) :: {:ok, [map()]} | {:error, term()}
+    @callback search_album(title :: String.t(), artist :: String.t()) :: {:ok, [map()]} | {:error, term()}
+    @callback get_artist(artist_id :: String.t()) :: {:ok, map()} | {:error, term()}
+    @callback get_artist_albums(artist_id :: String.t()) :: {:ok, [map()]} | {:error, term()}
+
     @callback placeholder() :: any()
     @optional_callbacks placeholder: 0
   end

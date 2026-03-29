@@ -156,15 +156,29 @@
                     <p class="text-slate-200 group-hover:text-white text-sm truncate transition-colors">
                       {track.name}
                     </p>
-                    <%= if track.duration_ms do %>
-                      <span class="text-slate-600 text-xs ml-auto shrink-0">
-                        {div(track.duration_ms, 60_000)}:{String.pad_leading(
-                          to_string(rem(div(track.duration_ms, 1000), 60)),
-                          2,
-                          "0"
-                        )}
-                      </span>
-                    <% end %>
+                    <div class="ml-auto flex items-center gap-2 shrink-0">
+                      <%= if get_in(track.external_links, ["genius"]) do %>
+                        <a
+                          href={get_in(track.external_links, ["genius"])}
+                          target="_blank"
+                          rel="noopener"
+                          class="flex items-center justify-center px-1.5 py-0.5 rounded bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 transition-all"
+                          title="View lyrics on Genius"
+                          onclick="event.stopPropagation();"
+                        >
+                          <img src="https://genius.com/favicon.ico" alt="Genius" class="w-3.5 h-3.5" />
+                        </a>
+                      <% end %>
+                      <%= if track.duration_ms do %>
+                        <span class="text-slate-600 text-xs">
+                          {div(track.duration_ms, 60_000)}:{String.pad_leading(
+                            to_string(rem(div(track.duration_ms, 1000), 60)),
+                            2,
+                            "0"
+                          )}
+                        </span>
+                      <% end %>
+                    </div>
                   </button>
                 <% end %>
               </div>

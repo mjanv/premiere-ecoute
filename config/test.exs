@@ -28,39 +28,39 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.SpotifyApi}]
   ],
   deezer: [
-    api: PremiereEcoute.Apis.MusicProvider.DeezerApi,
+    api: PremiereEcoute.Apis.MusicProvider.DeezerApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.DeezerApi}]
   ],
   tidal: [
-    api: PremiereEcoute.Apis.MusicProvider.TidalApi,
+    api: PremiereEcoute.Apis.MusicProvider.TidalApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicProvider.TidalApi}]
   ],
   frankfurter: [
-    api: PremiereEcoute.Apis.Payments.FrankfurterApi,
+    api: PremiereEcoute.Apis.Payments.FrankfurterApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Payments.FrankfurterApi}]
   ],
   discord: [
-    api: PremiereEcoute.Apis.DiscordApi,
+    api: PremiereEcoute.Apis.DiscordApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.DiscordApi}]
   ],
   buymeacoffee: [
-    api: PremiereEcoute.Apis.Payments.BuyMeACoffeeApi,
+    api: PremiereEcoute.Apis.Payments.BuyMeACoffeeApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Payments.BuyMeACoffeeApi}]
   ],
   youtube: [
-    api: PremiereEcoute.Apis.Video.YoutubeApi,
+    api: PremiereEcoute.Apis.Video.YoutubeApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.Video.YoutubeApi}]
   ],
   genius: [
-    api: PremiereEcoute.Apis.MusicMetadata.GeniusApi,
+    api: PremiereEcoute.Apis.MusicMetadata.GeniusApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.GeniusApi}]
   ],
   musicbrainz: [
-    api: PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi,
+    api: PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi}]
   ],
   wikipedia: [
-    api: PremiereEcoute.Apis.MusicMetadata.WikipediaApi,
+    api: PremiereEcoute.Apis.MusicMetadata.WikipediaApi.Mock,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.WikipediaApi}]
   ]
 

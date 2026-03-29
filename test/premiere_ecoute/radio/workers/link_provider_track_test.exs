@@ -1,13 +1,10 @@
 defmodule PremiereEcoute.Radio.Workers.LinkProviderTrackTest do
   use PremiereEcoute.DataCase, async: true
 
-  alias PremiereEcoute.ApiMock
-  alias PremiereEcoute.Apis.MusicProvider.DeezerApi
+  alias PremiereEcoute.Apis.MusicProvider.DeezerApi.Mock, as: DeezerApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Radio.Workers.LinkProviderTrack
-
-  setup {Req.Test, :verify_on_exit!}
 
   # Insert the track in manual mode so the scheduled worker job is not executed immediately.
   defp radio_track_fixture(provider, provider_ids) do
@@ -32,21 +29,9 @@ defmodule PremiereEcoute.Radio.Workers.LinkProviderTrackTest do
     test "resolves deezer_id when only spotify_id is known" do
       track = radio_track_fixture("spotify", %{spotify: "1pKYYY0dkg23sQQXi0Q5zN"})
 
-      ApiMock.expect(DeezerApi,
-        path: {:get, "/search"},
-        params: %{"q" => "Daft Punk Around the World"},
-        status: 200,
-        body: %{
-          "data" => [
-            %{
-              "id" => 3_135_556,
-              "title" => "Around the World",
-              "track_position" => 7,
-              "duration" => 429
-            }
-          ]
-        }
-      )
+      expect(DeezerApi, :search_tracks, fn _query ->
+        {:ok, [%PremiereEcoute.Discography.Album.Track{provider_ids: %{deezer: "3135556"}, name: "Around the World"}]}
+      end)
 
       :ok = perform_job(LinkProviderTrack, %{radio_track_id: track.id, provider: "spotify"})
 
@@ -57,7 +42,7 @@ defmodule PremiereEcoute.Radio.Workers.LinkProviderTrackTest do
     test "resolves spotify_id when only deezer_id is known" do
       track = radio_track_fixture("deezer", %{deezer: "3135556"})
 
-      Mox.expect(SpotifyApi, :search_tracks, fn [query: "Daft Punk Around the World"] ->
+      expect(SpotifyApi, :search_tracks, fn [query: "Daft Punk Around the World"] ->
         {:ok,
          [
            %PremiereEcoute.Discography.Album.Track{
@@ -85,12 +70,7 @@ defmodule PremiereEcoute.Radio.Workers.LinkProviderTrackTest do
     test "does nothing when search returns empty results" do
       track = radio_track_fixture("spotify", %{spotify: "1pKYYY0dkg23sQQXi0Q5zN"})
 
-      ApiMock.expect(DeezerApi,
-        path: {:get, "/search"},
-        params: %{"q" => "Daft Punk Around the World"},
-        status: 200,
-        body: %{"data" => []}
-      )
+      expect(DeezerApi, :search_tracks, fn _query -> {:ok, []} end)
 
       :ok = perform_job(LinkProviderTrack, %{radio_track_id: track.id, provider: "spotify"})
 

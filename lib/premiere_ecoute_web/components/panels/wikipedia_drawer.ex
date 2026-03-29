@@ -25,7 +25,7 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
 
   use PremiereEcouteWeb, :live_component
 
-  alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi
+  alias PremiereEcoute.Apis
   alias PremiereEcouteWeb.Components.Drawer
 
   @impl true
@@ -37,11 +37,11 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
     |> assign(:toc, nil)
     |> start_async(:fetch, fn ->
       with {:ok, query} <- to_query(assigns),
-           {:ok, [page | _]} <- WikipediaApi.search(query),
+           {:ok, [page | _]} <- Apis.wikipedia().search(query),
            _ <- :timer.sleep(1_000),
-           {:ok, summary} <- WikipediaApi.summary(page),
+           {:ok, summary} <- Apis.wikipedia().summary(page),
            _ <- :timer.sleep(1_000),
-           {:ok, toc} <- WikipediaApi.table_of_contents(page) do
+           {:ok, toc} <- Apis.wikipedia().table_of_contents(page) do
         {:ok, {summary, toc}}
       else
         {:error, :idle} -> {:error, :idle}

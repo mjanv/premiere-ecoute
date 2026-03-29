@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Automations
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Playlists
@@ -195,7 +195,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
 
   @impl true
   def handle_info(:fetch_playlists, %{assigns: %{current_scope: scope}} = socket) do
-    case SpotifyApi.get_library_playlists(scope, 1) do
+    case Apis.spotify().get_library_playlists(scope, 1) do
       {:ok, playlists} ->
         socket
         |> assign(:playlists_loading, false)
@@ -217,7 +217,7 @@ defmodule PremiereEcouteWeb.Playlists.LibraryLive do
   def handle_info(:fetch_more_playlists, %{assigns: %{current_scope: scope, current_page: page}} = socket) do
     next_page = page + 1
 
-    case SpotifyApi.get_library_playlists(scope, next_page) do
+    case Apis.spotify().get_library_playlists(scope, next_page) do
       {:ok, playlists} ->
         socket
         |> assign(:loading_more, false)

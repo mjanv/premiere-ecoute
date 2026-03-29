@@ -18,7 +18,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   require Logger
 
   alias PremiereEcoute.Accounts
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player, as: SpotifyPlayer
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Collections.CollectionSession
@@ -466,7 +466,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_event("stop_playback", _params, %{assigns: %{scope: scope}} = socket) do
-    case SpotifyApi.pause_playback(scope) do
+    case Apis.spotify().pause_playback(scope) do
       {:ok, _} -> {:noreply, socket}
       {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
     end
@@ -502,7 +502,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   defp play(nil, _scope, socket), do: {:noreply, socket}
 
   defp play(track, scope, socket) do
-    case SpotifyApi.start_resume_playback(scope, track) do
+    case Apis.spotify().start_resume_playback(scope, track) do
       {:ok, _} -> {:noreply, socket}
       {:error, reason} -> {:noreply, put_flash(socket, :error, inspect(reason))}
     end

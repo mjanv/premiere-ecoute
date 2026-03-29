@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Accounts.Workers.SubscribeStreamEvents do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis.Streaming.TwitchApi.EventSub
+  alias PremiereEcoute.Apis
 
   @types ["stream.online", "stream.offline"]
 
@@ -34,9 +34,9 @@ defmodule PremiereEcoute.Accounts.Workers.SubscribeStreamEvents do
   def subscribe_streamer(%User{twitch: %{username: username}} = user) do
     with _ <- Logger.info("Subscribing to events for streamer #{username}"),
          scope <- Scope.for_user(user),
-         {:ok, subscriptions} <- EventSub.get_event_subscriptions(scope),
+         {:ok, subscriptions} <- Apis.twitch().get_event_subscriptions(scope),
          types <- @types -- Enum.map(subscriptions, & &1["type"]),
-         events <- Enum.map(types, &EventSub.subscribe(scope, &1)),
+         events <- Enum.map(types, &Apis.twitch().subscribe(scope, &1)),
          true <- Enum.all?(events, fn {status, _} -> status == :ok end) do
       Logger.info("Subscribed all events streamer for streamer #{username}")
       :ok

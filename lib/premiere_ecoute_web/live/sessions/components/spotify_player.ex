@@ -9,13 +9,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
   require Logger
 
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
 
   @impl true
   def mount(socket) do
-    {:ok, assign(socket, :player_state, SpotifyApi.Player.default())}
+    {:ok, assign(socket, :player_state, Player.default())}
   end
 
   @impl true
@@ -35,7 +35,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         {:noreply, socket}
 
       %{"is_playing" => true} = state ->
-        case SpotifyApi.Player.pause_playback(socket.assigns.current_scope) do
+        case Player.pause_playback(socket.assigns.current_scope) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => false})
             {:noreply, socket}
@@ -45,7 +45,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         end
 
       %{"is_playing" => false} = state ->
-        case SpotifyApi.Player.start_playback(socket.assigns.current_scope, nil) do
+        case Player.start_playback(socket.assigns.current_scope, nil) do
           {:ok, _} ->
             socket = assign(socket, :player_state, %{state | "is_playing" => true})
             {:noreply, socket}

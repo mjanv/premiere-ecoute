@@ -1,7 +1,11 @@
 apis = [
-  PremiereEcoute.Apis.Streaming.TwitchApi,
-  PremiereEcoute.Apis.MusicProvider.SpotifyApi,
+  PremiereEcoute.Apis.MusicMetadata.GeniusApi,
+  PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi,
+  PremiereEcoute.Apis.MusicMetadata.WikipediaApi,
   PremiereEcoute.Apis.MusicProvider.DeezerApi,
+  PremiereEcoute.Apis.MusicProvider.SpotifyApi,
+  PremiereEcoute.Apis.MusicProvider.TidalApi,
+  PremiereEcoute.Apis.Streaming.TwitchApi,
   PremiereEcoute.Apis.Video.YoutubeApi,
   PremiereEcoute.Accounts.Mailer,
   PremiereEcouteCore.CommandBus,
