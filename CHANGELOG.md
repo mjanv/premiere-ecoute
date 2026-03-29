@@ -1,9 +1,10 @@
 # Changelog
 
-<!-- Last analyzed commit: d71db94 (2026-03-28) -->
+<!-- Last analyzed commit: a4eb451 (2026-03-29) -->
 
 ## March 2026
 
+* [Feature] Track enrichment with Genius: album pages now automatically find and display Genius lyrics links for each track, with fuzzy artist matching to avoid false positives.
 * [Feature] Collection sessions: take two playlists and build a new one by choosing between pairs of tracks — using streamer choice, audience vote (1 vs 2 in chat), or head-to-head track duels. Perfect for building "best of" or festival playlists collaboratively.
 * [Feature] Speech markers: the browser microphone detects when you are speaking during a session. Each detected speech segment is timestamped and can be exported as an Adobe Premiere Pro XMEML file for automatic video chapter markers in your recording.
 * [Feature] Wikipedia drawer: click any artist or album name in the session to see a Wikipedia summary with thumbnail, without leaving the page. Artist names in collection sessions are now clickable too.
