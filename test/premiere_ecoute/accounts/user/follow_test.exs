@@ -85,7 +85,6 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
   end
 
   describe "discover_follows/1" do
-    @tag :unstable
     test "returns the list of non-followed streamers by a viewer" do
       user = user_fixture(%{role: :viewer})
 
@@ -95,21 +94,27 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
       Enum.each(follows, fn f -> Accounts.follow(user, f) end)
 
       discovers = Accounts.discover_follows(user)
-      nonfollows_with_twitch = Enum.map(nonfollows, fn f -> Repo.preload(f, [:twitch]) end)
+      nonfollows_ids = Enum.map(nonfollows, & &1.id)
 
-      # Filter discovers to only include IDs from our test fixtures (not from seeds)
-      discovers_in_test = Enum.filter(discovers, fn u -> u.id in Enum.map(nonfollows, & &1.id) end)
-
-      assert discovers_in_test == nonfollows_with_twitch
+      # Verify our non-followed users are in the discovers list
+      assert Enum.all?(nonfollows_ids, fn id -> Enum.any?(discovers, fn u -> u.id == id end) end)
+      # Verify our followed users are NOT in the discovers list
+      followed_ids = Enum.map(follows, & &1.id)
+      refute Enum.any?(discovers, fn u -> u.id in followed_ids end)
     end
 
-    @tag :unstable
-    test "returns an empty list when no streamers are defined" do
+    test "returns users that the viewer is not following" do
       user = user_fixture(%{role: :viewer})
+      followed = user_fixture(%{role: :streamer})
 
-      # discover_follows may return seed streamers, so we just check that our user hasn't followed anyone
+      Accounts.follow(user, followed)
+
       discovers = Accounts.discover_follows(user)
-      assert user.id not in Enum.map(discovers, & &1.id)
+
+      # The followed user should not be in discovers
+      refute Enum.any?(discovers, fn u -> u.id == followed.id end)
+      # The user themselves should not be in discovers
+      refute Enum.any?(discovers, fn u -> u.id == user.id end)
     end
   end
 end

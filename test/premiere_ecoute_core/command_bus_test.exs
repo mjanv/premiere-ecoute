@@ -65,9 +65,8 @@ defmodule PremiereEcouteCore.CommandBusTest do
     end
   end
 
-  setup_all do
+  setup do
     PremiereEcouteCore.Registry.init()
-
     :ok
   end
 
@@ -96,7 +95,6 @@ defmodule PremiereEcouteCore.CommandBusTest do
       assert logs =~ "dispatch: %PremiereEcouteCore.CommandBusTest.EventA{a: 11}"
     end
 
-    @tag :unstable
     test "2" do
       {{:error, :unknown}, logs} = with_log(fn -> CommandBus.apply(%CommandA{a: 0}) end)
 

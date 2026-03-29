@@ -158,10 +158,9 @@ defmodule PremiereEcouteWeb.Plugs.TwitchExtensionAuthTest do
       assert json_response(conn, 401) == %{"error" => "Invalid token"}
     end
 
-    @tag :unstable
     test "accepts token expired 3 seconds ago (within leeway window)", %{conn: conn} do
       claims = %{
-        "exp" => System.system_time(:second) - 3,
+        "exp" => System.system_time(:second) - 4,
         "user_id" => "123456789",
         "channel_id" => "987654321",
         "role" => "viewer"

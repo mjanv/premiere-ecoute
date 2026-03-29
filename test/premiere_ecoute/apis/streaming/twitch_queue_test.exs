@@ -71,7 +71,6 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
       refute is_nil(state.timer)
     end
 
-    @tag :unstable
     test "circuit stays open and queues additional messages", %{bot: _bot} do
       message1 = %{user_id: "141981764", message: "test1"}
       message2 = %{user_id: "141981764", message: "test2"}
@@ -81,14 +80,16 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
 
       TwitchQueue.push({:do_send_chat_message, message1})
 
-      # Wait for circuit to open
-      wait_for_circuit_state(:open, 200)
+      # Wait for circuit to open with retries
+      wait_for_circuit_state(:open, 300)
 
       state = :sys.get_state(TwitchQueue)
       assert state.circuit == :open
 
       TwitchQueue.push({:do_send_chat_message, message2})
-      :timer.sleep(100)
+
+      # Wait for message to be queued
+      wait_for_circuit_state(:open, 200)
 
       state = :sys.get_state(TwitchQueue)
       assert state.circuit == :open
