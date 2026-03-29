@@ -18,8 +18,6 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.ChatTest do
     start_supervised(PremiereEcoute.Apis.RateLimit.RateLimiter)
     start_supervised(PremiereEcoute.Apis.Streaming.TwitchQueue)
 
-    :timer.sleep(500)
-
     {:ok, %{scope: scope}}
   end
 
@@ -41,7 +39,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.ChatTest do
 
       :ok = TwitchApi.send_chat_message(scope, message)
 
-      :timer.sleep(100)
+      :timer.sleep(50)
     end
   end
 
@@ -64,7 +62,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.ChatTest do
 
       :ok = TwitchApi.send_reply_message(scope, message, reply_to)
 
-      :timer.sleep(100)
+      :timer.sleep(50)
     end
   end
 
@@ -87,7 +85,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.ChatTest do
 
       :ok = TwitchApi.send_chat_announcement(scope, message, color)
 
-      :timer.sleep(100)
+      :timer.sleep(50)
     end
   end
 end

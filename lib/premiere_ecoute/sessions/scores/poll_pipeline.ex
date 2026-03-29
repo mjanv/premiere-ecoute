@@ -29,7 +29,13 @@ defmodule PremiereEcoute.Sessions.Scores.PollPipeline do
       name: __MODULE__,
       producer: [module: {PremiereEcouteCore.BroadwayProducer, []}, concurrency: 1],
       processors: [session: [concurrency: 1]],
-      batchers: [writer: [concurrency: 1, batch_size: 1, batch_timeout: 1_000]]
+      batchers: [
+        writer: [
+          concurrency: 1,
+          batch_size: 1,
+          batch_timeout: Application.get_env(:premiere_ecoute, :broadway_batch_timeout_ms, 1_000)
+        ]
+      ]
     )
   end
 

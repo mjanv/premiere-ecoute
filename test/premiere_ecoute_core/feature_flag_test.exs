@@ -1,5 +1,5 @@
 defmodule PremiereEcouteCore.FeatureFlagTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcouteCore.FeatureFlag
 

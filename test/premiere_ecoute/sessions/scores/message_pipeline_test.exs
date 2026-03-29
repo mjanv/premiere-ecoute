@@ -91,7 +91,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
         PremiereEcouteCore.publish(@pipeline, message)
       end
 
-      :timer.sleep(500)
+      :timer.sleep(100)
 
       assert Enum.empty?(Vote.all(where: [session_id: session.id]))
       assert is_nil(Report.get_by(session_id: session.id))

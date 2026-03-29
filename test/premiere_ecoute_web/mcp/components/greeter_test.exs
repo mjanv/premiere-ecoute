@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Mcp.Components.GreeterTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Hermes.Server.Frame
   alias PremiereEcouteWeb.Mcp.Components.Greeter

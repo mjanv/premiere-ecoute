@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Sessions.Scores.PollPipelineTest do
         votes: %{"A" => 0, "B" => 0}
       })
 
-      :timer.sleep(500)
+      :timer.sleep(100)
 
       [%Poll{} = poll] = Poll.all(where: [session_id: session.id])
 
@@ -60,7 +60,7 @@ defmodule PremiereEcoute.Sessions.Scores.PollPipelineTest do
         votes: %{"A" => 0, "B" => 0}
       })
 
-      :timer.sleep(500)
+      :timer.sleep(100)
 
       assert Enum.empty?(Poll.all(where: [session_id: session.id]))
     end
@@ -80,7 +80,7 @@ defmodule PremiereEcoute.Sessions.Scores.PollPipelineTest do
 
       PremiereEcouteCore.publish(@pipeline, %PollUpdated{id: "poll1", votes: %{"A" => 5, "B" => 7}})
 
-      :timer.sleep(500)
+      :timer.sleep(100)
 
       [%Poll{} = poll] = Poll.all(where: [session_id: session.id])
 

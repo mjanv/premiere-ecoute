@@ -1,5 +1,5 @@
 defmodule PremiereEcouteWeb.Mcp.Components.AlbumSearchTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias Hermes.Server.Frame
   alias PremiereEcoute.Discography.Album

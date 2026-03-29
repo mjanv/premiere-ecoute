@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Accounts.Workers.SubscribeStreamEventsTest do
-  use PremiereEcoute.DataCase
+  use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts.Workers.SubscribeStreamEvents
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
