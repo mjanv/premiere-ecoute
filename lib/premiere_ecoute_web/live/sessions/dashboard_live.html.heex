@@ -105,7 +105,7 @@
             </div>
             
 <!-- Next Track Timer/Slider — not shown for :track or :free -->
-            <%= if @listening_session.source not in [:track, :free] do %>
+            <%= if @listening_session.source not in [:track, :free] and @listening_session.status != :stopped do %>
               <div class="mt-4 pt-4 border-t border-white/20 space-y-2">
                 <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
               </div>
@@ -200,12 +200,12 @@
                       {:erlang.float_to_binary((@last_segment.end_ms - @last_segment.start_ms) / 1000, decimals: 1)}s
                     </span>
                   <% end %>
-                  <!-- <.session_toggle
+                  <.session_toggle
                     phx-click="toggle"
                     phx-value-flag="transcribe"
                     checked={@listening_session.options["transcribe"]}
                     legend=""
-                  /> -->
+                  />
                   <button
                     type="button"
                     id="dashboard-mic-btn"
@@ -250,6 +250,9 @@
                     class="rounded-lg w-full"
                   >
                   </canvas>
+                  <%= if @last_segment && @last_segment.text do %>
+                    <p class="mt-2 text-sm text-purple-200 italic px-1">{@last_segment.text}</p>
+                  <% end %>
                 </div>
               </div>
             <% end %>
