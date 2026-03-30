@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Wantlists do
   import Ecto.Query
 
   alias PremiereEcoute.Discography.Single
+  alias PremiereEcoute.Events.AddedToWantlist
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Wantlists.Wantlist
   alias PremiereEcoute.Wantlists.WantlistItem
@@ -56,7 +58,9 @@ defmodule PremiereEcoute.Wantlists do
 
     with {:ok, wantlist} <- get_or_create_default(user_id) do
       attrs = Map.merge(%{type: type, wantlist_id: wantlist.id}, %{fk_field => record_id})
+
       WantlistItem.create_if_not_exists(attrs)
+      |> Store.ok("wantlist", fn _item -> %AddedToWantlist{id: user_id, type: Atom.to_string(type), record_id: record_id} end)
     end
   end
 

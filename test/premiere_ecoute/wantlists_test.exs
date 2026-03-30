@@ -4,6 +4,8 @@ defmodule PremiereEcoute.WantlistsTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Single
+  alias PremiereEcoute.Events.AddedToWantlist
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Wantlists
   alias PremiereEcoute.Wantlists.Wantlist
   alias PremiereEcoute.Wantlists.WantlistItem
@@ -76,6 +78,21 @@ defmodule PremiereEcoute.WantlistsTest do
 
     test "returns error when record does not exist", %{user: user} do
       assert {:error, _changeset} = Wantlists.add_item(user.id, :album, 999_999)
+    end
+
+    test "appends AddedToWantlist event on album add", %{user: user, album: album} do
+      {:ok, _} = Wantlists.add_item(user.id, :album, album.id)
+      assert Store.last("wantlist-#{user.id}") == %AddedToWantlist{id: user.id, type: "album", record_id: album.id}
+    end
+
+    test "appends AddedToWantlist event on track add", %{user: user, single: single} do
+      {:ok, _} = Wantlists.add_item(user.id, :track, single.id)
+      assert Store.last("wantlist-#{user.id}") == %AddedToWantlist{id: user.id, type: "track", record_id: single.id}
+    end
+
+    test "appends AddedToWantlist event on artist add", %{user: user, artist: artist} do
+      {:ok, _} = Wantlists.add_item(user.id, :artist, artist.id)
+      assert Store.last("wantlist-#{user.id}") == %AddedToWantlist{id: user.id, type: "artist", record_id: artist.id}
     end
   end
 

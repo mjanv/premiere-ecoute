@@ -12,7 +12,7 @@ defmodule PremiereEcouteCore.Worker do
   """
   @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(opts) do
-    {timeout, opts} = Keyword.pop(opts, :timer.seconds(300))
+    {timeout, opts} = Keyword.pop(opts, :timeout, :timer.seconds(300))
 
     quote do
       use Oban.Worker, unquote(opts)
