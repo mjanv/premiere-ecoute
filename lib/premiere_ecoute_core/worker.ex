@@ -12,6 +12,8 @@ defmodule PremiereEcouteCore.Worker do
   """
   @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(opts) do
+    {timeout, opts} = Keyword.pop(opts, :timer.seconds(300))
+
     quote do
       use Oban.Worker, unquote(opts)
 
@@ -51,9 +53,8 @@ defmodule PremiereEcouteCore.Worker do
       def at(args, %DateTime{} = at), do: start(args, scheduled_at: DateTime.shift_zone!(at, "Etc/UTC"))
 
       @doc "Returns the default job timeout in milliseconds."
-      @spec timeout(Oban.Job.t()) :: integer()
       @impl Oban.Worker
-      def timeout(_job), do: :timer.seconds(300)
+      def timeout(_job), do: unquote(timeout)
     end
   end
 end

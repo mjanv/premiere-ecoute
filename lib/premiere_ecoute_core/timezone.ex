@@ -11,5 +11,5 @@ defmodule PremiereEcouteCore.Timezone do
 
   @doc "Returns a sorted list of all valid IANA timezone names."
   @spec list() :: [String.t()]
-  def list, do: Timex.timezones() |> Enum.sort()
+  def list, do: Enum.sort(Timex.timezones())
 end
