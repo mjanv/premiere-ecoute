@@ -64,7 +64,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   @impl true
   def dispatch(%CollectionSessionCompleted{session_id: session_id, user_id: user_id, kept_count: kept_count}) do
     PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:session_completed, kept_count})
-    PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:collection_completed, session_id})
     :ok
   end
 end

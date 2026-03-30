@@ -60,7 +60,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandlerTest do
 
       session_id = session.id
       assert_receive {:session_completed, 5}
-      assert_receive {:collection_completed, ^session_id}
     end
   end
 end
