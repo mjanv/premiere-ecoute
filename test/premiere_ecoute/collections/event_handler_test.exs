@@ -54,11 +54,9 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandlerTest do
       session = collection_session_fixture(user)
 
       PremiereEcoute.PubSub.subscribe("collection:#{session.id}")
-      PremiereEcoute.PubSub.subscribe("playback:#{user.id}")
 
       EventHandler.dispatch(%CollectionSessionCompleted{session_id: session.id, user_id: user.id, kept_count: 5})
 
-      session_id = session.id
       assert_receive {:session_completed, 5}
     end
   end
