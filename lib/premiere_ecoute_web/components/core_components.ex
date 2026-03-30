@@ -28,6 +28,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
   """
 
   use Phoenix.Component
+  use Gettext, backend: PremiereEcoute.Gettext
 
   alias Phoenix.HTML
   alias Phoenix.LiveView.JS
@@ -479,6 +480,38 @@ defmodule PremiereEcouteWeb.CoreComponents do
   @spec translate_errors(keyword(), atom()) :: [String.t()]
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  attr :event, :string, required: true
+  attr :active, :boolean, required: true
+  attr :active_class, :string, required: true
+  attr :inactive_class, :string, required: true
+
+  def wantlist_toggle(assigns) do
+    ~H"""
+    <button
+      phx-click={@event}
+      class={[
+        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all",
+        if(@active, do: @active_class, else: @inactive_class)
+      ]}
+    >
+      <svg
+        class="w-3.5 h-3.5"
+        fill={if @active, do: "currentColor", else: "none"}
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+        />
+      </svg>
+      {if @active, do: gettext("In wantlist"), else: gettext("Add to wantlist")}
+    </button>
+    """
   end
 
   defdelegate activity_card(assigns), to: ActivityCard

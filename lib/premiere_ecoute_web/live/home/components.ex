@@ -84,6 +84,61 @@ defmodule PremiereEcouteWeb.Home.Components do
   end
 
   @doc """
+  Renders a square album card with a hover overlay that includes an "Add to Wantlist" button.
+
+  Accepts `session_id` to link to the session page. The wantlist button fires a
+  `add_album_to_wantlist` event with the album_id.
+  """
+  attr :session, :map, required: true
+  attr :in_wantlist, :boolean, default: false
+
+  def album_square_wantlist(assigns) do
+    ~H"""
+    <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
+      <.link href={~p"/sessions/#{@session}"} class="block w-full h-full">
+        <%= if @session.album && @session.album.cover_url do %>
+          <img src={@session.album.cover_url} alt={@session.album.name} class="w-full h-full object-cover" loading="lazy" />
+        <% else %>
+          <div class="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
+            <svg class="w-10 h-10 text-white/40" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+            </svg>
+          </div>
+        <% end %>
+        <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2">
+          <p class="text-white text-xs font-semibold leading-tight truncate">{@session.album && @session.album.name}</p>
+          <p class="text-slate-300 text-xs truncate">{@session.album && @session.album.artist}</p>
+        </div>
+      </.link>
+      <%= if @session.album do %>
+        <button
+          phx-click="add_album_to_wantlist"
+          phx-value-album-id={@session.album.id}
+          class={[
+            "absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all",
+            "opacity-0 group-hover:opacity-100",
+            if(@in_wantlist,
+              do: "bg-purple-600/90 text-white",
+              else: "bg-black/60 hover:bg-purple-600/80 text-white"
+            )
+          ]}
+          title={if @in_wantlist, do: "Already in wantlist", else: "Add to wantlist"}
+        >
+          <svg class="w-3.5 h-3.5" fill={if @in_wantlist, do: "currentColor", else: "none"} stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
+          </svg>
+        </button>
+      <% end %>
+    </div>
+    """
+  end
+
+  @doc """
   Renders a compact rectangular card for a radio track, showing name, artist, and time.
   """
   attr :track, :map, required: true

@@ -30,6 +30,16 @@
               </span>
             <% end %>
           </div>
+
+          <%= if assigns[:current_scope] && assigns[:current_scope].user do %>
+            <.wantlist_toggle
+              event="toggle_wantlist_artist"
+              active={@in_wantlist}
+              active_class="bg-purple-600/30 border-purple-400/60 text-purple-300 hover:bg-red-900/30 hover:border-red-400/60 hover:text-red-300 w-full justify-center"
+              inactive_class="bg-white/5 border-white/20 text-slate-300 hover:bg-purple-600/20 hover:border-purple-400/60 hover:text-purple-300 w-full justify-center"
+            />
+          <% end %>
+
           <%!-- Bio --%>
           <%= if get_in(@artist.external_links, ["wikipedia"]) || get_in(@artist.external_links, ["genius"]) do %>
             <div>

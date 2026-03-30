@@ -12,6 +12,7 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
   alias PremiereEcoute.Sessions.ListeningSession.Review
   alias PremiereEcoute.Sessions.ReviewLikes
   alias PremiereEcoute.Sessions.Reviews
+  alias PremiereEcoute.Wantlists
 
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
@@ -31,12 +32,18 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
           do: ReviewLikes.liked_review_ids(review_ids, current_user.id),
           else: MapSet.new()
 
+      in_wantlist =
+        if current_user,
+          do: Wantlists.in_wantlist?(current_user.id, :album, album.id),
+          else: false
+
       {:ok,
        socket
        |> assign(:album, album)
        |> assign(:sessions, sessions)
        |> assign(:reviews, reviews)
        |> assign(:liked_ids, liked_ids)
+       |> assign(:in_wantlist, in_wantlist)
        |> assign(:review_modal_open, false)
        |> assign(:review_form, nil)
        |> assign(:editing_review, nil)
@@ -203,6 +210,24 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
      |> assign(:selected_track, nil)
      |> assign(:genius_result, nil)
      |> assign(:youtube_video_id, nil)}
+  end
+
+  @impl true
+  def handle_event("toggle_wantlist_album", _params, socket) do
+    user = socket.assigns.current_scope.user
+    album = socket.assigns.album
+
+    if socket.assigns.in_wantlist do
+      case Wantlists.remove_item(user.id, :album, album.id) do
+        {:ok, _} -> {:noreply, assign(socket, :in_wantlist, false)}
+        {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Could not remove from wantlist"))}
+      end
+    else
+      case Wantlists.add_item(user.id, :album, album.id) do
+        {:ok, _} -> {:noreply, assign(socket, :in_wantlist, true)}
+        {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Could not add to wantlist"))}
+      end
+    end
   end
 
   defp reload_reviews(socket, album_id, user) do

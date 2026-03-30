@@ -37,7 +37,10 @@
             </h3>
             <.scroll_carousel id="my-sessions-carousel">
               <%= for session <- @my_sessions do %>
-                <.album_square album={session.album} href={~p"/sessions/#{session}"} />
+                <.album_square_wantlist
+                  session={session}
+                  in_wantlist={MapSet.member?(assigns[:wantlisted_album_ids] || MapSet.new(), session.album_id)}
+                />
               <% end %>
               <%= if @my_sessions == [] do %>
                 <p class="text-slate-500 text-sm">{gettext("No sessions yet.")}</p>
@@ -66,7 +69,10 @@
               </h3>
               <.scroll_carousel id={"album-carousel-#{streamer.id}"}>
                 <%= for session <- sessions do %>
-                  <.album_square album={session.album} href={~p"/sessions/#{session}"} />
+                  <.album_square_wantlist
+                    session={session}
+                    in_wantlist={MapSet.member?(assigns[:wantlisted_album_ids] || MapSet.new(), session.album_id)}
+                  />
                 <% end %>
                 <%= if sessions == [] do %>
                   <p class="text-slate-500 text-sm">{gettext("No sessions yet.")}</p>

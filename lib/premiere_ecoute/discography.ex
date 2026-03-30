@@ -112,11 +112,41 @@ defmodule PremiereEcoute.Discography do
   def url(_), do: nil
 
   @spec url(any(), atom()) :: String.t() | nil
-  def url(%Album{provider_ids: ids}, :spotify), do: "https://open.spotify.com/album/#{ids[:spotify]}"
-  def url(%Album{provider_ids: ids}, :deezer), do: "https://www.deezer.com/album/#{ids[:deezer]}"
-  def url(%Album.Track{provider_ids: ids}, :spotify), do: "https://open.spotify.com/track/#{ids[:spotify]}"
-  def url(%Album.Track{provider_ids: ids}, :deezer), do: "https://www.deezer.com/track/#{ids[:deezer]}"
-  def url(%Single{provider_ids: ids}, :spotify), do: "https://open.spotify.com/track/#{ids[:spotify]}"
-  def url(%Single{provider_ids: ids}, :deezer), do: "https://www.deezer.com/track/#{ids[:deezer]}"
+  def url(%Album{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
+    do: "https://open.spotify.com/album/#{id}"
+
+  def url(%Album{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
+    do: "https://www.deezer.com/album/#{id}"
+
+  def url(%Album.Track{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
+    do: "https://open.spotify.com/track/#{id}"
+
+  def url(%Album.Track{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
+    do: "https://www.deezer.com/track/#{id}"
+
+  def url(%Single{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
+    do: "https://open.spotify.com/track/#{id}"
+
+  def url(%Single{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
+    do: "https://www.deezer.com/track/#{id}"
+
+  def url(%Artist{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
+    do: "https://open.spotify.com/artist/#{id}"
+
+  def url(%Artist{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
+    do: "https://www.deezer.com/artist/#{id}"
+
+  def url(%Album{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
+    do: "https://tidal.com/browse/album/#{id}"
+
+  def url(%Album.Track{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
+    do: "https://tidal.com/browse/track/#{id}"
+
+  def url(%Single{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
+    do: "https://tidal.com/browse/track/#{id}"
+
+  def url(%Artist{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
+    do: "https://tidal.com/browse/artist/#{id}"
+
   def url(_, _), do: nil
 end

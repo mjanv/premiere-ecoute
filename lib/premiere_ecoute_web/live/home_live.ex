@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.HomeLive do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Wantlists
 
   embed_templates "home/*"
 
@@ -36,11 +37,15 @@ defmodule PremiereEcouteWeb.HomeLive do
         _ -> []
       end
 
+    # AIDEV-NOTE: collect album ids in wantlist for the viewer to mark them visually
+    wantlisted_album_ids = build_wantlisted_album_ids(user.id, sessions_by_user, my_sessions)
+
     socket
     |> assign(:current_user, current_user)
     |> assign(:sessions_per_streamer, sessions_per_streamer)
     |> assign(:upcoming_sessions, upcoming_sessions)
     |> assign(:my_sessions, my_sessions)
+    |> assign(:wantlisted_album_ids, wantlisted_album_ids)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -78,6 +83,36 @@ defmodule PremiereEcouteWeb.HomeLive do
       {:ok, 1} -> {:noreply, assign(socket, next_radio: Radio.next_in?(user.id))}
       _ -> {:noreply, put_flash(socket, :error, gettext("Failed to stop radio"))}
     end
+  end
+
+  @impl true
+  def handle_event("add_album_to_wantlist", %{"album-id" => album_id}, socket) do
+    user = socket.assigns.current_scope.user
+
+    case Wantlists.add_item(user.id, :album, String.to_integer(album_id)) do
+      {:ok, _} ->
+        wantlisted_album_ids = MapSet.put(socket.assigns[:wantlisted_album_ids] || MapSet.new(), String.to_integer(album_id))
+        {:noreply, assign(socket, :wantlisted_album_ids, wantlisted_album_ids) |> put_flash(:info, gettext("Added to wantlist"))}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, gettext("Could not add to wantlist"))}
+    end
+  end
+
+  # AIDEV-NOTE: collects album ids that are already in the viewer's wantlist for visual feedback
+  defp build_wantlisted_album_ids(user_id, sessions_by_user, my_sessions) do
+    all_album_ids =
+      sessions_by_user
+      |> Map.values()
+      |> List.flatten()
+      |> Enum.concat(my_sessions)
+      |> Enum.map(& &1.album_id)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
+    all_album_ids
+    |> Enum.filter(&Wantlists.in_wantlist?(user_id, :album, &1))
+    |> MapSet.new()
   end
 
   # AIDEV-NOTE: render/1 dispatches to separate templates based on user role

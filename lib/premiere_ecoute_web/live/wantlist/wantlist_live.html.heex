@@ -1,0 +1,277 @@
+<Layouts.app
+  flash={@flash}
+  banners={assigns[:banners] || []}
+  current_scope={assigns[:current_scope] || %{}}
+>
+  <div class="synthwave-bg text-white min-h-screen">
+    <div class="max-w-4xl mx-auto px-6 py-12">
+      <%!-- Page header with view toggle --%>
+      <div class="flex items-start justify-between mb-10">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">{gettext("My Wantlist")}</h1>
+          <p class="text-slate-400 text-sm">{gettext("Music you want to explore")}</p>
+        </div>
+        <%= if @items != [] do %>
+          <div class="flex items-center gap-3 shrink-0 mt-1">
+            <%!-- Provider selector --%>
+            <div class="flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+              <button
+                phx-click="set_provider"
+                phx-value-name="spotify"
+                class={[
+                  "flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-all",
+                  if(@provider == :spotify,
+                    do: "bg-[#1DB954]/20 text-[#1DB954]",
+                    else: "text-slate-500 hover:text-slate-300"
+                  )
+                ]}
+                title="Spotify"
+              >
+                <.provider_icon provider={:spotify} class="w-3.5 h-3.5" /> Spotify
+              </button>
+              <button
+                phx-click="set_provider"
+                phx-value-name="deezer"
+                class={[
+                  "flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-all",
+                  if(@provider == :deezer,
+                    do: "bg-purple-600/20 text-purple-400",
+                    else: "text-slate-500 hover:text-slate-300"
+                  )
+                ]}
+                title="Deezer"
+              >
+                <.provider_icon provider={:deezer} class="w-3.5 h-3.5" /> Deezer
+              </button>
+              <button
+                phx-click="set_provider"
+                phx-value-name="tidal"
+                class={[
+                  "flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-all",
+                  if(@provider == :tidal,
+                    do: "bg-blue-600/20 text-blue-400",
+                    else: "text-slate-500 hover:text-slate-300"
+                  )
+                ]}
+                title="Tidal"
+              >
+                <.provider_icon provider={:tidal} class="w-3.5 h-3.5" /> Tidal
+              </button>
+            </div>
+            <%!-- View toggle --%>
+            <div class="flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+              <button
+                phx-click="set_view"
+                phx-value-mode="grid"
+                class={[
+                  "p-1.5 rounded transition-all",
+                  if(@view == :grid,
+                    do: "bg-purple-600/60 text-white",
+                    else: "text-slate-500 hover:text-white"
+                  )
+                ]}
+                title={gettext("Grid view")}
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button
+                phx-click="set_view"
+                phx-value-mode="list"
+                class={[
+                  "p-1.5 rounded transition-all",
+                  if(@view == :list,
+                    do: "bg-purple-600/60 text-white",
+                    else: "text-slate-500 hover:text-white"
+                  )
+                ]}
+                title={gettext("List view")}
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <%= if @items == [] do %>
+        <div class="flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <svg class="w-16 h-16 text-purple-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
+          </svg>
+          <p class="text-slate-500 text-base">{gettext("Your wantlist is empty.")}</p>
+          <p class="text-slate-600 text-sm">
+            {gettext("Add albums, tracks, or artists from the discography or radio pages.")}
+          </p>
+        </div>
+      <% else %>
+        <%!-- Albums section --%>
+        <%= if @album_items != [] do %>
+          <section class="mb-12">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+              {gettext("Albums")}
+              <span class="ml-2 text-purple-500">{@album_count}</span>
+            </h2>
+            <div class={if @view == :grid, do: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4", else: "space-y-2"}>
+              <.wantlist_media_card
+                :for={item <- @album_items}
+                item_id={item.id}
+                name={item.album.name}
+                subtitle={item.album.artist}
+                cover_url={item.album.cover_url}
+                navigate={~p"/discography/albums/#{item.album.slug}"}
+                provider_url={PremiereEcoute.Discography.url(item.album, @provider)}
+                provider={@provider}
+                view={@view}
+              />
+            </div>
+          </section>
+        <% end %>
+
+        <%!-- Tracks section --%>
+        <%= if @track_items != [] do %>
+          <section class="mb-12">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+              {gettext("Tracks")}
+              <span class="ml-2 text-purple-500">{@track_count}</span>
+            </h2>
+            <div class={if @view == :grid, do: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4", else: "space-y-2"}>
+              <.wantlist_media_card
+                :for={item <- @track_items}
+                item_id={item.id}
+                name={item.single.name}
+                subtitle={item.single.artist}
+                cover_url={item.single.cover_url}
+                navigate={~p"/discography/singles/#{item.single.slug}"}
+                provider_url={PremiereEcoute.Discography.url(item.single, @provider)}
+                provider={@provider}
+                view={@view}
+              />
+            </div>
+          </section>
+        <% end %>
+
+        <%!-- Artists section --%>
+        <%= if @artist_items != [] do %>
+          <section class="mb-12">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+              {gettext("Artists")}
+              <span class="ml-2 text-purple-500">{@artist_count}</span>
+            </h2>
+            <%= if @view == :grid do %>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <%= for item <- @artist_items do %>
+                  <% r = item.artist %>
+                  <% provider_url = PremiereEcoute.Discography.url(r, @provider) %>
+                  <div class="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:border-purple-400/40 transition-all">
+                    <.link navigate={~p"/discography/artists/#{r.slug}"} class="block p-4 text-center">
+                      <div class="w-20 h-20 rounded-full overflow-hidden bg-purple-900/30 mx-auto mb-3 flex items-center justify-center">
+                        <%= if url = PremiereEcoute.Discography.Artist.image_url(r, 160) do %>
+                          <img src={url} alt={r.name} class="w-full h-full object-cover" loading="lazy" />
+                        <% else %>
+                          <span class="text-3xl font-bold text-purple-300">
+                            {String.upcase(String.first(r.name || "?"))}
+                          </span>
+                        <% end %>
+                      </div>
+                      <p class="text-white text-sm font-semibold truncate">{r.name}</p>
+                    </.link>
+                    <%= if provider_url do %>
+                      <a
+                        href={provider_url}
+                        target="_blank"
+                        rel="noopener"
+                        class="absolute bottom-2 left-2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                        title={to_string(@provider)}
+                      >
+                        <.provider_icon provider={@provider} class="w-3.5 h-3.5 text-white" />
+                      </a>
+                    <% end %>
+                    <button
+                      phx-click="remove_item"
+                      phx-value-id={item.id}
+                      data-confirm={gettext("Remove from wantlist?")}
+                      class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 hover:bg-red-900/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                      title={gettext("Remove")}
+                    >
+                      <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="space-y-2">
+                <%= for item <- @artist_items do %>
+                  <% r = item.artist %>
+                  <% provider_url = PremiereEcoute.Discography.url(r, @provider) %>
+                  <div class="group flex items-center gap-4 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:border-purple-400/40 transition-all">
+                    <.link
+                      navigate={~p"/discography/artists/#{r.slug}"}
+                      class="flex items-center gap-4 flex-1 min-w-0"
+                    >
+                      <div class="w-10 h-10 rounded-full overflow-hidden bg-purple-900/30 shrink-0 flex items-center justify-center">
+                        <%= if url = PremiereEcoute.Discography.Artist.image_url(r, 80) do %>
+                          <img src={url} alt={r.name} class="w-full h-full object-cover" loading="lazy" />
+                        <% else %>
+                          <span class="text-lg font-bold text-purple-300">
+                            {String.upcase(String.first(r.name || "?"))}
+                          </span>
+                        <% end %>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-white text-sm font-medium truncate">{r.name}</p>
+                        <p class="text-slate-400 text-xs">{gettext("Artist")}</p>
+                      </div>
+                    </.link>
+                    <%= if provider_url do %>
+                      <a
+                        href={provider_url}
+                        target="_blank"
+                        rel="noopener"
+                        class="shrink-0 w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                        title={to_string(@provider)}
+                      >
+                        <.provider_icon provider={@provider} class="w-3.5 h-3.5 text-slate-300" />
+                      </a>
+                    <% end %>
+                    <button
+                      phx-click="remove_item"
+                      phx-value-id={item.id}
+                      data-confirm={gettext("Remove from wantlist?")}
+                      class="shrink-0 w-7 h-7 rounded-full hover:bg-red-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                      title={gettext("Remove")}
+                    >
+                      <svg
+                        class="w-3.5 h-3.5 text-slate-500 hover:text-red-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </section>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</Layouts.app>

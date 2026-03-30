@@ -46,6 +46,15 @@
             style="box-shadow: 0 8px 40px rgba(0,0,0,0.7);"
           />
 
+          <%= if assigns[:current_scope] && assigns[:current_scope].user do %>
+            <.wantlist_toggle
+              event="toggle_wantlist_single"
+              active={@in_wantlist}
+              active_class="bg-cyan-600/30 border-cyan-400/60 text-cyan-300 hover:bg-red-900/30 hover:border-red-400/60 hover:text-red-300 w-full justify-center"
+              inactive_class="bg-white/5 border-white/20 text-slate-300 hover:bg-cyan-600/20 hover:border-cyan-400/60 hover:text-cyan-300 w-full justify-center"
+            />
+          <% end %>
+
           <%!-- Where to listen --%>
           <div>
             <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
@@ -68,7 +77,9 @@
         <%!-- Right column --%>
         <div class="flex-1 min-w-0">
           <div class="mb-8">
-            <h1 class="text-4xl font-bold text-white leading-tight mb-1">{@single.name}</h1>
+            <div>
+              <h1 class="text-4xl font-bold text-white leading-tight mb-1">{@single.name}</h1>
+            </div>
             <%= if @single.artist && @single.artist.slug do %>
               <.link
                 navigate={~p"/discography/artists/#{@single.artist.slug}"}

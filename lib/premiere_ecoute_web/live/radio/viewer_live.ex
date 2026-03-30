@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Radio
+  alias PremiereEcoute.Wantlists
 
   @impl true
   def mount(%{"username" => username} = params, _session, socket) do
@@ -60,6 +61,26 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
     date = Date.utc_today()
     tracks = Radio.get_tracks(socket.assigns.user.id, date)
     {:noreply, assign(socket, date: date, tracks: tracks)}
+  end
+
+  @impl true
+  def handle_event("add_track_to_wantlist", %{"spotify-id" => spotify_id}, socket) do
+    current_scope = socket.assigns[:current_scope]
+
+    if current_scope && current_scope.user do
+      case Wantlists.add_radio_track(current_scope.user.id, spotify_id) do
+        {:ok, _} ->
+          {:noreply, put_flash(socket, :info, gettext("Added to wantlist"))}
+
+        {:error, :not_found} ->
+          {:noreply, put_flash(socket, :error, gettext("Track not found in discography"))}
+
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, gettext("Could not add to wantlist"))}
+      end
+    else
+      {:noreply, put_flash(socket, :error, gettext("You must be logged in"))}
+    end
   end
 
   defp link(_track, :spotify, provider_id), do: "https://open.spotify.com/track/#{provider_id}"
