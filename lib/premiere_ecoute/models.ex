@@ -4,23 +4,11 @@ defmodule PremiereEcoute.Models do
   require Logger
 
   alias PremiereEcoute.Models.AudioSegment
-  alias PremiereEcoute.Models.OpenAi.SpeechToTextWhisper
+
+  @stt Application.compile_env(:premiere_ecoute, :stt, PremiereEcoute.Models.Mistral.Transcription)
 
   defdelegate new_audio_segment(start_ms, end_ms, is_clean, audio), to: AudioSegment, as: :new
 
-  def run(%AudioSegment{class: :speech, audio: audio} = segment) do
-    audio
-    |> AudioSegment.decode_audio()
-    |> SpeechToTextWhisper.run()
-    |> case do
-      %{chunks: [%{text: text} | _]} ->
-        Logger.info("[whisper] text=#{inspect(text)}")
-        %{segment | text: String.trim(text)}
-
-      _ ->
-        segment
-    end
-  end
-
-  def run(segment), do: segment
+  def transcribe(%AudioSegment{class: :speech} = segment), do: @stt.transcribe(segment)
+  def transcribe(segment), do: segment
 end

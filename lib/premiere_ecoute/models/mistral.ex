@@ -5,10 +5,23 @@ defmodule PremiereEcoute.Models.Mistral do
   alias PremiereEcoute.Models.Mistral.Moderation
   alias PremiereEcoute.Models.Mistral.Transcription
 
-  def headers do
+  def headers(:json) do
     [
-      # {"content-type", "application/json"},
-      # {"accept", "application/json"},
+      {"content-type", "application/json"},
+      {"accept", "application/json"},
+      {"authorization", "Bearer #{Application.get_env(:premiere_ecoute, :mistral)[:api_key]}"}
+    ]
+  end
+
+  def headers(:multipart) do
+    [
+      {"accept", "application/json"},
+      {"authorization", "Bearer #{Application.get_env(:premiere_ecoute, :mistral)[:api_key]}"}
+    ]
+  end
+
+  def headers(_) do
+    [
       {"authorization", "Bearer #{Application.get_env(:premiere_ecoute, :mistral)[:api_key]}"}
     ]
   end

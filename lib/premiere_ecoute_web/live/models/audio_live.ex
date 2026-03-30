@@ -120,7 +120,7 @@ defmodule PremiereEcouteWeb.Models.AudioLive do
     segment = PremiereEcoute.Models.new_audio_segment(start_ms, end_ms, is_clean, audio)
 
     socket
-    |> start_async(:transcribe, fn -> PremiereEcoute.Models.run(segment) end)
+    |> start_async(:transcribe, fn -> PremiereEcoute.Models.transcribe(segment) end)
     |> update(:segments, &(&1 ++ [segment]))
     |> then(fn socket -> {:noreply, socket} end)
   end

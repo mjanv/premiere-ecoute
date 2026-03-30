@@ -269,7 +269,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
     socket
     |> then(fn socket ->
       if session.options["transcribe"] in [1, true] do
-        start_async(socket, :transcribe, fn -> {marker, PremiereEcoute.Models.run(segment)} end)
+        start_async(socket, :transcribe, fn -> {marker, PremiereEcoute.Models.transcribe(segment)} end)
       else
         socket
       end

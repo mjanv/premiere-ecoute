@@ -8,12 +8,10 @@ defmodule PremiereEcoute.Models.Mistral.Chat do
   def chat(_messages) do
     Req.post!(
       @url,
-      headers: Mistral.headers(),
+      headers: Mistral.headers(:json),
       json: %{
         model: "mistral-medium-latest",
-        messages: [
-          %{role: "user", content: "Who is the most renowned French painter?"}
-        ]
+        messages: [%{role: "user", content: "Who is the most renowned French painter?"}]
       }
     )
   end

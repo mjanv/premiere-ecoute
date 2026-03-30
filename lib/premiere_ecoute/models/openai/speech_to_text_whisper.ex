@@ -5,6 +5,10 @@ defmodule PremiereEcoute.Models.OpenAi.SpeechToTextWhisper do
 
   require Logger
 
+  alias PremiereEcoute.Models.AudioSegment
+
+  @behaviour PremiereEcoute.Models.Transcription
+
   def child_spec(opts) do
     %{
       id: __MODULE__,
@@ -35,7 +39,17 @@ defmodule PremiereEcoute.Models.OpenAi.SpeechToTextWhisper do
     Nx.Serving.start_link(serving: serving, name: __MODULE__, batch_timeout: 100)
   end
 
-  def run(samples) do
-    Nx.Serving.batched_run(__MODULE__, samples)
+  @impl PremiereEcoute.Models.Transcription
+  def transcribe(%AudioSegment{audio: audio} = segment) do
+    __MODULE__
+    |> Nx.Serving.batched_run(AudioSegment.decode_audio(audio))
+    |> case do
+      %{chunks: [%{text: text} | _]} ->
+        Logger.info("[whisper] text=#{inspect(text)}")
+        %{segment | text: text}
+
+      _ ->
+        segment
+    end
   end
 end
