@@ -37,8 +37,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
          tracks: [],
          today: today,
          oldest_date: Date.add(today, -Accounts.profile(user, [:radio_settings, :retention_days])),
-         timezone: Accounts.profile(user, [:timezone], "UTC"),
-         page_title: "#{username}'s tracks"
+         timezone: Accounts.profile(user, [:timezone], "UTC")
        )}
     else
       _ -> {:ok, push_navigate(socket, to: "/")}
