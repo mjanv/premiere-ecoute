@@ -44,6 +44,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarkerTest do
       result = TrackMarker.format_youtube_chapters(session, 0)
 
       assert result == """
+             0:00 Introduction
              0:30 Opening Song
              4:15 Second Song
              8:45 Third Song\
@@ -77,7 +78,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarkerTest do
 
       result = TrackMarker.format_youtube_chapters(session, 0)
 
-      assert result == "1:00 Playlist Track One"
+      assert result == "0:00 Introduction\n1:00 Playlist Track One"
     end
 
     test "applies positive time bias to all chapters" do
@@ -161,6 +162,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarkerTest do
       result = TrackMarker.format_youtube_chapters(session, 0)
 
       assert result == """
+             0:00 Introduction
              0:30 Only Track
              10:00 Conclusion\
              """
@@ -186,7 +188,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarkerTest do
 
       result = TrackMarker.format_youtube_chapters(session, 0)
 
-      assert result == "1:30:45 Long Track"
+      assert result == "0:00 Introduction\n1:30:45 Long Track"
     end
 
     test "complete example with Introduction, multiple tracks, and Conclusion" do

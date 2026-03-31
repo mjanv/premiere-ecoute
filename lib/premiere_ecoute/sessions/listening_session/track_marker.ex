@@ -59,8 +59,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
         "#{timestamp} #{track_name}"
       end)
 
-    # Add "Introduction" chapter at 0:00 if bias > 0
-    chapters = if bias > 0, do: ["0:00 Introduction" | chapters], else: chapters
+    # Add "Introduction" chapter at 0:00 if the first track doesn't start at 0:00
+    first_offset =
+      DateTime.diff(hd(Enum.sort_by(markers, & &1.started_at, {:asc, DateTime})).started_at, session.started_at, :second) + bias
+
+    chapters = if first_offset > 0, do: ["0:00 Introduction" | chapters], else: chapters
 
     # Add "Conclusion" chapter at the end if session has ended
     chapters =

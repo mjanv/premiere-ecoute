@@ -118,15 +118,22 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
         _params,
         %{assigns: %{listening_session: session, current_scope: scope}} = socket
       ) do
-    with {:ok, session, _} <-
-           PremiereEcoute.apply(%StartListeningSession{source: session.source, session_id: session.id, scope: scope}),
-         :ok <- :timer.sleep(1_000),
-         {:ok, session, _} <-
-           PremiereEcoute.apply(%SkipNextTrackListeningSession{source: session.source, session_id: session.id, scope: scope}) do
-      {:noreply, assign(socket, :listening_session, session)}
-    else
+    case PremiereEcoute.apply(%StartListeningSession{source: session.source, session_id: session.id, scope: scope}) do
+      {:ok, _, _} -> {:noreply, assign(socket, :listening_session, ListeningSession.get(session.id))}
       {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
       {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start session"))}
+    end
+  end
+
+  def handle_event(
+        "start_first_track",
+        _params,
+        %{assigns: %{listening_session: session, current_scope: scope}} = socket
+      ) do
+    case PremiereEcoute.apply(%SkipNextTrackListeningSession{source: session.source, session_id: session.id, scope: scope}) do
+      {:ok, session, _} -> {:noreply, assign(socket, :listening_session, session)}
+      {:error, reason} when is_binary(reason) -> {:noreply, put_flash(socket, :error, reason)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Cannot start first track"))}
     end
   end
 
