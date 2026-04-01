@@ -139,6 +139,16 @@ defmodule PremiereEcouteWeb.Router do
     end
   end
 
+  scope "/explore", PremiereEcouteWeb.Explorer do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :explore,
+      on_mount: [{UserAuth, :viewer}],
+      root_layout: {PremiereEcouteWeb.Layouts, :explore_root} do
+      live "/", ExploreLive, :index
+    end
+  end
+
   scope "/wantlist", PremiereEcouteWeb.Wantlist do
     pipe_through [:browser, :require_authenticated_user]
 

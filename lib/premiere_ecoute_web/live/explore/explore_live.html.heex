@@ -1,0 +1,55 @@
+<div class="flex flex-col h-screen bg-gray-900 text-white overflow-hidden">
+  <%!-- Query bar --%>
+  <div class="flex-shrink-0 border-b border-gray-800 px-6 py-4">
+    <form phx-submit="search" class="flex items-center gap-3 max-w-2xl">
+      <div class="relative flex-1">
+        <.icon name="hero-magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          type="text"
+          name="query"
+          value={@query}
+          placeholder="What do you want to explore?"
+          autocomplete="off"
+          class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={@loading}
+        class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
+      >
+        <%= if @loading do %>
+          <.icon name="hero-arrow-path" class="w-4 h-4 animate-spin" />
+        <% else %>
+          Explore
+        <% end %>
+      </button>
+    </form>
+
+    <%!-- Error banner --%>
+    <%= if @error do %>
+      <p class="mt-2 text-sm text-red-400">{@error}</p>
+    <% end %>
+  </div>
+
+  <%!-- Canvas — React Flow owns this subtree after mount --%>
+  <div
+    id="explore-canvas"
+    phx-hook="ExploreCanvas"
+    phx-update="ignore"
+    class="flex-1 w-full"
+  >
+    <%!-- Placeholder shown before first search --%>
+    <%= if @node_ids == [] and not @loading do %>
+      <div class="flex flex-col items-center justify-center h-full text-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center">
+          <.icon name="hero-musical-note" class="w-8 h-8 text-purple-400" />
+        </div>
+        <div>
+          <p class="text-lg font-medium text-gray-200">Start exploring</p>
+          <p class="mt-1 text-sm text-gray-500">Type an artist or album name above</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -24,10 +24,12 @@ import topbar from "../vendor/topbar"
 import {Hooks} from "./hooks/index.js"
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+// Merge page-specific hooks registered by separate bundles (e.g. explore.js).
+const allHooks = { ...Hooks, ...(window.__ExploreHooks || {}) }
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: Hooks
+  hooks: allHooks
 })
 
 topbar.config({barColors: {0: "rgba(168, 34, 221, 1)"}, shadowColor: "rgba(24, 72, 228, 0.3)"})

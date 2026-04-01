@@ -15,6 +15,7 @@ defmodule PremiereEcoute do
       {Collections, except: []},
       {Commands, except: []},
       {Discography, except: []},
+      {Explorer, except: []},
       {Donations, except: []},
       {Events, except: []},
       {Extension, except: []},

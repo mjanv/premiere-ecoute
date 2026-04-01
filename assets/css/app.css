@@ -110,3 +110,61 @@
 
 /* Alpine.js cloak utility to prevent flash of unstyled content */
 [x-cloak] { display: none !important; }
+
+/* ── Music Explorer ──────────────────────────────────────────────────────── */
+
+/* Annotated entity hotspots inside card content */
+.explorer-hotspot {
+  background: transparent;
+  color: #a78bfa; /* purple-400 */
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.explorer-hotspot:hover {
+  background-color: rgba(139, 92, 246, 0.15); /* purple-500/15 */
+  color: #c4b5fd; /* purple-300 */
+  text-decoration-style: solid;
+}
+
+/* Card prose inside ArtistNode */
+.explorer-card-content p { margin-bottom: 0.75rem; }
+.explorer-card-content ul, .explorer-card-content ol { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.explorer-card-content li { margin-bottom: 0.25rem; }
+.explorer-card-content h2, .explorer-card-content h3 { font-weight: 600; margin-bottom: 0.5rem; color: #e5e7eb; }
+
+/* Clickable album / track rows in DB-generated discography cards */
+.explorer-album-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+
+.explorer-album-row:hover { background-color: rgba(255,255,255,0.06); }
+.explorer-album-row:hover .explorer-album-row__name { color: #a78bfa; }
+.explorer-album-row__name { flex: 1; font-size: 0.875rem; color: #d1d5db; }
+.explorer-album-row__meta { font-size: 0.75rem; color: #6b7280; }
+
+/* Clickable track rows in album tracklist cards */
+.explorer-track-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  list-style: none;
+}
+.explorer-track-row:hover { background-color: rgba(255,255,255,0.06); }
+.explorer-track-row:hover .explorer-track-row__name { color: #a78bfa; }
+.explorer-track-row__number { font-size: 0.75rem; color: #6b7280; min-width: 1.25rem; text-align: right; }
+.explorer-track-row__name { flex: 1; font-size: 0.875rem; color: #d1d5db; }
+.explorer-track-row__duration { font-size: 0.75rem; color: #6b7280; }
