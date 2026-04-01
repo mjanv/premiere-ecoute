@@ -28,7 +28,7 @@ defmodule PremiereEcoute.Models.AudioSegment do
   @doc """
   Decodes a segment's base64 PCM audio into an Nx tensor.
 
-  The browser sends raw little-endian Float32 PCM at 16kHz.
+  The browser sends raw little-endian Float32 PCM at 48kHz.
   Returns a 1D `{num_samples}` tensor of type `:f32`.
   """
   def decode_audio(%__MODULE__{audio: b64} = _segment) do
@@ -40,13 +40,13 @@ defmodule PremiereEcoute.Models.AudioSegment do
   @doc """
   Wraps a segment's base64 PCM audio in a WAV container binary.
 
-  Input is Float32 LE PCM at 16kHz mono (fmt type 3 = IEEE float).
+  Input is Float32 LE PCM at 48kHz mono (fmt type 3 = IEEE float).
   Returns a valid WAV binary ready to be sent to an audio API.
   """
   def to_wav(%__MODULE__{audio: b64}) do
     pcm = Base.decode64!(b64)
     num_channels = 1
-    sample_rate = 16_000
+    sample_rate = 48_000
     bits_per_sample = 32
     byte_rate = sample_rate * num_channels * div(bits_per_sample, 8)
     block_align = num_channels * div(bits_per_sample, 8)

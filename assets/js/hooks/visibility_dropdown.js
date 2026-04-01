@@ -18,8 +18,8 @@ export const VisibilityDropdown = {
 
     this.closeDropdown = (e) => {
       if (!this.el.contains(e.target)) {
-        this.menu.classList.add('hidden');
-        this.chevron.style.transform = 'rotate(0deg)';
+        this.menu && this.menu.classList.add('hidden');
+        if (this.chevron) this.chevron.style.transform = 'rotate(0deg)';
       }
     };
 
