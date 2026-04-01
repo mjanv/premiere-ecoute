@@ -4,7 +4,8 @@
 // thread, avoiding MediaRecorder container format issues. Every CHUNK_SAMPLES frames
 // the worklet posts samples to the main thread → waveform accumulates + server notified.
 
-const SAMPLING_RATE = 16_000;
+// AIDEV-NOTE: 48kHz matches OBS default — no resampling needed for audio/video alignment.
+const SAMPLING_RATE = 48_000;
 
 export const Microphone = {
   mounted() {
@@ -12,7 +13,7 @@ export const Microphone = {
     this.stream = null;
     this.allSamples = new Float32Array(0);
     this.recording = false;
-    this.SAMPLES_PER_PX = 133; // ~10s visible at 16kHz on a 1200px canvas
+    this.SAMPLES_PER_PX = 400; // ~10s visible at 48kHz on a 1200px canvas
 
     const h = 160;
     const parent = this.el.parentElement;
@@ -70,7 +71,7 @@ export const Microphone = {
         // Append new frames first so smoothedClean has full context
         let framesOffsetBeforeAppend = this.allFrames.length;
         for (let i = 0; i < newFrames.length; i++) this.allFrames.push(newFrames[i]);
-        const maxFrames = Math.ceil(maxSamples / 480);
+        const maxFrames = Math.ceil(maxSamples / 1440);
         if (this.allFrames.length > maxFrames) {
           const evicted = this.allFrames.length - maxFrames;
           this.allFrames.splice(0, evicted);
@@ -94,7 +95,7 @@ export const Microphone = {
           }
           // Accumulate samples for the current open segment (speech + hangover)
           if (this.segmentStart !== null) {
-            const fStart = i * 480, fEnd = Math.min(fStart + 480, newSamples.length);
+            const fStart = i * 1440, fEnd = Math.min(fStart + 1440, newSamples.length);
             for (let s = fStart; s < fEnd; s++) this.segmentSamples.push(newSamples[s]);
           }
           if (!newFrames[i].isSpeech && this.segmentStart !== null) {
@@ -187,7 +188,7 @@ export const Microphone = {
   // AIDEV-NOTE: h is split: top 140px = waveform, bottom 16px = VAD segment bar
   drawWaveform(samples, frames = []) {
     const S = this.SAMPLES_PER_PX;
-    const FRAME_SAMPLES = 480; // 30ms at 16kHz — must match pcm-processor.js
+    const FRAME_SAMPLES = 1440; // 30ms at 48kHz — must match pcm-processor.js
     const w = this.W;
     const h = this.H;
     const waveH = h - 16;  // waveform area height

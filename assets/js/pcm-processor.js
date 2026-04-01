@@ -1,10 +1,11 @@
 // AIDEV-NOTE: AudioWorklet processor — runs in the audio thread.
 // Per 30ms frame computes: RMS VAD + spectral flatness + attack ratio.
 // Classification: isSpeech (VAD gate) + isCleanSpeech (flatness + attack filter).
+// AIDEV-NOTE: 48kHz matches OBS default capture rate — no resampling needed.
 
-const SAMPLE_RATE = 16000;
-const CHUNK_SAMPLES = SAMPLE_RATE * 0.5;  // 500ms chunks
-const FRAME_SAMPLES = SAMPLE_RATE * 0.03; // 30ms = 480 samples
+const SAMPLE_RATE = 48000;
+const CHUNK_SAMPLES = SAMPLE_RATE * 0.5;  // 500ms chunks = 24000 samples
+const FRAME_SAMPLES = SAMPLE_RATE * 0.03; // 30ms = 1440 samples
 const FFT_SIZE = 512;                      // next power of 2 >= 480
 
 // VAD hysteresis
@@ -15,7 +16,7 @@ const HANG_FRAMES = 20;    // ~1s hangover
 // Speech quality thresholds
 const FLATNESS_MAX  = 0.4;  // above → broadband noise
 const ATTACK_MAX    = 4.0;  // above → transient (click/thump)
-const ATTACK_SPLIT  = Math.floor(FRAME_SAMPLES * 5 / 30); // first 5ms of the 30ms frame
+const ATTACK_SPLIT  = Math.floor(FRAME_SAMPLES * 5 / 30); // first 5ms of the 30ms frame = 240 samples
 
 // --- Radix-2 Cooley-Tukey FFT (in-place, real input via split re/im arrays) ---
 function fft(re, im) {
