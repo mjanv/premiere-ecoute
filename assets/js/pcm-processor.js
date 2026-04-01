@@ -10,7 +10,7 @@ const FFT_SIZE = 512;                      // next power of 2 >= 480
 // VAD hysteresis
 const SPEECH_ON   = 0.008;
 const SPEECH_OFF  = 0.003;
-const HANG_FRAMES = 33;    // ~1s hangover
+const HANG_FRAMES = 20;    // ~1s hangover
 
 // Speech quality thresholds
 const FLATNESS_MAX  = 0.4;  // above → broadband noise

@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
   use Gettext, backend: PremiereEcoute.Gettext
 
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.ListeningSession.XmemlExport
 
   # AIDEV-NOTE: {timebase, ntsc} pairs matching xmeml spec. ntsc=TRUE applies 0.01% pulldown.
   @frame_rates [
@@ -52,7 +53,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
         %{assigns: %{listening_session: session, media_path: media_path, frame_rate: frame_rate}} = socket
       ) do
     {timebase, ntsc} = resolve_rate(frame_rate)
-    xml = build_xmeml(session, media_path, timebase, ntsc)
+    xml = XmemlExport.build(session, media_path, timebase, ntsc)
     filename = export_filename(session, "xml")
 
     {:noreply,
@@ -203,129 +204,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
     """
   end
 
-  # ---------------------------------------------------------------------------
-  # XMEML export
-  # AIDEV-NOTE: xmeml version 5, non-NTSC at @timebase fps.
-  # - start/end = clip position on timeline (frames from 0)
-  # - in/out    = source media in/out points (frames within the file)
-  # - First clipitem declares the <file> in full; subsequent ones reference id only.
-  # - pathurl must be file:///... with RFC-2396 percent-encoding.
-  # - file duration = total source duration; we use the whole recording length.
-  # ---------------------------------------------------------------------------
-
-  defp build_xmeml(%{speech_markers: speech_markers, track_markers: track_markers} = session, media_path, timebase, ntsc) do
-    sorted_speech = Enum.sort_by(speech_markers, & &1.start_ms)
-    sorted_tracks = Enum.sort_by(track_markers, & &1.started_at, {:asc, DateTime})
-
-    # Total sequence length: max of last speech end or last track start
-    speech_end_ms = if sorted_speech != [], do: List.last(sorted_speech).end_ms, else: 0
-
-    track_end_ms =
-      if sorted_tracks != [] && not is_nil(session.started_at) do
-        DateTime.diff(List.last(sorted_tracks).started_at, session.started_at, :millisecond)
-      else
-        0
-      end
-
-    total_sequence_frames = ms_to_frames(max(speech_end_ms, track_end_ms), timebase)
-
-    file_name = if media_path == "", do: "recording.mp4", else: Path.basename(media_path)
-    path_url = build_pathurl(media_path, file_name)
-    rate_xml = "<rate><timebase>#{timebase}</timebase><ntsc>#{ntsc}</ntsc></rate>"
-
-    # AIDEV-NOTE: file declared once as standalone element, clipitems reference it by id.
-    file_element =
-      "<file id=\"file-1\">" <>
-        "<name>#{xml_escape(file_name)}</name>" <>
-        "<pathurl>#{path_url}</pathurl>" <>
-        rate_xml <>
-        "<duration>#{total_sequence_frames}</duration>" <>
-        "</file>"
-
-    file_ref = "<file id=\"file-1\"/>"
-
-    build_clipitem = fn id_prefix, start_f, end_f, label, first? ->
-      duration_f = end_f - start_f
-
-      "<clipitem id=\"#{id_prefix}\">" <>
-        "<name>#{xml_escape(label)}</name>" <>
-        "<enabled>TRUE</enabled>" <>
-        "<duration>#{duration_f}</duration>" <>
-        rate_xml <>
-        "<start>#{start_f}</start>" <>
-        "<end>#{end_f}</end>" <>
-        "<in>#{start_f}</in>" <>
-        "<out>#{end_f}</out>" <>
-        if(first?, do: file_element, else: file_ref) <>
-        "</clipitem>"
-    end
-
-    # Track markers track — end of each = start of next, last one ends at sequence end
-    track_clips =
-      sorted_tracks
-      |> Enum.with_index(1)
-      |> Enum.map_join("\n", fn {marker, i} ->
-        start_ms =
-          if is_nil(session.started_at),
-            do: 0,
-            else: DateTime.diff(marker.started_at, session.started_at, :millisecond)
-
-        # i is 1-based, Enum.at is 0-based → gives next element
-        next = Enum.at(sorted_tracks, i)
-
-        end_ms =
-          if next && not is_nil(session.started_at),
-            do: DateTime.diff(next.started_at, session.started_at, :millisecond),
-            else: max(speech_end_ms, track_end_ms)
-
-        label = track_label(session, marker, i)
-        build_clipitem.("chapter-#{i}", ms_to_frames(start_ms, timebase), ms_to_frames(end_ms, timebase), label, i == 1)
-      end)
-
-    # Speech markers track
-    speech_clips =
-      sorted_speech
-      |> Enum.with_index(1)
-      |> Enum.map_join("\n", fn {marker, i} ->
-        label = marker.text || "Speech #{i}"
-        # First speech clip declares file only if there are no track clips
-        first? = i == 1 && sorted_tracks == []
-
-        build_clipitem.(
-          "speech-#{i}",
-          ms_to_frames(marker.start_ms, timebase),
-          ms_to_frames(marker.end_ms, timebase),
-          label,
-          first?
-        )
-      end)
-
-    """
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE xmeml>
-    <xmeml version="5">
-      <sequence>
-        <name>#{xml_escape(ListeningSession.title(session))}</name>
-        <duration>#{total_sequence_frames}</duration>
-        <rate>
-          <timebase>#{timebase}</timebase>
-          <ntsc>#{ntsc}</ntsc>
-        </rate>
-        <media>
-          <video>
-            <track>
-    #{track_clips}
-            </track>
-            <track>
-    #{speech_clips}
-            </track>
-          </video>
-        </media>
-      </sequence>
-    </xmeml>
-    """
-  end
-
   defp track_label(%{source: :album, album: album}, marker, i) do
     case album && Enum.find(album.tracks, &(&1.id == marker.track_id)) do
       %{name: name} -> name
@@ -348,29 +226,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
     |> then(fn {_, tb, ntsc} -> {tb, ntsc} end)
   end
 
-  defp build_pathurl("", file_name), do: "file:///#{percent_encode(file_name)}"
-
-  defp build_pathurl(path, _file_name) do
-    # Normalise: ensure absolute path, then encode
-    clean = path |> String.trim() |> String.replace_leading("file:///", "") |> String.replace_leading("file://localhost/", "")
-    "file:///#{percent_encode(clean)}"
-  end
-
-  # Percent-encode path segments per RFC 2396 (keep / separators unencoded)
-  defp percent_encode(path) do
-    path
-    |> String.split("/")
-    |> Enum.map_join("/", &URI.encode/1)
-  end
-
-  defp xml_escape(text) do
-    text
-    |> String.replace("&", "&amp;")
-    |> String.replace("<", "&lt;")
-    |> String.replace(">", "&gt;")
-    |> String.replace("\"", "&quot;")
-  end
-
   # ---------------------------------------------------------------------------
   # Shared helpers
   # ---------------------------------------------------------------------------
@@ -379,8 +234,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
     title = ListeningSession.title(session) |> String.replace(~r/[^\w\-]/, "_")
     "#{title}_speech_markers_#{Date.utc_today()}.#{ext}"
   end
-
-  defp ms_to_frames(ms, timebase), do: div(ms * timebase, 1000)
 
   defp ms_to_timestamp(ms) do
     total_seconds = div(ms, 1000)
