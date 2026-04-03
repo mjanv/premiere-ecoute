@@ -92,6 +92,7 @@ defmodule PremiereEcoute.MixProject do
       {:ex_cldr, "~> 2.0"},
       {:ex_cldr_dates_times, "~> 2.0"},
       {:req, "~> 0.5"},
+      {:websockex, "~> 0.5.1"},
       {:hackney, "~> 1.8"},
       {:jason, "~> 1.2"},
       {:cachex, "~> 4.1"},

@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Models.Supervisor do
 
   use PremiereEcouteCore.Supervisor,
     children: [
-      # {PremiereEcoute.Models.OpenAi.SpeechToTextWhisper, [model: "openai/whisper-tiny"]}
+      PremiereEcoute.Models.Mistral.Supervisor,
+      PremiereEcoute.Models.OpenAi.Supervisor
     ]
 end
