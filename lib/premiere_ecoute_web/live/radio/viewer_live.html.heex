@@ -18,14 +18,27 @@
             class="group flex items-center gap-4 sm:gap-6 rounded-xl px-4 sm:px-6 py-4 sm:py-6 border border-white/10 hover:border-purple-400/40 backdrop-blur-sm transition-all duration-300 sm:hover:scale-[1.10] hover:shadow-xl hover:shadow-purple-900/40 cursor-default"
             style="background-color: rgba(220,215,235,0.15);"
           >
-            <%= if false && assigns[:current_scope] && assigns[:current_scope].user && track.provider_ids[:spotify] do %>
+            <%= if assigns[:current_scope] && assigns[:current_scope].user && track.provider_ids[:spotify] do %>
+              <% wantlisted = MapSet.member?(@wantlisted_ids, track.provider_ids[:spotify]) %>
               <button
                 phx-click="add_track_to_wantlist"
                 phx-value-spotify-id={track.provider_ids[:spotify]}
-                class="shrink-0 w-8 h-8 rounded-full bg-white/5 hover:bg-purple-600/40 border border-white/10 hover:border-purple-400/60 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                disabled={wantlisted}
+                class={[
+                  "shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all opacity-0 group-hover:opacity-100",
+                  if(wantlisted,
+                    do: "bg-purple-600/60 border-purple-400/60 cursor-default",
+                    else: "bg-white/5 hover:bg-purple-600/40 border-white/10 hover:border-purple-400/60"
+                  )
+                ]}
                 title={gettext("Add to wantlist")}
               >
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="w-4 h-4 text-white"
+                  fill={if(wantlisted, do: "currentColor", else: "none")}
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"

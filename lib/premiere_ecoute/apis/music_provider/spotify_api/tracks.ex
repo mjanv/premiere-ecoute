@@ -56,13 +56,14 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
 
   defp parse_single(_), do: nil
 
-  defp parse_track(%{"album" => %{"album_type" => "album"}} = data) do
+  defp parse_track(%{"album" => %{"album_type" => "album", "id" => album_id}} = data) do
     %Track{
       provider_ids: %{spotify: data["id"]},
       name: data["name"],
       track_number: data["track_number"] || 0,
       duration_ms: data["duration_ms"] || 0
     }
+    |> Map.put(:album_spotify_id, album_id)
   end
 
   defp parse_track(_), do: nil

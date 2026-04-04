@@ -37,7 +37,8 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
          tracks: [],
          today: today,
          oldest_date: Date.add(today, -Accounts.profile(user, [:radio_settings, :retention_days])),
-         timezone: Accounts.profile(user, [:timezone], "UTC")
+         timezone: Accounts.profile(user, [:timezone], "UTC"),
+         wantlisted_ids: MapSet.new()
        )}
     else
       _ -> {:ok, push_navigate(socket, to: "/")}
@@ -49,7 +50,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
     case Date.from_iso8601(date_str) do
       {:ok, date} ->
         tracks = Radio.get_tracks(socket.assigns.user.id, date)
-        {:noreply, assign(socket, date: date, tracks: tracks)}
+        {:noreply, assign(socket, date: date, tracks: tracks, wantlisted_ids: load_wantlisted_ids(socket, tracks))}
 
       _ ->
         {:noreply, socket}
@@ -59,7 +60,7 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
   def handle_params(_params, _uri, socket) do
     date = Date.utc_today()
     tracks = Radio.get_tracks(socket.assigns.user.id, date)
-    {:noreply, assign(socket, date: date, tracks: tracks)}
+    {:noreply, assign(socket, date: date, tracks: tracks, wantlisted_ids: load_wantlisted_ids(socket, tracks))}
   end
 
   @impl true
@@ -69,16 +70,24 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
     if current_scope && current_scope.user do
       case Wantlists.add_radio_track(current_scope.user.id, spotify_id) do
         {:ok, _} ->
-          {:noreply, put_flash(socket, :info, gettext("Added to wantlist"))}
-
-        {:error, :not_found} ->
-          {:noreply, put_flash(socket, :error, gettext("Track not found in discography"))}
+          {:noreply, assign(socket, :wantlisted_ids, load_wantlisted_ids(socket, socket.assigns.tracks))}
 
         {:error, _} ->
-          {:noreply, put_flash(socket, :error, gettext("Could not add to wantlist"))}
+          {:noreply, socket}
       end
     else
-      {:noreply, put_flash(socket, :error, gettext("You must be logged in"))}
+      {:noreply, socket}
+    end
+  end
+
+  defp load_wantlisted_ids(socket, tracks) do
+    case socket.assigns[:current_scope] do
+      %{user: %{id: user_id}} ->
+        spotify_ids = tracks |> Enum.map(& &1.provider_ids[:spotify]) |> Enum.reject(&is_nil/1)
+        Wantlists.wantlisted_spotify_ids(user_id, spotify_ids)
+
+      _ ->
+        MapSet.new()
     end
   end
 
