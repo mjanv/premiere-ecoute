@@ -47,11 +47,15 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
         end
       end
 
-      {:ok, cached_session} = Cache.get(:sessions, current_scope.user.twitch.user_id)
+      open_vote =
+        case Cache.get(:sessions, current_scope.user.twitch.user_id) do
+          {:ok, cached_session} -> !is_nil(cached_session)
+          {:error, _} -> false
+        end
 
       socket
       |> assign(:listening_session, listening_session)
-      |> assign(:open_vote, !is_nil(cached_session))
+      |> assign(:open_vote, open_vote)
       |> assign(:player_state, nil)
       |> assign(:session_id, session_id)
       |> assign(:user_current_rating, nil)
@@ -289,10 +293,10 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   @impl true
   def handle_event(
         "segment_detected",
-        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean, "audio" => audio},
+        %{"start_ms" => start_ms, "end_ms" => end_ms, "is_clean" => is_clean} = params,
         socket
       ) do
-    segment = PremiereEcoute.Models.new_audio_segment(start_ms, end_ms, is_clean, audio)
+    segment = PremiereEcoute.Models.new_audio_segment(start_ms, end_ms, is_clean, Map.get(params, "audio"))
     {:noreply, assign(socket, :last_segment, segment)}
   end
 
@@ -450,11 +454,15 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
         %{assigns: %{listening_session: %ListeningSession{status: :active, source: source}, current_scope: scope}} = socket
       )
       when source != :free do
-    duration_ms = state["item"]["duration_ms"]
-    threshold = round(100 * (1 - 30_000 / duration_ms))
+    # AIDEV-NOTE: state["item"] is nil between tracks — guard before accessing duration_ms.
+    duration_ms = get_in(state, ["item", "duration_ms"])
 
-    if duration_ms >= 60_000 and abs(percent - threshold) <= 1 do
-      ListeningSessionWorker.in_seconds(%{action: "votes_closing", user_id: scope.user.id}, 0)
+    if is_integer(duration_ms) and duration_ms >= 60_000 do
+      threshold = round(100 * (1 - 30_000 / duration_ms))
+
+      if abs(percent - threshold) <= 1 do
+        ListeningSessionWorker.in_seconds(%{action: "votes_closing", user_id: scope.user.id}, 0)
+      end
     end
 
     {:noreply, assign(socket, :player_state, state)}

@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Models.Mistral.Transcription do
 
   @behaviour PremiereEcoute.Models.Transcription
 
+  require Logger
+
   alias PremiereEcoute.Models.AudioSegment
   alias PremiereEcoute.Models.Mistral
 
@@ -20,8 +22,12 @@ defmodule PremiereEcoute.Models.Mistral.Transcription do
       ]
     )
     |> case do
-      %{status: 200, body: %{"text" => text}} -> %{segment | text: text}
-      _ -> segment
+      %{status: 200, body: %{"text" => text}} ->
+        Logger.info("[Mistral] #{inspect(text)}")
+        %{segment | text: text}
+
+      _ ->
+        segment
     end
   end
 end

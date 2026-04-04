@@ -130,13 +130,15 @@ export const Microphone = {
         let binary = "";
         for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
         for (const seg of completedSegments) {
-          if (seg.samples) {
+          // AIDEV-NOTE: Only encode audio for clean segments — server only uses it for transcription.
+          // Sending large base64 blobs for noisy segments overflows the longpoll body limit (1MB).
+          if (seg.is_clean && seg.samples) {
             const bytes = new Uint8Array(seg.samples.buffer);
             let binary = "";
             for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
             seg.audio = btoa(binary);
-            delete seg.samples;
           }
+          delete seg.samples;
           this.pushEvent("segment_detected", seg);
         }
       };

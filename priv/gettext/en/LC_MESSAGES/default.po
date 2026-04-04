@@ -5421,7 +5421,7 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:195
 #, elixir-autogen, elixir-format, fuzzy
 msgid "no transcription"
-msgstr "Enter goal description"
+msgstr ""
 
 #: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:176
 #, elixir-autogen, elixir-format
