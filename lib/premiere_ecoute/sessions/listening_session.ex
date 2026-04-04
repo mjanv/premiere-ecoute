@@ -55,7 +55,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     field :vote_mode, Ecto.Enum, values: [:chat, :poll], default: :chat
     field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
     field :replays, {:array, :map}, default: []
-    field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0}
+    field :options, :map, default: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => true, "transcribe" => false}
     field :vote_options, {:array, :string}, default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     field :started_at, :utc_datetime
     field :ended_at, :utc_datetime

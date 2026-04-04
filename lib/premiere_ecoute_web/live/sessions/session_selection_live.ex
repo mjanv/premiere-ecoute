@@ -35,6 +35,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:pick_spinning, false)
     |> assign(:free_session_name, "")
     |> assign(:free_vote_mode, nil)
+    |> assign(:autostart, true)
     |> update_state()
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -133,6 +134,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
     |> assign(:free_vote_mode, nil)
+    # Reset autostart to default
+    |> assign(:autostart, true)
     # Load playlists if playlist source is selected
     |> maybe_load_playlists(source)
     |> update_state()
@@ -190,7 +193,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       source: :track,
       user_id: get_user_id(socket),
       track_id: Map.get(track.provider_ids, :spotify),
-      vote_options: get_vote_options(socket.assigns)
+      vote_options: get_vote_options(socket.assigns),
+      autostart: socket.assigns.autostart
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -206,7 +210,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       user_id: get_user_id(socket),
       name: socket.assigns.free_session_name,
       vote_options: get_vote_options(socket.assigns),
-      vote_mode: String.to_existing_atom(socket.assigns.free_vote_mode)
+      vote_mode: String.to_existing_atom(socket.assigns.free_vote_mode),
+      autostart: socket.assigns.autostart
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -257,7 +262,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       source: :album,
       user_id: get_user_id(socket),
       album_id: Map.get(album.provider_ids, :spotify),
-      vote_options: vote_options
+      vote_options: vote_options,
+      autostart: socket.assigns.autostart
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -277,7 +283,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       source: :playlist,
       user_id: get_user_id(socket),
       playlist_id: playlist.playlist_id,
-      vote_options: get_vote_options(socket.assigns)
+      vote_options: get_vote_options(socket.assigns),
+      autostart: socket.assigns.autostart
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -293,6 +300,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   def handle_event("select_free_vote_mode", %{"mode" => mode}, socket) do
     {:noreply, socket |> assign(:free_vote_mode, mode) |> update_state()}
+  end
+
+  def handle_event("toggle_autostart", _params, socket) do
+    {:noreply, socket |> assign(:autostart, !socket.assigns.autostart)}
   end
 
   def handle_event("open_random_modal", _params, socket) do

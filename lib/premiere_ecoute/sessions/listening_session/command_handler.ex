@@ -46,14 +46,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   command(PremiereEcoute.Sessions.ListeningSession.Commands.CloseVoteWindowListeningSession)
 
   @doc false
-  def handle(%PrepareListeningSession{source: :album, user_id: user_id, album_id: album_id, vote_options: vote_options}) do
+  def handle(%PrepareListeningSession{
+        source: :album,
+        user_id: user_id,
+        album_id: album_id,
+        vote_options: vote_options,
+        autostart: autostart
+      }) do
     with {:ok, album} <- EnrichDiscography.create_album(album_id, :spotify),
          {:ok, session} <-
            ListeningSession.create(%{
              user_id: user_id,
              source: :album,
              album_id: album.id,
-             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+             options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
            }) do
       {:ok, session,
        [
@@ -72,14 +79,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%PrepareListeningSession{source: :track, user_id: user_id, track_id: track_id, vote_options: vote_options}) do
+  def handle(%PrepareListeningSession{
+        source: :track,
+        user_id: user_id,
+        track_id: track_id,
+        vote_options: vote_options,
+        autostart: autostart
+      }) do
     with {:ok, single} <- EnrichDiscography.create_single(track_id, :spotify),
          {:ok, session} <-
            ListeningSession.create(%{
              user_id: user_id,
              source: :track,
              single_id: single.id,
-             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+             options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
            }) do
       {:ok, session,
        [
@@ -97,7 +111,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%PrepareListeningSession{source: :playlist, user_id: user_id, playlist_id: playlist_id, vote_options: vote_options}) do
+  def handle(%PrepareListeningSession{
+        source: :playlist,
+        user_id: user_id,
+        playlist_id: playlist_id,
+        vote_options: vote_options,
+        autostart: autostart
+      }) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
          {:ok, playlist} <- get_or_create_playlist(playlist),
          {:ok, session} <-
@@ -105,7 +125,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              user_id: user_id,
              source: :playlist,
              playlist_id: playlist.id,
-             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+             options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
            }) do
       {:ok, session,
        [
@@ -317,7 +338,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         user_id: user_id,
         name: name,
         vote_options: vote_options,
-        vote_mode: vote_mode
+        vote_mode: vote_mode,
+        autostart: autostart
       }) do
     resolved_options = vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 
@@ -326,7 +348,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            source: :free,
            name: name || "Free session",
            vote_mode: vote_mode || :chat,
-           vote_options: resolved_options
+           vote_options: resolved_options,
+           options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
          }) do
       {:ok, session} ->
         {:ok, session,

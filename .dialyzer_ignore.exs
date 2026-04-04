@@ -36,6 +36,8 @@
   {"lib/premiere_ecoute/donations/services/expenses.ex", :call_without_opaque},
   {"lib/premiere_ecoute/donations/services/goals.ex", :call_without_opaque},
   {"lib/premiere_ecoute/radio/radio_track.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/wantlists/wantlist.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/wantlists/wantlist_item.ex", :call_without_opaque},
   {"lib/premiere_ecoute_web/components/core_components.ex", :call_without_opaque},
   {"lib/premiere_ecoute_web/components/cards/modal.ex", :call_without_opaque},
   {"lib/premiere_ecoute_web/layouts/layouts.ex", :call_with_opaque},

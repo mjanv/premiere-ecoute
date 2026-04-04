@@ -90,6 +90,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     open_delay = if track.duration_ms <= @cooldown * 2 * 1000, do: 5, else: @cooldown
     ListeningSessionWorker.in_seconds(%{action: "open_playlist", session_id: session_id, user_id: user_id}, open_delay)
+    PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:next_track, track})
     :ok
   end
 

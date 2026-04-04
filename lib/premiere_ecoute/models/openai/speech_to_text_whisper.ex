@@ -40,9 +40,9 @@ defmodule PremiereEcoute.Models.OpenAi.SpeechToTextWhisper do
   end
 
   @impl PremiereEcoute.Models.Transcription
-  def transcribe(%AudioSegment{audio: audio} = segment) do
+  def transcribe(%AudioSegment{} = segment) do
     __MODULE__
-    |> Nx.Serving.batched_run(AudioSegment.decode_audio(audio))
+    |> Nx.Serving.batched_run(AudioSegment.decode_audio(segment))
     |> case do
       %{chunks: [%{text: text} | _]} ->
         Logger.info("[whisper] text=#{inspect(text)}")

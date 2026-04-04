@@ -60,6 +60,15 @@
           free_vote_mode={@free_vote_mode}
         />
         
+<!-- Step 3b: Autostart toggle -->
+        <%= if @step in ["3", "4"] do %>
+          <div class="mb-8 relative">
+            <div class="ml-16">
+              <.autostart_toggle autostart={@autostart} />
+            </div>
+          </div>
+        <% end %>
+        
 <!-- Step 4: Start -->
         <%= if @step == "4" do %>
           <div class="pt-6 relative" id="step-4">

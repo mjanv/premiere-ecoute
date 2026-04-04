@@ -272,7 +272,7 @@
                   </button>
                 <% end %>
 
-                <%= if @listening_session.status == :active && @listening_session.source in [:album, :playlist] && is_nil(@listening_session.current_track_id) && is_nil(@listening_session.current_playlist_track_id) do %>
+                <%= if @listening_session.status == :active && not(@listening_session.options["autostart"]) && @listening_session.source in [:album, :playlist] && is_nil(@listening_session.current_track_id) && is_nil(@listening_session.current_playlist_track_id) do %>
                   <button
                     phx-click="start_first_track"
                     class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white py-2 px-4 rounded-lg font-medium transition-all duration-200 text-sm flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"

@@ -16,10 +16,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
             track_id: String.t() | nil,
             name: String.t() | nil,
             vote_options: [String.t()],
-            vote_mode: :chat | :poll | nil
+            vote_mode: :chat | :poll | nil,
+            autostart: boolean()
           }
 
-    defstruct [:user_id, :source, :album_id, :playlist_id, :track_id, :name, :vote_options, :vote_mode]
+    defstruct [:user_id, :source, :album_id, :playlist_id, :track_id, :name, :vote_options, :vote_mode, autostart: true]
   end
 
   defmodule StartListeningSession do

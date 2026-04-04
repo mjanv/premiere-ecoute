@@ -167,15 +167,16 @@ defmodule PremiereEcoute.MixProject do
       ],
       gettext: ["gettext.extract", "gettext.merge priv/gettext"],
       # Quality
+      todo: ["credo --strict --only todo"],
       clean: [
         "format",
-        "credo --strict",
+        "credo --strict --ignore todo",
         "compile --warnings-as-errors"
       ],
       quality: [
         "compile --warnings-as-errors",
         "format --check-formatted",
-        "credo --strict",
+        "credo --strict --ignore todo",
         "dialyzer --format short",
         "doctor",
         "gettext.check"

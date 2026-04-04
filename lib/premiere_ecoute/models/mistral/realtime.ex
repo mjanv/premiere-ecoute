@@ -35,7 +35,7 @@ defmodule PremiereEcoute.Models.Realtime do
     Logger.info("Connected to Mistral Realtime API")
 
     # Immediately initialize the session
-    init_event = %{
+    _init_event = %{
       type: "session.update",
       session: %{
         model: "voxtral-mini-transcribe-realtime-2602",
@@ -45,7 +45,9 @@ defmodule PremiereEcoute.Models.Realtime do
       }
     }
 
-    {:reply, {:text, Jason.encode!(init_event)}, state}
+    # {:text, Jason.encode!(init_event)
+
+    {:ok, state}
   end
 
   @impl true

@@ -757,7 +757,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
         >
           3
         </div>
-        <h2 class="text-2xl font-semibold text-white">{gettext("Vote Options")}</h2>
+        <h2 class="text-2xl font-semibold text-white">{gettext("Options")}</h2>
       </div>
 
       <div class="ml-16">
@@ -832,6 +832,41 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
             </button>
           </div>
         <% end %>
+      </div>
+    </div>
+    """
+  end
+
+  # ---------------------------------------------------------------------------
+  # Autostart toggle
+  # ---------------------------------------------------------------------------
+
+  @doc "Renders the autostart toggle option"
+  attr :autostart, :boolean, required: true
+
+  def autostart_toggle(assigns) do
+    ~H"""
+    <div class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
+      <button
+        type="button"
+        phx-click="toggle_autostart"
+        class={[
+          "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+          if(@autostart, do: "bg-purple-600", else: "bg-gray-700")
+        ]}
+      >
+        <span class={[
+          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+          if(@autostart, do: "translate-x-5", else: "translate-x-0")
+        ]} />
+      </button>
+      <div class="flex-1">
+        <label class="text-sm font-medium text-gray-200 cursor-pointer">
+          {gettext("Auto-start first track")}
+        </label>
+        <p class="text-xs text-gray-400 mt-0.5">
+          {gettext("Automatically play the first track 1 second after session starts")}
+        </p>
       </div>
     </div>
     """
