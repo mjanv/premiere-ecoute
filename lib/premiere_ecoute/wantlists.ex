@@ -54,12 +54,9 @@ defmodule PremiereEcoute.Wantlists do
   @spec add_item(integer(), :album | :track | :artist, integer()) ::
           {:ok, WantlistItem.t()} | {:error, Ecto.Changeset.t()}
   def add_item(user_id, type, record_id) do
-    fk_field = fk_for(type)
-
     with {:ok, wantlist} <- get_or_create_default(user_id) do
-      attrs = Map.merge(%{type: type, wantlist_id: wantlist.id}, %{fk_field => record_id})
-
-      WantlistItem.create_if_not_exists(attrs)
+      Map.merge(%{type: type, wantlist_id: wantlist.id}, %{fk_for(type) => record_id})
+      |> WantlistItem.create_if_not_exists()
       |> Store.ok("wantlist", fn _item -> %AddedToWantlist{id: user_id, type: Atom.to_string(type), record_id: record_id} end)
     end
   end
@@ -84,13 +81,11 @@ defmodule PremiereEcoute.Wantlists do
   """
   @spec remove_item(integer(), integer()) :: {:ok, WantlistItem.t()} | {:error, :not_found}
   def remove_item(user_id, item_id) do
-    item =
-      WantlistItem
-      |> join(:inner, [i], w in Wantlist, on: w.id == i.wantlist_id and w.user_id == ^user_id)
-      |> where([i], i.id == ^item_id)
-      |> Repo.one()
-
-    case item do
+    WantlistItem
+    |> join(:inner, [i], w in Wantlist, on: w.id == i.wantlist_id and w.user_id == ^user_id)
+    |> where([i], i.id == ^item_id)
+    |> Repo.one()
+    |> case do
       nil -> {:error, :not_found}
       item -> Repo.delete(item) |> then(fn {:ok, i} -> {:ok, i} end)
     end
@@ -101,13 +96,11 @@ defmodule PremiereEcoute.Wantlists do
   def remove_item(user_id, type, record_id) do
     fk_field = fk_for(type)
 
-    item =
-      WantlistItem
-      |> join(:inner, [i], w in Wantlist, on: w.id == i.wantlist_id and w.user_id == ^user_id)
-      |> where([i], field(i, ^fk_field) == ^record_id)
-      |> Repo.one()
-
-    case item do
+    WantlistItem
+    |> join(:inner, [i], w in Wantlist, on: w.id == i.wantlist_id and w.user_id == ^user_id)
+    |> where([i], field(i, ^fk_field) == ^record_id)
+    |> Repo.one()
+    |> case do
       nil -> {:error, :not_found}
       item -> Repo.delete(item) |> then(fn {:ok, i} -> {:ok, i} end)
     end

@@ -17,44 +17,64 @@ defmodule PremiereEcouteCore.Worker do
     quote do
       use Oban.Worker, unquote(opts)
 
+      @type args() :: map()
+      @type one_or_many(t) :: t | [t]
+      @type result(t) :: {:ok, t} | {:error, term()}
+
       @doc "Schedules a job or multiple jobs."
-      @spec start(map() | list(map()), keyword()) ::
-              {:ok, Oban.Job.t()} | {:error, Ecto.Changeset.t()} | {:ok, list(Oban.Job.t())} | {:error, term()}
+      @spec start(one_or_many(args()), keyword()) :: result(one_or_many(Oban.Job.t()))
       def start(args, opts \\ [])
-      def start(args, opts) when is_map(args), do: Oban.insert(__MODULE__.new(args, opts))
-      def start(args, opts) when is_list(args), do: Oban.insert_all(Enum.map(args, &__MODULE__.new(&1, opts)))
+
+      def start(args, opts) when is_map(args) do
+        args
+        |> __MODULE__.new(opts)
+        |> Oban.insert()
+      end
+
+      def start(args, opts) when is_list(args) do
+        args
+        |> Enum.map(&__MODULE__.new(&1, opts))
+        |> Oban.insert_all()
+        |> then(fn jobs -> {:ok, jobs} end)
+      end
 
       @doc "Schedules a job for immediate execution."
-      @spec now(map() | list(map())) :: {:ok, Oban.Job.t()} | {:error, term()}
+      @spec now(map() | list(map())) :: result(one_or_many(Oban.Job.t()))
       def now(args), do: start(args)
 
       @doc "Schedules a job to run after a specified number of seconds."
-      @spec in_seconds(map() | list(map()), integer()) :: {:ok, Oban.Job.t()} | {:error, term()}
+      @spec in_seconds(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_seconds(args, seconds), do: start(args, schedule_in: {seconds, :seconds})
 
       @doc "Schedules a job to run after a specified number of minutes."
-      @spec in_minutes(map() | list(map()), integer()) :: {:ok, Oban.Job.t()} | {:error, term()}
+      @spec in_minutes(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_minutes(args, minutes), do: start(args, schedule_in: {minutes, :minutes})
 
       @doc "Schedules a job to run after a specified number of hours."
-      @spec in_hours(map() | list(map()), integer()) :: {:ok, Oban.Job.t()} | {:error, term()}
+      @spec in_hours(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_hours(args, hours), do: start(args, schedule_in: {hours, :hours})
 
       @doc "Schedules a job to run after a specified number of days."
-      @spec in_days(map() | list(map()), integer()) :: {:ok, Oban.Job.t()} | {:error, term()}
+      @spec in_days(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_days(args, days), do: start(args, schedule_in: {days, :days})
 
       @doc "Schedules a job to run after a specified number of weeks."
-      @spec in_weeks(map() | list(map()), integer()) :: {:ok, Oban.Job.t()} | {:error, term()}
+      @spec in_weeks(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_weeks(args, weeks), do: start(args, schedule_in: {weeks, :weeks})
 
       @doc "Schedules a job to run at a specific datetime."
-      @spec at(map() | list(map()), DateTime.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
+      @spec at(map() | list(map()), DateTime.t()) :: result(one_or_many(Oban.Job.t()))
       def at(args, %DateTime{} = at), do: start(args, scheduled_at: DateTime.shift_zone!(at, "Etc/UTC"))
+
+      @doc "Perform the job"
+      # @imp Oban.Worker
+      # def perform(%Oban.Job{args: args}), do: handle(args)
 
       @doc "Returns the default job timeout in milliseconds."
       @impl Oban.Worker
       def timeout(_job), do: unquote(timeout)
+
+      # defoverridable handle: 1
     end
   end
 end

@@ -29,12 +29,12 @@ defmodule PremiereEcoute.Discography.Workers.EnrichDiscographyWorker do
   def run(nil), do: {:error, :not_found}
 
   def run(%Artist{} = artist) do
-    with {:ok, _} <- EnrichArtistWorker.now(%{"id" => artist.id}),
-         {:ok, albums} <- EnrichDiscography.create_discography(artist),
-         :ok <- Enum.each(albums, fn album -> EnrichAlbumWorker.now(%{"id" => album.id}) end),
+    with {:ok, albums} <- EnrichDiscography.create_discography(artist),
          tracks <- Enum.flat_map(albums, fn album -> album.tracks end),
+         :ok <- PubSub.broadcast("artist:#{artist.id}", {:discography_enriched, artist}),
+         {:ok, _} <- EnrichArtistWorker.now(%{"id" => artist.id}),
+         :ok <- Enum.each(albums, fn album -> EnrichAlbumWorker.now(%{"id" => album.id}) end),
          :ok <- Enum.each(tracks, fn track -> EnrichTrackWorker.now(%{"id" => track.id}) end) do
-      PubSub.broadcast("artist:#{artist.id}", {:discography_enriched, artist})
       :ok
     else
       {:error, reason} -> Logger.warning("Failed to enrich discography for artist #{artist.id}: #{inspect(reason)}")

@@ -25,8 +25,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
                         scheduled_at: DateTime.add(DateTime.utc_now(), 0, :second)
 
         assert_enqueued worker: ListeningSessionWorker,
+                        args: %{"action" => "send_instructions", "user_id" => user.id},
+                        scheduled_at: DateTime.add(DateTime.utc_now(), 15, :second)
+
+        assert_enqueued worker: ListeningSessionWorker,
                         args: %{"action" => "send_promo_message", "user_id" => user.id},
-                        scheduled_at: DateTime.add(DateTime.utc_now(), 60, :second)
+                        scheduled_at: DateTime.add(DateTime.utc_now(), 30, :second)
       end)
     end
   end

@@ -17,8 +17,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    PremiereEcoute.PubSub.subscribe("listening_sessions")
-
     socket
     |> assign(:source_type, nil)
     |> assign(:search_form, to_form(%{"query" => ""}))

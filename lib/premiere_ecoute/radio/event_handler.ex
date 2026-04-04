@@ -26,7 +26,7 @@ defmodule PremiereEcoute.Radio.EventHandler do
   def handle_info(%StreamStarted{broadcaster_id: broadcaster_id}, state) do
     case Accounts.get_user_by_twitch_id(broadcaster_id) do
       %{profile: %{radio_settings: %{enabled: true}}} = user ->
-        Logger.info("Radio: starting playback polling for user #{user.id}")
+        Logger.info("[PremiereEcoute.Radio] starting radio for user #{user.username}")
         TrackSpotifyPlayback.now(%{user_id: user.id})
 
       _ ->
@@ -40,7 +40,7 @@ defmodule PremiereEcoute.Radio.EventHandler do
   def handle_info(%StreamEnded{broadcaster_id: broadcaster_id}, state) do
     case Accounts.get_user_by_twitch_id(broadcaster_id) do
       %{profile: %{radio_settings: %{enabled: _}}} = user ->
-        Logger.info("Radio: stopping playback polling for user #{user.id}")
+        Logger.info("[PremiereEcoute.Radio] stopping radio for user #{user.username}")
         TrackSpotifyPlayback.cancel_all(user.id)
 
       _ ->
