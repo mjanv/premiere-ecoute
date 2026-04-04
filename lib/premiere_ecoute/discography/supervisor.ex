@@ -11,6 +11,5 @@ defmodule PremiereEcoute.Discography.Supervisor do
     |> Task.Supervisor.async_stream(enumerable, function)
     |> Stream.filter(&match?({:ok, _}, &1))
     |> Enum.map(fn {:ok, r} -> r end)
-    |> Enum.into(%{})
   end
 end

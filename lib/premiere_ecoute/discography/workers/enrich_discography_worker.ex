@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Discography.Workers.EnrichDiscographyWorker do
 
   def run(%Artist{} = artist) do
     with {:ok, _} <- EnrichArtistWorker.now(%{"id" => artist.id}),
-         {:ok, albums} <- EnrichDiscography.enrich_discography(artist),
+         {:ok, albums} <- EnrichDiscography.create_discography(artist),
          :ok <- Enum.each(albums, fn album -> EnrichAlbumWorker.now(%{"id" => album.id}) end),
          tracks <- Enum.flat_map(albums, fn album -> album.tracks end),
          :ok <- Enum.each(tracks, fn track -> EnrichTrackWorker.now(%{"id" => track.id}) end) do

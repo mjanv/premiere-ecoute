@@ -7,37 +7,46 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
   then each is created if not already present.
   """
 
+  require Logger
+
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
+  alias PremiereEcoute.Discography.Single
+  alias PremiereEcoute.Discography.Supervisor
 
   @doc """
   Fetches all Spotify albums for the given artist and creates any missing ones.
-
-  Returns `{:ok, [Album.t()]}` with the list of persisted albums, or
-  `{:error, :no_spotify_id}` if the artist has no Spotify provider ID.
   """
-  @spec enrich_discography(Artist.t()) :: {:ok, [Album.t()]} | {:error, term()}
-  def enrich_discography(%Artist{provider_ids: %{spotify: spotify_id}} = _artist)
-      when is_binary(spotify_id) do
+  @spec create_discography(Artist.t()) :: {:ok, [Album.t()]} | {:error, term()}
+  def create_discography(%Artist{provider_ids: %{spotify: spotify_id}}) do
     with {:ok, albums} <- Apis.spotify().get_artist_albums(spotify_id) do
-      albums =
-        PremiereEcoute.Discography.TaskSupervisor
-        |> Task.Supervisor.async_stream(albums, fn %{provider_ids: %{spotify: id}} ->
-          with {:ok, album} <- Apis.spotify().get_album(id) do
-            Album.create_if_not_exists(album)
-          end
-        end)
-        |> Enum.flat_map(fn
-          {:ok, {:ok, album}} -> [album]
-          _ -> []
-        end)
-
-      {:ok, albums}
+      albums
+      |> Supervisor.async(fn %{provider_ids: %{spotify: id}} -> create_album(id, :spotify) end)
+      |> Stream.filter(&match?({:ok, _}, &1))
+      |> Enum.reduce({:ok, []}, fn {:ok, album}, {:ok, albums} -> {:ok, albums ++ [album]} end)
     end
   end
 
-  def enrich_discography(%Artist{}) do
+  def create_discography(%Artist{}) do
     {:error, :no_spotify_id}
+  end
+
+  @spec create_album(String.t(), atom()) :: {:ok, Album.t()} | {:error, term()}
+  def create_album(album_id, provider \\ :spotify) do
+    with {:ok, %Album{} = album} <- Apis.provider(provider).get_album(album_id),
+         {:ok, %Album{} = album} <- Album.create_if_not_exists(album) do
+      Logger.info("Album created")
+      {:ok, album}
+    end
+  end
+
+  @spec create_single(String.t(), atom()) :: {:ok, Single.t()} | {:error, term()}
+  def create_single(single_id, provider \\ :spotify) do
+    with {:ok, %Single{} = single} <- Apis.provider(provider).get_single(single_id),
+         {:ok, %Single{} = single} <- Single.create_if_not_exists(single) do
+      Logger.info("Single created")
+      {:ok, single}
+    end
   end
 end

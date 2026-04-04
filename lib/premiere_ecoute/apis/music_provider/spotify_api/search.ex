@@ -21,7 +21,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   @spec search_albums(String.t()) :: {:ok, list(Album.t())} | {:error, term()}
   def search_albums(query) when is_binary(query) do
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/search?q=#{URI.encode(query)}&type=album&limit=20")
+    |> SpotifyApi.get(url: "/search", params: [q: query(query: query), type: "album", limit: 10])
     |> SpotifyApi.handle(200, fn %{"albums" => %{"items" => items}} ->
       Enum.map(items, fn item ->
         %Album{
@@ -44,9 +44,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   Queries Spotify for artists matching the search string. Returns first matching artist's ID or nil if none found.
   """
   @spec search_artist(String.t()) :: {:ok, map() | nil} | {:error, term()}
-  def search_artist(query) when is_binary(query) do
+  def search_artist(name) do
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/search?q=#{URI.encode(query)}&type=artist&limit=1")
+    |> SpotifyApi.get(url: "/search", params: [q: query(query: name), type: "artist", limit: 1])
     |> SpotifyApi.handle(200, fn
       %{"artists" => %{"items" => [%{"uri" => "spotify:artist:" <> id}]}} -> %{id: id}
       _ -> nil
@@ -62,8 +62,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   @spec search_tracks(Keyword.t()) :: {:ok, [Track.t()]} | {:error, term()}
   def search_tracks(query) when is_list(query) do
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/search", params: [q: build_track_query(query), type: "track", limit: 20])
-    |> SpotifyApi.handle(200, fn %{"items" => items} -> Enum.map(items, &parse_track/1) end)
+    |> SpotifyApi.get(url: "/search", params: [q: query(query), type: "track", limit: 10])
+    |> SpotifyApi.handle(200, fn %{"items" => items} -> items |> Enum.map(&parse_track/1) |> Enum.reject(&is_nil/1) end)
   end
 
   @doc """
@@ -74,12 +74,22 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   @spec search_singles(String.t()) :: {:ok, [Single.t()]} | {:error, term()}
   def search_singles(query) when is_binary(query) do
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/search", params: [q: query, type: "track", limit: 20])
-    |> SpotifyApi.handle(200, fn %{"tracks" => %{"items" => items}} -> Enum.map(items, &parse_single/1) end)
+    |> SpotifyApi.get(url: "/search", params: [q: query, type: "track", limit: 10])
+    |> SpotifyApi.handle(200, fn %{"tracks" => %{"items" => items}} ->
+      items |> Enum.map(&parse_single/1) |> Enum.reject(&is_nil/1)
+    end)
   end
 
-  @spec parse_single(map()) :: Single.t()
-  defp parse_single(data) do
+  defp query(query) do
+    cond do
+      q = query[:query] -> q
+      q = query[:artist] -> "artist:#{q}"
+      q = query[:track] -> "track:#{q}"
+      q = query[:album] -> "album:#{q}"
+    end
+  end
+
+  defp parse_single(%{"album" => %{"album_type" => "single"}} = data) do
     %Single{
       provider_ids: %{spotify: data["id"]},
       name: data["name"],
@@ -89,18 +99,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
     }
   end
 
-  @spec build_track_query(Keyword.t()) :: String.t()
-  defp build_track_query(query) do
-    cond do
-      q = query[:query] -> q
-      q = query[:artist] -> "artist:#{q}"
-      q = query[:track] -> "track:#{q}"
-      q = query[:album] -> "album:#{q}"
-    end
-  end
+  defp parse_single(_), do: nil
 
-  @spec parse_track(map()) :: Track.t()
-  defp parse_track(data) do
+  defp parse_track(%{"album" => %{"album_type" => "album"}} = data) do
     %Track{
       provider_ids: %{spotify: data["id"]},
       name: data["name"],
@@ -108,4 +109,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
       duration_ms: data["duration_ms"] || 0
     }
   end
+
+  defp parse_track(_), do: nil
 end

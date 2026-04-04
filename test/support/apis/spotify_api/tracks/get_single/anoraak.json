@@ -1,0 +1,95 @@
+{
+  "album": {
+    "album_type": "single",
+    "total_tracks": 1,
+    "external_urls": {
+      "spotify": "https://open.spotify.com/album/4xIjnzo2zAu28xrKwFQHeY"
+    },
+    "href": "https://api.spotify.com/v1/albums/4xIjnzo2zAu28xrKwFQHeY",
+    "id": "4xIjnzo2zAu28xrKwFQHeY",
+    "images": [
+      {
+        "url": "https://i.scdn.co/image/ab67616d0000b2737b6371c510a9bfa82e129c2b",
+        "height": 640,
+        "width": 640
+      },
+      {
+        "url": "https://i.scdn.co/image/ab67616d00001e027b6371c510a9bfa82e129c2b",
+        "height": 300,
+        "width": 300
+      },
+      {
+        "url": "https://i.scdn.co/image/ab67616d000048517b6371c510a9bfa82e129c2b",
+        "height": 64,
+        "width": 64
+      }
+    ],
+    "name": "Gang",
+    "release_date": "2020-04-10",
+    "release_date_precision": "day",
+    "type": "album",
+    "uri": "spotify:album:4xIjnzo2zAu28xrKwFQHeY",
+    "artists": [
+      {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/artist/2DfP0hQCCFmZHjstSE8yXC"
+        },
+        "href": "https://api.spotify.com/v1/artists/2DfP0hQCCFmZHjstSE8yXC",
+        "id": "2DfP0hQCCFmZHjstSE8yXC",
+        "name": "Anoraak",
+        "type": "artist",
+        "uri": "spotify:artist:2DfP0hQCCFmZHjstSE8yXC"
+      },
+      {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/artist/5z9QnVuCb67N9a6lyu6ghe"
+        },
+        "href": "https://api.spotify.com/v1/artists/5z9QnVuCb67N9a6lyu6ghe",
+        "id": "5z9QnVuCb67N9a6lyu6ghe",
+        "name": "Sarah Maison",
+        "type": "artist",
+        "uri": "spotify:artist:5z9QnVuCb67N9a6lyu6ghe"
+      }
+    ],
+    "is_playable": true
+  },
+  "artists": [
+    {
+      "external_urls": {
+        "spotify": "https://open.spotify.com/artist/2DfP0hQCCFmZHjstSE8yXC"
+      },
+      "href": "https://api.spotify.com/v1/artists/2DfP0hQCCFmZHjstSE8yXC",
+      "id": "2DfP0hQCCFmZHjstSE8yXC",
+      "name": "Anoraak",
+      "type": "artist",
+      "uri": "spotify:artist:2DfP0hQCCFmZHjstSE8yXC"
+    },
+    {
+      "external_urls": {
+        "spotify": "https://open.spotify.com/artist/5z9QnVuCb67N9a6lyu6ghe"
+      },
+      "href": "https://api.spotify.com/v1/artists/5z9QnVuCb67N9a6lyu6ghe",
+      "id": "5z9QnVuCb67N9a6lyu6ghe",
+      "name": "Sarah Maison",
+      "type": "artist",
+      "uri": "spotify:artist:5z9QnVuCb67N9a6lyu6ghe"
+    }
+  ],
+  "disc_number": 1,
+  "duration_ms": 277442,
+  "explicit": false,
+  "external_ids": {
+    "isrc": "FRPHM2000100"
+  },
+  "external_urls": {
+    "spotify": "https://open.spotify.com/track/1KJSxDub5zDQv1O15ewU72"
+  },
+  "href": "https://api.spotify.com/v1/tracks/1KJSxDub5zDQv1O15ewU72",
+  "id": "1KJSxDub5zDQv1O15ewU72",
+  "is_playable": true,
+  "name": "Gang",
+  "track_number": 1,
+  "type": "track",
+  "uri": "spotify:track:1KJSxDub5zDQv1O15ewU72",
+  "is_local": false
+}

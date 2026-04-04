@@ -62,7 +62,7 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("enrich_discography", %{"id" => id}, socket) do
+  def handle_event("create_discography", %{"id" => id}, socket) do
     case EnrichDiscographyWorker.now(%{"id" => id}) do
       {:ok, _} -> put_flash(socket, :info, gettext("Enrichment job started"))
       {:error, _} -> put_flash(socket, :error, gettext("Failed to start enrichment"))

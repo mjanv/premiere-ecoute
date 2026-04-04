@@ -103,13 +103,13 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
     end)
   end
 
-  describe "enrich_discography/1" do
+  describe "create_discography/1" do
     test "fetches all albums and creates them in the database" do
       artist = artist_fixture()
       expect_get_artist_albums()
       stub_get_albums()
 
-      {:ok, albums} = EnrichDiscography.enrich_discography(artist)
+      {:ok, albums} = EnrichDiscography.create_discography(artist)
 
       assert length(albums) == 2
       spotify_ids = Enum.map(albums, & &1.provider_ids[:spotify])
@@ -122,7 +122,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
       expect_get_artist_albums()
       stub_get_albums()
 
-      {:ok, _} = EnrichDiscography.enrich_discography(artist)
+      {:ok, _} = EnrichDiscography.create_discography(artist)
 
       assert Album.get_by(provider_ids: %{spotify: @album_id_1}) != nil
       assert Album.get_by(provider_ids: %{spotify: @album_id_2}) != nil
@@ -132,10 +132,10 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
       artist = artist_fixture()
       expect_get_artist_albums()
       stub_get_albums()
-      {:ok, _} = EnrichDiscography.enrich_discography(artist)
+      {:ok, _} = EnrichDiscography.create_discography(artist)
 
       expect_get_artist_albums()
-      {:ok, albums} = EnrichDiscography.enrich_discography(artist)
+      {:ok, albums} = EnrichDiscography.create_discography(artist)
 
       assert length(albums) == 2
       assert length(Album.all()) == 2
@@ -144,13 +144,13 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
     test "returns error when artist has no spotify ID" do
       artist = artist_fixture(%{provider_ids: %{}})
 
-      assert EnrichDiscography.enrich_discography(artist) == {:error, :no_spotify_id}
+      assert EnrichDiscography.create_discography(artist) == {:error, :no_spotify_id}
     end
 
     test "returns error when artist has no provider_ids at all" do
       artist = %Artist{name: "Unknown", provider_ids: %{}}
 
-      assert EnrichDiscography.enrich_discography(artist) == {:error, :no_spotify_id}
+      assert EnrichDiscography.create_discography(artist) == {:error, :no_spotify_id}
     end
 
     test "returns empty list when spotify returns no albums" do
@@ -158,7 +158,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
 
       expect(SpotifyApi, :get_artist_albums, fn _id -> {:ok, []} end)
 
-      {:ok, albums} = EnrichDiscography.enrich_discography(artist)
+      {:ok, albums} = EnrichDiscography.create_discography(artist)
 
       assert albums == []
     end
@@ -168,7 +168,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
       expect_get_artist_albums()
       stub_get_albums()
 
-      {:ok, _} = EnrichDiscography.enrich_discography(artist)
+      {:ok, _} = EnrichDiscography.create_discography(artist)
 
       album = Album.get_by(provider_ids: %{spotify: @album_id_1})
       assert length(album.tracks) == 10

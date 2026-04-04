@@ -1,0 +1,75 @@
+{
+  "album": {
+    "album_type": "album",
+    "total_tracks": 17,
+    "external_urls": {
+      "spotify": "https://open.spotify.com/album/3ZN01xzenGMhWHdC5kfAe9"
+    },
+    "href": "https://api.spotify.com/v1/albums/3ZN01xzenGMhWHdC5kfAe9",
+    "id": "3ZN01xzenGMhWHdC5kfAe9",
+    "images": [
+      {
+        "url": "https://i.scdn.co/image/ab67616d0000b27397c0928704e5a2bd8d4c5b90",
+        "height": 640,
+        "width": 640
+      },
+      {
+        "url": "https://i.scdn.co/image/ab67616d00001e0297c0928704e5a2bd8d4c5b90",
+        "height": 300,
+        "width": 300
+      },
+      {
+        "url": "https://i.scdn.co/image/ab67616d0000485197c0928704e5a2bd8d4c5b90",
+        "height": 64,
+        "width": 64
+      }
+    ],
+    "name": "THIS MUSIC MAY CONTAIN HOPE.",
+    "release_date": "2026-03-27",
+    "release_date_precision": "day",
+    "type": "album",
+    "uri": "spotify:album:3ZN01xzenGMhWHdC5kfAe9",
+    "artists": [
+      {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/artist/5KKpBU5eC2tJDzf0wmlRp2"
+        },
+        "href": "https://api.spotify.com/v1/artists/5KKpBU5eC2tJDzf0wmlRp2",
+        "id": "5KKpBU5eC2tJDzf0wmlRp2",
+        "name": "RAYE",
+        "type": "artist",
+        "uri": "spotify:artist:5KKpBU5eC2tJDzf0wmlRp2"
+      }
+    ],
+    "is_playable": true
+  },
+  "artists": [
+    {
+      "external_urls": {
+        "spotify": "https://open.spotify.com/artist/5KKpBU5eC2tJDzf0wmlRp2"
+      },
+      "href": "https://api.spotify.com/v1/artists/5KKpBU5eC2tJDzf0wmlRp2",
+      "id": "5KKpBU5eC2tJDzf0wmlRp2",
+      "name": "RAYE",
+      "type": "artist",
+      "uri": "spotify:artist:5KKpBU5eC2tJDzf0wmlRp2"
+    }
+  ],
+  "disc_number": 1,
+  "duration_ms": 197142,
+  "explicit": false,
+  "external_ids": {
+    "isrc": "QMFME2535037"
+  },
+  "external_urls": {
+    "spotify": "https://open.spotify.com/track/7eYzn1CuiJK6VvUhf8zA6k"
+  },
+  "href": "https://api.spotify.com/v1/tracks/7eYzn1CuiJK6VvUhf8zA6k",
+  "id": "7eYzn1CuiJK6VvUhf8zA6k",
+  "is_playable": true,
+  "name": "WHERE IS MY HUSBAND!",
+  "track_number": 13,
+  "type": "track",
+  "uri": "spotify:track:7eYzn1CuiJK6VvUhf8zA6k",
+  "is_local": false
+}

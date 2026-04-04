@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
           {"authorization", "Bearer #{token}"},
           {"content-type", "application/json"}
         ],
-        params: %{"q" => "billie", "type" => "album", "limit" => "20"},
+        params: %{"q" => "billie", "type" => "album", "limit" => "10"},
         response: "spotify_api/search/search_for_item/albums.json",
         status: 200
       )
@@ -81,7 +81,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTest do
           {"authorization", "Bearer #{token}"},
           {"content-type", "application/json"}
         ],
-        params: %{"q" => "cut to the feeling", "type" => "track", "limit" => "20"},
+        params: %{"q" => "cut to the feeling", "type" => "track", "limit" => "10"},
         response: "spotify_api/search/search_singles/response.json",
         status: 200
       )

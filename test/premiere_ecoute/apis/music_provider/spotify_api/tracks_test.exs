@@ -50,25 +50,25 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.TracksTest do
     test "returns track details from a unique identifier", %{token: token} do
       ApiMock.expect(
         SpotifyApi,
-        path: {:get, "/v1/tracks/11dFghVXANMlKmJXsNCbNl"},
+        path: {:get, "/v1/tracks/7eYzn1CuiJK6VvUhf8zA6k"},
         headers: [
           {"authorization", "Bearer #{token}"},
           {"content-type", "application/json"}
         ],
-        response: "spotify_api/albums/get_track/response.json",
+        response: "spotify_api/tracks/get_track/raye.json",
         status: 200
       )
 
-      id = "11dFghVXANMlKmJXsNCbNl"
+      id = "7eYzn1CuiJK6VvUhf8zA6k"
 
       {:ok, track} = SpotifyApi.get_track(id)
 
       assert %Track{
                id: nil,
-               provider_ids: %{spotify: "11dFghVXANMlKmJXsNCbNl"},
-               name: "Cut To The Feeling",
-               track_number: 1,
-               duration_ms: 207_959
+               provider_ids: %{spotify: "7eYzn1CuiJK6VvUhf8zA6k"},
+               name: "WHERE IS MY HUSBAND!",
+               track_number: 13,
+               duration_ms: 197_142
              } = track
     end
   end

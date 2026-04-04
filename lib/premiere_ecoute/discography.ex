@@ -16,6 +16,7 @@ defmodule PremiereEcoute.Discography do
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
+  alias PremiereEcoute.Discography.Links
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Single
 
@@ -25,6 +26,7 @@ defmodule PremiereEcoute.Discography do
   defdelegate get_album_by_slug(id), to: Album, as: :get_album_by_slug
   defdelegate list_albums(), to: Album, as: :all
 
+  # TODO: refactor last_ methods to their contexts
   @spec last_albums(non_neg_integer()) :: [Album.t()]
   def last_albums(n \\ 5), do: Album.all(order_by: [desc: :inserted_at], limit: n) |> Enum.map(&Album.put_artist/1)
 
@@ -35,6 +37,7 @@ defmodule PremiereEcoute.Discography do
   @spec last_artists(non_neg_integer()) :: [Artist.t()]
   def last_artists(n \\ 5), do: Artist.all(order_by: [desc: :inserted_at], limit: n)
 
+  # TODO: To refactor into its context
   @spec list_albums_for_artist(integer()) :: [Album.t()]
   def list_albums_for_artist(artist_id) do
     Album
@@ -46,6 +49,7 @@ defmodule PremiereEcoute.Discography do
     |> Enum.map(&Album.put_artist/1)
   end
 
+  # TODO: To refactor into its context
   @spec list_singles_for_artist(integer()) :: [Single.t()]
   def list_singles_for_artist(artist_id) do
     Single
@@ -68,85 +72,7 @@ defmodule PremiereEcoute.Discography do
   # Playlist
   defdelegate create_playlist(playlist), to: Playlist, as: :create
 
-  @spec title(any()) :: String.t() | nil
-  def title(%{title: title}), do: title
-  def title(%{name: name}), do: name
-  def title(_), do: nil
-
-  @spec url(any()) :: String.t() | nil
-  def url(%Artist{provider_ids: ids}) do
-    cond do
-      id = Map.get(ids, :spotify) -> "https://open.spotify.com/artist/#{id}"
-      id = Map.get(ids, :deezer) -> "https://www.deezer.com/artist/#{id}"
-      true -> nil
-    end
-  end
-
-  def url(%Album{provider_ids: ids}) do
-    cond do
-      id = Map.get(ids, :spotify) -> "https://open.spotify.com/album/#{id}"
-      id = Map.get(ids, :deezer) -> "https://www.deezer.com/album/#{id}"
-      true -> nil
-    end
-  end
-
-  def url(%Album.Track{provider_ids: ids}) do
-    cond do
-      id = Map.get(ids, :spotify) -> "https://open.spotify.com/track/#{id}"
-      id = Map.get(ids, :deezer) -> "https://www.deezer.com/track/#{id}"
-      true -> nil
-    end
-  end
-
-  def url(%Single{provider_ids: ids}) do
-    cond do
-      id = Map.get(ids, :spotify) -> "https://open.spotify.com/track/#{id}"
-      id = Map.get(ids, :deezer) -> "https://www.deezer.com/track/#{id}"
-      true -> nil
-    end
-  end
-
-  def url(%Playlist{provider: :spotify, playlist_id: id}), do: "https://open.spotify.com/playlist/#{id}"
-  def url(%Playlist{provider: :deezer, playlist_id: id}), do: "https://www.deezer.com/playlist/#{id}"
-
-  def url(_), do: nil
-
-  @spec url(any(), atom()) :: String.t() | nil
-  def url(%Album{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
-    do: "https://open.spotify.com/album/#{id}"
-
-  def url(%Album{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
-    do: "https://www.deezer.com/album/#{id}"
-
-  def url(%Album.Track{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
-    do: "https://open.spotify.com/track/#{id}"
-
-  def url(%Album.Track{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
-    do: "https://www.deezer.com/track/#{id}"
-
-  def url(%Single{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
-    do: "https://open.spotify.com/track/#{id}"
-
-  def url(%Single{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
-    do: "https://www.deezer.com/track/#{id}"
-
-  def url(%Artist{provider_ids: %{spotify: id}}, :spotify) when is_binary(id),
-    do: "https://open.spotify.com/artist/#{id}"
-
-  def url(%Artist{provider_ids: %{deezer: id}}, :deezer) when is_binary(id),
-    do: "https://www.deezer.com/artist/#{id}"
-
-  def url(%Album{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
-    do: "https://tidal.com/browse/album/#{id}"
-
-  def url(%Album.Track{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
-    do: "https://tidal.com/browse/track/#{id}"
-
-  def url(%Single{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
-    do: "https://tidal.com/browse/track/#{id}"
-
-  def url(%Artist{provider_ids: %{tidal: id}}, :tidal) when is_binary(id),
-    do: "https://tidal.com/browse/artist/#{id}"
-
-  def url(_, _), do: nil
+  # Links
+  defdelegate title(entity), to: Links
+  defdelegate url(entity, provider), to: Links
 end

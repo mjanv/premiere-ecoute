@@ -26,6 +26,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichTrack do
     external_links =
       [:genius]
       |> Supervisor.async(fn k -> {k, enrich(k, track)} end)
+      |> Enum.into(%{})
       |> then(&Map.merge(track.external_links, &1))
 
     Track.update(track, %{external_links: external_links})

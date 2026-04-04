@@ -20,6 +20,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/tracks/#{track_id}")
     |> SpotifyApi.handle(200, &parse_track/1)
+    |> case do
+      {:ok, %Track{} = track} -> {:ok, track}
+      {:ok, nil} -> {:error, :no_track_found}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc """
@@ -32,10 +37,14 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/tracks/#{track_id}")
     |> SpotifyApi.handle(200, &parse_single/1)
+    |> case do
+      {:ok, %Single{} = single} -> {:ok, single}
+      {:ok, nil} -> {:error, :no_track_found}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
-  @spec parse_single(map()) :: Single.t()
-  defp parse_single(data) do
+  defp parse_single(%{"album" => %{"album_type" => "single"}} = data) do
     %Single{
       provider_ids: %{spotify: data["id"]},
       name: data["name"],
@@ -45,8 +54,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
     }
   end
 
-  @spec parse_track(map()) :: Track.t()
-  defp parse_track(data) do
+  defp parse_single(_), do: nil
+
+  defp parse_track(%{"album" => %{"album_type" => "album"}} = data) do
     %Track{
       provider_ids: %{spotify: data["id"]},
       name: data["name"],
@@ -54,4 +64,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
       duration_ms: data["duration_ms"] || 0
     }
   end
+
+  defp parse_track(_), do: nil
 end

@@ -26,11 +26,13 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbum do
     external_links =
       [:wikipedia]
       |> Supervisor.async(fn k -> {k, enrich(k, album)} end)
+      |> Enum.into(%{})
       |> then(&Map.merge(album.external_links, &1))
 
     provider_ids =
       [:spotify, :deezer, :tidal]
       |> Supervisor.async(fn k -> {k, enrich(k, album)} end)
+      |> Enum.into(%{})
       |> then(&Map.merge(album.provider_ids, &1))
 
     Album.update(album, %{external_links: external_links, provider_ids: provider_ids})

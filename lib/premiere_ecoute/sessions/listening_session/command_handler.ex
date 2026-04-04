@@ -11,10 +11,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   require Logger
 
   alias PremiereEcoute.Apis
-
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Services.EnrichDiscography
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.CaptureCurrentTrackListeningSession
@@ -47,8 +47,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   @doc false
   def handle(%PrepareListeningSession{source: :album, user_id: user_id, album_id: album_id, vote_options: vote_options}) do
-    with {:ok, album} <- Apis.spotify().get_album(album_id),
-         {:ok, album} <- Album.create_if_not_exists(album),
+    with {:ok, album} <- EnrichDiscography.create_album(album_id, :spotify),
          {:ok, session} <-
            ListeningSession.create(%{
              user_id: user_id,
@@ -74,8 +73,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%PrepareListeningSession{source: :track, user_id: user_id, track_id: track_id, vote_options: vote_options}) do
-    with {:ok, single} <- Apis.spotify().get_single(track_id),
-         {:ok, single} <- Single.create_if_not_exists(single),
+    with {:ok, single} <- EnrichDiscography.create_single(track_id, :spotify),
          {:ok, session} <-
            ListeningSession.create(%{
              user_id: user_id,
@@ -452,7 +450,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   defp get_or_create_playlist(playlist) do
     case Playlist.get_by(playlist_id: playlist.playlist_id, provider: playlist.provider) do
-      nil -> Playlist.create(%{playlist | url: Discography.url(playlist)})
+      nil -> Playlist.create(%{playlist | url: Discography.url(playlist, playlist.provider)})
       existing_playlist -> {:ok, existing_playlist}
     end
   end

@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Models.Realtime do
 
   @url "wss://api.mistral.ai/v1/audio/transcriptions/realtime"
 
-  def start_link(api_key) do
+  def start_link(_args) do
     WebSockex.start_link(@url, __MODULE__, %{initialized: false},
       extra_headers: [
         {"Authorization", "Bearer #{Application.get_env(:premiere_ecoute, :mistral)[:api_key]}"}

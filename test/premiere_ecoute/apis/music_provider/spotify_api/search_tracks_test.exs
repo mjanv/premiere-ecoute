@@ -25,7 +25,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
           {"authorization", "Bearer #{token}"},
           {"content-type", "application/json"}
         ],
-        params: %{"q" => "daft punk", "type" => "track", "limit" => "20"},
+        params: %{"q" => "daft punk", "type" => "track", "limit" => "10"},
         response: "spotify_api/search/search_tracks/query.json",
         status: 200
       )
@@ -51,7 +51,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
           {"authorization", "Bearer #{token}"},
           {"content-type", "application/json"}
         ],
-        params: %{"q" => "artist:daft punk", "type" => "track", "limit" => "20"},
+        params: %{"q" => "artist:daft punk", "type" => "track", "limit" => "10"},
         response: "spotify_api/search/search_tracks/artist.json",
         status: 200
       )
@@ -77,7 +77,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
           {"authorization", "Bearer #{token}"},
           {"content-type", "application/json"}
         ],
-        params: %{"q" => "track:one more time", "type" => "track", "limit" => "20"},
+        params: %{"q" => "track:one more time", "type" => "track", "limit" => "10"},
         response: "spotify_api/search/search_tracks/track.json",
         status: 200
       )
@@ -103,7 +103,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.SearchTracksTest do
           {"authorization", "Bearer #{token}"},
           {"content-type", "application/json"}
         ],
-        params: %{"q" => "album:discovery", "type" => "track", "limit" => "20"},
+        params: %{"q" => "album:discovery", "type" => "track", "limit" => "10"},
         response: "spotify_api/search/search_tracks/album.json",
         status: 200
       )
