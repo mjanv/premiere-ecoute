@@ -21,7 +21,6 @@ defmodule PremiereEcoute.Discography.Workers.EnrichDiscographyWorker do
   alias PremiereEcoute.Discography.Workers.EnrichAlbumWorker
   alias PremiereEcoute.Discography.Workers.EnrichArtistWorker
   alias PremiereEcoute.Discography.Workers.EnrichTrackWorker
-  alias PremiereEcoute.PubSub
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"id" => id}}), do: run(Artist.get(id))
@@ -31,10 +30,9 @@ defmodule PremiereEcoute.Discography.Workers.EnrichDiscographyWorker do
   def run(%Artist{} = artist) do
     with {:ok, albums} <- EnrichDiscography.create_discography(artist),
          tracks <- Enum.flat_map(albums, fn album -> album.tracks end),
-         :ok <- PubSub.broadcast("artist:#{artist.id}", {:discography_enriched, artist}),
          {:ok, _} <- EnrichArtistWorker.now(%{"id" => artist.id}),
-         :ok <- Enum.each(albums, fn album -> EnrichAlbumWorker.now(%{"id" => album.id}) end),
-         :ok <- Enum.each(tracks, fn track -> EnrichTrackWorker.now(%{"id" => track.id}) end) do
+         :ok <- EnrichAlbumWorker.interval(albums, fn album -> %{"id" => album.id} end),
+         :ok <- EnrichTrackWorker.interval(tracks, fn track -> %{"id" => track.id} end) do
       :ok
     else
       {:error, reason} -> Logger.warning("Failed to enrich discography for artist #{artist.id}: #{inspect(reason)}")

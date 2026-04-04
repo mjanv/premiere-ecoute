@@ -13,6 +13,7 @@ defmodule PremiereEcouteCore.Worker do
   @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(opts) do
     {timeout, opts} = Keyword.pop(opts, :timeout, :timer.seconds(300))
+    {rate_limit, opts} = Keyword.pop(opts, :rate_limit, :timer.seconds(1))
 
     quote do
       use Oban.Worker, unquote(opts)
@@ -39,32 +40,40 @@ defmodule PremiereEcouteCore.Worker do
       end
 
       @doc "Schedules a job for immediate execution."
-      @spec now(map() | list(map())) :: result(one_or_many(Oban.Job.t()))
+      @spec now(one_or_many(args())) :: result(one_or_many(Oban.Job.t()))
       def now(args), do: start(args)
 
       @doc "Schedules a job to run after a specified number of seconds."
-      @spec in_seconds(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
+      @spec in_seconds(one_or_many(args()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_seconds(args, seconds), do: start(args, schedule_in: {seconds, :seconds})
 
       @doc "Schedules a job to run after a specified number of minutes."
-      @spec in_minutes(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
+      @spec in_minutes(one_or_many(args()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_minutes(args, minutes), do: start(args, schedule_in: {minutes, :minutes})
 
       @doc "Schedules a job to run after a specified number of hours."
-      @spec in_hours(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
+      @spec in_hours(one_or_many(args()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_hours(args, hours), do: start(args, schedule_in: {hours, :hours})
 
       @doc "Schedules a job to run after a specified number of days."
-      @spec in_days(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
+      @spec in_days(one_or_many(args()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_days(args, days), do: start(args, schedule_in: {days, :days})
 
       @doc "Schedules a job to run after a specified number of weeks."
-      @spec in_weeks(map() | list(map()), integer()) :: result(one_or_many(Oban.Job.t()))
+      @spec in_weeks(one_or_many(args()), integer()) :: result(one_or_many(Oban.Job.t()))
       def in_weeks(args, weeks), do: start(args, schedule_in: {weeks, :weeks})
 
       @doc "Schedules a job to run at a specific datetime."
-      @spec at(map() | list(map()), DateTime.t()) :: result(one_or_many(Oban.Job.t()))
+      @spec at(one_or_many(args()), DateTime.t()) :: result(one_or_many(Oban.Job.t()))
       def at(args, %DateTime{} = at), do: start(args, scheduled_at: DateTime.shift_zone!(at, "Etc/UTC"))
+
+      @doc "Schedule a list of job at specific interval in the future"
+      @spec interval([any()], function()) :: :ok
+      def interval(args, f) do
+        args
+        |> Enum.with_index(0)
+        |> Enum.each(fn {x, i} -> start(f.(x), schedule_in: i * unquote(rate_limit)) end)
+      end
 
       @doc "Perform the job"
       # @imp Oban.Worker

@@ -40,7 +40,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Artists do
     SpotifyApi.api()
     |> SpotifyApi.get(url: "/artists/#{artist_id}/albums?include_groups=album")
     |> SpotifyApi.handle(200, fn %{"items" => items} ->
-      Enum.map(items, fn data ->
+      items
+      |> Enum.filter(fn item -> item["album_type"] == "album" end)
+      |> Enum.map(fn data ->
         %{
           provider_ids: %{spotify: data["id"]},
           name: data["name"],
@@ -57,6 +59,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Artists do
   Fetches an artist's top track.
 
   Retrieves the top tracks for a Spotify artist and returns the first one. Returns nil if no tracks found.
+  This endpoint has been DEPRECATED by Spotify.
   """
   @spec get_artist_top_track(String.t()) :: {:ok, Playlist.Track.t() | nil} | {:error, term()}
   def get_artist_top_track(artist_id) when is_binary(artist_id) do
