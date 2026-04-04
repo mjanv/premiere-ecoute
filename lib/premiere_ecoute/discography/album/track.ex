@@ -26,6 +26,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
           duration_ms: integer() | nil,
           album_id: integer() | nil,
           album: entity(Album.t()),
+          album_spotify_id: String.t() | nil,
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }
@@ -37,6 +38,8 @@ defmodule PremiereEcoute.Discography.Album.Track do
     field :slug, Slug.Type
     field :track_number, :integer
     field :duration_ms, :integer
+    # AIDEV-NOTE: virtual field used to carry album_spotify_id from Spotify API response without persisting it
+    field :album_spotify_id, :string, virtual: true
 
     belongs_to :album, Album
 

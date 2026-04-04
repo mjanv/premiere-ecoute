@@ -29,6 +29,22 @@ defmodule PremiereEcoute.Wantlists.Wantlist do
     timestamps(type: :utc_datetime)
   end
 
+  @spec get_by_user(integer()) :: t() | nil
+  def get_by_user(user_id), do: get_by(user_id: user_id)
+
+  @spec get_or_create(integer()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def get_or_create(user_id) do
+    case Repo.get_by(__MODULE__, user_id: user_id) do
+      nil ->
+        %__MODULE__{}
+        |> changeset(%{user_id: user_id})
+        |> Repo.insert()
+
+      wantlist ->
+        {:ok, wantlist}
+    end
+  end
+
   @doc "Wantlist changeset."
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(wantlist, attrs) do

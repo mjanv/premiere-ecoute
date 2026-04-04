@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.WantlistsTest do
+defmodule PremiereEcoute.Wantlists.WantlistItemTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography.Album
@@ -8,7 +8,6 @@ defmodule PremiereEcoute.WantlistsTest do
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Wantlists
   alias PremiereEcoute.Wantlists.Wantlist
-  alias PremiereEcoute.Wantlists.WantlistItem
 
   setup do
     user = user_fixture(%{role: :viewer})
@@ -18,40 +17,7 @@ defmodule PremiereEcoute.WantlistsTest do
     {:ok, %{user: user, album: album, single: single, artist: artist}}
   end
 
-  describe "get_or_create_default/1" do
-    test "creates a default wantlist on first call", %{user: user} do
-      assert {:ok, wantlist} = Wantlists.get_or_create_default(user.id)
-      assert wantlist.user_id == user.id
-    end
-
-    test "returns existing wantlist on subsequent calls", %{user: user} do
-      {:ok, first} = Wantlists.get_or_create_default(user.id)
-      {:ok, second} = Wantlists.get_or_create_default(user.id)
-      assert first.id == second.id
-    end
-  end
-
-  describe "get_wantlist/1" do
-    test "returns nil when wantlist does not exist", %{user: user} do
-      assert nil == Wantlists.get_wantlist(user.id)
-    end
-
-    test "returns wantlist with preloaded items", %{user: user, album: album} do
-      {:ok, _} = Wantlists.add_item(user.id, :album, album.id)
-      assert %Wantlist{items: [%WantlistItem{type: :album, album: %Album{}}]} = Wantlists.get_wantlist(user.id)
-    end
-
-    test "returns all items for the user", %{user: user, album: album, single: single} do
-      {:ok, _} = Wantlists.add_item(user.id, :album, album.id)
-      {:ok, _} = Wantlists.add_item(user.id, :track, single.id)
-      wantlist = Wantlists.get_wantlist(user.id)
-      assert length(wantlist.items) == 2
-      types = Enum.map(wantlist.items, & &1.type) |> MapSet.new()
-      assert types == MapSet.new([:album, :track])
-    end
-  end
-
-  describe "add_item/3" do
+  describe "add/3" do
     test "adds an album to the wantlist", %{user: user, album: album} do
       assert {:ok, item} = Wantlists.add_item(user.id, :album, album.id)
       assert item.type == :album
@@ -96,7 +62,7 @@ defmodule PremiereEcoute.WantlistsTest do
     end
   end
 
-  describe "remove_item/2" do
+  describe "remove/2 (by item id)" do
     test "removes an existing item from the wantlist", %{user: user, album: album} do
       {:ok, item} = Wantlists.add_item(user.id, :album, album.id)
       assert {:ok, _} = Wantlists.remove_item(user.id, item.id)
@@ -114,7 +80,7 @@ defmodule PremiereEcoute.WantlistsTest do
     end
   end
 
-  describe "remove_item/3" do
+  describe "remove/3 (by type and record id)" do
     test "removes an album by type and record id", %{user: user, album: album} do
       Wantlists.add_item(user.id, :album, album.id)
       assert {:ok, _} = Wantlists.remove_item(user.id, :album, album.id)
@@ -144,13 +110,13 @@ defmodule PremiereEcoute.WantlistsTest do
     end
   end
 
-  describe "in_wantlist?/3" do
+  describe "exists?/3" do
     test "returns false when wantlist does not exist", %{user: user, album: album} do
       refute Wantlists.in_wantlist?(user.id, :album, album.id)
     end
 
     test "returns false when item is not in wantlist", %{user: user, album: album} do
-      Wantlists.get_or_create_default(user.id)
+      Wantlist.get_or_create(user.id)
       refute Wantlists.in_wantlist?(user.id, :album, album.id)
     end
 
@@ -170,16 +136,33 @@ defmodule PremiereEcoute.WantlistsTest do
     end
   end
 
-  describe "add_radio_track/2" do
-    test "adds the matching single to the wantlist", %{user: user, single: single} do
-      spotify_id = single.provider_ids[:spotify]
-      assert {:ok, item} = Wantlists.add_radio_track(user.id, spotify_id)
-      assert item.type == :track
-      assert item.single_id == single.id
+  describe "wantlisted_spotify_ids/2" do
+    test "returns empty MapSet for empty list", %{user: user} do
+      assert MapSet.new() == Wantlists.wantlisted_spotify_ids(user.id, [])
     end
 
-    test "returns not_found when no single has that Spotify ID", %{user: user} do
-      assert {:error, :not_found} = Wantlists.add_radio_track(user.id, "nonexistent_id")
+    test "returns spotify id of a wantlisted single", %{user: user, single: single} do
+      Wantlists.add_item(user.id, :track, single.id)
+      spotify_id = single.provider_ids[:spotify]
+      assert MapSet.member?(Wantlists.wantlisted_spotify_ids(user.id, [spotify_id]), spotify_id)
+    end
+
+    test "returns spotify ids of all tracks of a wantlisted album", %{user: user, album: album} do
+      Wantlists.add_item(user.id, :album, album.id)
+      track_spotify_ids = Enum.map(album.tracks, & &1.provider_ids[:spotify])
+      result = Wantlists.wantlisted_spotify_ids(user.id, track_spotify_ids)
+      assert MapSet.equal?(result, MapSet.new(track_spotify_ids))
+    end
+
+    test "does not return ids not in wantlist", %{user: user} do
+      refute MapSet.member?(Wantlists.wantlisted_spotify_ids(user.id, ["unknown_id"]), "unknown_id")
+    end
+
+    test "does not return ids from another user's wantlist", %{user: user, single: single} do
+      other_user = user_fixture(%{role: :viewer})
+      Wantlists.add_item(other_user.id, :track, single.id)
+      spotify_id = single.provider_ids[:spotify]
+      refute MapSet.member?(Wantlists.wantlisted_spotify_ids(user.id, [spotify_id]), spotify_id)
     end
   end
 end
