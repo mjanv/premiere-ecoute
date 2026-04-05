@@ -5580,4 +5580,4 @@ msgstr "Lance automatiquement le premier morceau après 1 seconde"
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:760
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Options"
-msgstr "Optionnel"
+msgstr "Options"
