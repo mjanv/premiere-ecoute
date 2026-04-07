@@ -1,7 +1,7 @@
 %{
   language: "fr",
   version: "1.0",
-  date: "2025-07-21",
+  date: "2026-04-08",
   title: "Politique de confidentialité"
 }
 ---
@@ -54,10 +54,9 @@ Lors de l’utilisation de la plateforme, nous collectons :
 
 Le traitement de vos données repose sur les bases légales suivantes :
 
-* **Consentement** : pour les cookies non essentiels ou les communications marketing
-* **Exécution d’un contrat** : pour fournir le service
-* **Intérêt légitime** : pour améliorer le service et assurer sa sécurité
-* **Obligation légale** : pour répondre à des exigences réglementaires
+* **Exécution d’un contrat** : pour fournir le service (authentification, sessions d’écoute, votes)
+* **Intérêt légitime** : pour améliorer le service, assurer sa sécurité et prévenir les abus
+* **Obligation légale** : pour répondre à des exigences réglementaires ou judiciaires
 
 
 ## 4. Utilisation des données
@@ -92,7 +91,6 @@ Nous conservons vos données pour les durées suivantes :
 
 * **Données de compte** : tant que le compte est actif
 * **Données de session** : jusqu’à 3 ans après la dernière activité
-* **Données techniques** : maximum 13 mois (conformément à la CNIL)
 * **Données liées à la sécurité** : 1 an après résolution d’un incident
 
 
@@ -156,7 +154,7 @@ Nous pouvons mettre à jour cette politique à tout moment. En cas de changement
 
 Si vous estimez que vos droits ne sont pas respectés, vous pouvez déposer une réclamation auprès de la **CNIL** :
 
-> **[CNIL]((https://www.cnil.fr))**
+> **[CNIL](https://www.cnil.fr)**
 >
 > 3 Place de Fontenoy – TSA 80715
 > 75334 Paris CEDEX 07 – France

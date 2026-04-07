@@ -1,7 +1,7 @@
 %{
   language: "fr",
   version: "1.0",
-  date: "2025-07-21",
+  date: "2026-04-08",
   title: "Conditions générales d'utilisation"
 }
 ---
@@ -33,12 +33,39 @@ Vous vous engagez à :
 
 # 4. Protection des données
 
-La collecte et le traitement de vos données personnelles sont régis par notre [Politique de Confidentialité](/legal/terms).
+La collecte et le traitement de vos données personnelles sont régis par notre [Politique de Confidentialité](/legal/privacy).
 
-# 5. Droit applicable
+# 5. Propriété intellectuelle et contenu utilisateur
+
+Premiere Ecoute ne revendique aucun droit de propriété sur les données que vous générez via le service (votes, évaluations, historique de sessions). Ces données vous appartiennent et peuvent être supprimées à votre demande conformément à notre [Politique de Confidentialité](/legal/privacy).
+
+Les marques, logos et contenus propres à Premiere Ecoute restent la propriété exclusive de leur auteur.
+
+# 6. Limitation de responsabilité
+
+Le service est fourni **en l'état**, sans garantie d'aucune sorte. Premiere Ecoute ne saurait être tenu responsable :
+
+- des interruptions de service, qu'elles soient planifiées ou non
+- de la perte de données liée à une défaillance technique
+- des dysfonctionnements liés aux API tierces (Twitch, Spotify)
+- de tout préjudice indirect découlant de l'utilisation ou de l'impossibilité d'utiliser le service
+
+Aucune garantie de disponibilité ou de continuité du service n'est offerte.
+
+# 7. Suspension et résiliation
+
+Nous nous réservons le droit de suspendre ou supprimer l'accès de tout utilisateur qui :
+
+- viole les présentes CGU
+- adopte un comportement abusif, harcelant ou illicite
+- tente de compromettre la sécurité ou l'intégrité du service
+
+La suppression d'un compte entraîne la suppression des données associées conformément à notre politique de conservation.
+
+# 8. Droit applicable
 
 Les présentes CGU sont régies par le droit français. Les tribunaux français sont seuls compétents en cas de litige.
 
-# 6. Contact
+# 9. Contact
 
 Le contact est possible via nos informations de [contact](/legal/contact).
