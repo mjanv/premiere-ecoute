@@ -2,11 +2,14 @@ defmodule PremiereEcouteWeb.Apis.ExtensionControllerTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcouteCore.Cache
 
   @test_secret "test_secret_key_for_twitch_extension"
   @test_secret_base64 Base.encode64(@test_secret)
 
   setup do
+    start_supervised({Cache, name: :playback})
+
     # Store original config value
     original_secret = Application.get_env(:premiere_ecoute, :twitch_extension_secret)
 

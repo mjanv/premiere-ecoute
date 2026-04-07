@@ -8,9 +8,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
+  alias PremiereEcouteCore.Cache
 
   setup do
     start_supervised(PremiereEcoute.Apis.PlayerSupervisor)
+    start_supervised({Cache, name: :playback})
     :ok
   end
 

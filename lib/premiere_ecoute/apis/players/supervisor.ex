@@ -4,10 +4,9 @@ defmodule PremiereEcoute.Apis.Players.Supervisor do
   """
 
   use PremiereEcouteCore.Supervisor,
-    mandatory: [
-      {Registry, keys: :unique, name: PremiereEcoute.Apis.Players.PlayerRegistry}
-    ],
     optionals: [
-      PremiereEcoute.Apis.PlayerSupervisor
+      {Registry, keys: :unique, name: PremiereEcoute.Apis.Players.PlayerRegistry},
+      PremiereEcoute.Apis.PlayerSupervisor,
+      {PremiereEcouteCore.Cache, name: :playback, persist: false}
     ]
 end

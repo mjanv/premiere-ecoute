@@ -37,7 +37,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
 
       scope = %{scope | user: user}
 
-      {:ok, result} = TokenRenewal.maybe_renew_token(scope, :spotify)
+      result = TokenRenewal.maybe_renew_token(scope, :spotify)
 
       assert %Scope{user: %User{spotify: %OauthToken{access_token: "new_access_token"}}} = result
     end
@@ -54,7 +54,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
 
       scope = %{scope | user: user}
 
-      {:ok, result} = TokenRenewal.maybe_renew_token(scope, :twitch)
+      result = TokenRenewal.maybe_renew_token(scope, :twitch)
 
       assert %Scope{user: %User{twitch: %OauthToken{access_token: "new_access_token"}}} = result
     end

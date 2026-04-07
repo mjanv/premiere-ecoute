@@ -22,10 +22,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowClosed
   alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowOpened
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.CommandBus
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
+
+  setup do
+    start_supervised({Cache, name: :playback})
+
+    :ok
+  end
 
   describe "handle/1 - PrepareListeningSession" do
     test "successfully creates album session and returns SessionPrepared event" do

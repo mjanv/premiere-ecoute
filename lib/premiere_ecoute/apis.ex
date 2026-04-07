@@ -44,4 +44,6 @@ defmodule PremiereEcoute.Apis do
     @spec unquote(provider_name)() :: module()
     def unquote(provider_name)(), do: provider(unquote(provider_name))
   end
+
+  def cache(:spotify), do: PremiereEcoute.Apis.Players.PlaybackState
 end

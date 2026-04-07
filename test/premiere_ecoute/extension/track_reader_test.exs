@@ -4,9 +4,12 @@ defmodule PremiereEcoute.Extension.TrackReaderTest do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Extension.TrackReader
+  alias PremiereEcouteCore.Cache
 
   describe "get_current_track/1" do
     setup do
+      start_supervised({Cache, name: :playback})
+
       user =
         user_fixture(%{
           twitch: %{user_id: "broadcaster123"},

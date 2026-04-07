@@ -21,11 +21,8 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
          true <- token_expired?(expires_at),
          {:ok, tokens} <- Apis.provider(provider).renew_token(refresh_token),
          {:ok, user} <- User.refresh_token(user, provider, tokens) do
-      {:ok, %{scope | user: user}}
+      %{scope | user: user}
     else
-      {:ok, %Scope{} = scope} ->
-        scope
-
       {:error, reason} ->
         Logger.error("Failed to renew #{provider} token: #{inspect(reason)}")
         scope

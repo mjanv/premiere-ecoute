@@ -5466,13 +5466,12 @@ msgid "Add albums, tracks, or artists from the discography or radio pages."
 msgstr ""
 
 #: lib/premiere_ecoute_web/components/core_components.ex:512
-#: lib/premiere_ecoute_web/live/radio/viewer_live.html.heex:26
+#: lib/premiere_ecoute_web/live/radio/viewer_live.html.heex:34
 #, elixir-autogen, elixir-format
 msgid "Add to wantlist"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/home_live.ex:95
-#: lib/premiere_ecoute_web/live/radio/viewer_live.ex:72
 #, elixir-autogen, elixir-format
 msgid "Added to wantlist"
 msgstr ""
@@ -5481,7 +5480,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/discography/artist_live.ex:57
 #: lib/premiere_ecoute_web/live/discography/single_live.ex:52
 #: lib/premiere_ecoute_web/live/home_live.ex:98
-#: lib/premiere_ecoute_web/live/radio/viewer_live.ex:78
 #, elixir-autogen, elixir-format
 msgid "Could not add to wantlist"
 msgstr ""
@@ -5539,16 +5537,6 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/wantlist/wantlist_live.html.heex:255
 #, elixir-autogen, elixir-format
 msgid "Remove from wantlist?"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/radio/viewer_live.ex:75
-#, elixir-autogen, elixir-format
-msgid "Track not found in discography"
-msgstr ""
-
-#: lib/premiere_ecoute_web/live/radio/viewer_live.ex:81
-#, elixir-autogen, elixir-format
-msgid "You must be logged in"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/wantlist/wantlist_live.html.heex:115

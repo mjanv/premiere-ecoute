@@ -389,7 +389,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%CaptureCurrentTrackListeningSession{session_id: session_id, scope: scope}) do
-    with {:ok, %{"item" => item, "is_playing" => true}} <- Apis.spotify().get_playback_state(scope, %{}),
+    with {:ok, %{"item" => item, "is_playing" => true}} <- Apis.cache(:spotify).get_playback_state(scope, %{}),
          {:ok, single} <- Apis.spotify().get_single(item["id"]),
          {:ok, single} <- Single.create_if_not_exists(single),
          session <- ListeningSession.get(session_id),

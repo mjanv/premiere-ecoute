@@ -46,7 +46,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
     scope = Accounts.maybe_renew_token(Scope.for_user(user), :spotify)
 
     with true <- Accounts.profile(user, [:radio_settings, :enabled], false),
-         {:ok, playback} <- Apis.spotify().get_playback_state(scope, Player.default()),
+         {:ok, playback} <- Apis.cache(:spotify).get_playback_state(scope, Player.default()),
          {:ok, _track} <- store_track_if_new(user_id, playback),
          :ok <- schedule_next_poll(user_id, playback) do
       :ok

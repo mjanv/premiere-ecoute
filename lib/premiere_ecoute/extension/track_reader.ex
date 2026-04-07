@@ -3,7 +3,9 @@ defmodule PremiereEcoute.Extension.TrackReader do
   Read model for fetching track information.
 
   This module handles reading track data from Spotify sessions for
-  broadcaster users in the extension context.
+  broadcaster users in the extension context. Playback state is cached
+  per broadcaster to reduce Spotify API load when multiple viewers poll
+  concurrently.
   """
 
   alias PremiereEcoute.Accounts
@@ -29,9 +31,9 @@ defmodule PremiereEcoute.Extension.TrackReader do
   @spec get_current_track(String.t()) :: {:ok, map()} | {:error, atom()}
   def get_current_track(broadcaster_id) do
     with {:ok, user} <- get_broadcaster_user(broadcaster_id),
-         {:ok, spotify_scope} <- get_spotify_scope(user),
-         {:ok, playback_state} <- Apis.spotify().get_playback_state(spotify_scope, %{}),
-         {:ok, track_data} <- extract_track_from_playback(playback_state) do
+         true <- user.spotify != nil or {:error, :no_spotify},
+         {:ok, state} <- Apis.cache(:spotify).get_playback_state(Scope.for_user(user), %{}),
+         {:ok, track_data} <- extract_track_from_playback(state) do
       {:ok, track_data}
     else
       {:error, reason} -> {:error, reason}
@@ -45,14 +47,6 @@ defmodule PremiereEcoute.Extension.TrackReader do
       nil -> {:error, :no_user}
       user -> {:ok, user}
     end
-  end
-
-  defp get_spotify_scope(%{spotify: nil}), do: {:error, :no_spotify}
-
-  defp get_spotify_scope(%{spotify: _spotify_token} = user) do
-    # Create a Scope struct with the user (which includes preloaded spotify data)
-    scope = %Scope{user: user}
-    {:ok, scope}
   end
 
   defp extract_track_from_playback(%{"is_playing" => false}), do: {:error, :no_track}

@@ -5,6 +5,13 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlaybackTest do
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Radio.Workers.TrackSpotifyPlayback
+  alias PremiereEcouteCore.Cache
+
+  setup do
+    start_supervised({Cache, name: :playback})
+
+    :ok
+  end
 
   describe "perform/1" do
     test "stores a track when feature is enabled and playback is active" do
