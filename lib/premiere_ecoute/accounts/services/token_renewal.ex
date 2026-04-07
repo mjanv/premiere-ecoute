@@ -14,21 +14,25 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
   @doc """
   Automatically renews OAuth tokens when approaching expiration. Checks if the provider token expires within 5 minutes and refreshes it via the provider API if needed. Logs errors but returns the original scope on failure to avoid breaking the request flow.
   """
-  @spec maybe_renew_token(map(), atom()) :: Scope.t()
-  def maybe_renew_token(conn, provider) do
-    with %Scope{user: %User{} = user} = scope <- conn.assigns[:current_scope],
+  @spec maybe_renew_token(Scope.t(), atom()) :: Scope.t()
+  def maybe_renew_token(scope, provider) do
+    with %Scope{user: %User{} = user} <- scope,
          %{expires_at: expires_at, refresh_token: refresh_token} <- Map.get(user, provider),
          true <- token_expired?(expires_at),
          {:ok, tokens} <- Apis.provider(provider).renew_token(refresh_token),
          {:ok, user} <- User.refresh_token(user, provider, tokens) do
-      %{scope | user: user}
+      {:ok, %{scope | user: user}}
     else
+      {:ok, %Scope{} = scope} ->
+        scope
+
       {:error, reason} ->
         Logger.error("Failed to renew #{provider} token: #{inspect(reason)}")
-        conn.assigns[:current_scope]
+        scope
 
       _ ->
-        conn.assigns[:current_scope]
+        Logger.error("Failed to renew #{provider} token")
+        scope
     end
   end
 

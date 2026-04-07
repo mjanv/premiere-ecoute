@@ -25,10 +25,13 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
   @doc "Runs all steps of an automation, writes a run record, returns `:ok`."
   @spec run(Automation.t(), integer()) :: :ok
   def run(%Automation{} = automation, job_id) do
-    # AIDEV-NOTE: preload tokens and renew if expired so API calls succeed
     user = Repo.preload(Repo.get!(User, automation.user_id), [:spotify, :twitch])
-    scope = user |> Scope.for_user() |> then(&Accounts.maybe_renew_token(%{assigns: %{current_scope: &1}}, :spotify))
-    scope = Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :twitch)
+
+    scope =
+      user
+      |> Scope.for_user()
+      |> Accounts.maybe_renew_token(:spotify)
+      |> Accounts.maybe_renew_token(:twitch)
 
     {:ok, run} =
       AutomationRun.insert(%{

@@ -56,7 +56,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   def handle_info(:poll, %{scope: scope, state: old_state, polls: polls} = data) do
     with _ <- Process.send_after(self(), :poll, @poll_interval),
-         scope <- Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :spotify),
+         scope <- Accounts.maybe_renew_token(scope, :spotify),
          {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
          {:ok, state, events} <- handle(old_state, new_state),
          :ok <- Enum.each(events, fn event -> publish(scope, event, state) end) do

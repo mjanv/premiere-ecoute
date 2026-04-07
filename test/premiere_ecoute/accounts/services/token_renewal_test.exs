@@ -25,7 +25,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
   end
 
   describe "maybe_renew_token/2" do
-    test "renews expired Spotify token successfully", %{user: user, conn: conn} do
+    test "renews expired Spotify token successfully", %{user: user, scope: scope} do
       {:ok, user} =
         OauthToken.create(user, :spotify, %{
           user_id: "spotify_user_id",
@@ -35,14 +35,14 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
           expires_in: -3600
         })
 
-      conn = put_in(conn.assigns.current_scope.user, user)
+      scope = %{scope | user: user}
 
-      result = TokenRenewal.maybe_renew_token(conn, :spotify)
+      {:ok, result} = TokenRenewal.maybe_renew_token(scope, :spotify)
 
       assert %Scope{user: %User{spotify: %OauthToken{access_token: "new_access_token"}}} = result
     end
 
-    test "renews expired Twitch token successfully", %{user: user, conn: conn} do
+    test "renews expired Twitch token successfully", %{user: user, scope: scope} do
       {:ok, user} =
         OauthToken.create(user, :twitch, %{
           user_id: "twitch_user_id",
@@ -52,14 +52,14 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
           expires_in: -3600
         })
 
-      conn = put_in(conn.assigns.current_scope.user, user)
+      scope = %{scope | user: user}
 
-      result = TokenRenewal.maybe_renew_token(conn, :twitch)
+      {:ok, result} = TokenRenewal.maybe_renew_token(scope, :twitch)
 
       assert %Scope{user: %User{twitch: %OauthToken{access_token: "new_access_token"}}} = result
     end
 
-    test "does not renew non-expired token", %{user: user, conn: conn} do
+    test "does not renew non-expired token", %{user: user, scope: scope} do
       {:ok, user} =
         OauthToken.create(user, :spotify, %{
           user_id: "spotify_user_id",
@@ -69,37 +69,36 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
           expires_in: 3600
         })
 
-      conn = put_in(conn.assigns.current_scope.user, user)
+      scope = %{scope | user: user}
 
-      result = TokenRenewal.maybe_renew_token(conn, :spotify)
+      result = TokenRenewal.maybe_renew_token(scope, :spotify)
 
       assert %Scope{user: %User{spotify: %OauthToken{access_token: "current_access_token"}}} = result
     end
 
-    test "returns original scope when user has no token for provider", %{conn: conn, scope: scope} do
-      new_scope = TokenRenewal.maybe_renew_token(conn, :spotify)
+    test "returns original scope when user has no token for provider", %{scope: scope} do
+      new_scope = TokenRenewal.maybe_renew_token(scope, :spotify)
 
       assert new_scope == scope
     end
 
-    test "returns original scope when no current_scope in conn" do
-      conn = %Plug.Conn{assigns: %{}}
+    test "returns original scope when scope is nil" do
+      scope = nil
 
-      scope = TokenRenewal.maybe_renew_token(conn, :spotify)
+      result = TokenRenewal.maybe_renew_token(scope, :spotify)
 
-      assert is_nil(scope)
+      assert is_nil(result)
     end
 
-    test "returns original scope when user is nil in scope", %{conn: conn} do
+    test "returns original scope when user is nil in scope" do
       scope = %Scope{user: nil}
-      conn = put_in(conn.assigns.current_scope, scope)
 
-      scope = TokenRenewal.maybe_renew_token(conn, :spotify)
+      result = TokenRenewal.maybe_renew_token(scope, :spotify)
 
-      assert %Scope{user: nil} = scope
+      assert %Scope{user: nil} = result
     end
 
-    test "handles API renewal failure gracefully", %{user: user, conn: conn} do
+    test "handles API renewal failure gracefully", %{user: user, scope: scope} do
       stub(SpotifyApi, :renew_token, fn _refresh_token -> {:error, "Nope"} end)
 
       {:ok, user} =
@@ -112,11 +111,11 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
           expired_at: DateTime.add(DateTime.utc_now(), -3600, :second)
         })
 
-      conn = put_in(conn.assigns.current_scope.user, user)
+      scope = %{scope | user: user}
 
-      scope = TokenRenewal.maybe_renew_token(conn, :spotify)
+      result = TokenRenewal.maybe_renew_token(scope, :spotify)
 
-      assert %Scope{user: %User{spotify: %OauthToken{access_token: "old_access_token"}}} = scope
+      assert %Scope{user: %User{spotify: %OauthToken{access_token: "old_access_token"}}} = result
     end
   end
 

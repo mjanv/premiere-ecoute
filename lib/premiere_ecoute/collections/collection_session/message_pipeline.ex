@@ -106,8 +106,8 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
     trimmed = String.trim(message)
 
     cond do
-      String.ends_with?(trimmed, " 1") -> {:ok, :a}
-      String.ends_with?(trimmed, " 2") -> {:ok, :b}
+      trimmed == "1" or String.ends_with?(trimmed, " 1") -> {:ok, :a}
+      trimmed == "2" or String.ends_with?(trimmed, " 2") -> {:ok, :b}
       true -> {:error, :invalid_vote}
     end
   end

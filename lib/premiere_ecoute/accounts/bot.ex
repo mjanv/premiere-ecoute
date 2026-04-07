@@ -23,8 +23,7 @@ defmodule PremiereEcoute.Accounts.Bot do
   def get do
     with {:ok, nil} <- Cache.get(:users, :bot),
          %User{} = user <- Accounts.get_user_by_email(@bot),
-         %Scope{} = scope <- Scope.for_user(user),
-         %Scope{user: user} <- Accounts.maybe_renew_token(%{assigns: %{current_scope: scope}}, :twitch),
+         %Scope{user: user} = scope <- Accounts.maybe_renew_token(Scope.for_user(user), :twitch),
          _ <- Cache.put(:users, :bot, user, expire: 5 * 60 * 1_000) do
       {:ok, scope.user}
     else
