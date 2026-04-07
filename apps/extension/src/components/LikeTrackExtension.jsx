@@ -9,16 +9,16 @@ const getApiUrl = () => {
 
   // Check if running on Twitch's hosted test environment
   if (hostname.endsWith('.ext-twitch.tv')) {
-    return 'https://premiere-ecoute.fr';
+    return 'https://premiere-ecoute.fr/api';
   }
 
   // Check if running on localhost for development
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:4000';
+    return 'http://localhost:4000/api';
   }
 
   // Default to production
-  return 'https://premiere-ecoute.fr';
+  return 'https://premiere-ecoute.fr/api';
 };
 
 const PREMIERE_ECOUTE_API = getApiUrl();

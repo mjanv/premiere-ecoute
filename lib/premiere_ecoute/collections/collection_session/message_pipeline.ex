@@ -13,8 +13,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
 
   use Broadway
 
-  require Logger
-
   alias Broadway.BatchInfo
   alias Broadway.Message
   alias PremiereEcoute.Events.Chat.MessageSent
@@ -40,8 +38,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
   @doc false
   @spec handle_message(atom(), Message.t(), any()) :: Message.t()
   def handle_message(:session, message, _) do
-    Logger.info("#{inspect(message)}")
-
     case process(message.data) do
       {:ok, vote} -> message |> Message.put_data(vote) |> Message.put_batch_key(vote.session_id) |> Message.put_batcher(:writer)
       {:error, reason} -> Message.failed(message, reason)
@@ -110,8 +106,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.MessagePipeline do
     trimmed = String.trim(message)
 
     cond do
-      trimmed == "1" -> {:ok, :a}
-      trimmed == "2" -> {:ok, :b}
       String.ends_with?(trimmed, " 1") -> {:ok, :a}
       String.ends_with?(trimmed, " 2") -> {:ok, :b}
       true -> {:error, :invalid_vote}

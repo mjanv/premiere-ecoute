@@ -289,11 +289,11 @@ defmodule PremiereEcouteWeb.Router do
     post "/session/vote", VoteController, :create
   end
 
-  scope "/extension", PremiereEcouteWeb.Extension do
+  scope "/api/extension", PremiereEcouteWeb.Api do
     pipe_through :api
 
-    get "/tracks/current/:broadcaster_id", TrackController, :current_track
-    post "/tracks/like", TrackController, :like_track
+    get "/tracks/current/:broadcaster_id", ExtensionController, :current_track
+    post "/tracks/like", ExtensionController, :like_track
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do

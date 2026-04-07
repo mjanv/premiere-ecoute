@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Extension.TrackController do
+defmodule PremiereEcouteWeb.Api.ExtensionController do
   @moduledoc """
   Controller for Twitch extension track-related endpoints.
 

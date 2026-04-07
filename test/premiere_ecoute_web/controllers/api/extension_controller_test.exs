@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
+defmodule PremiereEcouteWeb.Apis.ExtensionControllerTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
@@ -47,7 +47,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
       conn =
         conn
         |> add_extension_auth("viewer_123", user.twitch.user_id)
-        |> get(~p"/extension/tracks/current/#{user.twitch.user_id}")
+        |> get(~p"/api/extension/tracks/current/#{user.twitch.user_id}")
 
       assert json_response(conn, 200) == %{
                "track" => %{
@@ -74,7 +74,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
       conn =
         conn
         |> add_extension_auth("viewer_123", user.twitch.user_id)
-        |> get(~p"/extension/tracks/current/#{user.twitch.user_id}")
+        |> get(~p"/api/extension/tracks/current/#{user.twitch.user_id}")
 
       assert json_response(conn, 404) == %{"error" => "No track currently playing"}
     end
@@ -83,7 +83,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
       conn =
         conn
         |> add_extension_auth("viewer_123", "nonexistent_broadcaster")
-        |> get(~p"/extension/tracks/current/nonexistent_broadcaster")
+        |> get(~p"/api/extension/tracks/current/nonexistent_broadcaster")
 
       assert json_response(conn, 404) == %{"error" => "Broadcaster not found or not connected to Spotify"}
     end
@@ -103,7 +103,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
       conn =
         conn
         |> add_extension_auth(user.twitch.user_id, "123456")
-        |> post(~p"/extension/tracks/like", params)
+        |> post(~p"/api/extension/tracks/like", params)
 
       assert json_response(conn, 404) == %{
                "error" => "No playlist rule configured. Please configure a playlist rule in the application settings."
@@ -120,7 +120,7 @@ defmodule PremiereEcouteWeb.Extension.TrackControllerTest do
       conn =
         conn
         |> add_extension_auth("123456", "123456")
-        |> post(~p"/extension/tracks/like", params)
+        |> post(~p"/api/extension/tracks/like", params)
 
       assert json_response(conn, 400) == %{
                "error" => "Missing required parameters: user_id and spotify_track_id"
