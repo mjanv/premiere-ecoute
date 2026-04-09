@@ -16,7 +16,7 @@ defmodule PremiereEcoute.Accounts.Workers.SubscribeStreamEvents do
 
   @impl true
   def perform(%Oban.Job{attempt: _attempt}) do
-    Accounts.streamers()
+    [Accounts.streamers() ++ Accounts.admins()]
     |> Enum.map(&subscribe_streamer/1)
     |> Enum.all?(fn status -> status == :ok end)
     |> case do
