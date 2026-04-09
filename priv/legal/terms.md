@@ -1,6 +1,6 @@
 %{
   language: "fr",
-  version: "1.0",
+  version: "1.1",
   date: "2026-04-08",
   title: "Conditions générales d'utilisation"
 }

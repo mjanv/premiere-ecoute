@@ -1211,7 +1211,7 @@ msgstr "Playlist supprimée de votre bibliothèque"
 msgid "Preferences"
 msgstr "Préférences"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:135
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:208
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:305
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:145
 #: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:725
@@ -1224,7 +1224,7 @@ msgstr "Privée"
 msgid "Profile preferences not available"
 msgstr "Préférences de profil non disponibles"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:134
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:207
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:140
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:294
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:142
@@ -3274,17 +3274,17 @@ msgstr "Exporter vers Youtube"
 msgid "Time Bias"
 msgstr "Décalage temporel"
 
-#: lib/premiere_ecoute/sessions/scores/command_handler.ex:31
+#: lib/premiere_ecoute/sessions/scores/command_handler.ex:33
 #, elixir-autogen, elixir-format
 msgid "Premiere Ecoute is a platform where viewers can vote on music played during the stream. Register on premiere-ecoute.fr to view your votes!"
 msgstr "Première Écoute est une plateforme où les spectateurs peuvent voter pour la musique diffusée pendant le stream. Inscrivez-vous sur premiere-ecoute.fr pour consulter vos votes !"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:142
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:215
 #, elixir-autogen, elixir-format
 msgid "Days before tracks are deleted"
 msgstr "Jours avant la suppression des titres"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:110
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:183
 #: lib/premiere_ecoute_web/live/playlists/automations/show_live.html.heex:63
 #, elixir-autogen, elixir-format
 msgid "Enable"
@@ -3301,23 +3301,24 @@ msgid "Manage streamer features and integrations"
 msgstr "Gérer les fonctionnalités et intégrations streamer"
 
 #: lib/premiere_ecoute_web/components/navigation/header.ex:62
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:99
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:172
 #: lib/premiere_ecoute_web/live/home/viewer.html.heex:14
 #, elixir-autogen, elixir-format
 msgid "Radio"
 msgstr "Radio"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:111
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:184
 #, elixir-autogen, elixir-format
 msgid "Record tracks played during streams"
 msgstr "Enregistrer les titres joués pendant les streams"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:141
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:214
 #, elixir-autogen, elixir-format
 msgid "Retention"
 msgstr "Rétention"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:160
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:156
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:233
 #: lib/premiere_ecoute_web/live/discography/album_live.html.heex:621
 #: lib/premiere_ecoute_web/live/playlists/automations/form_live.html.heex:156
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:630
@@ -3331,12 +3332,12 @@ msgstr "Enregistrer"
 msgid "Streamer Features"
 msgstr "Fonctionnalités streamer"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:126
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:199
 #, elixir-autogen, elixir-format
 msgid "Visibility"
 msgstr "Visibilité"
 
-#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:127
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:200
 #, elixir-autogen, elixir-format
 msgid "Who can see your daily track list"
 msgstr "Qui peut voir votre liste de titres quotidienne"
@@ -5569,3 +5570,38 @@ msgstr "Lance automatiquement le premier morceau après 1 seconde"
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Options"
 msgstr "Options"
+
+#: lib/premiere_ecoute/sessions/scores/command_handler.ex:73
+#, elixir-autogen, elixir-format
+msgid "%{track_name} saved to your wantlist!"
+msgstr "%{track_name} ajouté à ta liste de souhaits !"
+
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:103
+#, elixir-autogen, elixir-format
+msgid "Chat Commands"
+msgstr "Commandes de chat"
+
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:135
+#, elixir-autogen, elixir-format
+msgid "Save current track to wantlist"
+msgstr "Sauvegarder le titre en cours dans la liste de souhaits"
+
+#: lib/premiere_ecoute/sessions/scores/command_handler.ex:63
+#, elixir-autogen, elixir-format
+msgid "Track not saved. Register on premiere-ecoute.fr to save tracks to your wantlist!"
+msgstr "Titre non sauvegardé. Inscris-toi sur premiere-ecoute.fr pour sauvegarder des titres dans ta liste de souhaits !"
+
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:137
+#, elixir-autogen, elixir-format
+msgid "Viewers can save the currently playing track to their wantlist"
+msgstr "Les spectateurs peuvent sauvegarder le titre en cours dans leur liste de souhaits"
+
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:118
+#, elixir-autogen, elixir-format
+msgid "Viewers can check their current session rating"
+msgstr "Les spectateurs peuvent consulter leur note de session en cours"
+
+#: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:116
+#, elixir-autogen, elixir-format
+msgid "Vote average"
+msgstr "Moyenne des votes"

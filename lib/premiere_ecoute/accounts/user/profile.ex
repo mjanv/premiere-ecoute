@@ -17,7 +17,8 @@ defmodule PremiereEcoute.Accounts.User.Profile do
           language: :en | :fr | :it,
           timezone: String.t(),
           widget_settings: map() | nil,
-          radio_settings: map() | nil
+          radio_settings: map() | nil,
+          chat_settings: map() | nil
         }
 
   embedded_schema do
@@ -34,6 +35,11 @@ defmodule PremiereEcoute.Accounts.User.Profile do
       field :enabled, :boolean, default: false
       field :retention_days, :integer, default: 7
       field :visibility, Ecto.Enum, values: [:private, :public], default: :public
+    end
+
+    embeds_one :chat_settings, ChatSettings, on_replace: :update, primary_key: false do
+      field :save_wantlist, :boolean, default: false
+      field :vote_enabled, :boolean, default: true
     end
   end
 
@@ -52,9 +58,11 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     profile
     |> Map.put(:radio_settings, Map.get(profile, :radio_settings) || %__MODULE__.RadioSettings{})
     |> Map.put(:widget_settings, Map.get(profile, :widget_settings) || %__MODULE__.WidgetSettings{})
+    |> Map.put(:chat_settings, Map.get(profile, :chat_settings) || %__MODULE__.ChatSettings{})
     |> cast(attrs, [:color_scheme, :language, :timezone])
     |> cast_embed(:widget_settings, with: &widget_settings_changeset/2)
     |> cast_embed(:radio_settings, with: &radio_settings_changeset/2)
+    |> cast_embed(:chat_settings, with: &chat_settings_changeset/2)
     |> validate_required([:color_scheme, :language])
     |> validate_inclusion(:color_scheme, @schemes)
     |> validate_inclusion(:language, @languages)
@@ -74,6 +82,10 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     |> validate_number(:retention_days, greater_than: 0)
   end
 
+  defp chat_settings_changeset(settings, attrs) do
+    cast(settings, attrs, [:save_wantlist, :vote_enabled])
+  end
+
   defp validate_timezone(changeset) do
     validate_change(changeset, :timezone, fn :timezone, tz ->
       if PremiereEcouteCore.Timezone.exists?(tz), do: [], else: [timezone: "is not a valid timezone"]
@@ -86,7 +98,8 @@ defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile do
     profile
     |> Map.update!(:widget_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.WidgetSettings{}))
     |> Map.update!(:radio_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.RadioSettings{}))
-    |> Map.take([:color_scheme, :language, :timezone, :widget_settings, :radio_settings])
+    |> Map.update!(:chat_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.ChatSettings{}))
+    |> Map.take([:color_scheme, :language, :timezone, :widget_settings, :radio_settings, :chat_settings])
     |> Jason.Encode.map(opts)
   end
 end
@@ -100,5 +113,11 @@ end
 defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile.RadioSettings do
   def encode(settings, opts) do
     Jason.Encode.map(Map.take(settings, [:enabled, :retention_days, :visibility]), opts)
+  end
+end
+
+defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile.ChatSettings do
+  def encode(settings, opts) do
+    Jason.Encode.map(Map.take(settings, [:save_wantlist, :vote_enabled]), opts)
   end
 end

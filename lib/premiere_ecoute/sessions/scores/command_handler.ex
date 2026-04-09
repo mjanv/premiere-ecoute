@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   @moduledoc """
   Command handler for chat commands.
 
-  Handles !premiereecoute and !vote chat commands, sending information about the platform or user's current average vote via Twitch chat replies.
+  Handles !premiereecoute, !vote, and !save chat commands. Sends platform info, user vote averages, and saves the current track to a viewer's wantlist.
   """
 
   use PremiereEcouteCore.CommandBus.Handler
@@ -19,6 +19,8 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
+  alias PremiereEcoute.Wantlists
+  alias PremiereEcouteCore.Cache
 
   command(PremiereEcoute.Commands.Chat.SendChatCommand)
 
@@ -40,9 +42,43 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
 
   def handle(%SendChatCommand{command: "vote", broadcaster_id: broadcaster_id, user_id: viewer_id, message_id: message_id}) do
     with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
+         true <- Accounts.profile(broadcaster, [:chat_settings, :vote_enabled], true),
          session when not is_nil(session) <- get_active_session(broadcaster.id),
          message when not is_nil(message) <- get_vote_message(session.id, viewer_id, session.vote_options) do
       send_chat_reply(broadcaster_id, message_id, message)
+    else
+      _ -> {:ok, []}
+    end
+  end
+
+  def handle(%SendChatCommand{command: "save", broadcaster_id: broadcaster_id, user_id: viewer_twitch_id, message_id: message_id}) do
+    with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
+         true <- Accounts.profile(broadcaster, [:chat_settings, :save_wantlist], false),
+         {:ok, %{"item" => %{"id" => spotify_id, "name" => track_name}} = _state} when not is_nil(spotify_id) <-
+           Cache.get(:playback, broadcaster.id) do
+      case Accounts.get_user_by_twitch_id(viewer_twitch_id) do
+        nil ->
+          message =
+            Gettext.t(Scope.for_user(broadcaster), fn ->
+              gettext("Track not saved. Register on premiere-ecoute.fr to save tracks to your wantlist!")
+            end)
+
+          send_chat_reply(broadcaster_id, message_id, message)
+
+        viewer ->
+          case Wantlists.add_radio_track(viewer.id, spotify_id) do
+            {:ok, _} ->
+              message =
+                Gettext.t(Scope.for_user(broadcaster), fn ->
+                  gettext("%{track_name} saved to your wantlist!", track_name: track_name)
+                end)
+
+              send_chat_reply(broadcaster_id, message_id, message)
+
+            {:error, _} ->
+              {:ok, []}
+          end
+      end
     else
       _ -> {:ok, []}
     end

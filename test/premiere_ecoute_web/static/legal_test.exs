@@ -10,8 +10,8 @@ defmodule PremiereEcouteWeb.Static.LegalTest do
 
       assert %LegalDocument{
                id: "terms",
-               version: "1.0",
-               date: "2025-07-21",
+               version: "1.1",
+               date: "2026-04-08",
                title: "Conditions générales d'utilisation",
                body: _
              } = document

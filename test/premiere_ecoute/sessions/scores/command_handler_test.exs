@@ -1,8 +1,11 @@
 defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Commands.Chat.SendChatCommand
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.Scores.CommandHandler
+  alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.CommandBus
 
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
@@ -102,6 +105,32 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
         :ok
       end)
 
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "silently ignores when vote_enabled is false" do
+      broadcaster =
+        user_fixture(%{twitch: %{user_id: "1971641", access_token: "token"}})
+
+      {:ok, broadcaster} =
+        User.edit_user_profile(broadcaster, %{
+          "chat_settings" => %{"vote_enabled" => false}
+        })
+
+      viewer_id = "4145994"
+      session = session_fixture(%{user_id: broadcaster.id, status: :active})
+      vote_fixture(%{viewer_id: viewer_id, session_id: session.id, track_id: 1, value: "8"})
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: viewer_id,
+        message_id: "msg-123",
+        command: "vote",
+        args: [],
+        is_streamer: false
+      }
+
+      # No TwitchApi expectation — must not call send_reply_message
       assert {:ok, []} = CommandBus.apply(command)
     end
   end
@@ -276,6 +305,177 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
       # Note: This would normally not be reached in practice since validate
       # would reject unknown commands first
       assert {:ok, []} = CommandHandler.handle(%{})
+    end
+  end
+
+  describe "handle/1 - SendChatCommand with save" do
+    setup do
+      start_supervised({PremiereEcouteCore.Cache, name: :playback, persist: false})
+
+      broadcaster =
+        user_fixture(%{
+          twitch: %{user_id: "1971641", access_token: "token"},
+          profile: %{language: :en}
+        })
+
+      viewer = user_fixture(%{twitch: %{user_id: "9876543", access_token: "token2"}})
+
+      # AIDEV-NOTE: single_fixture returns an unsaved struct; create_if_not_exists persists it
+      {:ok, single} =
+        single_fixture(%{provider_ids: %{spotify: "spotify_track_123"}})
+        |> Single.create_if_not_exists()
+
+      playback_state = %{
+        "item" => %{"id" => "spotify_track_123", "name" => "Awesome Song"},
+        "is_playing" => true
+      }
+
+      {:ok,
+       %{
+         broadcaster: broadcaster,
+         viewer: viewer,
+         single: single,
+         playback_state: playback_state
+       }}
+    end
+
+    test "saves track to wantlist and sends reply when feature enabled and stream live", %{
+      broadcaster: broadcaster,
+      viewer: viewer,
+      playback_state: playback_state
+    } do
+      {:ok, broadcaster} =
+        User.edit_user_profile(broadcaster, %{
+          "chat_settings" => %{"save_wantlist" => true}
+        })
+
+      Cache.put(:playback, broadcaster.id, playback_state)
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: viewer.twitch.user_id,
+        message_id: "msg-save-1",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      expect(TwitchApi, :send_reply_message, fn scope, message, reply_to ->
+        assert scope.user.id == broadcaster.id
+        assert message == "Awesome Song saved to your wantlist!"
+        assert reply_to == "msg-save-1"
+        :ok
+      end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "sends registration reply when viewer is not registered", %{
+      broadcaster: broadcaster,
+      playback_state: playback_state
+    } do
+      {:ok, broadcaster} =
+        User.edit_user_profile(broadcaster, %{
+          "chat_settings" => %{"save_wantlist" => true}
+        })
+
+      Cache.put(:playback, broadcaster.id, playback_state)
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: "unregistered_twitch_id",
+        message_id: "msg-save-2",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      expect(TwitchApi, :send_reply_message, fn _scope, message, reply_to ->
+        assert message == "Track not saved. Register on premiere-ecoute.fr to save tracks to your wantlist!"
+        assert reply_to == "msg-save-2"
+        :ok
+      end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "silently ignores when feature is disabled", %{
+      broadcaster: broadcaster,
+      viewer: viewer,
+      playback_state: playback_state
+    } do
+      # save_wantlist defaults to false
+      Cache.put(:playback, broadcaster.id, playback_state)
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: viewer.twitch.user_id,
+        message_id: "msg-save-3",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      # No TwitchApi expectation — must not call send_reply_message
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "silently ignores when stream is offline (no playback cache entry)", %{
+      broadcaster: broadcaster,
+      viewer: viewer
+    } do
+      {:ok, _broadcaster} =
+        User.edit_user_profile(broadcaster, %{
+          "chat_settings" => %{"save_wantlist" => true}
+        })
+
+      # No Cache.put — stream is offline
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: viewer.twitch.user_id,
+        message_id: "msg-save-4",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "silently ignores when playback has no current item", %{
+      broadcaster: broadcaster,
+      viewer: viewer
+    } do
+      {:ok, broadcaster} =
+        User.edit_user_profile(broadcaster, %{
+          "chat_settings" => %{"save_wantlist" => true}
+        })
+
+      Cache.put(:playback, broadcaster.id, %{"item" => nil, "is_playing" => false})
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: viewer.twitch.user_id,
+        message_id: "msg-save-5",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "silently ignores when broadcaster is not found" do
+      command = %SendChatCommand{
+        broadcaster_id: "nonexistent",
+        user_id: "9876543",
+        message_id: "msg-save-6",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      assert {:ok, []} = CommandBus.apply(command)
     end
   end
 end
