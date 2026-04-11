@@ -38,12 +38,14 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   def handle(%PrepareCollectionSession{
         scope: %{user: %{id: user_id}},
         origin_playlist_id: origin_playlist_id,
-        destination_playlist_id: destination_playlist_id
+        destination_playlist_id: destination_playlist_id,
+        options: options
       }) do
     %{
       user_id: user_id,
       origin_playlist_id: origin_playlist_id,
-      destination_playlist_id: destination_playlist_id
+      destination_playlist_id: destination_playlist_id,
+      options: options
     }
     |> CollectionSession.create()
     |> case do

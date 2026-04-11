@@ -27,7 +27,7 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
         Logger.error("Failed to renew #{provider} token: #{inspect(reason)}")
         scope
 
-      error ->
+      _error ->
         scope
     end
   end

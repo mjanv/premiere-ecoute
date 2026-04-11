@@ -8,13 +8,14 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
 
   use PremiereEcouteCore.EventBus.Handler
 
+  alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Events.CollectionSessionCompleted
   alias PremiereEcoute.Collections.CollectionSession.Events.CollectionSessionPrepared
   alias PremiereEcoute.Collections.CollectionSession.Events.CollectionSessionStarted
   alias PremiereEcoute.Collections.CollectionSession.Events.TrackDecided
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowClosed
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
-  # alias PremiereEcoute.Collections.CollectionSessionWorker
+  alias PremiereEcoute.Collections.CollectionSessionWorker
 
   event(CollectionSessionPrepared)
   event(CollectionSessionStarted)
@@ -30,6 +31,16 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   def dispatch(%CollectionSessionStarted{session_id: session_id, user_id: user_id}) do
     PremiereEcoute.PubSub.broadcast("collection:#{session_id}", :session_started)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:collection_started, session_id})
+
+    session = CollectionSession.get(session_id)
+
+    if minutes = session.options["duel_reminder_minutes"] do
+      CollectionSessionWorker.in_minutes(
+        %{"action" => "duel_reminder", "session_id" => session_id},
+        minutes
+      )
+    end
+
     :ok
   end
 
@@ -40,17 +51,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   end
 
   @impl true
-  def dispatch(%VoteWindowOpened{
-        session_id: session_id,
-        user_id: _user_id,
-        track_id: _track_id,
-        vote_duration: _vote_duration
-      }) do
-    # CollectionSessionWorker.in_seconds(
-    #   %{action: "close_vote", session_id: session_id, user_id: user_id, track_id: track_id},
-    #   vote_duration
-    # )
-
+  def dispatch(%VoteWindowOpened{session_id: session_id}) do
     PremiereEcoute.PubSub.broadcast("collection:#{session_id}", :vote_open)
     :ok
   end
@@ -64,6 +65,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   @impl true
   def dispatch(%CollectionSessionCompleted{session_id: session_id, kept_count: kept_count}) do
     PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:session_completed, kept_count})
+    CollectionSessionWorker.cancel_duel_reminders(session_id)
     :ok
   end
 end

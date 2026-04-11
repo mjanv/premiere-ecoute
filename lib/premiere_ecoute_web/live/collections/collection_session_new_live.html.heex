@@ -69,6 +69,86 @@
               </div>
             </div>
 
+            <div class="border-t border-white/10 pt-4 space-y-3">
+              <% duel_reminder_enabled = @form[:duel_reminder_enabled].value == "true" %>
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-sm font-medium text-white">{gettext("Duel reminder")}</p>
+                  <p class="text-xs text-gray-500">{gettext("Get a reminder to start a duel at regular intervals")}</p>
+                </div>
+                <div class="flex items-center gap-3 flex-shrink-0 w-36 justify-end">
+                  <input type="hidden" name="session[duel_reminder_enabled]" value={@form[:duel_reminder_enabled].value} />
+                  <button
+                    type="button"
+                    phx-click="toggle_duel_reminder"
+                    class={[
+                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                      if duel_reminder_enabled do
+                        "bg-purple-600"
+                      else
+                        "bg-white/20"
+                      end
+                    ]}
+                  >
+                    <span class={[
+                      "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                      if duel_reminder_enabled do
+                        "translate-x-6"
+                      else
+                        "translate-x-1"
+                      end
+                    ]} />
+                  </button>
+                  <div class="flex items-center gap-1">
+                    <input
+                      type="number"
+                      name="session[duel_reminder_minutes]"
+                      value={@form[:duel_reminder_minutes].value}
+                      min="1"
+                      max="120"
+                      disabled={not duel_reminder_enabled}
+                      phx-debounce="300"
+                      class={[
+                        "w-16 bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent",
+                        if duel_reminder_enabled do
+                          "text-white"
+                        else
+                          "text-gray-600 cursor-not-allowed"
+                        end
+                      ]}
+                    />
+                    <span class={[
+                      "text-sm",
+                      if duel_reminder_enabled do
+                        "text-gray-400"
+                      else
+                        "text-gray-600"
+                      end
+                    ]}>
+                      {gettext("min")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-sm font-medium text-white">{gettext("Duel sound")}</p>
+                  <p class="text-xs text-gray-500">{gettext("Play a sound on the overlay when it's time for a duel")}</p>
+                </div>
+                <div class="flex-shrink-0 w-36 flex justify-end">
+                  <select
+                    name="session[duel_sound]"
+                    class="bg-white/10 border border-white/20 text-white rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="" selected={@form[:duel_sound].value == ""}>{gettext("None")}</option>
+                    <option value="ding" selected={@form[:duel_sound].value == "ding"}>{gettext("Ding")}</option>
+                    <option value="duel" selected={@form[:duel_sound].value == "duel"}>{gettext("Yugioh")}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <div class="flex items-center justify-between pt-2">
               <.link
                 navigate={~p"/collections"}

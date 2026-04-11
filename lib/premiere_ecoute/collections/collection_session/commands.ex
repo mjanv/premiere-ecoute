@@ -9,10 +9,11 @@ defmodule PremiereEcoute.Collections.CollectionSession.Commands do
     @type t :: %__MODULE__{
             scope: Scope.t(),
             origin_playlist_id: integer(),
-            destination_playlist_id: integer()
+            destination_playlist_id: integer(),
+            options: map()
           }
 
-    defstruct [:scope, :origin_playlist_id, :destination_playlist_id]
+    defstruct [:scope, :origin_playlist_id, :destination_playlist_id, options: %{}]
   end
 
   defmodule StartCollectionSession do

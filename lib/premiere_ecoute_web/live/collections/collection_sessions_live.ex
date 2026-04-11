@@ -8,11 +8,11 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionsLive do
 
   use PremiereEcouteWeb, :live_view
 
-  alias PremiereEcoute.Collections.CollectionSession
+  alias PremiereEcoute.Collections
 
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: scope}} = socket) do
-    sessions = CollectionSession.all_for_user(scope.user)
+    sessions = Collections.all_sessions_for_user(scope.user)
 
     socket
     |> assign(:sessions, sessions)

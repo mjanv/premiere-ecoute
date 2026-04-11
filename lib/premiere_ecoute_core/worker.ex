@@ -18,6 +18,8 @@ defmodule PremiereEcouteCore.Worker do
     quote do
       use Oban.Worker, unquote(opts)
 
+      require Ecto.Query
+
       @type args() :: map()
       @type one_or_many(t) :: t | [t]
       @type result(t) :: {:ok, t} | {:error, term()}
@@ -73,6 +75,16 @@ defmodule PremiereEcouteCore.Worker do
         args
         |> Enum.with_index(0)
         |> Enum.each(fn {x, i} -> start(f.(x), schedule_in: i * unquote(rate_limit)) end)
+      end
+
+      @doc "Cancel all worker jobs"
+      @spec cancel_all :: {:ok, non_neg_integer()}
+      def cancel_all do
+        worker = Atom.to_string(__MODULE__)
+
+        Oban.Job
+        |> Ecto.Query.where(worker: ^worker)
+        |> Oban.cancel_all_jobs()
       end
 
       @doc "Perform the job"

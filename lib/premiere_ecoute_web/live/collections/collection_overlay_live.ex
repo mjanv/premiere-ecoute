@@ -10,6 +10,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Collections
+  alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcouteCore.Cache
 
   @impl true
@@ -34,6 +36,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
       |> assign(:votes_a, votes_a)
       |> assign(:votes_b, votes_b)
       |> assign(:vote_open, vote_open)
+      |> assign(:play_ding, false)
+      |> assign(:duel_sound, duel_sound_file(session_id))
       |> assign(:color_primary, Accounts.profile(user, [:widget_settings, :color_primary]) || "#3b82f6")
       |> assign(:color_secondary, Accounts.profile(user, [:widget_settings, :color_secondary]) || "#f59e0b")
 
@@ -52,7 +56,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
        session_id: session_id,
        votes_a: votes_a,
        votes_b: votes_b,
-       vote_open: vote_open
+       vote_open: vote_open,
+       duel_sound: duel_sound_file(session_id)
      )}
   end
 
@@ -93,6 +98,15 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
   end
 
   @impl true
+  def handle_info({:duel_reminder, nil}, socket) do
+    {:noreply, assign(socket, :play_ding, not is_nil(socket.assigns.duel_sound))}
+  end
+
+  def handle_info({:duel_reminder, _}, socket) do
+    {:noreply, assign(socket, :play_ding, false)}
+  end
+
+  @impl true
   def handle_info(_event, socket), do: {:noreply, socket}
 
   # ── Helpers ───────────────────────────────────────────────────────────────
@@ -113,6 +127,15 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
 
       _ ->
         {nil, 0, 0, false}
+    end
+  end
+
+  defp duel_sound_file(nil), do: nil
+
+  defp duel_sound_file(session_id) do
+    case Collections.get_session(session_id) do
+      %CollectionSession{options: %{"duel_sound" => sound}} when is_binary(sound) -> "/audio/#{sound}.mp3"
+      _ -> nil
     end
   end
 

@@ -21,6 +21,7 @@ import { ClampText } from "./clamp_text";
 import { Microphone } from "./microphone";
 import { Drawer } from "./drawer";
 import { WikipediaDrawer } from "./wikipedia_drawer";
+import { PlaySound } from "./play_sound";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -45,5 +46,6 @@ export const Hooks = {
   ClampText: ClampText,
   Microphone: Microphone,
   Drawer: Drawer,
-  WikipediaDrawer: WikipediaDrawer
+  WikipediaDrawer: WikipediaDrawer,
+  PlaySound: PlaySound
 };

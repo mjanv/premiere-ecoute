@@ -21,20 +21,20 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player, as: SpotifyPlayer
   alias PremiereEcoute.Apis.PlayerSupervisor
+  alias PremiereEcoute.Collections
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.CloseVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.CompleteCollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.DecideTrack
   alias PremiereEcoute.Collections.CollectionSession.Commands.OpenVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.StartCollectionSession
-  alias PremiereEcoute.Collections.Tracklist
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.CommandBus
 
   @impl true
   def mount(%{"id" => id}, _session, %{assigns: %{current_scope: scope}} = socket) do
     session_id = String.to_integer(id)
-    session = CollectionSession.get(session_id)
+    session = Collections.get_session(session_id)
 
     if is_nil(session) || session.user_id != scope.user.id do
       socket
@@ -48,11 +48,13 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
         if session.status == :active do
           PlayerSupervisor.start(scope.user.id)
+          Process.send_after(self(), :duel_tick, 1000)
         end
       end
 
       broadcaster_id = scope.user.twitch.user_id
       {tracks, votes_a, votes_b, active_track_id, duel_track_id, vote_open} = load_cache(broadcaster_id)
+      next_duel_at = if session.status == :active, do: Collections.next_duel_reminder_at(session_id)
 
       socket
       |> assign(:session, session)
@@ -67,6 +69,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:votes_b, votes_b)
       |> assign(:vote_open, vote_open)
       |> assign(:countdown, nil)
+      |> assign(:next_duel_at, next_duel_at)
+      |> assign(:duel_countdown_secs, next_duel_at && max(0, DateTime.diff(next_duel_at, DateTime.utc_now(), :second)))
       |> assign(:player_state, if(session.status == :active, do: SpotifyPlayer.default(), else: nil))
       |> assign(:playing_track_id, nil)
       |> assign(:hide_decided, false)
@@ -106,8 +110,17 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   @impl true
   def handle_info(:session_started, socket) do
     {tracks, _, _, _, _, _} = load_cache(socket.assigns.broadcaster_id)
-    session = CollectionSession.get(socket.assigns.session_id)
+    session = Collections.get_session(socket.assigns.session_id)
+    Process.send_after(self(), :load_duel_reminder, 500)
+    Process.send_after(self(), :duel_tick, 1000)
     {:noreply, assign(socket, tracks: tracks, session: session)}
+  end
+
+  @impl true
+  def handle_info(:load_duel_reminder, socket) do
+    next_duel_at = Collections.next_duel_reminder_at(socket.assigns.session_id)
+    secs = next_duel_at && max(0, DateTime.diff(next_duel_at, DateTime.utc_now(), :second))
+    {:noreply, assign(socket, next_duel_at: next_duel_at, duel_countdown_secs: secs)}
   end
 
   @impl true
@@ -127,7 +140,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info({:track_decided, _track_id, _decision}, socket) do
-    session = CollectionSession.get(socket.assigns.session_id)
+    session = Collections.get_session(socket.assigns.session_id)
 
     {:noreply,
      assign(socket,
@@ -142,7 +155,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info({:session_completed, _kept_count}, socket) do
-    session = CollectionSession.get(socket.assigns.session_id)
+    session = Collections.get_session(socket.assigns.session_id)
     {:noreply, assign(socket, session: session)}
   end
 
@@ -153,6 +166,33 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info({:collection_started, _session_id}, socket), do: {:noreply, socket}
+
+  @impl true
+  def handle_info({:duel_reminder, nil}, socket) do
+    {:noreply, assign(socket, next_duel_at: nil, duel_countdown_secs: 0)}
+  end
+
+  def handle_info({:duel_reminder, next_duel_at}, socket) do
+    secs = max(0, DateTime.diff(next_duel_at, DateTime.utc_now(), :second))
+    {:noreply, assign(socket, next_duel_at: next_duel_at, duel_countdown_secs: secs)}
+  end
+
+  @impl true
+  def handle_info(:duel_tick, %{assigns: %{next_duel_at: nil, duel_countdown_secs: nil}} = socket), do: {:noreply, socket}
+
+  def handle_info(:duel_tick, %{assigns: %{session: %{status: :active}, next_duel_at: nil}} = socket) do
+    # reminder fired, waiting for a duel to be launched — keep ticking so badge stays visible
+    Process.send_after(self(), :duel_tick, 1000)
+    {:noreply, socket}
+  end
+
+  def handle_info(:duel_tick, %{assigns: %{session: %{status: :active}, next_duel_at: next_duel_at}} = socket) do
+    Process.send_after(self(), :duel_tick, 1000)
+    secs = max(0, DateTime.diff(next_duel_at, DateTime.utc_now(), :second))
+    {:noreply, assign(socket, :duel_countdown_secs, secs)}
+  end
+
+  def handle_info(:duel_tick, socket), do: {:noreply, socket}
 
   @impl true
   def handle_info({:player, :start_track, state}, socket) do
@@ -319,6 +359,11 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     |> CommandBus.apply()
     |> case do
       {:ok, session, _events} ->
+        socket =
+          if round_mode == :duel,
+            do: schedule_next_duel_reminder(socket),
+            else: socket
+
         {:noreply,
          assign(socket,
            session: session,
@@ -362,6 +407,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
              decision: :kept,
              duel_track_id: nil
            }) do
+      socket = schedule_next_duel_reminder(socket)
+
       {:noreply,
        assign(socket,
          session: session_b,
@@ -405,7 +452,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         _params,
         %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
       ) do
-    {:ok, tracks} = Tracklist.shuffle(session, broadcaster_id, tracks)
+    {:ok, tracks} = Collections.shuffle_tracklist(session, broadcaster_id, tracks)
     {:noreply, assign(socket, tracks: tracks)}
   end
 
@@ -415,7 +462,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         _params,
         %{assigns: %{broadcaster_id: broadcaster_id, original_tracks: original_tracks, tracks: tracks, session: session}} = socket
       ) do
-    {:ok, tracks} = Tracklist.restore(session, broadcaster_id, tracks, original_tracks)
+    {:ok, tracks} = Collections.restore_tracklist(session, broadcaster_id, tracks, original_tracks)
     {:noreply, assign(socket, tracks: tracks)}
   end
 
@@ -425,7 +472,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         %{"index" => index},
         %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
       ) do
-    {:ok, tracks} = Tracklist.move_to_top(session, String.to_integer(index), broadcaster_id, tracks)
+    {:ok, tracks} = Collections.move_track_to_top(session, String.to_integer(index), broadcaster_id, tracks)
     {:noreply, assign(socket, tracks: tracks)}
   end
 
@@ -435,7 +482,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         %{"index" => index},
         %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
       ) do
-    {:ok, tracks} = Tracklist.reorder(session, String.to_integer(index), -1, broadcaster_id, tracks)
+    {:ok, tracks} = Collections.reorder_tracklist(session, String.to_integer(index), -1, broadcaster_id, tracks)
     {:noreply, assign(socket, tracks: tracks)}
   end
 
@@ -445,7 +492,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
         %{"index" => index},
         %{assigns: %{broadcaster_id: broadcaster_id, tracks: tracks, session: session}} = socket
       ) do
-    {:ok, tracks} = Tracklist.reorder(session, String.to_integer(index), +1, broadcaster_id, tracks)
+    {:ok, tracks} = Collections.reorder_tracklist(session, String.to_integer(index), +1, broadcaster_id, tracks)
     {:noreply, assign(socket, tracks: tracks)}
   end
 
@@ -499,6 +546,19 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     {:noreply, assign(socket, :show_end_modal, false)}
   end
 
+  defp schedule_next_duel_reminder(%{assigns: %{session: session, session_id: session_id}} = socket) do
+    minutes = session.options["duel_reminder_minutes"]
+
+    next_duel_at =
+      if minutes do
+        {:ok, job} = Collections.schedule_duel_reminder(session_id, minutes)
+        job.scheduled_at
+      end
+
+    secs = next_duel_at && max(0, DateTime.diff(next_duel_at, DateTime.utc_now(), :second))
+    assign(socket, next_duel_at: next_duel_at, duel_countdown_secs: secs)
+  end
+
   defp play(nil, _scope, socket), do: {:noreply, socket}
 
   defp play(track, scope, socket) do
@@ -509,6 +569,13 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   end
 
   # ── View helpers ──────────────────────────────────────────────────────────
+
+  @spec format_countdown(integer() | nil) :: String.t() | nil
+  def format_countdown(nil), do: nil
+
+  def format_countdown(secs) do
+    :io_lib.format("~2..0B:~2..0B", [div(secs, 60), rem(secs, 60)]) |> IO.iodata_to_binary()
+  end
 
   @spec decision_class(atom()) :: String.t()
   def decision_class(:kept), do: "bg-green-600/20 text-green-400 border-green-500/30"

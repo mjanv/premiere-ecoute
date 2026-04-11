@@ -27,6 +27,7 @@ defmodule PremiereEcoute.Collections.CollectionSession do
           kept: [String.t()],
           rejected: [String.t()],
           skipped: [String.t()],
+          options: map(),
           user: entity(User.t()),
           origin_playlist: entity(LibraryPlaylist.t()),
           destination_playlist: entity(LibraryPlaylist.t()),
@@ -41,6 +42,7 @@ defmodule PremiereEcoute.Collections.CollectionSession do
     field :kept, {:array, :string}, default: []
     field :rejected, {:array, :string}, default: []
     field :skipped, {:array, :string}, default: []
+    field :options, :map, default: %{}
 
     belongs_to :user, User
     belongs_to :origin_playlist, LibraryPlaylist
@@ -59,6 +61,7 @@ defmodule PremiereEcoute.Collections.CollectionSession do
       :kept,
       :rejected,
       :skipped,
+      :options,
       :user_id,
       :origin_playlist_id,
       :destination_playlist_id

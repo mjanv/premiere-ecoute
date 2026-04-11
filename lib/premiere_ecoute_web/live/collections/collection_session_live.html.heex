@@ -162,9 +162,28 @@
                         </button>
                       <% end %>
                     <% end %>
-                    <div class="ml-auto w-1/2">
-                      <.player_bar player_state={@player_state} />
-                    </div>
+                    <%= if not is_nil(@duel_countdown_secs) do %>
+                      <span
+                        id="duel-countdown"
+                        class={[
+                          "ml-auto flex items-center gap-1.5 px-3 py-2 bg-white/5 border rounded-lg text-xs",
+                          if @duel_countdown_secs == 0 do
+                            "border-purple-500/60 text-purple-300 animate-pulse"
+                          else
+                            "border-white/10 text-gray-400"
+                          end
+                        ]}
+                      >
+                        ⚔️ <span class="font-mono text-white">{format_countdown(@duel_countdown_secs)}</span>
+                      </span>
+                      <div class="w-1/2">
+                        <.player_bar player_state={@player_state} />
+                      </div>
+                    <% else %>
+                      <div class="ml-auto w-1/2">
+                        <.player_bar player_state={@player_state} />
+                      </div>
+                    <% end %>
                   </div>
 
                   <%!-- Duel --%>

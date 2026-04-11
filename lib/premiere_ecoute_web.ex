@@ -35,7 +35,7 @@ defmodule PremiereEcouteWeb do
   These paths are publicly accessible without authentication and include documentation, assets, fonts, images, uploads, and standard web files.
   """
   @spec static_paths() :: [String.t()]
-  def static_paths, do: ~w(doc assets fonts images uploads favicon.ico robots.txt)
+  def static_paths, do: ~w(doc assets fonts images uploads audio favicon.ico robots.txt)
 
   @doc """
   Defines router configuration for Phoenix routes.

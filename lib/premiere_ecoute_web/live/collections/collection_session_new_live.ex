@@ -18,7 +18,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
 
     socket
     |> assign(:playlists, playlists)
-    |> assign(:form, to_form(default_form()))
+    |> assign(:form, to_form(default_form(), as: :session))
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -28,16 +28,36 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
   end
 
   @impl true
+  def handle_event("toggle_duel_reminder", _params, socket) do
+    params = socket.assigns.form.params
+    updated = Map.put(params, "duel_reminder_enabled", if(params["duel_reminder_enabled"] == "true", do: "false", else: "true"))
+    {:noreply, assign(socket, :form, to_form(updated, as: :session))}
+  end
+
+  @impl true
   def handle_event("validate", %{"session" => params}, socket) do
-    {:noreply, assign(socket, :form, to_form(params, as: :session))}
+    merged = Map.merge(socket.assigns.form.params, params)
+    {:noreply, assign(socket, :form, to_form(merged, as: :session))}
   end
 
   @impl true
   def handle_event("submit", %{"session" => params}, %{assigns: %{current_scope: scope}} = socket) do
+    options =
+      %{}
+      |> then(fn opts ->
+        if params["duel_reminder_enabled"] == "true",
+          do: Map.put(opts, "duel_reminder_minutes", String.to_integer(params["duel_reminder_minutes"])),
+          else: opts
+      end)
+      |> then(fn opts ->
+        if params["duel_sound"] != "", do: Map.put(opts, "duel_sound", params["duel_sound"]), else: opts
+      end)
+
     %PrepareCollectionSession{
       scope: scope,
       origin_playlist_id: parse_id(params["origin_playlist_id"]),
-      destination_playlist_id: parse_id(params["destination_playlist_id"])
+      destination_playlist_id: parse_id(params["destination_playlist_id"]),
+      options: options
     }
     |> CommandBus.apply()
     |> case do
@@ -54,7 +74,10 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionNewLive do
   defp default_form do
     %{
       "origin_playlist_id" => "",
-      "destination_playlist_id" => ""
+      "destination_playlist_id" => "",
+      "duel_reminder_enabled" => "false",
+      "duel_reminder_minutes" => "30",
+      "duel_sound" => ""
     }
   end
 

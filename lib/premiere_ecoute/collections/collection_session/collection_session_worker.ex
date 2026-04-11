@@ -14,30 +14,43 @@ defmodule PremiereEcoute.Collections.CollectionSessionWorker do
 
   require Logger
 
-  alias PremiereEcoute.Accounts.Scope
-  alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis
-  alias PremiereEcouteCore.Cache
+  alias PremiereEcoute.Collections.CollectionSession
+  alias PremiereEcoute.Repo
+
+  import Ecto.Query
+
+  @doc "Returns the scheduled_at of the next pending duel_reminder job for the given session, or nil."
+  @spec next_duel_reminder_at(integer()) :: DateTime.t() | nil
+  def next_duel_reminder_at(session_id) do
+    duel_reminder_query(session_id)
+    |> select([j], j.scheduled_at)
+    |> limit(1)
+    |> Repo.one(prefix: "oban")
+  end
+
+  @doc "Cancels all pending duel_reminder jobs for the given session."
+  @spec cancel_duel_reminders(integer()) :: :ok
+  def cancel_duel_reminders(session_id) do
+    duel_reminder_query(session_id)
+    |> Oban.cancel_all_jobs()
+  end
+
+  defp duel_reminder_query(session_id) do
+    Oban.Job
+    |> where([j], j.worker == ^inspect(__MODULE__))
+    |> where([j], fragment("(?->>'action')", j.args) == "duel_reminder")
+    |> where([j], fragment("(?->>'session_id')::bigint", j.args) == ^session_id)
+    |> order_by([j], asc: j.scheduled_at)
+  end
 
   @impl Oban.Worker
-  def perform(%Oban.Job{
-        args: %{"action" => "close_vote", "session_id" => session_id, "user_id" => user_id, "track_id" => track_id}
-      }) do
-    with {:ok, cached} <- Cache.get(:collections, session_id),
-         scope <- Scope.for_user(User.get(user_id)) do
-      votes_a = Map.get(cached, :votes_a, 0)
-      votes_b = Map.get(cached, :votes_b, 0)
+  def perform(%Oban.Job{args: %{"action" => "duel_reminder", "session_id" => session_id}}) do
+    case CollectionSession.get(session_id) do
+      %CollectionSession{status: :active} ->
+        PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:duel_reminder, nil})
 
-      Apis.twitch().send_chat_message(
-        scope,
-        Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
-          gettext("Votes are closed! Results: 1=%{a} | 2=%{b}", a: votes_a, b: votes_b)
-        end)
-      )
-
-      PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:vote_closed, track_id, %{votes_a: votes_a, votes_b: votes_b}})
-
-      Cache.put(:collections, session_id, Map.drop(cached, [:active_track_id, :duel_track_id, :votes_a, :votes_b]))
+      _ ->
+        :ok
     end
 
     :ok
