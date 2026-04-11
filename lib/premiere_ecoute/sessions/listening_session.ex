@@ -52,6 +52,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
     field :source, Ecto.Enum, values: [:album, :playlist, :track, :free], default: :album
     field :name, :string
+    field :share_token, :string
     field :vote_mode, Ecto.Enum, values: [:chat, :poll], default: :chat
     field :visibility, Ecto.Enum, values: [:private, :protected, :public], default: :protected
     field :replays, {:array, :map}, default: []
@@ -115,6 +116,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       :status,
       :source,
       :name,
+      :share_token,
       :replays,
       :vote_mode,
       :visibility,
@@ -129,11 +131,23 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       :current_playlist_track_id,
       :single_id
     ])
+    |> put_share_token()
     |> validate_required([])
+    |> unique_constraint(:share_token)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:album_id)
     |> foreign_key_constraint(:current_track_id)
     |> foreign_key_constraint(:current_playlist_track_id)
+  end
+
+  defp put_share_token(%Ecto.Changeset{data: %{share_token: nil}} = changeset) do
+    put_change(changeset, :share_token, generate_share_token())
+  end
+
+  defp put_share_token(changeset), do: changeset
+
+  defp generate_share_token do
+    :crypto.strong_rand_bytes(6) |> Base.url_encode64(padding: false)
   end
 
   @doc """
@@ -581,6 +595,31 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def title(%__MODULE__{single: %{name: name}}), do: name
 
   @doc """
+  Fetches a session by its share token with preloaded associations.
+  """
+  @spec get_by_share_token(String.t()) :: t() | nil
+  def get_by_share_token(token), do: get_by(share_token: token)
+
+  @doc """
+  Returns the shareable URL path segment for a session.
+
+  Combines a slugified title with the unique share token:
+  `artist-album-name-<token>` for album/playlist/single modes,
+  `free-session-<token>` for free mode.
+
+  Works for all four session sources: :album, :playlist, :track, :free.
+  """
+  @spec share_path(t()) :: String.t()
+  def share_path(%__MODULE__{share_token: token} = session) do
+    slug =
+      session
+      |> title()
+      |> Slug.slugify(separator: ?-)
+
+    "#{slug}-#{token}"
+  end
+
+  @doc """
   Returns the session's artist name.
 
   Extracts artist from album, playlist owner, or single depending on session source.
@@ -749,4 +788,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     )
     |> Repo.exists?()
   end
+end
+
+# AIDEV-NOTE: Phoenix.Param returns share_token only; username is interpolated separately in ~p sigils
+defimpl Phoenix.Param, for: PremiereEcoute.Sessions.ListeningSession do
+  def to_param(%{share_token: token}), do: token
 end

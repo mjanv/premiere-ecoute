@@ -95,7 +95,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   def album_square_wantlist(assigns) do
     ~H"""
     <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
-      <.link href={~p"/sessions/#{@session}"} class="block w-full h-full">
+      <.link href={~p"/sessions/#{@session.user.username}/#{@session}"} class="block w-full h-full">
         <%= if @session.album && @session.album.cover_url do %>
           <img src={@session.album.cover_url} alt={@session.album.name} class="w-full h-full object-cover" loading="lazy" />
         <% else %>
@@ -197,7 +197,7 @@ defmodule PremiereEcouteWeb.Home.Components do
 
   def session_row(assigns) do
     ~H"""
-    <.link href={~p"/sessions/#{@session}/dashboard"} class="group block">
+    <.link href={~p"/sessions/#{@session.share_token}/dashboard"} class="group block">
       <div class={[
         "flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-all border-l-2",
         if(@session.status == :active, do: "border-l-green-500", else: "border-l-transparent")

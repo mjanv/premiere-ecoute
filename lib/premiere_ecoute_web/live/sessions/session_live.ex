@@ -17,18 +17,16 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.Reviews
 
   @impl true
-  def mount(%{"id" => session_id}, _session, socket) do
-    session_id_int = String.to_integer(session_id)
-
+  def mount(%{"share_token" => share_token, "username" => _username}, _session, socket) do
     listening_session =
-      session_id_int
-      |> ListeningSession.get()
+      share_token
+      |> ListeningSession.get_by_share_token()
       |> Repo.preload(report: [:votes, :polls])
 
     {:ok, report} = Report.generate(listening_session)
     tracks = build_tracks(listening_session, report)
 
-    reviews = Reviews.list_for_session(session_id_int)
+    reviews = Reviews.list_for_session(listening_session.id)
     review_ids = Enum.map(reviews, & &1.id)
 
     current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user

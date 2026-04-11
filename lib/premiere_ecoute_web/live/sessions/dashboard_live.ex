@@ -32,11 +32,11 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   alias PremiereEcouteWeb.Components.WikipediaDrawer
 
   @impl true
-  def mount(%{"id" => id}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
-    session_id = String.to_integer(id)
-
+  def mount(%{"share_token" => share_token}, _session, %{assigns: %{current_scope: current_scope}} = socket) do
     with spotify when not is_nil(spotify) <- current_scope && current_scope.user && current_scope.user.spotify,
-         listening_session when not is_nil(listening_session) <- ListeningSession.get(session_id) do
+         listening_session when not is_nil(listening_session) <- ListeningSession.get_by_share_token(share_token) do
+      session_id = listening_session.id
+
       if connected?(socket) do
         Process.send_after(self(), :refresh, 100)
         {:ok, _} = Presence.join(current_scope.user.id, :overlay)

@@ -125,7 +125,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{item.session}"}
+                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
                     class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <img
@@ -155,7 +155,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
                 <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{item.session}"}
+                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
                     class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <img
@@ -185,7 +185,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
                 <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{item.session}"}
+                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
                     class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <img

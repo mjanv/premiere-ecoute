@@ -22,6 +22,7 @@ import { Microphone } from "./microphone";
 import { Drawer } from "./drawer";
 import { WikipediaDrawer } from "./wikipedia_drawer";
 import { PlaySound } from "./play_sound";
+import { ShareButton } from "./share_button";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -47,5 +48,6 @@ export const Hooks = {
   Microphone: Microphone,
   Drawer: Drawer,
   WikipediaDrawer: WikipediaDrawer,
-  PlaySound: PlaySound
+  PlaySound: PlaySound,
+  ShareButton: ShareButton
 };

@@ -53,7 +53,7 @@ defmodule PremiereEcoute.Sessions.Reviews do
     |> where([r], r.album_id == ^album_id)
     |> order_by([r], asc: r.inserted_at)
     |> with_likes_count()
-    |> preload(:user)
+    |> preload([:user, session: [user: :twitch]])
     |> Repo.all()
   end
 

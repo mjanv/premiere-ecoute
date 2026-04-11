@@ -116,7 +116,7 @@
               <% :album -> %>
                 <%= for vote_data <- votes_data.items do %>
                   <.link
-                    href={~p"/sessions/#{vote_data.session_id}"}
+                    href={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
                     class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <img
@@ -144,7 +144,7 @@
               <% :track -> %>
                 <%= for vote_data <- votes_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{vote_data.session_id}"}
+                    navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
                     class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
                   >
                     <img
@@ -172,7 +172,7 @@
               <% :playlist -> %>
                 <%= for vote_data <- votes_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{vote_data.session_id}"}
+                    navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
                     class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
                   >
                     <img

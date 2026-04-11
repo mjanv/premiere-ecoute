@@ -191,7 +191,7 @@ defmodule PremiereEcouteWeb.Router do
     end
 
     live_session :sessions_retrospective, on_mount: [{UserAuth, :current_scope}] do
-      live "/:id/retrospective", RetrospectiveLive, :show
+      live "/:username/:share_token/retrospective", RetrospectiveLive, :show
     end
 
     live_session :streamer_retrospective, on_mount: [{UserAuth, :streamer}] do
@@ -210,12 +210,12 @@ defmodule PremiereEcouteWeb.Router do
     live_session :sessions_streamer, on_mount: [{UserAuth, :streamer}] do
       live "/", SessionsLive, :index
       live "/new", SessionSelectionLive, :index
-      live "/:id/dashboard", DashboardLive, :show
+      live "/:share_token/dashboard", DashboardLive, :show
       live "/pick/albums", AlbumPickAdminLive, :index
     end
 
     live_session :sessions_viewer, on_mount: [{UserAuth, :viewer}] do
-      live "/:id", SessionLive, :show
+      live "/:username/:share_token", SessionLive, :show
     end
   end
 

@@ -303,7 +303,7 @@
                 <%= if @listening_session.status == :stopped do %>
                   <div class="flex-1 flex shadow-lg bg-linear-to-r from-purple-600 to-pink-600 items-stretch rounded-lg">
                     <.link
-                      navigate={~p"/sessions/#{@listening_session.id}/retrospective"}
+                      navigate={~p"/sessions/#{@listening_session.user.username}/#{@listening_session}/retrospective"}
                       class="flex-1 hover:bg-black/10 text-white py-2 px-4 font-medium text-sm flex items-center justify-center space-x-2 transition-all rounded-l-lg"
                       target="_blank"
                     >

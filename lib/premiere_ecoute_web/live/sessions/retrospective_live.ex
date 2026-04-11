@@ -15,10 +15,10 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   alias PremiereEcoute.Sessions.Reviews
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
+  def mount(%{"share_token" => share_token, "username" => _username}, _session, socket) do
     current_scope = socket.assigns[:current_scope]
 
-    with %ListeningSession{user: user} = listening_session <- ListeningSession.get(id),
+    with %ListeningSession{user: user} = listening_session <- ListeningSession.get_by_share_token(share_token),
          :ok <- validate_session_stopped(listening_session),
          :ok <- validate_authorization(listening_session, current_scope) do
       socket

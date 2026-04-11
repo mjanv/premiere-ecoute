@@ -40,8 +40,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   end
 
   @impl true
-  def handle_event("navigate", %{"session_id" => session_id}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/sessions/#{session_id}/dashboard")}
+  def handle_event("navigate", %{"session_id" => share_token}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/sessions/#{share_token}/dashboard")}
   end
 
   @impl true

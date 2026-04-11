@@ -24,7 +24,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   Get all albums listened by a specific streamer during a time period.
   """
   @spec get_albums_by_period(User.t(), time_period(), map()) :: [map()]
-  def get_albums_by_period(%User{id: user_id}, period, opts \\ %{}) do
+  def get_albums_by_period(%User{id: user_id} = user, period, opts \\ %{}) do
     current_date = DateTime.utc_now()
     year = Map.get(opts, :year, current_date.year)
     month = Map.get(opts, :month, current_date.month)
@@ -51,13 +51,14 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
           where: fragment("EXTRACT(year FROM ?) = ?", s.started_at, ^year)
     end
     |> Repo.all()
+    |> Enum.map(fn item -> %{item | session: %{item.session | user: user}} end)
   end
 
   @doc """
   Get all single-track sessions listened by a specific streamer during a time period.
   """
   @spec get_singles_by_period(User.t(), time_period(), map()) :: [map()]
-  def get_singles_by_period(%User{id: user_id}, period, opts \\ %{}) do
+  def get_singles_by_period(%User{id: user_id} = user, period, opts \\ %{}) do
     current_date = DateTime.utc_now()
     year = Map.get(opts, :year, current_date.year)
     month = Map.get(opts, :month, current_date.month)
@@ -85,13 +86,14 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
           where: fragment("EXTRACT(year FROM ?) = ?", s.started_at, ^year)
     end
     |> Repo.all()
+    |> Enum.map(fn item -> %{item | session: %{item.session | user: user}} end)
   end
 
   @doc """
   Get all playlist sessions listened by a specific streamer during a time period.
   """
   @spec get_playlists_by_period(User.t(), time_period(), map()) :: [map()]
-  def get_playlists_by_period(%User{id: user_id}, period, opts \\ %{}) do
+  def get_playlists_by_period(%User{id: user_id} = user, period, opts \\ %{}) do
     current_date = DateTime.utc_now()
     year = Map.get(opts, :year, current_date.year)
     month = Map.get(opts, :month, current_date.month)
@@ -119,6 +121,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
           where: fragment("EXTRACT(year FROM ?) = ?", s.started_at, ^year)
     end
     |> Repo.all()
+    |> Enum.map(fn item -> %{item | session: %{item.session | user: user}} end)
   end
 
   @doc """
@@ -136,11 +139,15 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: v.session_id == s.id,
         join: a in Album,
         on: s.album_id == a.id,
+        join: u in User,
+        on: u.id == s.user_id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [s.id, a.id, a.name, a.cover_url],
+        group_by: [s.id, s.share_token, u.username, a.id, a.name, a.cover_url],
         select: %{
           session_id: s.id,
+          share_token: s.share_token,
+          username: u.username,
           album: %Album{
             id: a.id,
             name: a.name,
@@ -182,11 +189,15 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: sa.single_id == sg.id,
         left_join: ar in Artist,
         on: ar.id == sa.artist_id,
+        join: u in User,
+        on: u.id == s.user_id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [s.id, sg.id, sg.name, sg.cover_url, ar.name],
+        group_by: [s.id, s.share_token, u.username, sg.id, sg.name, sg.cover_url, ar.name],
         select: %{
           session_id: s.id,
+          share_token: s.share_token,
+          username: u.username,
           single: %Single{
             id: sg.id,
             name: sg.name,
@@ -225,11 +236,15 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: v.session_id == s.id,
         join: p in Playlist,
         on: s.playlist_id == p.id,
+        join: u in User,
+        on: u.id == s.user_id,
         where: v.viewer_id == ^user_id,
         where: v.value not in ["smash", "pass"],
-        group_by: [s.id, p.id, p.title, p.owner_name, p.cover_url],
+        group_by: [s.id, s.share_token, u.username, p.id, p.title, p.owner_name, p.cover_url],
         select: %{
           session_id: s.id,
+          share_token: s.share_token,
+          username: u.username,
           playlist: %Playlist{
             id: p.id,
             title: p.title,
