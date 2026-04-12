@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Events.Store do
 
   use EventStore, otp_app: :premiere_ecoute, enable_hard_deletes: false
 
+  # TODO: Review the signatures of functions
+
   @doc """
   Reads events from a stream.
 

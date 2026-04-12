@@ -170,6 +170,44 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlaybackTest do
       end)
     end
 
+    test "backs off 5 minutes on rate limit" do
+      user = user_fixture()
+      user = enable_radio_tracking(user)
+
+      Mox.expect(SpotifyApi, :get_playback_state, fn _scope, _default ->
+        {:error, "Spotify rate limit exceeded"}
+      end)
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        assert :ok = perform_job(TrackSpotifyPlayback, %{user_id: user.id})
+
+        assert_enqueued worker: TrackSpotifyPlayback,
+                        args: %{user_id: user.id},
+                        scheduled_at: {DateTime.utc_now() |> DateTime.add(300, :second), delta: 5}
+      end)
+
+      assert Radio.get_tracks(user.id, Date.utc_today()) == []
+    end
+
+    test "reschedules 30s later on playback error to keep the loop alive" do
+      user = user_fixture()
+      user = enable_radio_tracking(user)
+
+      Mox.expect(SpotifyApi, :get_playback_state, fn _scope, _default ->
+        {:error, "Spotify playback state failed"}
+      end)
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        assert :ok = perform_job(TrackSpotifyPlayback, %{user_id: user.id})
+
+        assert_enqueued worker: TrackSpotifyPlayback,
+                        args: %{user_id: user.id},
+                        scheduled_at: {DateTime.utc_now() |> DateTime.add(30, :second), delta: 5}
+      end)
+
+      assert Radio.get_tracks(user.id, Date.utc_today()) == []
+    end
+
     test "does nothing when feature is disabled" do
       user = user_fixture()
 

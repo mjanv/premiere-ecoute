@@ -144,13 +144,12 @@ defmodule PremiereEcoute.Sessions.Reviews do
     end
   end
 
-  # AIDEV-NOTE: correlated subquery avoids N+1 when loading likes_count alongside reviews
   defp with_likes_count(query) do
-    likes_count_subquery =
+    subquery =
       ReviewLike
       |> where([l], l.review_id == parent_as(:review).id)
       |> select([l], count(l.id))
 
-    select_merge(query, [r], %{likes_count: subquery(likes_count_subquery)})
+    select_merge(query, [r], %{likes_count: subquery(subquery)})
   end
 end

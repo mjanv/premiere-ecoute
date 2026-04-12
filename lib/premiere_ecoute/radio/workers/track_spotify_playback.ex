@@ -42,16 +42,15 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
 
   @impl true
   def perform(%Oban.Job{args: %{"user_id" => user_id}}) do
-    user = user_id |> Accounts.User.get!() |> Repo.preload(:spotify)
-    scope = Accounts.maybe_renew_token(Scope.for_user(user), :spotify)
-
-    with true <- Accounts.profile(user, [:radio_settings, :enabled], false),
+    with user <- user_id |> Accounts.User.get!() |> Repo.preload(:spotify),
+         scope <- Accounts.maybe_renew_token(Scope.for_user(user), :spotify),
+         {:enabled?, true} <- {:enabled?, Accounts.profile(user, [:radio_settings, :enabled], false)},
          {:ok, playback} <- Apis.cache(:spotify).get_playback_state(scope, Player.default()),
          {:ok, _track} <- store_track_if_new(user_id, playback),
          :ok <- schedule_next_poll(user_id, playback) do
       :ok
     else
-      false ->
+      {:enabled?, false} ->
         Logger.debug("Radio tracking disabled for user #{user_id}")
         :ok
 
@@ -70,6 +69,8 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
 
       {:error, reason} ->
         Logger.error("Playback tracking failed for user #{user_id}: #{inspect(reason)}")
+        # AIDEV-NOTE: reschedule after failure to keep loop alive (e.g. transient 401 on expired token)
+        __MODULE__.in_seconds(%{user_id: user_id}, 30)
         :ok
     end
   end
