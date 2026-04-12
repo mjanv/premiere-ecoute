@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Radio do
   Context for managing stream playback tracking.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Radio.RadioTrack
   alias PremiereEcoute.Radio.Services.Backfill
   alias PremiereEcoute.Radio.Workers.TrackSpotifyPlayback

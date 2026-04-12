@@ -59,8 +59,12 @@ defmodule PremiereEcouteCore.Cache do
       {:ok, value} ->
         {:ok, value}
 
+      {:error, :no_cache} ->
+        Logger.error("No cache found : #{to_string(cache)}")
+        {:error, :no_cache}
+
       {:error, reason} ->
-        Logger.error("Cannot write into cache :#{to_string(cache)}")
+        Logger.error("Cannot write into cache : #{to_string(cache)}")
         {:error, reason}
     end
   end

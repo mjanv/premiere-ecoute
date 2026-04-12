@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Apis do
   Provides convenient access to external API implementations. This module acts as a centralized entry point for retrieving configured API client instances.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Apis.MusicMetadata.GeniusApi
   alias PremiereEcoute.Apis.MusicMetadata.MusicBrainzApi
   alias PremiereEcoute.Apis.MusicMetadata.WikipediaApi

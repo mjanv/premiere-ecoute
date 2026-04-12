@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Models do
   @moduledoc false
 
-  require Logger
+  use PremiereEcouteCore.Context
 
   alias PremiereEcoute.Models.AudioSegment
 

@@ -7,8 +7,8 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
   alias PremiereEcouteCore.CommandBus.Mock, as: CommandBus
 
-  setup {PremiereEcoute.Sessions, :mock}
-  setup {PremiereEcouteCore.CommandBus, :mock}
+  setup_mock(PremiereEcoute.Sessions)
+  setup_mock(PremiereEcouteCore.CommandBus)
 
   describe "POST /api/session/start" do
     test "dispatches StartListeningSession command and returns ok", %{conn: conn} do

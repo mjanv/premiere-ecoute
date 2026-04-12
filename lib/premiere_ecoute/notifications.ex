@@ -6,6 +6,8 @@ defmodule PremiereEcoute.Notifications do
   The system is channel-agnostic: types declare their channels, the dispatcher routes.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Notifications.{Dispatcher, Notification, Registry}
 
   @doc "Persists and dispatches a notification struct. Returns `{:error, :unknown_type}` for unknown types."

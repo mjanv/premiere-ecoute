@@ -38,6 +38,7 @@ defmodule PremiereEcoute.DataCase do
 
       import Hammox
       import Swoosh.TestAssertions
+      import PremiereEcouteCore.Context.Helpers
 
       setup :set_mox_from_context
       setup :verify_on_exit!

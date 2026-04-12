@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Billboards do
   Manages music billboards where users submit track URLs with deletion tokens, toggle submission reviews, activate/deactivate billboards, and generate billboard content from playlists.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Billboards.Billboard
   alias PremiereEcoute.Billboards.Services.BillboardCreation
   alias PremiereEcouteCore.Cache

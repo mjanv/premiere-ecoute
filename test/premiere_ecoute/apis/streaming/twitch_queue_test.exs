@@ -14,7 +14,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchQueueTest do
     bot = user_fixture(%{twitch: %{user_id: "467189141", access_token: "bot_token"}})
     Cache.put(:users, :bot, bot)
 
-    start_supervised!(RateLimiter)
+    start_supervised(RateLimiter)
     {:ok, pid} = start_supervised(TwitchQueue)
 
     :timer.sleep(100)

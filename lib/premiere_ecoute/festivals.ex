@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Festivals do
   Analyzes festival posters to extract lineups, searches for artist tracks on Spotify, and creates festival playlists.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Festivals.Services
 
   defdelegate analyze_poster(scope, image_path), to: Services.PosterAnalyzer

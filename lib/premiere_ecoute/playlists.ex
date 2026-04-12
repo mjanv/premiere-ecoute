@@ -5,6 +5,9 @@ defmodule PremiereEcoute.Playlists do
   Manages user playlist libraries including creation and export to music platforms.
   """
 
+  use PremiereEcouteCore.Context
+
+  # TODO: Cross-context ?
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.Services.PlaylistCreation
   alias PremiereEcoute.Playlists.Services.PlaylistExport

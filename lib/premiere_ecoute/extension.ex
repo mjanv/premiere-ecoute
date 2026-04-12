@@ -8,6 +8,8 @@ defmodule PremiereEcoute.Extension do
   - Managing extension user preferences
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Extension.Services.TrackLiker
   alias PremiereEcoute.Extension.TrackReader
 

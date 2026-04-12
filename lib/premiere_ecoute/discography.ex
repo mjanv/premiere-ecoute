@@ -12,6 +12,8 @@ defmodule PremiereEcoute.Discography do
   - `Track` - Individual songs within an album with track-specific information
   """
 
+  use PremiereEcouteCore.Context
+
   import Ecto.Query
 
   alias PremiereEcoute.Discography.Album

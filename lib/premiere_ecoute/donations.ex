@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Donations do
   Delegates business logic to service modules while providing a unified API for the rest of the application.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Donations.{Donation, Expense, Goal}
 
   @service PremiereEcoute.Donations.Services.Goals

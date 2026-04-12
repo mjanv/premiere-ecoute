@@ -6,6 +6,8 @@ defmodule PremiereEcoute.Automations do
   are not part of the public API.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Playlists.Automations.ActionRegistry
   alias PremiereEcoute.Playlists.Automations.Automation

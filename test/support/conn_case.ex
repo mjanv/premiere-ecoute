@@ -39,6 +39,7 @@ defmodule PremiereEcouteWeb.ConnCase do
       import PremiereEcoute.Sessions.ScoresFixtures
 
       import Hammox
+      import PremiereEcouteCore.Context.Helpers
 
       setup :set_mox_from_context
       setup :verify_on_exit!

@@ -5,7 +5,7 @@ defmodule PremiereEcouteWeb.Api.VoteControllerTest do
   alias PremiereEcoute.Sessions
   alias PremiereEcouteWeb.Api.VoteController
 
-  setup {PremiereEcoute.Sessions, :mock}
+  setup_mock(PremiereEcoute.Sessions)
 
   describe "POST /api/session/vote" do
     test "streamer publishes MessageSent on their own session", %{conn: conn} do

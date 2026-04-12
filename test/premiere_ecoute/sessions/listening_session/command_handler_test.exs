@@ -28,7 +28,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
 
-  setup do
+  setup_all do
     start_supervised({Cache, name: :playback})
 
     :ok

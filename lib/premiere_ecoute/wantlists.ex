@@ -6,6 +6,8 @@ defmodule PremiereEcoute.Wantlists do
   (albums, singles, or artists) by FK. The wantlist is created on first use.
   """
 
+  use PremiereEcouteCore.Context
+
   # TODO: Refactor overall Wantlists context
 
   alias PremiereEcoute.Wantlists.Services.AddTrack

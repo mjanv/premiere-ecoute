@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Accounts do
   The Accounts context.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Accounts.Services
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow

@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Collections do
   Manages collection session lifecycle, tracklist curation, and duel reminder scheduling.
   """
 
+  use PremiereEcouteCore.Context
+
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Collections.CollectionSessionWorker
   alias PremiereEcoute.Collections.Tracklist
