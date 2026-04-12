@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
-  use PremiereEcoute.DataCase, async: true
+  use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Discography.Album
@@ -30,6 +30,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   setup_all do
     start_supervised({Cache, name: :playback})
+
+    :ok
+  end
+
+  setup do
+    Cache.clear(:playback)
 
     :ok
   end

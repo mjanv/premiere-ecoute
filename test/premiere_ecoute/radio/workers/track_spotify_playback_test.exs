@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlaybackTest do
-  use PremiereEcoute.DataCase, async: true
+  use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
@@ -7,8 +7,14 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlaybackTest do
   alias PremiereEcoute.Radio.Workers.TrackSpotifyPlayback
   alias PremiereEcouteCore.Cache
 
-  setup do
+  setup_all do
     start_supervised({Cache, name: :playback})
+
+    :ok
+  end
+
+  setup do
+    Cache.clear(:playback)
 
     :ok
   end

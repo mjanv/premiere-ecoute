@@ -1,14 +1,20 @@
 defmodule PremiereEcoute.Extension.TrackReaderTest do
-  use PremiereEcoute.DataCase, async: true
+  use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Extension.TrackReader
   alias PremiereEcouteCore.Cache
 
+  setup_all do
+    start_supervised({Cache, name: :playback})
+
+    :ok
+  end
+
   describe "get_current_track/1" do
     setup do
-      start_supervised({Cache, name: :playback})
+      Cache.clear(:playback)
 
       user =
         user_fixture(%{

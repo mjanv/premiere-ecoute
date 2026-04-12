@@ -1,13 +1,19 @@
 defmodule PremiereEcoute.ExtensionTest do
-  use PremiereEcoute.DataCase, async: true
+  use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Extension
   alias PremiereEcouteCore.Cache
 
+  setup_all do
+    start_supervised({Cache, name: :playback})
+
+    :ok
+  end
+
   describe "get_current_track/1" do
     setup do
-      start_supervised({Cache, name: :playback})
+      Cache.clear(:playback)
       stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
       :ok
     end

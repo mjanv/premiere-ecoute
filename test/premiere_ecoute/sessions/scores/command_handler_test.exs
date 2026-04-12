@@ -1,5 +1,5 @@
 defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
-  use PremiereEcoute.DataCase, async: true
+  use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Commands.Chat.SendChatCommand
@@ -9,6 +9,18 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
   alias PremiereEcouteCore.CommandBus
 
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
+
+  setup_all do
+    start_supervised({Cache, name: :playback, persist: false})
+
+    :ok
+  end
+
+  setup do
+    Cache.clear(:playback)
+
+    :ok
+  end
 
   describe "handle/1 - SendChatCommand with vote" do
     test "sends average score when viewer has votes in active session" do
@@ -310,8 +322,6 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
 
   describe "handle/1 - SendChatCommand with save" do
     setup do
-      start_supervised({PremiereEcouteCore.Cache, name: :playback, persist: false})
-
       broadcaster =
         user_fixture(%{
           twitch: %{user_id: "1971641", access_token: "token"},
