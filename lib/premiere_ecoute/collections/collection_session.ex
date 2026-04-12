@@ -94,9 +94,9 @@ defmodule PremiereEcoute.Collections.CollectionSession do
   def all_for_user(%User{id: user_id}) do
     from(s in __MODULE__,
       where: s.user_id == ^user_id,
-      order_by: [desc: s.inserted_at],
-      preload: [:origin_playlist, :destination_playlist]
+      order_by: [desc: s.inserted_at]
     )
     |> Repo.all()
+    |> Enum.map(&preload/1)
   end
 end

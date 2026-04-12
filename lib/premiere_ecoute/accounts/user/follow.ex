@@ -5,9 +5,7 @@ defmodule PremiereEcoute.Accounts.User.Follow do
   Manages follow relationships between any two users in the system.
   """
 
-  use PremiereEcouteCore.Aggregate.Entity,
-    root: [:follower],
-    json: [:follower, :followed]
+  use PremiereEcouteCore.Aggregate.Entity
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Events.ChannelFollowed

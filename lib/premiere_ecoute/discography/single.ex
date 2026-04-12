@@ -46,6 +46,7 @@ defmodule PremiereEcoute.Discography.Single do
     timestamps(type: :utc_datetime)
   end
 
+  # AIDEV-NOTE: intentionally parallel to Album.put_artist/1 — both derive :artist from :artists
   @doc "Populates the virtual :artist field from the first entry in :artists."
   @spec put_artist(nil | t()) :: nil | t()
   def put_artist(nil), do: nil

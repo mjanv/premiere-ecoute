@@ -749,19 +749,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     page = Repo.paginate(query, page: page_number, page_size: page_size)
 
-    %{
-      page
-      | entries:
-          Repo.preload(page.entries,
-            user: [:twitch, :spotify],
-            album: [:tracks, :artists],
-            current_track: [],
-            playlist: [:tracks],
-            current_playlist_track: [],
-            single: [:artists],
-            track_markers: []
-          )
-    }
+    %{page | entries: Enum.map(page.entries, &preload/1)}
   end
 
   @spec next_page_for_user(integer(), Scrivener.Page.t()) :: Scrivener.Page.t()

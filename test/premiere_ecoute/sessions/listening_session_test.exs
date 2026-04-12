@@ -422,6 +422,27 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     end
   end
 
+  describe "page_for_user/3" do
+    test "returns entries with preloaded associations and virtual fields applied", %{
+      user: user,
+      album: album
+    } do
+      {:ok, _} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      page = ListeningSession.page_for_user(user.id, 1)
+
+      assert [session] = page.entries
+      assert session.user.id == user.id
+      assert session.user.role == :streamer
+      assert session.album.id == album.id
+
+      assert %PremiereEcoute.Discography.Artist{name: "Sample Artist"} = session.album.artist
+
+      assert [%Track{name: "Track One", track_number: 1}, %Track{name: "Track Two", track_number: 2}] =
+               Enum.sort_by(session.album.tracks, & &1.track_number)
+    end
+  end
+
   describe "delete/1" do
     test "can delete an existing listening session", %{user: user, album: album} do
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})

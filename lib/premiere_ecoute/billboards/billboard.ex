@@ -79,7 +79,7 @@ defmodule PremiereEcoute.Billboards.Billboard do
 
     query
     |> PremiereEcoute.Repo.all()
-    |> PremiereEcoute.Repo.preload([:streamer])
+    |> Enum.map(&preload/1)
     |> Enum.map(fn billboard ->
       billboard.submissions
       |> Enum.with_index()

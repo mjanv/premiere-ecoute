@@ -84,6 +84,20 @@ defmodule PremiereEcoute.Accounts.User.FollowTest do
     end
   end
 
+  describe "all/1" do
+    test "does not preload follower association" do
+      follower = user_fixture(%{role: :viewer})
+      followed = user_fixture(%{role: :streamer})
+
+      {:ok, _} = Accounts.follow(follower, followed)
+
+      [follow] = Follow.all(where: [follower_id: follower.id])
+
+      assert %Ecto.Association.NotLoaded{} = follow.follower
+      assert %Ecto.Association.NotLoaded{} = follow.followed
+    end
+  end
+
   describe "discover_follows/1" do
     test "returns the list of non-followed streamers by a viewer" do
       user = user_fixture(%{role: :viewer})

@@ -80,6 +80,7 @@ defmodule PremiereEcoute.Discography.Album do
   Populates the virtual :artist field from the first entry in :artists.
   """
   @spec put_artist(nil | t()) :: nil | t()
+  # AIDEV-NOTE: intentionally parallel to Single.put_artist/1 — both derive :artist from :artists
   def put_artist(nil), do: nil
   def put_artist(%__MODULE__{artists: [artist | _]} = album), do: %{album | artist: artist}
   def put_artist(%__MODULE__{} = album), do: album
@@ -87,16 +88,12 @@ defmodule PremiereEcoute.Discography.Album do
   @doc false
   def preload({:ok, entity}), do: {:ok, preload(entity)}
   def preload({:error, reason}), do: {:error, reason}
+  def preload(nil), do: nil
+  def preload(entities) when is_list(entities), do: Enum.map(entities, &preload/1)
 
-  def preload(entities) when is_list(entities) do
-    entities
-    |> Repo.preload([:tracks, :artists], force: true)
-    |> Enum.map(&put_artist/1)
-  end
-
-  def preload(entity) do
-    entity
-    |> Repo.preload([:tracks, :artists], force: true)
+  def preload(%__MODULE__{} = album) do
+    album
+    |> super()
     |> put_artist()
   end
 
