@@ -1,6 +1,7 @@
 <PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
 <div class="bg-gray-900 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <%!-- Header --%>
     <div class="mb-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -73,10 +74,9 @@
         </div>
       </div>
     </div>
-    
-<!-- Stats Cards -->
+
+    <%!-- Stats Cards --%>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
-      <!-- Users Card -->
       <.link navigate="/admin/users" class="block">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
           <div class="flex items-center justify-between">
@@ -97,8 +97,7 @@
           </div>
         </div>
       </.link>
-      
-<!-- Sessions Card -->
+
       <.link navigate="/admin/sessions" class="block">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
           <div class="flex items-center justify-between">
@@ -119,8 +118,7 @@
           </div>
         </div>
       </.link>
-      
-<!-- Albums Card -->
+
       <.link navigate="/admin/albums" class="block">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
           <div class="flex items-center justify-between">
@@ -141,8 +139,7 @@
           </div>
         </div>
       </.link>
-      
-<!-- Artists Card -->
+
       <.link navigate="/admin/artists" class="block">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
           <div class="flex items-center justify-between">
@@ -163,8 +160,7 @@
           </div>
         </div>
       </.link>
-      
-<!-- Reviews Card -->
+
       <.link navigate="/admin/reviews" class="block">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
           <div class="flex items-center justify-between">
@@ -185,8 +181,7 @@
           </div>
         </div>
       </.link>
-      
-<!-- Billboards Card -->
+
       <.link navigate="/admin/billboards" class="block">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
           <div class="flex items-center justify-between">
@@ -207,8 +202,7 @@
           </div>
         </div>
       </.link>
-      
-<!-- Goals Card -->
+
       <.link navigate="/admin/donations" class="block">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
           <div class="flex items-center justify-between">
@@ -218,169 +212,79 @@
             </div>
             <div class="p-2.5 rounded-lg bg-red-900">
               <svg class="w-6 h-6 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
           </div>
         </div>
       </.link>
     </div>
-    
-<!-- Event Store Section -->
-    <div class="mt-8">
-      <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-700">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-xl font-semibold text-white">{gettext("Event Store")}</h2>
-              <p class="mt-1 text-sm text-gray-400">{gettext("Browse and inspect stored events")}</p>
-            </div>
-            <form phx-change="change_stream">
-              <input
-                type="text"
-                name="stream"
-                value={@event_store.stream}
-                placeholder="Enter stream name (e.g. accounts, users)"
-                class="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
-              />
-            </form>
-          </div>
-        </div>
 
-        <div class="p-6">
-          
-<!-- Events Table -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-700">
-              <thead class="bg-gray-700">
-                <tr>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-16">
-                    {gettext("#")}
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    {gettext("Stream")}
-                  </th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-20">
-                    {gettext("Version")}
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    {gettext("Event")}
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    {gettext("Data")}
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    {gettext("Created At")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-gray-800 divide-y divide-gray-700">
-                <%= for event <- @event_store.events do %>
-                  <tr class="hover:bg-gray-700">
-                    <td class="px-3 py-4 whitespace-nowrap text-sm text-white">
-                      {event.event_number}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {event.stream_uuid}
-                    </td>
-                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {event.stream_version}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-medium">
-                        {String.replace(event.event_type || "Unknown", "Elixir.", "")}
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-300">
-                      <div class="flex flex-wrap gap-2">
-                        <%= for {key, value} <- Map.from_struct(event.data) do %>
-                          <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-purple-100 text-purple-800">
-                            <span class="font-medium">{key}:</span>
-                            <span class="ml-1">{inspect(value)}</span>
-                          </span>
-                        <% end %>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {Calendar.strftime(event.created_at, "%Y-%m-%d %H:%M:%S")}
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-          
-<!-- Pagination Controls -->
-          <div class="mt-6 flex items-center justify-center">
-            <nav class="flex items-center space-x-1">
-              <!-- Previous Button -->
-              <%= if @event_store.page > 1 do %>
-                <button
-                  phx-click="change_page"
-                  phx-value-page={@event_store.page - 1}
-                  class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-l-md hover:bg-gray-700 hover:text-white transition-colors"
-                >
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                  </svg>
-                  {gettext("Previous")}
-                </button>
-              <% else %>
-                <span class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-gray-900 border border-gray-700 rounded-l-md cursor-not-allowed">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                  </svg>
-                  {gettext("Previous")}
-                </span>
-              <% end %>
-              
-<!-- Page Numbers -->
-              <% max_page = if length(@event_store.events) < @event_store.size, do: @event_store.page, else: @event_store.page + 2 %>
-              <%= for page_num <- max(1, @event_store.page - 2)..max_page do %>
-                <%= if page_num == @event_store.page do %>
-                  <span class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600">
-                    {page_num}
-                  </span>
-                <% else %>
-                  <button
-                    phx-click="change_page"
-                    phx-value-page={page_num}
-                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 hover:bg-gray-700 hover:text-white transition-colors"
-                  >
-                    {page_num}
-                  </button>
-                <% end %>
-              <% end %>
-              
-<!-- Next Button -->
-              <%= if length(@event_store.events) == @event_store.size do %>
-                <button
-                  phx-click="change_page"
-                  phx-value-page={@event_store.page + 1}
-                  class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-r-md hover:bg-gray-700 hover:text-white transition-colors"
-                >
-                  {gettext("Next")}
-                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              <% else %>
-                <span class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-gray-900 border border-gray-700 rounded-r-md cursor-not-allowed">
-                  {gettext("Next")}
-                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              <% end %>
-            </nav>
-          </div>
+    <%!-- Analytics overview card --%>
+    <div class="bg-gray-800 border border-gray-700 rounded-lg mb-8 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-semibold text-white">{gettext("Analytics")}</h2>
+          <p class="text-sm text-gray-500 mt-0.5">{gettext("Last 30 days")}</p>
+        </div>
+        <.link
+          navigate="/admin/analytics"
+          class="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1"
+        >
+          {gettext("Full analytics")}
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </.link>
+      </div>
+      <div class="px-6 pb-6 pt-2">
+        <div
+          id="dash-chart-all"
+          phx-hook="AnalyticsChart"
+          data-chart-type="bar"
+          data-chart-id="dash-all"
+          data-unit="day"
+          data-inline-data={chart_json(@overview_charts.all_events)}
+          class="h-32 w-full"
+        >
         </div>
       </div>
+    </div>
+
+    <%!-- Activity Feed --%>
+    <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-semibold text-white">{gettext("Recent Activity")}</h2>
+          <p class="text-sm text-gray-500 mt-0.5">{gettext("Latest high-signal events across all streams")}</p>
+        </div>
+        <.link
+          navigate="/admin/events"
+          class="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1"
+        >
+          {gettext("Event store")}
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </.link>
+      </div>
+
+      <ul class="divide-y divide-gray-700">
+        <%= for event <- @feed do %>
+          <li class="px-6 py-3 flex items-center gap-4 hover:bg-gray-750">
+            <span class={"w-2 h-2 rounded-full flex-shrink-0 #{event_color(event)} bg-current opacity-80"}></span>
+            <span class={"text-sm font-medium flex-1 #{event_color(event)}"}>{event_label(event)}</span>
+            <span class="text-xs text-gray-500 tabular-nums whitespace-nowrap">
+              {Calendar.strftime(event.created_at, "%Y-%m-%d %H:%M")}
+            </span>
+          </li>
+        <% end %>
+        <%= if @feed == [] do %>
+          <li class="px-6 py-12 text-center text-gray-500 text-sm">
+            {gettext("No recent activity")}
+          </li>
+        <% end %>
+      </ul>
     </div>
   </div>
 </div>

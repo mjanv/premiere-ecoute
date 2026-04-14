@@ -17,14 +17,30 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
   """
   @impl true
   def mount(_params, _session, socket) do
-    billboards = Billboard.all(order_by: [desc: :updated_at])
+    billboards = list_billboards("")
 
     socket
+    |> assign(:search, "")
     |> assign(:billboards, billboards)
     |> assign(:billboard_stats, billboard_stats(billboards))
     |> assign(:selected_billboard, nil)
     |> assign(:show_billboard_modal, false)
     |> then(fn socket -> {:ok, socket} end)
+  end
+
+  defp list_billboards(search) do
+    billboards = Billboard.all(order_by: [desc: :updated_at])
+
+    if search != "" do
+      term = String.downcase(search)
+
+      Enum.filter(billboards, fn b ->
+        String.contains?(String.downcase(b.title || ""), term) or
+          String.contains?(String.downcase(b.streamer.username || ""), term)
+      end)
+    else
+      billboards
+    end
   end
 
   @doc """
@@ -33,6 +49,16 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
   Opens or closes detail modals, updates billboard status, manages submission review status, removes submissions, deletes billboards, and refreshes list with statistics and appropriate flash messages.
   """
   @impl true
+  def handle_event("search", %{"search" => search}, socket) do
+    billboards = list_billboards(search)
+
+    socket
+    |> assign(:search, search)
+    |> assign(:billboards, billboards)
+    |> assign(:billboard_stats, billboard_stats(billboards))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event("show_billboard_modal", %{"billboard_id" => billboard_id}, socket) do
     billboard =
       socket.assigns.billboards
@@ -58,7 +84,7 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
 
     case Billboards.update_billboard(billboard, %{status: String.to_existing_atom(status)}) do
       {:ok, updated_billboard} ->
-        billboards = Billboard.all(order_by: [desc: :updated_at])
+        billboards = list_billboards(socket.assigns.search)
 
         socket
         |> assign(:billboards, billboards)
@@ -79,7 +105,7 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
 
     case Billboards.remove_submission(billboard, String.to_integer(index)) do
       {:ok, updated_billboard} ->
-        billboards = Billboard.all(order_by: [desc: :updated_at])
+        billboards = list_billboards(socket.assigns.search)
 
         socket
         |> assign(:billboards, billboards)
@@ -100,7 +126,7 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
 
     case Billboards.toggle_submission_review(billboard, String.to_integer(index)) do
       {:ok, updated_billboard} ->
-        billboards = Billboard.all(order_by: [desc: :updated_at])
+        billboards = list_billboards(socket.assigns.search)
 
         socket
         |> assign(:billboards, billboards)
@@ -121,7 +147,7 @@ defmodule PremiereEcouteWeb.Admin.AdminBillboardsLive do
 
     case Billboards.delete_billboard(billboard) do
       {:ok, _} ->
-        billboards = Billboard.all(order_by: [desc: :updated_at])
+        billboards = list_billboards(socket.assigns.search)
 
         socket
         |> assign(:billboards, billboards)

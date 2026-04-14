@@ -7,10 +7,10 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
+
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
-
-  import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
 
   @doc """
   Initializes admin albums page with paginated list and statistics.
@@ -20,7 +20,8 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
   @impl true
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page, Album.page([], 1, 10))
+    |> assign(:search, "")
+    |> assign(:page, Album.list_for_admin("", 1, 10))
     |> assign(:album_stats, album_stats())
     |> assign(:selected_album, nil)
     |> assign(:show_modal, false)
@@ -38,7 +39,7 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
     page_size = String.to_integer(params["per_page"] || "10")
 
     socket
-    |> assign(:page, Album.page([], page_number, page_size))
+    |> assign(:page, Album.list_for_admin(socket.assigns.search, page_number, page_size))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -48,6 +49,13 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
   Opens detail modal for selected album, closes modal, or deletes album with list refresh and appropriate flash messages.
   """
   @impl true
+  def handle_event("search", %{"search" => search}, %{assigns: %{page: page}} = socket) do
+    socket
+    |> assign(:search, search)
+    |> assign(:page, Album.list_for_admin(search, 1, page.page_size))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event("show_album_modal", %{"album_id" => album_id}, socket) do
     socket
     |> assign(:selected_album, Album.get(album_id))
@@ -62,14 +70,14 @@ defmodule PremiereEcouteWeb.Admin.AdminAlbumsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  def handle_event("delete_album", %{"album_id" => album_id}, %{assigns: %{page: page}} = socket) do
+  def handle_event("delete_album", %{"album_id" => album_id}, %{assigns: %{page: page, search: search}} = socket) do
     album_id
     |> Album.get()
     |> Album.delete()
     |> case do
       {:ok, _} ->
         socket
-        |> assign(:page, Album.page([], page.page_number, page.page_size))
+        |> assign(:page, Album.list_for_admin(search, page.page_number, page.page_size))
         |> put_flash(:info, gettext("Album deleted successfully"))
 
       {:error, _} ->

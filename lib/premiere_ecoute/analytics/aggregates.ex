@@ -175,7 +175,11 @@ defmodule PremiereEcoute.Analytics.Aggregates do
     SELECT
       s.period,
       COALESCE(a.count, 0) AS count
-    FROM generate_series($#{n + 1}, $#{n + 2}, ('1 ' || $#{n + 3})::interval) AS s(period)
+    FROM generate_series(
+      DATE_TRUNC($#{n + 3}, $#{n + 1}::timestamptz AT TIME ZONE 'UTC'),
+      DATE_TRUNC($#{n + 3}, $#{n + 2}::timestamptz AT TIME ZONE 'UTC'),
+      ('1 ' || $#{n + 3})::interval
+    ) AS s(period)
     LEFT JOIN aggregated a ON a.period = s.period
     ORDER BY s.period
     """

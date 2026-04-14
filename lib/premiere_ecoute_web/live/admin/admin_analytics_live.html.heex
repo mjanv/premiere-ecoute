@@ -1,0 +1,163 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
+
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <%!-- Header --%>
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <.link navigate="/admin" class="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {gettext("Back to Dashboard")}
+          </.link>
+        </div>
+        <h1 class="text-3xl font-bold text-white">{gettext("Analytics")}</h1>
+        <p class="mt-2 text-gray-400">{gettext("Event trends grouped by domain")}</p>
+      </div>
+
+      <%!-- Range selector --%>
+      <div class="flex items-center gap-1 bg-gray-800 border border-gray-700 rounded-lg p-1">
+        <%= for {label, key} <- [{"14d", "14d"}, {"30d", "30d"}, {"90d", "90d"}, {"3m", "3m"}, {"6m", "6m"}, {"12m", "12m"}, {"All", "all"}] do %>
+          <button
+            phx-click="set_range"
+            phx-value-range={key}
+            class={[
+              "px-4 py-2 text-sm rounded-md transition-all duration-150 font-medium",
+              if(@range == key,
+                do: "bg-violet-600 text-white",
+                else: "text-gray-400 hover:text-white hover:bg-gray-700"
+              )
+            ]}
+          >
+            {label}
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <%!-- Context tabs --%>
+    <div class="flex gap-0 mb-8 border-b border-gray-700">
+      <%= for {label, ctx} <- [{"Accounts", "accounts"}, {"Sessions", "sessions"}, {"Discography", "discography"}, {"Wantlists", "wantlists"}] do %>
+        <button
+          phx-click="set_context"
+          phx-value-context={ctx}
+          class={[
+            "px-5 py-3 text-base font-medium transition-all duration-150 border-b-2 -mb-px",
+            if(@active_context == ctx,
+              do: "border-violet-500 text-white",
+              else: "border-transparent text-gray-500 hover:text-gray-300"
+            )
+          ]}
+        >
+          {label}
+        </button>
+      <% end %>
+    </div>
+
+    <%!-- ===== ACCOUNTS CONTEXT ===== --%>
+    <%= if @active_context == "accounts" do %>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+        <.kpi_card label="New accounts" value={@accounts_data.total_created} color="violet" />
+        <.kpi_card label="Deleted accounts" value={@accounts_data.total_deleted} color="red" />
+        <.kpi_card label="Net growth" value={@accounts_data.total_created - @accounts_data.total_deleted} color="emerald" />
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <.chart_card
+          title="New accounts over time"
+          chart_id="acc_created"
+          data={chart_json(@accounts_data.created)}
+          unit={to_string(@unit)}
+        />
+        <.chart_card
+          title="OAuth connections by provider"
+          chart_id="acc_associated"
+          data={chart_json(@accounts_data.associated, :provider)}
+          unit={to_string(@unit)}
+        />
+        <.chart_card
+          title="Account deletions"
+          chart_id="acc_deleted"
+          data={chart_json(@accounts_data.deleted)}
+          unit={to_string(@unit)}
+        />
+      </div>
+    <% end %>
+
+    <%!-- ===== SESSIONS CONTEXT ===== --%>
+    <%= if @active_context == "sessions" do %>
+      <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-8">
+        <.kpi_card label="Sessions started" value={@sessions_data.total_started} color="emerald" />
+        <.kpi_card label="Vote windows opened" value={@sessions_data.total_votes} color="violet" />
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <.chart_card
+          title="Sessions by source"
+          chart_id="sess_started"
+          data={chart_json(@sessions_data.started, :source)}
+          unit={to_string(@unit)}
+        />
+        <.chart_card
+          title="Sessions stopped"
+          chart_id="sess_stopped"
+          data={chart_json(@sessions_data.stopped)}
+          unit={to_string(@unit)}
+        />
+        <.chart_card
+          title="Vote windows by mode"
+          chart_id="sess_votes"
+          data={chart_json(@sessions_data.votes, :vote_mode)}
+          unit={to_string(@unit)}
+        />
+        <.chart_card
+          title="Track decisions"
+          chart_id="sess_decisions"
+          data={chart_json(@sessions_data.decisions, :decision)}
+          unit={to_string(@unit)}
+        />
+      </div>
+    <% end %>
+
+    <%!-- ===== DISCOGRAPHY CONTEXT ===== --%>
+    <%= if @active_context == "discography" do %>
+      <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-8">
+        <.kpi_card label="Albums added" value={@discography_data.total_albums} color="yellow" />
+        <.kpi_card label="Artists added" value={@discography_data.total_artists} color="orange" />
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <.chart_card
+          title="Albums added to catalog"
+          chart_id="disco_albums"
+          data={chart_json(@discography_data.albums)}
+          unit={to_string(@unit)}
+        />
+        <.chart_card
+          title="Artists added to catalog"
+          chart_id="disco_artists"
+          data={chart_json(@discography_data.artists)}
+          unit={to_string(@unit)}
+        />
+      </div>
+    <% end %>
+
+    <%!-- ===== WANTLISTS CONTEXT ===== --%>
+    <%= if @active_context == "wantlists" do %>
+      <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-8">
+        <.kpi_card label="Items added" value={@wantlists_data.total_added} color="sky" />
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <.chart_card
+          title="Wantlist additions by type"
+          chart_id="wl_added"
+          data={chart_json(@wantlists_data.added, :type)}
+          unit={to_string(@unit)}
+        />
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -721,6 +721,33 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   def can_view_retrospective?(%__MODULE__{}, _scope), do: false
 
+  @doc "Fetches paginated sessions for admin, optionally filtered by user email, Twitch username, album name, or artist name."
+  @spec list_for_admin(String.t(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
+  def list_for_admin(search \\ "", page_number, page_size) do
+    __MODULE__
+    |> then(fn q ->
+      if search != "" do
+        term = "%#{search}%"
+
+        q
+        |> join(:left, [s], u in assoc(s, :user), as: :user)
+        |> join(:left, [s, u], tw in assoc(u, :twitch), as: :twitch)
+        |> join(:left, [s], a in assoc(s, :album), as: :album)
+        |> join(:left, [s, album: a], ar in assoc(a, :artists), as: :artist)
+        |> where(
+          [s, user: u, twitch: tw, album: a, artist: ar],
+          ilike(u.email, ^term) or ilike(tw.username, ^term) or ilike(a.name, ^term) or ilike(ar.name, ^term)
+        )
+        |> distinct(true)
+      else
+        q
+      end
+    end)
+    |> order_by(desc: :inserted_at)
+    |> preload([:album, user: :twitch])
+    |> Repo.paginate(page: page_number, page_size: page_size)
+  end
+
   @doc """
   Returns session counts grouped by status.
 

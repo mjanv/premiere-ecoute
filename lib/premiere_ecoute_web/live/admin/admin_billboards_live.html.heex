@@ -1,106 +1,76 @@
 <PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
 <div class="bg-gray-900 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-white">{gettext("Billboard Management")}</h1>
-          <p class="mt-2 text-gray-400">{gettext("Manage billboards and their submissions")}</p>
-        </div>
-        <div class="mt-4 sm:mt-0">
-          <.link
-            navigate="/admin"
-            class="inline-flex items-center px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-colors"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            {gettext("Back to Dashboard")}
-          </.link>
-        </div>
-      </div>
-    </div>
-    
-<!-- Billboard Statistics -->
+    <PremiereEcouteWeb.Admin.AdminComponents.admin_page_header
+      title={gettext("Billboard Management")}
+      subtitle={gettext("Manage billboards and their submissions")}
+    />
+
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-      <!-- Created Stats -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-yellow-900">
-            <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :created, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Created")}</p>
-          </div>
-        </div>
-      </div>
-      
-<!-- Active Stats -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-green-900">
-            <svg class="w-8 h-8 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :active, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Active")}</p>
-          </div>
-        </div>
-      </div>
-      
-<!-- Stopped Stats -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-red-900">
-            <svg class="w-8 h-8 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :stopped, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Stopped")}</p>
-          </div>
-        </div>
-      </div>
-      
-<!-- Total Submissions -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-purple-900">
-            <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@billboard_stats, :total_submissions, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Submissions")}</p>
-          </div>
-        </div>
-      </div>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card
+        value={Map.get(@billboard_stats, :created, 0)}
+        label={gettext("Created")}
+        color="yellow"
+      >
+        <:icon>
+          <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card
+        value={Map.get(@billboard_stats, :active, 0)}
+        label={gettext("Active")}
+        color="green"
+      >
+        <:icon>
+          <svg class="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card
+        value={Map.get(@billboard_stats, :stopped, 0)}
+        label={gettext("Stopped")}
+        color="red"
+      >
+        <:icon>
+          <svg class="w-6 h-6 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+            />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card
+        value={Map.get(@billboard_stats, :total_submissions, 0)}
+        label={gettext("Submissions")}
+        color="purple"
+      >
+        <:icon>
+          <svg class="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
     </div>
-    
-<!-- Billboards Table -->
+
+    <PremiereEcouteWeb.Admin.AdminComponents.search_bar value={@search} placeholder={gettext("Search by title or streamer…")} />
+
     <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-700">
         <h2 class="text-lg font-medium text-white">{gettext("All Billboards")}</h2>

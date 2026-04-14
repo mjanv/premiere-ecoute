@@ -207,6 +207,30 @@ defmodule PremiereEcoute.Accounts.User do
   @spec get_user_by_username(String.t()) :: t() | nil
   def get_user_by_username(username), do: get_by(username: username)
 
+  @doc "Fetches paginated users for admin, optionally filtered by search term and role."
+  @spec list_for_admin(String.t(), String.t(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
+  def list_for_admin(search \\ "", role \\ "", page_number, page_size) do
+    __MODULE__
+    |> then(fn q ->
+      if search != "" do
+        term = "%#{search}%"
+        where(q, [u], ilike(u.email, ^term) or ilike(u.username, ^term))
+      else
+        q
+      end
+    end)
+    |> then(fn q ->
+      if role != "" do
+        where(q, [u], u.role == ^String.to_existing_atom(role))
+      else
+        q
+      end
+    end)
+    |> order_by(asc: :inserted_at)
+    |> preload([:twitch, :spotify])
+    |> Repo.paginate(page: page_number, page_size: page_size)
+  end
+
   @doc "Returns a paginated page of members (viewer + admin roles)."
   @spec page_members(integer(), integer()) :: Scrivener.Page.t()
   def page_members(page_number, page_size) do

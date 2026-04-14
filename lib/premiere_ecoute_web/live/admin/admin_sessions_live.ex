@@ -7,10 +7,10 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
+
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
-
-  import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
 
   @doc """
   Initializes admin sessions page with paginated list and statistics.
@@ -20,7 +20,8 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   @impl true
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page, ListeningSession.page([], 1, 10))
+    |> assign(:search, "")
+    |> assign(:page, ListeningSession.list_for_admin("", 1, 10))
     |> assign(:session_stats, session_stats())
     |> assign(:selected_session, nil)
     |> assign(:show_modal, false)
@@ -40,7 +41,7 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
     page_size = String.to_integer(params["per_page"] || "10")
 
     socket
-    |> assign(:page, ListeningSession.page([], page_number, page_size))
+    |> assign(:page, ListeningSession.list_for_admin(socket.assigns.search, page_number, page_size))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -50,6 +51,13 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   Opens detail modal for selected session, closes modals, initiates deletion with confirmation dialog, or confirms and executes session deletion with list refresh and appropriate flash messages.
   """
   @impl true
+  def handle_event("search", %{"search" => search}, %{assigns: %{page: page}} = socket) do
+    socket
+    |> assign(:search, search)
+    |> assign(:page, ListeningSession.list_for_admin(search, 1, page.page_size))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event("show_session_modal", %{"session_id" => session_id}, socket) do
     socket
     |> assign(:selected_session, ListeningSession.get(session_id))
@@ -83,13 +91,14 @@ defmodule PremiereEcouteWeb.Admin.AdminSessionsLive do
   def handle_event("confirm_delete_session", _params, socket) do
     current_page = socket.assigns.page
     session = socket.assigns.session_to_delete
+    search = socket.assigns.search
 
     session
     |> ListeningSession.delete()
     |> case do
       {:ok, _deleted_session} ->
         socket
-        |> assign(:page, ListeningSession.page([], current_page.page_number, current_page.page_size))
+        |> assign(:page, ListeningSession.list_for_admin(search, current_page.page_number, current_page.page_size))
         |> assign(:session_to_delete, nil)
         |> assign(:show_delete_modal, false)
         |> put_flash(:info, gettext("Session deleted successfully"))

@@ -1,9 +1,9 @@
 defmodule PremiereEcoute.Analytics.EventsTest do
   use PremiereEcoute.DataCase, async: false
 
+  alias PremiereEcoute.Analytics.Events
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.AccountDeleted
-  alias PremiereEcoute.Analytics.Events
   alias PremiereEcoute.Events.Store
 
   # AIDEV-NOTE: async: false — inserts go directly into event_store.events

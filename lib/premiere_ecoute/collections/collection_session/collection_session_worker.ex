@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Collections.CollectionSessionWorker do
   end
 
   @doc "Cancels all pending duel_reminder jobs for the given session."
-  @spec cancel_duel_reminders(integer()) :: :ok
+  @spec cancel_duel_reminders(integer()) :: {:ok, non_neg_integer()}
   def cancel_duel_reminders(session_id) do
     duel_reminder_query(session_id)
     |> Oban.cancel_all_jobs()

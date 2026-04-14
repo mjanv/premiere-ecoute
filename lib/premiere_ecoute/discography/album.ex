@@ -187,6 +187,28 @@ defmodule PremiereEcoute.Discography.Album do
     end
   end
 
+  @doc "Fetches paginated albums for admin, optionally filtered by album name or artist name."
+  @spec list_for_admin(String.t(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
+  def list_for_admin(search \\ "", page_number, page_size) do
+    __MODULE__
+    |> then(fn q ->
+      if search != "" do
+        term = "%#{search}%"
+
+        q
+        |> join(:left, [a], ar in assoc(a, :artists), as: :artist)
+        |> where([a, artist: ar], ilike(a.name, ^term) or ilike(ar.name, ^term))
+        |> distinct(true)
+      else
+        q
+      end
+    end)
+    |> order_by(desc: :inserted_at)
+    |> preload([:tracks, :artists])
+    |> Repo.paginate(page: page_number, page_size: page_size)
+    |> then(fn page -> %{page | entries: Enum.map(page.entries, &put_artist/1)} end)
+  end
+
   @doc "Returns a random album with missing informations"
   @spec random :: nil | t()
   def random do

@@ -7,10 +7,7 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
 
   use PremiereEcouteWeb, :live_view
 
-  import Ecto.Query
-
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Repo
 
   @doc """
   Initializes admin users page with paginated user list and role statistics.
@@ -22,7 +19,7 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
     socket
     |> assign(:search, "")
     |> assign(:role_filter, "")
-    |> assign(:page, list_users("", "", 1, 10))
+    |> assign(:page, User.list_for_admin("", "", 1, 10))
     |> assign(:user_stats, User.count_by_role())
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -38,7 +35,7 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
     page_size = String.to_integer(params["per_page"] || "10")
 
     socket
-    |> assign(:page, list_users(socket.assigns.search, socket.assigns.role_filter, page_number, page_size))
+    |> assign(:page, User.list_for_admin(socket.assigns.search, socket.assigns.role_filter, page_number, page_size))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -47,46 +44,9 @@ defmodule PremiereEcouteWeb.Admin.AdminUsersLive do
     socket
     |> assign(:search, search)
     |> assign(:role_filter, role)
-    |> assign(:page, list_users(search, role, 1, page.page_size))
+    |> assign(:page, User.list_for_admin(search, role, 1, page.page_size))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: custom query for admin search/filter — User.page doesn't support dynamic text search
-  defp list_users(search, role, page_number, page_size) do
-    User
-    |> then(fn q ->
-      if search != "" do
-        term = "%#{search}%"
-        where(q, [u], ilike(u.email, ^term) or ilike(u.username, ^term))
-      else
-        q
-      end
-    end)
-    |> then(fn q ->
-      if role != "" do
-        where(q, [u], u.role == ^String.to_existing_atom(role))
-      else
-        q
-      end
-    end)
-    |> order_by(asc: :inserted_at)
-    |> preload([:twitch, :spotify])
-    |> Repo.paginate(page: page_number, page_size: page_size)
-  end
-
-  defp pagination_range(current_page, total_pages) do
-    cond do
-      total_pages <= 7 ->
-        1..total_pages |> Enum.to_list()
-
-      current_page <= 4 ->
-        [1, 2, 3, 4, 5, :ellipsis, total_pages]
-
-      current_page >= total_pages - 3 ->
-        [1, :ellipsis, total_pages - 4, total_pages - 3, total_pages - 2, total_pages - 1, total_pages]
-
-      true ->
-        [1, :ellipsis, current_page - 1, current_page, current_page + 1, :ellipsis, total_pages]
-    end
-  end
+  import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
 end

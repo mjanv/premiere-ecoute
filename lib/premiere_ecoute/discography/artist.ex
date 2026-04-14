@@ -124,6 +124,14 @@ defmodule PremiereEcoute.Discography.Artist do
     |> Slug.maybe_generate_slug()
   end
 
+  @doc "Returns the count of artists that have a Wikipedia external link."
+  @spec count_enriched() :: non_neg_integer()
+  def count_enriched do
+    __MODULE__
+    |> where([a], fragment("? \\? 'wikipedia'", a.external_links))
+    |> count(:id)
+  end
+
   @doc "Returns a random artist with missing informations"
   @spec random :: nil | t()
   def random do

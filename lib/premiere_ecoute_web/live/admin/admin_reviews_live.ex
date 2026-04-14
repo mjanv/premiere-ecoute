@@ -7,17 +7,16 @@ defmodule PremiereEcouteWeb.Admin.AdminReviewsLive do
 
   use PremiereEcouteWeb, :live_view
 
-  import Ecto.Query
   import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
 
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession.Review
 
   @impl true
   def mount(_params, _session, socket) do
     socket
-    |> assign(:page, list_reviews(1, 20))
-    |> assign(:reviews_count, Review.count(:id))
+    |> assign(:search, "")
+    |> assign(:page, Review.list_for_admin("", 1, 20))
+    |> assign(:review_stats, review_stats())
     |> assign(:selected_review, nil)
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -28,29 +27,36 @@ defmodule PremiereEcouteWeb.Admin.AdminReviewsLive do
     page_size = String.to_integer(params["per_page"] || "20")
 
     socket
-    |> assign(:page, list_reviews(page_number, page_size))
+    |> assign(:page, Review.list_for_admin(socket.assigns.search, page_number, page_size))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
+  def handle_event("search", %{"search" => search}, %{assigns: %{page: page}} = socket) do
+    socket
+    |> assign(:search, search)
+    |> assign(:page, Review.list_for_admin(search, 1, page.page_size))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event("show_review", %{"id" => id}, socket) do
-    review = Repo.get!(Review, id) |> Repo.preload([:user, :album, :likes])
-    {:noreply, assign(socket, :selected_review, review)}
+    {:noreply, assign(socket, :selected_review, Review.get(id))}
   end
 
   def handle_event("close_modal", _params, socket) do
     {:noreply, assign(socket, :selected_review, nil)}
   end
 
-  def handle_event("delete_review", %{"id" => id}, %{assigns: %{page: page}} = socket) do
-    review = Repo.get!(Review, id)
-
-    case Repo.delete(review) do
+  def handle_event("delete_review", %{"id" => id}, %{assigns: %{page: page, search: search}} = socket) do
+    id
+    |> Review.get()
+    |> Review.delete()
+    |> case do
       {:ok, _} ->
         socket
         |> assign(:selected_review, nil)
-        |> assign(:page, list_reviews(page.page_number, page.page_size))
-        |> assign(:reviews_count, Review.count(:id))
+        |> assign(:page, Review.list_for_admin(search, page.page_number, page.page_size))
+        |> assign(:review_stats, review_stats())
         |> put_flash(:info, gettext("Review deleted"))
 
       {:error, _} ->
@@ -59,11 +65,14 @@ defmodule PremiereEcouteWeb.Admin.AdminReviewsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  # AIDEV-NOTE: Review.page preloads [:user, :likes] from root; album is added here
-  defp list_reviews(page, page_size) do
-    Review
-    |> order_by(desc: :inserted_at)
-    |> preload([:user, :album, :likes])
-    |> Repo.paginate(page: page, page_size: page_size)
+  defp review_stats do
+    avg =
+      case Review.average(:rating) do
+        nil -> 0.0
+        %Decimal{} = dec -> dec |> Decimal.to_float() |> Float.round(2)
+        f when is_float(f) -> Float.round(f, 2)
+      end
+
+    %{total_reviews: Review.count(:id), average_rating: avg}
   end
 end

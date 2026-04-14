@@ -1,139 +1,92 @@
 <PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
 <div class="bg-gray-900 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-white">{gettext("User Management")}</h1>
-          <p class="mt-2 text-gray-400">{gettext("Manage user accounts and roles")}</p>
-        </div>
-        <div class="mt-4 sm:mt-0">
-          <.link
-            navigate="/admin"
-            class="inline-flex items-center px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-colors"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            {gettext("Back to Dashboard")}
-          </.link>
-        </div>
-      </div>
-    </div>
-    
-<!-- User Statistics by Role -->
+    <PremiereEcouteWeb.Admin.AdminComponents.admin_page_header
+      title={gettext("User Management")}
+      subtitle={gettext("Manage user accounts and roles")}
+    />
+
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-      <!-- Admin Stats -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-purple-900">
-            <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :admin, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Admins")}</p>
-          </div>
-        </div>
-      </div>
-      
-<!-- Streamer Stats -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-blue-900">
-            <svg class="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :streamer, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Streamers")}</p>
-          </div>
-        </div>
-      </div>
-      
-<!-- Viewer Stats -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-gray-700">
-            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :viewer, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Viewers")}</p>
-          </div>
-        </div>
-      </div>
-      
-<!-- Bot Stats -->
-      <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div class="flex items-center">
-          <div class="p-3 rounded-full bg-red-900">
-            <svg class="w-8 h-8 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-2xl font-semibold text-white">{Map.get(@user_stats, :bot, 0)}</p>
-            <p class="text-sm text-gray-400">{gettext("Bots")}</p>
-          </div>
-        </div>
-      </div>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card
+        value={Map.get(@user_stats, :admin, 0)}
+        label={gettext("Admins")}
+        color="purple"
+      >
+        <:icon>
+          <svg class="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card
+        value={Map.get(@user_stats, :streamer, 0)}
+        label={gettext("Streamers")}
+        color="blue"
+      >
+        <:icon>
+          <svg class="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+            />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card
+        value={Map.get(@user_stats, :viewer, 0)}
+        label={gettext("Viewers")}
+        color="gray"
+      >
+        <:icon>
+          <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+            />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
+      <PremiereEcouteWeb.Admin.AdminComponents.stat_card value={Map.get(@user_stats, :bot, 0)} label={gettext("Bots")} color="red">
+        <:icon>
+          <svg class="w-6 h-6 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            />
+          </svg>
+        </:icon>
+      </PremiereEcouteWeb.Admin.AdminComponents.stat_card>
     </div>
 
-    <form phx-change="filter" class="flex gap-3 mb-4">
-      <div class="relative flex-1">
-        <svg
-          class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <PremiereEcouteWeb.Admin.AdminComponents.search_bar
+      value={@search}
+      placeholder={gettext("Search by email or username…")}
+      event="filter"
+    >
+      <:extra>
+        <select
+          name="role"
+          class="bg-gray-800 border border-gray-600 rounded-md text-sm text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
-        </svg>
-        <input
-          type="text"
-          name="search"
-          value={@search}
-          placeholder={gettext("Search by email or username…")}
-          class="w-full pl-9 pr-4 py-2 bg-gray-800 border border-gray-600 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          phx-debounce="300"
-        />
-      </div>
-      <select
-        name="role"
-        class="bg-gray-800 border border-gray-600 rounded-md text-sm text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-      >
-        <option value="" selected={@role_filter == ""}>{gettext("All roles")}</option>
-        <option value="viewer" selected={@role_filter == "viewer"}>{gettext("Viewer")}</option>
-        <option value="streamer" selected={@role_filter == "streamer"}>{gettext("Streamer")}</option>
-        <option value="admin" selected={@role_filter == "admin"}>{gettext("Admin")}</option>
-        <option value="bot" selected={@role_filter == "bot"}>{gettext("Bot")}</option>
-      </select>
-    </form>
+          <option value="" selected={@role_filter == ""}>{gettext("All roles")}</option>
+          <option value="viewer" selected={@role_filter == "viewer"}>{gettext("Viewer")}</option>
+          <option value="streamer" selected={@role_filter == "streamer"}>{gettext("Streamer")}</option>
+          <option value="admin" selected={@role_filter == "admin"}>{gettext("Admin")}</option>
+          <option value="bot" selected={@role_filter == "bot"}>{gettext("Bot")}</option>
+        </select>
+      </:extra>
+    </PremiereEcouteWeb.Admin.AdminComponents.search_bar>
 
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700">

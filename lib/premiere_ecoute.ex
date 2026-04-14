@@ -10,6 +10,7 @@ defmodule PremiereEcoute do
     exports: [
       {Apis, except: []},
       {Automations, except: []},
+      {Analytics, except: []},
       {Accounts, except: []},
       {Billboard, except: []},
       {Collections, except: []},

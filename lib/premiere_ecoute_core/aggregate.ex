@@ -130,6 +130,23 @@ defmodule PremiereEcouteCore.Aggregate do
       def page(clauses \\ [], page, page_size \\ 1),
         do: Repo.paginate(all_query(clauses), page: page, page_size: page_size)
 
+      @doc "Fetches paginated entities filtered by ilike search on given fields"
+      @spec search([atom()], String.t(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
+      def search(fields, term, page_number, page_size \\ 10) do
+        pattern = "%#{term}%"
+
+        filter =
+          Enum.reduce(fields, false, fn field, acc ->
+            dynamic([x], ^acc or ilike(field(x, ^field), ^pattern))
+          end)
+
+        __MODULE__
+        |> where(^filter)
+        |> order_by(asc: :updated_at)
+        |> preload(unquote(root))
+        |> Repo.paginate(page: page_number, page_size: page_size)
+      end
+
       @doc "Fetches next page of results"
       def next_page(clauses \\ [], page)
 
@@ -193,6 +210,8 @@ defmodule PremiereEcouteCore.Aggregate do
                      get_by: 1,
                      get_by: 2,
                      preload: 1,
+                     search: 3,
+                     search: 4,
                      update: 2,
                      upsert: 2,
                      delete: 1,

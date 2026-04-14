@@ -35,6 +35,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Review do
     timestamps(type: :utc_datetime)
   end
 
+  @doc "Fetches paginated reviews for admin, optionally filtered by username or album name."
+  @spec list_for_admin(String.t(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
+  def list_for_admin(search \\ "", page_number, page_size) do
+    __MODULE__
+    |> then(fn q ->
+      if search != "" do
+        term = "%#{search}%"
+
+        q
+        |> join(:left, [r], u in assoc(r, :user), as: :user)
+        |> join(:left, [r], a in assoc(r, :album), as: :album)
+        |> where([r, user: u, album: a], ilike(u.username, ^term) or ilike(a.name, ^term))
+      else
+        q
+      end
+    end)
+    |> order_by(desc: :inserted_at)
+    |> preload([:user, :album, :likes])
+    |> Repo.paginate(page: page_number, page_size: page_size)
+  end
+
   @doc "Review changeset."
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(review, attrs) do
