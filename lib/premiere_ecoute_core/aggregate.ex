@@ -2,6 +2,8 @@ defmodule PremiereEcouteCore.Aggregate do
   @moduledoc """
   Base module for aggregate roots and entities.
 
+  > Any change to this module's API must be reflected in `.claude/skills/aggregate/SKILL.md`.
+
   Provides comprehensive CRUD operations, pagination, preloading, statistics, and JSON encoding for domain aggregates using Ecto. Aggregates are configured with root associations for preloading, identity fields for uniqueness checks, and JSON fields for serialization.
 
   ## Options

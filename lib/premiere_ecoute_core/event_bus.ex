@@ -4,6 +4,8 @@ defmodule PremiereEcouteCore.EventBus do
 
   Dispatches domain events to registered handlers for processing. Handlers must be registered in the Registry for their event types. Supports dispatching single events or lists of events.
 
+  > Any change to this module's API must be reflected in `.claude/skills/event-store/SKILL.md`.
+
   ## Usage
 
       EventBus.dispatch(%MyEvent{field: "value"})

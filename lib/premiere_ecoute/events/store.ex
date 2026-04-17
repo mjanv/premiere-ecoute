@@ -1,8 +1,10 @@
 defmodule PremiereEcoute.Events.Store do
   @moduledoc """
-  Event store implementation
+  Event store implementation.
 
   Provides event persistence and retrieval capabilities with conditional event appending based on operation results. This module wraps the EventStore library to offer simplified interfaces for reading event streams and appending events with optional metadata.
+
+  > Any change to this module's API must be reflected in `.claude/skills/event-store/SKILL.md`.
   """
 
   use EventStore, otp_app: :premiere_ecoute, enable_hard_deletes: false
