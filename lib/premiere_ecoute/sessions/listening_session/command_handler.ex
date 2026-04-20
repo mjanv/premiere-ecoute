@@ -51,7 +51,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         user_id: user_id,
         album_id: album_id,
         vote_options: vote_options,
-        autostart: autostart
+        autostart: autostart,
+        interlude_threshold_ms: interlude_threshold_ms
       }) do
     with {:ok, album} <- EnrichDiscography.create_album(album_id, :spotify),
          {:ok, session} <-
@@ -60,7 +61,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              source: :album,
              album_id: album.id,
              vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-             options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
+             options: %{
+               "votes" => 0,
+               "scores" => 0,
+               "next_track" => 0,
+               "autostart" => autostart,
+               "interlude_threshold_ms" => interlude_threshold_ms
+             }
            }) do
       {:ok, session,
        [
@@ -116,7 +123,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         user_id: user_id,
         playlist_id: playlist_id,
         vote_options: vote_options,
-        autostart: autostart
+        autostart: autostart,
+        interlude_threshold_ms: interlude_threshold_ms
       }) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
          {:ok, playlist} <- get_or_create_playlist(playlist),
@@ -126,7 +134,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              source: :playlist,
              playlist_id: playlist.id,
              vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-             options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
+             options: %{
+               "votes" => 0,
+               "scores" => 0,
+               "next_track" => 0,
+               "autostart" => autostart,
+               "interlude_threshold_ms" => interlude_threshold_ms
+             }
            }) do
       {:ok, session,
        [

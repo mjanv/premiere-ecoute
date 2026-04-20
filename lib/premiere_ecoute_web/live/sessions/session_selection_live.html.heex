@@ -60,11 +60,14 @@
           free_vote_mode={@free_vote_mode}
         />
         
-<!-- Step 3b: Autostart toggle -->
+<!-- Step 3b: Session options -->
         <%= if @step in ["3", "4"] do %>
           <div class="mb-8 relative">
-            <div class="ml-16">
+            <div class="ml-16 space-y-2">
               <.autostart_toggle autostart={@autostart} />
+              <%= if @source_type in ["album", "playlist"] do %>
+                <.interlude_toggle interlude_skip={@interlude_skip} interlude_threshold_s={@interlude_threshold_s} />
+              <% end %>
             </div>
           </div>
         <% end %>

@@ -56,15 +56,25 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"action" => "open_album", "user_id" => user_id, "session_id" => session_id}}) do
-    with scope <- Scope.for_user(User.get(user_id)),
-         session <- ListeningSession.get(session_id),
-         {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, Map.take(session, [:id, :vote_options, :current_track_id])),
-         :ok <-
-           Apis.twitch().send_chat_message(
-             scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
-           ) do
-      PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
+    scope = Scope.for_user(User.get(user_id))
+    session = ListeningSession.get(session_id)
+
+    if interlude?(session.current_track, session) do
+      Apis.twitch().send_chat_message(
+        scope,
+        Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+          gettext("Interlude — no vote for this track")
+        end)
+      )
+    else
+      with {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, Map.take(session, [:id, :vote_options, :current_track_id])),
+           :ok <-
+             Apis.twitch().send_chat_message(
+               scope,
+               Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
+             ) do
+        PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
+      end
     end
 
     :ok
@@ -88,15 +98,27 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
       Apis.twitch().send_chat_message(scope, welcome)
     end
 
-    cache_entry = %{id: session.id, vote_options: session.vote_options, current_track_id: session.current_playlist_track_id}
-
-    with {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, cache_entry),
-         :ok <-
-           Apis.twitch().send_chat_message(
-             scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
-           ) do
-      PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
+    if interlude?(session.current_playlist_track, session) do
+      Apis.twitch().send_chat_message(
+        scope,
+        Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+          gettext("Interlude — no vote for this track")
+        end)
+      )
+    else
+      with cache_entry <- %{
+             id: session.id,
+             vote_options: session.vote_options,
+             current_track_id: session.current_playlist_track_id
+           },
+           {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, cache_entry),
+           :ok <-
+             Apis.twitch().send_chat_message(
+               scope,
+               Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
+             ) do
+        PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open)
+      end
     end
 
     :ok
@@ -223,5 +245,14 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
     end
 
     :ok
+  end
+
+  defp interlude?(nil, _session), do: false
+
+  defp interlude?(track, session) do
+    case session.options["interlude_threshold_ms"] do
+      nil -> false
+      threshold -> track.duration_ms < threshold
+    end
   end
 end

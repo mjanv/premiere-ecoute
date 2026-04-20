@@ -872,9 +872,48 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
     """
   end
 
-  # ---------------------------------------------------------------------------
-  # Private helpers
-  # ---------------------------------------------------------------------------
+  @doc "Renders the interlude skip toggle with optional duration input"
+  attr :interlude_skip, :boolean, required: true
+  attr :interlude_threshold_s, :integer, required: true
+
+  def interlude_toggle(assigns) do
+    ~H"""
+    <form phx-change="set_interlude" class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
+      <button
+        type="button"
+        phx-click={JS.dispatch("click", to: "#interlude-checkbox")}
+        class={[
+          "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+          if(@interlude_skip, do: "bg-purple-600", else: "bg-gray-700")
+        ]}
+      >
+        <span class={[
+          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+          if(@interlude_skip, do: "translate-x-5", else: "translate-x-0")
+        ]} />
+      </button>
+      <input id="interlude-checkbox" type="checkbox" name="enabled" checked={@interlude_skip} class="hidden" />
+      <div class="flex-1">
+        <label class="text-sm font-medium text-gray-200">{gettext("Skip interludes")}</label>
+        <p class="text-xs text-gray-400 mt-0.5">{gettext("Skip voting for tracks shorter than the specified duration")}</p>
+      </div>
+      <div class={[
+        "flex items-center space-x-2 transition-opacity",
+        if(@interlude_skip, do: "opacity-100", else: "opacity-0 pointer-events-none")
+      ]}>
+        <input
+          type="number"
+          min="1"
+          max="300"
+          value={@interlude_threshold_s}
+          name="threshold"
+          class="w-16 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white text-center focus:outline-none focus:border-purple-500"
+        />
+        <span class="text-xs text-gray-400">{gettext("seconds")}</span>
+      </div>
+    </form>
+    """
+  end
 
   defp vote_options("0-10"), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
   defp vote_options("1-5"), do: ["1", "2", "3", "4", "5"]

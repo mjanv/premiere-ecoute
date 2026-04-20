@@ -36,6 +36,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:free_session_name, "")
     |> assign(:free_vote_mode, nil)
     |> assign(:autostart, true)
+    |> assign(:interlude_skip, true)
+    |> assign(:interlude_threshold_s, 45)
     |> update_state()
     |> then(fn socket -> {:ok, socket} end)
   end
@@ -134,8 +136,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
     |> assign(:free_vote_mode, nil)
-    # Reset autostart to default
+    # Reset autostart and interlude to defaults
     |> assign(:autostart, true)
+    |> assign(:interlude_skip, true)
+    |> assign(:interlude_threshold_s, 45)
     # Load playlists if playlist source is selected
     |> maybe_load_playlists(source)
     |> update_state()
@@ -263,7 +267,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       user_id: get_user_id(socket),
       album_id: Map.get(album.provider_ids, :spotify),
       vote_options: vote_options,
-      autostart: socket.assigns.autostart
+      autostart: socket.assigns.autostart,
+      interlude_threshold_ms: interlude_threshold_ms(socket.assigns)
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -284,7 +289,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       user_id: get_user_id(socket),
       playlist_id: playlist.playlist_id,
       vote_options: get_vote_options(socket.assigns),
-      autostart: socket.assigns.autostart
+      autostart: socket.assigns.autostart,
+      interlude_threshold_ms: interlude_threshold_ms(socket.assigns)
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -304,6 +310,18 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   def handle_event("toggle_autostart", _params, socket) do
     {:noreply, socket |> assign(:autostart, !socket.assigns.autostart)}
+  end
+
+  def handle_event("set_interlude", params, socket) do
+    enabled = Map.has_key?(params, "enabled")
+
+    threshold_s =
+      case Integer.parse(params["threshold"] || "") do
+        {s, ""} when s > 0 -> s
+        _ -> socket.assigns.interlude_threshold_s
+      end
+
+    {:noreply, socket |> assign(:interlude_skip, enabled) |> assign(:interlude_threshold_s, threshold_s)}
   end
 
   def handle_event("open_random_modal", _params, socket) do
@@ -523,6 +541,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   end
 
   defp maybe_load_playlists(socket, _), do: socket
+
+  defp interlude_threshold_ms(%{interlude_skip: true, interlude_threshold_s: s}), do: s * 1000
+  defp interlude_threshold_ms(_), do: nil
 
   defp update_state(socket) do
     %{
