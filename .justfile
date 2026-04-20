@@ -14,7 +14,7 @@ ssh:
 
 # Watch productions logs
 watch:
-    ssh $SERVER 'journalctl -u premiere-ecoute -f'
+    ssh $SERVER 'journalctl -u premiere-ecoute --since today -f'
 
 # Connect to remote console
 remote:
