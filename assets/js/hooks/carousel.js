@@ -93,6 +93,7 @@ export const Carousel = {
         dots[index]?.removeEventListener('click', handler);
       });
     }
+    if (this.keyHandler) document.removeEventListener('keydown', this.keyHandler);
     
     const updateCarousel = () => {
       const translateX = -currentIndex * 100;
@@ -130,6 +131,15 @@ export const Carousel = {
     
     nextButton.addEventListener('click', this.nextHandler);
     prevButton.addEventListener('click', this.prevHandler);
+
+    // Keyboard navigation
+    this.keyHandler = (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      else if (e.key === 'ArrowLeft') prevSlide();
+      else if (e.key === 'ArrowUp') { currentIndex = totalSlides - 1; updateCarousel(); }
+      else if (e.key === 'ArrowDown') { currentIndex = 0; updateCarousel(); }
+    };
+    document.addEventListener('keydown', this.keyHandler);
     
     // Dot navigation
     dots.forEach((dot, index) => {
@@ -158,5 +168,6 @@ export const Carousel = {
         dots[index]?.removeEventListener('click', handler);
       });
     }
+    if (this.keyHandler) document.removeEventListener('keydown', this.keyHandler);
   }
 };
