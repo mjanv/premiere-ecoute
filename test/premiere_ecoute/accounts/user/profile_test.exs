@@ -49,8 +49,13 @@ defmodule PremiereEcoute.Accounts.User.ProfileTest do
         })
 
       assert Profile.get(user, [:language]) == :it
+      assert Profile.get(user, [:radio_settings, :visibility]) == :private
       assert Profile.get(user, [:radio_settings, :unknown]) == nil
       assert Profile.get(user, [:radio_settings, :unknown], :default) == :default
+    end
+
+    test "can get default values" do
+      assert Profile.get(nil, [:unknown], :default) == :default
     end
   end
 end

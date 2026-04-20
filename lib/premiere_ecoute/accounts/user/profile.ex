@@ -8,6 +8,8 @@ defmodule PremiereEcoute.Accounts.User.Profile do
 
   use PremiereEcouteCore.Aggregate.Object
 
+  # alias PremiereEcoute.Accounts.User
+
   @schemes [:light, :dark, :system]
   @languages [:en, :fr, :it]
   @hex_color_regex ~r/^#[0-9A-Fa-f]{6}$/
@@ -43,14 +45,18 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     end
   end
 
-  def get(user, path, default \\ nil) do
-    Enum.reduce_while(path, user.profile, fn key, acc ->
+  def get(user, path, default \\ nil)
+
+  def get(%{profile: %__MODULE__{} = profile}, path, default) do
+    Enum.reduce_while(path, profile, fn key, acc ->
       case acc do
         nil -> {:halt, default}
         _ -> {:cont, Map.get(acc, key, default)}
       end
     end)
   end
+
+  def get(_user, _path, default), do: default
 
   @doc "User profile changeset."
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
