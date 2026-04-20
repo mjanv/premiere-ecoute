@@ -37,7 +37,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
         nil ->
           socket
           |> assign(:user, user)
-          |> assign(:user_id, user.id)
           |> assign(:id, nil)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
@@ -85,7 +84,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
           socket
           |> assign(:user, user)
-          |> assign(:user_id, user.id)
           |> assign(:id, session.id)
           |> assign(:score, :streamer)
           |> assign(:percent, 0)
@@ -207,10 +205,10 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
-  def handle_info(:session_stopped, %{assigns: %{listening_session: session, user_id: user_id}} = socket)
+  def handle_info(:session_stopped, %{assigns: %{listening_session: session, user: %{id: id}}} = socket)
       when not is_nil(session) do
     PremiereEcoute.PubSub.unsubscribe("session:#{session.id}")
-    Presence.unjoin(user_id, :overlay)
+    Presence.unjoin(id, :overlay)
 
     socket
     |> assign(:id, nil)
