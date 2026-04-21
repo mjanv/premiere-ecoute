@@ -244,6 +244,9 @@ defmodule PremiereEcoute.Events.Backfill do
     |> MapSet.new()
   end
 
+  defp to_utc(%NaiveDateTime{} = ndt), do: DateTime.from_naive!(ndt, "Etc/UTC")
+  defp to_utc(%DateTime{} = dt), do: dt
+
   defp insert_event(event_type, data, created_at, metadata \\ %{"backfill" => true}) do
     Repo.insert_all(
       "events",
@@ -253,7 +256,7 @@ defmodule PremiereEcoute.Events.Backfill do
           event_type: event_type,
           data: data,
           metadata: metadata,
-          created_at: created_at
+          created_at: to_utc(created_at)
         }
       ],
       prefix: "event_store"
