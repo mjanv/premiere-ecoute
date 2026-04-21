@@ -104,3 +104,15 @@ defmodule PremiereEcoute.Events.TrackLiked do
 
   use PremiereEcouteCore.Event, fields: [:provider, :user_id, :track_id]
 end
+
+defmodule PremiereEcoute.Events.UserLoggedIn do
+  @moduledoc """
+  Event - User logged in.
+  """
+
+  @type t :: %__MODULE__{
+          id: String.t() | nil
+        }
+
+  use PremiereEcouteCore.Event
+end

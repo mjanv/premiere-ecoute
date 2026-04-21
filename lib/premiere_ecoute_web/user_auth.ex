@@ -13,6 +13,8 @@ defmodule PremiereEcouteWeb.UserAuth do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Events.Store
+  alias PremiereEcoute.Events.UserLoggedIn
 
   # Make the remember me cookie valid for 14 days. This should match
   # the session validity setting in User.Token.
@@ -42,6 +44,7 @@ defmodule PremiereEcouteWeb.UserAuth do
   @spec log_in_user(Plug.Conn.t(), User.t(), map()) :: Plug.Conn.t()
   def log_in_user(conn, user, params \\ %{}) do
     user_return_to = get_session(conn, :user_return_to)
+    Store.append(%UserLoggedIn{id: user.id}, stream: "user")
 
     conn
     |> create_or_extend_session(user, params)

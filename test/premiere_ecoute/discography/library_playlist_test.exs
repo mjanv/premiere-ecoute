@@ -2,6 +2,9 @@ defmodule PremiereEcoute.Discography.LibraryPlaylistTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Discography.LibraryPlaylist
+  alias PremiereEcoute.Events.LibraryPlaylistAdded
+  alias PremiereEcoute.Events.LibraryPlaylistDeleted
+  alias PremiereEcoute.Events.Store
 
   describe "create/2" do
     test "creates a library playlist with valid attributes" do
@@ -110,6 +113,70 @@ defmodule PremiereEcoute.Discography.LibraryPlaylistTest do
       {:error, changeset} = LibraryPlaylist.create(user, attrs)
 
       assert errors_on(changeset) == %{user_id: ["has already been taken"]}
+    end
+
+    test "appends LibraryPlaylistAdded event" do
+      user = user_fixture()
+
+      {:ok, _} =
+        LibraryPlaylist.create(user, %{
+          provider: :spotify,
+          playlist_id: "event_pl_#{System.unique_integer([:positive])}",
+          title: "Event Playlist",
+          url: "https://open.spotify.com/playlist/event"
+        })
+
+      user_id = user.id
+      assert %LibraryPlaylistAdded{id: ^user_id, provider: "spotify"} = Store.last("user-#{user_id}")
+    end
+  end
+
+  describe "delete/2" do
+    test "deletes a playlist owned by the user" do
+      user = user_fixture()
+
+      {:ok, playlist} =
+        LibraryPlaylist.create(user, %{
+          provider: :deezer,
+          playlist_id: "del_#{System.unique_integer([:positive])}",
+          title: "To Delete",
+          url: "https://deezer.com/playlist/del"
+        })
+
+      assert {:ok, _} = LibraryPlaylist.delete(user, playlist)
+      refute LibraryPlaylist.exists?(user, playlist)
+    end
+
+    test "returns :not_found when playlist belongs to another user" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      {:ok, playlist} =
+        LibraryPlaylist.create(user1, %{
+          provider: :spotify,
+          playlist_id: "other_#{System.unique_integer([:positive])}",
+          title: "Other User Playlist",
+          url: "https://open.spotify.com/playlist/other"
+        })
+
+      assert {:error, :not_found} = LibraryPlaylist.delete(user2, playlist)
+    end
+
+    test "appends LibraryPlaylistDeleted event" do
+      user = user_fixture()
+
+      {:ok, playlist} =
+        LibraryPlaylist.create(user, %{
+          provider: :spotify,
+          playlist_id: "del_ev_#{System.unique_integer([:positive])}",
+          title: "To Delete",
+          url: "https://open.spotify.com/playlist/del_ev"
+        })
+
+      {:ok, _} = LibraryPlaylist.delete(user, playlist)
+
+      user_id = user.id
+      assert %LibraryPlaylistDeleted{id: ^user_id, provider: "spotify"} = Store.last("user-#{user_id}")
     end
   end
 

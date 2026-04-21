@@ -4,6 +4,8 @@ defmodule PremiereEcoute.Accounts.UserTest do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Token
+  alias PremiereEcoute.Events.AccountCreated
+  alias PremiereEcoute.Events.Store
 
   describe "count_by_role/0" do
     test "returns a map keyed by role atoms" do
@@ -112,6 +114,12 @@ defmodule PremiereEcoute.Accounts.UserTest do
       assert is_nil(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
+    end
+
+    test "appends AccountCreated event" do
+      {:ok, user} = Accounts.create_user(valid_user_attributes())
+
+      assert Store.last("user-#{user.id}") == %AccountCreated{id: user.id}
     end
 
     test "registers users with a default role" do

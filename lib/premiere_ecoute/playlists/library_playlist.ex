@@ -9,6 +9,9 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     identity: [:provider, :playlist_id]
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Events.LibraryPlaylistAdded
+  alias PremiereEcoute.Events.LibraryPlaylistDeleted
+  alias PremiereEcoute.Events.Store
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -66,11 +69,21 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
   Inserts playlist record with user association and validates constraints.
   """
   @spec create(User.t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def create(%User{id: id}, attrs) do
+  def create(%User{id: id} = user, attrs) do
     %__MODULE__{}
     |> changeset(Map.put(attrs, :user_id, id))
     |> Repo.insert()
+    |> Store.ok("user", fn playlist -> %LibraryPlaylistAdded{id: user.id, provider: to_string(playlist.provider)} end)
   end
+
+  @spec delete(User.t(), t()) :: {:ok, t()} | {:error, :not_found}
+  def delete(%User{id: user_id}, %__MODULE__{user_id: user_id} = playlist) do
+    playlist
+    |> Repo.delete()
+    |> Store.ok("user", fn p -> %LibraryPlaylistDeleted{id: user_id, provider: to_string(p.provider)} end)
+  end
+
+  def delete(_user, _playlist), do: {:error, :not_found}
 
   @doc """
   Checks if playlist exists in user's library.

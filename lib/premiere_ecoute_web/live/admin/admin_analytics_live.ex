@@ -10,12 +10,14 @@ defmodule PremiereEcouteWeb.Admin.AdminAnalyticsLive do
 
   alias PremiereEcoute.Analytics
   alias PremiereEcoute.Collections.CollectionSession.Events, as: CollectionEvents
-  alias PremiereEcoute.Discography.Album
-  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Events.AccountAssociated
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.AddedToWantlist
+  alias PremiereEcoute.Events.AlbumAdded
+  alias PremiereEcoute.Events.ArtistAdded
+  alias PremiereEcoute.Events.RemovedFromWantlist
+  alias PremiereEcoute.Events.UserLoggedIn
   alias PremiereEcoute.Sessions.ListeningSession.Events, as: SessionEvents
 
   @impl true
@@ -62,13 +64,16 @@ defmodule PremiereEcouteWeb.Admin.AdminAnalyticsLive do
     created = Analytics.aggregate_events(AccountCreated, unit, gap_opts)
     deleted = Analytics.aggregate_events(AccountDeleted, unit, gap_opts)
     associated = Analytics.aggregate_events(AccountAssociated, unit, Keyword.merge(opts, fields: [:provider]))
+    logins = Analytics.aggregate_events(UserLoggedIn, unit, gap_opts)
 
     %{
       created: created,
       deleted: deleted,
       associated: associated,
+      logins: logins,
       total_created: Enum.sum(Enum.map(created, & &1.count)),
-      total_deleted: Enum.sum(Enum.map(deleted, & &1.count))
+      total_deleted: Enum.sum(Enum.map(deleted, & &1.count)),
+      total_logins: Enum.sum(Enum.map(logins, & &1.count))
     }
   end
 
@@ -89,8 +94,8 @@ defmodule PremiereEcouteWeb.Admin.AdminAnalyticsLive do
   end
 
   defp load_discography(gap_opts, unit) do
-    albums = Analytics.aggregate_schema(Album, unit, gap_opts)
-    artists = Analytics.aggregate_schema(Artist, unit, gap_opts)
+    albums = Analytics.aggregate_events(AlbumAdded, unit, gap_opts)
+    artists = Analytics.aggregate_events(ArtistAdded, unit, gap_opts)
 
     %{
       albums: albums,
@@ -102,10 +107,13 @@ defmodule PremiereEcouteWeb.Admin.AdminAnalyticsLive do
 
   defp load_wantlists(opts, gap_opts, unit) do
     added = Analytics.aggregate_events(AddedToWantlist, unit, Keyword.merge(opts, fields: [:type]))
+    removed = Analytics.aggregate_events(RemovedFromWantlist, unit, gap_opts)
 
     %{
       added: added,
-      total_added: Enum.sum(Enum.map(Analytics.aggregate_events(AddedToWantlist, unit, gap_opts), & &1.count))
+      removed: removed,
+      total_added: Enum.sum(Enum.map(Analytics.aggregate_events(AddedToWantlist, unit, gap_opts), & &1.count)),
+      total_removed: Enum.sum(Enum.map(removed, & &1.count))
     }
   end
 

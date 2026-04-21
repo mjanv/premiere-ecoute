@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Wantlists.WantlistItemTest do
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Events.AddedToWantlist
+  alias PremiereEcoute.Events.RemovedFromWantlist
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Wantlists
   alias PremiereEcoute.Wantlists.Wantlist
@@ -73,6 +74,13 @@ defmodule PremiereEcoute.Wantlists.WantlistItemTest do
       assert {:error, :not_found} = Wantlists.remove_item(user.id, 999_999)
     end
 
+    test "appends RemovedFromWantlist event", %{user: user, album: album} do
+      {:ok, item} = Wantlists.add_item(user.id, :album, album.id)
+      {:ok, _} = Wantlists.remove_item(user.id, item.id)
+
+      assert Store.last("wantlist-#{user.id}") == %RemovedFromWantlist{id: user.id, type: "album", record_id: album.id}
+    end
+
     test "returns not_found when item belongs to another user", %{user: user, album: album} do
       other_user = user_fixture(%{role: :viewer})
       {:ok, item} = Wantlists.add_item(user.id, :album, album.id)
@@ -101,6 +109,13 @@ defmodule PremiereEcoute.Wantlists.WantlistItemTest do
 
     test "returns not_found when record is not in wantlist", %{user: user, album: album} do
       assert {:error, :not_found} = Wantlists.remove_item(user.id, :album, album.id)
+    end
+
+    test "appends RemovedFromWantlist event", %{user: user, artist: artist} do
+      {:ok, _} = Wantlists.add_item(user.id, :artist, artist.id)
+      {:ok, _} = Wantlists.remove_item(user.id, :artist, artist.id)
+
+      assert Store.last("wantlist-#{user.id}") == %RemovedFromWantlist{id: user.id, type: "artist", record_id: artist.id}
     end
 
     test "returns not_found when record belongs to another user", %{user: user, album: album} do

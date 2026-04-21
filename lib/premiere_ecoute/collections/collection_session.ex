@@ -19,6 +19,9 @@ defmodule PremiereEcoute.Collections.CollectionSession do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Discography.LibraryPlaylist
+  alias PremiereEcoute.Events.CollectionCreated
+  alias PremiereEcoute.Events.CollectionDeleted
+  alias PremiereEcoute.Events.Store
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -73,6 +76,14 @@ defmodule PremiereEcoute.Collections.CollectionSession do
     |> foreign_key_constraint(:destination_playlist_id)
   end
 
+  @doc "Creates a collection session and publishes CollectionCreated event."
+  @spec create(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def create(attrs) do
+    attrs
+    |> super()
+    |> Store.ok("collection", fn session -> %CollectionCreated{id: session.id} end)
+  end
+
   @doc "Transitions session from pending to active."
   @spec start(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def start(%__MODULE__{} = session) do
@@ -87,6 +98,14 @@ defmodule PremiereEcoute.Collections.CollectionSession do
     session
     |> changeset(%{status: :completed})
     |> Repo.update()
+  end
+
+  @doc "Deletes a collection session and publishes CollectionDeleted event."
+  @spec delete(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def delete(%__MODULE__{} = session) do
+    session
+    |> Repo.delete()
+    |> Store.ok("collection", fn s -> %CollectionDeleted{id: s.id} end)
   end
 
   @doc "Returns all sessions for a user, ordered by most recent."

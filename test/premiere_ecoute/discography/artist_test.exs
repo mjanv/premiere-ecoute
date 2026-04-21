@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Discography.ArtistTest do
 
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Artist.Image
+  alias PremiereEcoute.Events.ArtistAdded
+  alias PremiereEcoute.Events.Store
 
   defp artist_fixture(attrs \\ %{}) do
     struct(
@@ -37,6 +39,12 @@ defmodule PremiereEcoute.Discography.ArtistTest do
       {:error, changeset} = Artist.create(artist_fixture())
 
       assert Repo.traverse_errors(changeset) != %{}
+    end
+
+    test "appends ArtistAdded event" do
+      {:ok, artist} = Artist.create(artist_fixture())
+
+      assert Store.last("artist-#{artist.id}") == %ArtistAdded{id: artist.id, name: artist.name}
     end
   end
 

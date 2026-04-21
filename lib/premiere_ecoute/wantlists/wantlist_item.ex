@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Events.AddedToWantlist
+  alias PremiereEcoute.Events.RemovedFromWantlist
   alias PremiereEcoute.Wantlists.Wantlist
   alias PremiereEcoute.Wantlists.WantlistItem
 
@@ -90,8 +91,15 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
     |> where([i], i.id == ^item_id)
     |> Repo.one()
     |> case do
-      nil -> {:error, :not_found}
-      item -> Repo.delete(item) |> then(fn {:ok, i} -> {:ok, i} end)
+      nil ->
+        {:error, :not_found}
+
+      item ->
+        item
+        |> Repo.delete()
+        |> Store.ok("wantlist", fn i ->
+          %RemovedFromWantlist{id: user_id, type: Atom.to_string(i.type), record_id: i.album_id || i.single_id || i.artist_id}
+        end)
     end
   end
 
@@ -104,8 +112,15 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
     |> where([i], field(i, ^fk_field) == ^record_id)
     |> Repo.one()
     |> case do
-      nil -> {:error, :not_found}
-      item -> Repo.delete(item) |> then(fn {:ok, i} -> {:ok, i} end)
+      nil ->
+        {:error, :not_found}
+
+      item ->
+        item
+        |> Repo.delete()
+        |> Store.ok("wantlist", fn _ ->
+          %RemovedFromWantlist{id: user_id, type: Atom.to_string(type), record_id: record_id}
+        end)
     end
   end
 

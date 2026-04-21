@@ -201,7 +201,7 @@ defmodule PremiereEcoute.Analytics.Events do
     end
   end
 
-  defp event_type_string(module) when is_atom(module), do: "Elixir.#{module}"
+  defp event_type_string(module) when is_atom(module), do: Atom.to_string(module)
   defp event_type_string(string) when is_binary(string), do: string
 
   defp validate_unit!(unit) when unit in [:year, :month, :week, :day, :hour], do: :ok

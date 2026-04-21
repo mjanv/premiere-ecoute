@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Playlists do
   alias PremiereEcoute.Playlists.Services.PlaylistExport
 
   defdelegate create_library_playlist(scope, playlist), to: PlaylistCreation
+  defdelegate delete_library_playlist(user, playlist), to: LibraryPlaylist, as: :delete
   defdelegate export_tracks_to_playlist(scope, playlist_id, tracks), to: PlaylistExport
   defdelegate all_for_user(user), to: LibraryPlaylist
 end

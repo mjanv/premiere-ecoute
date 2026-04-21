@@ -2,6 +2,8 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
   use PremiereEcouteWeb.ConnCase, async: true
 
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Events.Store
+  alias PremiereEcoute.Events.UserLoggedIn
 
   setup do
     %{unconfirmed_user: unconfirmed_user_fixture(), user: user_fixture()}
@@ -24,6 +26,16 @@ defmodule PremiereEcouteWeb.Accounts.UserSessionControllerTest do
       response = html_response(conn, 200)
       assert response =~ ~p"/users/account"
       assert response =~ ~p"/users/log-out"
+    end
+
+    test "appends UserLoggedIn event on login", %{conn: conn, user: user} do
+      user = set_password(user)
+
+      post(conn, ~p"/users/log-in", %{
+        "user" => %{"email" => user.email, "password" => valid_user_password()}
+      })
+
+      assert Store.last("user-#{user.id}") == %UserLoggedIn{id: user.id}
     end
 
     test "logs the user in with remember me", %{conn: conn, user: user} do

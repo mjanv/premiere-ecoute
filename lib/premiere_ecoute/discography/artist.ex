@@ -17,6 +17,8 @@ defmodule PremiereEcoute.Discography.Artist do
   end
 
   alias PremiereEcoute.Discography.Artist.Slug
+  alias PremiereEcoute.Events.ArtistAdded
+  alias PremiereEcoute.Events.Store
 
   defmodule Image do
     @moduledoc false
@@ -78,10 +80,14 @@ defmodule PremiereEcoute.Discography.Artist do
     |> Map.from_struct()
     |> Map.update(:images, [], fn images -> Enum.map(images, &Map.from_struct/1) end)
     |> then(fn attrs -> %__MODULE__{} |> changeset(attrs) |> Repo.insert() end)
+    |> Store.ok("artist", fn artist -> %ArtistAdded{id: artist.id, name: artist.name} end)
   end
 
   def create(attrs) when is_map(attrs) do
-    %__MODULE__{} |> changeset(attrs) |> Repo.insert()
+    %__MODULE__{}
+    |> changeset(attrs)
+    |> Repo.insert()
+    |> Store.ok("artist", fn artist -> %ArtistAdded{id: artist.id, name: artist.name} end)
   end
 
   @doc "Returns the image URL closest to the given size, or nil if no images."

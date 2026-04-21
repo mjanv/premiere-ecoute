@@ -21,6 +21,8 @@ defmodule PremiereEcoute.Discography.Album do
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.AlbumArtist
   alias PremiereEcoute.Discography.Artist
+  alias PremiereEcoute.Events.AlbumAdded
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Repo
 
   @type t :: %__MODULE__{
@@ -123,6 +125,10 @@ defmodule PremiereEcoute.Discography.Album do
       |> Repo.insert()
     end)
     |> preload()
+    |> Store.ok("album", fn album ->
+      artist = album.artists |> List.first() |> then(&(&1 && &1.name))
+      %AlbumAdded{id: album.id, name: album.name, artist: artist}
+    end)
   end
 
   @spec create_if_not_exists(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}

@@ -15,6 +15,7 @@ defmodule PremiereEcoute.Collections do
 
   defdelegate get_session(id), to: CollectionSession, as: :get
   defdelegate all_sessions_for_user(user), to: CollectionSession, as: :all_for_user
+  defdelegate delete_session(session), to: CollectionSession, as: :delete
 
   # Tracklist
 

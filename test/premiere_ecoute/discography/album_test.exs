@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Discography.AlbumTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Artist
+  alias PremiereEcoute.Events.AlbumAdded
+  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
 
@@ -42,6 +44,13 @@ defmodule PremiereEcoute.Discography.AlbumTest do
       {:error, changeset} = Album.create(album_fixture())
 
       assert Repo.traverse_errors(changeset) != %{}
+    end
+
+    test "appends AlbumAdded event" do
+      {:ok, album} = Discography.create_album(album_fixture())
+
+      artist_name = album.artists |> List.first() |> then(&(&1 && &1.name))
+      assert Store.last("album-#{album.id}") == %AlbumAdded{id: album.id, name: album.name, artist: artist_name}
     end
   end
 
