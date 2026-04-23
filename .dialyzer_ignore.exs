@@ -4,6 +4,7 @@
   {"lib/premiere_ecoute/discography/single.ex", :call_without_opaque},
   {"lib/premiere_ecoute/discography/single.ex", :pattern_match},
   {"lib/premiere_ecoute/notifications/notification.ex", :call_without_opaque},
+  {"lib/premiere_ecoute/discography/album.ex", :pattern_match},
   {"lib/premiere_ecoute/sessions/listening_session.ex", :pattern_match},
   {"lib/premiere_ecoute/sessions/listening_session/review.ex", :call_without_opaque},
   {"lib/premiere_ecoute/twitch/history/site_history/minute_watched.ex", :no_return},

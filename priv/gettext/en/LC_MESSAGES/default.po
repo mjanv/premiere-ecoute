@@ -26,6 +26,7 @@ msgstr "Are you sure you want to delete this listening session? This action cann
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:565
 #: lib/premiere_ecoute_web/live/collections/collection_session_live.html.heex:592
 #: lib/premiere_ecoute_web/live/collections/collection_session_new_live.html.heex:157
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:35
 #: lib/premiere_ecoute_web/live/discography/album_live.html.heex:628
 #: lib/premiere_ecoute_web/live/festivals/poster_live.html.heex:84
 #: lib/premiere_ecoute_web/live/playlists/automations/form_live.html.heex:150
@@ -43,6 +44,7 @@ msgstr "Cancel"
 #: lib/premiere_ecoute_web/live/admin/donations/donations_live.html.heex:219
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:210
 #: lib/premiere_ecoute_web/live/billboards/show_live.html.heex:78
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:41
 #: lib/premiere_ecoute_web/live/discography/album_live.html.heex:359
 #: lib/premiere_ecoute_web/live/playlists/automations/show_live.html.heex:70
 #: lib/premiere_ecoute_web/live/sessions/session_live.html.heex:519
@@ -4348,7 +4350,7 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/components/navigation/sidebar.ex:60
 #: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:58
-#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:11
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:50
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Collections"
 msgstr "Collections"
@@ -4358,12 +4360,12 @@ msgstr "Collections"
 msgid "Confirm & complete"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:55
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:94
 #, elixir-autogen, elixir-format
 msgid "Create your first collection"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:12
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:51
 #, elixir-autogen, elixir-format
 msgid "Curate your Spotify playlists live with your community"
 msgstr ""
@@ -4482,7 +4484,7 @@ msgid "My last sessions"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/collections/collection_session_new_live.html.heex:11
-#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:27
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:66
 #, elixir-autogen, elixir-format
 msgid "New collection"
 msgstr ""
@@ -4499,7 +4501,7 @@ msgstr "No album selected"
 msgid "No artists yet."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:47
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:86
 #, elixir-autogen, elixir-format
 msgid "No collections yet"
 msgstr ""
@@ -4622,7 +4624,7 @@ msgstr ""
 msgid "Skip"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:49
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:88
 #, elixir-autogen, elixir-format
 msgid "Start a collection to curate a playlist with your community."
 msgstr ""
@@ -5730,3 +5732,28 @@ msgstr "Skip voting for tracks shorter than the specified duration"
 #, elixir-autogen, elixir-format
 msgid "seconds"
 msgstr "seconds"
+
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:28
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Are you sure you want to delete this collection? This action cannot be undone."
+msgstr "Are you sure you want to delete this session? This action cannot be undone."
+
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.ex:59
+#, elixir-autogen, elixir-format
+msgid "Collection deleted successfully"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:25
+#, elixir-autogen, elixir-format
+msgid "Delete Collection"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.html.heex:127
+#, elixir-autogen, elixir-format
+msgid "Delete collection"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/collections/collection_sessions_live.ex:62
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Failed to delete collection"
+msgstr "Failed to delete goal"
