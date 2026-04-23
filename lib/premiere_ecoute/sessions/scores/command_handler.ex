@@ -14,11 +14,9 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Commands.Chat.SendChatCommand
   alias PremiereEcoute.Gettext
-  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcoute.Wantlists
-  alias PremiereEcouteCore.Cache
 
   command(PremiereEcoute.Commands.Chat.SendChatCommand)
 
@@ -52,8 +50,8 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   def handle(%SendChatCommand{command: "save", broadcaster_id: broadcaster_id, user_id: viewer_twitch_id, message_id: message_id}) do
     with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
          true <- Accounts.profile(broadcaster, [:chat_settings, :save_wantlist], false),
-         {:ok, %{"item" => %{"id" => spotify_id, "name" => track_name}} = _state} when not is_nil(spotify_id) <-
-           Cache.get(:playback, broadcaster.id) do
+         {:ok, %{"item" => %{"id" => spotify_id, "name" => track_name}}} when not is_nil(spotify_id) <-
+           Apis.cache(:spotify).get_playback_state(Scope.for_user(broadcaster), %{}) do
       case Accounts.get_user_by_twitch_id(viewer_twitch_id) do
         nil ->
           message =
