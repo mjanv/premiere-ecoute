@@ -16,12 +16,56 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionsLive do
 
     socket
     |> assign(:sessions, sessions)
+    |> assign(:show_delete_modal, false)
+    |> assign(:session_to_delete, nil)
     |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("navigate", %{"session_id" => session_id}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/collections/#{session_id}")}
+  end
+
+  @impl true
+  def handle_event("delete_session", %{"session_id" => session_id}, socket) do
+    socket
+    |> assign(:show_delete_modal, true)
+    |> assign(:session_to_delete, String.to_integer(session_id))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("cancel_delete", _params, socket) do
+    socket
+    |> assign(:show_delete_modal, false)
+    |> assign(:session_to_delete, nil)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("confirm_delete", _params, %{assigns: %{session_to_delete: session_id}} = socket) do
+    session = Collections.get_session(session_id)
+
+    socket =
+      case Collections.delete_session(session) do
+        {:ok, deleted} ->
+          socket
+          |> assign(:sessions, Enum.reject(socket.assigns.sessions, &(&1.id == deleted.id)))
+          |> put_flash(:info, gettext("Collection deleted successfully"))
+
+        {:error, _} ->
+          put_flash(socket, :error, gettext("Failed to delete collection"))
+      end
+
+    socket
+    |> assign(:show_delete_modal, false)
+    |> assign(:session_to_delete, nil)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @spec mode_label(atom()) :: String.t()
