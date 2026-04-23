@@ -82,6 +82,18 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     end
   end
 
+  defp get_vote_message(session_id, viewer_id, vote_options) do
+    from(v in __MODULE__,
+      where: v.session_id == ^session_id and v.viewer_id == ^viewer_id,
+      select: avg(fragment("CAST(? AS FLOAT)", v.value))
+    )
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      avg -> "#{Float.round(avg, 1)}/#{List.last(vote_options)}"
+    end
+  end
+
   @doc """
   Fetches all votes cast by a viewer for a list of track ids.
 

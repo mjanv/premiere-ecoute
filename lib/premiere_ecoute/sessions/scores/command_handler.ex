@@ -9,8 +9,6 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
 
   require Logger
 
-  import Ecto.Query
-
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
@@ -43,8 +41,8 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   def handle(%SendChatCommand{command: "vote", broadcaster_id: broadcaster_id, user_id: viewer_id, message_id: message_id}) do
     with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
          true <- Accounts.profile(broadcaster, [:chat_settings, :vote_enabled], true),
-         session when not is_nil(session) <- get_active_session(broadcaster.id),
-         message when not is_nil(message) <- get_vote_message(session.id, viewer_id, session.vote_options) do
+         session when not is_nil(session) <- ListeningSession.get_active_session(broadcaster.id),
+         message when not is_nil(message) <- Vote.get_vote_message(session.id, viewer_id, session.vote_options) do
       send_chat_reply(broadcaster_id, message_id, message)
     else
       _ -> {:ok, []}
@@ -99,27 +97,6 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
       {:error, reason} ->
         Logger.error("Cannot send chat reply due to: #{inspect(reason)}")
         {:error, []}
-    end
-  end
-
-  defp get_active_session(user_id) do
-    from(s in ListeningSession,
-      where: s.user_id == ^user_id and s.status == :active,
-      order_by: [desc: s.updated_at],
-      limit: 1
-    )
-    |> Repo.one()
-  end
-
-  defp get_vote_message(session_id, viewer_id, vote_options) do
-    from(v in Vote,
-      where: v.session_id == ^session_id and v.viewer_id == ^viewer_id,
-      select: avg(fragment("CAST(? AS FLOAT)", v.value))
-    )
-    |> Repo.one()
-    |> case do
-      nil -> nil
-      avg -> "#{Float.round(avg, 1)}/#{List.last(vote_options)}"
     end
   end
 end
