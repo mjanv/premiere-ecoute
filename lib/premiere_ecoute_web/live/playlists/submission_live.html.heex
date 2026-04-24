@@ -1,0 +1,222 @@
+<div class="min-h-screen text-white font-mono relative overflow-hidden synthwave-bg">
+  <div class="text-white flex flex-col min-h-screen relative z-10">
+    <div class="max-w-2xl mx-auto w-full px-6 py-10">
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white">{gettext("Submit a track")}</h1>
+            <p class="text-sm text-gray-400">
+              {@library_playlist.title}
+              <span class="text-gray-500">· {@streamer.username}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <%= if not LibraryPlaylist.submissions_open?(@library_playlist) do %>
+        <!-- Submissions closed -->
+        <div class="bg-slate-800/40 rounded-xl border border-gray-700/50 p-8 text-center">
+          <div class="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-lg font-semibold text-white mb-2">{gettext("Submissions are currently closed")}</h2>
+          <p class="text-gray-400 text-sm">{gettext("%{name} will open submissions when ready.", name: @streamer.username)}</p>
+        </div>
+      <% else %>
+        <!-- Search -->
+        <div class="bg-slate-800/40 rounded-xl border border-gray-700/50 p-6 mb-6">
+          <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-4">{gettext("Search for a track")}</h2>
+
+          <div class="relative" phx-hook="ClickOutside" id="track-search-container" data-event="clear_search_results">
+            <.form for={@search_form} id="track-search-form" phx-change="search" phx-submit="search">
+              <.input
+                field={@search_form[:query]}
+                type="text"
+                placeholder={gettext("Track name, artist...")}
+                autocomplete="off"
+                class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+                error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+              />
+            </.form>
+
+            <%= if @search_results.loading do %>
+              <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4">
+                <div class="flex items-center justify-center space-x-3">
+                  <div class="animate-spin rounded-full h-5 w-5 border-2 border-green-400 border-t-transparent"></div>
+                  <span class="text-gray-300 text-sm">{gettext("Searching tracks...")}</span>
+                </div>
+              </div>
+            <% end %>
+
+            <%= if @search_results.ok? && is_list(@search_results.result) && @search_results.result != [] do %>
+              <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
+                <%= for track <- @search_results.result do %>
+                  <div
+                    class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center space-x-3"
+                    style="background-color: var(--color-dark-800);"
+                    phx-click="select_track"
+                    phx-value-track_id={Map.get(track.provider_ids, :spotify)}
+                  >
+                    <%= if track.cover_url do %>
+                      <img src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
+                    <% end %>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-white font-medium truncate">{track.name}</p>
+                      <p class="text-gray-400 text-sm truncate">
+                        {Enum.map_join(track.artists || [], ", ", & &1.name)}
+                      </p>
+                    </div>
+                    <span class="text-gray-400 text-xs flex-shrink-0">
+                      {PremiereEcouteCore.Duration.timer(track.duration_ms)}
+                    </span>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Selected track + submit -->
+        <%= if @selected_track do %>
+          <div class="rounded-xl overflow-hidden mb-6 relative" style="background-color: var(--color-dark-900);">
+            <%= if @selected_track.cover_url do %>
+              <div
+                class="absolute inset-0"
+                style={"background-image: url('#{@selected_track.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
+              >
+              </div>
+            <% else %>
+              <div
+                class="absolute inset-0"
+                style="background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);"
+              >
+              </div>
+            <% end %>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black/90"></div>
+            <div class="relative z-10 p-6 flex items-center justify-between gap-4">
+              <div class="flex items-center space-x-4">
+                <%= if @selected_track.cover_url do %>
+                  <img
+                    src={@selected_track.cover_url}
+                    alt={@selected_track.name}
+                    class="w-16 h-16 rounded-lg shadow-xl border border-white/10 flex-shrink-0"
+                  />
+                <% end %>
+                <div>
+                  <p class="text-xs text-green-400 font-medium uppercase tracking-wide mb-0.5">{gettext("Selected")}</p>
+                  <p class="text-white font-bold text-lg leading-tight">{@selected_track.name}</p>
+                  <p class="text-white/70 text-sm">
+                    {Enum.map_join(@selected_track.artists || [], ", ", & &1.name)} · {PremiereEcouteCore.Duration.timer(
+                      @selected_track.duration_ms
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button
+                  phx-click="clear_selected_track"
+                  class="p-2 text-gray-400 hover:text-white transition-colors"
+                  title={gettext("Deselect")}
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <button
+                  phx-click="submit_track"
+                  disabled={@submitting}
+                  class={[
+                    "px-5 py-2.5 rounded-lg font-semibold text-sm transition-all",
+                    if @submitting do
+                      "bg-gray-600 text-gray-400 cursor-not-allowed"
+                    else
+                      "bg-green-600 hover:bg-green-700 text-white"
+                    end
+                  ]}
+                >
+                  <%= if @submitting do %>
+                    <span class="flex items-center gap-2">
+                      <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        >
+                        </path>
+                      </svg>
+                      {gettext("Adding...")}
+                    </span>
+                  <% else %>
+                    {gettext("Add to playlist")}
+                  <% end %>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+<!-- Feedback messages -->
+        <%= if @success do %>
+          <div class="flex items-center gap-3 px-4 py-3 bg-green-600/20 border border-green-600/40 rounded-lg mb-6 text-sm text-green-300">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            {@success}
+          </div>
+        <% end %>
+
+        <%= if @error do %>
+          <div class="flex items-center gap-3 px-4 py-3 bg-red-600/20 border border-red-600/40 rounded-lg mb-6 text-sm text-red-300">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z"
+              />
+            </svg>
+            {@error}
+          </div>
+        <% end %>
+      <% end %>
+      
+<!-- Current playlist tracks (optional) -->
+      <%= if @tracks do %>
+        <div class="bg-slate-800/30 rounded-xl border border-gray-700/50 p-6 mt-6">
+          <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-4">
+            {gettext("Current playlist")}
+            <span class="text-gray-500 normal-case font-normal">
+              ({length(@tracks)} {ngettext("track", "tracks", length(@tracks))})
+            </span>
+          </h2>
+          <div class="divide-y divide-gray-700/30 max-h-96 overflow-y-auto">
+            <%= for {track, index} <- Enum.with_index(@tracks, 1) do %>
+              <div class="flex items-center gap-3 py-2.5">
+                <span class="text-xs text-gray-500 w-5 text-right flex-shrink-0">{index}</span>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-white truncate">{track.name}</p>
+                  <p class="text-xs text-gray-400 truncate">{track.artist}</p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

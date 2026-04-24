@@ -4,6 +4,8 @@ defmodule PremiereEcouteWeb.Radio.ViewerLiveTest do
   import Phoenix.LiveViewTest
   import PremiereEcoute.Discography.SingleFixtures
 
+  alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Radio.RadioTrack
 
@@ -12,11 +14,11 @@ defmodule PremiereEcouteWeb.Radio.ViewerLiveTest do
       streamer = user_fixture(%{role: :streamer})
 
       {:ok, _} =
-        PremiereEcoute.Accounts.User.edit_user_profile(streamer, %{
+        User.edit_user_profile(streamer, %{
           "radio_settings" => %{"visibility" => "public", "enabled" => true, "retention_days" => 7}
         })
 
-      streamer = PremiereEcoute.Accounts.get_user_by_username(streamer.username)
+      streamer = Accounts.get_user_by_username(streamer.username)
 
       viewer = user_fixture(%{role: :viewer})
 

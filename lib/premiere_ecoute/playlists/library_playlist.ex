@@ -48,6 +48,15 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     timestamps()
   end
 
+  @spec submission_page_enabled?(t()) :: boolean()
+  def submission_page_enabled?(%__MODULE__{metadata: meta}), do: meta["submission_page_enabled"] == true
+
+  @spec submissions_open?(t()) :: boolean()
+  def submissions_open?(%__MODULE__{metadata: meta}), do: meta["submissions_open"] == true
+
+  @spec show_tracks_to_viewers?(t()) :: boolean()
+  def show_tracks_to_viewers?(%__MODULE__{metadata: meta}), do: meta["show_tracks_to_viewers"] == true
+
   @doc """
   Creates changeset for library playlist validation.
 
@@ -84,6 +93,18 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
   end
 
   def delete(_user, _playlist), do: {:error, :not_found}
+
+  @doc """
+  Updates submission-related options in the playlist metadata.
+
+  Merges the given option map into the existing metadata, preserving all other keys.
+  """
+  @spec update_submission_options(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def update_submission_options(%__MODULE__{metadata: metadata} = playlist, options) do
+    playlist
+    |> changeset(%{metadata: Map.merge(metadata || %{}, options)})
+    |> Repo.update()
+  end
 
   @doc """
   Checks if playlist exists in user's library.

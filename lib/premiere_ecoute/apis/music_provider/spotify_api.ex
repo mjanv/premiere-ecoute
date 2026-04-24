@@ -200,6 +200,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
   defdelegate search_artist(query), to: __MODULE__.Search
   defdelegate search_tracks(query), to: __MODULE__.Search
   defdelegate search_singles(query), to: __MODULE__.Search
+  defdelegate search_any_track(query), to: __MODULE__.Search
 
   # Users
   defdelegate get_user_profile(access_token), to: __MODULE__.Users

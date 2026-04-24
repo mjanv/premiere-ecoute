@@ -157,6 +157,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/automations/new", Automations.FormLive, :new
       live "/automations/:id", Automations.ShowLive, :show
       live "/automations/:id/edit", Automations.FormLive, :edit
+      live "/:id/submit", SubmissionLive, :new
       live "/:id", PlaylistLive, :show
     end
   end

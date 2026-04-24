@@ -15,6 +15,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   def mount(%{"id" => playlist_id}, _session, socket) do
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
     library_playlist = LibraryPlaylist.get_by(user_id: current_user.id, playlist_id: playlist_id)
+    library_playlist = if library_playlist, do: ensure_metadata(library_playlist), else: nil
 
     socket =
       socket
@@ -35,8 +36,14 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
     if library_playlist do
       user = socket.assigns.current_scope.user
       automations = Automations.list_for_playlist(user, playlist_id)
+      submission_url = url(~p"/playlists/#{playlist_id}/submit")
       send(self(), :fetch_playlist_data)
-      {:ok, socket |> assign(:automations, automations) |> assign(:show_automations_modal, false)}
+
+      {:ok,
+       socket
+       |> assign(:automations, automations)
+       |> assign(:show_automations_modal, false)
+       |> assign(:submission_url, submission_url)}
     else
       {:ok, assign(socket, :error, gettext("Playlist not found in your library"))}
     end
@@ -168,6 +175,21 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
     |> assign(:selected_tracks, MapSet.new())
     |> assign(:select_all, false)
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("toggle_submission_page", _params, socket) do
+    toggle_option(socket, "submission_page_enabled")
+  end
+
+  @impl true
+  def handle_event("toggle_submissions_open", _params, socket) do
+    toggle_option(socket, "submissions_open")
+  end
+
+  @impl true
+  def handle_event("toggle_show_tracks", _params, socket) do
+    toggle_option(socket, "show_tracks_to_viewers")
   end
 
   @impl true
@@ -328,4 +350,20 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   end
 
   defp delete_tracks_from_playlist(_, _, _), do: {:error, :unsupported_provider}
+
+  defp toggle_option(socket, key) do
+    playlist = socket.assigns.library_playlist
+    current = (playlist.metadata || %{})[key] == true
+
+    case LibraryPlaylist.update_submission_options(playlist, %{key => !current}) do
+      {:ok, updated} ->
+        {:noreply, assign(socket, :library_playlist, updated)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, gettext("Failed to update setting"))}
+    end
+  end
+
+  defp ensure_metadata(%LibraryPlaylist{metadata: nil} = p), do: %{p | metadata: %{}}
+  defp ensure_metadata(p), do: p
 end
