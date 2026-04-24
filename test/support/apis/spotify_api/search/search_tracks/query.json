@@ -1,4 +1,4 @@
-{
+{"tracks": {
   "href": "https://api.spotify.com/v1/search?offset=0&limit=20&query=daft%2Bpunk&type=track&locale=en-US,en;q%3D0.9",
   "limit": 20,
   "next": "https://api.spotify.com/v1/search?offset=20&limit=20&query=daft%2Bpunk&type=track&locale=en-US,en;q%3D0.9",
@@ -9127,4 +9127,4 @@
       "uri": "spotify:track:0U0ldCRmgCqhVvD6ksG63j"
     }
   ]
-}
+}}

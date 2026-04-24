@@ -163,7 +163,7 @@ msgstr "Mostra voti"
 
 #: lib/premiere_ecoute_web/live/admin/admin_sessions_live.html.heex:267
 #: lib/premiere_ecoute_web/live/playlists/automations/show_live.html.heex:95
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:641
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:668
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:47
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:96
 #, elixir-autogen, elixir-format
@@ -504,7 +504,7 @@ msgid "No user associated with this session"
 msgstr "Nessun utente associato a questa sessione"
 
 #: lib/premiere_ecoute_web/live/admin/admin_albums_live.html.heex:65
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:638
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:665
 #, elixir-autogen, elixir-format
 msgid "Release Date"
 msgstr "Data di Rilascio"
@@ -696,7 +696,7 @@ msgstr "Termini"
 #: lib/premiere_ecoute_web/live/admin/admin_billboards_live.html.heex:197
 #: lib/premiere_ecoute_web/live/admin/admin_reviews_live.html.heex:270
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:407
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:834
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:861
 #, elixir-autogen, elixir-format
 msgid "Close"
 msgstr "Chiudi"
@@ -765,7 +765,7 @@ msgstr "Homepage"
 msgid "Premiere Ecoute Changelog"
 msgstr "Registro delle Modifiche di Premiere Ecoute"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:705
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:732
 #, elixir-autogen, elixir-format
 msgid "Unknown Artist"
 msgstr "Artista Sconosciuto"
@@ -1097,7 +1097,7 @@ msgstr "Inglese"
 msgid "Failed to add playlist to your library"
 msgstr "Impossibile aggiungere la playlist alla tua libreria"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:210
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:224
 #, elixir-autogen, elixir-format
 msgid "Failed to remove playlist"
 msgstr "Impossibile rimuovere la playlist"
@@ -1157,7 +1157,7 @@ msgid "No playlists found"
 msgstr "Nessuna playlist trovata"
 
 #: lib/premiere_ecoute_web/live/billboards/dashboard_live.html.heex:381
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:241
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:246
 #, elixir-autogen, elixir-format
 msgid "Open"
 msgstr "Apri"
@@ -1172,7 +1172,7 @@ msgstr "Playlist aggiunta alla tua libreria!"
 msgid "Playlist is already in your library"
 msgstr "La playlist è già nella tua libreria"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:205
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:219
 #, elixir-autogen, elixir-format
 msgid "Playlist removed from your library"
 msgstr "Playlist rimossa dalla tua libreria"
@@ -1407,7 +1407,7 @@ msgid "Billboard title updated successfully"
 msgstr "Titolo della classifica aggiornato con successo"
 
 #: lib/premiere_ecoute_web/live/billboards/submission_live.html.heex:45
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:250
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:260
 #: lib/premiere_ecoute_web/live/sessions/album_pick_admin_live.html.heex:115
 #: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:99
 #: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:178
@@ -1716,7 +1716,7 @@ msgstr "Questa playlist è già stata inviata"
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:351
 #: lib/premiere_ecoute_web/live/billboards/new_live.html.heex:49
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:448
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:637
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:664
 #: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:84
 #, elixir-autogen, elixir-format
 msgid "Title"
@@ -1926,14 +1926,14 @@ msgstr "Seleziona Playlist Spotify"
 msgid "Successfully exported top %{count} tracks to your Spotify playlist!"
 msgstr "Top %{count} brani esportati con successo nella tua playlist Spotify!"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:535
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:562
 #, elixir-autogen, elixir-format
 msgid "%{count} track selected"
 msgid_plural "%{count} tracks selected"
 msgstr[0] "%{count} brano selezionato"
 msgstr[1] "%{count} brani selezionati"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:259
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:273
 #, elixir-autogen, elixir-format
 msgid "%{count} tracks removed from playlist"
 msgstr "%{count} brani rimossi dalla playlist"
@@ -1947,25 +1947,25 @@ msgid "Active"
 msgstr "Attivo"
 
 #: lib/premiere_ecoute_web/live/admin/admin_artists_live.html.heex:68
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:639
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:666
 #, elixir-autogen, elixir-format
 msgid "Added"
 msgstr "Aggiunto"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:640
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:667
 #, elixir-autogen, elixir-format
 msgid "Added By"
 msgstr "Aggiunto da"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:401
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:437
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:473
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:428
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:464
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:500
 #: lib/premiere_ecoute_web/live/sessions/retrospective/tops_live.html.heex:57
 #, elixir-autogen, elixir-format
 msgid "All"
 msgstr "Tutti"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:556
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:583
 #, elixir-autogen, elixir-format
 msgid "Are you sure you want to remove %{count} tracks from this playlist?"
 msgstr "Sei sicuro di voler rimuovere questa submission?"
@@ -1981,28 +1981,28 @@ msgstr "Sei sicuro di voler rimuovere questa submission?"
 msgid "Back to Library"
 msgstr "Aggiungi alla Libreria"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:504
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:549
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:531
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:576
 #, elixir-autogen, elixir-format
 msgid "Clear"
 msgstr "Cancella"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:776
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:803
 #, elixir-autogen, elixir-format
 msgid "Clear Filters"
 msgstr "Cancella filtri"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:499
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:526
 #, elixir-autogen, elixir-format
 msgid "Clear all filters"
 msgstr "Cancella tutti i filtri"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:269
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:283
 #, elixir-autogen, elixir-format
 msgid "Failed to delete tracks from playlist"
 msgstr "Impossibile eliminare i brani dalla playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:246
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:260
 #, elixir-autogen, elixir-format
 msgid "Failed to load playlist data"
 msgstr "Impossibile caricare i dettagli dell'album"
@@ -2027,12 +2027,12 @@ msgstr "Caricamento delle tue playlist..."
 msgid "Manage your saved playlists and discover new music"
 msgstr "Gestisci le tue playlist salvate e scopri nuova musica"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:782
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:809
 #, elixir-autogen, elixir-format
 msgid "No tracks have been added to this playlist yet"
 msgstr "Nessun brano è stato ancora aggiunto a questa playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:764
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:791
 #, elixir-autogen, elixir-format
 msgid "No tracks match your filters"
 msgstr "Nessun brano corrisponde ai tuoi filtri"
@@ -2047,7 +2047,7 @@ msgstr "Nessun brano selezionato"
 msgid "Open in %{provider}"
 msgstr "Apri in %{provider}"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:199
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:213
 #, elixir-autogen, elixir-format
 msgid "Playlist not found"
 msgstr "Riproduci"
@@ -2062,19 +2062,19 @@ msgstr "Playlist non trovata nella tua libreria"
 msgid "Refresh playlist data"
 msgstr "Aggiorna dati playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:387
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:414
 #, elixir-autogen, elixir-format
 msgid "Release date"
 msgstr "Data di Rilascio"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:589
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:616
 #, elixir-autogen, elixir-format
 msgid "Remove Track"
 msgid_plural "Remove Tracks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:579
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:606
 #, elixir-autogen, elixir-format
 msgid "Removing..."
 msgstr "Rimozione in corso..."
@@ -2089,12 +2089,12 @@ msgstr "Riprova"
 msgid "Search by artist or title..."
 msgstr "Cerca per artista o titolo..."
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:366
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:393
 #, elixir-autogen, elixir-format
 msgid "Search by title, artist, or user..."
 msgstr "Cerca per titolo, artista o utente..."
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:607
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:634
 #, elixir-autogen, elixir-format
 msgid "Select all visible tracks"
 msgstr "Seleziona tutti i brani visibili"
@@ -2110,7 +2110,7 @@ msgstr "Fermato"
 msgid "The library feature is not currently enabled for your account"
 msgstr "La funzionalità libreria non è attualmente abilitata per il tuo account"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:781
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:808
 #, elixir-autogen, elixir-format
 msgid "This playlist is empty"
 msgstr "Questa playlist è vuota"
@@ -2120,7 +2120,7 @@ msgstr "Questa playlist è vuota"
 msgid "Unable to Load Playlist"
 msgstr "Impossibile caricare la playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:702
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:729
 #, elixir-autogen, elixir-format
 msgid "Unknown Track"
 msgstr "Sconosciuto"
@@ -2131,7 +2131,7 @@ msgid "Your library is empty"
 msgstr "La tua libreria è vuota"
 
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:137
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:185
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:213
 #, elixir-autogen, elixir-format
 msgid "track"
 msgid_plural "tracks"
@@ -2180,7 +2180,7 @@ msgstr "Nessun voto trovato"
 msgid "No votes cast during this period"
 msgstr "Nessun voto espresso durante questo periodo"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:416
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:443
 #, elixir-autogen, elixir-format
 msgid "> 1 week"
 msgstr "< 1 settimana"
@@ -2379,12 +2379,12 @@ msgstr "Descrizione"
 msgid "Destination playlist"
 msgstr "Playlist di destinazione"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:423
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:450
 #, elixir-autogen, elixir-format
 msgid "Duplicates"
 msgstr "Duplicati"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:452
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:479
 #, elixir-autogen, elixir-format
 msgid "Duplicates only"
 msgstr "Solo duplicati"
@@ -2420,7 +2420,7 @@ msgstr "Aumenta numero tracce"
 msgid "Make playlist public"
 msgstr "Rendi playlist pubblica"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:488
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:515
 #, elixir-autogen, elixir-format
 msgid "Multiple (>3)"
 msgstr "Multipli (>3)"
@@ -2486,12 +2486,12 @@ msgstr "Obiettivo"
 msgid "Time period"
 msgstr "Periodo di tempo"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:766
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:793
 #, elixir-autogen, elixir-format
 msgid "Try adjusting your search query or filters to find more tracks"
 msgstr "Prova ad aggiustare la tua query di ricerca o i filtri."
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:459
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:486
 #, elixir-autogen, elixir-format
 msgid "User submissions"
 msgstr "Invii utente"
@@ -3472,7 +3472,7 @@ msgstr "Evento ricevuto: %{event}"
 msgid "Search Spotify tracks..."
 msgstr "Cerca brani su Spotify..."
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:55
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:69
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:629
 #, elixir-autogen, elixir-format
 msgid "Searching tracks..."
@@ -3676,8 +3676,8 @@ msgstr "Pick album casuale"
 msgid "Search an album"
 msgstr "Cerca un album"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:117
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:124
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:137
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:144
 #: lib/premiere_ecoute_web/live/sessions/album_pick_admin_live.ex:136
 #: lib/premiere_ecoute_web/live/sessions/album_pick_admin_live.ex:143
 #: lib/premiere_ecoute_web/live/sessions/album_pick_submission_live.ex:116
@@ -4816,7 +4816,7 @@ msgstr "Automazione salvata ed esecuzione avviata"
 
 #: lib/premiere_ecoute_web/live/playlists/automations/index_live.html.heex:12
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:31
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:798
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:825
 #, elixir-autogen, elixir-format
 msgid "Automations"
 msgstr "Automazioni"
@@ -4852,7 +4852,7 @@ msgstr "Copia playlist"
 msgid "Could not delete review"
 msgstr "Impossibile eliminare la recensione"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:803
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:830
 #, elixir-autogen, elixir-format
 msgid "Create automation"
 msgstr "Crea automazione"
@@ -5039,7 +5039,7 @@ msgstr "Prossima: %{dt}"
 msgid "No artists found"
 msgstr "Nessun artista trovato"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:807
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:834
 #, elixir-autogen, elixir-format
 msgid "No automations reference this playlist."
 msgstr "Nessuna automazione fa riferimento a questa playlist."
@@ -5764,78 +5764,79 @@ msgstr "Elimina la collezione"
 msgid "Failed to delete collection"
 msgstr "Impossibile eliminare la sessione"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:290
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:300
 #, elixir-autogen, elixir-format
 msgid "Accept submissions"
 msgstr "Accetta i contributi"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:151
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:174
 #, elixir-autogen, elixir-format
 msgid "Add to playlist"
 msgstr "Aggiungi alla playlist"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:148
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:171
 #, elixir-autogen, elixir-format
 msgid "Adding..."
 msgstr "Aggiunta in corso..."
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:183
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:211
 #, elixir-autogen, elixir-format
 msgid "Current playlist"
 msgstr "Playlist attuale"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:124
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:142
 #, elixir-autogen, elixir-format
 msgid "Deselect"
 msgstr "Deseleziona"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:326
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:336
 #, elixir-autogen, elixir-format
 msgid "Display current playlist contents on the submission page"
 msgstr "Mostra il contenuto attuale della playlist nella pagina di invio"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:151
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:158
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:174
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:181
 #, elixir-autogen, elixir-format
 msgid "Failed to add track. Please try again."
 msgstr "Impossibile aggiungere il brano. Riprova."
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:363
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:201
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.ex:377
 #, elixir-autogen, elixir-format
 msgid "Failed to update setting"
 msgstr "Impossibile aggiornare l'impostazione"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:291
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:301
 #, elixir-autogen, elixir-format
 msgid "Open or close the queue for new track submissions"
 msgstr "Apri o chiudi la coda per i nuovi contributi"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:94
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:101
 #, elixir-autogen, elixir-format
 msgid "Please select a track first."
 msgstr "Seleziona prima un brano."
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:36
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:50
 #, elixir-autogen, elixir-format
 msgid "Search for a track"
 msgstr "Cerca un brano"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:112
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:129
 #, elixir-autogen, elixir-format
 msgid "Selected"
 msgstr "Selezionato"
 
-#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:325
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:335
 #, elixir-autogen, elixir-format
 msgid "Show playlist tracks to viewers"
 msgstr "Mostra i brani della playlist agli spettatori"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:30
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:44
 #, elixir-autogen, elixir-format
 msgid "Submissions are currently closed"
 msgstr "I contributi sono attualmente chiusi"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:97
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:104
 #, elixir-autogen, elixir-format
 msgid "Submissions are currently closed."
 msgstr "I contributi sono attualmente chiusi."
@@ -5845,17 +5846,17 @@ msgstr "I contributi sono attualmente chiusi."
 msgid "Submit a track"
 msgstr "Invia un brano"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:131
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:151
 #, elixir-autogen, elixir-format
 msgid "This track is already in the playlist."
 msgstr "Questo brano è già nella playlist."
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:144
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:167
 #, elixir-autogen, elixir-format
 msgid "Track added to the playlist!"
 msgstr "Brano aggiunto alla playlist!"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:43
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:57
 #, elixir-autogen, elixir-format
 msgid "Track name, artist..."
 msgstr "Nome del brano, artista..."
@@ -5865,7 +5866,31 @@ msgstr "Nome del brano, artista..."
 msgid "Viewer Submissions"
 msgstr "Contributi degli spettatori"
 
-#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:31
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:45
 #, elixir-autogen, elixir-format
 msgid "%{name} will open submissions when ready."
 msgstr "%{name} aprirà i contributi quando sarà pronto."
+
+#: lib/premiere_ecoute_web/live/playlists/submission_live.html.heex:19
+#, elixir-autogen, elixir-format
+msgid "%{count}/%{limit} submission used"
+msgid_plural "%{count}/%{limit} submissions used"
+msgstr[0] "%{count}/%{limit} contributo utilizzato"
+msgstr[1] "%{count}/%{limit} contributi utilizzati"
+
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:364
+#, elixir-autogen, elixir-format
+msgid "Maximum number of tracks a viewer can submit"
+msgstr "Numero massimo di brani che uno spettatore può inviare"
+
+#: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:363
+#, elixir-autogen, elixir-format
+msgid "Submissions per viewer"
+msgstr "Contributi per spettatore"
+
+#: lib/premiere_ecoute_web/live/playlists/submission_live.ex:111
+#, elixir-autogen, elixir-format
+msgid "You have reached the limit of %{count} submission for this playlist."
+msgid_plural "You have reached the limit of %{count} submissions for this playlist."
+msgstr[0] "Hai raggiunto il limite di %{count} contributo per questa playlist."
+msgstr[1] "Hai raggiunto il limite di %{count} contributi per questa playlist."

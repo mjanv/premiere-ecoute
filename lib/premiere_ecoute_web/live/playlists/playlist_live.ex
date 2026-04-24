@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Automations
   alias PremiereEcoute.Discography.LibraryPlaylist
+  alias PremiereEcoute.Playlists.PlaylistSubmission
 
   @impl true
   def mount(%{"id" => playlist_id}, _session, socket) do
@@ -32,6 +33,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
       |> assign(:selected_tracks, MapSet.new())
       |> assign(:select_all, false)
       |> assign(:deleting_tracks, false)
+      |> assign(:submitters, %{})
 
     if library_playlist do
       user = socket.assigns.current_scope.user
@@ -193,6 +195,20 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   end
 
   @impl true
+  def handle_event("set_submission_limit", %{"limit" => raw}, socket) do
+    case Integer.parse(raw) do
+      {n, ""} when n >= 1 and n <= 20 ->
+        case LibraryPlaylist.update_submission_options(socket.assigns.library_playlist, %{"submission_limit" => n}) do
+          {:ok, updated} -> {:noreply, assign(socket, :library_playlist, updated)}
+          {:error, _} -> {:noreply, put_flash(socket, :error, gettext("Failed to update setting"))}
+        end
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
   def handle_event("remove_from_library", _params, socket) do
     case socket.assigns.library_playlist do
       nil ->
@@ -238,6 +254,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
         |> assign(:playlist, playlist)
         |> assign(:loading, false)
         |> assign(:error, nil)
+        |> assign(:submitters, PlaylistSubmission.submitters_map(library_playlist))
         |> apply_filters()
 
       {:error, _} ->

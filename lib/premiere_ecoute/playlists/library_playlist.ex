@@ -57,6 +57,9 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
   @spec show_tracks_to_viewers?(t()) :: boolean()
   def show_tracks_to_viewers?(%__MODULE__{metadata: meta}), do: meta["show_tracks_to_viewers"] == true
 
+  @spec submission_limit(t()) :: pos_integer()
+  def submission_limit(%__MODULE__{metadata: meta}), do: meta["submission_limit"] || 3
+
   @doc """
   Creates changeset for library playlist validation.
 

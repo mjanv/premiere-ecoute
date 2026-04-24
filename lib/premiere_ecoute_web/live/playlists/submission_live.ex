@@ -15,13 +15,19 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.LibraryPlaylist
+  alias PremiereEcoute.Playlists.PlaylistSubmission
 
   @impl true
   def mount(%{"id" => playlist_id}, _session, socket) do
     library_playlist = LibraryPlaylist.get_by(playlist_id: playlist_id)
 
+    viewer = socket.assigns.current_scope.user
+
     cond do
       is_nil(library_playlist) ->
+        {:ok, redirect(socket, to: ~p"/")}
+
+      not PremiereEcouteCore.FeatureFlag.enabled?(:playlist_submissions, for: viewer) ->
         {:ok, redirect(socket, to: ~p"/")}
 
       not LibraryPlaylist.submission_page_enabled?(library_playlist) ->
@@ -29,18 +35,22 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
 
       true ->
         streamer = Accounts.get_user!(library_playlist.user_id)
+        {tracks, submitters} = load_playlist_data(library_playlist)
 
         {:ok,
          socket
          |> assign(:library_playlist, library_playlist)
          |> assign(:streamer, streamer)
+         |> assign(:viewer, viewer)
+         |> assign(:submissions_count, PlaylistSubmission.count_for_viewer(library_playlist, viewer))
          |> assign(:search_form, to_form(%{"query" => ""}))
          |> assign(:search_results, AsyncResult.ok([]))
          |> assign(:selected_track, nil)
          |> assign(:submitting, false)
          |> assign(:error, nil)
          |> assign(:success, nil)
-         |> assign(:tracks, load_playlist_tracks(library_playlist))}
+         |> assign(:tracks, tracks)
+         |> assign(:submitters, submitters)}
     end
   end
 
@@ -87,7 +97,8 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
 
   @impl true
   def handle_event("submit_track", _params, socket) do
-    %{library_playlist: playlist, selected_track: track} = socket.assigns
+    %{library_playlist: playlist, selected_track: track, viewer: viewer, submissions_count: count} = socket.assigns
+    limit = LibraryPlaylist.submission_limit(playlist)
 
     cond do
       is_nil(track) ->
@@ -96,12 +107,25 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
       not LibraryPlaylist.submissions_open?(playlist) ->
         {:noreply, assign(socket, :error, gettext("Submissions are currently closed."))}
 
+      count >= limit ->
+        {:noreply,
+         assign(
+           socket,
+           :error,
+           ngettext(
+             "You have reached the limit of %{count} submission for this playlist.",
+             "You have reached the limit of %{count} submissions for this playlist.",
+             limit,
+             count: limit
+           )
+         )}
+
       true ->
         {:noreply,
          socket
          |> assign(:submitting, true)
          |> assign(:error, nil)
-         |> start_async(:submit, fn -> do_submit(playlist, track) end)}
+         |> start_async(:submit, fn -> do_submit(playlist, track, viewer) end)}
     end
   end
 
@@ -131,16 +155,19 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
      |> assign(:error, gettext("This track is already in the playlist."))}
   end
 
-  def handle_async(:submit, {:ok, :ok}, socket) do
-    # Reload playlist tracks so the updated list is shown if show_tracks_to_viewers is on
-    updated_tracks = load_playlist_tracks(socket.assigns.library_playlist)
+  def handle_async(:submit, {:ok, {:ok, provider_id}}, socket) do
+    %{library_playlist: playlist, viewer: viewer} = socket.assigns
+    {:ok, _} = PlaylistSubmission.create(playlist, viewer, provider_id)
+    {tracks, submitters} = load_playlist_data(playlist)
 
     {:noreply,
      socket
      |> assign(:submitting, false)
      |> assign(:selected_track, nil)
      |> assign(:search_form, to_form(%{"query" => ""}))
-     |> assign(:tracks, updated_tracks)
+     |> assign(:submissions_count, socket.assigns.submissions_count + 1)
+     |> assign(:tracks, tracks)
+     |> assign(:submitters, submitters)
      |> assign(:success, gettext("Track added to the playlist!"))}
   end
 
@@ -159,10 +186,10 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   end
 
   # Fetches current playlist tracks from Spotify, checks for duplicate, then adds.
-  # Returns :ok | :duplicate | {:error, term}
+  # Returns {:ok, provider_id} | :duplicate | {:error, term}
   # AIDEV-NOTE: Single has no provider/2 — wraps spotify ID in Album.Track which does,
   # since add_items_to_playlist only needs the ID via track_id/1.
-  defp do_submit(playlist, single) do
+  defp do_submit(playlist, single, _viewer) do
     track_spotify_id = Map.get(single.provider_ids, :spotify)
     streamer_scope = build_streamer_scope(playlist.user_id)
     api_track = %Album.Track{provider_ids: %{spotify: track_spotify_id}}
@@ -170,7 +197,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
     with {:ok, current_playlist} <- Apis.spotify().get_playlist(playlist.playlist_id),
          false <- track_already_present?(current_playlist.tracks, track_spotify_id),
          {:ok, _} <- Apis.spotify().add_items_to_playlist(streamer_scope, playlist.playlist_id, [api_track]) do
-      :ok
+      {:ok, track_spotify_id}
     else
       true -> :duplicate
       {:error, _} = err -> err
@@ -191,13 +218,22 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   end
 
   # AIDEV-NOTE: get_playlist uses client credentials; streamer token only needed for writes.
-  # Returns nil when show_tracks_to_viewers is off so the template skips the track list.
-  defp load_playlist_tracks(playlist) do
+  # On each load, stale PlaylistSubmission rows are reconciled against the live Spotify track list.
+  # Returns {tracks_or_nil, submitters_map}.
+  defp load_playlist_data(playlist) do
     if LibraryPlaylist.show_tracks_to_viewers?(playlist) do
       case Apis.spotify().get_playlist(playlist.playlist_id) do
-        {:ok, p} -> p.tracks
-        _ -> nil
+        {:ok, p} ->
+          live_ids = Enum.map(p.tracks, & &1.track_id)
+          PlaylistSubmission.delete_stale(playlist, live_ids)
+          submitters = PlaylistSubmission.submitters_map(playlist)
+          {p.tracks, submitters}
+
+        _ ->
+          {nil, %{}}
       end
+    else
+      {nil, %{}}
     end
   end
 end

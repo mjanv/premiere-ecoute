@@ -15,6 +15,15 @@
               {@library_playlist.title}
               <span class="text-gray-500">· {@streamer.username}</span>
             </p>
+            <p class="text-xs text-gray-500 mt-0.5">
+              {ngettext(
+                "%{count}/%{limit} submission used",
+                "%{count}/%{limit} submissions used",
+                @submissions_count,
+                count: @submissions_count,
+                limit: LibraryPlaylist.submission_limit(@library_playlist)
+              )}
+            </p>
           </div>
         </div>
       </div>
@@ -210,7 +219,12 @@
                 <span class="text-xs text-gray-500 w-5 text-right flex-shrink-0">{index}</span>
                 <div class="min-w-0 flex-1">
                   <p class="text-sm text-white truncate">{track.name}</p>
-                  <p class="text-xs text-gray-400 truncate">{track.artist}</p>
+                  <p class="text-xs text-gray-400 truncate">
+                    {track.artist}
+                    <%= if submitter = Map.get(@submitters, track.track_id) do %>
+                      <span class="text-gray-500">· {submitter}</span>
+                    <% end %>
+                  </p>
                 </div>
               </div>
             <% end %>
