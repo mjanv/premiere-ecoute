@@ -82,7 +82,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     end
   end
 
-  defp get_vote_message(session_id, viewer_id, vote_options) do
+  def get_vote_message(session_id, viewer_id, vote_options) do
     from(v in __MODULE__,
       where: v.session_id == ^session_id and v.viewer_id == ^viewer_id,
       select: avg(fragment("CAST(? AS FLOAT)", v.value))

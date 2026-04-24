@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.CommandBus
 
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
 
   setup_all do
@@ -439,7 +440,9 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
           "chat_settings" => %{"save_wantlist" => true}
         })
 
-      # No Cache.put — stream is offline
+      # No Cache.put — stream is offline, PlaybackState falls through to Spotify API
+      stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:error, :not_playing} end)
+
       command = %SendChatCommand{
         broadcaster_id: "1971641",
         user_id: viewer.twitch.user_id,

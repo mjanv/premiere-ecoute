@@ -22,7 +22,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   @impl true
   def mount(%{"username" => username}, _session, socket) do
     user = Accounts.User.get_user_by_username(username)
-    listening_session = ListeningSession.get_active_session(user)
 
     color_primary = Accounts.profile(user, [:widget_settings, :color_primary])
     color_secondary = Accounts.profile(user, [:widget_settings, :color_secondary])
@@ -32,71 +31,69 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
       {:ok, _} = Presence.join(user.id, :overlay)
     end
 
-    socket =
-      case listening_session do
-        nil ->
-          socket
-          |> assign(:user, user)
-          |> assign(:id, nil)
-          |> assign(:score, :streamer)
-          |> assign(:percent, 0)
-          |> assign(:progress, AsyncResult.loading())
-          |> assign(:widget_state, :idle)
-          |> assign(:color_primary, color_primary)
-          |> assign(:color_secondary, color_secondary)
-          |> assign(:listening_session, nil)
-          |> assign(:summary, AsyncResult.loading())
-          |> assign(:vote_distribution, [])
+    case ListeningSession.get_active_session(user) do
+      nil ->
+        socket
+        |> assign(:user, user)
+        |> assign(:id, nil)
+        |> assign(:score, :streamer)
+        |> assign(:percent, 0)
+        |> assign(:progress, AsyncResult.loading())
+        |> assign(:widget_state, :idle)
+        |> assign(:color_primary, color_primary)
+        |> assign(:color_secondary, color_secondary)
+        |> assign(:listening_session, nil)
+        |> assign(:summary, AsyncResult.loading())
+        |> assign(:vote_distribution, [])
 
-        session ->
-          if connected?(socket) do
-            PremiereEcoute.PubSub.subscribe("session:#{session.id}")
+      session ->
+        if connected?(socket) do
+          PremiereEcoute.PubSub.subscribe("session:#{session.id}")
+        end
+
+        _ = PlayerSupervisor.start(session.user.id)
+
+        widget_state =
+          case session.user.twitch do
+            nil ->
+              :closed
+
+            twitch ->
+              case Cache.get(:sessions, twitch.user_id) do
+                {:ok, cached_session} when not is_nil(cached_session) -> :open
+                _ -> :closed
+              end
           end
 
-          _ = PlayerSupervisor.start(session.user.id)
+        summary_result =
+          case Report.get_by(session_id: session.id) do
+            nil ->
+              AsyncResult.loading()
 
-          widget_state =
-            case session.user.twitch do
-              nil ->
-                :closed
+            report ->
+              summary = Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
 
-              twitch ->
-                case Cache.get(:sessions, twitch.user_id) do
-                  {:ok, cached_session} when not is_nil(cached_session) -> :open
-                  _ -> :closed
-                end
-            end
+              if is_nil(summary) do
+                AsyncResult.ok(%{viewer_score: nil, streamer_score: nil})
+              else
+                AsyncResult.ok(summary)
+              end
+          end
 
-          summary_result =
-            case Report.get_by(session_id: session.id) do
-              nil ->
-                AsyncResult.loading()
-
-              report ->
-                summary = Enum.find(report.track_summaries, fn s -> s["track_id"] == session.current_track_id end)
-
-                if is_nil(summary) do
-                  AsyncResult.ok(%{viewer_score: nil, streamer_score: nil})
-                else
-                  AsyncResult.ok(summary)
-                end
-            end
-
-          socket
-          |> assign(:user, user)
-          |> assign(:id, session.id)
-          |> assign(:score, :streamer)
-          |> assign(:percent, 0)
-          |> assign(:progress, AsyncResult.loading())
-          |> assign(:widget_state, widget_state)
-          |> assign(:color_primary, color_primary)
-          |> assign(:color_secondary, color_secondary)
-          |> assign(:listening_session, session)
-          |> assign(:summary, summary_result)
-          |> assign(:vote_distribution, [])
-      end
-
-    {:ok, socket}
+        socket
+        |> assign(:user, user)
+        |> assign(:id, session.id)
+        |> assign(:score, :streamer)
+        |> assign(:percent, 0)
+        |> assign(:progress, AsyncResult.loading())
+        |> assign(:widget_state, widget_state)
+        |> assign(:color_primary, color_primary)
+        |> assign(:color_secondary, color_secondary)
+        |> assign(:listening_session, session)
+        |> assign(:summary, summary_result)
+        |> assign(:vote_distribution, [])
+    end
+    |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true

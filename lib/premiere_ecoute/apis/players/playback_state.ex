@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
   alias PremiereEcouteCore.Cache
 
   @cache :playback
-  @default_ttl 10_000
+  @default_ttl 60_000
 
   @doc """
   Gets playback state from cache or fetches fresh if expired/missing.
@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
 
   defp ttl(%{"item" => %{"duration_ms" => duration_ms}, "progress_ms" => progress_ms})
        when is_integer(duration_ms) and is_integer(progress_ms) do
-    max(duration_ms - progress_ms, @default_ttl)
+    min(duration_ms - progress_ms, @default_ttl)
   end
 
   defp ttl(_), do: @default_ttl
