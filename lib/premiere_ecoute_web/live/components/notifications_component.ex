@@ -58,12 +58,18 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
   end
 
   defp notification_icon_bg("check-circle"), do: "bg-green-500/20"
+  defp notification_icon_bg("heart"), do: "bg-pink-500/20"
   defp notification_icon_bg(_), do: "bg-red-500/20"
 
   defp notification_icon_color("check-circle"), do: "text-green-400"
+  defp notification_icon_color("heart"), do: "text-pink-400"
   defp notification_icon_color(_), do: "text-red-400"
 
   defp notification_icon_path("check-circle"), do: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+
+  defp notification_icon_path("heart"),
+    do:
+      "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
 
   defp notification_icon_path(_),
     do:

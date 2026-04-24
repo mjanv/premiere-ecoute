@@ -8,6 +8,8 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
   import PremiereEcouteWeb.Components.Navigation.DayNav
 
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Notifications
+  alias PremiereEcoute.Notifications.Types.WantlistSave
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Wantlists
 
@@ -70,6 +72,8 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
     if current_scope && current_scope.user do
       case Wantlists.add_radio_track(current_scope.user.id, spotify_id) do
         {:ok, _} ->
+          {track_name, artist_name} = find_track_info(socket.assigns.tracks, spotify_id)
+          Notifications.dispatch(current_scope.user, %WantlistSave{track_name: track_name, artist_name: artist_name})
           {:noreply, assign(socket, :wantlisted_ids, load_wantlisted_ids(socket, socket.assigns.tracks))}
 
         {:error, _} ->
@@ -77,6 +81,13 @@ defmodule PremiereEcouteWeb.Radio.ViewerLive do
       end
     else
       {:noreply, socket}
+    end
+  end
+
+  defp find_track_info(tracks, spotify_id) do
+    case Enum.find(tracks, fn t -> t.provider_ids[:spotify] == spotify_id end) do
+      %{name: name, artist: artist} -> {name, artist}
+      _ -> {spotify_id, ""}
     end
   end
 

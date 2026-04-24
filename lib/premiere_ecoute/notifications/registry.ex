@@ -10,7 +10,8 @@ defmodule PremiereEcoute.Notifications.Registry do
   # AIDEV-NOTE: add new notification type modules here; keys are built from the module itself
   @types [
     PremiereEcoute.Notifications.Types.AutomationFailure,
-    PremiereEcoute.Notifications.Types.AutomationSuccess
+    PremiereEcoute.Notifications.Types.AutomationSuccess,
+    PremiereEcoute.Notifications.Types.WantlistSave
   ]
 
   @by_module Map.new(@types, fn mod -> {mod, mod} end)

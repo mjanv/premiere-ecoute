@@ -337,7 +337,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
         |> Single.create_if_not_exists()
 
       playback_state = %{
-        "item" => %{"id" => "spotify_track_123", "name" => "Awesome Song"},
+        "item" => %{"id" => "spotify_track_123", "name" => "Awesome Song", "artists" => [%{"name" => "Daft Punk"}]},
         "is_playing" => true
       }
 
@@ -483,6 +483,71 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
         broadcaster_id: "nonexistent",
         user_id: "9876543",
         message_id: "msg-save-6",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      assert {:ok, []} = CommandBus.apply(command)
+    end
+
+    test "dispatches a WantlistSave notification to the viewer via PubSub", %{
+      broadcaster: broadcaster,
+      viewer: viewer,
+      playback_state: playback_state
+    } do
+      {:ok, broadcaster} =
+        User.edit_user_profile(broadcaster, %{
+          "chat_settings" => %{"save_wantlist" => true}
+        })
+
+      Cache.put(:playback, broadcaster.id, playback_state)
+
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "user:#{viewer.id}")
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: viewer.twitch.user_id,
+        message_id: "msg-save-notif",
+        command: "save",
+        args: [],
+        is_streamer: false
+      }
+
+      stub(TwitchApi, :send_reply_message, fn _scope, _message, _reply_to -> :ok end)
+
+      assert {:ok, []} = CommandBus.apply(command)
+
+      assert_receive {:user_notification, notification, rendered}
+      assert notification.type == "wantlist_save"
+      assert rendered.title == "Awesome Song"
+      assert rendered.body == "Daft Punk"
+      assert rendered.path == "/wantlist"
+    end
+
+    test "does not dispatch notification when viewer is not registered", %{
+      broadcaster: broadcaster,
+      playback_state: playback_state
+    } do
+      {:ok, broadcaster} =
+        User.edit_user_profile(broadcaster, %{
+          "chat_settings" => %{"save_wantlist" => true}
+        })
+
+      Cache.put(:playback, broadcaster.id, playback_state)
+
+      unregistered_id = "unregistered_twitch_id_notif"
+      # No user to subscribe as — just verify no notification is dispatched by asserting
+      # the Twitch reply is for the registration prompt (not the save confirmation)
+      stub(TwitchApi, :send_reply_message, fn _scope, message, _reply_to ->
+        assert message =~ "Register on premiere-ecoute.fr"
+        :ok
+      end)
+
+      command = %SendChatCommand{
+        broadcaster_id: "1971641",
+        user_id: unregistered_id,
+        message_id: "msg-save-notif-unreg",
         command: "save",
         args: [],
         is_streamer: false

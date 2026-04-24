@@ -14,6 +14,8 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Commands.Chat.SendChatCommand
   alias PremiereEcoute.Gettext
+  alias PremiereEcoute.Notifications
+  alias PremiereEcoute.Notifications.Types.WantlistSave
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcoute.Wantlists
@@ -52,8 +54,10 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
     with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
          scope <- Scope.for_user(broadcaster),
          true <- Accounts.profile(broadcaster, [:chat_settings, :save_wantlist], false),
-         {:ok, %{"item" => %{"id" => id, "name" => name}}} when not is_nil(id) <-
+         {:ok, %{"item" => %{"id" => id, "name" => name} = item}} when not is_nil(id) <-
            Apis.cache(:spotify).get_playback_state(scope, %{}) do
+      artist_name = item |> Map.get("artists", []) |> Enum.map_join(", ", & &1["name"])
+
       case Accounts.get_user_by_twitch_id(viewer_twitch_id) do
         nil ->
           message =
@@ -64,6 +68,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
         viewer ->
           case Wantlists.add_radio_track(viewer.id, id) do
             {:ok, _} ->
+              Notifications.dispatch(viewer, %WantlistSave{track_name: name, artist_name: artist_name})
               message = Gettext.t(scope, fn -> gettext("%{track_name} saved to your wantlist!", track_name: name) end)
               send_reply(scope, message, message_id)
 
