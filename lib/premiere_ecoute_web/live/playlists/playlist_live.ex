@@ -250,11 +250,21 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   def handle_info(:fetch_playlist_data, %{assigns: %{library_playlist: library_playlist}} = socket) do
     case Apis.provider(library_playlist.provider).get_playlist(library_playlist.playlist_id) do
       {:ok, playlist} ->
+        submitters = Submission.submitters_map(library_playlist)
+
+        tracks =
+          Enum.map(playlist.tracks, fn track ->
+            case Map.get(submitters, track.track_id) do
+              nil -> track
+              %{username: username} -> %{track | user_id: username}
+            end
+          end)
+
         socket
-        |> assign(:playlist, playlist)
+        |> assign(:playlist, %{playlist | tracks: tracks})
+        |> assign(:submitters, submitters)
         |> assign(:loading, false)
         |> assign(:error, nil)
-        |> assign(:submitters, Submission.submitters_map(library_playlist))
         |> apply_filters()
 
       {:error, _} ->
@@ -336,8 +346,8 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   defp filter_duplicates(tracks, "all"), do: tracks
 
   defp filter_duplicates(tracks, "only") do
-    frequencies = Enum.frequencies_by(tracks, & &1.track_id)
-    Enum.filter(tracks, fn track -> Map.get(frequencies, track.track_id, 0) > 1 end)
+    frequencies = Enum.frequencies_by(tracks, & &1.name)
+    Enum.filter(tracks, fn track -> Map.get(frequencies, track.name, 0) > 1 end)
   end
 
   defp filter_submissions(tracks, "all"), do: tracks

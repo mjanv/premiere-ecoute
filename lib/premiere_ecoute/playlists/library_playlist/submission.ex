@@ -105,20 +105,16 @@ defmodule PremiereEcoute.Playlists.LibraryPlaylist.Submission do
   end
 
   @doc """
-  Returns submissions for a playlist as a map of provider_id => app username.
+  Returns submissions for a playlist as a map of provider_id => User.
 
-  Used to attribute submitted tracks to their submitters in the track list,
-  overriding the raw Spotify user_id when a submission record exists.
+  Accepts either a playlist with preloaded submissions (avoids a DB query) or
+  an unloaded playlist (issues a join query).
   """
-  @spec submitters_map(LibraryPlaylist.t()) :: %{String.t() => String.t()}
-  def submitters_map(%LibraryPlaylist{id: playlist_id}) do
-    from(s in __MODULE__,
-      join: u in assoc(s, :user),
-      where: s.library_playlist_id == ^playlist_id,
-      select: {s.provider_id, u.username}
-    )
-    |> Repo.all()
-    |> Map.new()
+  @spec submitters_map(LibraryPlaylist.t()) :: %{String.t() => User.t()}
+  def submitters_map(%LibraryPlaylist{submissions: submissions}) when is_list(submissions) do
+    for %__MODULE__{user: %User{} = user, provider_id: provider_id} <- submissions,
+        into: %{},
+        do: {provider_id, user}
   end
 
   @doc """

@@ -60,7 +60,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
     socket
     |> assign(:search_results, AsyncResult.loading())
     |> assign(:selected_track, nil)
-    |> start_async(:search, fn -> Apis.spotify().search_singles(query) end)
+    |> start_async(:search, fn -> Apis.spotify().search_any_track(query) end)
     |> then(&{:noreply, &1})
   end
 

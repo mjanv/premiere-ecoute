@@ -82,6 +82,29 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
     end)
   end
 
+  @doc """
+  Searches Spotify catalog for tracks of any type (singles and album tracks).
+
+  Returns Single structs regardless of album type. Used for submission search
+  where viewers should be able to submit any track, not just singles.
+  """
+  @spec search_any_track(String.t()) :: {:ok, [Single.t()]} | {:error, term()}
+  def search_any_track(query) when is_binary(query) do
+    SpotifyApi.api()
+    |> SpotifyApi.get(url: "/search", params: [q: query, type: "track", limit: 10])
+    |> SpotifyApi.handle(200, fn %{"tracks" => %{"items" => items}} ->
+      Enum.map(items, fn data ->
+        %Single{
+          provider_ids: %{spotify: data["id"]},
+          name: data["name"],
+          artists: Parser.parse_artists(data["artists"]),
+          duration_ms: data["duration_ms"] || 0,
+          cover_url: Parser.parse_album_cover_url(data["album"]["images"])
+        }
+      end)
+    end)
+  end
+
   defp query(query) do
     cond do
       q = query[:query] -> q

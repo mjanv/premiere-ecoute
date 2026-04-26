@@ -6,12 +6,14 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
   """
 
   use PremiereEcouteCore.Aggregate,
-    identity: [:provider, :playlist_id]
+    identity: [:provider, :playlist_id],
+    root: [submissions: :user]
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Events.LibraryPlaylistAdded
   alias PremiereEcoute.Events.LibraryPlaylistDeleted
   alias PremiereEcoute.Events.Store
+  alias PremiereEcoute.Playlists.LibraryPlaylist.Submission
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -26,6 +28,7 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
           metadata: map() | nil,
           user: User.t() | Ecto.Association.NotLoaded.t() | nil,
           user_id: binary() | nil,
+          submissions: [Submission.t()] | Ecto.Association.NotLoaded.t(),
           inserted_at: NaiveDateTime.t() | nil,
           updated_at: NaiveDateTime.t() | nil
         }
@@ -44,6 +47,7 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     field :metadata, :map
 
     belongs_to :user, User
+    has_many :submissions, Submission
 
     timestamps()
   end

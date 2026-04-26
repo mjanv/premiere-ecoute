@@ -252,7 +252,7 @@
                   <p class="text-xs text-gray-400 truncate">
                     {track.artist}
                     <%= if submitter = Map.get(@submitters, track.track_id) do %>
-                      <span class="text-gray-500">· {submitter}</span>
+                      <span class="text-gray-500">· {submitter.username}</span>
                     <% end %>
                   </p>
                 </div>

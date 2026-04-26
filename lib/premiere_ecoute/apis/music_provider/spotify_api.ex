@@ -88,6 +88,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     @callback search_albums(query :: String.t()) :: {:ok, [Album.t()]} | {:error, term()}
     @callback search_artist(query :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback search_singles(query :: String.t()) :: {:ok, [Single.t()]} | {:error, term()}
+    @callback search_any_track(query :: String.t()) :: {:ok, [Single.t()]} | {:error, term()}
 
     # Users
     @callback get_user_profile(access_token :: String.t()) :: {:ok, map()} | {:error, term()}
@@ -200,6 +201,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
   defdelegate search_artist(query), to: __MODULE__.Search
   defdelegate search_tracks(query), to: __MODULE__.Search
   defdelegate search_singles(query), to: __MODULE__.Search
+  defdelegate search_any_track(query), to: __MODULE__.Search
 
   # Users
   defdelegate get_user_profile(access_token), to: __MODULE__.Users
