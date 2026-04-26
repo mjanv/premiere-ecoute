@@ -10,7 +10,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Automations
   alias PremiereEcoute.Discography.LibraryPlaylist
-  alias PremiereEcoute.Playlists.PlaylistSubmission
+  alias PremiereEcoute.Playlists.LibraryPlaylist.Submission
 
   @impl true
   def mount(%{"id" => playlist_id}, _session, socket) do
@@ -254,7 +254,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
         |> assign(:playlist, playlist)
         |> assign(:loading, false)
         |> assign(:error, nil)
-        |> assign(:submitters, PlaylistSubmission.submitters_map(library_playlist))
+        |> assign(:submitters, Submission.submitters_map(library_playlist))
         |> apply_filters()
 
       {:error, _} ->

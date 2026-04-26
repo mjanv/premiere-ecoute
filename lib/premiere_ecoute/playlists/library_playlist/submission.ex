@@ -1,4 +1,4 @@
-defmodule PremiereEcoute.Playlists.PlaylistSubmission do
+defmodule PremiereEcoute.Playlists.LibraryPlaylist.Submission do
   @moduledoc """
   Tracks viewer track submissions to a library playlist.
 
@@ -26,7 +26,7 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmission do
           inserted_at: NaiveDateTime.t() | nil
         }
 
-  schema "playlist_submissions" do
+  schema "library_playlist_submissions" do
     field :provider_id, :string
 
     belongs_to :library_playlist, LibraryPlaylist
@@ -41,7 +41,7 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmission do
     |> cast(attrs, [:library_playlist_id, :user_id, :provider_id])
     |> validate_required([:library_playlist_id, :user_id, :provider_id])
     |> unique_constraint([:library_playlist_id, :user_id, :provider_id],
-      name: :playlist_submissions_library_playlist_id_user_id_provider_id_in
+      name: :library_playlist_submissions_library_playlist_id_user_id_provid
     )
     |> foreign_key_constraint(:library_playlist_id)
     |> foreign_key_constraint(:user_id)

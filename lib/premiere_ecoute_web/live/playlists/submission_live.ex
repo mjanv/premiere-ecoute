@@ -15,7 +15,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.LibraryPlaylist
-  alias PremiereEcoute.Playlists.PlaylistSubmission
+  alias PremiereEcoute.Playlists.LibraryPlaylist.Submission
 
   @impl true
   def mount(%{"id" => playlist_id}, _session, socket) do
@@ -42,8 +42,8 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
          |> assign(:library_playlist, library_playlist)
          |> assign(:streamer, streamer)
          |> assign(:viewer, viewer)
-         |> assign(:viewer_submissions, PlaylistSubmission.list_for_viewer(library_playlist, viewer))
-         |> assign(:submissions_count, PlaylistSubmission.count_for_viewer(library_playlist, viewer))
+         |> assign(:viewer_submissions, Submission.list_for_viewer(library_playlist, viewer))
+         |> assign(:submissions_count, Submission.count_for_viewer(library_playlist, viewer))
          |> assign(:search_form, to_form(%{"query" => ""}))
          |> assign(:search_results, AsyncResult.ok([]))
          |> assign(:selected_track, nil)
@@ -195,7 +195,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
 
   def handle_async(:submit, {:ok, {:ok, provider_id}}, socket) do
     %{library_playlist: playlist, viewer: viewer} = socket.assigns
-    {:ok, _} = PlaylistSubmission.create(playlist, viewer, provider_id)
+    {:ok, _} = Submission.create(playlist, viewer, provider_id)
     {tracks, submitters} = load_playlist_data(playlist)
 
     {:noreply,
@@ -203,7 +203,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
      |> assign(:submitting, false)
      |> assign(:selected_track, nil)
      |> assign(:search_form, to_form(%{"query" => ""}))
-     |> assign(:viewer_submissions, PlaylistSubmission.list_for_viewer(playlist, viewer))
+     |> assign(:viewer_submissions, Submission.list_for_viewer(playlist, viewer))
      |> assign(:submissions_count, socket.assigns.submissions_count + 1)
      |> assign(:tracks, tracks)
      |> assign(:submitters, submitters)
@@ -230,8 +230,8 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
 
     {:noreply,
      socket
-     |> assign(:viewer_submissions, PlaylistSubmission.list_for_viewer(playlist, viewer))
-     |> assign(:submissions_count, PlaylistSubmission.count_for_viewer(playlist, viewer))
+     |> assign(:viewer_submissions, Submission.list_for_viewer(playlist, viewer))
+     |> assign(:submissions_count, Submission.count_for_viewer(playlist, viewer))
      |> assign(:tracks, tracks)
      |> assign(:submitters, submitters)
      |> assign(:success, gettext("Track removed from the playlist."))}
@@ -254,7 +254,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   defp do_submit(playlist, single, viewer) do
     track_spotify_id = Map.get(single.provider_ids, :spotify)
     fresh_playlist = LibraryPlaylist.get_by(id: playlist.id)
-    fresh_count = PlaylistSubmission.count_for_viewer(fresh_playlist, viewer)
+    fresh_count = Submission.count_for_viewer(fresh_playlist, viewer)
     limit = LibraryPlaylist.submission_limit(fresh_playlist)
 
     cond do
@@ -300,7 +300,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
       end
 
     with :ok <- spotify_result,
-         {:ok, _} <- PlaylistSubmission.delete_for_viewer(playlist, viewer, provider_id) do
+         {:ok, _} <- Submission.delete_for_viewer(playlist, viewer, provider_id) do
       {:ok, load_playlist_data(playlist)}
     end
   end
@@ -327,8 +327,8 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
     case Apis.spotify().get_playlist(playlist.playlist_id) do
       {:ok, p} ->
         live_ids = Enum.map(p.tracks, & &1.track_id)
-        PlaylistSubmission.delete_stale(playlist, live_ids)
-        submitters = PlaylistSubmission.submitters_map(playlist)
+        Submission.delete_stale(playlist, live_ids)
+        submitters = Submission.submitters_map(playlist)
         {p.tracks, submitters}
 
       _ ->
