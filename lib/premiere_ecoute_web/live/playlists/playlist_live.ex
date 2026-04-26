@@ -215,7 +215,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
         {:noreply, put_flash(socket, :error, gettext("Playlist not found"))}
 
       library_playlist ->
-        case LibraryPlaylist.delete(library_playlist) do
+        case LibraryPlaylist.delete(socket.assigns.current_scope.user, library_playlist) do
           {:ok, _} ->
             socket
             |> put_flash(:success, gettext("Playlist removed from your library"))
@@ -336,7 +336,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   defp filter_duplicates(tracks, "all"), do: tracks
 
   defp filter_duplicates(tracks, "only") do
-    frequencies = Enum.frequencies_by(tracks, & &1.user_id)
+    frequencies = Enum.frequencies_by(tracks, & &1.track_id)
     Enum.filter(tracks, fn track -> Map.get(frequencies, track.track_id, 0) > 1 end)
   end
 
