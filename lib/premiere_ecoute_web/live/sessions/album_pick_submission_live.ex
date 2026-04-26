@@ -13,9 +13,8 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickSubmissionLive do
   alias PremiereEcoute.Sessions.AlbumPicks
 
   @impl true
-  def mount(%{"user_id" => user_id_str}, _session, socket) do
-    with {user_id, ""} <- Integer.parse(user_id_str),
-         streamer <- Accounts.get_user!(user_id),
+  def mount(%{"username" => username}, _session, socket) do
+    with %Accounts.User{} = streamer <- Accounts.get_user_by_username(username),
          true <- streamer.role in [:streamer, :admin] do
       socket
       |> assign(:streamer, streamer)
@@ -80,7 +79,7 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickSubmissionLive do
         attrs = %{
           album_id: Map.get(album.provider_ids, :spotify),
           name: album.name,
-          artist: album.artist,
+          artist: album.artist.name,
           cover_url: album.cover_url
         }
 

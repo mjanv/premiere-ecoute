@@ -205,7 +205,7 @@ defmodule PremiereEcouteWeb.Router do
     end
 
     live_session :picks, on_mount: [{UserAuth, :current_scope}] do
-      live "/pick/:user_id/submit", AlbumPickSubmissionLive, :new
+      live "/:username/pick", AlbumPickSubmissionLive, :new
     end
 
     live_session :sessions_streamer, on_mount: [{UserAuth, :streamer}] do

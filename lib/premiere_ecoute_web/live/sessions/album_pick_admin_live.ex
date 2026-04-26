@@ -13,14 +13,14 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    user_id = socket.assigns.current_scope.user.id
+    user = socket.assigns.current_scope.user
 
-    PremiereEcoute.PubSub.subscribe("album_picks:#{user_id}")
+    PremiereEcoute.PubSub.subscribe("album_picks:#{user.id}")
 
     socket
-    |> stream(:picks, AlbumPicks.list_for_user(user_id))
-    |> assign(:picks_count, AlbumPicks.count_for_user(user_id))
-    |> assign(:viewer_submit_url, url(~p"/sessions/pick/#{user_id}/submit"))
+    |> stream(:picks, AlbumPicks.list_for_user(user.id))
+    |> assign(:picks_count, AlbumPicks.count_for_user(user.id))
+    |> assign(:viewer_submit_url, url(~p"/sessions/#{user.username}/pick"))
     |> assign(:show_clear_modal, false)
     |> assign(:search_form, to_form(%{"query" => ""}))
     |> assign(:search_albums, AsyncResult.ok([]))
@@ -58,7 +58,7 @@ defmodule PremiereEcouteWeb.Sessions.AlbumPickAdminLive do
         attrs = %{
           album_id: Map.get(album.provider_ids, :spotify),
           name: album.name,
-          artist: album.artist,
+          artist: album.artist.name,
           cover_url: album.cover_url
         }
 

@@ -1,11 +1,12 @@
 defmodule PremiereEcoute.Playlists.LibraryPlaylist.SubmissionTest do
   use PremiereEcoute.DataCase, async: true
 
+  alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.LibraryPlaylist.Submission
 
   defp library_playlist_fixture(user) do
     {:ok, playlist} =
-      PremiereEcoute.Discography.LibraryPlaylist.create(user, %{
+      LibraryPlaylist.create(user, %{
         provider: :spotify,
         playlist_id: "pl_#{System.unique_integer([:positive])}",
         title: "Test Playlist",
