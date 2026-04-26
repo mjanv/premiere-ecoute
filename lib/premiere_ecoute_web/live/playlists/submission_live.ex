@@ -161,6 +161,31 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
      |> assign(:error, gettext("Search failed. Please try again."))}
   end
 
+  def handle_async(:submit, {:ok, :submissions_closed}, socket) do
+    {:noreply,
+     socket
+     |> assign(:submitting, false)
+     |> assign(:error, gettext("Submissions are currently closed."))}
+  end
+
+  def handle_async(:submit, {:ok, :quota_exceeded}, socket) do
+    %{library_playlist: playlist} = socket.assigns
+    limit = LibraryPlaylist.submission_limit(playlist)
+
+    {:noreply,
+     socket
+     |> assign(:submitting, false)
+     |> assign(
+       :error,
+       ngettext(
+         "You have reached the limit of %{count} submission for this playlist.",
+         "You have reached the limit of %{count} submissions for this playlist.",
+         limit,
+         count: limit
+       )
+     )}
+  end
+
   def handle_async(:submit, {:ok, :duplicate}, socket) do
     {:noreply,
      socket
@@ -221,41 +246,61 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   end
 
   # Fetches current playlist tracks from Spotify, checks for duplicate, then adds.
-  # Returns {:ok, provider_id} | :duplicate | {:error, term}
+  # Returns {:ok, provider_id} | :duplicate | :quota_exceeded | :submissions_closed | {:error, term}
   # AIDEV-NOTE: Single has no provider/2 — wraps spotify ID in Album.Track which does,
   # since add_items_to_playlist only needs the ID via track_id/1.
-  defp do_submit(playlist, single, _viewer) do
+  # Re-fetches library_playlist and count from DB to avoid stale mount-time snapshot
+  # (submissions_open? toggled by streamer, or quota raced from multiple tabs).
+  defp do_submit(playlist, single, viewer) do
     track_spotify_id = Map.get(single.provider_ids, :spotify)
-    streamer_scope = build_streamer_scope(playlist.user_id)
-    api_track = %Album.Track{provider_ids: %{spotify: track_spotify_id}}
+    fresh_playlist = LibraryPlaylist.get_by(id: playlist.id)
+    fresh_count = PlaylistSubmission.count_for_viewer(fresh_playlist, viewer)
+    limit = LibraryPlaylist.submission_limit(fresh_playlist)
 
-    with {:ok, current_playlist} <- Apis.spotify().get_playlist(playlist.playlist_id),
-         false <- track_already_present?(current_playlist.tracks, track_spotify_id),
-         {:ok, _} <- Apis.spotify().add_items_to_playlist(streamer_scope, playlist.playlist_id, [api_track]) do
-      {:ok, track_spotify_id}
-    else
-      true -> :duplicate
-      {:error, _} = err -> err
+    cond do
+      not LibraryPlaylist.submissions_open?(fresh_playlist) ->
+        :submissions_closed
+
+      fresh_count >= limit ->
+        :quota_exceeded
+
+      true ->
+        streamer_scope = build_streamer_scope(playlist.user_id)
+        api_track = %Album.Track{provider_ids: %{spotify: track_spotify_id}}
+
+        with {:ok, current_playlist} <- Apis.spotify().get_playlist(playlist.playlist_id),
+             false <- track_already_present?(current_playlist.tracks, track_spotify_id),
+             {:ok, _} <- Apis.spotify().add_items_to_playlist(streamer_scope, playlist.playlist_id, [api_track]) do
+          {:ok, track_spotify_id}
+        else
+          true -> :duplicate
+          {:error, _} = err -> err
+        end
     end
   end
 
-  # Deletes the submission record, then removes the track from Spotify if still present.
-  # Returns {:ok, {tracks, submitters}} on success so the caller can refresh state in one pass.
+  # Removes track from Spotify first (if still present), then deletes the submission record.
+  # Order matters: if the Spotify call fails, the DB record is preserved so the viewer retains
+  # their submission slot and can retry. Returns {:ok, playlist_data} | {:error, term}.
   defp do_delete_submission(playlist, viewer, provider_id) do
-    with {:ok, _} <- PlaylistSubmission.delete_for_viewer(playlist, viewer, provider_id) do
-      streamer_scope = build_streamer_scope(playlist.user_id)
+    streamer_scope = build_streamer_scope(playlist.user_id)
+    api_track = %Album.Track{provider_ids: %{spotify: provider_id}}
 
+    spotify_result =
       case Apis.spotify().get_playlist(playlist.playlist_id) do
         {:ok, current_playlist} ->
           if track_already_present?(current_playlist.tracks, provider_id) do
-            api_track = %Album.Track{provider_ids: %{spotify: provider_id}}
             Apis.spotify().remove_playlist_items(streamer_scope, playlist.playlist_id, [api_track])
+          else
+            :ok
           end
 
-        _ ->
-          :ok
+        {:error, _} = err ->
+          err
       end
 
+    with :ok <- spotify_result,
+         {:ok, _} <- PlaylistSubmission.delete_for_viewer(playlist, viewer, provider_id) do
       {:ok, load_playlist_data(playlist)}
     end
   end
@@ -276,6 +321,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   # AIDEV-NOTE: get_playlist uses client credentials; streamer token only needed for writes.
   # Reconciliation always runs regardless of show_tracks_to_viewers? so stale submission
   # records are cleaned up even when the track list is hidden from viewers.
+  # @tracks always holds the full list; the template gates display on show_tracks_to_viewers?.
   # Returns {tracks_or_nil, submitters_map}.
   defp load_playlist_data(playlist) do
     case Apis.spotify().get_playlist(playlist.playlist_id) do
@@ -283,12 +329,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
         live_ids = Enum.map(p.tracks, & &1.track_id)
         PlaylistSubmission.delete_stale(playlist, live_ids)
         submitters = PlaylistSubmission.submitters_map(playlist)
-
-        if LibraryPlaylist.show_tracks_to_viewers?(playlist) do
-          {p.tracks, submitters}
-        else
-          {nil, submitters}
-        end
+        {p.tracks, submitters}
 
       _ ->
         {nil, %{}}

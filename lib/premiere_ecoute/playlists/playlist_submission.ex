@@ -128,6 +128,10 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmission do
   removed directly via Spotify.
   """
   @spec delete_stale(LibraryPlaylist.t(), [String.t()]) :: non_neg_integer()
+  # AIDEV-NOTE: Guard against empty list — SQL `NOT IN []` would delete every row for the playlist,
+  # which would wipe all submissions on a transient empty Spotify response.
+  def delete_stale(_playlist, []), do: 0
+
   def delete_stale(%LibraryPlaylist{id: playlist_id}, live_track_ids) do
     {count, _} =
       from(s in __MODULE__,

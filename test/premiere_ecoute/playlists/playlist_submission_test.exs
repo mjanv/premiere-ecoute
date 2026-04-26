@@ -182,7 +182,7 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmissionTest do
       assert PlaylistSubmission.count_for_viewer(playlist, viewer) == 2
     end
 
-    test "deletes all submissions when live list is empty" do
+    test "does nothing when live list is empty (guards against transient empty Spotify response)" do
       user = user_fixture()
       playlist = library_playlist_fixture(user)
       viewer = user_fixture()
@@ -192,8 +192,8 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmissionTest do
 
       deleted = PlaylistSubmission.delete_stale(playlist, [])
 
-      assert deleted == 2
-      assert PlaylistSubmission.count_for_viewer(playlist, viewer) == 0
+      assert deleted == 0
+      assert PlaylistSubmission.count_for_viewer(playlist, viewer) == 2
     end
 
     test "only affects submissions for the given playlist" do
@@ -205,7 +205,8 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmissionTest do
       submission_fixture(playlist1, viewer, "track_gone")
       submission_fixture(playlist2, viewer, "track_gone")
 
-      PlaylistSubmission.delete_stale(playlist1, [])
+      # "track_gone" is absent from playlist1's live list but present in playlist2's
+      PlaylistSubmission.delete_stale(playlist1, ["some_other_track"])
 
       assert PlaylistSubmission.count_for_viewer(playlist1, viewer) == 0
       assert PlaylistSubmission.count_for_viewer(playlist2, viewer) == 1

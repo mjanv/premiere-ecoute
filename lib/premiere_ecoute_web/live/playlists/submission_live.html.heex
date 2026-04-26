@@ -235,7 +235,7 @@
       <% end %>
       
 <!-- Current playlist tracks (optional) -->
-      <%= if @tracks do %>
+      <%= if @tracks && LibraryPlaylist.show_tracks_to_viewers?(@library_playlist) do %>
         <div class="bg-slate-800/30 rounded-xl border border-gray-700/50 p-6 mt-6">
           <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-4">
             {gettext("Current playlist")}
