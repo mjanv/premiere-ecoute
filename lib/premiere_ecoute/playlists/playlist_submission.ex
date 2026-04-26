@@ -40,7 +40,9 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmission do
     submission
     |> cast(attrs, [:library_playlist_id, :user_id, :provider_id])
     |> validate_required([:library_playlist_id, :user_id, :provider_id])
-    |> unique_constraint([:library_playlist_id, :user_id, :provider_id])
+    |> unique_constraint([:library_playlist_id, :user_id, :provider_id],
+      name: :playlist_submissions_library_playlist_id_user_id_provider_id_in
+    )
     |> foreign_key_constraint(:library_playlist_id)
     |> foreign_key_constraint(:user_id)
   end
@@ -69,6 +71,37 @@ defmodule PremiereEcoute.Playlists.PlaylistSubmission do
       where: s.library_playlist_id == ^playlist_id and s.user_id == ^user_id
     )
     |> Repo.aggregate(:count)
+  end
+
+  @doc """
+  Returns all submissions made by a user for a playlist, ordered oldest first.
+  """
+  @spec list_for_viewer(LibraryPlaylist.t(), User.t()) :: [t()]
+  def list_for_viewer(%LibraryPlaylist{id: playlist_id}, %User{id: user_id}) do
+    from(s in __MODULE__,
+      where: s.library_playlist_id == ^playlist_id and s.user_id == ^user_id,
+      order_by: [asc: s.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Deletes a single submission record owned by the given user.
+
+  Returns {:ok, submission} if found and deleted, {:error, :not_found} if the
+  submission does not belong to that user.
+  """
+  @spec delete_for_viewer(LibraryPlaylist.t(), User.t(), String.t()) ::
+          {:ok, t()} | {:error, :not_found}
+  def delete_for_viewer(%LibraryPlaylist{id: playlist_id}, %User{id: user_id}, provider_id) do
+    case Repo.get_by(__MODULE__,
+           library_playlist_id: playlist_id,
+           user_id: user_id,
+           provider_id: provider_id
+         ) do
+      nil -> {:error, :not_found}
+      submission -> Repo.delete(submission)
+    end
   end
 
   @doc """

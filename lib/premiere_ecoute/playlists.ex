@@ -20,6 +20,8 @@ defmodule PremiereEcoute.Playlists do
 
   defdelegate create_submission(playlist, user, provider_id), to: PlaylistSubmission, as: :create
   defdelegate count_submissions_for_viewer(playlist, user), to: PlaylistSubmission, as: :count_for_viewer
+  defdelegate list_submissions_for_viewer(playlist, user), to: PlaylistSubmission, as: :list_for_viewer
+  defdelegate delete_submission_for_viewer(playlist, user, provider_id), to: PlaylistSubmission, as: :delete_for_viewer
   defdelegate submitters_map(playlist), to: PlaylistSubmission
   defdelegate delete_stale_submissions(playlist, live_track_ids), to: PlaylistSubmission, as: :delete_stale
 end

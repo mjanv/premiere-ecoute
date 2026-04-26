@@ -42,6 +42,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
          |> assign(:library_playlist, library_playlist)
          |> assign(:streamer, streamer)
          |> assign(:viewer, viewer)
+         |> assign(:viewer_submissions, PlaylistSubmission.list_for_viewer(library_playlist, viewer))
          |> assign(:submissions_count, PlaylistSubmission.count_for_viewer(library_playlist, viewer))
          |> assign(:search_form, to_form(%{"query" => ""}))
          |> assign(:search_results, AsyncResult.ok([]))
@@ -93,6 +94,18 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   @impl true
   def handle_event("clear_selected_track", _params, socket) do
     {:noreply, assign(socket, :selected_track, nil)}
+  end
+
+  @impl true
+  def handle_event("delete_submission", %{"provider_id" => provider_id}, socket) do
+    %{library_playlist: playlist, viewer: viewer} = socket.assigns
+
+    {:noreply,
+     socket
+     |> assign(:error, nil)
+     |> start_async({:delete_submission, provider_id}, fn ->
+       do_delete_submission(playlist, viewer, provider_id)
+     end)}
   end
 
   @impl true
@@ -165,6 +178,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
      |> assign(:submitting, false)
      |> assign(:selected_track, nil)
      |> assign(:search_form, to_form(%{"query" => ""}))
+     |> assign(:viewer_submissions, PlaylistSubmission.list_for_viewer(playlist, viewer))
      |> assign(:submissions_count, socket.assigns.submissions_count + 1)
      |> assign(:tracks, tracks)
      |> assign(:submitters, submitters)
@@ -183,6 +197,27 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
      socket
      |> assign(:submitting, false)
      |> assign(:error, gettext("Failed to add track. Please try again."))}
+  end
+
+  def handle_async({:delete_submission, _provider_id}, {:ok, {:ok, playlist_data}}, socket) do
+    %{library_playlist: playlist, viewer: viewer} = socket.assigns
+    {tracks, submitters} = playlist_data
+
+    {:noreply,
+     socket
+     |> assign(:viewer_submissions, PlaylistSubmission.list_for_viewer(playlist, viewer))
+     |> assign(:submissions_count, PlaylistSubmission.count_for_viewer(playlist, viewer))
+     |> assign(:tracks, tracks)
+     |> assign(:submitters, submitters)
+     |> assign(:success, gettext("Track removed from the playlist."))}
+  end
+
+  def handle_async({:delete_submission, _provider_id}, {:ok, {:error, _}}, socket) do
+    {:noreply, assign(socket, :error, gettext("Failed to remove track. Please try again."))}
+  end
+
+  def handle_async({:delete_submission, _provider_id}, {:exit, _}, socket) do
+    {:noreply, assign(socket, :error, gettext("Failed to remove track. Please try again."))}
   end
 
   # Fetches current playlist tracks from Spotify, checks for duplicate, then adds.
@@ -204,6 +239,27 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
     end
   end
 
+  # Deletes the submission record, then removes the track from Spotify if still present.
+  # Returns {:ok, {tracks, submitters}} on success so the caller can refresh state in one pass.
+  defp do_delete_submission(playlist, viewer, provider_id) do
+    with {:ok, _} <- PlaylistSubmission.delete_for_viewer(playlist, viewer, provider_id) do
+      streamer_scope = build_streamer_scope(playlist.user_id)
+
+      case Apis.spotify().get_playlist(playlist.playlist_id) do
+        {:ok, current_playlist} ->
+          if track_already_present?(current_playlist.tracks, provider_id) do
+            api_track = %Album.Track{provider_ids: %{spotify: provider_id}}
+            Apis.spotify().remove_playlist_items(streamer_scope, playlist.playlist_id, [api_track])
+          end
+
+        _ ->
+          :ok
+      end
+
+      {:ok, load_playlist_data(playlist)}
+    end
+  end
+
   defp track_already_present?(tracks, spotify_id) do
     Enum.any?(tracks, fn t -> t.track_id == spotify_id end)
   end
@@ -218,22 +274,24 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
   end
 
   # AIDEV-NOTE: get_playlist uses client credentials; streamer token only needed for writes.
-  # On each load, stale PlaylistSubmission rows are reconciled against the live Spotify track list.
+  # Reconciliation always runs regardless of show_tracks_to_viewers? so stale submission
+  # records are cleaned up even when the track list is hidden from viewers.
   # Returns {tracks_or_nil, submitters_map}.
   defp load_playlist_data(playlist) do
-    if LibraryPlaylist.show_tracks_to_viewers?(playlist) do
-      case Apis.spotify().get_playlist(playlist.playlist_id) do
-        {:ok, p} ->
-          live_ids = Enum.map(p.tracks, & &1.track_id)
-          PlaylistSubmission.delete_stale(playlist, live_ids)
-          submitters = PlaylistSubmission.submitters_map(playlist)
-          {p.tracks, submitters}
+    case Apis.spotify().get_playlist(playlist.playlist_id) do
+      {:ok, p} ->
+        live_ids = Enum.map(p.tracks, & &1.track_id)
+        PlaylistSubmission.delete_stale(playlist, live_ids)
+        submitters = PlaylistSubmission.submitters_map(playlist)
 
-        _ ->
-          {nil, %{}}
-      end
-    else
-      {nil, %{}}
+        if LibraryPlaylist.show_tracks_to_viewers?(playlist) do
+          {p.tracks, submitters}
+        else
+          {nil, submitters}
+        end
+
+      _ ->
+        {nil, %{}}
     end
   end
 end

@@ -15,15 +15,6 @@
               {@library_playlist.title}
               <span class="text-gray-500">· {@streamer.username}</span>
             </p>
-            <p class="text-xs text-gray-500 mt-0.5">
-              {ngettext(
-                "%{count}/%{limit} submission used",
-                "%{count}/%{limit} submissions used",
-                @submissions_count,
-                count: @submissions_count,
-                limit: LibraryPlaylist.submission_limit(@library_playlist)
-              )}
-            </p>
           </div>
         </div>
       </div>
@@ -202,6 +193,45 @@
             {@error}
           </div>
         <% end %>
+      <% end %>
+      
+<!-- My submissions -->
+      <%= if @viewer_submissions != [] do %>
+        <div class="bg-slate-800/30 rounded-xl border border-gray-700/50 p-6 mt-6">
+          <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-4">
+            {gettext("My submissions")}
+            <span class="text-gray-500 normal-case font-normal">
+              ({length(@viewer_submissions)} / {LibraryPlaylist.submission_limit(@library_playlist)})
+            </span>
+          </h2>
+          <div class="divide-y divide-gray-700/30">
+            <%= for submission <- @viewer_submissions do %>
+              <div class="flex items-center justify-between gap-3 py-2.5">
+                <p class="text-sm text-gray-300 truncate">
+                  {case Enum.find(@tracks || [], &(&1.track_id == submission.provider_id)) do
+                    nil -> submission.provider_id
+                    track -> "#{track.name} · #{track.artist}"
+                  end}
+                </p>
+                <button
+                  phx-click="delete_submission"
+                  phx-value-provider_id={submission.provider_id}
+                  class="flex-shrink-0 p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded"
+                  title={gettext("Remove submission")}
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              </div>
+            <% end %>
+          </div>
+        </div>
       <% end %>
       
 <!-- Current playlist tracks (optional) -->
