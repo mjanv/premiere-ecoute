@@ -98,4 +98,12 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
   defp overlay_url(username, score_type) do
     "#{PremiereEcouteWeb.Endpoint.url()}/sessions/overlay/#{username}?score=#{score_type}"
   end
+
+  defp obs_size_hint("streamer"), do: "300 × 300"
+  defp obs_size_hint("viewer"), do: "300 × 300"
+  defp obs_size_hint("both"), do: "600 × 300"
+  defp obs_size_hint("player"), do: "1200 × 240"
+  defp obs_size_hint("votes"), do: "800 × 240"
+  defp obs_size_hint("collections"), do: "800 × 600"
+  defp obs_size_hint(_), do: "300 × 300"
 end
