@@ -1,13 +1,13 @@
 <.async_result :let={summary} assign={@summary}>
   <:loading>
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <span style={"font-size: 128px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
+      <span style={"font-size: 53vh; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
         -
       </span>
     </div>
   </:loading>
 
-  <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 500px; margin: 0 auto;">
+  <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 100%;">
     <!-- Viewer Score -->
     <div style="display: flex; flex-direction: column; align-items: center; flex: 1; padding: 0 8px;">
       <%= if @widget_state == :closed do %>
@@ -16,7 +16,7 @@
           viewBox="0 0 24 24"
           fill={@text_color}
           aria-hidden="true"
-          style="width: 128px; height: 128px;"
+          style="width: 53vh; height: 53vh;"
         >
           <path
             fill-rule="evenodd"
@@ -31,17 +31,17 @@
             viewBox="0 0 24 24"
             fill={@text_color}
             aria-hidden="true"
-            style="width: 128px; height: 128px;"
+            style="width: 53vh; height: 53vh;"
           >
             <path d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 0 1-1.5 0V6.75a3.75 3.75 0 1 0-7.5 0v3a3 3 0 0 1 3 3v6.75a3 3 0 0 1-3 3H3.75a3 3 0 0 1-3-3v-6.75a3 3 0 0 1 3-3h9v-3c0-2.9 2.35-5.25 5.25-5.25Z" />
           </svg>
         <% else %>
-          <span style={"font-size: 128px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
+          <span style={"font-size: 53vh; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
             {score_value(summary, :viewer)}
           </span>
         <% end %>
       <% end %>
-      <div style={"font-size: 32px; color: #{@text_color}; text-transform: uppercase; letter-spacing: 0.5px;"}>
+      <div style={"font-size: 13vh; color: #{@text_color}; text-transform: uppercase; letter-spacing: 0.5px;"}>
         {score_label(@user, :viewer)}
       </div>
     </div>
@@ -54,7 +54,7 @@
           viewBox="0 0 24 24"
           fill={@text_color}
           aria-hidden="true"
-          style="width: 128px; height: 128px;"
+          style="width: 53vh; height: 53vh;"
         >
           <path
             fill-rule="evenodd"
@@ -69,17 +69,17 @@
             viewBox="0 0 24 24"
             fill={@text_color}
             aria-hidden="true"
-            style="width: 128px; height: 128px;"
+            style="width: 53vh; height: 53vh;"
           >
             <path d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 0 1-1.5 0V6.75a3.75 3.75 0 1 0-7.5 0v3a3 3 0 0 1 3 3v6.75a3 3 0 0 1-3 3H3.75a3 3 0 0 1-3-3v-6.75a3 3 0 0 1 3-3h9v-3c0-2.9 2.35-5.25 5.25-5.25Z" />
           </svg>
         <% else %>
-          <span style={"font-size: 128px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
+          <span style={"font-size: 53vh; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
             {score_value(summary, :streamer)}
           </span>
         <% end %>
       <% end %>
-      <div style={"font-size: 32px; color: #{@text_color}; text-transform: uppercase; letter-spacing: 0.5px;"}>
+      <div style={"font-size: 13vh; color: #{@text_color}; text-transform: uppercase; letter-spacing: 0.5px;"}>
         {score_label(@user, :streamer)}
       </div>
     </div>

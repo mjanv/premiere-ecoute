@@ -240,12 +240,14 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp parse_score("votes"), do: :votes
   defp parse_score(_), do: :player
 
-  defp overlay_width(:player), do: 480 * 2.5
-  defp overlay_width(:both), do: 480
-  defp overlay_width(:votes), do: 800
-  defp overlay_width(_), do: 240
+  # AIDEV-NOTE: single/streamer/viewer use 100vw/100vh to fill OBS browser source at any size
+  defp overlay_size(:player), do: "width: #{480 * 2.5}px; height: 240px; "
+  defp overlay_size(:both), do: "width: 100vw; height: 100vh; "
+  defp overlay_size(:votes), do: "width: 800px; height: 240px; "
+  defp overlay_size(_), do: "width: 100vw; height: 100vh; "
 
-  defp overlay_height(_), do: 240
+  defp progress_bar_height(score) when score in [:viewer, :streamer, :both], do: "10vh"
+  defp progress_bar_height(_), do: "24px"
 
   defp compute_vote_distribution(summary, %ListeningSession{} = session) do
     track_id = summary[:track_id] || summary["track_id"]
