@@ -535,7 +535,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> where([s], s.id in ^session_ids and s.status == :stopped)
     |> order_by([s], desc: s.started_at)
     |> limit(^limit)
-    |> preload(album: [:tracks, :artists])
+    |> preload([:user, album: [:tracks, :artists]])
     |> Repo.all()
   end
 
