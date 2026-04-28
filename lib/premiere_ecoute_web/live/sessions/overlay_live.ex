@@ -23,6 +23,15 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   def mount(%{"username" => username}, _session, socket) do
     user = Accounts.User.get_user_by_username(username)
 
+    # AIDEV-NOTE: guard against nil user (unknown username) to prevent BadMapError on user.id
+    if is_nil(user) do
+      {:ok, redirect(socket, to: "/")}
+    else
+      mount_with_user(user, socket)
+    end
+  end
+
+  defp mount_with_user(user, socket) do
     color_primary = Accounts.profile(user, [:widget_settings, :color_primary])
     color_secondary = Accounts.profile(user, [:widget_settings, :color_secondary])
 
