@@ -29,6 +29,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.Retrospective.Report
 
+  @vote_options %{
+    "0-10" => ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+    "1-5" => ["1", "2", "3", "4", "5"],
+    "67" => ["6", "7", "67"],
+    "smash-pass" => ["smash", "pass"]
+  }
+
   @type t :: %__MODULE__{
           id: integer() | nil,
           status: atom(),
@@ -77,6 +84,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
     timestamps(type: :utc_datetime)
   end
+
+  def vote_options(key), do: @vote_options[key]
 
   # AIDEV-NOTE: preload/1 override to populate Album.artist virtual field after association preload
   def preload({:ok, entity}), do: {:ok, preload(entity)}

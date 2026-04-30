@@ -773,13 +773,14 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
               </option>
               <option value="0-10" selected={@vote_options_preset == "0-10"}>{gettext("0-10 Rating")}</option>
               <option value="1-5" selected={@vote_options_preset == "1-5"}>{gettext("1-5 Rating")}</option>
-              <option value="smash-pass" selected={@vote_options_preset == "smash-pass"}>{gettext("Smash or Pass")}</option>
+              <option value="67" selected={@vote_options_preset == "1-5"}>{"Six seveeeen!"}</option>
+              <option value="smash-pass" selected={@vote_options_preset == "smash-pass"}>{"Smash or Pass"}</option>
             </select>
           </form>
 
           <%= if @vote_options_preset && @vote_options_preset != "" do %>
             <div class="flex flex-wrap gap-1.5">
-              <%= for option <- vote_options(@vote_options_preset) do %>
+              <%= for option <- PremiereEcoute.Sessions.ListeningSession.vote_options(@vote_options_preset) do %>
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-600/15 text-purple-300 border border-purple-600/25 hover:bg-purple-600/25 transition-colors">
                   {option}
                 </span>
@@ -791,7 +792,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
         </div>
 
         <%= if @source_type == "free" && @vote_options_preset && @vote_options_preset != "" do %>
-          <% opts = vote_options(@vote_options_preset) %>
+          <% opts = PremiereEcoute.Sessions.ListeningSession.vote_options(@vote_options_preset) %>
           <% poll_allowed = length(opts) <= 5 %>
           <div class="mt-4 flex items-center gap-3">
             <button
@@ -914,9 +915,4 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
     </form>
     """
   end
-
-  defp vote_options("0-10"), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-  defp vote_options("1-5"), do: ["1", "2", "3", "4", "5"]
-  defp vote_options("smash-pass"), do: ["smash", "pass"]
-  defp vote_options(_), do: []
 end

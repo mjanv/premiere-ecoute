@@ -108,14 +108,4 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     )
     |> Repo.all()
   end
-
-  @doc """
-  Parses vote value from chat message using default vote options 0-10.
-
-  Convenience function using standard vote scale.
-  """
-  @spec from_message(String.t()) :: {:ok, String.t()} | {:error, String.t()}
-  def from_message(message) do
-    from_message(message, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
-  end
 end

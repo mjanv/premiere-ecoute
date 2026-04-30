@@ -389,7 +389,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   end
 
   defp vote_option_color(rating, session) do
-    vote_options = session.vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    vote_options = session.vote_options
     total_options = length(vote_options)
 
     # Find the index of this vote option

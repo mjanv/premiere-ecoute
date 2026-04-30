@@ -99,6 +99,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
       case session.vote_options do
         ["0" | _] -> :numeric
         ["1" | _] -> :numeric
+        ["6" | _] -> :numeric
         ["smash" | _] -> :text
       end
 

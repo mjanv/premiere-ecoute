@@ -590,11 +590,11 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   def vote_type_display(nil), do: "0-10"
 
   def vote_type_display(%{vote_options: vote_options}) when is_list(vote_options) do
-    cond do
-      vote_options == ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] -> "0-10"
-      vote_options == ["1", "2", "3", "4", "5"] -> "1-5"
-      vote_options == ["smash", "pass"] -> gettext("Smash or Pass")
-      true -> gettext("Custom (%{count} options)", count: length(vote_options))
+    case vote_options do
+      ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] -> "0-10"
+      ["1", "2", "3", "4", "5"] -> "1-5"
+      ["6", "7", "67"] -> "67"
+      ["smash", "pass"] -> "Smash or Pass"
     end
   end
 

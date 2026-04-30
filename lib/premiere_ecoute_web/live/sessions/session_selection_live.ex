@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions.AlbumPicks
+  alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
 
   require Logger
@@ -505,18 +506,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
-  @doc """
-  Returns vote options list based on preset configuration.
-
-  Maps preset identifiers (0-10, 1-5, smash-pass) to their corresponding vote option arrays for session configuration.
-  """
+  @doc "Returns vote options list based on preset configuration."
   @spec get_vote_options(map()) :: [String.t()]
-  def get_vote_options(%{vote_options_preset: "0-10"}), do: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-  def get_vote_options(%{vote_options_preset: "1-5"}), do: ["1", "2", "3", "4", "5"]
-  def get_vote_options(%{vote_options_preset: "smash-pass"}), do: ["smash", "pass"]
-  def get_vote_options(%{vote_options_preset: nil}), do: []
-
-  # default fallback - return empty for any other case
+  def get_vote_options(%{vote_options_preset: preset}), do: ListeningSession.vote_options(preset)
   def get_vote_options(_), do: []
 
   defp get_user_id(socket) do

@@ -60,7 +60,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              user_id: user_id,
              source: :album,
              album_id: album.id,
-             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+             vote_options: vote_options,
              options: %{
                "votes" => 0,
                "scores" => 0,
@@ -99,7 +99,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              user_id: user_id,
              source: :track,
              single_id: single.id,
-             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+             vote_options: vote_options,
              options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
            }) do
       {:ok, session,
@@ -133,7 +133,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              user_id: user_id,
              source: :playlist,
              playlist_id: playlist.id,
-             vote_options: vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+             vote_options: vote_options,
              options: %{
                "votes" => 0,
                "scores" => 0,
@@ -355,7 +355,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         vote_mode: vote_mode,
         autostart: autostart
       }) do
-    resolved_options = vote_options || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    resolved_options = vote_options
 
     case ListeningSession.create(%{
            user_id: user_id,
