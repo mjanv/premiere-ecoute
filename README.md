@@ -22,7 +22,6 @@ Premiere Ecoute turns music discovery into an interactive experience where strea
 - 🐘 [Postgres](https://www.postgresql.org/)
 - 🧙‍♂️ [Elixir](https://elixir-lang.org/)
 - 🐦 [Phoenix Framework](https://www.phoenixframework.org/)
-- 📱 [_React Native_](https://reactnative.dev/)
 
 ## Documentation
 
