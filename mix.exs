@@ -27,20 +27,7 @@ defmodule PremiereEcoute.MixProject do
         groups_for_extras: [
           Doc: Path.wildcard("docs/*.md")
         ],
-        groups_for_modules: [
-          "Backend - Accounts": ~r/^PremiereEcoute\.Accounts(\.|$)/,
-          "Backend - Sessions": ~r/^PremiereEcoute\.Sessions(\.|$)/,
-          "Backend - Core": ~r/^PremiereEcoute\.Core(\.|$)/,
-          "Backend - APIs": ~r/^PremiereEcoute\.Apis(\.|$)/,
-          Backend: ~r/^PremiereEcoute(\.|$)/,
-          "Web - Accounts": ~r/^PremiereEcouteWeb\.Accounts(\.|$)/,
-          "Web - Sessions": ~r/^PremiereEcouteWeb\.Sessions(\.|$)/,
-          "Web - Static": ~r/^PremiereEcouteWeb\.Static(\.|$)/,
-          "Web - Webhooks": ~r/^PremiereEcouteWeb\.Webhooks(\.|$)/,
-          "Web - Plugs": ~r/^PremiereEcouteWeb\.Plugs(\.|$)/,
-          "Web - Errors": ~r/^PremiereEcouteWeb\.Errors(\.|$)/,
-          Web: ~r/^PremiereEcouteWeb(\.|$)/
-        ]
+        groups_for_modules: groups_for_modules()
       ]
     ]
   end
@@ -57,6 +44,36 @@ defmodule PremiereEcoute.MixProject do
       default_task: "phx.server",
       preferred_envs: [test: :test, "test.cover": :test, "test.watch": :test]
     ]
+  end
+
+  defp groups_for_modules do
+    prefixes = [
+      {"Backend", "PremiereEcoute"},
+      {"Web", "PremiereEcouteWeb"},
+      {"Core", "PremiereEcouteCore"},
+      {"Mock", "PremiereEcouteMock"}
+    ]
+
+    subgroups =
+      for {label, ns} <- prefixes do
+        Path.wildcard("lib/**/*.ex")
+        |> Enum.flat_map(fn path ->
+          path
+          |> File.read!()
+          |> then(fn content -> Regex.scan(~r/^defmodule #{ns}\.([A-Z][A-Za-z0-9]+)/, content, multiline: true) end)
+          |> Enum.map(fn [_, sub] -> sub end)
+        end)
+        |> Enum.uniq()
+        |> Enum.sort()
+        |> Enum.map(fn sub -> {"#{label} - #{sub}", ~r/^#{ns}\.#{sub}(\.|$)/} end)
+      end
+
+    catchalls =
+      for {label, ns} <- prefixes do
+        {String.to_atom(label), ~r/^#{ns}(\.|$)/}
+      end
+
+    List.flatten(subgroups) ++ catchalls ++ [Storybook: ~r/^Storybook(\.|$)/, Mix: ~r/^PremiereEcouteMix$/]
   end
 
   defp elixirc_paths(_), do: ["lib", "test/support"]
