@@ -171,7 +171,7 @@ jobs:
 
       - name: Deploy release to server
         run: |
-          rsync -av --delete --exclude='.env' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
+          rsync -avz --delete --exclude='.env' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
 
       - name: Deploy .env file
         run: |
