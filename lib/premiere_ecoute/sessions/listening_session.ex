@@ -14,7 +14,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
       current_playlist_track: [],
       single: [:artists],
       track_markers: [],
-      speech_markers: []
+      speech_markers: [],
+      session_notes: []
     ],
     json: [:id, :status, :started_at, :ended_at, :user, :album, :current_track, :playlist, :single]
 
@@ -25,6 +26,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions.ListeningSession.SessionNote
   alias PremiereEcoute.Sessions.ListeningSession.SpeechMarker
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.Retrospective.Report
@@ -81,6 +83,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     has_one :report, Report, foreign_key: :session_id
     has_many :track_markers, TrackMarker, foreign_key: :listening_session_id
     has_many :speech_markers, SpeechMarker, foreign_key: :listening_session_id
+    has_many :session_notes, SessionNote, foreign_key: :listening_session_id
 
     timestamps(type: :utc_datetime)
   end
@@ -256,13 +259,42 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     {:error, :no_current_track}
   end
 
-  @doc """
-  Records a transcribed speech segment against a session.
+  @doc "Adds a streamer note to the session, optionally linked to the current track marker."
+  @spec add_note(t(), String.t(), integer() | nil) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def add_note(%__MODULE__{} = session, content, track_marker_id \\ nil) do
+    with {:ok, _note} <-
+           %SessionNote{}
+           |> SessionNote.changeset(%{
+             content: content,
+             listening_session_id: session.id,
+             track_marker_id: track_marker_id
+           })
+           |> Repo.insert() do
+      {:ok, get(session.id)}
+    end
+  end
 
-  `start_ms` and `end_ms` are millisecond offsets from the session's `started_at` timestamp.
-  `text` is the Whisper transcription result; it may be nil when the segment is inserted
-  immediately and filled in asynchronously.
-  """
+  @doc "Deletes a session note from the session."
+  @spec delete_note(t(), SessionNote.t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def delete_note(%__MODULE__{} = session, %SessionNote{} = note) do
+    with {:ok, _} <- Repo.delete(note) do
+      {:ok, get(session.id)}
+    end
+  end
+
+  @doc "Returns the most recent track marker ID for the session, or nil if none."
+  @spec current_track_marker_id(t()) :: integer() | nil
+  def current_track_marker_id(%__MODULE__{track_markers: markers}) when is_list(markers) do
+    markers
+    |> Enum.sort_by(& &1.started_at, {:desc, DateTime})
+    |> case do
+      [%{id: id} | _] -> id
+      [] -> nil
+    end
+  end
+
+  def current_track_marker_id(_), do: nil
+
   @spec add_speech_marker(t(), integer(), integer(), String.t() | nil) ::
           {:ok, SpeechMarker.t()} | {:error, Ecto.Changeset.t()}
   def add_speech_marker(%__MODULE__{} = session, start_ms, end_ms, text \\ nil) do

@@ -64,6 +64,9 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       |> assign(:next_track_at, nil)
       |> assign(:show_youtube_modal, false)
       |> assign(:show_premiere_modal, false)
+      |> assign(:show_note_hud, false)
+      |> assign(:notes_open, false)
+      |> assign(:notes_grouping, :none)
       |> assign(:microphone_active, false)
       |> assign(:recording_started_at, nil)
       |> assign(:last_segment, nil)
@@ -313,6 +316,54 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   @impl true
   def handle_event("segment_detected", _params, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("set_notes_grouping", %{"mode" => mode}, socket) do
+    {:noreply, assign(socket, :notes_grouping, String.to_existing_atom(mode))}
+  end
+
+  @impl true
+  def handle_event("toggle_notes_open", _params, socket) do
+    {:noreply, assign(socket, :notes_open, !socket.assigns.notes_open)}
+  end
+
+  @impl true
+  def handle_event("toggle_note_hud", _params, socket) do
+    {:noreply, assign(socket, :show_note_hud, !socket.assigns.show_note_hud)}
+  end
+
+  @impl true
+  def handle_event("close_note_hud", _params, socket) do
+    {:noreply, assign(socket, :show_note_hud, false)}
+  end
+
+  @impl true
+  def handle_event("save_note", %{"content" => content}, %{assigns: %{listening_session: session}} = socket)
+      when byte_size(content) > 0 do
+    track_marker_id = if session.status == :active, do: ListeningSession.current_track_marker_id(session)
+
+    case ListeningSession.add_note(session, content, track_marker_id) do
+      {:ok, session} ->
+        {:noreply, socket |> assign(:listening_session, session) |> push_event("clear_note_input", %{})}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, gettext("Cannot save note"))}
+    end
+  end
+
+  def handle_event("save_note", _params, socket), do: {:noreply, socket}
+
+  @impl true
+  def handle_event("delete_note", %{"id" => id}, %{assigns: %{listening_session: session}} = socket) do
+    case Enum.find(session.session_notes, &(to_string(&1.id) == id)) do
+      nil ->
+        {:noreply, socket}
+
+      note ->
+        {:ok, session} = ListeningSession.delete_note(session, note)
+        {:noreply, assign(socket, :listening_session, session)}
+    end
   end
 
   @impl true
@@ -754,6 +805,59 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
     </svg>
     """
+  end
+
+  defp group_notes_by_track(%ListeningSession{} = session) do
+    notes = Enum.sort_by(session.session_notes, & &1.inserted_at, {:asc, DateTime})
+    markers = Enum.sort_by(session.track_markers, & &1.track_number)
+
+    {before_notes, mid_notes, after_notes} =
+      Enum.reduce(notes, {[], [], []}, fn note, {before, mid, after_} ->
+        cond do
+          session.started_at && DateTime.before?(note.inserted_at, session.started_at) ->
+            {[note | before], mid, after_}
+
+          session.ended_at && DateTime.after?(note.inserted_at, session.ended_at) ->
+            {before, mid, [note | after_]}
+
+          true ->
+            {before, [note | mid], after_}
+        end
+      end)
+
+    mid_by_marker = mid_notes |> Enum.reverse() |> Enum.group_by(& &1.track_marker_id)
+
+    track_groups =
+      for marker <- markers,
+          track_notes = Map.get(mid_by_marker, marker.id, []),
+          track_notes != [],
+          do: {"#{marker.track_number}. #{note_track_name(session, marker)}", track_notes}
+
+    [
+      {gettext("Before"), Enum.reverse(before_notes)},
+      {gettext("Session"), Map.get(mid_by_marker, nil, [])}
+    ]
+    |> Kernel.++(track_groups)
+    |> Kernel.++([{gettext("After"), Enum.reverse(after_notes)}])
+    |> Enum.reject(fn {_label, ns} -> ns == [] end)
+  end
+
+  defp note_track_name(%ListeningSession{source: :album, album: album}, marker) when not is_nil(album) do
+    case Enum.find(album.tracks, &(&1.id == marker.track_id)) do
+      nil -> marker.track_name || gettext("Track %{n}", n: marker.track_number)
+      track -> track.name
+    end
+  end
+
+  defp note_track_name(%ListeningSession{source: :playlist, playlist: playlist}, marker) when not is_nil(playlist) do
+    case Enum.find(playlist.tracks, &(&1.id == marker.track_id)) do
+      nil -> marker.track_name || gettext("Track %{n}", n: marker.track_number)
+      track -> track.name
+    end
+  end
+
+  defp note_track_name(_session, marker) do
+    marker.track_name || gettext("Track %{n}", n: marker.track_number)
   end
 
   @doc """

@@ -24,6 +24,7 @@ import { WikipediaDrawer } from "./wikipedia_drawer";
 import { PlaySound } from "./play_sound";
 import { ShareButton } from "./share_button";
 import { AnalyticsChart } from "./analytics_chart";
+import { NoteHud } from "./note_hud";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -51,5 +52,6 @@ export const Hooks = {
   WikipediaDrawer: WikipediaDrawer,
   PlaySound: PlaySound,
   ShareButton: ShareButton,
-  AnalyticsChart: AnalyticsChart
+  AnalyticsChart: AnalyticsChart,
+  NoteHud: NoteHud
 };

@@ -5,6 +5,7 @@
   current_scope={assigns[:current_scope] || %{}}
   current_page="my_sessions"
 >
+  <div id="note-hud-listener" phx-hook="NoteHud" class="hidden"></div>
   <div class="synthwave-bg min-h-screen text-white" phx-hook="FileDownload" id="dashboard-page">
     <div class="max-w-7xl mx-auto pt-12 pb-6 px-6 flex items-center">
       <div class="w-2/3">
@@ -390,6 +391,104 @@
           </.gradient_bg>
         <% end %>
 
+        <div class="mb-6 mt-8 border border-white/30 rounded-xl">
+          <div class="flex items-center px-4 py-3 gap-3">
+            <button
+              type="button"
+              phx-click="toggle_notes_open"
+              class="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors flex-1"
+            >
+              <svg
+                class={["w-4 h-4 transition-transform", if(@notes_open, do: "rotate-90", else: "")]}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+              <span>{gettext("Notes")} ({length(@listening_session.session_notes)})</span>
+            </button>
+            <%= if @listening_session.status == :stopped do %>
+              <button
+                type="button"
+                title={gettext("Copy all notes")}
+                onclick={"navigator.clipboard.writeText(#{Jason.encode!(Enum.map_join(Enum.sort_by(@listening_session.session_notes, & &1.inserted_at, {:asc, DateTime}), "\n\n", & &1.content))})"}
+                class="text-slate-500 hover:text-white transition-colors border border-white/10 hover:border-white/30 rounded-md p-1"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+              <div class="flex items-center rounded-lg overflow-hidden border border-white/10 text-xs">
+                <%= for {label, mode} <- [{gettext("none"), "none"}, {gettext("time"), "time"}, {gettext("track"), "track"}] do %>
+                  <button
+                    type="button"
+                    phx-click="set_notes_grouping"
+                    phx-value-mode={mode}
+                    class={[
+                      "px-3 py-1 transition-colors",
+                      if(@notes_grouping == String.to_existing_atom(mode),
+                        do: "bg-white/15 text-white",
+                        else: "text-slate-500 hover:text-slate-300"
+                      )
+                    ]}
+                  >
+                    {label}
+                  </button>
+                <% end %>
+              </div>
+            <% end %>
+            <%= if @listening_session.status != :stopped do %>
+              <kbd class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[#4a4030] text-xs font-mono bg-[linear-gradient(to_bottom,#e8e0cc,#cfc8b4)] border border-[#a09070] shadow-[0_2px_0_#7a6a50,inset_0_1px_0_rgba(255,255,255,0.7)]">
+                TAB
+              </kbd>
+            <% end %>
+          </div>
+          <%= if @notes_open do %>
+            <div class="border-t border-white/10 px-4 pb-4 pt-3">
+              <%= if @notes_grouping == :track do %>
+                <% groups = group_notes_by_track(@listening_session) %>
+                <%= for {label, notes} <- groups do %>
+                  <div class="mb-4">
+                    <p class="text-xs text-slate-500 uppercase tracking-wide mb-2">{label}</p>
+                    <div class="space-y-2">
+                      <%= for note <- notes do %>
+                        <div class="rounded-lg bg-white/5 border border-white/20 px-4 py-3">
+                          <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{note.content}</p>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              <% else %>
+                <%= if @notes_grouping == :none do %>
+                  <div class="rounded-lg bg-white/5 border border-white/20 px-4 py-3 space-y-2">
+                    <%= for note <- Enum.sort_by(@listening_session.session_notes, & &1.inserted_at, {:asc, DateTime}) do %>
+                      <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{note.content}</p>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="space-y-2">
+                    <%= for note <- Enum.sort_by(@listening_session.session_notes, & &1.inserted_at, {:asc, DateTime}) do %>
+                      <div class="rounded-lg bg-white/5 border border-white/20 px-4 py-3 flex items-start gap-3">
+                        <span class="text-white/30 text-xs pt-0.5 flex-shrink-0 tabular-nums">
+                          {Calendar.strftime(note.inserted_at, "%H:%M")}
+                        </span>
+                        <p class="text-white/80 text-sm leading-relaxed flex-1 whitespace-pre-wrap">{note.content}</p>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
         <div class="mb-6 mt-8">
           <%= if @listening_session.source == :free do %>
             <!-- Free mode: show captured track markers list + current captured track -->
@@ -678,4 +777,74 @@
   <% end %>
 
   <.live_component module={PremiereEcouteWeb.Components.WikipediaDrawer} id="wiki" />
+
+  <%= if @show_note_hud do %>
+    <div class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-md"></div>
+      <div class="relative z-10 w-full max-w-2xl mx-4">
+        <form phx-submit="save_note">
+          <div class="rounded-xl shadow-2xl overflow-hidden">
+            <%!-- Input sits directly in the blur — no card background --%>
+            <div class="flex items-start gap-3 px-5 py-4 bg-white/5 backdrop-blur-xl border border-white/10">
+              <svg class="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              <textarea
+                name="content"
+                id="note-hud-input"
+                rows="1"
+                phx-mounted={JS.focus()}
+                autocomplete="off"
+                placeholder={
+                  if ListeningSession.current_track_marker_id(@listening_session),
+                    do: gettext("Note for current track…"),
+                    else: gettext("Session note…")
+                }
+                class="flex-1 bg-transparent text-white placeholder-white/30 focus:outline-none text-sm resize-none leading-relaxed overflow-hidden"
+              ></textarea>
+              <div class="flex items-center gap-1 flex-shrink-0">
+                <kbd class="inline-flex items-center px-2 py-1 rounded-sm text-[#4a4030] text-xs font-mono bg-[linear-gradient(to_bottom,#e8e0cc,#cfc8b4)] border border-[#a09070] shadow-[0_3px_0_#7a6a50,0_4px_6px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.7)]">
+                  ↵
+                </kbd>
+                <kbd class="inline-flex items-center px-2 py-1 rounded-sm text-[#4a4030] text-xs font-mono bg-[linear-gradient(to_bottom,#e8e0cc,#cfc8b4)] border border-[#a09070] shadow-[0_3px_0_#7a6a50,0_4px_6px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.7)]">
+                  ESC
+                </kbd>
+                <kbd class="inline-flex items-center px-2 py-1 rounded-sm text-[#4a4030] text-xs font-mono bg-[linear-gradient(to_bottom,#e8e0cc,#cfc8b4)] border border-[#a09070] shadow-[0_3px_0_#7a6a50,0_4px_6px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.7)]">
+                  TAB
+                </kbd>
+              </div>
+            </div>
+            <%!-- Existing notes, most recent first --%>
+            <%= if @listening_session.session_notes != [] do %>
+              <div class="bg-black/40 backdrop-blur-xl border-x border-b border-white/10 divide-y divide-white/20 max-h-64 overflow-y-auto">
+                <%= for note <- Enum.sort_by(@listening_session.session_notes, & &1.inserted_at, {:desc, DateTime}) do %>
+                  <div class="px-4 py-2 flex items-start gap-3 group">
+                    <span class="text-white/20 text-xs pt-0.5 flex-shrink-0 tabular-nums">
+                      {Calendar.strftime(note.inserted_at, "%H:%M")}
+                    </span>
+                    <p class="text-white/70 text-xs leading-relaxed flex-1 whitespace-pre-wrap">{note.content}</p>
+                    <button
+                      type="button"
+                      phx-click="delete_note"
+                      phx-value-id={note.id}
+                      class="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 transition-all flex-shrink-0 self-center"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </form>
+      </div>
+    </div>
+  <% end %>
 </Layouts.app>
