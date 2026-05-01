@@ -106,7 +106,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorkerTest do
           source: :album,
           user_id: user.id,
           album_id: Map.get(album.provider_ids, :spotify),
-          interlude_threshold_ms: 45_000
+          interlude_threshold_ms: 45_000,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       assert session.options["interlude_threshold_ms"] == 45_000
@@ -122,7 +123,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorkerTest do
         PremiereEcoute.apply(%PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession{
           source: :album,
           user_id: user.id,
-          album_id: Map.get(album.provider_ids, :spotify)
+          album_id: Map.get(album.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       assert is_nil(session.options["interlude_threshold_ms"])
@@ -141,7 +143,8 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorkerTest do
           source: :playlist,
           user_id: user.id,
           playlist_id: playlist.playlist_id,
-          interlude_threshold_ms: 30_000
+          interlude_threshold_ms: 30_000,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       assert session.options["interlude_threshold_ms"] == 30_000

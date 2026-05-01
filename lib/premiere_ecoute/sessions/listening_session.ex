@@ -718,16 +718,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   """
   @spec can_view_retrospective?(t(), Scope.t()) :: boolean()
   def can_view_retrospective?(%__MODULE__{visibility: :public}, _scope), do: true
-
-  def can_view_retrospective?(%__MODULE__{}, %Scope{user: %User{role: :admin}}), do: true
-
+  def can_view_retrospective?(%__MODULE__{visibility: _}, %Scope{user: %User{role: :admin}}), do: true
   def can_view_retrospective?(%__MODULE__{visibility: :protected}, %Scope{user: %User{}}), do: true
-
-  def can_view_retrospective?(%__MODULE__{user_id: user_id, visibility: :private}, %Scope{
-        user: %User{id: user_id}
-      }),
-      do: true
-
+  def can_view_retrospective?(%__MODULE__{visibility: :private, user_id: id}, %Scope{user: %User{id: id}}), do: true
   def can_view_retrospective?(%__MODULE__{}, _scope), do: false
 
   @doc "Fetches paginated sessions for admin, optionally filtered by user email, Twitch username, album name, or artist name."

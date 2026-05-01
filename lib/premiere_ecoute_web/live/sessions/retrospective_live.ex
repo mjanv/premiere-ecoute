@@ -45,9 +45,8 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
       {:error, :not_stopped} ->
         redirect_with_error(socket, "Retrospective only available for ended sessions")
 
-      {:error, :unauthorized, listening_session} ->
-        error_message = authorization_error_message(listening_session, current_scope)
-        redirect_with_error(socket, error_message)
+      {:error, {:unauthorized, listening_session}} ->
+        redirect_with_error(socket, authorization_error_message(listening_session, current_scope))
     end
   end
 
@@ -58,7 +57,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     if Sessions.can_view_retrospective?(listening_session, current_scope) do
       :ok
     else
-      {:error, :unauthorized, listening_session}
+      {:error, {:unauthorized, listening_session}}
     end
   end
 
@@ -137,7 +136,6 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
   @impl true
   def handle_event("update_review_form", %{"review" => params}, socket) do
-    # AIDEV-NOTE: cast all user-editable fields to keep the form consistent between phx-change events
     changeset =
       Ecto.Changeset.cast(socket.assigns.review_form.source, params, [
         :content,

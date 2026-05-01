@@ -133,11 +133,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
   """
   @spec replace_items_to_playlist(Scope.t(), String.t(), list(Track.t())) :: {:ok, map()} | {:error, term()}
   def replace_items_to_playlist(scope, id, tracks) do
-    # AIDEV-NOTE: Spotify PUT /playlists/:id/tracks accepts max 100 URIs; first chunk
-    # clears+sets the playlist, subsequent chunks are POSTed (appended) in order.
-    [first_chunk | rest_chunks] = Enum.chunk_every(tracks, @items_limit)
-
-    with {:ok, result} <-
+    with [first_chunk | rest_chunks] <- Enum.chunk_every(tracks, @items_limit),
+         {:ok, result} <-
            scope
            |> SpotifyApi.api()
            |> SpotifyApi.put(
@@ -188,7 +185,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
     end)
   end
 
-  # AIDEV-NOTE: both Album.Track and Playlist.Track implement provider/2 on their own module
   defp track_id(%{__struct__: mod} = track), do: mod.provider(track, :spotify)
 
   defp valid_track_item?(item), do: not is_nil(item["track"])

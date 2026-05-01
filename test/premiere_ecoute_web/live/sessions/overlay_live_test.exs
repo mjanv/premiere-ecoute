@@ -39,10 +39,10 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       conn = log_in_user(conn, user)
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
-      # Verify overlay is rendered with proper dimensions (default streamer width: 240px)
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
-      assert html =~ "height: 240px"
+      # Verify overlay is rendered with proper dimensions (default streamer width: 100vw)
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
+      assert html =~ "height: 10vh"
     end
 
     test "displays overlay with correct score type from query params", %{conn: conn, user: user, album: album} do
@@ -54,9 +54,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       conn = log_in_user(conn, user)
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=viewer")
 
-      # Viewer score also uses 240px width
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
+      # Viewer score also uses 100vw width
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
     end
   end
 
@@ -66,9 +66,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Default overlay should render with streamer dimensions
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
-      assert html =~ "height: 240px"
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
+      assert html =~ "height: 10vh"
     end
 
     test "displays default overlay when user has only preparing session", %{conn: conn, user: user, album: album} do
@@ -81,8 +81,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Should show default overlay since preparing sessions don't count as active
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
     end
 
     test "displays default overlay when user has only stopped session", %{conn: conn, user: user, album: album} do
@@ -97,8 +97,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Should show default overlay since stopped sessions don't count as active
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
     end
   end
 
@@ -118,8 +118,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify overlay renders for the most recent active session
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
     end
   end
 
@@ -138,17 +138,17 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify overlay renders initially
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
       # Send vote_close event and verify it re-renders
       send(view.pid, :vote_close)
       html = render(view)
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
       # Send vote_open event and verify it re-renders
       send(view.pid, :vote_open)
       html = render(view)
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
     end
 
     test "updates progress when :player event received", %{conn: conn, user: user, album: album} do
@@ -160,7 +160,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       conn = log_in_user(conn, user)
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
       player_state = %{
         "progress_ms" => 60_000,
@@ -171,7 +171,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       html = render(view)
 
       # Progress should update the gradient (33% progress)
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
     end
 
     test "handles :session_summary event", %{conn: conn, user: user, album: album} do
@@ -183,7 +183,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       conn = log_in_user(conn, user)
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
       session_summary = %{"streamer_score" => 8.5, "viewer_score" => 7.2}
 
@@ -191,7 +191,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       html = render(view)
 
       # Summary event should trigger a re-render
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
     end
 
     test "handles :player :no_device event", %{conn: conn, user: user, album: album} do
@@ -203,13 +203,13 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       conn = log_in_user(conn, user)
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
       send(view.pid, {:player, :no_device, %{}})
       html = render(view)
 
       # Should still render overlay even without device
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
     end
   end
 
@@ -222,17 +222,17 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
 
       conn = log_in_user(conn, user)
 
-      # Default score (streamer) - width: 240px
+      # Default score (streamer) - width: 100vw
       {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
-      # Viewer score - width: 240px
+      # Viewer score - width: 100vw
       {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=viewer")
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
-      # Both scores - width: 480px
+      # Both scores - width: 100vw
       {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=both")
-      assert html =~ "width: 480px"
+      assert html =~ "width: 100vw"
 
       # Player score - width: 1200px (480 * 2.5)
       {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}?score=player")
@@ -255,9 +255,9 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify the overlay shows the active session with proper rendering
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
-      assert html =~ "height: 240px"
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
+      assert html =~ "height: 10vh"
     end
 
     test "overlay updates when session is stopped", %{conn: conn, user: user, album: album} do
@@ -270,7 +270,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, _view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Verify active session is displayed
-      assert html =~ "width: 240px"
+      assert html =~ "width: 100vw"
 
       # Now stop the session and reload
       {:ok, _} = ListeningSession.stop(session)
@@ -279,8 +279,8 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       {:ok, view, html} = live(conn, ~p"/sessions/overlay/#{user.username}")
 
       # Should still show overlay (default display for no active session)
-      assert has_element?(view, "div[style*='width: 240px']")
-      assert html =~ "width: 240px"
+      assert has_element?(view, "div[style*='width: 100vw']")
+      assert html =~ "width: 100vw"
     end
   end
 end

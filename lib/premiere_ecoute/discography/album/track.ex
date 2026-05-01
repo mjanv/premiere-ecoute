@@ -38,6 +38,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
     field :slug, Slug.Type
     field :track_number, :integer
     field :duration_ms, :integer
+    # TODO: must be rethink - how to carry metadata information (here spotify album id) ?
     # AIDEV-NOTE: virtual field used to carry album_spotify_id from Spotify API response without persisting it
     field :album_spotify_id, :string, virtual: true
 

@@ -82,7 +82,6 @@ defmodule PremiereEcoute.Discography.Album do
   Populates the virtual :artist field from the first entry in :artists.
   """
   @spec put_artist(nil | t()) :: nil | t()
-  # AIDEV-NOTE: intentionally parallel to Single.put_artist/1 — both derive :artist from :artists
   def put_artist(nil), do: nil
   def put_artist(%__MODULE__{artists: [artist | _]} = album), do: %{album | artist: artist}
   def put_artist(%__MODULE__{} = album), do: album

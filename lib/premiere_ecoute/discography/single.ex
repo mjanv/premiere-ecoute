@@ -46,7 +46,6 @@ defmodule PremiereEcoute.Discography.Single do
     timestamps(type: :utc_datetime)
   end
 
-  # AIDEV-NOTE: intentionally parallel to Album.put_artist/1 — both derive :artist from :artists
   @doc "Populates the virtual :artist field from the first entry in :artists."
   @spec put_artist(nil | t()) :: nil | t()
   def put_artist(nil), do: nil
@@ -93,17 +92,14 @@ defmodule PremiereEcoute.Discography.Single do
   end
 
   def create_if_not_exists(%__MODULE__{provider_ids: provider_ids} = single) when map_size(provider_ids) > 0 do
-    # AIDEV-NOTE: lookup by first provider entry since there is no unique constraint on provider_ids
     [{provider, id}] = Enum.take(provider_ids, 1)
 
-    result =
-      from(s in __MODULE__,
-        where: fragment("?->>? = ?", s.provider_ids, ^to_string(provider), ^id)
-      )
-      |> Repo.one()
-      |> preload()
-
-    case result do
+    from(s in __MODULE__,
+      where: fragment("?->>? = ?", s.provider_ids, ^to_string(provider), ^id)
+    )
+    |> Repo.one()
+    |> preload()
+    |> case do
       nil -> create(single)
       existing -> {:ok, existing}
     end
@@ -125,7 +121,6 @@ defmodule PremiereEcoute.Discography.Single do
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 
-  # AIDEV-NOTE: custom Jason encoder to serialize :artist as name string
   defimpl Jason.Encoder do
     def encode(single, opts) do
       single

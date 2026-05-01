@@ -13,7 +13,6 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Donations.Goal
-  # AIDEV-NOTE: Album/Artist kept for stats_count; Analytics used for overview chart
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
 

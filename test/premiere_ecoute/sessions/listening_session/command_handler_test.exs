@@ -50,7 +50,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: Map.get(album.provider_ids, :spotify)
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
@@ -117,7 +118,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: Map.get(album.provider_ids, :spotify)
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, _, [event1]} = CommandBus.apply(command)
@@ -135,7 +137,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :track,
         user_id: user.id,
-        track_id: Map.get(single.provider_ids, :spotify)
+        track_id: Map.get(single.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, session, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -175,7 +178,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :playlist,
         user_id: user.id,
-        playlist_id: playlist.playlist_id
+        playlist_id: playlist.playlist_id,
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
@@ -219,7 +223,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: Map.get(album.provider_ids, :spotify)
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -289,7 +294,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%PrepareListeningSession{
           source: :album,
           user_id: user.id,
-          album_id: Map.get(album.provider_ids, :spotify)
+          album_id: Map.get(album.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       {:ok, _, [%SessionStarted{}]} =
@@ -300,7 +306,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%PrepareListeningSession{
           source: :album,
           user_id: user.id,
-          album_id: Map.get(album.provider_ids, :spotify)
+          album_id: Map.get(album.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       # Try to start second session - should fail
@@ -340,7 +347,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :playlist,
         user_id: user.id,
-        playlist_id: playlist.playlist_id
+        playlist_id: playlist.playlist_id,
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -405,7 +413,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%PrepareListeningSession{
           source: :track,
           user_id: user.id,
-          track_id: Map.get(single.provider_ids, :spotify)
+          track_id: Map.get(single.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       {:ok, _, [%SessionStarted{} = event]} =
@@ -431,7 +440,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%PrepareListeningSession{
           source: :track,
           user_id: user.id,
-          track_id: Map.get(single.provider_ids, :spotify)
+          track_id: Map.get(single.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       {:error, reason} =
@@ -479,7 +489,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: Map.get(album.provider_ids, :spotify)
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -532,7 +543,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :playlist, user_id: user.id, playlist_id: playlist.playlist_id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :playlist,
+          user_id: user.id,
+          playlist_id: playlist.playlist_id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
@@ -569,7 +585,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :playlist, user_id: user.id, playlist_id: playlist.playlist_id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :playlist,
+          user_id: user.id,
+          playlist_id: playlist.playlist_id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
@@ -625,7 +646,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: Map.get(album.provider_ids, :spotify)
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -704,7 +726,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
-        album_id: Map.get(album.provider_ids, :spotify)
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
@@ -780,7 +803,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :playlist, user_id: user.id, playlist_id: playlist.playlist_id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :playlist,
+          user_id: user.id,
+          playlist_id: playlist.playlist_id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
@@ -830,7 +858,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%PrepareListeningSession{
           source: :track,
           user_id: user.id,
-          track_id: Map.get(single.provider_ids, :spotify)
+          track_id: Map.get(single.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
         })
 
       {:ok, _, [%SessionStarted{} = started]} =
@@ -885,7 +914,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       command = %PrepareListeningSession{
         source: :free,
         user_id: user.id,
-        name: "My Friday stream"
+        name: "My Friday stream",
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
       }
 
       {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
@@ -897,7 +927,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       user = user_fixture()
 
       {:ok, session, [%SessionPrepared{}]} =
-        CommandBus.apply(%PrepareListeningSession{source: :free, user_id: user.id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       assert session.name == "Free session"
     end
@@ -917,7 +951,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :free, user_id: user.id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, session, [%SessionStarted{} = event]} =
         CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
@@ -934,7 +972,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :devices, fn _ -> {:ok, [%{"is_active" => false}]} end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :free, user_id: user.id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:error, reason} =
         CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
@@ -960,7 +1002,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(SpotifyApi, :get_single, fn _track_id -> {:ok, single} end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :free, user_id: user.id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
@@ -987,7 +1033,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :free, user_id: user.id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
@@ -1044,7 +1094,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       stub(TwitchApi, :send_chat_message, fn _, _ -> :ok end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :free, user_id: user.id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
@@ -1122,7 +1176,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
-        CommandBus.apply(%PrepareListeningSession{source: :free, user_id: user.id})
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
 
       {:ok, _, [%SessionStarted{} = started]} =
         CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})

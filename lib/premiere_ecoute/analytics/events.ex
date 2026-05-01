@@ -2,9 +2,7 @@ defmodule PremiereEcoute.Analytics.Events do
   @moduledoc """
   Analytics queries directly on the event store.
 
-  Provides aggregation helpers over the `event_store.events` table.
-  Useful for quick operational metrics (e.g. accounts created per month)
-  without building read-model projections.
+  Provides aggregation helpers over the `event_store.events` table. Useful for quick operational metrics (e.g. accounts created per month) without building read-model projections.
   """
 
   alias PremiereEcoute.Repo
@@ -83,24 +81,11 @@ defmodule PremiereEcoute.Analytics.Events do
     {sql, params} = build_query(event_type, unit, fields, filters, stream, from_dt, to_dt, fill_gaps)
 
     %{columns: columns, rows: rows} = Repo.query!(sql, params)
-
-    # AIDEV-NOTE: String.to_existing_atom/1 prevents atom table leaks when
-    # arbitrary field names come from callers. Unknown column names raise —
-    # callers must ensure field name atoms are declared before calling aggregate.
-    column_atoms = Enum.map(columns, &String.to_existing_atom/1)
-
-    Enum.map(rows, fn row ->
-      column_atoms
-      |> Enum.zip(row)
-      |> Map.new()
-    end)
+    columns = Enum.map(columns, &String.to_existing_atom/1)
+    Enum.map(rows, fn row -> columns |> Enum.zip(row) |> Map.new() end)
   end
 
-  # ---------------------------------------------------------------------------
-  # Query builder
-  # ---------------------------------------------------------------------------
-
-  # AIDEV-NOTE: Raw SQL is used instead of Ecto.Query because schemaless tables
+  # Raw SQL is used instead of Ecto.Query because schemaless tables
   # cause Ecto to inject bare column refs into SELECT, which breaks GROUP BY
   # when those columns are not aggregated or grouped.
   # Field names are validated to be safe identifiers (atoms or alphanumeric
@@ -164,8 +149,8 @@ defmodule PremiereEcoute.Analytics.Events do
     """
 
     if fill_gaps do
-      # AIDEV-NOTE: gap filling wraps the inner query as a CTE and left-joins
-      # it against generate_series so periods with no events appear as count=0.
+      # gap filling wraps the inner query as a CTE and left-joins it against
+      # generate_series so periods with no events appear as count=0.
       # from_dt / to_dt are already in params; we reference them by index.
       # The series step is '1 <unit>' cast as interval.
       from_idx = Enum.find_index(extra_params, &(&1 == from_dt)) + 2
