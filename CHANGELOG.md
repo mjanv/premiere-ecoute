@@ -1,9 +1,39 @@
 # Changelog
 
-<!-- Last analyzed commit: a4eb451 (2026-03-29) -->
+<!-- Last analyzed commit: c0675e9 (2026-05-01) -->
+
+## April 2026
+
+* [Feature] Viewer track submission to streamer playlists: a public submission page lets viewers search Spotify and add tracks directly to a playlist the streamer has opened for contributions — with open/close toggle and optional playlist preview.
+* [Feature] Shareable session URLs: sessions are now accessible via human-readable URLs like `/sessions/username/this-music-may-contain-hope-bd45ec30` with a one-click share button.
+* [Feature] Autostart option: toggle whether the first track starts automatically 1 second after session launch, or manually via a dedicated "Start First Track" button.
+* [Feature] Duel reminder system for collection sessions: schedule recurring reminders at custom intervals with a countdown badge and choice of notification sound (none, ding, or Yugioh theme).
+* [Feature] "Six seveeeen!" vote mode: new voting preset with options 6, 7, and 67 — a meme-friendly alternative to the standard 0-10 scale.
+* [Feature] Skip voting for short tracks: configure a duration threshold (default 45s) so interludes and sound collages are silently skipped without opening a vote window.
+* [Feature] Chat command settings: toggle the `!save` (wantlist) and `!vote` commands independently per streamer in account settings.
+* [Feature] Delete collection sessions from the list page, with a confirmation modal to prevent accidents.
+* [Feature] Admin analytics dashboard with 30-day event volume charts, KPI cards, and a top-events breakdown; new event store viewer for browsing recorded domain events.
+* [Improvement] Wantlist on the radio page: add tracks directly from playback history, with automatic Spotify ingestion for tracks not yet in the local discography.
+* [Improvement] Bell notifications when tracks are saved to the wantlist, from either the radio page or a `!save` chat command.
+* [Improvement] Overlay widgets now scale to any OBS browser source size using viewport-relative units — no more gray borders at custom resolutions.
+* [Improvement] Overlay settings page shows the recommended OBS browser source dimensions for each overlay type, updating live as the type changes.
+* [Improvement] Playlist submissions now support album tracks (not only singles); duplicate detection groups by track title to catch identical songs from different sources.
+* [Improvement] Playback state cache TTL now matches remaining track duration, keeping `!save` and other chat commands reliably warm.
+* [Improvement] 48kHz audio capture throughout the speech-marker pipeline, matching OBS default — no resampling needed and no audio/video drift.
+* [Improvement] Keyboard navigation on the retrospective carousel: left/right to step through graphs, up/down to jump to last/first.
+* [Improvement] Extension API routes reorganized under `/api/extension`; `mix extension.build` task added for packaging the browser extension.
+* [Improvement] Playback state shared cache introduced to reduce redundant Spotify API calls across extension polling and session handlers.
+* [Fix] Radio playback tracking loop now survives transient API failures (e.g. expired token) by scheduling a 30-second retry instead of silently dying.
+* [Fix] Waveform no longer disappears during track transitions — fixed crash when Spotify player has no active item between tracks.
+* [Fix] Crash when accessing an overlay URL with an unknown username now returns a safe error instead of a BadMapError.
+* [Fix] Album pick submission was failing due to artist field type mismatch; submission URL now uses username instead of numeric user ID.
+* [Fix] Backlink navigation on the session viewer page corrected.
 
 ## March 2026
 
+* [Feature] Wantlist: save albums, tracks, and artists to a personal collection from discography pages, the radio, and the home page — with grid/list toggle and direct links to Spotify, Deezer, and Tidal.
+* [Feature] "Start First Track" button: session init and first-track playback are now two separate steps — start the session first (bot announces, Spotify configured), then choose when the music actually begins.
+* [Improvement] Speech-to-text backend is now pluggable: swap between Mistral and OpenAI Whisper via config; transcriptions now display live below the waveform in the session dashboard.
 * [Feature] Track enrichment with Genius: album pages now automatically find and display Genius lyrics links for each track, with fuzzy artist matching to avoid false positives.
 * [Feature] Collection sessions: take two playlists and build a new one by choosing between pairs of tracks — using streamer choice, audience vote (1 vs 2 in chat), or head-to-head track duels. Perfect for building "best of" or festival playlists collaboratively.
 * [Feature] Speech markers: the browser microphone detects when you are speaking during a session. Each detected speech segment is timestamped and can be exported as an Adobe Premiere Pro XMEML file for automatic video chapter markers in your recording.
