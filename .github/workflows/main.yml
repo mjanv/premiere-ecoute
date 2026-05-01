@@ -171,25 +171,15 @@ jobs:
 
       - name: Deploy release to server
         run: |
-          rsync -avz --delete --exclude='.env' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
-
-      - name: Deploy .env file
-        run: |
+          rsync -avzq --delete --exclude='.env' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
           scp .env.production root@68.183.219.251:/opt/premiere-ecoute/.env
-
-      - name: Fix permissions
-        run: |
           ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -path "*/releases/*/iex" -o -name "*.so" \) -type f -exec chmod +x {} \;'
-
-      - name: Ensure PostgreSQL is running
-        run: |
-          ssh root@68.183.219.251 'systemctl start postgresql && systemctl is-active postgresql'
 
       - name: Restart application
         run: |
-          ssh root@68.183.219.251 'systemctl restart premiere-ecoute || (journalctl -u premiere-ecoute -n 50 --no-pager && exit 1)'
-
-      - name: Verify deployment
-        run: |
-          ssh root@68.183.219.251 'systemctl status premiere-ecoute --no-pager'
-
+          ssh root@68.183.219.251 '
+            systemctl is-active postgresql
+            systemctl restart premiere-ecoute
+            systemctl status premiere-ecoute --no-pager
+            journalctl -u premiere-ecoute -n 50 --no-pager
+          '
