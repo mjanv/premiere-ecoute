@@ -1,5 +1,5 @@
 {
-	"Name": "Première Écoute",
+	"Name": "Premiere Ecoute",
 	"Version": "0.1.0.0",
 	"Author": "Maxime Janvier",
 	"Actions": [
@@ -120,10 +120,10 @@
 			]
 		}
 	],
-	"Category": "Première Écoute",
+	"Category": "Premiere Ecoute",
 	"CategoryIcon": "imgs/plugin/category-icon",
 	"CodePath": "bin/plugin.js",
-	"Description": "Control your Première Écoute listening session from your Stream Deck.",
+	"Description": "Control your Premiere Ecoute listening session from your Stream Deck.",
 	"Icon": "imgs/plugin/marketplace",
 	"SDKVersion": 3,
 	"Software": {

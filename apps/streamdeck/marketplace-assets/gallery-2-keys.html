@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { width: 100%; height: 100%; }
+  body {
+    width: 100vw; height: 100vh; overflow: hidden;
+    background: #0a0a14;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 72px;
+    background-image: radial-gradient(ellipse at 50% 45%, #1e1b4b44 0%, transparent 60%);
+  }
+
+  h2 {
+    font-size: 72px; font-weight: 900; color: #fff; letter-spacing: -2px; text-align: center;
+  }
+  h2 span {
+    background: linear-gradient(135deg, #a78bfa, #6366f1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .keys-row { display: flex; gap: 56px; align-items: flex-start; }
+
+  .key-card { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+  .key {
+    width: 260px; height: 260px;
+    border-radius: 36px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; border: 2px solid;
+    position: relative; overflow: hidden;
+  }
+  .key::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.09) 0%, transparent 55%);
+  }
+  .key-down {
+    background: linear-gradient(145deg, #3b1212, #1f0a0a);
+    border-color: #ef4444;
+    box-shadow: 0 0 60px #ef444433, 0 28px 56px #00000088;
+  }
+  .key-vote {
+    background: linear-gradient(145deg, #312e81, #1e1b4b);
+    border-color: #6366f1;
+    box-shadow: 0 0 60px #6366f166, 0 28px 56px #00000088;
+    transform: scale(1.08);
+  }
+  .key-up {
+    background: linear-gradient(145deg, #1a3320, #0f1f14);
+    border-color: #22c55e;
+    box-shadow: 0 0 60px #22c55e33, 0 28px 56px #00000088;
+  }
+  .key-icon { font-size: 88px; line-height: 1; }
+  .key-score { font-size: 84px; font-weight: 900; color: #818cf8; line-height: 1; }
+  .key-lbl { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .key-down .key-lbl { color: #fca5a5; }
+  .key-vote .key-lbl { color: #818cf8; }
+  .key-up .key-lbl { color: #86efac; }
+
+  .key-desc { text-align: center; max-width: 260px; }
+  .key-desc h3 { font-size: 26px; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+  .key-desc p { font-size: 18px; color: #64748b; line-height: 1.5; }
+
+  .scale {
+    display: flex; align-items: center; gap: 8px;
+    background: #0d0d1a; border: 1.5px solid #1e1b4b;
+    border-radius: 16px; padding: 16px 32px;
+  }
+  .scale-lbl { font-size: 16px; color: #374151; margin: 0 12px; font-weight: 600; }
+  .pip {
+    width: 48px; height: 48px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #2d2a6e;
+    background: #111128; border: 1px solid #1e1b4b;
+  }
+  .pip.active {
+    background: linear-gradient(135deg, #4338ca, #6366f1);
+    color: #fff; border-color: #6366f1;
+    box-shadow: 0 0 18px #6366f166; transform: scale(1.15);
+  }
+</style>
+</head>
+<body>
+  <h2>Three keys. <span>Vote instantly.</span></h2>
+
+  <div class="keys-row">
+    <div class="key-card">
+      <div class="key key-down">
+        <div class="key-icon">▼</div>
+        <div class="key-lbl">Vote Down</div>
+      </div>
+      <div class="key-desc">
+        <h3>Vote Down</h3>
+        <p>Decrease your rating by 1</p>
+      </div>
+    </div>
+    <div class="key-card">
+      <div class="key key-vote">
+        <div class="key-score">7</div>
+        <div class="key-lbl">Submit Vote</div>
+      </div>
+      <div class="key-desc">
+        <h3>Vote</h3>
+        <p>Shows your current rating.<br>Press to submit it.</p>
+      </div>
+    </div>
+    <div class="key-card">
+      <div class="key key-up">
+        <div class="key-icon">▲</div>
+        <div class="key-lbl">Vote Up</div>
+      </div>
+      <div class="key-desc">
+        <h3>Vote Up</h3>
+        <p>Increase your rating by 1</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="scale">
+    <span class="scale-lbl">0</span>
+    <div class="pip">0</div><div class="pip">1</div><div class="pip">2</div>
+    <div class="pip">3</div><div class="pip">4</div><div class="pip">5</div>
+    <div class="pip">6</div><div class="pip active">7</div><div class="pip">8</div>
+    <div class="pip">9</div><div class="pip">10</div>
+    <span class="scale-lbl">10</span>
+  </div>
+</body>
+</html>

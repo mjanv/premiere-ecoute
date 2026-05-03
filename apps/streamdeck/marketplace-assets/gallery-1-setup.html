@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { width: 100%; height: 100%; }
+  body {
+    width: 100vw; height: 100vh; overflow: hidden;
+    background: #0a0a14;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    align-items: stretch;
+  }
+
+  /* Left half: settings panel */
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(ellipse at 30% 50%, #1e1b4b44 0%, transparent 65%);
+    padding: 80px 80px 80px 140px;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 680px;
+    background: #111128;
+    border: 1.5px solid #2a2755;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 0 80px #6366f122, 0 40px 80px #00000066;
+  }
+
+  .titlebar {
+    background: #0d0d1a;
+    padding: 24px 32px;
+    border-bottom: 1px solid #1e1b4b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .titlebar-title {
+    font-size: 16px; color: #4338ca; font-weight: 600; letter-spacing: 1px; margin-left: 8px;
+  }
+
+  .panel-body { padding: 48px; display: flex; flex-direction: column; gap: 36px; }
+
+  .field { display: flex; flex-direction: column; gap: 12px; }
+  .field-label {
+    font-size: 13px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: #6366f1;
+  }
+  .field-input {
+    background: #0d0d1a;
+    border: 1.5px solid #4338ca;
+    border-radius: 12px;
+    padding: 18px 22px;
+    font-size: 20px;
+    color: #c7d2fe;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Right half: descriptions */
+  .right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 140px 80px 80px;
+    background: radial-gradient(ellipse at 70% 50%, #1e1b4b33 0%, transparent 65%);
+    gap: 52px;
+    border-left: 1px solid #1e1b4b;
+  }
+
+  .desc-item { display: flex; gap: 28px; align-items: flex-start; }
+  .num {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #1e1b4b; border: 2px solid #4338ca;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #818cf8;
+    flex-shrink: 0;
+  }
+  .desc-text h4 { font-size: 26px; color: #e2e8f0; font-weight: 700; margin-bottom: 8px; }
+  .desc-text p { font-size: 19px; color: #64748b; line-height: 1.55; }
+  .desc-text code {
+    color: #a78bfa; font-family: 'Courier New', monospace;
+    font-size: 17px; background: #1e1b4b; padding: 2px 8px; border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+  <div class="left">
+    <div class="panel">
+      <div class="titlebar">
+        <div class="dot" style="background:#ef4444"></div>
+        <div class="dot" style="background:#f59e0b"></div>
+        <div class="dot" style="background:#22c55e"></div>
+        <div class="titlebar-title">Première Écoute Viewer — Settings</div>
+      </div>
+      <div class="panel-body">
+        <div class="field">
+          <div class="field-label">Server URL</div>
+          <div class="field-input">https://premiere-ecoute.fr</div>
+        </div>
+        <div class="field">
+          <div class="field-label">API Token</div>
+          <div class="field-input">••••••••••••••••••••••••</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Broadcaster Username</div>
+          <div class="field-input">maxime_janvier</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="desc-item">
+      <div class="num">1</div>
+      <div class="desc-text">
+        <h4>Server URL</h4>
+        <p>The Première Écoute server to connect to.<br>Default: <code>https://premiere-ecoute.fr</code></p>
+      </div>
+    </div>
+    <div class="desc-item">
+      <div class="num">2</div>
+      <div class="desc-text">
+        <h4>API Token</h4>
+        <p>Your personal token from your profile page.<br>Required to authenticate your votes.</p>
+      </div>
+    </div>
+    <div class="desc-item">
+      <div class="num">3</div>
+      <div class="desc-text">
+        <h4>Broadcaster Username</h4>
+        <p>The Twitch username of the streamer<br>whose session you want to vote in.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

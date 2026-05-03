@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { width: 100%; height: 100%; }
+  body {
+    width: 100vw; height: 100vh; overflow: hidden;
+    background: #0a0a14;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    align-items: stretch;
+  }
+
+  /* Left half */
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 100px 0 140px;
+    background: radial-gradient(ellipse at 30% 50%, #1e1b4b55 0%, transparent 65%);
+    gap: 48px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
+  .badge {
+    width: 88px; height: 88px;
+    border-radius: 22px;
+    background-color: #8b4fff;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .badge svg { width: 52px; height: 52px; fill: white; }
+  .name {
+    font-size: 96px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -3px;
+    line-height: 1;
+  }
+
+  .tagline {
+    font-size: 30px;
+    color: #94a3b8;
+    line-height: 1.55;
+    max-width: 640px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    background: #1e1b4b;
+    border: 2px solid #4338ca;
+    border-radius: 999px;
+    padding: 12px 28px;
+    font-size: 18px;
+    color: #a78bfa;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+    width: fit-content;
+  }
+
+  /* Divider */
+  .divider {
+    width: 1px;
+    background: linear-gradient(180deg, transparent 5%, #2a2755 50%, transparent 95%);
+    flex-shrink: 0;
+  }
+
+  /* Right half */
+  .right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 70% 50%, #1e1b4b44 0%, transparent 65%);
+  }
+
+  .keys {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .key {
+    width: 240px; height: 240px;
+    border-radius: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border: 2px solid;
+    position: relative;
+    overflow: hidden;
+  }
+  .key::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.09) 0%, transparent 55%);
+  }
+
+  .key-down {
+    background: linear-gradient(145deg, #3b1212, #1f0a0a);
+    border-color: #ef4444;
+    box-shadow: 0 0 80px #ef444433, 0 32px 64px #00000088;
+  }
+  .key-vote {
+    background: linear-gradient(145deg, #312e81, #1e1b4b);
+    border-color: #6366f1;
+    box-shadow: 0 0 80px #6366f166, 0 32px 64px #00000088;
+    transform: scale(1.12);
+    z-index: 1;
+  }
+  .key-up {
+    background: linear-gradient(145deg, #1a3320, #0f1f14);
+    border-color: #22c55e;
+    box-shadow: 0 0 80px #22c55e33, 0 32px 64px #00000088;
+  }
+
+  .key-icon { font-size: 80px; line-height: 1; }
+  .key-score { font-size: 72px; font-weight: 900; color: #818cf8; line-height: 1; }
+  .key-lbl { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .key-down .key-lbl { color: #fca5a5; }
+  .key-vote .key-lbl { color: #818cf8; }
+  .key-up .key-lbl { color: #86efac; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <div class="logo-row">
+      <div class="badge">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+      </div>
+      <div class="name">Première Écoute</div>
+    </div>
+    <div class="tagline">Vote on music tracks during a live<br>listening session — from your Stream Deck.</div>
+    <div class="pill">Viewer Plugin</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="right">
+    <div class="keys">
+      <div class="key key-down">
+        <div class="key-icon">▼</div>
+        <div class="key-lbl">Vote Down</div>
+      </div>
+      <div class="key key-vote">
+        <div class="key-score">7</div>
+        <div class="key-lbl">Submit Vote</div>
+      </div>
+      <div class="key key-up">
+        <div class="key-icon">▲</div>
+        <div class="key-lbl">Vote Up</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

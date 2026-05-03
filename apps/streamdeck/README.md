@@ -63,3 +63,23 @@ npm run deploy   # build + rsync + restart Stream Deck (streamer only)
 npm run watch    # rebuild and redeploy on every file change
 ```
 
+## Marketplace assets
+
+Source and generated images for the Elgato Marketplace submission are in `marketplace-assets/`.
+
+| File | Purpose | Dimensions |
+|---|---|---|
+| `icon.png` | Plugin icon | 288×288 |
+| `thumbnail.png` | Marketplace thumbnail | 1920×960 |
+| `gallery-1.png` | Settings screen | 1920×960 |
+| `gallery-2.png` | Three keys explained | 1920×960 |
+| `gallery-3.png` | Vote submission flow | 1920×960 |
+
+Each PNG is generated from its corresponding HTML source file (`_icon.html`, `thumbnail.html`, `gallery-*.html`) via puppeteer:
+
+```bash
+node marketplace-assets/screenshot.mjs
+```
+
+The icon uses the same music note mark and `#8b4fff` background as the app navbar.
+

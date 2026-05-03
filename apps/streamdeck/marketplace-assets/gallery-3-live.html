@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { width: 100%; height: 100%; }
+  body {
+    width: 100vw; height: 100vh; overflow: hidden;
+    background: #0a0a14;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 72px;
+    background-image: radial-gradient(ellipse at 50% 45%, #1e1b4b44 0%, transparent 60%);
+  }
+
+  h2 {
+    font-size: 72px; font-weight: 900; color: #fff; letter-spacing: -2px; text-align: center;
+  }
+  h2 span {
+    background: linear-gradient(135deg, #a78bfa, #6366f1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .flow { display: flex; align-items: center; gap: 40px; }
+
+  .step { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+
+  .key {
+    width: 200px; height: 200px;
+    border-radius: 28px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; border: 2px solid;
+    position: relative; overflow: hidden;
+  }
+  .key::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.09) 0%, transparent 55%);
+  }
+  .key.up {
+    background: linear-gradient(145deg, #1a3320, #0f1f14);
+    border-color: #22c55e; box-shadow: 0 0 50px #22c55e33;
+  }
+  .key.vote {
+    background: linear-gradient(145deg, #312e81, #1e1b4b);
+    border-color: #6366f1; box-shadow: 0 0 50px #6366f155;
+  }
+  .key.vote-lit {
+    background: linear-gradient(145deg, #312e81, #1e1b4b);
+    border-color: #a78bfa; box-shadow: 0 0 70px #a78bfa88;
+  }
+  .key .icon { font-size: 72px; line-height: 1; }
+  .key .score { font-size: 68px; font-weight: 900; color: #818cf8; line-height: 1; }
+  .key .score-lit { font-size: 68px; font-weight: 900; color: #c7d2fe; line-height: 1; }
+  .key .lbl { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .key.up .lbl { color: #86efac; }
+  .key.vote .lbl { color: #818cf8; }
+  .key.vote-lit .lbl { color: #a78bfa; }
+
+  .step-caption { text-align: center; max-width: 220px; }
+  .step-caption h4 { font-size: 22px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+  .step-caption p { font-size: 16px; color: #64748b; line-height: 1.5; }
+
+  .arrow { font-size: 40px; color: #2d2a6e; margin-bottom: 46px; flex-shrink: 0; }
+
+  .result {
+    background: #0a1a0f;
+    border: 2px solid #166534;
+    border-radius: 20px;
+    padding: 24px 36px;
+    display: flex; align-items: center; gap: 20px;
+    box-shadow: 0 0 40px #22c55e33;
+    min-width: 300px;
+  }
+  .result-check { font-size: 36px; }
+  .result-text h4 { font-size: 22px; font-weight: 700; color: #86efac; margin-bottom: 4px; }
+  .result-text p { font-size: 17px; color: #4ade80; }
+
+  .note {
+    font-size: 18px; color: #374151; text-align: center; letter-spacing: 0.3px;
+  }
+  .note strong { color: #4338ca; }
+</style>
+</head>
+<body>
+  <h2>Adjust your rating. <span>Submit when ready.</span></h2>
+
+  <div class="flow">
+    <div class="step">
+      <div class="key up">
+        <div class="icon">▲</div>
+        <div class="lbl">Vote Up</div>
+      </div>
+      <div class="step-caption">
+        <h4>Tune your rating</h4>
+        <p>Press ▲ or ▼ to adjust<br>between 0 and 10</p>
+      </div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="step">
+      <div class="key vote">
+        <div class="score">7</div>
+        <div class="lbl">Submit Vote</div>
+      </div>
+      <div class="step-caption">
+        <h4>See your score</h4>
+        <p>The Vote key always shows<br>your current rating</p>
+      </div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="step">
+      <div class="key vote-lit">
+        <div class="score-lit">7</div>
+        <div class="lbl">Submit Vote</div>
+      </div>
+      <div class="step-caption">
+        <h4>Press to submit</h4>
+        <p>Your vote is sent to<br>the active session</p>
+      </div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="step">
+      <div class="result">
+        <div class="result-check">✓</div>
+        <div class="result-text">
+          <h4>Vote received</h4>
+          <p>Rating <strong>7 / 10</strong> sent</p>
+        </div>
+      </div>
+      <div class="step-caption">
+        <h4>Confirmed</h4>
+        <p>The key shows feedback<br>on success</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
