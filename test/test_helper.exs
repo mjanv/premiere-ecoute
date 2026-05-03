@@ -9,7 +9,8 @@ apis = [
   PremiereEcoute.Apis.Video.YoutubeApi,
   PremiereEcoute.Accounts.Mailer,
   PremiereEcouteCore.CommandBus,
-  PremiereEcoute.Sessions
+  PremiereEcoute.Sessions,
+  PremiereEcoute.Wantlists
 ]
 
 for api <- apis do

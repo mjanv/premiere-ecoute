@@ -14,6 +14,12 @@ defmodule PremiereEcoute.Wantlists do
   alias PremiereEcoute.Wantlists.Wantlist
   alias PremiereEcoute.Wantlists.WantlistItem
 
+  @callback get_wantlist(user_id :: integer()) :: Wantlist.t() | nil
+  @callback add_radio_track(user_id :: integer(), spotify_id :: String.t()) ::
+              {:ok, WantlistItem.t()} | {:error, term()}
+  @callback remove_item(user_id :: integer(), item_id :: integer()) ::
+              {:ok, WantlistItem.t()} | {:error, :not_found}
+
   defdelegate get_wantlist(user_id), to: Wantlist, as: :get_by_user
   defdelegate add_item(user_id, type, record_id), to: WantlistItem, as: :add
   defdelegate in_wantlist?(user_id, type, record_id), to: WantlistItem, as: :exists?

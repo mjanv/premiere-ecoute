@@ -308,6 +308,14 @@ defmodule PremiereEcouteWeb.Router do
     post "/vote", VoteController, :create
   end
 
+  scope "/api/wantlist", PremiereEcouteWeb.Api.Wantlist do
+    pipe_through :api_auth
+
+    get "/", WantlistController, :show
+    post "/tracks/current", TrackController, :create
+    delete "/items/:id", ItemController, :delete
+  end
+
   scope "/api/extension", PremiereEcouteWeb.Api.Extension do
     pipe_through :api
 
