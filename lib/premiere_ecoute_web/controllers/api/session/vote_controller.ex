@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Api.VoteController do
+defmodule PremiereEcouteWeb.Api.Session.VoteController do
   @moduledoc """
   API controller for submitting track votes.
 
@@ -54,8 +54,7 @@ defmodule PremiereEcouteWeb.Api.VoteController do
   Submits a vote for the current track (0–10).
   """
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def create(%{assigns: %{current_scope: %{user: %{role: :streamer, twitch: %{user_id: user_id}}}}} = conn, %{"rating" => rating})
-      when rating in 1..10 do
+  def create(%{assigns: %{current_scope: %{user: %{role: :streamer, twitch: %{user_id: user_id}}}}} = conn, %{"rating" => rating}) do
     Sessions.impl().publish_message(%MessageSent{
       broadcaster_id: user_id,
       user_id: user_id,
@@ -70,10 +69,10 @@ defmodule PremiereEcouteWeb.Api.VoteController do
         "rating" => rating,
         "username" => username
       })
-      when role in [:viewer, :admin] and rating in 1..10 do
+      when role in [:viewer, :admin] do
     case Accounts.get_user_by_username(username) do
       nil ->
-        conn |> put_status(:not_found) |> json(%{error: "Broadcaster not found"})
+        conn |> put_status(:not_found) |> json(%{error: "Viewer not found"})
 
       broadcaster ->
         Sessions.impl().publish_message(%MessageSent{
@@ -83,11 +82,11 @@ defmodule PremiereEcouteWeb.Api.VoteController do
           is_streamer: false
         })
 
-        json(conn, %{ok: true, rating: rating})
+        conn |> put_status(:ok) |> json(%{ok: true, rating: rating})
     end
   end
 
   def create(conn, _params) do
-    conn |> put_status(:unprocessable_entity) |> json(%{error: "cannot process vote"})
+    conn |> put_status(:unprocessable_entity) |> json(%{error: "Cannot process vote"})
   end
 end

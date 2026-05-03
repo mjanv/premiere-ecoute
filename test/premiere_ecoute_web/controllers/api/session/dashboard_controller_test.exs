@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Api.SessionControllerTest do
+defmodule PremiereEcouteWeb.Api.Session.DashboardControllerTest do
   use PremiereEcouteWeb.ApiCase, async: false
 
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
@@ -36,7 +36,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       conn
       |> auth(user)
       |> post(~p"/api/session/start")
-      |> response(200, op(SessionController, :start))
+      |> response(200, op(PremiereEcouteWeb.Api.Session.DashboardController, :start))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
@@ -64,7 +64,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       conn
       |> auth(user)
       |> post(~p"/api/session/stop")
-      |> response(200, op(SessionController, :stop))
+      |> response(200, op(PremiereEcouteWeb.Api.Session.DashboardController, :stop))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
@@ -92,7 +92,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       conn
       |> auth(user)
       |> post(~p"/api/session/next")
-      |> response(200, op(SessionController, :next))
+      |> response(200, op(PremiereEcouteWeb.Api.Session.DashboardController, :next))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
@@ -120,7 +120,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
       conn
       |> auth(user)
       |> post(~p"/api/session/previous")
-      |> response(200, op(SessionController, :previous))
+      |> response(200, op(PremiereEcouteWeb.Api.Session.DashboardController, :previous))
     end
 
     test "returns 404 when no session exists", %{conn: conn} do
@@ -142,7 +142,7 @@ defmodule PremiereEcouteWeb.Api.SessionControllerTest do
         conn
         |> auth(user)
         |> get(~p"/api/session")
-        |> response(200, op(SessionController, :show))
+        |> response(200, op(PremiereEcouteWeb.Api.Session.DashboardController, :show))
 
       assert response["id"] == session.id
       assert response["status"] == "active"

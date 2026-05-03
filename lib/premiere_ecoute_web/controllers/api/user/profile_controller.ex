@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Api.UserProfileController do
+defmodule PremiereEcouteWeb.Api.User.ProfileController do
   @moduledoc """
   API controller for reading and updating the authenticated user's profile.
 
@@ -52,12 +52,10 @@ defmodule PremiereEcouteWeb.Api.UserProfileController do
   Returns the authenticated user's profile settings.
   """
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def show(conn, _params) do
-    profile = conn.assigns.current_scope.user.profile
-
+  def show(%{assigns: %{current_scope: %{user: user}}} = conn, _params) do
     conn
     |> put_status(:ok)
-    |> json(profile)
+    |> json(user.profile)
   end
 
   operation(:update,
@@ -81,9 +79,7 @@ defmodule PremiereEcouteWeb.Api.UserProfileController do
   in the payload retain their existing values.
   """
   @spec update(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def update(conn, params) do
-    user = conn.assigns.current_scope.user
-
+  def update(%{assigns: %{current_scope: %{user: user}}} = conn, params) do
     case Accounts.edit_user_profile(user, params) do
       {:ok, user} ->
         conn

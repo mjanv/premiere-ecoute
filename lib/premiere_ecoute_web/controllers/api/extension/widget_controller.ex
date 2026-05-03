@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Api.ExtensionController do
+defmodule PremiereEcouteWeb.Api.Extension.WidgetController do
   @moduledoc """
   Controller for Twitch extension track-related endpoints.
 
@@ -24,13 +24,10 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   @spec current_track(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def current_track(conn, %{"broadcaster_id" => broadcaster_id}) do
     case Extension.get_current_track(broadcaster_id) do
-      {:ok, track_data} ->
+      {:ok, track} ->
         conn
         |> put_status(:ok)
-        |> json(%{
-          track: track_data,
-          broadcaster_id: broadcaster_id
-        })
+        |> json(%{track: track, broadcaster_id: broadcaster_id})
 
       {:error, :no_user} ->
         Logger.info("No user found for broadcaster ID: #{broadcaster_id}")
@@ -69,15 +66,12 @@ defmodule PremiereEcouteWeb.Api.ExtensionController do
   """
   @spec like_track(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def like_track(conn, %{"user_id" => user_id, "spotify_track_id" => spotify_track_id}) do
-    # AIDEV-NOTE: like_track always returns {:error, :no_playlist_rule} — playlist rules were removed
     {:error, :no_playlist_rule} = Extension.like_track(user_id, spotify_track_id)
     Logger.info("No playlist rule configured for user #{user_id}")
 
     conn
     |> put_status(:not_found)
-    |> json(%{
-      error: "No playlist rule configured. Please configure a playlist rule in the application settings."
-    })
+    |> json(%{error: "No playlist rule configured. Please configure a playlist rule in the application settings."})
   end
 
   def like_track(conn, params) do

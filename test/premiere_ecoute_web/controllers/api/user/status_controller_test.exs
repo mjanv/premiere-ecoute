@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Api.StatusControllerTest do
+defmodule PremiereEcouteWeb.Api.User.StatusControllerTest do
   use PremiereEcouteWeb.ApiCase, async: true
 
   alias PremiereEcoute.Accounts
@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.Api.StatusControllerTest do
       conn =
         conn
         |> put_req_header("authorization", "Bearer #{token}")
-        |> get(~p"/api/status")
+        |> get(~p"/api/user/status")
 
       assert %{
                "status" => "ok",
@@ -20,7 +20,7 @@ defmodule PremiereEcouteWeb.Api.StatusControllerTest do
                  "username" => username,
                  "role" => role
                }
-             } = response(conn, 200, op(StatusController, :index))
+             } = response(conn, 200, op(PremiereEcouteWeb.Api.User.StatusController, :index))
 
       assert user_id == user.id
       assert username == user.username
@@ -28,7 +28,7 @@ defmodule PremiereEcouteWeb.Api.StatusControllerTest do
     end
 
     test "returns 401 without authorization header", %{conn: conn} do
-      conn = get(conn, ~p"/api/status")
+      conn = get(conn, ~p"/api/user/status")
 
       assert json_response(conn, 401) == %{"error" => "Missing or invalid Authorization header"}
     end
@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Api.StatusControllerTest do
       conn =
         conn
         |> put_req_header("authorization", "Bearer invalid")
-        |> get(~p"/api/status")
+        |> get(~p"/api/user/status")
 
       assert json_response(conn, 401) == %{"error" => "Invalid or expired token"}
     end

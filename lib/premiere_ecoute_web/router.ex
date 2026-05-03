@@ -276,27 +276,31 @@ defmodule PremiereEcouteWeb.Router do
     get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
-  scope "/api", PremiereEcouteWeb.Api do
+  scope "/api/user", PremiereEcouteWeb.Api.User do
     pipe_through :api_auth
 
     get "/status", StatusController, :index
-
-    get "/profile", UserProfileController, :show
-    patch "/profile", UserProfileController, :update
-
-    get "/session", SessionController, :show
-    post "/session/start", SessionController, :start
-    post "/session/stop", SessionController, :stop
-    post "/session/next", SessionController, :next
-    post "/session/previous", SessionController, :previous
-    post "/session/vote", VoteController, :create
+    get "/profile", ProfileController, :show
+    patch "/profile", ProfileController, :update
   end
 
-  scope "/api/extension", PremiereEcouteWeb.Api do
+  scope "/api/session", PremiereEcouteWeb.Api.Session do
+    pipe_through :api_auth
+
+    get "/", DashboardController, :show
+    post "/start", DashboardController, :start
+    post "/stop", DashboardController, :stop
+    post "/next", DashboardController, :next
+    post "/previous", DashboardController, :previous
+
+    post "/vote", VoteController, :create
+  end
+
+  scope "/api/extension", PremiereEcouteWeb.Api.Extension do
     pipe_through :api
 
-    get "/tracks/current/:broadcaster_id", ExtensionController, :current_track
-    post "/tracks/like", ExtensionController, :like_track
+    get "/tracks/current/:broadcaster_id", WidgetController, :current_track
+    post "/tracks/like", WidgetController, :like_track
   end
 
   scope "/webhooks", PremiereEcouteWeb.Webhooks do

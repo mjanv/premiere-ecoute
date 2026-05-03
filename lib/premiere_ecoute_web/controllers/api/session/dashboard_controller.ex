@@ -1,6 +1,6 @@
-defmodule PremiereEcouteWeb.Api.SessionController do
+defmodule PremiereEcouteWeb.Api.Session.DashboardController do
   @moduledoc """
-  API controller for listening session control.
+  API controller for streamer listening session control.
 
   Exposes session lifecycle and track navigation for programmatic clients (e.g. StreamDeck).
   All actions operate on the authenticated user's current active session.

@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Api.StatusController do
+defmodule PremiereEcouteWeb.Api.User.StatusController do
   @moduledoc """
   API status endpoint.
 
@@ -13,8 +13,7 @@ defmodule PremiereEcouteWeb.Api.StatusController do
 
   operation(:index,
     summary: "API status",
-    description:
-      "Smoke-test route that confirms authentication is working and returns basic information about the authenticated user.",
+    description: "Smoke-test route that confirms authentication is working and returns basic information about the authenticated user.",
     tags: ["Status"],
     security: [%{"bearer" => []}],
     responses: [
@@ -39,13 +38,9 @@ defmodule PremiereEcouteWeb.Api.StatusController do
     ]
   )
 
-  @doc """
-  Returns the authenticated user's identity and a timestamp.
-  """
+  @doc "Returns the authenticated user's identity and a timestamp."
   @spec index(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def index(conn, _params) do
-    user = conn.assigns.current_scope.user
-
+  def index(%{assigns: %{current_scope: %{user: user}}} = conn, _params) do
     conn
     |> put_status(:ok)
     |> json(%{

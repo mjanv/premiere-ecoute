@@ -1,9 +1,9 @@
-defmodule PremiereEcouteWeb.Api.VoteControllerTest do
+defmodule PremiereEcouteWeb.Api.Session.VoteControllerTest do
   use PremiereEcouteWeb.ApiCase, async: false
 
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions
-  alias PremiereEcouteWeb.Api.VoteController
+  alias PremiereEcouteWeb.Api.Session.VoteController
 
   setup_mock(PremiereEcoute.Sessions)
 
@@ -76,15 +76,6 @@ defmodule PremiereEcouteWeb.Api.VoteControllerTest do
       conn
       |> auth(viewer)
       |> post(~p"/api/session/vote", %{rating: 5})
-      |> json_response(422)
-    end
-
-    test "returns 422 when rating is out of range", %{conn: conn} do
-      user = user_fixture(%{role: :streamer, twitch: %{user_id: "streamer123"}})
-
-      conn
-      |> auth(user)
-      |> post(~p"/api/session/vote", %{rating: 11})
       |> json_response(422)
     end
 

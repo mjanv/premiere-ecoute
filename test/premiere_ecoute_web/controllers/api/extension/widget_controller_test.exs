@@ -1,4 +1,4 @@
-defmodule PremiereEcouteWeb.Apis.ExtensionControllerTest do
+defmodule PremiereEcouteWeb.Api.Extension.WidgetControllerTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
@@ -10,13 +10,11 @@ defmodule PremiereEcouteWeb.Apis.ExtensionControllerTest do
   setup do
     start_supervised({Cache, name: :playback})
 
-    # Store original config value
     original_secret = Application.get_env(:premiere_ecoute, :twitch_extension_secret)
 
     Application.put_env(:premiere_ecoute, :twitch_extension_secret, @test_secret_base64)
 
     on_exit(fn ->
-      # Restore original value
       if original_secret do
         Application.put_env(:premiere_ecoute, :twitch_extension_secret, original_secret)
       else
