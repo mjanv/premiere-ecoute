@@ -296,6 +296,18 @@ defmodule PremiereEcouteWeb.Router do
     post "/vote", VoteController, :create
   end
 
+  scope "/api/collection", PremiereEcouteWeb.Api.Collection do
+    pipe_through :api_auth
+
+    get "/", DashboardController, :show
+    post "/start", DashboardController, :start
+    post "/vote/open", DashboardController, :open_vote
+    post "/vote/close", DashboardController, :close_vote
+    post "/decide", DashboardController, :decide
+    post "/complete", DashboardController, :complete
+    post "/vote", VoteController, :create
+  end
+
   scope "/api/extension", PremiereEcouteWeb.Api.Extension do
     pipe_through :api
 
