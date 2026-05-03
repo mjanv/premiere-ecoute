@@ -1,8 +1,9 @@
 defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
   @moduledoc """
-  Streamer/admin feature settings LiveView.
+  Feature settings LiveView.
 
-  Manages feature-specific settings (radio tracking) accessible only to streamers and admins.
+  Streamers and admins see all sections (overlay, chat commands, radio, Stream Deck).
+  Viewers see only the Stream Deck section.
   """
 
   use PremiereEcouteWeb, :live_view
@@ -14,22 +15,20 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_scope && socket.assigns.current_scope.user
 
-    not_allowed =
-      is_nil(current_user) or
-        current_user.role not in [:streamer, :admin] or
-        not PremiereEcouteCore.FeatureFlag.enabled?(:radio, for: current_user)
-
-    if not_allowed do
+    if is_nil(current_user) or current_user.role not in [:viewer, :streamer, :admin] do
       {:ok, push_navigate(socket, to: ~p"/users/account")}
     else
+      streamer_features? = current_user.role in [:streamer, :admin]
+
       profile_form =
-        current_user.profile
-        |> Profile.changeset()
-        |> to_form()
+        if streamer_features? do
+          current_user.profile |> Profile.changeset() |> to_form()
+        end
 
       {:ok,
        socket
        |> assign(current_user: current_user, profile_form: profile_form)
+       |> assign(:streamer_features?, streamer_features?)
        |> assign(:api_tokens, Accounts.list_user_api_tokens(current_user))
        |> assign(:new_api_token, nil)
        |> assign(:overlay_score_type, "streamer")}

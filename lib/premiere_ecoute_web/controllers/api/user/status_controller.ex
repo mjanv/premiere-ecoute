@@ -13,7 +13,8 @@ defmodule PremiereEcouteWeb.Api.User.StatusController do
 
   operation(:index,
     summary: "API status",
-    description: "Smoke-test route that confirms authentication is working and returns basic information about the authenticated user.",
+    description:
+      "Smoke-test route that confirms authentication is working and returns basic information about the authenticated user.",
     tags: ["Status"],
     security: [%{"bearer" => []}],
     responses: [
