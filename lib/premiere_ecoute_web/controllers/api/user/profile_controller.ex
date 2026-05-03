@@ -39,7 +39,7 @@ defmodule PremiereEcouteWeb.Api.User.ProfileController do
 
   operation(:show,
     summary: "Get profile",
-    description: "Returns the authenticated user's profile settings.",
+    description: "Returns the authenticated user's profile settings.\n\n**Roles:** streamer, viewer",
     tags: ["Profile"],
     security: [%{"bearer" => []}],
     responses: [
@@ -61,7 +61,7 @@ defmodule PremiereEcouteWeb.Api.User.ProfileController do
   operation(:update,
     summary: "Update profile",
     description:
-      "Partially updates the authenticated user's profile settings. Only fields present in the request body are changed.",
+      "Partially updates the authenticated user's profile settings. Only fields present in the request body are changed.\n\n**Roles:** streamer, viewer",
     tags: ["Profile"],
     security: [%{"bearer" => []}],
     request_body: {"Profile fields to update", "application/json", @profile_schema},

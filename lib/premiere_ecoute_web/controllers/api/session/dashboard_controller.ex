@@ -40,7 +40,7 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:show,
     summary: "Get current session",
-    description: "Returns the authenticated user's current active session state.",
+    description: "Returns the authenticated user's current active session state.\n\n**Roles:** streamer",
     tags: ["Session"],
     security: [%{"bearer" => []}],
     responses: [
@@ -101,7 +101,7 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:start,
     summary: "Start session",
-    description: "Starts the authenticated user's current session and advances to the first track.",
+    description: "Starts the authenticated user's current session and advances to the first track.\n\n**Roles:** streamer",
     tags: ["Session"],
     security: [%{"bearer" => []}],
     responses: [
@@ -138,7 +138,7 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:stop,
     summary: "Stop session",
-    description: "Stops the authenticated user's current session.",
+    description: "Stops the authenticated user's current session.\n\n**Roles:** streamer",
     tags: ["Session"],
     security: [%{"bearer" => []}],
     responses: [
@@ -169,7 +169,7 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:next,
     summary: "Next track",
-    description: "Skips to the next track in the authenticated user's current session.",
+    description: "Skips to the next track in the authenticated user's current session.\n\n**Roles:** streamer",
     tags: ["Session"],
     security: [%{"bearer" => []}],
     responses: [
@@ -200,7 +200,7 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:previous,
     summary: "Previous track",
-    description: "Skips to the previous track in the authenticated user's current session.",
+    description: "Skips to the previous track in the authenticated user's current session.\n\n**Roles:** streamer",
     tags: ["Session"],
     security: [%{"bearer" => []}],
     responses: [
