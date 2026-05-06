@@ -31,13 +31,13 @@ defmodule PremiereEcouteWeb.Api.Wantlist.ItemController do
 
   @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(%{assigns: %{current_scope: %{user: user}}} = conn, %{"id" => id}) do
-    case Wantlists.impl().remove_item(user.id, String.to_integer(id)) do
-      {:ok, _item} ->
-        conn
-        |> put_status(:ok)
-        |> json(%{ok: true})
-
-      {:error, :not_found} ->
+    with {int_id, ""} <- Integer.parse(id),
+         {:ok, _item} <- Wantlists.impl().remove_item(user.id, int_id) do
+      conn
+      |> put_status(:ok)
+      |> json(%{ok: true})
+    else
+      _ ->
         conn
         |> put_status(:not_found)
         |> json(%{error: "Item not found"})

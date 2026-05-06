@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.CaptureCurrentTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.CloseVoteWindowListeningSession
@@ -89,7 +90,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         provider_ids: %{spotify: album_id},
         # Invalid name to trigger creation failure
         name: nil,
-        artist: "Test Artist",
+        artist: %Artist{name: "Test Artist"},
         cover_url: nil,
         release_date: nil,
         total_tracks: 0,

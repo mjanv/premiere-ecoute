@@ -40,7 +40,8 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
     broadcaster_lookup = Accounts.get_user_by_twitch_id(broadcaster_twitch_id)
 
     with broadcaster when not is_nil(broadcaster) <- broadcaster_lookup,
-         {:ok, playback} <- Apis.cache(:spotify).get_playback_state(Scope.for_user(broadcaster), %{}),
+         {:playback, {:ok, playback}} <-
+           {:playback, Apis.cache(:spotify).get_playback_state(Scope.for_user(broadcaster), %{})},
          {:ok, spotify_id} <- current_track_id(playback),
          {:ok, _item} <- Wantlists.impl().add_radio_track(user.id, spotify_id) do
       conn
@@ -49,6 +50,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
     else
       nil -> conn |> put_status(:not_found) |> json(%{error: "Broadcaster not found"})
       :no_track -> conn |> put_status(:not_found) |> json(%{error: "No track currently playing"})
+      {:playback, {:error, _}} -> conn |> put_status(:not_found) |> json(%{error: "No track currently playing"})
       {:error, _} -> conn |> put_status(:unprocessable_entity) |> json(%{error: "Track could not be saved"})
     end
   end

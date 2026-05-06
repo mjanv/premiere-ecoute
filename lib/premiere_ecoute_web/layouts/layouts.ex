@@ -165,6 +165,14 @@ defmodule PremiereEcouteWeb.Layouts do
             >
               {gettext("Contact")}
             </.link>
+            <span class="text-sm" style="color: var(--color-dark-500);">&bull;</span>
+            <.link
+              href={~p"/api/swaggerui"}
+              class="text-sm font-medium transition-colors hover:text-white"
+              style="color: var(--color-dark-300);"
+            >
+              {gettext("API")}
+            </.link>
           </div>
         </div>
       </footer>

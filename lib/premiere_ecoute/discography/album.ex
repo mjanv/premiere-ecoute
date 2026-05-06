@@ -30,7 +30,7 @@ defmodule PremiereEcoute.Discography.Album do
           provider_ids: %{atom() => String.t()},
           external_links: %{optional(String.t()) => String.t()},
           name: String.t() | nil,
-          artist: Artist.t() | String.t() | nil,
+          artist: Artist.t() | nil,
           release_date: Date.t() | nil,
           cover_url: String.t() | nil,
           total_tracks: integer() | nil,
