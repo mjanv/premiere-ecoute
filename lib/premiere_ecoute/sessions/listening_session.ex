@@ -668,9 +668,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @spec artist(t()) :: String.t()
   def artist(%__MODULE__{source: :free}), do: ""
   def artist(%__MODULE__{album: nil, playlist: nil, single: nil}), do: ""
-  def artist(%__MODULE__{album: %{artist: artist}}), do: artist
+  def artist(%__MODULE__{album: %{artist: %{name: name}}}), do: name
+  def artist(%__MODULE__{album: %{artist: artist}}) when is_binary(artist), do: artist
   def artist(%__MODULE__{playlist: %{owner_name: owner_name}}), do: owner_name
-  def artist(%__MODULE__{single: %{artist: artist}}), do: artist
+  def artist(%__MODULE__{single: %{artist: %{name: name}}}), do: name
+  def artist(%__MODULE__{single: %{artist: artist}}) when is_binary(artist), do: artist
 
   @doc """
   Returns the current track being played.

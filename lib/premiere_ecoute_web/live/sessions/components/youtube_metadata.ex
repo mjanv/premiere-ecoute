@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.TitleTemplate
 
   @impl true
   def mount(socket) do
@@ -18,14 +19,26 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
   @impl true
   def update(assigns, socket) do
     session = assigns.listening_session
+    report = Report.get_by(session_id: session.id)
+
+    video_settings = get_in(assigns, [:current_user, Access.key(:profile), Access.key(:video_settings)])
+    show_name = (video_settings && video_settings.show_name) || "PREMIÈRE ÉCOUTE"
+    saved_template = (video_settings && video_settings.title_template) || "{show_name} : \"{title}\" by {artist}"
+
+    # AIDEV-NOTE: template_override lets the streamer tweak the template per-session without saving to profile
+    template_override = socket.assigns[:template_override]
+    active_template = template_override || saved_template
 
     socket
     |> assign(assigns)
-    |> assign(:listening_session, session)
-    |> assign(:report, Report.get_by(session_id: session.id))
-    |> assign(:youtube_title, ListeningSession.title(session))
+    |> assign(:report, report)
+    |> assign(:show_name, show_name)
+    |> assign(:saved_template, saved_template)
+    |> assign(:template_override, template_override)
+    |> assign(:active_template, active_template)
+    |> assign(:youtube_title, TitleTemplate.render(active_template, show_name, session, report))
     |> assign(:youtube_artist, ListeningSession.artist(session))
-    |> assign(:youtube_chapters, TrackMarker.format_youtube_chapters(session, socket.assigns[:time_bias]))
+    |> assign(:youtube_chapters, TrackMarker.format_youtube_chapters(session, socket.assigns[:time_bias] || 0))
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -45,6 +58,42 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
     key = String.to_existing_atom(option)
     options = Map.update!(socket.assigns.options, key, &(!&1))
     {:noreply, assign(socket, :options, options)}
+  end
+
+  @impl true
+  def handle_event("update_template", %{"template" => template}, socket) do
+    rendered =
+      TitleTemplate.render(
+        template,
+        socket.assigns.show_name,
+        socket.assigns.listening_session,
+        socket.assigns.report
+      )
+
+    socket
+    |> assign(:template_override, template)
+    |> assign(:active_template, template)
+    |> assign(:youtube_title, rendered)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("reset_template", _params, socket) do
+    template = socket.assigns.saved_template
+
+    rendered =
+      TitleTemplate.render(
+        template,
+        socket.assigns.show_name,
+        socket.assigns.listening_session,
+        socket.assigns.report
+      )
+
+    socket
+    |> assign(:template_override, nil)
+    |> assign(:active_template, template)
+    |> assign(:youtube_title, rendered)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -77,7 +126,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
           </p>
         </div>
         
-    <!-- Title -->
+    <!-- Rendered title -->
         <div class="mb-4">
           <div class="flex items-center justify-between mb-2">
             <label class="text-sm font-medium text-purple-300">
@@ -104,7 +153,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             readonly
             rows="1"
             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-          >{gettext("PREMIÈRE ÉCOUTE : \"%{title}\" by %{artist} (React Live)", title: @youtube_title, artist: @youtube_artist)}</textarea>
+          >{@youtube_title}</textarea>
         </div>
         
     <!-- YouTube Chapters Textbox -->
@@ -184,7 +233,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             readonly
             rows="12"
             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-          ><%= if @options.intro do %><%= if @listening_session.source == :playlist do %>{gettext("This week I listened and reacted live to the playlist \"%{title}\" by %{artist} !", title: @youtube_title, artist: @youtube_artist)}<% else %>{gettext("This week I listened and reacted live to the new album \"%{title}\" by %{artist} !", title: @youtube_title, artist: @youtube_artist)}<% end %>&#013;&#010;&#013;&#010;<% end %><%= if @options.notes do %>{gettext("Streamer score")}: {inspect(@report.session_summary["streamer_score"])}
+          ><%= if @options.intro do %><%= if @listening_session.source == :playlist do %>{gettext("This week I listened and reacted live to the playlist \"%{title}\" by %{artist} !", title: ListeningSession.title(@listening_session), artist: @youtube_artist)}<% else %>{gettext("This week I listened and reacted live to the new album \"%{title}\" by %{artist} !", title: ListeningSession.title(@listening_session), artist: @youtube_artist)}<% end %>&#013;&#010;&#013;&#010;<% end %><%= if @options.notes do %>{gettext("Streamer score")}: {inspect(@report.session_summary["streamer_score"])}
     {gettext("Viewer score")}: {inspect(@report.session_summary["viewer_score"])}&#013; &#010;<% end %><%= if @options.chapters do %>{@youtube_chapters}<% end %>
           </textarea>
         </div>

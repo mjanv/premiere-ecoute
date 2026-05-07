@@ -20,7 +20,8 @@ defmodule PremiereEcoute.Accounts.User.Profile do
           timezone: String.t(),
           widget_settings: map() | nil,
           radio_settings: map() | nil,
-          chat_settings: map() | nil
+          chat_settings: map() | nil,
+          video_settings: map() | nil
         }
 
   embedded_schema do
@@ -42,6 +43,11 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     embeds_one :chat_settings, ChatSettings, on_replace: :update, primary_key: false do
       field :save_wantlist, :boolean, default: false
       field :vote_enabled, :boolean, default: true
+    end
+
+    embeds_one :video_settings, VideoSettings, on_replace: :update, primary_key: false do
+      field :show_name, :string, default: "PREMIÈRE ÉCOUTE"
+      field :title_template, :string, default: "{show_name} : \"{title}\" by {artist}"
     end
   end
 
@@ -65,10 +71,12 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     |> Map.put(:radio_settings, Map.get(profile, :radio_settings) || %__MODULE__.RadioSettings{})
     |> Map.put(:widget_settings, Map.get(profile, :widget_settings) || %__MODULE__.WidgetSettings{})
     |> Map.put(:chat_settings, Map.get(profile, :chat_settings) || %__MODULE__.ChatSettings{})
+    |> Map.put(:video_settings, Map.get(profile, :video_settings) || %__MODULE__.VideoSettings{})
     |> cast(attrs, [:color_scheme, :language, :timezone])
     |> cast_embed(:widget_settings, with: &widget_settings_changeset/2)
     |> cast_embed(:radio_settings, with: &radio_settings_changeset/2)
     |> cast_embed(:chat_settings, with: &chat_settings_changeset/2)
+    |> cast_embed(:video_settings, with: &video_settings_changeset/2)
     |> validate_required([:color_scheme, :language])
     |> validate_inclusion(:color_scheme, @schemes)
     |> validate_inclusion(:language, @languages)
@@ -92,6 +100,13 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     cast(settings, attrs, [:save_wantlist, :vote_enabled])
   end
 
+  defp video_settings_changeset(settings, attrs) do
+    settings
+    |> cast(attrs, [:show_name, :title_template])
+    |> validate_length(:show_name, max: 100)
+    |> validate_length(:title_template, max: 200)
+  end
+
   defp validate_timezone(changeset) do
     validate_change(changeset, :timezone, fn :timezone, tz ->
       if PremiereEcouteCore.Timezone.exists?(tz), do: [], else: [timezone: "is not a valid timezone"]
@@ -105,7 +120,8 @@ defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile do
     |> Map.update!(:widget_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.WidgetSettings{}))
     |> Map.update!(:radio_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.RadioSettings{}))
     |> Map.update!(:chat_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.ChatSettings{}))
-    |> Map.take([:color_scheme, :language, :timezone, :widget_settings, :radio_settings, :chat_settings])
+    |> Map.update!(:video_settings, &(&1 || %PremiereEcoute.Accounts.User.Profile.VideoSettings{}))
+    |> Map.take([:color_scheme, :language, :timezone, :widget_settings, :radio_settings, :chat_settings, :video_settings])
     |> Jason.Encode.map(opts)
   end
 end
@@ -125,5 +141,11 @@ end
 defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile.ChatSettings do
   def encode(settings, opts) do
     Jason.Encode.map(Map.take(settings, [:save_wantlist, :vote_enabled]), opts)
+  end
+end
+
+defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile.VideoSettings do
+  def encode(settings, opts) do
+    Jason.Encode.map(Map.take(settings, [:show_name, :title_template]), opts)
   end
 end
