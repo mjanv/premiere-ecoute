@@ -10,15 +10,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.XmemlExport
 
-  # AIDEV-NOTE: {timebase, ntsc} pairs matching xmeml spec. ntsc=TRUE applies 0.01% pulldown.
-  @frame_rates [
-    {"23.976", 24, "TRUE"},
-    {"24", 24, "FALSE"},
-    {"25", 25, "FALSE"},
-    {"29.97", 30, "TRUE"},
-    {"30", 30, "FALSE"}
-  ]
-
   @impl true
   def update(assigns, socket) do
     socket =
@@ -66,7 +57,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
 
   @impl true
   def render(assigns) do
-    assigns = assign(assigns, :frame_rates, @frame_rates)
+    assigns = assign(assigns, :frame_rates, XmemlExport.frame_rates())
 
     ~H"""
     <div
@@ -220,11 +211,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
 
   defp track_label(_session, marker, i), do: marker.track_name || "Track #{i}"
 
-  defp resolve_rate(label) do
-    @frame_rates
-    |> Enum.find({"25", 25, "FALSE"}, fn {l, _, _} -> l == label end)
-    |> then(fn {_, tb, ntsc} -> {tb, ntsc} end)
-  end
+  defp resolve_rate(label), do: XmemlExport.resolve_rate(label)
 
   # ---------------------------------------------------------------------------
   # Shared helpers

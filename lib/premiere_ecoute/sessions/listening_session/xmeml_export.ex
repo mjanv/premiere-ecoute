@@ -30,6 +30,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
   # AIDEV-NOTE: ppro internal clock = 254016000000 ticks/second
   @ppro_ticks_per_second 254_016_000_000
 
+  # {label, timebase, ntsc} — ntsc="TRUE" applies 1000/1001 pulldown (NTSC lineage rates)
+  @frame_rates [
+    {"23.976", 24, "TRUE"},
+    {"24", 24, "FALSE"},
+    {"25", 25, "FALSE"},
+    {"29.97", 30, "TRUE"},
+    {"30", 30, "FALSE"},
+    {"50", 50, "FALSE"},
+    {"59.94", 60, "TRUE"},
+    {"60", 60, "FALSE"}
+  ]
+
+  @doc "Returns the list of supported frame rates as {label, timebase, ntsc} tuples."
+  def frame_rates, do: @frame_rates
+
+  @doc "Resolves a frame rate label to its {timebase, ntsc} pair. Raises if not found."
+  def resolve_rate(label) do
+    {_, tb, ntsc} = Enum.find(@frame_rates, fn {l, _, _} -> l == label end)
+    {tb, ntsc}
+  end
+
   @sequence_attrs ~s(TL.SQAudioVisibleBase="0" TL.SQVideoVisibleBase="0" TL.SQVisibleBaseTime="0" ) <>
                     ~s(TL.SQAVDividerPosition="0.5" TL.SQHideShyTracks="0" TL.SQHeaderWidth="204" ) <>
                     ~s(MZ.Sequence.PreviewFrameSizeHeight="1080" MZ.Sequence.PreviewFrameSizeWidth="1920" ) <>
