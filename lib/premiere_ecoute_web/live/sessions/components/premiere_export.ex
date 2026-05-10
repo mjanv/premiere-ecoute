@@ -16,7 +16,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
       socket
       |> assign(assigns)
       |> assign_new(:media_path, fn -> "" end)
-      |> assign_new(:frame_rate, fn -> "25" end)
+      |> assign_new(:frame_rate, fn -> "59.94" end)
 
     {:ok, socket}
   end

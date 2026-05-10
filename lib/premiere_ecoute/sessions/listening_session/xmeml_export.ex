@@ -31,13 +31,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
   @ppro_ticks_per_second 254_016_000_000
 
   # {label, timebase, ntsc} — ntsc="TRUE" applies 1000/1001 pulldown (NTSC lineage rates)
+  # Labels match OBS Settings → Video → Common FPS Values exactly
   @frame_rates [
-    {"23.976", 24, "TRUE"},
-    {"24", 24, "FALSE"},
-    {"25", 25, "FALSE"},
+    {"10", 10, "FALSE"},
+    {"20", 20, "FALSE"},
+    {"24 NTSC", 24, "TRUE"},
+    {"25 PAL", 25, "FALSE"},
     {"29.97", 30, "TRUE"},
     {"30", 30, "FALSE"},
-    {"50", 50, "FALSE"},
+    {"48", 48, "FALSE"},
+    {"50 PAL", 50, "FALSE"},
     {"59.94", 60, "TRUE"},
     {"60", 60, "FALSE"}
   ]
