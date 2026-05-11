@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
   alias PremiereEcoute.Sessions.ListeningSession.SpeechMarker
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.ListeningSession.XmemlExport
+  alias PremiereEcouteCore.Xml
 
   # Reference files produced by iterating with Premiere Pro 26.0.2
   @fixture_speech "test/support/premiere/test_speech.xml"
@@ -53,40 +54,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
   end
 
   # ---------------------------------------------------------------------------
-  # Helpers
-  # ---------------------------------------------------------------------------
-
-  defp parse_xml(xml_string) do
-    xml_string
-    |> String.to_charlist()
-    |> :xmerl_scan.string(quiet: true)
-    |> elem(0)
-  end
-
-  defp xpath(doc, path) do
-    :xmerl_xpath.string(String.to_charlist(path), doc)
-  end
-
-  defp text_value(elements) when is_list(elements) do
-    elements
-    |> Enum.map(&text_value/1)
-  end
-
-  defp text_value({:xmlElement, _, _, _, _, _, _, _, children, _, _, _}) do
-    children
-    |> Enum.filter(&match?({:xmlText, _, _, _, _, _}, &1))
-    |> Enum.map_join(fn {:xmlText, _, _, _, value, _} -> to_string(value) end)
-  end
-
-  defp text_value({:xmlText, _, _, _, value, _}), do: to_string(value)
-
-  defp attr_value({:xmlElement, _, _, _, _, _, _, attrs, _, _, _, _}, attr_name) do
-    attrs
-    |> Enum.find(fn {:xmlAttribute, name, _, _, _, _, _, _, _, _} -> name == attr_name end)
-    |> then(fn {:xmlAttribute, _, _, _, _, _, _, _, value, _} -> to_string(value) end)
-  end
-
-  # ---------------------------------------------------------------------------
   # Tests: speech-only fixture
   # ---------------------------------------------------------------------------
 
@@ -99,115 +66,115 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
     end
 
     test "produces valid XML", %{xml: xml} do
-      assert {:xmlElement, :xmeml, _, _, _, _, _, _, _, _, _, _} = parse_xml(xml)
+      assert {:xmlElement, :xmeml, _, _, _, _, _, _, _, _, _, _} = Xml.parse(xml)
     end
 
     test "xmeml version is 4", %{xml: xml} do
-      doc = parse_xml(xml)
-      [el] = xpath(doc, "/xmeml")
-      assert attr_value(el, :version) == "4"
+      doc = Xml.parse(xml)
+      [el] = Xml.xpath(doc, "/xmeml")
+      assert Xml.attr(el, :version) == "4"
     end
 
     test "sequence uuid matches reference", %{xml: xml, ref: ref} do
-      doc = parse_xml(xml)
-      ref_doc = parse_xml(ref)
+      doc = Xml.parse(xml)
+      ref_doc = Xml.parse(ref)
 
-      assert text_value(xpath(doc, "/xmeml/sequence/uuid")) ==
-               text_value(xpath(ref_doc, "/xmeml/sequence/uuid"))
+      assert Xml.text(Xml.xpath(doc, "/xmeml/sequence/uuid")) ==
+               Xml.text(Xml.xpath(ref_doc, "/xmeml/sequence/uuid"))
     end
 
     test "sequence duration matches reference", %{xml: xml, ref: ref} do
-      doc = parse_xml(xml)
-      ref_doc = parse_xml(ref)
+      doc = Xml.parse(xml)
+      ref_doc = Xml.parse(ref)
 
-      assert text_value(xpath(doc, "/xmeml/sequence/duration")) ==
-               text_value(xpath(ref_doc, "/xmeml/sequence/duration"))
+      assert Xml.text(Xml.xpath(doc, "/xmeml/sequence/duration")) ==
+               Xml.text(Xml.xpath(ref_doc, "/xmeml/sequence/duration"))
     end
 
     test "has exactly 1 video track (no chapter track)", %{xml: xml} do
-      doc = parse_xml(xml)
-      tracks = xpath(doc, "/xmeml/sequence/media/video/track")
+      doc = Xml.parse(xml)
+      tracks = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
       assert length(tracks) == 1
     end
 
     test "speech track has 3 clipitems", %{xml: xml} do
-      doc = parse_xml(xml)
-      clips = xpath(doc, "/xmeml/sequence/media/video/track/clipitem")
+      doc = Xml.parse(xml)
+      clips = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem")
       assert length(clips) == 3
     end
 
     test "clipitem ids match reference", %{xml: xml, ref: ref} do
-      doc = parse_xml(xml)
-      ref_doc = parse_xml(ref)
+      doc = Xml.parse(xml)
+      ref_doc = Xml.parse(ref)
 
-      ids = xpath(doc, "/xmeml/sequence/media/video/track/clipitem") |> Enum.map(&attr_value(&1, :id))
-      ref_ids = xpath(ref_doc, "/xmeml/sequence/media/video/track/clipitem") |> Enum.map(&attr_value(&1, :id))
+      ids = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem") |> Enum.map(&Xml.attr(&1, :id))
+      ref_ids = Xml.xpath(ref_doc, "/xmeml/sequence/media/video/track/clipitem") |> Enum.map(&Xml.attr(&1, :id))
 
       assert ids == ref_ids
     end
 
     test "first clipitem start/end/in/out match reference", %{xml: xml, ref: ref} do
-      doc = parse_xml(xml)
-      ref_doc = parse_xml(ref)
+      doc = Xml.parse(xml)
+      ref_doc = Xml.parse(ref)
 
       for field <- ~w(start end in out) do
         path = "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/#{field}"
-        assert text_value(xpath(doc, path)) == text_value(xpath(ref_doc, path))
+        assert Xml.text(Xml.xpath(doc, path)) == Xml.text(Xml.xpath(ref_doc, path))
       end
     end
 
     test "clip names are Clip 001, Clip 002, Clip 003", %{xml: xml} do
-      doc = parse_xml(xml)
-      names = xpath(doc, "/xmeml/sequence/media/video/track/clipitem/name") |> text_value()
+      doc = Xml.parse(xml)
+      names = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem/name") |> Xml.text()
       assert names == ["Clip 001", "Clip 002", "Clip 003"]
     end
 
     test "marker comments contain transcription text", %{xml: xml} do
-      doc = parse_xml(xml)
-      comments = xpath(doc, "/xmeml/sequence/media/video/track/clipitem/marker/comment") |> text_value()
+      doc = Xml.parse(xml)
+      comments = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem/marker/comment") |> Xml.text()
       assert Enum.at(comments, 0) =~ "welcome to the stream"
       assert Enum.at(comments, 1) =~ "let's go"
       assert Enum.at(comments, 2) == "Background music starts"
     end
 
     test "first clipitem declares file-1 fully, others reference it", %{xml: xml} do
-      doc = parse_xml(xml)
+      doc = Xml.parse(xml)
 
       # clipitem-1 should have a full file element with pathurl
-      [pathurl] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/file/pathurl")
-      assert text_value(pathurl) =~ "Sample%20Media%20Clip%208.mp4"
+      [pathurl] = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/file/pathurl")
+      assert Xml.text(pathurl) =~ "Sample%20Media%20Clip%208.mp4"
 
       # clipitem-2 should have a self-referencing file element (no pathurl child)
-      pathrefs2 = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-2']/file/pathurl")
+      pathrefs2 = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-2']/file/pathurl")
       assert pathrefs2 == []
     end
 
     test "has 2 audio tracks", %{xml: xml} do
-      doc = parse_xml(xml)
-      tracks = xpath(doc, "/xmeml/sequence/media/audio/track")
+      doc = Xml.parse(xml)
+      tracks = Xml.xpath(doc, "/xmeml/sequence/media/audio/track")
       assert length(tracks) == 2
     end
 
     test "audio tracks have 3 clipitems each", %{xml: xml} do
-      doc = parse_xml(xml)
-      tracks = xpath(doc, "/xmeml/sequence/media/audio/track")
+      doc = Xml.parse(xml)
+      tracks = Xml.xpath(doc, "/xmeml/sequence/media/audio/track")
 
       for track <- tracks do
-        clips = xpath(track, "clipitem")
+        clips = Xml.xpath(track, "clipitem")
         assert length(clips) == 3
       end
     end
 
     test "pathurl uses file://localhost/ format for Windows paths", %{xml: xml} do
-      doc = parse_xml(xml)
-      [pathurl] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/file/pathurl")
-      assert text_value(pathurl) =~ "file://localhost/"
+      doc = Xml.parse(xml)
+      [pathurl] = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/file/pathurl")
+      assert Xml.text(pathurl) =~ "file://localhost/"
     end
 
     test "pathurl encodes colon in drive letter as %3a", %{xml: xml} do
-      doc = parse_xml(xml)
-      [pathurl] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/file/pathurl")
-      assert text_value(pathurl) =~ "C%3a"
+      doc = Xml.parse(xml)
+      [pathurl] = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/file/pathurl")
+      assert Xml.text(pathurl) =~ "C%3a"
     end
   end
 
@@ -224,69 +191,69 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
     end
 
     test "produces valid XML", %{xml: xml} do
-      assert {:xmlElement, :xmeml, _, _, _, _, _, _, _, _, _, _} = parse_xml(xml)
+      assert {:xmlElement, :xmeml, _, _, _, _, _, _, _, _, _, _} = Xml.parse(xml)
     end
 
     test "has 2 video tracks", %{xml: xml} do
-      doc = parse_xml(xml)
-      tracks = xpath(doc, "/xmeml/sequence/media/video/track")
+      doc = Xml.parse(xml)
+      tracks = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
       assert length(tracks) == 2
     end
 
     test "speech track (V1) has 3 clipitems", %{xml: xml} do
-      doc = parse_xml(xml)
-      [speech_track | _] = xpath(doc, "/xmeml/sequence/media/video/track")
-      assert length(xpath(speech_track, "clipitem")) == 3
+      doc = Xml.parse(xml)
+      [speech_track | _] = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
+      assert length(Xml.xpath(speech_track, "clipitem")) == 3
     end
 
     test "chapter track (V2) has 2 clipitems", %{xml: xml} do
-      doc = parse_xml(xml)
-      [_, chapter_track] = xpath(doc, "/xmeml/sequence/media/video/track")
-      assert length(xpath(chapter_track, "clipitem")) == 2
+      doc = Xml.parse(xml)
+      [_, chapter_track] = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
+      assert length(Xml.xpath(chapter_track, "clipitem")) == 2
     end
 
     test "chapter clipitem names match track names", %{xml: xml} do
-      doc = parse_xml(xml)
-      [_, chapter_track] = xpath(doc, "/xmeml/sequence/media/video/track")
-      names = xpath(chapter_track, "clipitem/name") |> text_value()
+      doc = Xml.parse(xml)
+      [_, chapter_track] = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
+      names = Xml.xpath(chapter_track, "clipitem/name") |> Xml.text()
       assert names == ["Chapter 01 - Introduction", "Chapter 02 - Conclusion"]
     end
 
     test "chapter clipitems have independent file declarations (no cross-track idref)", %{xml: xml} do
-      doc = parse_xml(xml)
-      [_, chapter_track] = xpath(doc, "/xmeml/sequence/media/video/track")
-      clips = xpath(chapter_track, "clipitem")
+      doc = Xml.parse(xml)
+      [_, chapter_track] = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
+      clips = Xml.xpath(chapter_track, "clipitem")
 
       for clip <- clips do
-        [file] = xpath(clip, "file")
-        file_id = attr_value(file, :id)
+        [file] = Xml.xpath(clip, "file")
+        file_id = Xml.attr(file, :id)
         assert file_id != "file-1", "Chapter track must not reuse file-1 from speech track"
-        pathrls = xpath(file, "pathurl")
+        pathrls = Xml.xpath(file, "pathurl")
         assert length(pathrls) == 1, "Chapter clipitem must have full file declaration with pathurl"
       end
     end
 
     test "chapter track clipitem start frames match reference", %{xml: xml, ref: ref} do
-      doc = parse_xml(xml)
-      ref_doc = parse_xml(ref)
+      doc = Xml.parse(xml)
+      ref_doc = Xml.parse(ref)
 
       for id <- ["clipitem-10", "clipitem-11"] do
         path = "/xmeml/sequence/media/video/track/clipitem[@id='#{id}']/start"
-        assert text_value(xpath(doc, path)) == text_value(xpath(ref_doc, path))
+        assert Xml.text(Xml.xpath(doc, path)) == Xml.text(Xml.xpath(ref_doc, path))
       end
     end
 
     test "chapter labels are Lavender", %{xml: xml} do
-      doc = parse_xml(xml)
-      [_, chapter_track] = xpath(doc, "/xmeml/sequence/media/video/track")
-      labels = xpath(chapter_track, "clipitem/labels/label2") |> text_value()
+      doc = Xml.parse(xml)
+      [_, chapter_track] = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
+      labels = Xml.xpath(chapter_track, "clipitem/labels/label2") |> Xml.text()
       assert Enum.all?(labels, &(&1 == "Lavender"))
     end
 
     test "speech labels are Iris", %{xml: xml} do
-      doc = parse_xml(xml)
-      [speech_track | _] = xpath(doc, "/xmeml/sequence/media/video/track")
-      labels = xpath(speech_track, "clipitem/labels/label2") |> text_value()
+      doc = Xml.parse(xml)
+      [speech_track | _] = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
+      labels = Xml.xpath(speech_track, "clipitem/labels/label2") |> Xml.text()
       assert Enum.all?(labels, &(&1 == "Iris"))
     end
   end
@@ -308,8 +275,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
       }
 
       xml = XmemlExport.build(session, "", @timebase, @ntsc, @fixed_uuid)
-      doc = parse_xml(xml)
-      clips = xpath(doc, "/xmeml/sequence/media/video/track/clipitem")
+      doc = Xml.parse(xml)
+      clips = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem")
       assert clips == []
     end
 
@@ -328,9 +295,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
       assert xml =~ "&amp;"
       assert xml =~ "&lt;"
       assert xml =~ "&quot;"
-      doc = parse_xml(xml)
-      [comment] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem/marker/comment")
-      assert text_value(comment) == ~s(A & B <tag> "quote")
+      doc = Xml.parse(xml)
+      [comment] = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem/marker/comment")
+      assert Xml.text(comment) == ~s(A & B <tag> "quote")
     end
 
     test "nil transcription produces empty marker comment" do
@@ -345,9 +312,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
       }
 
       xml = XmemlExport.build(session, "", @timebase, @ntsc, @fixed_uuid)
-      doc = parse_xml(xml)
-      [comment] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem/marker/comment")
-      assert text_value(comment) == ""
+      doc = Xml.parse(xml)
+      [comment] = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem/marker/comment")
+      assert Xml.text(comment) == ""
     end
 
     test "blank media path produces recording.mp4 filename" do
@@ -375,48 +342,48 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
       session = speech_only_session()
       # bias 4000ms @ 25fps = 100 frames; first marker original 12_840ms = 321f → 321 + 100 = 421
       xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
-      doc = parse_xml(xml)
+      doc = Xml.parse(xml)
 
-      [start_el] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/start")
-      [end_el] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/end")
+      [start_el] = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/start")
+      [end_el] = Xml.xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/end")
 
-      assert text_value(start_el) == "421"
+      assert Xml.text(start_el) == "421"
       # original end 14_440ms = 361f → 461
-      assert text_value(end_el) == "461"
+      assert Xml.text(end_el) == "461"
     end
 
     test "shifts chapter clipitem positions by bias_ms" do
       session = speech_and_chapters_session()
       # First chapter original 12_840ms = 321f, with 4000ms bias → 421
       xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
-      doc = parse_xml(xml)
+      doc = Xml.parse(xml)
 
-      [_, chapter_track] = xpath(doc, "/xmeml/sequence/media/video/track")
-      [first_chapter | _] = xpath(chapter_track, "clipitem")
-      [start_el] = xpath(first_chapter, "start")
+      [_, chapter_track] = Xml.xpath(doc, "/xmeml/sequence/media/video/track")
+      [first_chapter | _] = Xml.xpath(chapter_track, "clipitem")
+      [start_el] = Xml.xpath(first_chapter, "start")
 
-      assert text_value(start_el) == "421"
+      assert Xml.text(start_el) == "421"
     end
 
     test "shifts audio clipitem positions by bias_ms" do
       session = speech_only_session()
       xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
-      doc = parse_xml(xml)
+      doc = Xml.parse(xml)
 
-      [first_audio_clip | _] = xpath(doc, "/xmeml/sequence/media/audio/track[1]/clipitem")
-      [start_el] = xpath(first_audio_clip, "start")
+      [first_audio_clip | _] = Xml.xpath(doc, "/xmeml/sequence/media/audio/track[1]/clipitem")
+      [start_el] = Xml.xpath(first_audio_clip, "start")
 
-      assert text_value(start_el) == "421"
+      assert Xml.text(start_el) == "421"
     end
 
     test "extends sequence duration by bias_ms" do
       session = speech_only_session()
       # Last marker end 21_360ms = 534f, +4000ms (100f) = 634
       xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
-      doc = parse_xml(xml)
+      doc = Xml.parse(xml)
 
-      [duration_el] = xpath(doc, "/xmeml/sequence/duration")
-      assert text_value(duration_el) == "634"
+      [duration_el] = Xml.xpath(doc, "/xmeml/sequence/duration")
+      assert Xml.text(duration_el) == "634"
     end
 
     test "default bias is 0 (positions match unbiased build)" do

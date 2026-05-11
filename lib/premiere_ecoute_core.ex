@@ -34,6 +34,7 @@ defmodule PremiereEcouteCore do
       Timezone,
       Utils,
       Worker,
+      Xml,
       Zipfile
     ]
 
