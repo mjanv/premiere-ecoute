@@ -365,4 +365,65 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExportTest do
       assert xml =~ "recording.mp4"
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # Tests: time bias
+  # ---------------------------------------------------------------------------
+
+  describe "build/7 - time bias" do
+    test "shifts speech clipitem positions by bias_ms" do
+      session = speech_only_session()
+      # bias 4000ms @ 25fps = 100 frames; first marker original 12_840ms = 321f → 321 + 100 = 421
+      xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
+      doc = parse_xml(xml)
+
+      [start_el] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/start")
+      [end_el] = xpath(doc, "/xmeml/sequence/media/video/track/clipitem[@id='clipitem-1']/end")
+
+      assert text_value(start_el) == "421"
+      # original end 14_440ms = 361f → 461
+      assert text_value(end_el) == "461"
+    end
+
+    test "shifts chapter clipitem positions by bias_ms" do
+      session = speech_and_chapters_session()
+      # First chapter original 12_840ms = 321f, with 4000ms bias → 421
+      xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
+      doc = parse_xml(xml)
+
+      [_, chapter_track] = xpath(doc, "/xmeml/sequence/media/video/track")
+      [first_chapter | _] = xpath(chapter_track, "clipitem")
+      [start_el] = xpath(first_chapter, "start")
+
+      assert text_value(start_el) == "421"
+    end
+
+    test "shifts audio clipitem positions by bias_ms" do
+      session = speech_only_session()
+      xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
+      doc = parse_xml(xml)
+
+      [first_audio_clip | _] = xpath(doc, "/xmeml/sequence/media/audio/track[1]/clipitem")
+      [start_el] = xpath(first_audio_clip, "start")
+
+      assert text_value(start_el) == "421"
+    end
+
+    test "extends sequence duration by bias_ms" do
+      session = speech_only_session()
+      # Last marker end 21_360ms = 534f, +4000ms (100f) = 634
+      xml = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 4000)
+      doc = parse_xml(xml)
+
+      [duration_el] = xpath(doc, "/xmeml/sequence/duration")
+      assert text_value(duration_el) == "634"
+    end
+
+    test "default bias is 0 (positions match unbiased build)" do
+      session = speech_only_session()
+      xml_default = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000)
+      xml_zero = XmemlExport.build(session, @media_path, @timebase, @ntsc, @fixed_uuid, 1000, 0)
+      assert xml_default == xml_zero
+    end
+  end
 end

@@ -72,17 +72,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
   - `ntsc` - "TRUE" or "FALSE"
   - `uuid` - sequence UUID string (injectable for deterministic tests)
   - `source_duration` - source file duration in frames (optional, defaults to sequence duration)
+  - `bias_ms` - time offset in milliseconds applied to every marker position (default 0)
   """
-  @spec build(ListeningSession.t(), String.t(), integer(), String.t(), String.t(), integer() | nil) :: String.t()
-  def build(session, media_path, timebase, ntsc, uuid \\ generate_uuid(), source_duration \\ nil) do
+  @spec build(ListeningSession.t(), String.t(), integer(), String.t(), String.t(), integer() | nil, integer()) ::
+          String.t()
+  def build(session, media_path, timebase, ntsc, uuid \\ generate_uuid(), source_duration \\ nil, bias_ms \\ 0) do
     sorted_speech = Enum.sort_by(session.speech_markers, & &1.start_ms)
     sorted_tracks = Enum.sort_by(session.track_markers, & &1.started_at, {:asc, DateTime})
 
-    speech_end_ms = if sorted_speech != [], do: List.last(sorted_speech).end_ms, else: 0
+    speech_end_ms = if sorted_speech != [], do: List.last(sorted_speech).end_ms + bias_ms, else: 0
 
     track_end_ms =
       if sorted_tracks != [] && not is_nil(session.started_at) do
-        DateTime.diff(List.last(sorted_tracks).started_at, session.started_at, :millisecond)
+        DateTime.diff(List.last(sorted_tracks).started_at, session.started_at, :millisecond) + bias_ms
       else
         0
       end
@@ -97,14 +99,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
     file_name = if media_path == "", do: "recording.mp4", else: Path.basename(media_path)
     path_url = build_pathurl(media_path, file_name)
 
-    speech_video_track = build_speech_video_track(sorted_speech, file_name, path_url, file_source_duration, timebase, ntsc)
+    speech_video_track =
+      build_speech_video_track(sorted_speech, file_name, path_url, file_source_duration, timebase, ntsc, bias_ms)
 
     chapter_video_track =
       build_chapter_video_track(sorted_tracks, session, file_name, path_url, file_source_duration, timebase, ntsc,
-        speech_count: length(sorted_speech)
+        speech_count: length(sorted_speech),
+        bias_ms: bias_ms
       )
 
-    audio_tracks = build_audio_tracks(sorted_speech, file_name, file_source_duration, timebase, ntsc)
+    audio_tracks = build_audio_tracks(sorted_speech, file_name, file_source_duration, timebase, ntsc, bias_ms)
 
     """
     <?xml version="1.0" encoding="UTF-8"?>
@@ -169,15 +173,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
   # Video tracks
   # ---------------------------------------------------------------------------
 
-  defp build_speech_video_track(sorted_speech, file_name, path_url, source_duration, timebase, ntsc) do
+  defp build_speech_video_track(sorted_speech, file_name, path_url, source_duration, timebase, ntsc, bias_ms) do
     n = length(sorted_speech)
 
     clips =
       sorted_speech
       |> Enum.with_index(1)
       |> Enum.map_join("\n", fn {marker, i} ->
-        start_f = ms_to_frames(marker.start_ms, timebase)
-        end_f = ms_to_frames(marker.end_ms, timebase)
+        start_f = ms_to_frames(marker.start_ms + bias_ms, timebase)
+        end_f = ms_to_frames(marker.end_ms + bias_ms, timebase)
         name = "Clip #{String.pad_leading(to_string(i), 3, "0")}"
 
         # Audio link targets: ch1 = clipitem-(n+i), ch2 = clipitem-(2n+i)
@@ -238,6 +242,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
 
   defp build_chapter_video_track(sorted_tracks, session, file_name, path_url, source_duration, timebase, ntsc, opts) do
     speech_count = Keyword.fetch!(opts, :speech_count)
+    bias_ms = Keyword.get(opts, :bias_ms, 0)
     # Chapter clipitems start after speech (n) + audio ch1 (n) + audio ch2 (n) = 3n
     base_id = 3 * speech_count + 1
 
@@ -267,8 +272,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
             do: DateTime.diff(next.started_at, session.started_at, :millisecond),
             else: last_end_ms
 
-        start_f = ms_to_frames(start_ms, timebase)
-        end_f = ms_to_frames(end_ms, timebase)
+        start_f = ms_to_frames(start_ms + bias_ms, timebase)
+        end_f = ms_to_frames(end_ms + bias_ms, timebase)
         label = track_label(session, marker, i)
 
         # AIDEV-NOTE: each chapter clipitem gets its own full file declaration to avoid
@@ -320,7 +325,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
   # Audio tracks (exploded stereo: ch1 + ch2, one clipitem per speech segment per channel)
   # ---------------------------------------------------------------------------
 
-  defp build_audio_tracks(sorted_speech, file_name, source_duration, timebase, ntsc) do
+  defp build_audio_tracks(sorted_speech, file_name, source_duration, timebase, ntsc, bias_ms) do
     n = length(sorted_speech)
 
     build_channel = fn channel_index, track_index, output_channel ->
@@ -328,8 +333,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
         sorted_speech
         |> Enum.with_index(1)
         |> Enum.map_join("\n", fn {marker, i} ->
-          start_f = ms_to_frames(marker.start_ms, timebase)
-          end_f = ms_to_frames(marker.end_ms, timebase)
+          start_f = ms_to_frames(marker.start_ms + bias_ms, timebase)
+          end_f = ms_to_frames(marker.end_ms + bias_ms, timebase)
 
           # audio ch1 clipitem ids = n+i, ch2 = 2n+i
           clipitem_id = "clipitem-#{track_index * n + i}"

@@ -17,6 +17,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
       |> assign(assigns)
       |> assign_new(:media_path, fn -> "" end)
       |> assign_new(:frame_rate, fn -> "59.94" end)
+      |> assign_new(:time_bias, fn -> 0 end)
 
     {:ok, socket}
   end
@@ -38,13 +39,25 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
   end
 
   @impl true
+  def handle_event("update_bias", %{"bias" => bias}, socket) do
+    {:noreply, assign(socket, :time_bias, String.to_integer(bias))}
+  end
+
+  @impl true
   def handle_event(
         "export_xml",
         _,
-        %{assigns: %{listening_session: session, media_path: media_path, frame_rate: frame_rate}} = socket
+        %{
+          assigns: %{
+            listening_session: session,
+            media_path: media_path,
+            frame_rate: frame_rate,
+            time_bias: time_bias
+          }
+        } = socket
       ) do
     {timebase, ntsc} = resolve_rate(frame_rate)
-    xml = XmemlExport.build(session, media_path, timebase, ntsc)
+    xml = XmemlExport.build(session, media_path, timebase, ntsc, UUID.uuid4(), nil, time_bias)
     filename = export_filename(session, "xml")
 
     {:noreply,
@@ -134,6 +147,34 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
           <p class="text-xs text-gray-600 mt-1">
             {gettext("Leave path blank to relink manually in Premiere.")}
           </p>
+
+          <%!-- Time bias slider --%>
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-medium text-gray-400">
+                {gettext("Time Bias")}
+              </label>
+              <span class="text-xs font-mono text-white bg-violet-600/30 px-2 py-0.5 rounded-md">
+                {format_bias_display(@time_bias)}
+              </span>
+            </div>
+            <form phx-change="update_bias" phx-target={@myself}>
+              <input
+                type="range"
+                min="0"
+                max="60000"
+                step="10"
+                value={@time_bias}
+                name="bias"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-violet-600"
+              />
+            </form>
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>0:00</span>
+              <span>0:30</span>
+              <span>1:00</span>
+            </div>
+          </div>
         </div>
 
         <%!-- Markers list --%>
@@ -228,5 +269,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
     ss = rem(total_seconds, 60)
     ms_part = rem(ms, 1000)
     :io_lib.format("~2..0B:~2..0B.~3..0B", [mm, ss, ms_part]) |> IO.iodata_to_binary()
+  end
+
+  defp format_bias_display(bias_ms) do
+    total_seconds = div(bias_ms, 1000)
+    mm = div(total_seconds, 60)
+    ss = rem(total_seconds, 60)
+    hundredths = div(rem(bias_ms, 1000), 10)
+    :io_lib.format("~B:~2..0B.~2..0B", [mm, ss, hundredths]) |> IO.iodata_to_binary()
   end
 end
