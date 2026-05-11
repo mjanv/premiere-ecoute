@@ -27,7 +27,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     client_id = Application.get_env(:premiere_ecoute, :twitch_client_id)
     redirect_uri = Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
 
-    if client_id && redirect_uri do
+    if client_id && redirect_uri && role in ~w(viewer streamer admin bot) do
       redirect(conn, external: TwitchApi.authorization_url(String.to_existing_atom(role)))
     else
       conn

@@ -12,8 +12,6 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
 
   import Plug.Conn
 
-  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
-
   @doc false
   @spec init(any()) :: map()
   def init(_default), do: %{}
@@ -24,12 +22,17 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
   Reads the request body and verifies the HMAC signature using the message ID, timestamp, and secret. Assigns the validation result to the connection under :twitch_hmac key for downstream processing.
   """
   @spec call(Plug.Conn.t(), any()) :: Plug.Conn.t()
-  def call(%Plug.Conn{req_headers: req_headers} = conn, _opts) do
-    with id when id != "" <- at(req_headers, "id"),
-         {:ok, body, _} <- read_body(conn) do
-      assign(conn, :twitch_hmac, hmac(req_headers, @secret, body))
-    else
-      _ -> conn
+  if Application.compile_env(:premiere_ecoute, :environment) == :dev do
+    def call(conn, _opts), do: assign(conn, :twitch_hmac, true)
+  else
+    @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
+    def call(%Plug.Conn{req_headers: req_headers} = conn, _opts) do
+      with id when id != "" <- at(req_headers, "id"),
+           {:ok, body, _} <- read_body(conn) do
+        assign(conn, :twitch_hmac, hmac(req_headers, @secret, body))
+      else
+        _ -> conn
+      end
     end
   end
 

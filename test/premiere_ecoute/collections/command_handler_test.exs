@@ -64,6 +64,103 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       assert is_list(cached.tracks)
       assert cached.session_id == session.id
     end
+
+    test "stores rewards in cache when session has reward options" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+
+      session =
+        collection_session_fixture(user, %{
+          options: %{
+            "rewards" => [%{"title" => "Song request", "cost" => 1000, "prompt" => "", "is_user_input_required" => false}]
+          }
+        })
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      expect(TwitchApi, :subscribe, fn _scope, "channel.channel_points_custom_reward_redemption.add" -> {:ok, %{}} end)
+
+      expect(TwitchApi, :create_reward, fn _scope, attrs ->
+        {:ok,
+         %PremiereEcoute.Twitch.Reward{
+           id: "reward-abc",
+           title: attrs.title,
+           cost: 1000,
+           broadcaster_id: "1234",
+           is_enabled: true,
+           is_paused: false,
+           is_in_stock: true,
+           is_user_input_required: false
+         }}
+      end)
+
+      {:ok, _session, _events} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      {:ok, cached} = Cache.get(:collections, user.twitch.user_id)
+      assert [%PremiereEcoute.Twitch.Reward{id: "reward-abc"}] = cached.rewards
+      assert cached.redemptions == []
+    end
+
+    test "skips failed reward creation and stores remaining rewards" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+
+      session =
+        collection_session_fixture(user, %{
+          options: %{
+            "rewards" => [
+              %{"title" => "Good reward", "cost" => 500, "prompt" => "", "is_user_input_required" => false},
+              %{"title" => "Bad reward", "cost" => 999, "prompt" => "", "is_user_input_required" => false}
+            ]
+          }
+        })
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      expect(TwitchApi, :subscribe, fn _scope, "channel.channel_points_custom_reward_redemption.add" -> {:ok, %{}} end)
+
+      expect(TwitchApi, :create_reward, fn _scope, %{title: "Good reward"} ->
+        {:ok,
+         %PremiereEcoute.Twitch.Reward{
+           id: "good-id",
+           title: "Good reward",
+           cost: 500,
+           broadcaster_id: "1234",
+           is_enabled: true,
+           is_paused: false,
+           is_in_stock: true,
+           is_user_input_required: false
+         }}
+      end)
+
+      expect(TwitchApi, :create_reward, fn _scope, %{title: "Bad reward"} ->
+        {:error, :unauthorized}
+      end)
+
+      {:ok, _session, _events} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      {:ok, cached} = Cache.get(:collections, user.twitch.user_id)
+      assert length(cached.rewards) == 1
+      assert hd(cached.rewards).id == "good-id"
+    end
+
+    test "stores empty rewards and redemptions when no reward options" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+      session = collection_session_fixture(user)
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+
+      {:ok, _session, _events} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      {:ok, cached} = Cache.get(:collections, user.twitch.user_id)
+      assert cached.rewards == []
+      assert cached.redemptions == []
+    end
   end
 
   describe "handle/1 - OpenVoteWindow" do
@@ -385,6 +482,64 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       end)
 
       command = %CompleteCollectionSession{session_id: session.id, scope: scope, remove_rejected: true}
+      {:ok, completed, _events} = CommandBus.apply(command)
+      assert completed.status == :completed
+    end
+
+    test "deletes rewards and unsubscribes redemption topic when session had rewards" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+
+      session =
+        collection_session_fixture(user, %{
+          options: %{
+            "rewards" => [%{"title" => "Song request", "cost" => 1000, "prompt" => "", "is_user_input_required" => false}]
+          }
+        })
+
+      reward = %PremiereEcoute.Twitch.Reward{
+        id: "reward-abc",
+        title: "Song request",
+        cost: 1000,
+        broadcaster_id: "1234",
+        is_enabled: true,
+        is_paused: false,
+        is_in_stock: true,
+        is_user_input_required: false
+      }
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      expect(TwitchApi, :subscribe, fn _scope, "channel.channel_points_custom_reward_redemption.add" -> {:ok, %{}} end)
+      expect(TwitchApi, :create_reward, fn _scope, _attrs -> {:ok, reward} end)
+      {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      expect(TwitchApi, :delete_reward, fn _scope, "reward-abc" -> :ok end)
+      expect(TwitchApi, :unsubscribe, fn _scope, "channel.chat.message" -> {:ok, "unsubscribed"} end)
+
+      expect(TwitchApi, :unsubscribe, fn _scope, "channel.channel_points_custom_reward_redemption.add" ->
+        {:ok, "unsubscribed"}
+      end)
+
+      command = %CompleteCollectionSession{session_id: session.id, scope: scope}
+      {:ok, completed, _events} = CommandBus.apply(command)
+      assert completed.status == :completed
+    end
+
+    test "does not unsubscribe redemption topic when session had no rewards" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = Scope.for_user(user)
+      playlist = playlist_fixture()
+      session = collection_session_fixture(user)
+
+      expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
+      expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
+
+      expect(TwitchApi, :unsubscribe, fn _scope, "channel.chat.message" -> {:ok, "unsubscribed"} end)
+
+      command = %CompleteCollectionSession{session_id: session.id, scope: scope}
       {:ok, completed, _events} = CommandBus.apply(command)
       assert completed.status == :completed
     end

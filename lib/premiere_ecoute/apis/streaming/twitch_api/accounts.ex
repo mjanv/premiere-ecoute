@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.Accounts do
 
   @scopes [
     streamer:
-      "user:read:email user:read:follows user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcements",
+      "user:read:email user:read:follows user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcements channel:manage:redemptions",
     viewer: "user:read:email user:read:follows"
   ]
 

@@ -56,7 +56,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
           %PollEnded{} = event -> Sessions.publish_poll(event)
           %StreamStarted{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
           %StreamEnded{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
-          # %RewardRedeemed{} = event -> TODO
+          %RewardRedeemed{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
           _ -> :ok
         end
 

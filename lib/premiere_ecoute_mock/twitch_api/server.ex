@@ -238,6 +238,101 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
     )
   end
 
+  post "/channel_points/custom_rewards" do
+    broadcaster_id = conn.query_params["broadcaster_id"]
+    reward_id = UUID.uuid4()
+
+    reward = %{
+      "id" => reward_id,
+      "broadcaster_id" => broadcaster_id,
+      "title" => conn.body_params["title"],
+      "cost" => conn.body_params["cost"],
+      "prompt" => conn.body_params["prompt"] || "",
+      "is_enabled" => Map.get(conn.body_params, "is_enabled", true),
+      "is_paused" => false,
+      "is_in_stock" => true,
+      "is_user_input_required" => Map.get(conn.body_params, "is_user_input_required", false)
+    }
+
+    Logger.info("Mock: created reward \"#{reward["title"]}\" (#{reward_id}) for broadcaster #{broadcaster_id}")
+    Backend.update({:rewards, broadcaster_id}, [], fn rewards -> rewards ++ [reward] end)
+
+    json(conn, 200, data(reward, %{}))
+  end
+
+  delete "/channel_points/custom_rewards" do
+    broadcaster_id = conn.query_params["broadcaster_id"]
+    reward_id = conn.query_params["id"]
+
+    Backend.update({:rewards, broadcaster_id}, [], fn rewards ->
+      Enum.reject(rewards, fn r -> r["id"] == reward_id end)
+    end)
+
+    Logger.info("Mock: deleted reward #{reward_id} for broadcaster #{broadcaster_id}")
+    no_content(conn)
+  end
+
+  post "/:broadcaster_id/simulate/redemption" do
+    broadcaster_id = conn.params["broadcaster_id"]
+    rewards = Backend.get({:rewards, broadcaster_id}, [])
+
+    reward =
+      case conn.body_params["reward_id"] do
+        nil -> List.first(rewards)
+        id -> Enum.find(rewards, fn r -> r["id"] == id end)
+      end
+
+    case reward do
+      nil ->
+        json(conn, 404, %{"error" => "No rewards found for broadcaster #{broadcaster_id}"})
+
+      reward ->
+        send_webhook_notification("channel.channel_points_custom_reward_redemption.add", %{
+          "id" => UUID.uuid4(),
+          "broadcaster_user_id" => broadcaster_id,
+          "broadcaster_user_login" => "mock",
+          "broadcaster_user_name" => "Mock",
+          "user_id" => conn.body_params["user_id"] || "99999",
+          "user_login" => conn.body_params["user_login"] || "mockviewer",
+          "user_name" => conn.body_params["user_name"] || "MockViewer",
+          "user_input" => conn.body_params["user_input"] || "",
+          "status" => "unfulfilled",
+          "reward" => %{"id" => reward["id"], "title" => reward["title"], "cost" => reward["cost"], "prompt" => reward["prompt"]},
+          "redeemed_at" => DateTime.to_iso8601(DateTime.utc_now())
+        })
+
+        json(conn, 200, %{"status" => "sent", "reward" => reward["title"]})
+    end
+  end
+
+  patch "/channel_points/custom_rewards/redemptions" do
+    broadcaster_id = conn.query_params["broadcaster_id"]
+    redemption_id = conn.query_params["id"]
+    reward_id = conn.query_params["reward_id"]
+    status = conn.body_params["status"]
+
+    Logger.info("Mock: updating redemption #{redemption_id} to #{status} for broadcaster #{broadcaster_id}")
+
+    redemption = %{
+      "id" => redemption_id,
+      "broadcaster_id" => broadcaster_id,
+      "user_id" => "99999",
+      "user_login" => "mockviewer",
+      "reward" => %{"id" => reward_id, "title" => "Reward", "cost" => 500, "prompt" => ""},
+      "user_input" => "",
+      "status" => status,
+      "redeemed_at" => DateTime.to_iso8601(DateTime.utc_now())
+    }
+
+    json(conn, 200, data(redemption, %{}))
+  end
+
+  get "/channel_points/custom_rewards" do
+    broadcaster_id = conn.query_params["broadcaster_id"]
+    rewards = Backend.get({:rewards, broadcaster_id}, [])
+    json(conn, 200, data(rewards, %{}))
+  end
+
   get "/channels/followed" do
     json(conn, 200, data([], %{"total" => 0}))
   end

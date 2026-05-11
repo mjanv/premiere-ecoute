@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Collections.Supervisor do
       {PremiereEcouteCore.Cache, name: :collections, persist: :timer.minutes(30)}
     ],
     optionals: [
-      {PremiereEcoute.Collections.CollectionSession.MessagePipeline, []}
+      {PremiereEcoute.Collections.CollectionSession.MessagePipeline, []},
+      {PremiereEcoute.Collections.EventHandler, []}
     ]
 end

@@ -63,8 +63,16 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   def handle(%StartCollectionSession{session_id: session_id, scope: %{user: %{twitch: %{user_id: broadcaster_id}}} = scope}) do
     with %CollectionSession{origin_playlist: origin_playlist} = session <- CollectionSession.get(session_id),
          {:ok, playlist} <- Apis.provider(origin_playlist.provider).get_playlist(origin_playlist.playlist_id),
-         {:ok, _} <- Cache.put(:collections, broadcaster_id, %{session_id: session_id, tracks: playlist.tracks}),
+         rewards <- create_rewards(scope, session.options["rewards"] || []),
+         {:ok, _} <-
+           Cache.put(:collections, broadcaster_id, %{
+             session_id: session_id,
+             tracks: playlist.tracks,
+             rewards: rewards,
+             redemptions: []
+           }),
          {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
+         {:ok, _} <- maybe_subscribe_rewards(scope, rewards),
          {:ok, session} <- CollectionSession.start(session) do
       {:ok, session, [%CollectionSessionStarted{session_id: session.id, user_id: scope.user.id}]}
     else
@@ -179,9 +187,13 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
 
     broadcaster_id = scope.user.twitch.user_id
 
-    with {:ok, _} <- sync_to_spotify(scope, session),
+    with {:ok, cached} <- Cache.get(:collections, broadcaster_id),
+         rewards = (cached || %{})[:rewards] || [],
+         :ok <- delete_rewards(scope, rewards),
+         {:ok, _} <- sync_to_spotify(scope, session),
          {:ok, _} <- remove_from_origin(scope, session, to_remove),
          {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
+         {:ok, _} <- maybe_unsubscribe_rewards(scope, rewards),
          {:ok, _} <- Cache.del(:collections, broadcaster_id),
          {:ok, session} <- CollectionSession.complete(session) do
       {:ok, session,
@@ -206,6 +218,46 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
     tracks = Enum.map(track_ids, &%Track{provider_ids: %{spotify: &1}})
     Apis.spotify().remove_playlist_items(scope, playlist_id, tracks)
   end
+
+  defp create_rewards(_scope, []), do: []
+
+  defp create_rewards(scope, reward_configs) do
+    Enum.flat_map(reward_configs, fn attrs ->
+      string_keyed = Map.new(attrs, fn {k, v} -> {String.to_atom(k), v} end)
+
+      case Apis.twitch().create_reward(scope, string_keyed) do
+        {:ok, reward} ->
+          [reward]
+
+        {:error, reason} ->
+          Logger.warning("Failed to create reward #{inspect(attrs)}: #{inspect(reason)}")
+          []
+      end
+    end)
+  end
+
+  defp delete_rewards(_scope, []), do: :ok
+
+  defp delete_rewards(scope, rewards) do
+    Enum.each(rewards, fn reward ->
+      case Apis.twitch().delete_reward(scope, reward.id) do
+        :ok -> :ok
+        {:error, reason} -> Logger.warning("Failed to delete reward #{reward.id}: #{inspect(reason)}")
+      end
+    end)
+
+    :ok
+  end
+
+  defp maybe_subscribe_rewards(_scope, []), do: {:ok, :no_rewards}
+
+  defp maybe_subscribe_rewards(scope, _rewards),
+    do: Apis.twitch().subscribe(scope, "channel.channel_points_custom_reward_redemption.add")
+
+  defp maybe_unsubscribe_rewards(_scope, []), do: {:ok, :no_rewards}
+
+  defp maybe_unsubscribe_rewards(scope, _rewards),
+    do: Apis.twitch().unsubscribe(scope, "channel.channel_points_custom_reward_redemption.add")
 
   defp sync_to_spotify(_scope, %{kept: []}), do: {:ok, :nothing_to_sync}
 

@@ -36,6 +36,7 @@
                 </label>
                 <select
                   name="session[origin_playlist_id]"
+                  required
                   class="w-full bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="">{gettext("Select…")}</option>
@@ -55,6 +56,7 @@
                 </label>
                 <select
                   name="session[destination_playlist_id]"
+                  required
                   class="w-full bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="">{gettext("Select…")}</option>
@@ -147,6 +149,145 @@
                   </select>
                 </div>
               </div>
+            </div>
+
+            <div class="border-t border-white/10 pt-4 space-y-3">
+              <div>
+                <p class="text-sm font-medium text-white mb-0.5">{gettext("Channel point rewards")}</p>
+                <p class="text-xs text-gray-500 mb-3">
+                  {gettext("Rewards created on Twitch when the session starts, removed when it ends")}
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <% locale = Gettext.get_locale(PremiereEcoute.Gettext) %>
+                  <%= for entry <- @catalog do %>
+                    <% already_added = Enum.any?(@rewards, &(&1["title"] == entry.title)) %>
+                    <button
+                      type="button"
+                      phx-click="add_from_catalog"
+                      phx-value-id={entry.id}
+                      disabled={already_added}
+                      class={[
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border",
+                        if already_added do
+                          "bg-purple-600/20 border-purple-500/40 text-purple-400 cursor-default"
+                        else
+                          "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20"
+                        end
+                      ]}
+                    >
+                      <%= if already_added do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            fill-rule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      <% else %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      <% end %>
+                      {Map.get(entry.labels, locale, entry.title)}
+                    </button>
+                  <% end %>
+                  <button
+                    type="button"
+                    phx-click="add_reward"
+                    class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-colors border border-white/20 border-dashed"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    {gettext("Custom")}
+                  </button>
+                </div>
+              </div>
+
+              <%= for {reward, i} <- Enum.with_index(@rewards) do %>
+                <% user_input_required = reward["is_user_input_required"] == "true" %>
+                <div class="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="text"
+                      name={"session[rewards][#{i}][title]"}
+                      value={reward["title"]}
+                      placeholder={gettext("Reward title")}
+                      phx-debounce="300"
+                      class="flex-1 bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1.5 text-sm placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <input
+                      type="number"
+                      name={"session[rewards][#{i}][cost]"}
+                      value={reward["cost"]}
+                      min="1"
+                      phx-debounce="300"
+                      class="w-24 bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1.5 text-sm text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <span class="text-xs text-gray-500">{gettext("pts")}</span>
+                    <button
+                      type="button"
+                      phx-click="remove_reward"
+                      phx-value-index={i}
+                      class="text-gray-500 hover:text-red-400 transition-colors p-1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="text"
+                      name={"session[rewards][#{i}][prompt]"}
+                      value={reward["prompt"]}
+                      placeholder={gettext("Description (optional)")}
+                      phx-debounce="300"
+                      class="flex-1 bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1.5 text-xs placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <input
+                      type="hidden"
+                      name={"session[rewards][#{i}][is_user_input_required]"}
+                      value={reward["is_user_input_required"]}
+                    />
+                    <button
+                      type="button"
+                      phx-click="toggle_reward_input"
+                      phx-value-index={i}
+                      title={gettext("Require viewer text input")}
+                      class={[
+                        "flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs transition-colors flex-shrink-0",
+                        if user_input_required do
+                          "bg-purple-600/40 text-purple-300 border border-purple-500/40"
+                        else
+                          "bg-white/5 text-gray-500 border border-white/10 hover:text-gray-300"
+                        end
+                      ]}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      {gettext("Input")}
+                    </button>
+                  </div>
+                </div>
+              <% end %>
             </div>
 
             <div class="flex items-center justify-between pt-2">

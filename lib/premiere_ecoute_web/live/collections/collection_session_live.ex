@@ -53,7 +53,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       end
 
       broadcaster_id = scope.user.twitch.user_id
-      {tracks, votes_a, votes_b, active_track_id, duel_track_id, vote_open} = load_cache(broadcaster_id)
+      {tracks, votes_a, votes_b, active_track_id, duel_track_id, vote_open, rewards, redemptions} = load_cache(broadcaster_id)
       next_duel_at = if session.status == :active, do: Collections.next_duel_reminder_at(session_id)
 
       socket
@@ -68,6 +68,8 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:votes_a, votes_a)
       |> assign(:votes_b, votes_b)
       |> assign(:vote_open, vote_open)
+      |> assign(:rewards, rewards)
+      |> assign(:redemptions, redemptions)
       |> assign(:countdown, nil)
       |> assign(:next_duel_at, next_duel_at)
       |> assign(:duel_countdown_secs, next_duel_at && max(0, DateTime.diff(next_duel_at, DateTime.utc_now(), :second)))
@@ -85,10 +87,20 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   # ── Cache helpers ─────────────────────────────────────────────────────────
 
-  defp load_cache(session_id) do
-    case Cache.get(:collections, session_id) do
+  defp update_cached_redemptions(broadcaster_id, redemptions) do
+    case Cache.get(:collections, broadcaster_id) do
+      {:ok, cached} when not is_nil(cached) ->
+        Cache.put(:collections, broadcaster_id, Map.put(cached, :redemptions, redemptions))
+
+      _ ->
+        :ok
+    end
+  end
+
+  defp load_cache(broadcaster_id) do
+    case Cache.get(:collections, broadcaster_id) do
       {:ok, nil} ->
-        {[], 0, 0, nil, nil, false}
+        {[], 0, 0, nil, nil, false, [], []}
 
       {:ok, cached} ->
         {
@@ -97,11 +109,13 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
           Map.get(cached, :votes_b, 0),
           Map.get(cached, :active_track_id),
           Map.get(cached, :duel_track_id),
-          not is_nil(Map.get(cached, :active_track_id))
+          not is_nil(Map.get(cached, :active_track_id)),
+          Map.get(cached, :rewards, []),
+          Map.get(cached, :redemptions, [])
         }
 
       _ ->
-        {[], 0, 0, nil, nil, false}
+        {[], 0, 0, nil, nil, false, [], []}
     end
   end
 
@@ -109,11 +123,11 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info(:session_started, socket) do
-    {tracks, _, _, _, _, _} = load_cache(socket.assigns.broadcaster_id)
+    {tracks, _, _, _, _, _, rewards, redemptions} = load_cache(socket.assigns.broadcaster_id)
     session = Collections.get_session(socket.assigns.session_id)
     Process.send_after(self(), :load_duel_reminder, 500)
     Process.send_after(self(), :duel_tick, 1000)
-    {:noreply, assign(socket, tracks: tracks, session: session)}
+    {:noreply, assign(socket, tracks: tracks, session: session, rewards: rewards, redemptions: redemptions)}
   end
 
   @impl true
@@ -166,6 +180,11 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info({:collection_started, _session_id}, socket), do: {:noreply, socket}
+
+  @impl true
+  def handle_info({:redemption_received, redemption}, socket) do
+    {:noreply, assign(socket, :redemptions, socket.assigns.redemptions ++ [redemption])}
+  end
 
   @impl true
   def handle_info({:duel_reminder, nil}, socket) do
@@ -233,11 +252,17 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     |> CommandBus.apply()
     |> case do
       {:ok, started, _events} ->
-        {tracks, _, _, _, _, _} = load_cache(socket.assigns.broadcaster_id)
+        {tracks, _, _, _, _, _, rewards, _} = load_cache(socket.assigns.broadcaster_id)
         PlayerSupervisor.start(socket.assigns.scope.user.id)
 
         {:noreply,
-         assign(socket, session: started, tracks: tracks, original_tracks: tracks, player_state: SpotifyPlayer.default())}
+         assign(socket,
+           session: started,
+           tracks: tracks,
+           original_tracks: tracks,
+           rewards: rewards,
+           player_state: SpotifyPlayer.default()
+         )}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, inspect(reason))}
@@ -279,7 +304,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     |> CommandBus.apply()
     |> case do
       {:ok, _session, _events} ->
-        {_, votes_a, votes_b, active_id, duel_id, _} = load_cache(socket.assigns.broadcaster_id)
+        {_, votes_a, votes_b, active_id, duel_id, _, _, _} = load_cache(socket.assigns.broadcaster_id)
         Process.send_after(self(), :tick, 1000)
 
         {:noreply,
@@ -544,6 +569,40 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   @impl true
   def handle_event("hide_end_modal", _params, socket) do
     {:noreply, assign(socket, :show_end_modal, false)}
+  end
+
+  @impl true
+  def handle_event(
+        "fulfill_redemption",
+        %{"redemption-id" => redemption_id, "reward-id" => reward_id},
+        %{assigns: %{scope: scope, broadcaster_id: broadcaster_id, redemptions: redemptions}} = socket
+      ) do
+    case Apis.twitch().update_redemption_status(scope, reward_id, redemption_id, :fulfilled) do
+      {:ok, updated} ->
+        redemptions = Enum.map(redemptions, fn r -> if r.id == updated.id, do: updated, else: r end)
+        update_cached_redemptions(broadcaster_id, redemptions)
+        {:noreply, assign(socket, :redemptions, redemptions)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, inspect(reason))}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "cancel_redemption",
+        %{"redemption-id" => redemption_id, "reward-id" => reward_id},
+        %{assigns: %{scope: scope, broadcaster_id: broadcaster_id, redemptions: redemptions}} = socket
+      ) do
+    case Apis.twitch().update_redemption_status(scope, reward_id, redemption_id, :canceled) do
+      {:ok, updated} ->
+        redemptions = Enum.map(redemptions, fn r -> if r.id == updated.id, do: updated, else: r end)
+        update_cached_redemptions(broadcaster_id, redemptions)
+        {:noreply, assign(socket, :redemptions, redemptions)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, inspect(reason))}
+    end
   end
 
   defp schedule_next_duel_reminder(%{assigns: %{session: session, session_id: session_id}} = socket) do
