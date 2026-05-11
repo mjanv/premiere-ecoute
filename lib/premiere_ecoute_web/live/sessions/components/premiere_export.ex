@@ -44,6 +44,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
   end
 
   @impl true
+  def handle_event("adjust_bias", %{"delta" => delta}, socket) do
+    new_bias = (socket.assigns.time_bias + String.to_integer(delta)) |> max(0) |> min(600_000)
+    {:noreply, assign(socket, :time_bias, new_bias)}
+  end
+
+  @impl true
   def handle_event(
         "export_xml",
         _,
@@ -154,15 +160,53 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
               <label class="text-xs font-medium text-gray-400">
                 {gettext("Time Bias")}
               </label>
-              <span class="text-xs font-mono text-white bg-violet-600/30 px-2 py-0.5 rounded-md">
-                {format_bias_display(@time_bias)}
-              </span>
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  phx-click="adjust_bias"
+                  phx-value-delta="-100"
+                  phx-target={@myself}
+                  class="text-xs font-mono text-gray-300 hover:text-white bg-gray-700/60 hover:bg-gray-600 px-2 py-0.5 rounded-md transition-colors"
+                >
+                  -100ms
+                </button>
+                <button
+                  type="button"
+                  phx-click="adjust_bias"
+                  phx-value-delta="-10"
+                  phx-target={@myself}
+                  class="text-xs font-mono text-gray-300 hover:text-white bg-gray-700/60 hover:bg-gray-600 px-2 py-0.5 rounded-md transition-colors"
+                >
+                  -10ms
+                </button>
+                <span class="text-xs font-mono text-white bg-violet-600/30 px-2 py-0.5 rounded-md min-w-[60px] text-center">
+                  {format_bias_display(@time_bias)}
+                </span>
+                <button
+                  type="button"
+                  phx-click="adjust_bias"
+                  phx-value-delta="10"
+                  phx-target={@myself}
+                  class="text-xs font-mono text-gray-300 hover:text-white bg-gray-700/60 hover:bg-gray-600 px-2 py-0.5 rounded-md transition-colors"
+                >
+                  +10ms
+                </button>
+                <button
+                  type="button"
+                  phx-click="adjust_bias"
+                  phx-value-delta="100"
+                  phx-target={@myself}
+                  class="text-xs font-mono text-gray-300 hover:text-white bg-gray-700/60 hover:bg-gray-600 px-2 py-0.5 rounded-md transition-colors"
+                >
+                  +100ms
+                </button>
+              </div>
             </div>
             <form phx-change="update_bias" phx-target={@myself}>
               <input
                 type="range"
                 min="0"
-                max="60000"
+                max="600000"
                 step="10"
                 value={@time_bias}
                 name="bias"
@@ -171,8 +215,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
             </form>
             <div class="flex justify-between text-xs text-gray-500 mt-1">
               <span>0:00</span>
-              <span>0:30</span>
-              <span>1:00</span>
+              <span>5:00</span>
+              <span>10:00</span>
             </div>
           </div>
         </div>
@@ -193,7 +237,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
               >
                 <span class="font-mono text-xs text-amber-400 shrink-0">
                   {if @listening_session.started_at,
-                    do: ms_to_timestamp(DateTime.diff(marker.started_at, @listening_session.started_at, :millisecond)),
+                    do: ms_to_timestamp(DateTime.diff(marker.started_at, @listening_session.started_at, :millisecond) + @time_bias),
                     else: "—"}
                 </span>
                 <span class="text-sm text-gray-200 flex-1">
@@ -217,9 +261,9 @@ defmodule PremiereEcouteWeb.Sessions.Components.PremiereExport do
                 class="flex items-start gap-3 rounded-lg bg-white/5 border border-white/10 px-3 py-2"
               >
                 <div class="flex items-center gap-1 shrink-0 mt-0.5">
-                  <span class="font-mono text-xs text-violet-400">{ms_to_timestamp(marker.start_ms)}</span>
+                  <span class="font-mono text-xs text-violet-400">{ms_to_timestamp(marker.start_ms + @time_bias)}</span>
                   <span class="text-gray-600 text-xs">→</span>
-                  <span class="font-mono text-xs text-violet-300">{ms_to_timestamp(marker.end_ms)}</span>
+                  <span class="font-mono text-xs text-violet-300">{ms_to_timestamp(marker.end_ms + @time_bias)}</span>
                   <span class="text-gray-500 text-xs">
                     ({:erlang.float_to_binary((marker.end_ms - marker.start_ms) / 1000, decimals: 1)}s)
                   </span>
