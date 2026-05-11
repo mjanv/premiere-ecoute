@@ -24,12 +24,17 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi do
   use PremiereEcouteCore.Api, api: :twitch
 
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Twitch.Redemption
+  alias PremiereEcoute.Twitch.Reward
 
   defmodule Behaviour do
     @moduledoc "Twitch API Behaviour"
 
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Accounts.User
+    alias PremiereEcoute.Apis.Streaming.TwitchApi.Rewards
+    alias PremiereEcoute.Twitch.Redemption
+    alias PremiereEcoute.Twitch.Reward
 
     # Accounts
     @callback client_credentials() :: {:ok, map()} | {:error, any()}
@@ -53,6 +58,26 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi do
     @callback create_poll(scope :: Scope.t(), poll :: map()) :: {:ok, map()} | {:error, term()}
     @callback end_poll(scope :: Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
     @callback get_poll(scope :: Scope.t(), poll_id :: String.t()) :: {:ok, map()} | {:error, term()}
+
+    # Rewards
+    @callback create_reward(scope :: Scope.t(), attrs :: Rewards.create_attrs()) ::
+                {:ok, Reward.t()} | {:error, term()}
+    @callback get_rewards(scope :: Scope.t()) :: {:ok, [Reward.t()]} | {:error, term()}
+    @callback update_reward(scope :: Scope.t(), reward_id :: Reward.id(), attrs :: Rewards.update_attrs()) ::
+                {:ok, Reward.t()} | {:error, term()}
+    @callback delete_reward(scope :: Scope.t(), reward_id :: Reward.id()) ::
+                :ok | {:error, term()}
+    @callback get_redemptions(
+                scope :: Scope.t(),
+                reward_id :: Reward.id(),
+                status :: Redemption.status()
+              ) :: {:ok, [Redemption.t()]} | {:error, term()}
+    @callback update_redemption_status(
+                scope :: Scope.t(),
+                reward_id :: Reward.id(),
+                redemption_id :: Redemption.id(),
+                status :: Redemption.status()
+              ) :: {:ok, Redemption.t()} | {:error, term()}
 
     # Channels
     @callback get_followed_channels(scope :: Scope.t()) :: {:ok, [map()]} | {:error, term()}
@@ -162,4 +187,12 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi do
 
   # Users
   defdelegate get_user_profile(access_token), to: __MODULE__.Users
+
+  # Rewards
+  defdelegate create_reward(scope, attrs), to: __MODULE__.Rewards
+  defdelegate get_rewards(scope), to: __MODULE__.Rewards
+  defdelegate update_reward(scope, reward_id, attrs), to: __MODULE__.Rewards
+  defdelegate delete_reward(scope, reward_id), to: __MODULE__.Rewards
+  defdelegate get_redemptions(scope, reward_id, status), to: __MODULE__.Rewards
+  defdelegate update_redemption_status(scope, reward_id, redemption_id, status), to: __MODULE__.Rewards
 end

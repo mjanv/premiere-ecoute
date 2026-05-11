@@ -7,6 +7,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   alias PremiereEcoute.Events.Chat.PollEnded
   alias PremiereEcoute.Events.Chat.PollStarted
   alias PremiereEcoute.Events.Chat.PollUpdated
+  alias PremiereEcoute.Events.Twitch.RewardRedeemed
   alias PremiereEcoute.Events.Twitch.StreamEnded
   alias PremiereEcoute.Events.Twitch.StreamStarted
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
@@ -364,6 +365,25 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
       assert event == %StreamEnded{
                broadcaster_id: "1337",
                broadcaster_name: "Cool_User"
+             }
+    end
+
+    test "channel.channel_points_custom_reward_redemption.add" do
+      payload =
+        ApiMock.payload("twitch_api/eventsub/channel_points_custom_reward_redemption_add.json")
+
+      event = TwitchController.handle(payload)
+
+      assert event == %RewardRedeemed{
+               id: "17fa2df1-ad76-4804-bfa5-a40ef63efe63",
+               broadcaster_id: "1337",
+               user_id: "9001",
+               user_login: "cooler_user",
+               reward_id: "92af127c-7326-4483-a52b-b0da0be61c01",
+               reward_title: "title",
+               user_input: "pogchamp",
+               status: "unfulfilled",
+               redeemed_at: "2020-07-15T17:16:03.17106713Z"
              }
     end
   end

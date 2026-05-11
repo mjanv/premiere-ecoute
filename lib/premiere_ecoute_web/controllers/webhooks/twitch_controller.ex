@@ -14,6 +14,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   alias PremiereEcoute.Events.Chat.PollEnded
   alias PremiereEcoute.Events.Chat.PollStarted
   alias PremiereEcoute.Events.Chat.PollUpdated
+  alias PremiereEcoute.Events.Twitch.RewardRedeemed
   alias PremiereEcoute.Events.Twitch.StreamEnded
   alias PremiereEcoute.Events.Twitch.StreamStarted
   alias PremiereEcoute.Sessions
@@ -55,6 +56,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
           %PollEnded{} = event -> Sessions.publish_poll(event)
           %StreamStarted{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
           %StreamEnded{} = event -> PremiereEcoute.PubSub.broadcast("twitch:events", event)
+          # %RewardRedeemed{} = event -> TODO
           _ -> :ok
         end
 
@@ -172,6 +174,32 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
     %StreamEnded{
       broadcaster_id: broadcaster_id,
       broadcaster_name: broadcaster_name
+    }
+  end
+
+  def handle(%{
+        "subscription" => %{"type" => "channel.channel_points_custom_reward_redemption.add"},
+        "event" => %{
+          "id" => id,
+          "broadcaster_user_id" => broadcaster_id,
+          "user_id" => user_id,
+          "user_login" => user_login,
+          "user_input" => user_input,
+          "status" => status,
+          "reward" => %{"id" => reward_id, "title" => reward_title},
+          "redeemed_at" => redeemed_at
+        }
+      }) do
+    %RewardRedeemed{
+      id: id,
+      broadcaster_id: broadcaster_id,
+      user_id: user_id,
+      user_login: user_login,
+      reward_id: reward_id,
+      reward_title: reward_title,
+      user_input: user_input,
+      status: status,
+      redeemed_at: redeemed_at
     }
   end
 

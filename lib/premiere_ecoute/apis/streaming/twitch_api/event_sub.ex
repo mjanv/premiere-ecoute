@@ -122,6 +122,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.EventSub do
   defp version("channel.poll.progress"), do: "1"
   defp version("stream.online"), do: "1"
   defp version("stream.offline"), do: "1"
+  defp version("channel.channel_points_custom_reward_redemption.add"), do: "1"
   defp version(_), do: "0"
 
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.chat.message") do
@@ -139,6 +140,9 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.EventSub do
     do: %{broadcaster_user_id: user_id}
 
   defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "stream.offline"),
+    do: %{broadcaster_user_id: user_id}
+
+  defp condition(%Scope{user: %{twitch: %{user_id: user_id}}}, "channel.channel_points_custom_reward_redemption.add"),
     do: %{broadcaster_user_id: user_id}
 
   defp condition(_, _), do: %{}
