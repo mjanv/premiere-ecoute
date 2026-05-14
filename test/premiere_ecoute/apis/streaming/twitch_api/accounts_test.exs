@@ -129,7 +129,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.AccountsTest do
       query = URI.decode_query(uri.query)
 
       expected_scope =
-        "user:read:email user:read:follows user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcements"
+        "user:read:email user:read:follows user:read:chat user:write:chat user:bot channel:manage:polls channel:read:polls channel:bot moderator:manage:announcements channel:manage:redemptions"
 
       assert query["scope"] == expected_scope
     end

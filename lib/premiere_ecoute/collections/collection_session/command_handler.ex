@@ -25,6 +25,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowClosed
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Twitch.Services.Rewards
   alias PremiereEcouteCore.Cache
 
   command(PrepareCollectionSession)
@@ -63,7 +64,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   def handle(%StartCollectionSession{session_id: session_id, scope: %{user: %{twitch: %{user_id: broadcaster_id}}} = scope}) do
     with %CollectionSession{origin_playlist: origin_playlist} = session <- CollectionSession.get(session_id),
          {:ok, playlist} <- Apis.provider(origin_playlist.provider).get_playlist(origin_playlist.playlist_id),
-         rewards <- create_rewards(scope, session.options["rewards"] || []),
+         rewards <- Rewards.create_rewards(scope, session.options["rewards"] || []),
          {:ok, _} <-
            Cache.put(:collections, broadcaster_id, %{
              session_id: session_id,
@@ -189,7 +190,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
 
     with {:ok, cached} <- Cache.get(:collections, broadcaster_id),
          rewards = (cached || %{})[:rewards] || [],
-         :ok <- delete_rewards(scope, rewards),
+         :ok <- Rewards.delete_rewards(scope, rewards),
          {:ok, _} <- sync_to_spotify(scope, session),
          {:ok, _} <- remove_from_origin(scope, session, to_remove),
          {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
@@ -217,36 +218,6 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
     playlist_id = session.origin_playlist.playlist_id
     tracks = Enum.map(track_ids, &%Track{provider_ids: %{spotify: &1}})
     Apis.spotify().remove_playlist_items(scope, playlist_id, tracks)
-  end
-
-  defp create_rewards(_scope, []), do: []
-
-  defp create_rewards(scope, reward_configs) do
-    Enum.flat_map(reward_configs, fn attrs ->
-      string_keyed = Map.new(attrs, fn {k, v} -> {String.to_atom(k), v} end)
-
-      case Apis.twitch().create_reward(scope, string_keyed) do
-        {:ok, reward} ->
-          [reward]
-
-        {:error, reason} ->
-          Logger.warning("Failed to create reward #{inspect(attrs)}: #{inspect(reason)}")
-          []
-      end
-    end)
-  end
-
-  defp delete_rewards(_scope, []), do: :ok
-
-  defp delete_rewards(scope, rewards) do
-    Enum.each(rewards, fn reward ->
-      case Apis.twitch().delete_reward(scope, reward.id) do
-        :ok -> :ok
-        {:error, reason} -> Logger.warning("Failed to delete reward #{reward.id}: #{inspect(reason)}")
-      end
-    end)
-
-    :ok
   end
 
   defp maybe_subscribe_rewards(_scope, []), do: {:ok, :no_rewards}
