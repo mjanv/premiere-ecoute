@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcouteCore.Cache
 
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Albums
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Artist
@@ -48,6 +49,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
                release_date: ~D[2024-05-17],
                cover_url: "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
                total_tracks: 10,
+               explicit: false,
                tracks: [
                  %Track{
                    id: nil,
@@ -123,6 +125,34 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
              } = album
     end
 
+    test "returns album marked as explicit when all tracks are explicit", %{token: token} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/albums/5K4W6rqBFWDnAN6FQUkS6x"},
+        headers: [
+          {"authorization", "Bearer #{token}"},
+          {"content-type", "application/json"}
+        ],
+        response: "spotify_api/albums/get_album/explicit_album.json",
+        status: 200
+      )
+
+      {:ok, album} = SpotifyApi.get_album("5K4W6rqBFWDnAN6FQUkS6x")
+
+      assert %Album{
+               provider_ids: %{spotify: "5K4W6rqBFWDnAN6FQUkS6x"},
+               name: "The Marshall Mathers LP (Explicit)",
+               artists: [%Artist{name: "Eminem"}],
+               total_tracks: 3,
+               explicit: true,
+               tracks: [
+                 %Track{name: "The Way I Am", track_number: 1, explicit: true},
+                 %Track{name: "Stan", track_number: 2, explicit: true},
+                 %Track{name: "Kim", track_number: 3, explicit: true}
+               ]
+             } = album
+    end
+
     test "returns an error from an unknown unique identifier", %{token: token} do
       ApiMock.expect(
         SpotifyApi,
@@ -143,6 +173,81 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
 
       assert logs =~
                "[error] Spotify API unexpected status: 404 - %{\"error\" => %{\"message\" => \"Resource not found\", \"status\" => 404}}"
+    end
+  end
+
+  describe "parse_album_with_tracks/1" do
+    defp spotify_response(tracks) do
+      %{
+        "id" => "abc123",
+        "name" => "Test Album",
+        "release_date" => "2024-01-01",
+        "release_date_precision" => "day",
+        "total_tracks" => length(tracks),
+        "images" => [],
+        "artists" => [%{"id" => "art1", "name" => "Test Artist", "type" => "artist"}],
+        "tracks" => %{"items" => tracks}
+      }
+    end
+
+    defp track(id, name, number, explicit) do
+      %{
+        "id" => id,
+        "name" => name,
+        "track_number" => number,
+        "duration_ms" => 200_000,
+        "explicit" => explicit
+      }
+    end
+
+    test "marks album as non-explicit when all tracks have explicit: false" do
+      data = spotify_response([
+        track("t1", "Clean Track One", 1, false),
+        track("t2", "Clean Track Two", 2, false)
+      ])
+
+      album = Albums.parse_album_with_tracks(data)
+
+      assert album.explicit == false
+      assert Enum.all?(album.tracks, &(&1.explicit == false))
+    end
+
+    test "marks album as explicit when all tracks are explicit" do
+      data = spotify_response([
+        track("t1", "Explicit Track One", 1, true),
+        track("t2", "Explicit Track Two", 2, true)
+      ])
+
+      album = Albums.parse_album_with_tracks(data)
+
+      assert album.explicit == true
+      assert Enum.all?(album.tracks, &(&1.explicit == true))
+    end
+
+    test "marks album as explicit when at least one track is explicit" do
+      data = spotify_response([
+        track("t1", "Clean Track", 1, false),
+        track("t2", "Explicit Track", 2, true),
+        track("t3", "Another Clean Track", 3, false)
+      ])
+
+      album = Albums.parse_album_with_tracks(data)
+
+      assert album.explicit == true
+      assert Enum.at(album.tracks, 0).explicit == false
+      assert Enum.at(album.tracks, 1).explicit == true
+      assert Enum.at(album.tracks, 2).explicit == false
+    end
+
+    test "treats missing explicit field in track response as non-explicit" do
+      data = spotify_response([
+        %{"id" => "t1", "name" => "Track", "track_number" => 1, "duration_ms" => 200_000}
+      ])
+
+      album = Albums.parse_album_with_tracks(data)
+
+      assert album.explicit == false
+      assert Enum.at(album.tracks, 0).explicit == false
     end
   end
 end
