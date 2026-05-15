@@ -24,6 +24,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
           name: String.t() | nil,
           track_number: integer() | nil,
           duration_ms: integer() | nil,
+          explicit: boolean() | nil,
           album_id: integer() | nil,
           album: entity(Album.t()),
           album_spotify_id: String.t() | nil,
@@ -41,6 +42,8 @@ defmodule PremiereEcoute.Discography.Album.Track do
     # TODO: must be rethink - how to carry metadata information (here spotify album id) ?
     # AIDEV-NOTE: virtual field used to carry album_spotify_id from Spotify API response without persisting it
     field :album_spotify_id, :string, virtual: true
+    # AIDEV-NOTE: virtual field populated from Spotify API response; not persisted
+    field :explicit, :boolean, virtual: true, default: false
 
     belongs_to :album, Album
 

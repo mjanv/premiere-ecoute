@@ -34,6 +34,7 @@ defmodule PremiereEcoute.Discography.Album do
           release_date: Date.t() | nil,
           cover_url: String.t() | nil,
           total_tracks: integer() | nil,
+          explicit: boolean() | nil,
           tracks: entity([Track.t()]),
           artists: entity([Artist.t()]),
           inserted_at: DateTime.t() | nil,
@@ -49,6 +50,8 @@ defmodule PremiereEcoute.Discography.Album do
     field :cover_url, :string
     field :total_tracks, :integer
     field :artist, :string, virtual: true
+    # AIDEV-NOTE: virtual field derived from track-level explicit flags; not persisted (Spotify tracks carry explicit, album derives it)
+    field :explicit, :boolean, virtual: true, default: false
 
     has_many :tracks, Track, foreign_key: :album_id, on_delete: :delete_all
     many_to_many :artists, Artist, join_through: AlbumArtist, on_replace: :delete

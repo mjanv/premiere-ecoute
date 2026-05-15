@@ -265,7 +265,12 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
                   <% end %>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-white mb-1">{@selected_album.result.name}</h3>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="text-2xl font-bold text-white">{@selected_album.result.name}</h3>
+                    <%= if @selected_album.result.explicit do %>
+                      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold bg-gray-500 text-white shrink-0">E</span>
+                    <% end %>
+                  </div>
                   <p class="text-white text-lg font-semibold mb-3">{@selected_album.result.artist}</p>
                   <div class="flex items-center space-x-6 text-white/90 text-sm">
                     <div class="flex items-center space-x-2">
@@ -320,8 +325,11 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
                   <div class="rounded-lg p-3 hover:bg-white/5 transition-colors" style="background-color: rgba(0, 0, 0, 0.3);">
                     <div class="flex items-center space-x-3">
                       <span class="text-sm text-gray-300 w-6 text-right">{index + 1}</span>
-                      <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-1.5 flex-1 min-w-0">
                         <h5 class="font-medium text-white truncate text-sm">{track.name}</h5>
+                        <%= if Map.get(track, :explicit) do %>
+                          <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-bold bg-gray-500 text-white shrink-0">E</span>
+                        <% end %>
                       </div>
                       <span class="text-sm text-gray-300">{PremiereEcouteCore.Duration.timer(track.duration_ms)}</span>
                     </div>

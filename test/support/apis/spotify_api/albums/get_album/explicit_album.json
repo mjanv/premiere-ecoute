@@ -1,0 +1,124 @@
+{
+  "album_type": "album",
+  "total_tracks": 3,
+  "id": "5K4W6rqBFWDnAN6FQUkS6x",
+  "name": "The Marshall Mathers LP (Explicit)",
+  "release_date": "2000-05-23",
+  "release_date_precision": "day",
+  "images": [
+    {
+      "url": "https://i.scdn.co/image/ab67616d0000b2739a1bb73de0a7c6a64df02f8a",
+      "height": 640,
+      "width": 640
+    },
+    {
+      "url": "https://i.scdn.co/image/ab67616d00001e029a1bb73de0a7c6a64df02f8a",
+      "height": 300,
+      "width": 300
+    },
+    {
+      "url": "https://i.scdn.co/image/ab67616d000048519a1bb73de0a7c6a64df02f8a",
+      "height": 64,
+      "width": 64
+    }
+  ],
+  "artists": [
+    {
+      "id": "7dGJo4pcD2V6oG8kP0tJRR",
+      "name": "Eminem",
+      "type": "artist",
+      "external_urls": {"spotify": "https://open.spotify.com/artist/7dGJo4pcD2V6oG8kP0tJRR"},
+      "href": "https://api.spotify.com/v1/artists/7dGJo4pcD2V6oG8kP0tJRR",
+      "uri": "spotify:artist:7dGJo4pcD2V6oG8kP0tJRR"
+    }
+  ],
+  "tracks": {
+    "href": "https://api.spotify.com/v1/albums/5K4W6rqBFWDnAN6FQUkS6x/tracks?offset=0&limit=50",
+    "limit": 50,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total": 3,
+    "items": [
+      {
+        "id": "7GhIk7Il098yCjg4BQjzvb",
+        "name": "The Way I Am",
+        "track_number": 1,
+        "duration_ms": 290666,
+        "explicit": true,
+        "disc_number": 1,
+        "type": "track",
+        "uri": "spotify:track:7GhIk7Il098yCjg4BQjzvb",
+        "is_local": false,
+        "preview_url": null,
+        "external_urls": {"spotify": "https://open.spotify.com/track/7GhIk7Il098yCjg4BQjzvb"},
+        "href": "https://api.spotify.com/v1/tracks/7GhIk7Il098yCjg4BQjzvb",
+        "artists": [
+          {
+            "id": "7dGJo4pcD2V6oG8kP0tJRR",
+            "name": "Eminem",
+            "type": "artist",
+            "external_urls": {"spotify": "https://open.spotify.com/artist/7dGJo4pcD2V6oG8kP0tJRR"},
+            "href": "https://api.spotify.com/v1/artists/7dGJo4pcD2V6oG8kP0tJRR",
+            "uri": "spotify:artist:7dGJo4pcD2V6oG8kP0tJRR"
+          }
+        ]
+      },
+      {
+        "id": "7lQ8MOoKJcH3E8KbxVzZah",
+        "name": "Stan",
+        "track_number": 2,
+        "duration_ms": 404893,
+        "explicit": true,
+        "disc_number": 1,
+        "type": "track",
+        "uri": "spotify:track:7lQ8MOoKJcH3E8KbxVzZah",
+        "is_local": false,
+        "preview_url": null,
+        "external_urls": {"spotify": "https://open.spotify.com/track/7lQ8MOoKJcH3E8KbxVzZah"},
+        "href": "https://api.spotify.com/v1/tracks/7lQ8MOoKJcH3E8KbxVzZah",
+        "artists": [
+          {
+            "id": "7dGJo4pcD2V6oG8kP0tJRR",
+            "name": "Eminem",
+            "type": "artist",
+            "external_urls": {"spotify": "https://open.spotify.com/artist/7dGJo4pcD2V6oG8kP0tJRR"},
+            "href": "https://api.spotify.com/v1/artists/7dGJo4pcD2V6oG8kP0tJRR",
+            "uri": "spotify:artist:7dGJo4pcD2V6oG8kP0tJRR"
+          }
+        ]
+      },
+      {
+        "id": "3iVcZ5G6tvkXZkZKlMpIUs",
+        "name": "Kim",
+        "track_number": 3,
+        "duration_ms": 399533,
+        "explicit": true,
+        "disc_number": 1,
+        "type": "track",
+        "uri": "spotify:track:3iVcZ5G6tvkXZkZKlMpIUs",
+        "is_local": false,
+        "preview_url": null,
+        "external_urls": {"spotify": "https://open.spotify.com/track/3iVcZ5G6tvkXZkZKlMpIUs"},
+        "href": "https://api.spotify.com/v1/tracks/3iVcZ5G6tvkXZkZKlMpIUs",
+        "artists": [
+          {
+            "id": "7dGJo4pcD2V6oG8kP0tJRR",
+            "name": "Eminem",
+            "type": "artist",
+            "external_urls": {"spotify": "https://open.spotify.com/artist/7dGJo4pcD2V6oG8kP0tJRR"},
+            "href": "https://api.spotify.com/v1/artists/7dGJo4pcD2V6oG8kP0tJRR",
+            "uri": "spotify:artist:7dGJo4pcD2V6oG8kP0tJRR"
+          }
+        ]
+      }
+    ]
+  },
+  "copyrights": [
+    {"text": "© 2000 Aftermath Entertainment/Interscope Records", "type": "C"}
+  ],
+  "external_ids": {"upc": "00606949048327"},
+  "genres": ["hip hop", "rap"],
+  "label": "Aftermath/Interscope",
+  "popularity": 87
+}
