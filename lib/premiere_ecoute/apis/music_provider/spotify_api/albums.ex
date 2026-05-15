@@ -31,6 +31,17 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Albums do
   """
   @spec parse_album_with_tracks(map()) :: Album.t()
   def parse_album_with_tracks(data) do
+    tracks =
+      Enum.map(data["tracks"]["items"], fn track ->
+        %Track{
+          provider_ids: %{spotify: track["id"]},
+          name: track["name"],
+          track_number: track["track_number"] || 0,
+          duration_ms: track["duration_ms"] || 0,
+          explicit: track["explicit"] || false
+        }
+      end)
+
     %Album{
       provider_ids: %{spotify: data["id"]},
       name: data["name"],
@@ -38,15 +49,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Albums do
       release_date: Parser.parse_release_date(data["release_date"]),
       cover_url: Parser.parse_album_cover_url(data["images"]),
       total_tracks: data["total_tracks"],
-      tracks:
-        Enum.map(data["tracks"]["items"], fn track ->
-          %Track{
-            provider_ids: %{spotify: track["id"]},
-            name: track["name"],
-            track_number: track["track_number"] || 0,
-            duration_ms: track["duration_ms"] || 0
-          }
-        end)
+      explicit: Enum.any?(tracks, & &1.explicit),
+      tracks: tracks
     }
   end
 end
