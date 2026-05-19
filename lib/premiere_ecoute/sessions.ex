@@ -56,6 +56,8 @@ defmodule PremiereEcoute.Sessions do
 
   defdelegate create_vote(vote), to: Scores.Vote, as: :create
   defdelegate get_track_votes_for_user(track_ids, viewer_id), to: Scores.Vote, as: :for_tracks_and_viewer
+  defdelegate post_vote_eligible?(session_id, viewer_id), to: Scores.PostSessionVote, as: :eligible?
+  defdelegate submit_post_votes(session, viewer_id, votes), to: Scores.PostSessionVote, as: :submit
 
   # Retrospective
   defdelegate get_albums_by_period(user, period, opts \\ %{}), to: Retrospective.History
