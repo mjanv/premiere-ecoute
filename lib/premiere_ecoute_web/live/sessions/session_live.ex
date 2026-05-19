@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   use PremiereEcouteWeb, :live_view
 
   alias PremiereEcoute.Repo
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
   alias PremiereEcoute.Sessions.Retrospective.Report
@@ -36,6 +37,16 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         do: ReviewLikes.liked_review_ids(review_ids, current_user.id),
         else: MapSet.new()
 
+    my_twitch_id =
+      current_user && current_user.twitch && current_user.twitch.user_id
+
+    # AIDEV-NOTE: post-vote eligibility — only for stopped sessions when viewer has 0 votes
+    post_vote_eligible =
+      listening_session.status == :stopped &&
+        is_binary(my_twitch_id) &&
+        listening_session.source in [:album, :playlist] &&
+        Sessions.post_vote_eligible?(listening_session.id, my_twitch_id)
+
     socket =
       socket
       |> assign(:listening_session, listening_session)
@@ -43,6 +54,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       |> assign(:tracks, tracks)
       |> assign(:reviews, reviews)
       |> assign(:liked_ids, liked_ids)
+      |> assign(:my_twitch_id, my_twitch_id)
+      |> assign(:post_vote_eligible, post_vote_eligible)
+      |> assign(:post_vote_modal_open, false)
+      |> assign(:post_vote_selections, %{})
       |> assign(:review_modal_open, false)
       |> assign(:review_form, nil)
       |> assign(:editing_review, nil)
@@ -55,6 +70,50 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("open_post_vote_modal", _params, socket) do
+    {:noreply, assign(socket, :post_vote_modal_open, true)}
+  end
+
+  @impl true
+  def handle_event("close_post_vote_modal", _params, socket) do
+    {:noreply, socket |> assign(:post_vote_modal_open, false) |> assign(:post_vote_selections, %{})}
+  end
+
+  @impl true
+  def handle_event("set_post_vote", %{"track_id" => track_id, "value" => value}, socket) do
+    selections = Map.put(socket.assigns.post_vote_selections, String.to_integer(track_id), value)
+    {:noreply, assign(socket, :post_vote_selections, selections)}
+  end
+
+  @impl true
+  def handle_event("submit_post_votes", _params, socket) do
+    session = socket.assigns.listening_session
+    viewer_id = socket.assigns.my_twitch_id
+    selections = socket.assigns.post_vote_selections
+
+    if socket.assigns.post_vote_eligible && is_binary(viewer_id) && map_size(selections) > 0 do
+      case Sessions.submit_post_votes(session, viewer_id, selections) do
+        {:ok, report} ->
+          tracks = build_tracks(session, report)
+
+          {:noreply,
+           socket
+           |> assign(:report, report)
+           |> assign(:tracks, tracks)
+           |> assign(:post_vote_modal_open, false)
+           |> assign(:post_vote_selections, %{})
+           |> assign(:post_vote_eligible, false)
+           |> put_flash(:info, gettext("Your votes have been submitted!"))}
+
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, gettext("Failed to submit votes"))}
+      end
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
