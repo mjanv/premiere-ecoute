@@ -201,10 +201,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
     end
 
     test "marks album as non-explicit when all tracks have explicit: false" do
-      data = spotify_response([
-        track("t1", "Clean Track One", 1, false),
-        track("t2", "Clean Track Two", 2, false)
-      ])
+      data =
+        spotify_response([
+          track("t1", "Clean Track One", 1, false),
+          track("t2", "Clean Track Two", 2, false)
+        ])
 
       album = Albums.parse_album_with_tracks(data)
 
@@ -213,10 +214,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
     end
 
     test "marks album as explicit when all tracks are explicit" do
-      data = spotify_response([
-        track("t1", "Explicit Track One", 1, true),
-        track("t2", "Explicit Track Two", 2, true)
-      ])
+      data =
+        spotify_response([
+          track("t1", "Explicit Track One", 1, true),
+          track("t2", "Explicit Track Two", 2, true)
+        ])
 
       album = Albums.parse_album_with_tracks(data)
 
@@ -225,11 +227,12 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
     end
 
     test "marks album as explicit when at least one track is explicit" do
-      data = spotify_response([
-        track("t1", "Clean Track", 1, false),
-        track("t2", "Explicit Track", 2, true),
-        track("t3", "Another Clean Track", 3, false)
-      ])
+      data =
+        spotify_response([
+          track("t1", "Clean Track", 1, false),
+          track("t2", "Explicit Track", 2, true),
+          track("t3", "Another Clean Track", 3, false)
+        ])
 
       album = Albums.parse_album_with_tracks(data)
 
@@ -240,9 +243,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AlbumsTest do
     end
 
     test "treats missing explicit field in track response as non-explicit" do
-      data = spotify_response([
-        %{"id" => "t1", "name" => "Track", "track_number" => 1, "duration_ms" => 200_000}
-      ])
+      data =
+        spotify_response([
+          %{"id" => "t1", "name" => "Track", "track_number" => 1, "duration_ms" => 200_000}
+        ])
 
       album = Albums.parse_album_with_tracks(data)
 

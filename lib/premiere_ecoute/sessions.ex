@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Sessions do
 
   use PremiereEcouteCore.Context
 
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
@@ -44,18 +45,17 @@ defmodule PremiereEcoute.Sessions do
 
   # Votes
   @doc "Retrieves all votes cast by viewer"
-  @spec viewer_votes(PremiereEcoute.Accounts.User.t()) :: list(Scores.Vote.t())
+  @spec viewer_votes(User.t()) :: list(Scores.Vote.t())
   def viewer_votes(user), do: Scores.Vote.all(where: [viewer_id: user.twitch.user_id])
 
   @doc "Counts all votes cast by a viewer"
-  @spec count_viewer_votes(PremiereEcoute.Accounts.User.t()) :: integer()
-  def count_viewer_votes(%{twitch: twitch}) when not is_nil(twitch),
-    do: Scores.Vote.count_for_viewer(twitch.user_id)
-
-  def count_viewer_votes(_user), do: 0
+  @spec count_viewer_votes(User.t()) :: integer()
+  def count_viewer_votes(%User{twitch: twitch}), do: Scores.Vote.count_for_viewer(twitch.user_id)
 
   defdelegate create_vote(vote), to: Scores.Vote, as: :create
   defdelegate get_track_votes_for_user(track_ids, viewer_id), to: Scores.Vote, as: :for_tracks_and_viewer
+  defdelegate has_voted?(session, user), to: Scores.PostSessionVote, as: :has_voted?
+  defdelegate submit_post_votes(session, viewer_id, votes), to: Scores.PostSessionVote, as: :submit
 
   # Retrospective
   defdelegate get_albums_by_period(user, period, opts \\ %{}), to: Retrospective.History

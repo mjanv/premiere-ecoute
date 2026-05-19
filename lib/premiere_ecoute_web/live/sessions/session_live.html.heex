@@ -344,6 +344,22 @@
               </div>
             <% end %>
 
+            <%!-- Post-session vote prompt --%>
+            <%= if @post_vote_eligible do %>
+              <div class="mb-6 flex items-center justify-between px-4 py-3 rounded-xl bg-purple-900/20 border border-purple-500/30">
+                <div>
+                  <p class="text-sm font-medium text-purple-200">{gettext("You didn't vote during this session")}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{gettext("You can still rate the tracks you heard.")}</p>
+                </div>
+                <button
+                  phx-click="open_post_vote_modal"
+                  class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold transition-all shrink-0"
+                >
+                  {gettext("Cast your votes")}
+                </button>
+              </div>
+            <% end %>
+
             <%!-- Track list --%>
             <%= if @listening_session.source in [:album, :playlist] && @tracks != [] do %>
               <section>
@@ -822,6 +838,86 @@
                 </button>
               </div>
             </.form>
+          </div>
+        </div>
+      <% end %>
+
+      <%!-- Post-session voting modal --%>
+      <%= if @post_vote_modal_open do %>
+        <% vote_tracks =
+          case @listening_session.source do
+            :album -> Enum.sort_by(@listening_session.album.tracks, & &1.track_number)
+            :playlist -> @listening_session.playlist.tracks
+            _ -> []
+          end %>
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-3xl shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between mb-2 shrink-0">
+              <h3 class="text-xl font-bold text-white">{gettext("Cast your votes")}</h3>
+              <button phx-click="close_post_vote_modal" class="text-slate-500 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-5 shrink-0">
+              {gettext("Rate each track you heard. You can skip tracks you didn't listen to.")}
+            </p>
+
+            <% vote_options = @listening_session.vote_options || [] %>
+            <% many_options = length(vote_options) > 5 %>
+            <div class="overflow-y-auto flex-1 space-y-3 pr-1">
+              <%= for track <- vote_tracks do %>
+                <% selected = Map.get(@post_vote_selections, track.id) %>
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <%= if @listening_session.source == :album && track.track_number do %>
+                      <span class="text-slate-600 font-mono text-xs w-4 text-right shrink-0">
+                        {track.track_number}
+                      </span>
+                    <% end %>
+                    <p class="text-slate-300 text-sm truncate">{track.name}</p>
+                  </div>
+                  <div class={if many_options, do: "flex gap-1 flex-1 justify-end", else: "flex gap-1 shrink-0"}>
+                    <%= for option <- vote_options do %>
+                      <button
+                        type="button"
+                        phx-click="set_post_vote"
+                        phx-value-track_id={track.id}
+                        phx-value-note={option}
+                        class={"#{if many_options, do: "flex-1 py-1 text-center", else: "px-2.5 py-1"} rounded text-xs font-semibold transition-all border #{if selected == option, do: "bg-purple-600 border-purple-400 text-white", else: "bg-white/5 border-white/10 text-slate-400 hover:border-purple-400 hover:text-white"}"}
+                      >
+                        {option}
+                      </button>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="flex gap-3 pt-5 shrink-0 border-t border-white/10 mt-4">
+              <% any_selected = map_size(@post_vote_selections) > 0 %>
+              <button
+                type="button"
+                phx-click="submit_post_votes"
+                disabled={!any_selected}
+                class={"flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all #{if any_selected, do: "bg-purple-600 hover:bg-purple-500 text-white", else: "bg-purple-900/30 text-slate-600 cursor-not-allowed"}"}
+              >
+                {ngettext(
+                  "Submit %{count} vote",
+                  "Submit %{count} votes",
+                  map_size(@post_vote_selections),
+                  count: map_size(@post_vote_selections)
+                )}
+              </button>
+              <button
+                type="button"
+                phx-click="close_post_vote_modal"
+                class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+              >
+                {gettext("Cancel")}
+              </button>
+            </div>
           </div>
         </div>
       <% end %>
