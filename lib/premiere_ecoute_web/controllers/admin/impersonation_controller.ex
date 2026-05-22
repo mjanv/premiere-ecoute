@@ -54,7 +54,6 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
           target_user ->
             conn
             |> UserAuth.start_impersonation(current_scope.user, target_user)
-            |> put_flash(:info, "Now impersonating #{target_user.username}")
             |> redirect(to: ~p"/")
         end
     end
