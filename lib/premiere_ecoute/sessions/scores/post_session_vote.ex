@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
   @doc """
   Returns true when the viewer has cast zero votes in this stopped session.
   """
-  @spec has_voted?(ListeningSession.t(), String.t()) :: boolean()
+  @spec has_voted?(ListeningSession.t(), User.t()) :: boolean()
   def has_voted?(%ListeningSession{id: session_id, status: :stopped}, %User{twitch: %{user_id: user_id}}) do
     !Repo.exists?(
       from(v in Vote,

@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Automations
   alias PremiereEcoute.Discography.LibraryPlaylist
+  alias PremiereEcoute.Playlists
   alias PremiereEcoute.Playlists.LibraryPlaylist.Submission
 
   @impl true
@@ -41,11 +42,16 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
       submission_url = url(~p"/playlists/#{playlist_id}/submit")
       send(self(), :fetch_playlist_data)
 
+      subscriber_count = Playlists.subscriber_count(library_playlist)
+
       {:ok,
        socket
        |> assign(:automations, automations)
        |> assign(:show_automations_modal, false)
-       |> assign(:submission_url, submission_url)}
+       |> assign(:show_notify_modal, false)
+       |> assign(:counts_per_channel, %{})
+       |> assign(:submission_url, submission_url)
+       |> assign(:subscriber_count, subscriber_count)}
     else
       {:ok, assign(socket, :error, gettext("Playlist not found in your library"))}
     end
@@ -177,6 +183,39 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
     |> assign(:selected_tracks, MapSet.new())
     |> assign(:select_all, false)
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("toggle_subscriptions_open", _params, socket) do
+    toggle_option(socket, "subscriptions_open")
+  end
+
+  @impl true
+  def handle_event("show_notify_modal", _params, socket) do
+    counts = Playlists.counts_per_channel(socket.assigns.library_playlist)
+    {:noreply, socket |> assign(:show_notify_modal, true) |> assign(:counts_per_channel, counts)}
+  end
+
+  @impl true
+  def handle_event("hide_notify_modal", _params, socket) do
+    {:noreply, assign(socket, :show_notify_modal, false)}
+  end
+
+  @impl true
+  def handle_event("notify_subscribers", _params, socket) do
+    {:ok, count} = Playlists.notify_subscribers(socket.assigns.library_playlist)
+
+    flash =
+      if count == 0 do
+        {:info, gettext("No subscribers to notify.")}
+      else
+        {:success, ngettext("Notified %{n} subscriber.", "Notified %{n} subscribers.", count, n: count)}
+      end
+
+    {:noreply,
+     socket
+     |> assign(:show_notify_modal, false)
+     |> put_flash(elem(flash, 0), elem(flash, 1))}
   end
 
   @impl true

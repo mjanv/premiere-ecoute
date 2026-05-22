@@ -30,6 +30,66 @@
             </section>
           <% end %>
 
+          <%!-- Open playlists from followed streamers, one section per streamer --%>
+          <%= for {streamer, playlists} <- assigns[:open_playlists_per_streamer] || [] do %>
+            <section class="mb-12">
+              <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+                {gettext("Playlists from")}
+                <.link navigate={~p"/users/#{streamer.username}"} class="text-purple-400 hover:text-purple-300 transition-colors">
+                  {streamer.username}
+                </.link>
+              </h3>
+              <div class="flex flex-wrap gap-3">
+                <%= for playlist <- playlists do %>
+                  <% subscribed = MapSet.member?(assigns[:subscribed_playlist_ids] || MapSet.new(), playlist.id) %>
+                  <button
+                    phx-click="open_subscription_modal"
+                    phx-value-playlist-id={playlist.id}
+                    class={[
+                      "flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left",
+                      if(subscribed,
+                        do: "border-green-500/40 bg-green-500/10 hover:bg-green-500/20",
+                        else: "border-white/10 bg-white/5 hover:bg-white/10"
+                      )
+                    ]}
+                  >
+                    <div class="relative flex-shrink-0">
+                      <%= if playlist.cover_url do %>
+                        <img src={playlist.cover_url} alt={playlist.title} class="w-10 h-10 rounded object-cover" />
+                      <% else %>
+                        <div class="w-10 h-10 rounded bg-green-600/20 flex items-center justify-center">
+                          <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                            />
+                          </svg>
+                        </div>
+                      <% end %>
+                      <%= if subscribed do %>
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                          <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-2.83-2h5.66A3 3 0 0110 18z" />
+                          </svg>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div>
+                      <p class={["text-sm font-medium", if(subscribed, do: "text-green-300", else: "text-white")]}>
+                        {playlist.title}
+                      </p>
+                      <p class="text-slate-400 text-xs">
+                        {ngettext("%{n} track", "%{n} tracks", playlist.track_count || 0, n: playlist.track_count || 0)}
+                      </p>
+                    </div>
+                  </button>
+                <% end %>
+              </div>
+            </section>
+          <% end %>
+
           <%!-- My last sessions (voted in) --%>
           <section class="mb-12">
             <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
@@ -103,4 +163,107 @@
       </div>
     </div>
   </div>
+  <%!-- Playlist subscription modal --%>
+  <%= if @subscription_modal do %>
+    <% playlist = @subscription_modal.playlist %>
+    <% channels = @subscription_modal.channels %>
+    <% any_subscribed = Enum.any?(channels, fn {_ch, v} -> v end) %>
+    <div
+      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+      phx-click="close_subscription_modal"
+    >
+      <div
+        class="bg-gray-800 rounded-xl border border-gray-700 p-8 w-full max-w-lg mx-4"
+        phx-click-away="close_subscription_modal"
+      >
+        <%!-- Header --%>
+        <div class="flex items-start gap-5 mb-8">
+          <%= if playlist.cover_url do %>
+            <img src={playlist.cover_url} alt={playlist.title} class="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
+          <% else %>
+            <div class="w-20 h-20 rounded-xl bg-green-600/20 flex items-center justify-center flex-shrink-0">
+              <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                />
+              </svg>
+            </div>
+          <% end %>
+          <div class="min-w-0">
+            <h3 class="text-xl font-bold text-white mb-1">{playlist.title}</h3>
+            <p class="text-sm text-gray-400">{gettext("Choose how you want to receive updates")}</p>
+          </div>
+        </div>
+
+        <%!-- Channels --%>
+        <div class="space-y-3 mb-8">
+          <div class="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl">
+            <div>
+              <p class="text-sm font-semibold text-white">{gettext("Email")}</p>
+              <p class="text-xs text-gray-400 mt-0.5">
+                {gettext("Receive playlist updates to %{email}", email: @current_user.email)}
+              </p>
+            </div>
+            <button
+              phx-click="toggle_subscription"
+              phx-value-channel="email"
+              class={[
+                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0",
+                if(channels.email, do: "bg-green-600", else: "bg-gray-600")
+              ]}
+            >
+              <span class={[
+                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                if(channels.email, do: "translate-x-6", else: "translate-x-1")
+              ]}>
+              </span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl">
+            <div>
+              <p class="text-sm font-semibold text-white">{gettext("In-app notification")}</p>
+              <p class="text-xs text-gray-400 mt-0.5">
+                {gettext("Receive a notification in the app when the playlist is updated")}
+              </p>
+            </div>
+            <button
+              phx-click="toggle_subscription"
+              phx-value-channel="notification"
+              class={[
+                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0",
+                if(channels.notification, do: "bg-green-600", else: "bg-gray-600")
+              ]}
+            >
+              <span class={[
+                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                if(channels.notification, do: "translate-x-6", else: "translate-x-1")
+              ]}>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <%!-- Actions --%>
+        <div class="flex items-center gap-3">
+          <%= if any_subscribed do %>
+            <button
+              phx-click="unsubscribe_all"
+              class="flex-1 px-4 py-2.5 bg-red-700 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {gettext("Unsubscribe all")}
+            </button>
+          <% end %>
+          <button
+            phx-click="close_subscription_modal"
+            class="flex-1 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
+          >
+            {gettext("Close")}
+          </button>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </Layouts.app>

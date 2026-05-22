@@ -71,7 +71,7 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
     ]
   ]
 
-# config :premiere_ecoute, PremiereEcoute.Accounts.Mailer, adapter: Swoosh.Adapters.Local
+config :premiere_ecoute, PremiereEcoute.Accounts.Mailer, adapter: Swoosh.Adapters.Local
 
 config :premiere_ecoute, dev_routes: true
 

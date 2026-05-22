@@ -14,9 +14,10 @@ defmodule PremiereEcoute.Notifications.NotificationType do
 
   @doc "Derives display content from the type struct"
   @callback render(struct()) :: %{
-              title: String.t(),
-              body: String.t(),
-              icon: String.t(),
-              path: String.t() | nil
+              required(:title) => String.t(),
+              required(:body) => String.t(),
+              required(:icon) => String.t(),
+              required(:path) => String.t() | nil,
+              optional(:target) => String.t()
             }
 end

@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Notifications.Registry do
   @types [
     PremiereEcoute.Notifications.Types.AutomationFailure,
     PremiereEcoute.Notifications.Types.AutomationSuccess,
+    PremiereEcoute.Notifications.Types.PlaylistUpdated,
     PremiereEcoute.Notifications.Types.WantlistSave
   ]
 

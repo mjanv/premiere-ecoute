@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Playlists.Automations.Template do
     - `%{month}`          — current month name (e.g. "March")
     - `%{next_month}`     — next month name
     - `%{previous_month}` — previous month name
+    - `%{week}`           — ISO week number (e.g. "21")
 
   Unknown placeholders are left as-is.
   Resolution uses the date at call time, not scheduling time.
@@ -21,11 +22,14 @@ defmodule PremiereEcoute.Playlists.Automations.Template do
     next = Date.shift(date, month: 1)
     prev = Date.shift(date, month: -1)
 
+    {week, _year} = :calendar.iso_week_number({date.year, date.month, date.day})
+
     replacements = [
       {"%{year}", to_string(date.year)},
       {"%{month}", month_name(date)},
       {"%{next_month}", month_name(next)},
-      {"%{previous_month}", month_name(prev)}
+      {"%{previous_month}", month_name(prev)},
+      {"%{week}", to_string(week)}
     ]
 
     Enum.reduce(replacements, template, fn {placeholder, value}, acc ->

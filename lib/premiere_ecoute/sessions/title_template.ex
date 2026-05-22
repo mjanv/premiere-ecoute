@@ -21,9 +21,9 @@ defmodule PremiereEcoute.Sessions.TitleTemplate do
     viewer_score = report && report.session_summary["viewer_score"]
 
     template
-    |> String.replace("{show_name}", show_name || "")
-    |> String.replace("{title}", ListeningSession.title(session) || "")
-    |> String.replace("{artist}", ListeningSession.artist(session) || "")
+    |> String.replace("{show_name}", show_name)
+    |> String.replace("{title}", ListeningSession.title(session))
+    |> String.replace("{artist}", ListeningSession.artist(session))
     |> String.replace("{streamer_score}", format_score(streamer_score))
     |> String.replace("{viewer_score}", format_score(viewer_score))
   end

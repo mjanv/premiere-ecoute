@@ -160,6 +160,8 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
                 >
                   <a
                     href={rendered.path || "#"}
+                    target={Map.get(rendered, :target)}
+                    rel={if Map.get(rendered, :target) == "_blank", do: "noopener noreferrer"}
                     phx-click="mark_read"
                     phx-value-id={notification.id}
                     phx-target={@myself}

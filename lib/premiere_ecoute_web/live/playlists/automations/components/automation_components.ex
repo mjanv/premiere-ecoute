@@ -243,7 +243,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
           placeholder="e.g. Discoveries %{month} %{year}"
         />
-        <p class="text-xs text-gray-500 mt-1">{"Available: %{month}, %{next_month}, %{previous_month}, %{year}"}</p>
+        <p class="text-xs text-gray-500 mt-1">{"Available: %{month}, %{next_month}, %{previous_month}, %{year}, %{week}"}</p>
       </div>
     </div>
     """
@@ -329,6 +329,19 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     """
   end
 
+  def step_config_fields(%{step: %{"action_type" => "notify_subscribers"}} = assigns) do
+    ~H"""
+    <div class="space-y-2">
+      <.playlist_select
+        name={"steps[#{@index}][config][playlist]"}
+        label={gettext("Playlist to notify subscribers about")}
+        value={get_in(@step, ["config", "playlist"])}
+        playlists={@library_playlists}
+      />
+    </div>
+    """
+  end
+
   def step_config_fields(%{step: %{"action_type" => "snapshot_playlist"}} = assigns) do
     ~H"""
     <div class="space-y-2">
@@ -347,7 +360,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
           placeholder="e.g. Archive %{month} %{year}"
         />
-        <p class="text-xs text-gray-500 mt-1">{"Available: %{month}, %{next_month}, %{previous_month}, %{year}"}</p>
+        <p class="text-xs text-gray-500 mt-1">{"Available: %{month}, %{next_month}, %{previous_month}, %{year}, %{week}"}</p>
       </div>
     </div>
     """
@@ -398,6 +411,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   defp humanize_action("create_playlist"), do: gettext("Create playlist")
   defp humanize_action("empty_playlist"), do: gettext("Empty playlist")
   defp humanize_action("merge_playlists"), do: gettext("Merge playlists")
+  defp humanize_action("notify_subscribers"), do: gettext("Notify subscribers")
   defp humanize_action("remove_duplicates"), do: gettext("Remove duplicates")
   defp humanize_action("shuffle_playlist"), do: gettext("Shuffle playlist")
   defp humanize_action("snapshot_playlist"), do: gettext("Snapshot playlist")
@@ -450,6 +464,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   defp output_summary(%{"removed_count" => n}), do: gettext("Removed %{n} tracks", n: n)
   defp output_summary(%{"copied_count" => n}), do: gettext("Copied %{n} tracks", n: n)
   defp output_summary(%{"merged_count" => n}), do: gettext("Merged %{n} tracks", n: n)
+  defp output_summary(%{"notified_count" => n}), do: gettext("Notified %{n} subscribers", n: n)
   defp output_summary(%{"track_count" => n}), do: gettext("%{n} tracks", n: n)
   defp output_summary(map), do: Enum.map_join(map, ", ", fn {k, v} -> "#{k}: #{v}" end)
 end

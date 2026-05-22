@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.HomeLive do
   import PremiereEcouteWeb.Home.Components
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Playlists
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Wantlists
@@ -40,12 +41,27 @@ defmodule PremiereEcouteWeb.HomeLive do
     # AIDEV-NOTE: collect album ids in wantlist for the viewer to mark them visually
     wantlisted_album_ids = build_wantlisted_album_ids(user.id, sessions_by_user, my_sessions)
 
+    streamer_ids = Enum.map(current_user.channels, & &1.id)
+    open_playlists = Playlists.list_open_for_subscriptions(streamer_ids)
+    playlists_by_streamer = Enum.group_by(open_playlists, & &1.user_id)
+
+    # AIDEV-NOTE: preserves follow order from current_user.channels, same pattern as sessions_per_streamer
+    open_playlists_per_streamer =
+      current_user.channels
+      |> Enum.map(fn streamer -> {streamer, Map.get(playlists_by_streamer, streamer.id, [])} end)
+      |> Enum.reject(fn {_streamer, playlists} -> playlists == [] end)
+
+    subscribed_playlist_ids = Playlists.subscribed_playlist_ids(user, open_playlists)
+
     socket
     |> assign(:current_user, current_user)
     |> assign(:sessions_per_streamer, sessions_per_streamer)
     |> assign(:upcoming_sessions, upcoming_sessions)
     |> assign(:my_sessions, my_sessions)
     |> assign(:wantlisted_album_ids, wantlisted_album_ids)
+    |> assign(:open_playlists_per_streamer, open_playlists_per_streamer)
+    |> assign(:subscribed_playlist_ids, subscribed_playlist_ids)
+    |> assign(:subscription_modal, nil)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -67,6 +83,94 @@ defmodule PremiereEcouteWeb.HomeLive do
   @impl true
   def handle_info(:refresh, %{assigns: %{current_scope: %{user: user}}} = socket) do
     {:noreply, assign(socket, next_radio: Radio.next_in?(user.id), last_radios: Radio.last_tracks(user.id))}
+  end
+
+  @impl true
+  def handle_event("open_subscription_modal", %{"playlist-id" => playlist_id}, socket) do
+    playlist =
+      Enum.find_value(socket.assigns.open_playlists_per_streamer, fn {_streamer, playlists} ->
+        Enum.find(playlists, &(&1.id == String.to_integer(playlist_id)))
+      end)
+
+    case playlist do
+      nil ->
+        {:noreply, socket}
+
+      playlist ->
+        viewer = socket.assigns.current_scope.user
+
+        channels = %{
+          email: Playlists.subscribed?(playlist, viewer, :email),
+          notification: Playlists.subscribed?(playlist, viewer, :notification)
+        }
+
+        {:noreply, assign(socket, :subscription_modal, %{playlist: playlist, channels: channels})}
+    end
+  end
+
+  @impl true
+  def handle_event("close_subscription_modal", _params, socket) do
+    {:noreply, assign(socket, :subscription_modal, nil)}
+  end
+
+  @impl true
+  def handle_event("unsubscribe_all", _params, socket) do
+    %{playlist: playlist, channels: channels} = socket.assigns.subscription_modal
+    viewer = socket.assigns.current_scope.user
+
+    results =
+      channels
+      |> Enum.filter(fn {_ch, subscribed} -> subscribed end)
+      |> Enum.map(fn {ch, _} -> Playlists.unsubscribe(playlist, viewer, ch) end)
+
+    if Enum.all?(results, &match?({:ok, _}, &1)) do
+      subscribed_playlist_ids = MapSet.delete(socket.assigns.subscribed_playlist_ids, playlist.id)
+      new_channels = Map.new(channels, fn {ch, _} -> {ch, false} end)
+
+      {:noreply,
+       socket
+       |> assign(:subscription_modal, %{playlist: playlist, channels: new_channels})
+       |> assign(:subscribed_playlist_ids, subscribed_playlist_ids)}
+    else
+      {:noreply, put_flash(socket, :error, gettext("Something went wrong. Please try again."))}
+    end
+  end
+
+  @impl true
+  def handle_event("toggle_subscription", %{"channel" => channel}, socket)
+      when channel in ["email", "notification"] do
+    %{playlist: playlist, channels: channels} = socket.assigns.subscription_modal
+    viewer = socket.assigns.current_scope.user
+    ch = String.to_existing_atom(channel)
+    currently_subscribed = Map.get(channels, ch, false)
+
+    result =
+      if currently_subscribed do
+        Playlists.unsubscribe(playlist, viewer, ch)
+      else
+        Playlists.subscribe(playlist, viewer, ch)
+      end
+
+    case result do
+      {:ok, _} ->
+        new_channels = Map.put(channels, ch, !currently_subscribed)
+        any_subscribed = Enum.any?(new_channels, fn {_ch, v} -> v end)
+
+        subscribed_playlist_ids =
+          if any_subscribed do
+            MapSet.put(socket.assigns.subscribed_playlist_ids, playlist.id)
+          else
+            MapSet.delete(socket.assigns.subscribed_playlist_ids, playlist.id)
+          end
+
+        {:noreply,
+         socket
+         |> assign(:subscription_modal, %{playlist: playlist, channels: new_channels})
+         |> assign(:subscribed_playlist_ids, subscribed_playlist_ids)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, gettext("Something went wrong. Please try again."))}
+    end
   end
 
   @impl true

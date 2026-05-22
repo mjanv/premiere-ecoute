@@ -52,6 +52,23 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     timestamps()
   end
 
+  @spec subscriptions_open?(t()) :: boolean()
+  def subscriptions_open?(%__MODULE__{metadata: meta}), do: meta["subscriptions_open"] == true
+
+  @doc """
+  Returns playlists open for subscriptions owned by any of the given streamers.
+  """
+  @spec list_open_for_subscriptions([binary()]) :: [t()]
+  def list_open_for_subscriptions([]), do: []
+
+  def list_open_for_subscriptions(streamer_ids) do
+    from(p in __MODULE__,
+      where: p.user_id in ^streamer_ids and fragment("(?->>'subscriptions_open')::boolean", p.metadata),
+      order_by: [desc: p.updated_at]
+    )
+    |> Repo.all()
+  end
+
   @spec submission_page_enabled?(t()) :: boolean()
   def submission_page_enabled?(%__MODULE__{metadata: meta}), do: meta["submission_page_enabled"] == true
 
@@ -138,5 +155,11 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
       order_by: [desc: p.updated_at]
     )
     |> Repo.all()
+  end
+
+  @doc "Retrieves a user's library playlist by its provider playlist_id."
+  @spec get_by_playlist_id(User.t(), String.t()) :: t() | nil
+  def get_by_playlist_id(%User{id: user_id}, playlist_id) do
+    Repo.get_by(__MODULE__, user_id: user_id, playlist_id: playlist_id)
   end
 end

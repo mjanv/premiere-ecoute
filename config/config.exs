@@ -143,7 +143,8 @@ config :premiere_ecoute, Oban,
     radio: 1,
     automations: 5,
     notifications: 1,
-    discography: 1
+    discography: 1,
+    emails: 1
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},
