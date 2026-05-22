@@ -24,6 +24,11 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
         <div class="flex-1 flex flex-col justify-center">
           <nav class="p-3 space-y-1">
             <.sidebar_link href={~p"/"} page={@current_page} page_id="home" icon="hero-home">{gettext("Home")}</.sidebar_link>
+            <%= if PremiereEcouteCore.FeatureFlag.enabled?(:users, for: @current_user) do %>
+              <.sidebar_link href={~p"/users"} page={@current_page} page_id="users" icon="hero-users">
+                {gettext("Community")}
+              </.sidebar_link>
+            <% end %>
 
             <%= if PremiereEcouteCore.FeatureFlag.enabled?(:discography, for: @current_user) do %>
               <.sidebar_link
