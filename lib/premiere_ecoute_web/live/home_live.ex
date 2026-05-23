@@ -137,6 +137,29 @@ defmodule PremiereEcouteWeb.HomeLive do
   end
 
   @impl true
+  def handle_event("subscribe_all", _params, socket) do
+    %{playlist: playlist, channels: channels} = socket.assigns.subscription_modal
+    viewer = socket.assigns.current_scope.user
+
+    results =
+      channels
+      |> Enum.reject(fn {_ch, subscribed} -> subscribed end)
+      |> Enum.map(fn {ch, _} -> Playlists.subscribe(playlist, viewer, ch) end)
+
+    if Enum.all?(results, &match?({:ok, _}, &1)) do
+      subscribed_playlist_ids = MapSet.put(socket.assigns.subscribed_playlist_ids, playlist.id)
+      new_channels = Map.new(channels, fn {ch, _} -> {ch, true} end)
+
+      {:noreply,
+       socket
+       |> assign(:subscription_modal, %{playlist: playlist, channels: new_channels})
+       |> assign(:subscribed_playlist_ids, subscribed_playlist_ids)}
+    else
+      {:noreply, put_flash(socket, :error, gettext("Something went wrong. Please try again."))}
+    end
+  end
+
+  @impl true
   def handle_event("toggle_subscription", %{"channel" => channel}, socket)
       when channel in ["email", "notification"] do
     %{playlist: playlist, channels: channels} = socket.assigns.subscription_modal
