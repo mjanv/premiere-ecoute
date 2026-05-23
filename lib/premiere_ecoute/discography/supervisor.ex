@@ -8,7 +8,7 @@ defmodule PremiereEcoute.Discography.Supervisor do
 
   def async(enumerable, function) do
     PremiereEcoute.Discography.TaskSupervisor
-    |> Task.Supervisor.async_stream(enumerable, function)
+    |> Task.Supervisor.async_stream(enumerable, function, timeout: 30_000)
     |> Stream.filter(&match?({:ok, _}, &1))
     |> Enum.map(fn {:ok, r} -> r end)
   end

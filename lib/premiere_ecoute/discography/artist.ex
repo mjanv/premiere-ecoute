@@ -102,6 +102,14 @@ defmodule PremiereEcoute.Discography.Artist do
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 
+  @spec find_by_provider(String.t(), atom()) :: t() | nil
+  def find_by_provider(id, provider) do
+    from(a in __MODULE__,
+      where: fragment("?->>? = ?", a.provider_ids, ^to_string(provider), ^id)
+    )
+    |> Repo.one()
+  end
+
   defp validate_external_links(%Ecto.Changeset{} = changeset) do
     case get_change(changeset, :external_links) do
       nil -> changeset

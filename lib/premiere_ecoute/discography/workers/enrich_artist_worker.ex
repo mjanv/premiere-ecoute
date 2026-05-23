@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Discography.Workers.EnrichArtistWorker do
 
   use PremiereEcouteCore.Worker, queue: :discography, max_attempts: 3
 
+  require Logger
+
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichArtist
   alias PremiereEcoute.PubSub
@@ -17,9 +19,11 @@ defmodule PremiereEcoute.Discography.Workers.EnrichArtistWorker do
     case EnrichArtist.enrich_artist(artist) do
       {:ok, artist} ->
         PubSub.broadcast("artist:#{artist.id}", {:artist_enriched, artist})
+        Logger.info("artist #{artist.id} (#{artist.name}) enriched")
         :ok
 
       {:error, reason} ->
+        Logger.warning("artist #{artist.id} (#{artist.name}) failed: #{inspect(reason)}")
         {:error, reason}
     end
   end

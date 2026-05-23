@@ -41,7 +41,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Artists do
     |> SpotifyApi.get(url: "/artists/#{artist_id}/albums?include_groups=album")
     |> SpotifyApi.handle(200, fn %{"items" => items} ->
       items
-      |> Enum.filter(fn item -> item["album_type"] == "album" end)
       |> Enum.map(fn data ->
         %{
           provider_ids: %{spotify: data["id"]},

@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Playlists.Automations.ActionRegistry do
     PremiereEcoute.Playlists.Automations.Actions.CopyPlaylist,
     PremiereEcoute.Playlists.Automations.Actions.CreatePlaylist,
     PremiereEcoute.Playlists.Automations.Actions.EmptyPlaylist,
+    PremiereEcoute.Playlists.Automations.Actions.EnrichDiscographyFromPlaylist,
     PremiereEcoute.Playlists.Automations.Actions.MergePlaylists,
     PremiereEcoute.Playlists.Automations.Actions.NotifySubscribers,
     PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicates,

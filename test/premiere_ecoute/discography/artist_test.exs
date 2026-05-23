@@ -161,4 +161,17 @@ defmodule PremiereEcoute.Discography.ArtistTest do
       assert is_nil(Artist.get(artist.id))
     end
   end
+
+  describe "find_by_provider/2" do
+    test "returns artist when it exists with the given Spotify ID" do
+      {:ok, artist} = Artist.create_if_not_exists(%{name: "Test Artist", provider_ids: %{spotify: "spotifyartist123"}})
+
+      assert %Artist{id: id} = Artist.find_by_provider("spotifyartist123", :spotify)
+      assert id == artist.id
+    end
+
+    test "returns nil when no artist has the given Spotify ID" do
+      assert is_nil(Artist.find_by_provider("nonexistent", :spotify))
+    end
+  end
 end

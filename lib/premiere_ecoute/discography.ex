@@ -18,9 +18,13 @@ defmodule PremiereEcoute.Discography do
 
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
+  alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Discography.Links
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Services.SyncPlaylistDiscography
   alias PremiereEcoute.Discography.Single
+  alias PremiereEcoute.Discography.Workers.EnrichArtistWorker
+  alias PremiereEcoute.Discography.Workers.EnrichDiscographyWorker
 
   # Album
   defdelegate create_album(album), to: Album, as: :create
@@ -77,4 +81,15 @@ defmodule PremiereEcoute.Discography do
   # Links
   defdelegate title(entity), to: Links
   defdelegate url(entity, provider), to: Links
+
+  # Enrichment
+  @spec enrich_artist(integer() | String.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
+  def enrich_artist(id), do: EnrichArtistWorker.now(%{"id" => id})
+
+  @spec enrich_discography(integer() | String.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
+  def enrich_discography(id), do: EnrichDiscographyWorker.now(%{"id" => id})
+
+  @spec sync_playlist(LibraryPlaylist.t()) ::
+          {:ok, :unchanged} | {:ok, SyncPlaylistDiscography.result()} | {:error, term()}
+  defdelegate sync_playlist(library_playlist), to: SyncPlaylistDiscography, as: :sync
 end

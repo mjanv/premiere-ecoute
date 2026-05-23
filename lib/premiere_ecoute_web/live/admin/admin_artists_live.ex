@@ -9,9 +9,8 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
 
   import PremiereEcouteWeb.Admin.Pagination, only: [pagination_range: 2]
 
+  alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Artist
-  alias PremiereEcoute.Discography.Workers.EnrichArtistWorker
-  alias PremiereEcoute.Discography.Workers.EnrichDiscographyWorker
   alias PremiereEcoute.PubSub
 
   @impl true
@@ -60,7 +59,7 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
   end
 
   def handle_event("enrich_artist", %{"id" => id}, socket) do
-    case EnrichArtistWorker.now(%{"id" => id}) do
+    case Discography.enrich_artist(id) do
       {:ok, _} -> put_flash(socket, :info, gettext("Enrichment job started"))
       {:error, _} -> put_flash(socket, :error, gettext("Failed to start enrichment"))
     end
@@ -68,7 +67,7 @@ defmodule PremiereEcouteWeb.Admin.AdminArtistsLive do
   end
 
   def handle_event("enrich_discography", %{"id" => id}, socket) do
-    case EnrichDiscographyWorker.now(%{"id" => id}) do
+    case Discography.enrich_discography(id) do
       {:ok, _} -> put_flash(socket, :info, gettext("Enrichment job started"))
       {:error, _} -> put_flash(socket, :error, gettext("Failed to start enrichment"))
     end

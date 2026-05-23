@@ -43,6 +43,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
                owner_id: "ku296zgwbo0e3qff8cylptsjq",
                owner_name: "Flonflon",
                title: "FLONFLON MUSIC FRIDAY",
+               snapshot_id: "AAAQG1CdHTJ5APxsJOuLjQNAuK3KcGhi",
                cover_url: cover_url,
                tracks: tracks
              } = playlist

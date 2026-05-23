@@ -269,4 +269,17 @@ defmodule PremiereEcoute.Discography.AlbumTest do
       assert !is_nil(Album.get(album.id))
     end
   end
+
+  describe "find_by_provider/2" do
+    test "returns album when it exists with the given Spotify ID" do
+      {:ok, album} = Album.create(album_fixture(%{provider_ids: %{spotify: "spotifyid123"}}))
+
+      assert %Album{id: id} = Album.find_by_provider("spotifyid123", :spotify)
+      assert id == album.id
+    end
+
+    test "returns nil when no album has the given Spotify ID" do
+      assert is_nil(Album.find_by_provider("nonexistent", :spotify))
+    end
+  end
 end

@@ -207,6 +207,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
       owner_id: data["owner"]["id"],
       title: data["name"],
       cover_url: Parser.parse_album_cover_url(data["images"]),
+      snapshot_id: data["snapshot_id"],
       tracks: tracks
     }
 
@@ -226,6 +227,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
       provider: :spotify,
       track_id: data["track"]["id"],
       album_id: data["track"]["album"]["id"],
+      artist_id: get_in(data, ["track", "artists", Access.at(0), "id"]),
       user_id: data["added_by"]["id"],
       playlist_id: playlist_id,
       name: data["track"]["name"],

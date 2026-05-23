@@ -16,13 +16,20 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
   alias PremiereEcoute.Discography.Supervisor
 
   @doc """
-  Fetches all Spotify albums for the given artist and creates any missing ones.
+  Fetches all Spotify albums for the given artist and creates any that are missing.
+
+  Returns only newly created albums; albums already in the database are excluded.
   """
   @spec create_discography(Artist.t()) :: {:ok, [Album.t()]} | {:error, term()}
   def create_discography(%Artist{provider_ids: %{spotify: spotify_id}}) do
     with {:ok, albums} <- Apis.spotify().get_artist_albums(spotify_id) do
       albums
-      |> Supervisor.async(fn %{provider_ids: %{spotify: id}} -> create_album(id, :spotify) end)
+      |> Supervisor.async(fn %{provider_ids: %{spotify: id}} ->
+        case Album.find_by_provider(id, :spotify) do
+          %Album{} -> :existing
+          nil -> create_album(id, :spotify)
+        end
+      end)
       |> Stream.filter(&match?({:ok, _}, &1))
       |> Enum.reduce({:ok, []}, fn {:ok, album}, {:ok, albums} -> {:ok, albums ++ [album]} end)
     end
@@ -36,7 +43,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
   def create_album(album_id, provider \\ :spotify) do
     with {:ok, %Album{} = album} <- Apis.provider(provider).get_album(album_id),
          {:ok, %Album{} = album} <- Album.create_if_not_exists(album) do
-      Logger.info("Album created")
+      Logger.info("album #{album.id} (#{album.name}) created")
       {:ok, album}
     end
   end
@@ -45,7 +52,6 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
   def create_single(single_id, provider \\ :spotify) do
     with {:ok, %Single{} = single} <- Apis.provider(provider).get_single(single_id),
          {:ok, %Single{} = single} <- Single.create_if_not_exists(single) do
-      Logger.info("Single created")
       {:ok, single}
     end
   end

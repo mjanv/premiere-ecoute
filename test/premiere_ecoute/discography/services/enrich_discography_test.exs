@@ -137,7 +137,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
       expect_get_artist_albums()
       {:ok, albums} = EnrichDiscography.create_discography(artist)
 
-      assert length(albums) == 2
+      assert length(albums) == 0
       assert length(Album.all()) == 2
     end
 

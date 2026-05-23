@@ -149,6 +149,15 @@ defmodule PremiereEcoute.Discography.Album do
 
   def create_if_not_exists(%__MODULE__{} = album), do: create(album)
 
+  @spec find_by_provider(String.t(), atom()) :: t() | nil
+  def find_by_provider(id, provider) do
+    from(a in __MODULE__,
+      where: fragment("?->>? = ?", a.provider_ids, ^to_string(provider), ^id)
+    )
+    |> Repo.one()
+    |> preload()
+  end
+
   def get_by(query \\ __MODULE__, clauses), do: query |> Repo.get_by(clauses) |> preload()
 
   @spec get(integer()) :: t() | nil

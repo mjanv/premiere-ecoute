@@ -366,6 +366,19 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     """
   end
 
+  def step_config_fields(%{step: %{"action_type" => "enrich_discography_from_playlist"}} = assigns) do
+    ~H"""
+    <div class="space-y-2">
+      <.playlist_select
+        name={"steps[#{@index}][config][playlist]"}
+        label={gettext("Playlist to enrich from")}
+        value={get_in(@step, ["config", "playlist"])}
+        playlists={@library_playlists}
+      />
+    </div>
+    """
+  end
+
   def step_config_fields(assigns) do
     ~H"""
     <p class="text-xs text-gray-500 italic">{gettext("Unknown action type: %{type}", type: @step["action_type"])}</p>
@@ -407,6 +420,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
     end
   end
 
+  defp humanize_action("enrich_discography_from_playlist"), do: gettext("Enrich discography from playlist")
   defp humanize_action("copy_playlist"), do: gettext("Copy playlist")
   defp humanize_action("create_playlist"), do: gettext("Create playlist")
   defp humanize_action("empty_playlist"), do: gettext("Empty playlist")

@@ -25,6 +25,7 @@ defmodule PremiereEcoute.Discography.Playlist do
           url: String.t() | nil,
           cover_url: String.t() | nil,
           public: boolean(),
+          snapshot_id: String.t() | nil,
           tracks: [Track.t()] | Ecto.Association.NotLoaded.t(),
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
@@ -42,6 +43,8 @@ defmodule PremiereEcoute.Discography.Playlist do
     field :url, :string
     field :cover_url, :string
     field :public, :boolean, default: true
+
+    field :snapshot_id, :string, virtual: true
 
     has_many :tracks, Track, foreign_key: :playlist_id, on_delete: :delete_all
 

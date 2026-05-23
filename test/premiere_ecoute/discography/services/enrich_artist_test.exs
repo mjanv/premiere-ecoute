@@ -76,6 +76,17 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
     expect(YoutubeApi, :search_artist, fn _query -> {:ok, []} end)
   end
 
+  defp stub_get_artist do
+    stub(SpotifyApi, :get_artist, fn _id ->
+      {:ok,
+       %Artist{
+         name: "Daft Punk",
+         provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi"},
+         images: []
+       }}
+    end)
+  end
+
   defp expect_all do
     expect_wikipedia()
     expect_genius()
@@ -83,6 +94,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
     expect_spotify()
     expect_tidal()
     expect_youtube_music()
+    stub_get_artist()
   end
 
   describe "enrich_artist/1 - wikipedia" do
@@ -121,6 +133,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
       expect_spotify()
       expect_tidal()
       expect_youtube_music()
+      stub_get_artist()
 
       {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
@@ -166,6 +179,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
       expect_spotify()
       expect_tidal()
       expect_youtube_music()
+      stub_get_artist()
 
       {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
@@ -210,6 +224,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
       expect_spotify()
       expect_tidal()
       expect_youtube_music()
+      stub_get_artist()
 
       {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
@@ -254,6 +269,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
       expect_spotify_empty()
       expect_tidal()
       expect_youtube_music()
+      stub_get_artist()
 
       {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
@@ -298,11 +314,54 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
       expect_spotify()
       expect_tidal_empty()
       expect_youtube_music()
+      stub_get_artist()
 
       {:ok, updated} = EnrichArtist.enrich_artist(artist)
 
       assert Map.has_key?(Artist.get(artist.id).provider_ids, :tidal)
       assert is_nil(updated.provider_ids[:tidal])
+    end
+  end
+
+  describe "enrich_artist/1 - images" do
+    test "fetches and stores images when artist has none" do
+      artist = artist_fixture(%{images: []})
+
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_spotify()
+      expect_tidal()
+      expect_youtube_music()
+
+      expect(SpotifyApi, :get_artist, fn _id ->
+        {:ok,
+         %Artist{
+           name: "Daft Punk",
+           provider_ids: %{spotify: "4tZwfgrHOc3mvqYlEYSvVi"},
+           images: [%Artist.Image{url: "https://example.com/img.jpg", height: 640, width: 640}]
+         }}
+      end)
+
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
+
+      assert length(updated.images) == 1
+      assert hd(updated.images).url == "https://example.com/img.jpg"
+    end
+
+    test "skips get_artist call when artist already has images" do
+      artist = artist_fixture(%{images: [%Artist.Image{url: "https://example.com/existing.jpg", height: 640, width: 640}]})
+
+      expect_wikipedia()
+      expect_genius()
+      expect_deezer()
+      expect_spotify()
+      expect_tidal()
+      expect_youtube_music()
+
+      {:ok, updated} = EnrichArtist.enrich_artist(artist)
+
+      assert hd(updated.images).url == "https://example.com/existing.jpg"
     end
   end
 
@@ -342,6 +401,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
       expect_spotify()
       expect_tidal()
       expect_youtube_music_empty()
+      stub_get_artist()
 
       {:ok, updated} = EnrichArtist.enrich_artist(artist)
 

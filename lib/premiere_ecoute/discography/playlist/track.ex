@@ -15,6 +15,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
           provider: :spotify | :deezer,
           track_id: String.t(),
           album_id: String.t() | nil,
+          artist_id: String.t() | nil,
           user_id: String.t() | nil,
           name: String.t() | nil,
           artist: String.t() | nil,
@@ -31,6 +32,7 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
     field :provider, Ecto.Enum, values: [:spotify, :deezer]
     field :track_id, :string
     field :album_id, :string
+    field :artist_id, :string, virtual: true
     field :user_id, :string
     field :name, :string
     field :artist, :string

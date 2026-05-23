@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
 
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Automations
+  alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists
   alias PremiereEcoute.Playlists.LibraryPlaylist.Submission
@@ -245,6 +246,27 @@ defmodule PremiereEcouteWeb.Playlists.PlaylistLive do
       _ ->
         {:noreply, socket}
     end
+  end
+
+  @impl true
+  def handle_event("enrich_discography", _params, socket) do
+    flash =
+      case Discography.sync_playlist(socket.assigns.library_playlist) do
+        {:ok, :unchanged} ->
+          {:info, gettext("Discography up to date — playlist unchanged since last run.")}
+
+        {:ok, %{new_artists: new, skipped_albums: skipped}} ->
+          {:success,
+           gettext("Discography enriched — %{new} new artists scheduled, %{skipped} albums already known.",
+             new: new,
+             skipped: skipped
+           )}
+
+        {:error, reason} ->
+          {:error, gettext("Enrichment failed: %{reason}", reason: inspect(reason))}
+      end
+
+    {:noreply, put_flash(socket, elem(flash, 0), elem(flash, 1))}
   end
 
   @impl true

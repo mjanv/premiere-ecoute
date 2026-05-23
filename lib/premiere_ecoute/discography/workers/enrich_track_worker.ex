@@ -3,6 +3,8 @@ defmodule PremiereEcoute.Discography.Workers.EnrichTrackWorker do
 
   use PremiereEcouteCore.Worker, queue: :discography, max_attempts: 3
 
+  require Logger
+
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Services.EnrichTrack
   alias PremiereEcoute.PubSub
@@ -18,9 +20,11 @@ defmodule PremiereEcoute.Discography.Workers.EnrichTrackWorker do
     case EnrichTrack.enrich_track(track) do
       {:ok, track} ->
         PubSub.broadcast("track:#{track.id}", {:track_enriched, track})
+        Logger.info("track #{track.id} (#{track.name}) enriched")
         :ok
 
       {:error, reason} ->
+        Logger.warning("track #{track.id} (#{track.name}) failed: #{inspect(reason)}")
         {:error, reason}
     end
   end

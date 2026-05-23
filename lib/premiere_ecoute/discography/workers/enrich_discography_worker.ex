@@ -16,26 +16,40 @@ defmodule PremiereEcoute.Discography.Workers.EnrichDiscographyWorker do
 
   use PremiereEcouteCore.Worker, queue: :discography, max_attempts: 3
 
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichDiscography
   alias PremiereEcoute.Discography.Workers.EnrichAlbumWorker
   alias PremiereEcoute.Discography.Workers.EnrichArtistWorker
-  alias PremiereEcoute.Discography.Workers.EnrichTrackWorker
+  # alias PremiereEcoute.Discography.Workers.EnrichTrackWorker
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"id" => id}}), do: run(Artist.get(id))
+
+  def perform(%Oban.Job{args: %{"spotify_id" => spotify_id}}) do
+    with nil <- Artist.find_by_provider(spotify_id, :spotify),
+         {:ok, fetched} <- Apis.spotify().get_artist(spotify_id),
+         {:ok, created} <- Artist.create(fetched) do
+      Logger.info("artist #{created.id} (#{created.name}) created from spotify_id #{spotify_id}")
+      created
+    else
+      %Artist{} = artist -> artist
+    end
+    |> run()
+  end
 
   def run(nil), do: {:error, :not_found}
 
   def run(%Artist{} = artist) do
     with {:ok, albums} <- EnrichDiscography.create_discography(artist),
-         tracks <- Enum.flat_map(albums, fn album -> album.tracks end),
          {:ok, _} <- EnrichArtistWorker.now(%{"id" => artist.id}),
-         :ok <- EnrichAlbumWorker.interval(albums, fn album -> %{"id" => album.id} end),
-         :ok <- EnrichTrackWorker.interval(tracks, fn track -> %{"id" => track.id} end) do
+         :ok <- EnrichAlbumWorker.interval(albums, fn album -> %{"id" => album.id} end) do
+      Logger.info("artist #{artist.id} (#{artist.name}) #{length(albums)} albums scheduled")
       :ok
     else
-      {:error, reason} -> Logger.warning("Failed to enrich discography for artist #{artist.id}: #{inspect(reason)}")
+      {:error, reason} ->
+        Logger.warning("artist #{artist.id} (#{artist.name}) failed: #{inspect(reason)}")
+        {:error, reason}
     end
   end
 end

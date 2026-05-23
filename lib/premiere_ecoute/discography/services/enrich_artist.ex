@@ -33,8 +33,21 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
       |> Enum.into(%{})
       |> then(&Map.merge(artist.provider_ids, &1))
 
-    Artist.update(artist, %{external_links: external_links, provider_ids: provider_ids})
+    images = fetch_images(artist)
+
+    Artist.update(artist, %{external_links: external_links, provider_ids: provider_ids, images: images})
   end
+
+  defp fetch_images(%Artist{images: images}) when images != [], do: Enum.map(images, &Map.from_struct/1)
+
+  defp fetch_images(%Artist{provider_ids: %{spotify: spotify_id}}) do
+    case Apis.spotify().get_artist(spotify_id) do
+      {:ok, fetched} -> Enum.map(fetched.images, &Map.from_struct/1)
+      {:error, _} -> []
+    end
+  end
+
+  defp fetch_images(%Artist{}), do: []
 
   defp enrich(:wikipedia, %Artist{name: name}) do
     case Apis.wikipedia().search(artist: name) do
