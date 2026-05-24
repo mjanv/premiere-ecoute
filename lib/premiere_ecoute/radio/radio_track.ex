@@ -127,6 +127,25 @@ defmodule PremiereEcoute.Radio.RadioTrack do
   end
 
   @doc """
+  Returns distinct provider track IDs played across all users on the given date.
+  Tracks without the given provider ID are excluded.
+  """
+  @spec distinct_provider_ids(Date.t(), atom()) :: [String.t()]
+  def distinct_provider_ids(date, provider) do
+    provider_key = to_string(provider)
+    start = DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
+    stop = DateTime.new!(date, ~T[23:59:59], "Etc/UTC")
+
+    from(t in __MODULE__,
+      where: t.started_at >= ^start and t.started_at <= ^stop,
+      where: fragment("?->>? IS NOT NULL", t.provider_ids, ^provider_key),
+      select: fragment("?->>?", t.provider_ids, ^provider_key),
+      distinct: true
+    )
+    |> Repo.all()
+  end
+
+  @doc """
   Delete all tracks for a user that started before the given datetime.
 
   ## Examples

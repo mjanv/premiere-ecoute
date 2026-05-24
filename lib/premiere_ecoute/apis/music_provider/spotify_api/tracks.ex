@@ -64,6 +64,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
       duration_ms: data["duration_ms"] || 0
     }
     |> Map.put(:album_spotify_id, album_id)
+    |> Map.put(:artist_spotify_id, get_in(data, ["artists", Access.at(0), "id"]))
   end
 
   defp parse_track(_), do: nil

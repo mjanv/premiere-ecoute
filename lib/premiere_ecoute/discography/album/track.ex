@@ -28,6 +28,7 @@ defmodule PremiereEcoute.Discography.Album.Track do
           album_id: integer() | nil,
           album: entity(Album.t()),
           album_spotify_id: String.t() | nil,
+          artist_spotify_id: String.t() | nil,
           inserted_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil
         }
@@ -39,9 +40,11 @@ defmodule PremiereEcoute.Discography.Album.Track do
     field :slug, Slug.Type
     field :track_number, :integer
     field :duration_ms, :integer
-    # TODO: must be rethink - how to carry metadata information (here spotify album id) ?
+    # TODO: must be rethink - how to carry metadata information (here spotify album/artists ids) ?
     # AIDEV-NOTE: virtual field used to carry album_spotify_id from Spotify API response without persisting it
     field :album_spotify_id, :string, virtual: true
+    # AIDEV-NOTE: virtual field used to carry artist_spotify_id from Spotify API response without persisting it
+    field :artist_spotify_id, :string, virtual: true
     # AIDEV-NOTE: virtual field populated from Spotify API response; not persisted
     field :explicit, :boolean, virtual: true, default: false
 
@@ -69,6 +72,14 @@ defmodule PremiereEcoute.Discography.Album.Track do
   end
 
   def provider(%__MODULE__{provider_ids: providers_ids}, provider), do: Map.get(providers_ids, provider)
+
+  @spec find_by_provider(String.t(), atom()) :: t() | nil
+  def find_by_provider(id, provider) do
+    from(t in __MODULE__,
+      where: fragment("?->>? = ?", t.provider_ids, ^to_string(provider), ^id)
+    )
+    |> Repo.one()
+  end
 
   defp validate_external_links(%Ecto.Changeset{} = changeset) do
     case get_change(changeset, :external_links) do

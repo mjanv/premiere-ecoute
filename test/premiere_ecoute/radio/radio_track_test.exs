@@ -126,6 +126,57 @@ defmodule PremiereEcoute.Radio.RadioTrackTest do
     end
   end
 
+  describe "distinct_provider_ids/2" do
+    test "returns unique provider track IDs across all users for a given date" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      date = ~D[2026-01-15]
+
+      RadioTrack.insert(user1.id, track_attrs(%{provider_ids: %{spotify: "track_a"}, started_at: ~U[2026-01-15 10:00:00Z]}))
+      RadioTrack.insert(user2.id, track_attrs(%{provider_ids: %{spotify: "track_a"}, started_at: ~U[2026-01-15 11:00:00Z]}))
+      RadioTrack.insert(user1.id, track_attrs(%{provider_ids: %{spotify: "track_b"}, started_at: ~U[2026-01-15 12:00:00Z]}))
+
+      ids = RadioTrack.distinct_provider_ids(date, :spotify)
+      assert Enum.sort(ids) == ["track_a", "track_b"]
+    end
+
+    test "excludes tracks outside the given date" do
+      user = user_fixture()
+
+      RadioTrack.insert(user.id, track_attrs(%{provider_ids: %{spotify: "yesterday"}, started_at: ~U[2026-01-14 23:59:59Z]}))
+      RadioTrack.insert(user.id, track_attrs(%{provider_ids: %{spotify: "today"}, started_at: ~U[2026-01-15 10:00:00Z]}))
+
+      ids = RadioTrack.distinct_provider_ids(~D[2026-01-15], :spotify)
+      assert ids == ["today"]
+    end
+
+    test "excludes tracks without the requested provider ID" do
+      user = user_fixture()
+
+      RadioTrack.insert(user.id, track_attrs(%{provider_ids: %{deezer: "deezer_only"}, started_at: ~U[2026-01-15 10:00:00Z]}))
+
+      ids = RadioTrack.distinct_provider_ids(~D[2026-01-15], :spotify)
+      assert ids == []
+    end
+
+    test "returns IDs for the requested provider only" do
+      user = user_fixture()
+
+      RadioTrack.insert(
+        user.id,
+        track_attrs(%{provider_ids: %{spotify: "sp_1", deezer: "dz_1"}, started_at: ~U[2026-01-15 10:00:00Z]})
+      )
+
+      assert RadioTrack.distinct_provider_ids(~D[2026-01-15], :deezer) == ["dz_1"]
+      assert RadioTrack.distinct_provider_ids(~D[2026-01-15], :spotify) == ["sp_1"]
+    end
+
+    test "returns empty list when no tracks exist for date" do
+      ids = RadioTrack.distinct_provider_ids(~D[2026-01-15], :spotify)
+      assert ids == []
+    end
+  end
+
   describe "delete_before/2" do
     test "deletes tracks older than the cutoff" do
       user = user_fixture()
