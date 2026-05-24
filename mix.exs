@@ -115,7 +115,7 @@ defmodule PremiereEcoute.MixProject do
       {:cachex, "~> 4.1"},
       {:bcrypt_elixir, "~> 3.0"},
       {:postgrex, "~> 0.21"},
-      {:ecto_sql, "~> 3.10"},
+      {:ecto_sql, "~> 3.13"},
       {:ecto_autoslug_field, "~> 3.1"},
       {:cloak_ecto, "~> 1.3"},
       {:eventstore, "~> 1.4"},
@@ -135,6 +135,7 @@ defmodule PremiereEcoute.MixProject do
       {:xml_builder, "~> 2.1"},
       {:jose, "~> 1.11"},
       {:hammer, "~> 7.0"},
+      {:decimal, "~> 3.0", override: true},
       # Data / Machine Learning
       {:instructor, "~> 0.1"},
       {:hermes_mcp, "~> 0.14"},
@@ -202,6 +203,7 @@ defmodule PremiereEcoute.MixProject do
       audit: [
         "sobelow --compact",
         "deps.audit",
+        "hex.audit",
         "hex.outdated --within-requirements"
       ],
       # Tests
