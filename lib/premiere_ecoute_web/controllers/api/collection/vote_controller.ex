@@ -23,9 +23,10 @@ defmodule PremiereEcouteWeb.Api.Collection.VoteController do
   operation(:create,
     summary: "Submit collection vote",
     description:
-      "Submits a binary choice (1 or 2) for the active vote window. Streamers vote on their own session; viewers must supply a `username` body param (the broadcaster's username).\n\n**Roles:** streamer, viewer",
+      "Submits a binary choice (1 or 2) for the active vote window. Streamers vote on their own session; viewers must supply a `username` body param (the broadcaster's username).",
     tags: ["Collection"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer", "viewer"],
     request_body:
       {"Vote payload", "application/json",
        %Schema{

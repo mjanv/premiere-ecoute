@@ -34,9 +34,10 @@ defmodule PremiereEcouteWeb.Api.Wantlist.WantlistController do
 
   operation(:show,
     summary: "Get wantlist",
-    description: "Returns the authenticated user's wantlist with all items.\n\n**Roles:** streamer, viewer",
+    description: "Returns the authenticated user's wantlist with all items.",
     tags: ["Wantlist"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer", "viewer"],
     parameters: [
       type: [
         in: :query,

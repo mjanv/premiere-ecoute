@@ -66,6 +66,13 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
     :ok
   end
 
+  @impl true
+  def dispatch(%CollectionSessionCompleted{session_id: session_id, kept_count: kept_count}) do
+    PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:session_completed, kept_count})
+    CollectionSessionWorker.cancel_duel_reminders(session_id)
+    :ok
+  end
+
   defp maybe_schedule_enrichment(:kept, track_id) do
     with nil <- Album.Track.find_by_provider(track_id, :spotify),
          {:ok, %Album.Track{artist_spotify_id: id}} when is_binary(id) <- Apis.spotify().get_track(track_id) do
@@ -74,11 +81,4 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   end
 
   defp maybe_schedule_enrichment(_decision, _track_id), do: :ok
-
-  @impl true
-  def dispatch(%CollectionSessionCompleted{session_id: session_id, kept_count: kept_count}) do
-    PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:session_completed, kept_count})
-    CollectionSessionWorker.cancel_duel_reminders(session_id)
-    :ok
-  end
 end

@@ -263,6 +263,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       command = %DecideTrack{
@@ -288,6 +289,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       # AIDEV-NOTE: LiveView remaps "Pick B" before sending: primary = B (kept), loser = A (rejected)
@@ -315,6 +317,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       command = %DecideTrack{
@@ -340,6 +343,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       command = %DecideTrack{
@@ -364,6 +368,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       # Record a kept decision
@@ -422,6 +427,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       CommandBus.apply(%DecideTrack{
@@ -454,6 +460,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
 
       expect(SpotifyApi, :get_playlist, fn _id -> {:ok, playlist} end)
       expect(TwitchApi, :resubscribe, fn _scope, "channel.chat.message" -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
       CommandBus.apply(%DecideTrack{

@@ -40,9 +40,10 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:show,
     summary: "Get current session",
-    description: "Returns the authenticated user's current active session state.\n\n**Roles:** streamer",
+    description: "Returns the authenticated user's current active session state.",
     tags: ["Session"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Session state", "application/json", @session_response},
       not_found: {"No active session", "application/json", @error_response},
@@ -101,9 +102,10 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:start,
     summary: "Start session",
-    description: "Starts the authenticated user's current session and advances to the first track.\n\n**Roles:** streamer",
+    description: "Starts the authenticated user's current session and advances to the first track.",
     tags: ["Session"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Success", "application/json", @ok_response},
       not_found: {"No active session", "application/json", @error_response},
@@ -138,9 +140,10 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:stop,
     summary: "Stop session",
-    description: "Stops the authenticated user's current session.\n\n**Roles:** streamer",
+    description: "Stops the authenticated user's current session.",
     tags: ["Session"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Success", "application/json", @ok_response},
       not_found: {"No active session", "application/json", @error_response},
@@ -169,9 +172,10 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:next,
     summary: "Next track",
-    description: "Skips to the next track in the authenticated user's current session.\n\n**Roles:** streamer",
+    description: "Skips to the next track in the authenticated user's current session.",
     tags: ["Session"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Success", "application/json", @ok_response},
       not_found: {"No active session", "application/json", @error_response},
@@ -200,9 +204,10 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
 
   operation(:previous,
     summary: "Previous track",
-    description: "Skips to the previous track in the authenticated user's current session.\n\n**Roles:** streamer",
+    description: "Skips to the previous track in the authenticated user's current session.",
     tags: ["Session"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Success", "application/json", @ok_response},
       not_found: {"No active session", "application/json", @error_response},

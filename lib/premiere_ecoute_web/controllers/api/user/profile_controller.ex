@@ -39,9 +39,10 @@ defmodule PremiereEcouteWeb.Api.User.ProfileController do
 
   operation(:show,
     summary: "Get profile",
-    description: "Returns the authenticated user's profile settings.\n\n**Roles:** streamer, viewer",
+    description: "Returns the authenticated user's profile settings.",
     tags: ["Profile"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer", "viewer"],
     responses: [
       ok: {"Profile", "application/json", @profile_schema},
       unauthorized: "Missing or invalid Authorization header"
@@ -61,9 +62,10 @@ defmodule PremiereEcouteWeb.Api.User.ProfileController do
   operation(:update,
     summary: "Update profile",
     description:
-      "Partially updates the authenticated user's profile settings. Only fields present in the request body are changed.\n\n**Roles:** streamer, viewer",
+      "Partially updates the authenticated user's profile settings. Only fields present in the request body are changed.",
     tags: ["Profile"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer", "viewer"],
     request_body: {"Profile fields to update", "application/json", @profile_schema},
     responses: [
       ok: {"Updated profile", "application/json", @profile_schema},

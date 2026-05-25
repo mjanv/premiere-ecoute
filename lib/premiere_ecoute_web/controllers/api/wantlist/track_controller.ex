@@ -19,10 +19,10 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
 
   operation(:create,
     summary: "Save current track",
-    description:
-      "Saves the track currently playing on the broadcaster's stream to the authenticated user's wantlist.\n\n**Roles:** streamer, viewer",
+    description: "Saves the track currently playing on the broadcaster's stream to the authenticated user's wantlist.",
     tags: ["Wantlist"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer", "viewer"],
     parameters: [
       broadcaster_id: [in: :query, description: "Twitch user ID of the broadcaster", type: :string, required: true]
     ],

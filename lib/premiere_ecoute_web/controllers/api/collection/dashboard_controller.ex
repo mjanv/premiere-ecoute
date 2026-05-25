@@ -42,9 +42,10 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
 
   operation(:show,
     summary: "Get active collection session",
-    description: "Returns the authenticated streamer's current active collection session.\n\n**Roles:** streamer",
+    description: "Returns the authenticated streamer's current active collection session.",
     tags: ["Collection"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Collection session state", "application/json", @session_response},
       not_found: {"No active session", "application/json", @error_response},
@@ -64,9 +65,10 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
 
   operation(:start,
     summary: "Start collection session",
-    description: "Starts the authenticated streamer's pending collection session.\n\n**Roles:** streamer",
+    description: "Starts the authenticated streamer's pending collection session.",
     tags: ["Collection"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Success", "application/json", @ok_response},
       not_found: {"No pending session", "application/json", @error_response},
@@ -92,9 +94,10 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
 
   operation(:open_vote,
     summary: "Open vote window",
-    description: "Opens a vote window for the current track(s) in the active collection session.\n\n**Roles:** streamer",
+    description: "Opens a vote window for the current track(s) in the active collection session.",
     tags: ["Collection"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     request_body:
       {"Vote window options", "application/json",
        %Schema{
@@ -142,9 +145,10 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
 
   operation(:close_vote,
     summary: "Close vote window",
-    description: "Closes the active vote window in the current collection session.\n\n**Roles:** streamer",
+    description: "Closes the active vote window in the current collection session.",
     tags: ["Collection"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     responses: [
       ok: {"Success", "application/json", @ok_response},
       not_found: {"No active session", "application/json", @error_response},
@@ -170,9 +174,10 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
 
   operation(:decide,
     summary: "Decide current track",
-    description: "Records the streamer's decision (kept/rejected/skipped) for the current track.\n\n**Roles:** streamer",
+    description: "Records the streamer's decision (kept/rejected/skipped) for the current track.",
     tags: ["Collection"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     request_body:
       {"Decision payload", "application/json",
        %Schema{
@@ -220,9 +225,10 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
 
   operation(:complete,
     summary: "Complete collection session",
-    description: "Completes the collection session and syncs kept tracks to the destination playlist.\n\n**Roles:** streamer",
+    description: "Completes the collection session and syncs kept tracks to the destination playlist.",
     tags: ["Collection"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer"],
     request_body:
       {"Completion options", "application/json",
        %Schema{

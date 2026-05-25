@@ -22,9 +22,10 @@ defmodule PremiereEcouteWeb.Api.Session.VoteController do
   operation(:create,
     summary: "Vote on current track",
     description:
-      "Submits a rating (0–10) for the current track in the session. Streamers vote on their own session directly; viewers must supply a `username` body param (the broadcaster's username).\n\n**Roles:** streamer, viewer",
+      "Submits a rating (0–10) for the current track in the session. Streamers vote on their own session directly; viewers must supply a `username` body param (the broadcaster's username).",
     tags: ["Session"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer", "viewer"],
     request_body:
       {"Vote payload", "application/json",
        %Schema{

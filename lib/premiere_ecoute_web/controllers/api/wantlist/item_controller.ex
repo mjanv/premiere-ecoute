@@ -16,9 +16,10 @@ defmodule PremiereEcouteWeb.Api.Wantlist.ItemController do
 
   operation(:delete,
     summary: "Remove wantlist item",
-    description: "Removes an item from the authenticated user's wantlist.\n\n**Roles:** streamer, viewer",
+    description: "Removes an item from the authenticated user's wantlist.",
     tags: ["Wantlist"],
     security: [%{"bearer" => []}],
+    "x-role": ["streamer", "viewer"],
     parameters: [
       id: [in: :path, description: "Wantlist item ID", type: :integer, required: true]
     ],

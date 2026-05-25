@@ -52,6 +52,14 @@ defmodule PremiereEcouteWeb.Router do
     plug PremiereEcouteWeb.Plugs.ApiAuth
   end
 
+  pipeline :api_auth_optional do
+    plug :accepts, ["json"]
+    plug :fetch_session
+    plug :fetch_current_scope_for_user
+    plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
+    plug PremiereEcouteWeb.Plugs.ApiAuthOptional
+  end
+
   pipeline :app do
     plug :accepts, ["html"]
     plug :put_secure_browser_headers
@@ -271,9 +279,9 @@ defmodule PremiereEcouteWeb.Router do
   end
 
   scope "/api" do
-    pipe_through :api
+    pipe_through :api_auth_optional
 
-    get "/openapi", OpenApiSpex.Plug.RenderSpec, []
+    get "/openapi", PremiereEcouteWeb.Api.SpecController, :show
     get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
