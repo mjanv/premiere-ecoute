@@ -3,7 +3,6 @@
   id="overlay-ding"
   phx-hook="PlaySound"
   data-sound={@duel_sound}
-  {if @play_ding, do: %{"data-play" => true}, else: %{}}
   style="display:none;"
 />
 <% pct_a = bar_pct(@votes_a, @votes_b, :a)
