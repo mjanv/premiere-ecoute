@@ -171,7 +171,7 @@ jobs:
 
       - name: Deploy release to server
         run: |
-          rsync -avzq --delete --exclude='.env' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
+          rsync -avzq --delete --exclude='.env' --exclude='cache' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
           scp .env.production root@68.183.219.251:/opt/premiere-ecoute/.env
           ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -path "*/releases/*/iex" -o -name "*.so" \) -type f -exec chmod +x {} \;'
 
