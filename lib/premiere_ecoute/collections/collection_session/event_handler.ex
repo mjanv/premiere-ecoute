@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
 
   use PremiereEcouteCore.EventBus.Handler
 
+  alias PremiereEcoute.Apis
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Events.CollectionSessionCompleted
   alias PremiereEcoute.Collections.CollectionSession.Events.CollectionSessionPrepared
@@ -16,6 +17,8 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowClosed
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
   alias PremiereEcoute.Collections.CollectionSessionWorker
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Workers.EnrichDiscographyWorker
 
   event(CollectionSessionPrepared)
   event(CollectionSessionStarted)
@@ -47,6 +50,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
   @impl true
   def dispatch(%TrackDecided{session_id: session_id, track_id: track_id, decision: decision}) do
     PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:track_decided, track_id, decision})
+    maybe_schedule_enrichment(decision, track_id)
     :ok
   end
 
@@ -61,6 +65,15 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandler do
     PremiereEcoute.PubSub.broadcast("collection:#{session_id}", {:vote_closed, track_id})
     :ok
   end
+
+  defp maybe_schedule_enrichment(:kept, track_id) do
+    with nil <- Album.Track.find_by_provider(track_id, :spotify),
+         {:ok, %Album.Track{artist_spotify_id: id}} when is_binary(id) <- Apis.spotify().get_track(track_id) do
+      EnrichDiscographyWorker.now(%{"spotify_id" => id})
+    end
+  end
+
+  defp maybe_schedule_enrichment(_decision, _track_id), do: :ok
 
   @impl true
   def dispatch(%CollectionSessionCompleted{session_id: session_id, kept_count: kept_count}) do

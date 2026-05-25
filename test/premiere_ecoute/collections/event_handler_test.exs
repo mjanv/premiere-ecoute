@@ -1,10 +1,107 @@
 defmodule PremiereEcoute.Collections.CollectionSession.EventHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
+  import Hammox
+
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Collections.CollectionSession.EventHandler
   alias PremiereEcoute.Collections.CollectionSession.Events.CollectionSessionCompleted
   alias PremiereEcoute.Collections.CollectionSession.Events.CollectionSessionStarted
+  alias PremiereEcoute.Collections.CollectionSession.Events.TrackDecided
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Workers.EnrichDiscographyWorker
+
+  setup :verify_on_exit!
+
+  describe "dispatch/1 - TrackDecided" do
+    test "schedules EnrichDiscographyWorker when a track is kept and not in discography" do
+      user = user_fixture()
+      session = collection_session_fixture(user)
+
+      stub(SpotifyApi, :get_track, fn "track_new" ->
+        {:ok,
+         %Album.Track{
+           provider_ids: %{spotify: "track_new"},
+           name: "Some Track",
+           track_number: 1,
+           duration_ms: 200_000,
+           album_spotify_id: "album_id",
+           artist_spotify_id: "artist_spotify_id"
+         }}
+      end)
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%TrackDecided{
+          session_id: session.id,
+          user_id: user.id,
+          track_id: "track_new",
+          decision: :kept
+        })
+
+        assert_enqueued(worker: EnrichDiscographyWorker, args: %{"spotify_id" => "artist_spotify_id"})
+      end)
+    end
+
+    test "does not schedule enrichment when track is already in discography" do
+      user = user_fixture()
+      session = collection_session_fixture(user)
+
+      {:ok, artist} = PremiereEcoute.Discography.Artist.create_if_not_exists(%{name: "Known Artist"})
+      {:ok, album} = Album.create(album_fixture(%{artists: [artist]}))
+
+      Repo.insert!(%Album.Track{
+        provider_ids: %{spotify: "track_known"},
+        name: "Known Track",
+        track_number: 1,
+        duration_ms: 200_000,
+        album_id: album.id
+      })
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%TrackDecided{
+          session_id: session.id,
+          user_id: user.id,
+          track_id: "track_known",
+          decision: :kept
+        })
+
+        assert [] = all_enqueued(worker: EnrichDiscographyWorker)
+      end)
+    end
+
+    test "does not schedule enrichment when decision is :rejected" do
+      user = user_fixture()
+      session = collection_session_fixture(user)
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%TrackDecided{
+          session_id: session.id,
+          user_id: user.id,
+          track_id: "track_rejected",
+          decision: :rejected
+        })
+
+        assert [] = all_enqueued(worker: EnrichDiscographyWorker)
+      end)
+    end
+
+    test "does not schedule enrichment when decision is :skipped" do
+      user = user_fixture()
+      session = collection_session_fixture(user)
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%TrackDecided{
+          session_id: session.id,
+          user_id: user.id,
+          track_id: "track_skipped",
+          decision: :skipped
+        })
+
+        assert [] = all_enqueued(worker: EnrichDiscographyWorker)
+      end)
+    end
+  end
 
   describe "dispatch/1 - CollectionSessionStarted" do
     test "broadcasts session_started and collection_started" do
