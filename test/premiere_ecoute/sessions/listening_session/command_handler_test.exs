@@ -724,6 +724,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         :ok
       end)
 
+      expect(TwitchApi, :send_chat_message, fn _scope, msg ->
+        assert msg =~ "/sessions/"
+        :ok
+      end)
+
       command = %PrepareListeningSession{
         source: :album,
         user_id: user.id,
@@ -803,6 +808,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         :ok
       end)
 
+      expect(TwitchApi, :send_chat_message, fn _scope, msg ->
+        assert msg =~ "/sessions/"
+        :ok
+      end)
+
       {:ok, _, [%SessionPrepared{} = prepared]} =
         CommandBus.apply(%PrepareListeningSession{
           source: :playlist,
@@ -852,6 +862,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
                                                "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn _scope, msg ->
+        assert msg =~ "/sessions/"
         :ok
       end)
 
@@ -1173,6 +1188,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(TwitchApi, :send_chat_message, fn %Scope{},
                                                "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn _scope, msg ->
+        assert msg =~ "/sessions/"
         :ok
       end)
 

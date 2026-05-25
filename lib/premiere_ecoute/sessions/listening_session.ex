@@ -661,6 +661,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   @doc """
+  Returns the absolute viewer URL for a session.
+
+  Builds the URL from the endpoint config (scheme, host, port) and the session's
+  share token, e.g. `https://premiere-ecoute.fr/sessions/username/share_token`.
+  """
+  @spec viewer_url(t(), String.t()) :: String.t()
+  def viewer_url(%__MODULE__{share_token: share_token}, username) do
+    url_config = Application.fetch_env!(:premiere_ecoute, PremiereEcouteWeb.Endpoint)[:url] || []
+    scheme = Keyword.get(url_config, :scheme, "https")
+    host = Keyword.get(url_config, :host, "premiere-ecoute.fr")
+    port = Keyword.get(url_config, :port)
+
+    base =
+      if port && port not in [80, 443],
+        do: "#{scheme}://#{host}:#{port}",
+        else: "#{scheme}://#{host}"
+
+    "#{base}/sessions/#{username}/#{share_token}"
+  end
+
+  @doc """
   Returns the session's artist name.
 
   Extracts artist from album, playlist owner, or single depending on session source.

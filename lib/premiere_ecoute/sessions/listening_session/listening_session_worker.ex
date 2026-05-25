@@ -183,6 +183,22 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   end
 
   @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"action" => "send_session_link", "user_id" => user_id, "session_id" => session_id}}) do
+    scope = Scope.for_user(User.get(user_id))
+    session = ListeningSession.get(session_id)
+    url = ListeningSession.viewer_url(session, scope.user.username)
+
+    Apis.twitch().send_chat_message(
+      scope,
+      Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn ->
+        gettext("Check out the session summary at %{url}", url: url)
+      end)
+    )
+
+    :ok
+  end
+
+  @impl Oban.Worker
   def perform(%Oban.Job{
         args: %{"action" => "open_free", "user_id" => user_id, "session_id" => session_id, "track_id" => track_id}
       }) do

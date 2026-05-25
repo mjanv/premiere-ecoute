@@ -107,6 +107,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   def dispatch(%SessionStopped{session_id: session_id, user_id: user_id}) do
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 10)
+    ListeningSessionWorker.in_seconds(%{action: "send_session_link", session_id: session_id, user_id: user_id}, 20)
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_stopped, session_id})
     :ok

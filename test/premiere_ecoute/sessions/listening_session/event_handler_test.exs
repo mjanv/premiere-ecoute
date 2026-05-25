@@ -54,6 +54,24 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
     end
   end
 
+  describe "dispatch/1 - SessionStopped" do
+    test "schedules send_session_link job 20 seconds after session stops" do
+      user = user_fixture()
+      session = session_fixture(%{user_id: user.id, status: :active})
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped{
+          session_id: session.id,
+          user_id: user.id
+        })
+
+        assert_enqueued worker: ListeningSessionWorker,
+                        args: %{"action" => "send_session_link", "session_id" => session.id, "user_id" => user.id},
+                        scheduled_at: DateTime.add(DateTime.utc_now(), 20, :second)
+      end)
+    end
+  end
+
   describe "dispatch/1 - NextTrackStarted album" do
     test "schedules open_album after cooldown for a normal-length track" do
       user = user_fixture()

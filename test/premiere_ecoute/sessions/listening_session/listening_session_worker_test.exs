@@ -151,6 +151,27 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorkerTest do
     end
   end
 
+  describe "perform/1 - send_session_link" do
+    test "sends a Twitch chat message with the full session viewer URL" do
+      user = user_fixture(%{username: "streamer1", twitch: %{user_id: "1234"}})
+      session = session_fixture(%{user_id: user.id, status: :stopped})
+      expected_url = "https://localhost/sessions/#{user.username}/#{session.share_token}"
+
+      expect(TwitchApi, :send_chat_message, fn _scope, msg ->
+        assert msg =~ "Check out the session summary at"
+        assert msg =~ expected_url
+        :ok
+      end)
+
+      assert :ok =
+               perform_job(ListeningSessionWorker, %{
+                 "action" => "send_session_link",
+                 "user_id" => user.id,
+                 "session_id" => session.id
+               })
+    end
+  end
+
   defp album_track_fixture(album, name, duration_ms) do
     Repo.insert!(%Track{
       album_id: album.id,

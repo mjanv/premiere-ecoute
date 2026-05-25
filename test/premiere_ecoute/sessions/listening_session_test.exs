@@ -575,6 +575,14 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       assert DateTime.compare(marker2.started_at, marker3.started_at) in [:lt, :eq]
     end
 
+    test "viewer_url/2 returns absolute URL with username and share_token", %{user: user, album: album} do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      url = ListeningSession.viewer_url(session, "streamer1")
+
+      assert url =~ "//localhost/sessions/streamer1/#{session.share_token}"
+    end
+
     test "track markers are deleted when session is deleted", %{user: user, album: album} do
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, session} = ListeningSession.start(session)
