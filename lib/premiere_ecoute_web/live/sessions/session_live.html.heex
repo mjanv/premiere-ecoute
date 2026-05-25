@@ -16,7 +16,7 @@
       <%!-- Hero backdrop: absolute so it doesn't push content down --%>
       <div class="absolute inset-x-0 top-0 h-[32rem]">
         <div class="max-w-6xl mx-auto px-6 h-full relative overflow-hidden">
-          <img
+          <.cover
             src={entity.cover_url}
             alt=""
             aria-hidden="true"
@@ -51,7 +51,7 @@
             </.link>
 
             <%!-- Cover --%>
-            <img
+            <.cover
               src={entity.cover_url}
               alt={PremiereEcoute.Discography.title(entity)}
               class="w-full aspect-square object-cover rounded-lg shadow-2xl"

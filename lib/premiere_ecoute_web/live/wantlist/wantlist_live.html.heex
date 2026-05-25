@@ -180,7 +180,7 @@
                     <.link navigate={~p"/discography/artists/#{r.slug}"} class="block p-4 text-center">
                       <div class="w-20 h-20 rounded-full overflow-hidden bg-purple-900/30 mx-auto mb-3 flex items-center justify-center">
                         <%= if url = PremiereEcoute.Discography.Artist.image_url(r, 160) do %>
-                          <img src={url} alt={r.name} class="w-full h-full object-cover" loading="lazy" />
+                          <.cover src={url} alt={r.name} class="w-full h-full object-cover" />
                         <% else %>
                           <span class="text-3xl font-bold text-purple-300">
                             {String.upcase(String.first(r.name || "?"))}
@@ -226,7 +226,7 @@
                     >
                       <div class="w-10 h-10 rounded-full overflow-hidden bg-purple-900/30 shrink-0 flex items-center justify-center">
                         <%= if url = PremiereEcoute.Discography.Artist.image_url(r, 80) do %>
-                          <img src={url} alt={r.name} class="w-full h-full object-cover" loading="lazy" />
+                          <.cover src={url} alt={r.name} class="w-full h-full object-cover" />
                         <% else %>
                           <span class="text-lg font-bold text-purple-300">
                             {String.upcase(String.first(r.name || "?"))}

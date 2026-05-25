@@ -105,7 +105,7 @@
                 >
                   <!-- Background Cover -->
                   <%= if playlist.cover_url do %>
-                    <img src={playlist.cover_url} alt={playlist.title} class="absolute inset-0 w-full h-full object-cover" />
+                    <.cover src={playlist.cover_url} alt={playlist.title} class="absolute inset-0 w-full h-full object-cover" />
                   <% else %>
                     <div class="absolute inset-0 bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                       <svg class="w-16 h-16 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,7 +254,7 @@
                   >
                     <div class="flex items-start space-x-3">
                       <%= if playlist.cover_url do %>
-                        <img
+                        <.cover
                           src={playlist.cover_url}
                           alt={playlist.title}
                           class="w-16 h-16 rounded-lg object-cover flex-shrink-0"
@@ -363,7 +363,7 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                   <%= if @selected_playlist.cover_url do %>
-                    <img
+                    <.cover
                       src={@selected_playlist.cover_url}
                       alt={@selected_playlist.title}
                       class="w-10 h-10 rounded object-cover"

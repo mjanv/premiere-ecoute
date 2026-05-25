@@ -119,7 +119,7 @@
                     href={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
                     class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
-                    <img
+                    <.cover
                       src={vote_data.album.cover_url}
                       alt={gettext("Album cover")}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
@@ -147,7 +147,7 @@
                     navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
                     class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
                   >
-                    <img
+                    <.cover
                       src={vote_data.single.cover_url}
                       alt={gettext("Track cover")}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
@@ -175,7 +175,7 @@
                     navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
                     class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
                   >
-                    <img
+                    <.cover
                       src={vote_data.playlist.cover_url}
                       alt={gettext("Playlist cover")}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"

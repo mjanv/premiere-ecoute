@@ -71,7 +71,7 @@ defmodule PremiereEcouteWeb.Wantlist.WantlistLive do
     <div class="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:border-purple-400/40 transition-all">
       <.link navigate={@navigate} class="block">
         <%= if @cover_url do %>
-          <img src={@cover_url} alt={@name} class="w-full aspect-square object-cover" loading="lazy" />
+          <.cover src={@cover_url} alt={@name} class="w-full aspect-square object-cover" />
         <% else %>
           <div class="w-full aspect-square bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
             <svg class="w-10 h-10 text-white/30" fill="currentColor" viewBox="0 0 20 20">
@@ -115,7 +115,7 @@ defmodule PremiereEcouteWeb.Wantlist.WantlistLive do
     <div class="group flex items-center gap-4 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:border-purple-400/40 transition-all">
       <.link navigate={@navigate} class="flex items-center gap-4 flex-1 min-w-0">
         <%= if @cover_url do %>
-          <img src={@cover_url} alt={@name} class="w-10 h-10 rounded object-cover shrink-0" loading="lazy" />
+          <.cover src={@cover_url} alt={@name} class="w-10 h-10 rounded object-cover shrink-0" />
         <% else %>
           <div class="w-10 h-10 rounded bg-gradient-to-br from-indigo-900 to-purple-900 shrink-0 flex items-center justify-center">
             <svg class="w-4 h-4 text-white/30" fill="currentColor" viewBox="0 0 20 20">

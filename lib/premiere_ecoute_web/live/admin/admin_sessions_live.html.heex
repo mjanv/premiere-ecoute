@@ -116,7 +116,7 @@
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-8 w-8">
                       <%= if session.album && session.album.cover_url do %>
-                        <img class="h-8 w-8 rounded object-cover" src={session.album.cover_url} alt={session.album.name} />
+                        <.cover class="h-8 w-8 rounded object-cover" src={session.album.cover_url} alt={session.album.name} />
                       <% else %>
                         <div class="h-8 w-8 rounded bg-gray-600 flex items-center justify-center">
                           <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,7 +310,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0 h-16 w-16">
                 <%= if @selected_session.album.cover_url do %>
-                  <img
+                  <.cover
                     class="h-16 w-16 rounded-lg object-cover"
                     src={@selected_session.album.cover_url}
                     alt={@selected_session.album.name}

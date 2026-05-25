@@ -14,6 +14,8 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
 
   use Phoenix.Component
 
+  import PremiereEcouteWeb.Components.Images
+
   @doc """
   Renders an album display with cover image, name, and artist.
 
@@ -55,7 +57,7 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
       <!-- Album cover -->
       <div class={["flex-shrink-0", cover_size_classes(@size)]}>
         <%= if @album.cover_url do %>
-          <img src={@album.cover_url} alt={@album.name} class={["object-cover rounded", cover_size_classes(@size)]} loading="lazy" />
+          <.cover src={@album.cover_url} alt={@album.name} class={["object-cover rounded", cover_size_classes(@size)]} />
         <% else %>
           <div class={[
             "bg-gradient-primary-diagonal rounded flex items-center justify-center",
@@ -207,11 +209,10 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
       <!-- Playlist cover -->
       <div class={["flex-shrink-0 relative", cover_size_classes(@size)]}>
         <%= if @playlist.cover_url do %>
-          <img
+          <.cover
             src={@playlist.cover_url}
             alt={@playlist.title || @playlist.name || "Playlist"}
             class={["object-cover rounded", cover_size_classes(@size)]}
-            loading="lazy"
           />
         <% else %>
           <div class={[

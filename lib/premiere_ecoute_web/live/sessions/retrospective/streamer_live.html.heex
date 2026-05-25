@@ -128,7 +128,7 @@
                     navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
                     class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
-                    <img
+                    <.cover
                       src={item.album.cover_url}
                       alt={gettext("Album cover")}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
@@ -158,7 +158,7 @@
                     navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
                     class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
-                    <img
+                    <.cover
                       src={item.single.cover_url}
                       alt={item.single.name}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
@@ -188,7 +188,7 @@
                     navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
                     class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
-                    <img
+                    <.cover
                       src={item.playlist.cover_url}
                       alt={item.playlist.title}
                       class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"

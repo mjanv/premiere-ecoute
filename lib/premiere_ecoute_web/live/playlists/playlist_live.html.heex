@@ -82,7 +82,7 @@
                   <!-- Playlist Cover -->
                   <div class="flex-shrink-0">
                     <%= if @playlist.cover_url do %>
-                      <img
+                      <.cover
                         src={@playlist.cover_url}
                         alt={@playlist.title}
                         class="w-56 h-56 object-cover rounded-lg shadow-2xl"

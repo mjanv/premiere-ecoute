@@ -66,6 +66,10 @@ config :premiere_ecoute, PremiereEcoute.Apis,
     req_options: [plug: {Req.Test, PremiereEcoute.Apis.MusicMetadata.WikipediaApi}]
   ]
 
+config :premiere_ecoute, PremiereEcouteWeb.Images.ImageProxyController,
+  req_options: [plug: {Req.Test, PremiereEcouteWeb.Images.ImageProxyController}],
+  cache_dir: System.tmp_dir!() |> Path.join("pe_proxy_test")
+
 config :premiere_ecoute, PremiereEcoute.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2

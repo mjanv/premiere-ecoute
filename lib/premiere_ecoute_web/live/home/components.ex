@@ -9,6 +9,8 @@ defmodule PremiereEcouteWeb.Home.Components do
 
   use PremiereEcouteWeb, :verified_routes
 
+  import PremiereEcouteWeb.Components.Images
+
   alias PremiereEcoute.Sessions.ListeningSession
 
   @doc """
@@ -67,7 +69,7 @@ defmodule PremiereEcouteWeb.Home.Components do
     ~H"""
     <.link href={@href} class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg block">
       <%= if @album.cover_url do %>
-        <img src={@album.cover_url} alt={@album.name} class="w-full h-full object-cover" loading="lazy" />
+        <.cover src={@album.cover_url} alt={@album.name} class="w-full h-full object-cover" />
       <% else %>
         <div class="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
           <svg class="w-10 h-10 text-white/40" fill="currentColor" viewBox="0 0 20 20">
@@ -97,7 +99,7 @@ defmodule PremiereEcouteWeb.Home.Components do
     <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
       <.link href={~p"/sessions/#{@session.user.username}/#{@session}"} class="block w-full h-full">
         <%= if @session.album && @session.album.cover_url do %>
-          <img src={@session.album.cover_url} alt={@session.album.name} class="w-full h-full object-cover" loading="lazy" />
+          <.cover src={@session.album.cover_url} alt={@session.album.name} class="w-full h-full object-cover" />
         <% else %>
           <div class="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
             <svg class="w-10 h-10 text-white/40" fill="currentColor" viewBox="0 0 20 20">
@@ -161,7 +163,7 @@ defmodule PremiereEcouteWeb.Home.Components do
     ~H"""
     <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
       <%= if @session.album && @session.album.cover_url do %>
-        <img src={@session.album.cover_url} alt={ListeningSession.title(@session)} class="w-full h-full object-cover" loading="lazy" />
+        <.cover src={@session.album.cover_url} alt={ListeningSession.title(@session)} class="w-full h-full object-cover" />
       <% else %>
         <div class="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
           <svg class="w-10 h-10 text-white/40" fill="currentColor" viewBox="0 0 20 20">

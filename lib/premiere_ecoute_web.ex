@@ -19,6 +19,7 @@ defmodule PremiereEcouteWeb do
       CoreComponents,
       Components.ActivityCard,
       Components.AlbumTrackDisplay,
+      Components.Images,
       Components.Card,
       Components.EmptyState,
       Components.LoadingState,
@@ -135,6 +136,7 @@ defmodule PremiereEcouteWeb do
 
       import Phoenix.HTML
       import PremiereEcouteWeb.CoreComponents
+      import PremiereEcouteWeb.Components.Images
       import PremiereEcouteWeb.Components.Modal
 
       alias Phoenix.LiveView.AsyncResult

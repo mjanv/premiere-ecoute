@@ -8,7 +8,7 @@
     <%!-- Hero backdrop --%>
     <div class="absolute inset-x-0 top-0 h-[32rem]">
       <div class="max-w-6xl mx-auto px-6 h-full relative overflow-hidden">
-        <img
+        <.cover
           src={@album.cover_url}
           alt=""
           aria-hidden="true"
@@ -39,7 +39,7 @@
             {gettext("Back to albums")}
           </.link>
 
-          <img
+          <.cover
             src={@album.cover_url}
             alt={@album.name}
             class="w-full aspect-square object-cover rounded-lg shadow-2xl"

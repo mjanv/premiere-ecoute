@@ -75,7 +75,7 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center gap-3">
                     <%= if image_url = PremiereEcoute.Discography.Artist.image_url(artist, 64) do %>
-                      <img src={image_url} class="w-10 h-10 rounded-full object-cover flex-shrink-0" alt={artist.name} />
+                      <.cover src={image_url} class="w-10 h-10 rounded-full object-cover flex-shrink-0" alt={artist.name} />
                     <% else %>
                       <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@
       <%!-- Header --%>
       <div class="flex items-center gap-4 p-6 border-b border-gray-700">
         <%= if image_url = Artist.image_url(@selected_artist, 128) do %>
-          <img src={image_url} class="w-16 h-16 rounded-full object-cover flex-shrink-0" alt={@selected_artist.name} />
+          <.cover src={image_url} class="w-16 h-16 rounded-full object-cover flex-shrink-0" alt={@selected_artist.name} />
         <% else %>
           <div class="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

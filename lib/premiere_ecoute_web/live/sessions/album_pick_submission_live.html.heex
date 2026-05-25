@@ -105,7 +105,7 @@
           <%= if @selected_album do %>
             <div class="mb-6 flex items-center gap-4 p-4 rounded-xl bg-purple-600/10 border border-purple-500/30">
               <%= if @selected_album.cover_url do %>
-                <img
+                <.cover
                   src={@selected_album.cover_url}
                   alt={@selected_album.name}
                   class="w-14 h-14 rounded-lg object-cover flex-shrink-0"

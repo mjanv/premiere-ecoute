@@ -398,7 +398,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
               <div class="text-center">
                 <div class="flex items-center space-x-4 p-4 rounded-xl bg-purple-600/10 border border-purple-500/30 mx-auto max-w-sm mb-5">
                   <%= if @random_pick.cover_url do %>
-                    <img src={@random_pick.cover_url} alt={@random_pick.name} class="w-20 h-20 rounded-lg shadow-lg flex-shrink-0" />
+                    <.cover src={@random_pick.cover_url} alt={@random_pick.name} class="w-20 h-20 rounded-lg shadow-lg flex-shrink-0" />
                   <% else %>
                     <div class="w-20 h-20 rounded-lg bg-purple-900/50 flex items-center justify-center flex-shrink-0">
                       <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
@@ -653,7 +653,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
                 phx-value-track_id={Map.get(track.provider_ids, :spotify)}
               >
                 <%= if track.cover_url do %>
-                  <img src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
+                  <.cover src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
                 <% end %>
                 <div class="flex-1 min-w-0">
                   <p class="text-white font-medium truncate">{track.name}</p>

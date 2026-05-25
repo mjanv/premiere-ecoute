@@ -157,11 +157,11 @@
                   <li class="relative flex items-center justify-between overflow-hidden rounded-lg border border-gray-800 hover:border-gray-700 transition-colors">
                     <div
                       class="absolute inset-0 scale-150 bg-center bg-cover blur-md brightness-[0.25]"
-                      style={"background-image: url('#{cover_url}');"}
+                      style={"background-image: url('#{proxy_url(cover_url)}');"}
                     >
                     </div>
                     <div class="relative flex items-center space-x-4 min-w-0">
-                      <img
+                      <.cover
                         src={cover_url}
                         alt={cover_alt}
                         class="w-20 h-20 shrink-0 object-cover"

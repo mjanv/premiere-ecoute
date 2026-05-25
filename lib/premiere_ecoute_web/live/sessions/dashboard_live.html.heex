@@ -503,7 +503,7 @@
                 ]}>
                   <div class="flex items-center space-x-4">
                     <%= if @listening_session.single.cover_url do %>
-                      <img src={@listening_session.single.cover_url} class="w-14 h-14 rounded-lg shadow-lg flex-shrink-0" />
+                      <.cover src={@listening_session.single.cover_url} class="w-14 h-14 rounded-lg shadow-lg flex-shrink-0" />
                     <% end %>
                     <div class="flex-1 min-w-0">
                       <h4 class={["font-medium text-lg truncate", if(@open_vote, do: "text-green-300", else: "text-amber-300")]}>
@@ -590,7 +590,7 @@
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-4 flex-1 min-w-0">
                     <%= if @listening_session.single.cover_url do %>
-                      <img src={@listening_session.single.cover_url} class="w-14 h-14 rounded-lg shadow-lg flex-shrink-0" />
+                      <.cover src={@listening_session.single.cover_url} class="w-14 h-14 rounded-lg shadow-lg flex-shrink-0" />
                     <% end %>
                     <div class="flex-1 min-w-0">
                       <h4 class={["font-medium text-lg truncate", if(@open_vote, do: "text-green-300", else: "text-orange-300")]}>

@@ -22,7 +22,7 @@
             <.link navigate={~p"/discography/artists/#{artist.slug}"} class="group block">
               <div class="relative aspect-square overflow-hidden rounded-full shadow-lg mb-3 bg-purple-900/30 flex items-center justify-center border border-purple-500/20">
                 <%= if url = Artist.image_url(artist, 320) do %>
-                  <img
+                  <.cover
                     src={url}
                     alt={artist.name}
                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

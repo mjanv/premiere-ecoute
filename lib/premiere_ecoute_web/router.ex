@@ -70,6 +70,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:browser]
 
     get "/health", HealthController, :index
+    get "/img", Images.ImageProxyController, :show
     oban_dashboard("/oban", resolver: PremiereEcouteWeb.ObanResolver)
 
     live_session :main, on_mount: [{UserAuth, :current_scope}] do

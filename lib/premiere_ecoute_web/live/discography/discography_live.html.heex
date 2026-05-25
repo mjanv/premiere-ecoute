@@ -34,7 +34,7 @@
               <.link navigate={~p"/discography/artists/#{artist.slug}"} class="group block">
                 <div class="relative aspect-square overflow-hidden rounded-full shadow-lg mb-2 bg-purple-900/30 flex items-center justify-center border border-purple-500/20">
                   <%= if url = Artist.image_url(artist, 160) do %>
-                    <img
+                    <.cover
                       src={url}
                       alt={artist.name}
                       class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -78,7 +78,7 @@
             <%= for album <- @last_albums do %>
               <.link navigate={~p"/discography/albums/#{album.slug}"} class="group block">
                 <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
-                  <img
+                  <.cover
                     src={album.cover_url}
                     alt={album.name}
                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -118,7 +118,7 @@
             <%= for single <- @last_singles do %>
               <.link navigate={~p"/discography/singles/#{single.slug}"} class="group block">
                 <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
-                  <img
+                  <.cover
                     src={single.cover_url}
                     alt={single.name}
                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

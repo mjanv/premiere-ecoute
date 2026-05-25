@@ -23,7 +23,7 @@
 
           <div class="w-full aspect-square rounded-full overflow-hidden bg-purple-900/30 border border-purple-500/20 flex items-center justify-center shadow-2xl">
             <%= if url = Artist.image_url(@artist, 640) do %>
-              <img src={url} alt={@artist.name} class="w-full h-full object-cover" />
+              <.cover src={url} alt={@artist.name} class="w-full h-full object-cover" />
             <% else %>
               <span class="text-7xl font-bold text-purple-300">
                 {String.upcase(String.first(@artist.name || "?"))}
@@ -142,7 +142,7 @@
                 <%= for album <- @albums do %>
                   <.link navigate={~p"/discography/albums/#{album.slug}"} class="group block">
                     <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-2">
-                      <img
+                      <.cover
                         src={album.cover_url}
                         alt={album.name}
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -170,7 +170,7 @@
                 <%= for single <- @singles do %>
                   <.link navigate={~p"/discography/singles/#{single.slug}"} class="group block">
                     <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-2">
-                      <img
+                      <.cover
                         src={single.cover_url}
                         alt={single.name}
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

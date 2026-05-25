@@ -122,7 +122,7 @@
                 >
                   <div class="w-full aspect-square relative overflow-hidden">
                     <%= if session.album && session.album.cover_url do %>
-                      <img
+                      <.cover
                         src={session.album.cover_url}
                         alt={session.album.name}
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -164,7 +164,11 @@
                   <%!-- Cover + album name + date --%>
                   <div class="flex items-center gap-3 min-w-0">
                     <%= if review.album && review.album.cover_url do %>
-                      <img src={review.album.cover_url} alt={review.album.name} class="w-10 h-10 rounded object-cover shrink-0" />
+                      <.cover
+                        src={review.album.cover_url}
+                        alt={review.album.name}
+                        class="w-10 h-10 rounded object-cover shrink-0"
+                      />
                     <% else %>
                       <div class="w-10 h-10 rounded bg-gradient-to-br from-purple-900/60 to-indigo-900/60 shrink-0" />
                     <% end %>

@@ -72,7 +72,7 @@
                     phx-value-track_id={Map.get(track.provider_ids, :spotify)}
                   >
                     <%= if track.cover_url do %>
-                      <img src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
+                      <.cover src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
                     <% end %>
                     <div class="flex-1 min-w-0">
                       <p class="text-white font-medium truncate">{track.name}</p>
@@ -96,7 +96,7 @@
             <%= if @selected_track.cover_url do %>
               <div
                 class="absolute inset-0"
-                style={"background-image: url('#{@selected_track.cover_url}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
+                style={"background-image: url('#{proxy_url(@selected_track.cover_url)}'); background-size: cover; background-position: center; background-repeat: no-repeat; filter: blur(15px); transform: scale(1.2);"}
               >
               </div>
             <% else %>
@@ -110,7 +110,7 @@
             <div class="relative z-10 p-6 flex items-center justify-between gap-4">
               <div class="flex items-center space-x-4">
                 <%= if @selected_track.cover_url do %>
-                  <img
+                  <.cover
                     src={@selected_track.cover_url}
                     alt={@selected_track.name}
                     class="w-16 h-16 rounded-lg shadow-xl border border-white/10 flex-shrink-0"

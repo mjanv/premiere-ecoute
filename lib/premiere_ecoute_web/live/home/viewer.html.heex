@@ -118,7 +118,7 @@
                       >
                         <div class="relative flex-shrink-0">
                           <%= if playlist.cover_url do %>
-                            <img src={playlist.cover_url} alt={playlist.title} class="w-7 h-7 rounded object-cover" />
+                            <.cover src={playlist.cover_url} alt={playlist.title} class="w-7 h-7 rounded object-cover" />
                           <% else %>
                             <div class={[
                               "w-7 h-7 rounded flex items-center justify-center",
@@ -212,7 +212,7 @@
         <%!-- Header --%>
         <div class="flex items-start gap-5 mb-8">
           <%= if playlist.cover_url do %>
-            <img src={playlist.cover_url} alt={playlist.title} class="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
+            <.cover src={playlist.cover_url} alt={playlist.title} class="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
           <% else %>
             <div class="w-20 h-20 rounded-xl bg-green-600/20 flex items-center justify-center flex-shrink-0">
               <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
