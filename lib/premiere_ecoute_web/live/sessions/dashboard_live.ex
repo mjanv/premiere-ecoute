@@ -231,7 +231,13 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
 
   @impl true
   def handle_event("toggle_reminder_modal", _params, socket) do
-    {:noreply, assign(socket, :show_reminder_modal, !socket.assigns.show_reminder_modal)}
+    reminder = get_in(socket.assigns, [:current_scope, :user, :profile, :session_reminder])
+
+    if reminder in [nil, ""] do
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, :show_reminder_modal, !socket.assigns.show_reminder_modal)}
+    end
   end
 
   @impl true
