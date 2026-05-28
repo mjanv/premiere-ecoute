@@ -13,6 +13,14 @@ export const NoteHud = {
 
       if (e.key === "Escape") {
         this.pushEvent("close_note_hud", {});
+        this.pushEvent("close_reminder_modal", {});
+      }
+
+      if (e.key === "r" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        const input = document.getElementById("note-hud-input");
+        if (input) return;
+        if (document.activeElement && document.activeElement !== document.body) return;
+        this.pushEvent("toggle_reminder_modal", {});
       }
 
       if (e.key === "Enter") {

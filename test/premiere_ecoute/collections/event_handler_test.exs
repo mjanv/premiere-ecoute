@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandlerTest do
   alias PremiereEcoute.Collections.CollectionSession.Events.TrackDecided
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Workers.EnrichDiscographyWorker
 
   setup :verify_on_exit!
@@ -47,7 +48,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.EventHandlerTest do
       user = user_fixture()
       session = collection_session_fixture(user)
 
-      {:ok, artist} = PremiereEcoute.Discography.Artist.create_if_not_exists(%{name: "Known Artist"})
+      {:ok, artist} = Artist.create_if_not_exists(%{name: "Known Artist"})
       {:ok, album} = Album.create(album_fixture(%{artists: [artist]}))
 
       Repo.insert!(%Album.Track{

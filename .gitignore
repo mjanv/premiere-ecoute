@@ -54,6 +54,7 @@ node_modules/
 data/
 priv/request/
 priv/cache/
+priv/static/images/proxy/
 apps/digital_ocean/backups/
 *.excalidraw
 *.mp3

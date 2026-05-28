@@ -407,6 +407,11 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
               <span>{gettext("Notes")} ({length(@listening_session.session_notes)})</span>
+              <%= if @listening_session.status != :stopped do %>
+                <kbd class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[#4a4030] text-xs font-mono bg-[linear-gradient(to_bottom,#e8e0cc,#cfc8b4)] border border-[#a09070] shadow-[0_2px_0_#7a6a50,inset_0_1px_0_rgba(255,255,255,0.7)]">
+                  TAB
+                </kbd>
+              <% end %>
             </button>
             <%= if @listening_session.status == :stopped do %>
               <button
@@ -443,9 +448,24 @@
                 <% end %>
               </div>
             <% end %>
-            <%= if @listening_session.status != :stopped do %>
+            <%= if @current_scope.user.profile && @current_scope.user.profile.session_reminder not in [nil, ""] do %>
+              <button
+                type="button"
+                phx-click="open_reminder_modal"
+                class="flex items-center gap-1.5 text-slate-500 hover:text-white transition-colors border border-white/10 hover:border-white/30 rounded-md px-2 py-1"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+                <span class="text-xs">{gettext("Reminder")}</span>
+              </button>
               <kbd class="inline-flex items-center px-1.5 py-0.5 rounded-sm text-[#4a4030] text-xs font-mono bg-[linear-gradient(to_bottom,#e8e0cc,#cfc8b4)] border border-[#a09070] shadow-[0_2px_0_#7a6a50,inset_0_1px_0_rgba(255,255,255,0.7)]">
-                TAB
+                R
               </kbd>
             <% end %>
           </div>
@@ -778,6 +798,37 @@
   <% end %>
 
   <.live_component module={PremiereEcouteWeb.Components.WikipediaDrawer} id="wiki" />
+
+  <%= if @show_reminder_modal do %>
+    <div class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" phx-click="close_reminder_modal"></div>
+      <div class="relative z-10 w-full max-w-lg mx-4 rounded-xl shadow-2xl bg-gray-900/95 border border-white/10 overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            <h3 class="text-white font-medium text-sm">{gettext("Session Reminder")}</h3>
+          </div>
+          <button phx-click="close_reminder_modal" class="text-white/40 hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="px-5 py-5">
+          <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
+            {String.trim(@current_scope.user.profile.session_reminder)}
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
 
   <%= if @show_note_hud do %>
     <div class="fixed inset-0 z-50 flex items-center justify-center">

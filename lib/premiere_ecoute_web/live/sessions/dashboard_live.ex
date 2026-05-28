@@ -64,6 +64,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       |> assign(:next_track_at, nil)
       |> assign(:show_youtube_modal, false)
       |> assign(:show_premiere_modal, false)
+      |> assign(:show_reminder_modal, false)
       |> assign(:show_note_hud, false)
       |> assign(:notes_open, false)
       |> assign(:notes_grouping, :none)
@@ -216,6 +217,21 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   @impl true
   def handle_event("close_youtube_modal", _params, socket) do
     {:noreply, assign(socket, :show_youtube_modal, false)}
+  end
+
+  @impl true
+  def handle_event("open_reminder_modal", _params, socket) do
+    {:noreply, assign(socket, :show_reminder_modal, true)}
+  end
+
+  @impl true
+  def handle_event("close_reminder_modal", _params, socket) do
+    {:noreply, assign(socket, :show_reminder_modal, false)}
+  end
+
+  @impl true
+  def handle_event("toggle_reminder_modal", _params, socket) do
+    {:noreply, assign(socket, :show_reminder_modal, !socket.assigns.show_reminder_modal)}
   end
 
   @impl true
