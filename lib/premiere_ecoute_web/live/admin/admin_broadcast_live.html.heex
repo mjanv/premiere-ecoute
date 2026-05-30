@@ -1,0 +1,305 @@
+<PremiereEcouteWeb.Components.Header.app_header current_user={@current_scope.user} current_scope={@current_scope} />
+
+<div class="bg-gray-900 min-h-screen">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <%!-- Header --%>
+    <div class="mb-10">
+      <div class="flex items-center gap-2 mb-3">
+        <.link
+          navigate="/admin"
+          class="text-xs text-gray-600 hover:text-gray-400 transition-colors font-mono tracking-widest uppercase"
+        >
+          ← {gettext("Dashboard")}
+        </.link>
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold text-white tracking-tight">{gettext("Broadcast")}</h1>
+      </div>
+    </div>
+
+    <form phx-submit="send" phx-change="change">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <%!-- Left column: mode + target --%>
+        <div class="lg:col-span-2 flex flex-col gap-4">
+          <%!-- Message type panel --%>
+          <div class="bg-gray-800/60 border border-gray-700/80 rounded-xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-700/80 flex items-center gap-2">
+              <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                />
+              </svg>
+              <span class="text-xs font-mono tracking-widest text-gray-400 uppercase">{gettext("Mode")}</span>
+            </div>
+            <div class="p-3 flex flex-col gap-1">
+              <label class={[
+                "group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150",
+                if(@type == "chat", do: "bg-violet-500/15 ring-1 ring-violet-500/40", else: "hover:bg-gray-700/50")
+              ]}>
+                <input type="radio" name="type" value="chat" checked={@type == "chat"} class="sr-only" />
+                <div class={[
+                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
+                  if(@type == "chat", do: "border-violet-400 bg-violet-400", else: "border-gray-600 group-hover:border-gray-500")
+                ]}>
+                  <%= if @type == "chat" do %>
+                    <div class="w-1.5 h-1.5 rounded-full bg-gray-900"></div>
+                  <% end %>
+                </div>
+                <div>
+                  <p class={[
+                    "text-sm font-medium transition-colors",
+                    if(@type == "chat", do: "text-violet-300", else: "text-gray-300 group-hover:text-white")
+                  ]}>
+                    {gettext("Chat message")}
+                  </p>
+                  <p class="text-xs text-gray-600">{gettext("Standard chat line")}</p>
+                </div>
+              </label>
+
+              <label class={[
+                "group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150",
+                if(@type == "announcement", do: "bg-violet-500/15 ring-1 ring-violet-500/40", else: "hover:bg-gray-700/50")
+              ]}>
+                <input type="radio" name="type" value="announcement" checked={@type == "announcement"} class="sr-only" />
+                <div class={[
+                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
+                  if(@type == "announcement",
+                    do: "border-violet-400 bg-violet-400",
+                    else: "border-gray-600 group-hover:border-gray-500"
+                  )
+                ]}>
+                  <%= if @type == "announcement" do %>
+                    <div class="w-1.5 h-1.5 rounded-full bg-gray-900"></div>
+                  <% end %>
+                </div>
+                <div>
+                  <p class={[
+                    "text-sm font-medium transition-colors",
+                    if(@type == "announcement", do: "text-violet-300", else: "text-gray-300 group-hover:text-white")
+                  ]}>
+                    {gettext("Announcement")}
+                  </p>
+                  <p class="text-xs text-gray-600">{gettext("Highlighted banner")}</p>
+                </div>
+              </label>
+            </div>
+
+            <%!-- Color picker — only for announcements --%>
+            <%= if @type == "announcement" do %>
+              <div class="px-4 pb-4 pt-1 border-t border-gray-700/60">
+                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-2.5">{gettext("Color")}</p>
+                <div class="flex gap-2">
+                  <%= for {color, dot_class, label} <- [
+                    {"purple", "bg-purple-500", gettext("Purple")},
+                    {"blue", "bg-blue-500", gettext("Blue")},
+                    {"green", "bg-green-500", gettext("Green")},
+                    {"orange", "bg-orange-500", gettext("Orange")},
+                    {"primary", "bg-gray-400", gettext("Default")}
+                  ] do %>
+                    <label class="cursor-pointer" title={label}>
+                      <input type="radio" name="color" value={color} checked={@color == color} class="sr-only" />
+                      <div class={[
+                        "w-6 h-6 rounded-full transition-all duration-150",
+                        dot_class,
+                        if(@color == color,
+                          do: "ring-2 ring-offset-2 ring-offset-gray-800 ring-white scale-110",
+                          else: "opacity-50 hover:opacity-80"
+                        )
+                      ]}>
+                      </div>
+                    </label>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <%!-- Target panel --%>
+          <div class="bg-gray-800/60 border border-gray-700/80 rounded-xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-700/80 flex items-center gap-2">
+              <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <span class="text-xs font-mono tracking-widest text-gray-400 uppercase">{gettext("Target")}</span>
+            </div>
+            <div class="p-3 flex flex-col gap-1 max-h-72 overflow-y-auto">
+              <%!-- All streamers option --%>
+              <label class={[
+                "group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150",
+                if(@target == "all", do: "bg-violet-500/15 ring-1 ring-violet-500/40", else: "hover:bg-gray-700/50")
+              ]}>
+                <input type="radio" name="target" value="all" checked={@target == "all"} class="sr-only" />
+                <div class={[
+                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
+                  if(@target == "all", do: "border-violet-400 bg-violet-400", else: "border-gray-600 group-hover:border-gray-500")
+                ]}>
+                  <%= if @target == "all" do %>
+                    <div class="w-1.5 h-1.5 rounded-full bg-gray-900"></div>
+                  <% end %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class={[
+                    "text-sm font-medium transition-colors",
+                    if(@target == "all", do: "text-violet-300", else: "text-gray-300 group-hover:text-white")
+                  ]}>
+                    {gettext("All channels")}
+                  </p>
+                  <p class="text-xs text-gray-600 font-mono">
+                    {ngettext("%{count} streamer", "%{count} streamers", length(@streamers), count: length(@streamers))}
+                  </p>
+                </div>
+              </label>
+
+              <%= if @streamers != [] do %>
+                <div class="my-1 border-t border-gray-700/60"></div>
+              <% end %>
+
+              <%= for streamer <- @streamers do %>
+                <%= if streamer.twitch do %>
+                  <label class={[
+                    "group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150",
+                    if(@target == to_string(streamer.id),
+                      do: "bg-violet-500/15 ring-1 ring-violet-500/40",
+                      else: "hover:bg-gray-700/50"
+                    )
+                  ]}>
+                    <input
+                      type="radio"
+                      name="target"
+                      value={streamer.id}
+                      checked={@target == to_string(streamer.id)}
+                      class="sr-only"
+                    />
+                    <div class={[
+                      "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
+                      if(@target == to_string(streamer.id),
+                        do: "border-violet-400 bg-violet-400",
+                        else: "border-gray-600 group-hover:border-gray-500"
+                      )
+                    ]}>
+                      <%= if @target == to_string(streamer.id) do %>
+                        <div class="w-1.5 h-1.5 rounded-full bg-gray-900"></div>
+                      <% end %>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class={[
+                        "text-sm font-medium truncate transition-colors",
+                        if(@target == to_string(streamer.id), do: "text-violet-300", else: "text-gray-300 group-hover:text-white")
+                      ]}>
+                        @{streamer.twitch.username}
+                      </p>
+                      <p class="text-xs text-gray-600 font-mono truncate">{streamer.email}</p>
+                    </div>
+                  </label>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <%!-- Right column: message composer --%>
+        <div class="lg:col-span-3 flex flex-col gap-4">
+          <div class="bg-gray-800/60 border border-gray-700/80 rounded-xl overflow-hidden flex flex-col flex-1">
+            <div class="px-4 py-3 border-b border-gray-700/80 flex items-center gap-2">
+              <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              <span class="text-xs font-mono tracking-widest text-gray-400 uppercase">{gettext("Compose")}</span>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <textarea
+                name="message"
+                rows="7"
+                maxlength="500"
+                placeholder={gettext("Type your message…")}
+                class="w-full flex-1 bg-gray-900/70 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 px-4 py-3 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500 resize-none font-mono leading-relaxed transition-colors"
+              >{@message}</textarea>
+              <div class="flex items-center justify-between mt-3">
+                <p class="text-xs font-mono text-gray-600">
+                  <span class={if String.length(@message) > 450, do: "text-orange-400", else: ""}>{String.length(@message)}</span>
+                  <span class="text-gray-700">/500</span>
+                </p>
+                <button
+                  type="submit"
+                  class="group inline-flex items-center gap-2 px-5 py-2 bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white text-sm font-semibold rounded-lg transition-all duration-150 shadow-lg shadow-violet-900/30"
+                >
+                  <svg
+                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                  </svg>
+                  {gettext("Transmit")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <%!-- Results --%>
+    <%= if @results != [] do %>
+      <div class="mt-6 bg-gray-800/60 border border-gray-700/80 rounded-xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-700/80 flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span class="text-xs font-mono tracking-widest text-gray-400 uppercase">{gettext("Transmission log")}</span>
+          <span class="ml-auto text-xs font-mono text-gray-600">
+            {gettext("%{sent}/%{total} delivered",
+              sent: Enum.count(@results, &match?({:ok, _}, &1)),
+              total: length(@results)
+            )}
+          </span>
+        </div>
+        <ul class="divide-y divide-gray-700/50">
+          <%= for result <- @results do %>
+            <li class="px-4 py-2.5 flex items-center gap-3">
+              <%= case result do %>
+                <% {:ok, user} -> %>
+                  <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <span class="text-sm font-mono text-emerald-400">@{user.twitch.username}</span>
+                  <span class="text-xs text-gray-600 ml-auto">{gettext("queued")}</span>
+                <% {:error, msg} -> %>
+                  <svg class="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <span class="text-sm font-mono text-red-400">{msg}</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+</div>

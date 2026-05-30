@@ -263,6 +263,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/billboards", AdminBillboardsLive, :index
       live "/donations", Donations.DonationsLive, :index
       live "/donations/goals/:id", Donations.GoalLive, :show
+      live "/broadcast", AdminBroadcastLive, :index
     end
 
     pipe_through [:require_authenticated_user]
