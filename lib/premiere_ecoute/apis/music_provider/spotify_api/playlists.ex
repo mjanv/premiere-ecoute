@@ -50,7 +50,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
 
   defp fetch_tracks_page(playlist_id, offset) do
     SpotifyApi.api()
-    |> SpotifyApi.get(url: "/playlists/#{playlist_id}/tracks", params: [limit: @tracks_limit, offset: offset])
+    |> SpotifyApi.get(url: "/playlists/#{playlist_id}/items", params: [limit: @tracks_limit, offset: offset])
     |> SpotifyApi.handle(200, fn %{"items" => items} ->
       items |> Enum.filter(&valid_track_item?/1) |> Enum.map(&parse_track(&1, playlist_id))
     end)
@@ -111,7 +111,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
       scope
       |> SpotifyApi.api()
       |> SpotifyApi.post(
-        url: "/playlists/#{id}/tracks",
+        url: "/playlists/#{id}/items",
         json: %{"position" => 0, "uris" => Enum.map(chunk, fn t -> "spotify:track:#{track_id(t)}" end)}
       )
       |> SpotifyApi.handle(201, fn body -> body end)
@@ -136,7 +136,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
            scope
            |> SpotifyApi.api()
            |> SpotifyApi.put(
-             url: "/playlists/#{id}/tracks",
+             url: "/playlists/#{id}/items",
              json: %{"uris" => Enum.map(first_chunk, fn t -> "spotify:track:#{track_id(t)}" end)}
            )
            |> SpotifyApi.handle(200, fn body -> body end) do
@@ -144,7 +144,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
         scope
         |> SpotifyApi.api()
         |> SpotifyApi.post(
-          url: "/playlists/#{id}/tracks",
+          url: "/playlists/#{id}/items",
           json: %{"uris" => Enum.map(chunk, fn t -> "spotify:track:#{track_id(t)}" end)}
         )
         |> SpotifyApi.handle(201, fn body -> body end)
@@ -170,7 +170,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
       scope
       |> SpotifyApi.api()
       |> SpotifyApi.delete(
-        url: "/playlists/#{id}/tracks",
+        url: "/playlists/#{id}/items",
         json: %{
           "tracks" => Enum.map(chunk, fn t -> %{"uri" => "spotify:track:#{track_id(t)}"} end)
         }
@@ -185,7 +185,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
 
   defp track_id(%{__struct__: mod} = track), do: mod.provider(track, :spotify)
 
-  defp valid_track_item?(item), do: not is_nil(item["track"])
+  defp valid_track_item?(i), do: not is_nil(i["item"])
 
   @spec parse_playlist(map()) :: {Playlist.t(), integer()}
   defp parse_playlist(data) do
@@ -193,7 +193,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
       if Map.has_key?(data["tracks"], "items") do
         data["tracks"]["items"]
         |> Enum.filter(&valid_track_item?/1)
-        |> Enum.map(fn item -> parse_track(item, data["id"]) end)
+        |> Enum.map(fn i -> parse_track(i, data["id"]) end)
       else
         []
       end
@@ -220,19 +220,19 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
   Transforms raw track JSON from playlist response into structured Track with metadata, artist, and timing information.
   """
   @spec parse_track(map(), String.t()) :: Track.t()
-  def parse_track(data, playlist_id) do
+  def parse_track(%{"item" => track} = data, playlist_id) do
     %Track{
       provider: :spotify,
-      track_id: data["track"]["id"],
-      album_id: data["track"]["album"]["id"],
-      artist_id: get_in(data, ["track", "artists", Access.at(0), "id"]),
+      track_id: track["id"],
+      album_id: track["album"]["id"],
+      artist_id: get_in(track, ["artists", Access.at(0), "id"]),
       user_id: data["added_by"]["id"],
       playlist_id: playlist_id,
-      name: data["track"]["name"],
-      artist: Parser.parse_primary_artist(data["track"]["artists"]),
-      duration_ms: data["track"]["duration_ms"] || 0,
+      name: track["name"],
+      artist: Parser.parse_primary_artist(track["artists"]),
+      duration_ms: track["duration_ms"] || 0,
       added_at: NaiveDateTime.from_iso8601!(data["added_at"]),
-      release_date: Parser.parse_release_date(data["track"]["album"]["release_date"])
+      release_date: Parser.parse_release_date(track["album"]["release_date"])
     }
   end
 

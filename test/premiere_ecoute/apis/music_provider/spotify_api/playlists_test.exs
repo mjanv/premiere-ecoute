@@ -148,7 +148,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
     test "add one or more items to a user's playlist" do
       ApiMock.expect(
         SpotifyApi,
-        path: {:post, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        path: {:post, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/items"},
         headers: [
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
@@ -176,7 +176,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
       ApiMock.expect(
         SpotifyApi,
         n: 2,
-        path: {:post, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        path: {:post, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/items"},
         headers: [
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
@@ -199,7 +199,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
     test "add one or more items to a user's playlist" do
       ApiMock.expect(
         SpotifyApi,
-        path: {:put, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        path: {:put, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/items"},
         headers: [
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
@@ -228,7 +228,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
     test "remove one or more items to a user's playlist" do
       ApiMock.expect(
         SpotifyApi,
-        path: {:delete, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        path: {:delete, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/items"},
         headers: [
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
@@ -256,7 +256,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlaylistsTest do
       ApiMock.expect(
         SpotifyApi,
         n: 2,
-        path: {:delete, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/tracks"},
+        path: {:delete, "/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7/items"},
         headers: [
           {"authorization", "Bearer access_token"},
           {"content-type", "application/json"}
