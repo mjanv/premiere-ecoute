@@ -12,8 +12,6 @@ defmodule PremiereEcoute.Extension.TrackReader do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
 
-  require Logger
-
   @doc """
   Gets the current playing track for a broadcaster.
 

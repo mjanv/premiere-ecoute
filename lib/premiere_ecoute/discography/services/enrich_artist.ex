@@ -7,8 +7,6 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   The artist's name is used for all lookups.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Supervisor

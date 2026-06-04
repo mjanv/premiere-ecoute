@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.EventSub do
   Manages Twitch EventSub webhook subscriptions for chat messages, follows, polls, and stream status. Handles subscription creation/cancellation with proper conditions and caches subscription IDs.
   """
 
-  require Logger
-
   alias PremiereEcoute.Accounts.Bot
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.Streaming.TwitchApi

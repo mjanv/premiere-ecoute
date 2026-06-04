@@ -28,10 +28,15 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylists do
       when is_list(ids) and length(ids) >= 2 and is_binary(tgt) and tgt != "",
       do: :ok
 
-  def validate(%{"sources" => ids}) when is_list(ids) and length(ids) < 2,
-    do: {:error, ["sources must contain at least 2 playlist IDs"]}
+  def validate(config) do
+    sources = Map.get(config, "sources")
 
-  def validate(_), do: {:error, ["sources (list) and target are required"]}
+    if is_list(sources) and length(sources) < 2 do
+      {:error, ["sources must contain at least 2 playlist IDs"]}
+    else
+      {:error, ["sources (list) and target are required"]}
+    end
+  end
 
   @impl true
   def execute(%{"sources" => source_ids, "target" => target_id_or_ref}, context, scope) do

@@ -17,7 +17,6 @@ defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Artist
   def url(_, _), do: nil
 
   def title(%{name: name}), do: name
-  def title(_), do: nil
 end
 
 defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Album do
@@ -27,7 +26,6 @@ defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Album 
   def url(_, _), do: nil
 
   def title(%{name: name}), do: name
-  def title(_), do: nil
 end
 
 defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Album.Track do
@@ -37,7 +35,6 @@ defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Album.
   def url(_, _), do: nil
 
   def title(%{name: name}), do: name
-  def title(_), do: nil
 end
 
 defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Single do
@@ -47,7 +44,6 @@ defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Single
   def url(_, _), do: nil
 
   def title(%{name: name}), do: name
-  def title(_), do: nil
 end
 
 defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Playlist do
@@ -56,7 +52,6 @@ defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Playli
   def url(_, _), do: nil
 
   def title(%{title: title}), do: title
-  def title(_), do: nil
 end
 
 defimpl PremiereEcoute.Discography.Links, for: Any do

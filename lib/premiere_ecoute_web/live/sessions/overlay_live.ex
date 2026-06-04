@@ -7,8 +7,6 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
 
   use PremiereEcouteWeb, :live_view
 
-  require Logger
-
   import PremiereEcouteWeb.Sessions.Overlay
 
   alias Phoenix.LiveView.AsyncResult

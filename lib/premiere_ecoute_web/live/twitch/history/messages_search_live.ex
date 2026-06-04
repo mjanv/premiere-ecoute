@@ -5,8 +5,7 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesSearchLive do
 
   use PremiereEcouteWeb, :live_view
 
-  require Explorer.DataFrame, as: DataFrame
-
+  alias Explorer.DataFrame, as: DataFrame
   alias PremiereEcoute.Twitch.History
   alias PremiereEcoute.Twitch.History.SiteHistory
 

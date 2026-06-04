@@ -7,8 +7,6 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
 
   use Broadway
 
-  require Logger
-
   alias Broadway.BatchInfo
   alias Broadway.Message
 

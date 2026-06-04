@@ -89,8 +89,6 @@ defmodule PremiereEcouteWeb.Twitch.History.GamesLive do
     Enum.take(by_game, n)
   end
 
-  defp game_timeline_data([], _period, _df), do: []
-
   defp game_timeline_data(games, period, minutes_df) when is_list(games) do
     {groups, label} = period_params(period)
 

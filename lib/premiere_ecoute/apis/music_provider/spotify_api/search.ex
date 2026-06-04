@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Search do
   Searches Spotify catalog for albums, artists, and tracks with query string matching and field filters.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser
   alias PremiereEcoute.Discography.Album

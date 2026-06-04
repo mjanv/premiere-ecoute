@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Albums do
   Fetches album data with tracks from Spotify API and parses into Album aggregates.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser
   alias PremiereEcoute.Discography.Album

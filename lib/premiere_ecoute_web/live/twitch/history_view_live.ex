@@ -63,8 +63,6 @@ defmodule PremiereEcouteWeb.Twitch.HistoryViewLive do
     {:noreply, assign(socket, :periods, Map.put(periods, String.to_existing_atom(graph), period))}
   end
 
-  defp graph_data(nil, _periods, _period), do: []
-
   defp graph_data(follows, %{follows: period}, :follows) do
     {groups, label} = params(period)
 

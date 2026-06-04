@@ -12,8 +12,6 @@ defmodule PremiereEcoute.Collections.CollectionSessionWorker do
 
   use Gettext, backend: PremiereEcoute.Gettext
 
-  require Logger
-
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Repo
 

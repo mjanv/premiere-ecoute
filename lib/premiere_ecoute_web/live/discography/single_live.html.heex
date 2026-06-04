@@ -130,9 +130,7 @@
                         />
                       </svg>
                       <span class="text-slate-300 group-hover:text-white text-sm transition-colors truncate">
-                        <%= if session.user do %>
-                          {gettext("by %{name}", name: session.user.username)}
-                        <% end %>
+                        {gettext("by %{name}", name: session.user.username)}
                       </span>
                     </div>
                     <%= if session.started_at do %>

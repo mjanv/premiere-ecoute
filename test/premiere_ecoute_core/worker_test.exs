@@ -1,8 +1,6 @@
 defmodule Worker do
   use PremiereEcouteCore.Worker
 
-  require Logger
-
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
     {:ok, args}

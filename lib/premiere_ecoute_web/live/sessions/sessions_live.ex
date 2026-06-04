@@ -7,8 +7,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   use PremiereEcouteWeb, :live_view
 
-  require Logger
-
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Sessions.ListeningSession
 

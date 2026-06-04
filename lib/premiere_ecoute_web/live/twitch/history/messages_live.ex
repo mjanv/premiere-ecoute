@@ -90,8 +90,6 @@ defmodule PremiereEcouteWeb.Twitch.History.MessagesLive do
     Enum.take(by_channel, n)
   end
 
-  defp channel_timeline_data([], _period, _df), do: []
-
   defp channel_timeline_data(channels, period, messages_df) when is_list(channels) do
     {groups, label} = period_params(period)
 

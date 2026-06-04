@@ -9,8 +9,6 @@ defmodule PremiereEcoute.Discography.Services.EnrichAlbum do
   for all lookups to improve accuracy.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Supervisor

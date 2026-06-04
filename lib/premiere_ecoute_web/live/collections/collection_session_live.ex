@@ -15,8 +15,6 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   import PremiereEcouteWeb.Collections.Components.SessionComponents
 
-  require Logger
-
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player, as: SpotifyPlayer

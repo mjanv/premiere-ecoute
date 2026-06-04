@@ -3,7 +3,7 @@ defmodule PremiereEcouteWeb.Components.Live.Graph do
 
   use PremiereEcouteWeb, :live_component
 
-  require VegaLite, as: Vl
+  alias VegaLite, as: Vl
 
   @impl true
   def update(assigns, socket) do

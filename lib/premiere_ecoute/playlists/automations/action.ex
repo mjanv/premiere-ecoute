@@ -181,31 +181,31 @@ defmodule PremiereEcoute.Playlists.Automations.Action do
       end
 
       # AIDEV-NOTE: generated validate/1 checks presence of all required inputs;
-      # actions with custom constraints should override this with @impl true def validate/1
-      @impl true
-      def validate(config) do
-        required_keys =
-          @action_inputs
-          |> Enum.filter(& &1.required)
-          |> Enum.map(& &1.key)
+      # only injected when the module hasn't defined its own @impl validate/1
+      if not Module.defines?(__MODULE__, {:validate, 1}, :def) do
+        @impl true
+        def validate(configg) do
+          required_keys =
+            @action_inputs
+            |> Enum.filter(& &1.required)
+            |> Enum.map(& &1.key)
 
-        errors =
-          Enum.flat_map(required_keys, fn key ->
-            case Map.get(config, key) do
-              nil -> ["#{key} is required"]
-              "" -> ["#{key} is required"]
-              [] -> ["#{key} is required"]
-              _ -> []
-            end
-          end)
+          errors =
+            Enum.flat_map(required_keys, fn key ->
+              case Map.get(configg, key) do
+                nil -> ["#{key} is required"]
+                "" -> ["#{key} is required"]
+                [] -> ["#{key} is required"]
+                _ -> []
+              end
+            end)
 
-        case errors do
-          [] -> :ok
-          _ -> {:error, errors}
+          case errors do
+            [] -> :ok
+            _ -> {:error, errors}
+          end
         end
       end
-
-      defoverridable validate: 1
     end
   end
 end

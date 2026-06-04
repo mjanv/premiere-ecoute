@@ -1,8 +1,7 @@
 defmodule PremiereEcouteCore.Dataflow.Sink do
   @moduledoc false
 
-  require Explorer.DataFrame, as: DF
-
+  alias Explorer.DataFrame, as: DF
   alias Explorer.Series
 
   @callback read(String.t()) :: nil | Explorer.DataFrame.t()

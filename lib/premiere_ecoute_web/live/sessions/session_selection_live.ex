@@ -14,8 +14,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
 
-  require Logger
-
   @impl true
   def mount(_params, _session, socket) do
     socket

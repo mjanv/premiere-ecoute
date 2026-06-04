@@ -5,7 +5,6 @@ defmodule PremiereEcouteWeb.Playlists.Automations.IndexLive do
 
   alias PremiereEcoute.Automations
 
-  defp format_dt(nil), do: "—"
   defp format_dt(%DateTime{} = dt), do: Calendar.strftime(dt, "%d %b %Y %H:%M")
 
   @impl true

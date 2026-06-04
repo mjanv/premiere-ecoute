@@ -51,9 +51,8 @@ defmodule PremiereEcouteWeb.Components.WikipediaDrawer do
     |> then(fn socket -> {:ok, socket} end)
   end
 
-  def update(assigns, socket) do
+  def update(_assigns, socket) do
     socket
-    |> assign(:id, assigns.id)
     |> assign_new(:status, fn -> :idle end)
     |> assign_new(:result, fn -> nil end)
     |> assign_new(:toc, fn -> nil end)

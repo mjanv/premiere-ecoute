@@ -7,8 +7,6 @@ defmodule PremiereEcouteMock.TwitchApi.Backend do
 
   use GenServer
 
-  require Logger
-
   @doc """
   Starts the mock backend GenServer.
 

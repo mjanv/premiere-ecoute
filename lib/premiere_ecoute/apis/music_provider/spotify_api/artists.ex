@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Artists do
   Fetches artist data and albums from Spotify API.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser
   alias PremiereEcoute.Discography.Artist

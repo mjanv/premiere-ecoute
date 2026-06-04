@@ -12,8 +12,6 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
 
   use Gettext, backend: PremiereEcoute.Gettext
 
-  require Logger
-
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis

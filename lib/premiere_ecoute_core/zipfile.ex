@@ -1,8 +1,9 @@
 defmodule PremiereEcouteCore.Zipfile do
   @moduledoc false
 
-  require Explorer.DataFrame, as: DataFrame
   require Logger
+
+  alias Explorer.DataFrame, as: DataFrame
 
   @doc "Returns the list of files in a zip file"
   @spec list(String.t()) :: [String.t()]

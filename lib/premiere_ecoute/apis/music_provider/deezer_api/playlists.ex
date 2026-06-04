@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Playlists do
   Fetches playlist data from Deezer API and parses into Playlist aggregates with tracks.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis.MusicProvider.DeezerApi
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track

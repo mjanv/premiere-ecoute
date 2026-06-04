@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Playlists do
   Manages Spotify playlist operations including fetching playlists with tracks, creating user playlists, adding/removing/replacing tracks, and listing user's library playlists.
   """
 
-  require Logger
-
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Parser

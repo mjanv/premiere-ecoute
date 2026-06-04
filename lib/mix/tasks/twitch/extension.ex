@@ -18,8 +18,6 @@ defmodule Mix.Tasks.Twitch.Extension do
   use Mix.Task
   use Boundary, classify_to: PremiereEcouteMix
 
-  require Logger
-
   @impl Mix.Task
   def run(_args) do
     Mix.shell().info("🚀 Building Twitch extension...")

@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.Payments.BuyMeACoffeeApi.Supporters do
   Fetches one-time supporters from the Buy Me a Coffee API and parses them into Donation events.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis.Payments.BuyMeACoffeeApi
   alias PremiereEcoute.Events.BuyMeACoffee.Donation
 

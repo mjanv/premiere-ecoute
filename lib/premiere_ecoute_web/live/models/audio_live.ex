@@ -8,8 +8,6 @@ defmodule PremiereEcouteWeb.Models.AudioLive do
 
   use PremiereEcouteWeb, :live_view
 
-  require Logger
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok, assign(socket, recording: false, chunks_received: 0, segments: [])}

@@ -7,8 +7,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
 
   use PremiereEcouteWeb, :live_component
 
-  require Logger
-
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession

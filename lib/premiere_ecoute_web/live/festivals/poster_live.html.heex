@@ -375,11 +375,9 @@
                   <p class="text-sm text-gray-500 mt-2">
                     {gettext("Unable to extract artist information from the image")}
                   </p>
-                  <%= if @festival.failed do %>
-                    <p class="text-xs text-gray-600 mt-2 italic">
-                      {@festival.failed}
-                    </p>
-                  <% end %>
+                  <p class="text-xs text-gray-600 mt-2 italic">
+                    {@festival.failed}
+                  </p>
                 </div>
               </div>
             <% true -> %>

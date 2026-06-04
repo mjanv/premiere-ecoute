@@ -219,11 +219,9 @@
                             {session.single && session.single.name}
                           <% end %>
                         </span>
-                        <%= if session.user do %>
-                          <span class="text-slate-600 text-xs block">
-                            {gettext("by %{name}", name: session.user.username)}
-                          </span>
-                        <% end %>
+                        <span class="text-slate-600 text-xs block">
+                          {gettext("by %{name}", name: session.user.username)}
+                        </span>
                       </div>
                     </div>
                     <%= if session.started_at do %>

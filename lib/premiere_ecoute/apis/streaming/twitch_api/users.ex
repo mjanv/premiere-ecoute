@@ -5,8 +5,6 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.Users do
   Fetches Twitch user profile information from API.
   """
 
-  require Logger
-
   alias PremiereEcoute.Apis.Streaming.TwitchApi
 
   @doc """

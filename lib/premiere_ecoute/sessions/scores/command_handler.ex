@@ -7,8 +7,6 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
 
   use PremiereEcouteCore.CommandBus.Handler
 
-  require Logger
-
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
