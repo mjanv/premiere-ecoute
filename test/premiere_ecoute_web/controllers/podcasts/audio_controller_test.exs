@@ -63,5 +63,16 @@ defmodule PremiereEcouteWeb.Podcasts.AudioControllerTest do
       conn = get(conn, ~p"/podcasts/audiostreamer/#{show.slug}/episodes/missing-guid/audio")
       assert response(conn, 404)
     end
+
+    test "HEAD returns headers (size, ranges) without a body or a download count", %{conn: conn, show: show, episode: episode} do
+      path = ~p"/podcasts/audiostreamer/#{show.slug}/episodes/#{episode.guid}/audio"
+      conn = dispatch(conn, @endpoint, "head", path)
+
+      assert conn.status == 200
+      assert conn.resp_body == ""
+      assert get_resp_header(conn, "accept-ranges") == ["bytes"]
+      assert get_resp_header(conn, "content-length") == ["#{episode.audio_byte_size}"]
+      assert Store.read("podcast_download-#{episode.id}", :event) == []
+    end
   end
 end

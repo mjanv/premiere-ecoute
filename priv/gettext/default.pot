@@ -6611,3 +6611,35 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "No downloads yet."
 msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Reason"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Report this podcast"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Thanks — this podcast has been reported to moderators."
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Reports"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "File is too large (max 200 MB)"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Only MP3 files are allowed"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Only one file can be uploaded"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Upload error"
+msgstr ""

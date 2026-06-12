@@ -6612,3 +6612,35 @@ msgstr "Download (ultimi 30 giorni)"
 #, elixir-autogen, elixir-format
 msgid "No downloads yet."
 msgstr "Ancora nessun download."
+
+#, elixir-autogen, elixir-format
+msgid "Reason"
+msgstr "Motivo"
+
+#, elixir-autogen, elixir-format
+msgid "Report this podcast"
+msgstr "Segnala questo podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Thanks — this podcast has been reported to moderators."
+msgstr "Grazie — questo podcast è stato segnalato ai moderatori."
+
+#, elixir-autogen, elixir-format
+msgid "Reports"
+msgstr "Segnalazioni"
+
+#, elixir-autogen, elixir-format
+msgid "File is too large (max 200 MB)"
+msgstr "Il file è troppo grande (max 200 MB)"
+
+#, elixir-autogen, elixir-format
+msgid "Only MP3 files are allowed"
+msgstr "Sono ammessi solo file MP3"
+
+#, elixir-autogen, elixir-format
+msgid "Only one file can be uploaded"
+msgstr "È possibile caricare un solo file"
+
+#, elixir-autogen, elixir-format
+msgid "Upload error"
+msgstr "Errore di caricamento"

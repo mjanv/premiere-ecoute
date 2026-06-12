@@ -48,6 +48,16 @@ defmodule PremiereEcoute.Events.EpisodePublished do
   use PremiereEcouteCore.Event, fields: [:show_id]
 end
 
+defmodule PremiereEcoute.Events.ShowReported do
+  @moduledoc """
+  Event - Podcast show reported for abuse/DMCA. `id` is the show id.
+  """
+
+  @type t :: %__MODULE__{id: integer() | nil, reason: String.t() | nil}
+
+  use PremiereEcouteCore.Event, fields: [:reason]
+end
+
 defmodule PremiereEcoute.Events.EpisodeDownloaded do
   @moduledoc """
   Event - Podcast episode audio downloaded/streamed, tagged by source (:web or :feed).

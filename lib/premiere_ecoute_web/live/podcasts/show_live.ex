@@ -66,7 +66,25 @@ defmodule PremiereEcouteWeb.Podcasts.ShowLive do
           </audio>
         </li>
       </ul>
+
+      <form phx-submit="report" class="mt-10 flex items-center gap-2 text-xs text-gray-400">
+        <input
+          type="text"
+          name="reason"
+          placeholder={gettext("Reason")}
+          class="border rounded px-2 py-1 flex-1 max-w-xs"
+        />
+        <button type="submit" class="underline">{gettext("Report this podcast")}</button>
+      </form>
     </div>
     """
   end
+
+  @impl true
+  def handle_event("report", %{"reason" => reason}, %{assigns: %{show: %{} = show}} = socket) do
+    Podcasts.report_show(show, reason)
+    {:noreply, put_flash(socket, :info, gettext("Thanks — this podcast has been reported to moderators."))}
+  end
+
+  def handle_event("report", _params, socket), do: {:noreply, socket}
 end

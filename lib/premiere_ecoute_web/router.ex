@@ -44,6 +44,7 @@ defmodule PremiereEcouteWeb.Router do
   # AIDEV-NOTE: podcast feed/audio must not negotiate content (podcast apps send arbitrary Accept
   # headers) — no `plug :accepts`, responses set their own content type / redirect.
   pipeline :podcast_public do
+    plug Plugs.PodcastRateLimit
     plug :put_secure_browser_headers
   end
 
