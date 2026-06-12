@@ -11,8 +11,13 @@ if [ "$CLAUDE_CODE_REMOTE" = "true" ]; then
   echo "==> Setting postgres password..."
   su -c "psql -c \"ALTER USER postgres PASSWORD 'postgres';\" 2>/dev/null || true" postgres
 
-  echo "==> Installing Mix dependencies..."
-  mix deps.get
+  # Skip if deps/ was restored from the setup-script cache
+  if [ ! -d deps ]; then
+    echo "==> Installing Mix dependencies..."
+    mix deps.get
+  else
+    echo "==> Mix dependencies already cached, skipping."
+  fi
 
   echo "==> Setting up test database..."
   MIX_ENV=test mix ecto.setup || true
