@@ -279,7 +279,32 @@ integration with the directories.
 
 _Resolved: duration extraction → pure-Elixir parser (§7); website plays count as listens (§9)._
 
-## 15. Implementation phases
+## 15. Implementation status
+
+Tracks what is built on `claude/feature-design-discussion-dc8m46`.
+
+**Done (with unit tests):**
+- `PremiereEcoute.Podcasts` context, `Show` + `Episode` aggregates, `podcasts_shows` /
+  `podcasts_episodes` migration, domain events.
+- Pure-Elixir MP3 duration parser (`Podcasts.Audio.Mp3`) — CBR + Xing/Info/VBRI VBR, ID3v1/v2
+  handling. Runtime-verified against constructed frames.
+- RSS feed builder (`Podcasts.Services.Feed`) — RSS 2.0 + iTunes namespace. Runtime-verified
+  against real `xml_builder` output.
+- Public read surface: `FeedController` (per-show RSS), `AudioController` (download tracking +
+  302 to storage), `ShowsLive` / `ShowLive` website pages, routes + `:podcast_public` pipeline.
+- `Podcasts.Storage` — stable keys + public URL builder, and a swappable `fetch/delete` adapter
+  behaviour with a `NotConfigured` fallback.
+- `EpisodeIngestionWorker` — fetches audio, extracts duration/byte size, marks ready/failed,
+  emits `EpisodeProcessed`. Tested with a stub storage adapter.
+
+**Remaining (blocked on owner-provisioned object storage):**
+- Concrete S3-compatible `Storage` adapter (presigned PUT, fetch, delete). Owner provisions the
+  provider/bucket; plug its module in via `config :premiere_ecoute, Podcasts.Storage, adapter: …`.
+- Streamer admin LiveViews: create/edit shows (+ cover upload), upload episodes via presigned
+  PUT, publish toggles. The upload step depends on the S3 adapter above.
+- Directory-submission help UI and telemetry dashboards.
+
+## 16. Implementation phases
 
 1. **Context + storage foundation** — `Podcasts` context, `Show`/`Episode` aggregates,
    migrations, object-storage client + config, presigned upload.
