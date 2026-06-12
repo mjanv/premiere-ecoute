@@ -273,8 +273,10 @@ Postgres-backed **event store** (`event_store.events`), so streamer analytics su
 queries downloads via `Analytics.aggregate_events/3` (no extra projection table needed):
 - `show_download_stats/1`, `episode_download_stats/1` — totals split by source (`:web` vs `:feed`)
 - `show_downloads_last/2` — rolling window (e.g. last 30 days)
-- `episode_downloads_over_time/3` — time-bucketed rows for charts
-Surfaced on the studio show dashboard (total / last-30-days / podcast-apps / website + per-episode).
+- `unique_listeners/1` — IAB-style distinct `ip`+`user_agent` fingerprints (audience size)
+- `show_downloads_over_time/3`, `episode_downloads_over_time/3` — time-bucketed (zero-filled) series
+Surfaced on the studio show dashboard: total / unique listeners / last-30-days / podcast-apps /
+website stats, a 30-day downloads bar chart (server-rendered, no JS), and per-episode counts.
 
 Tracked domain events (all in the event store): `ShowCreated`, `ShowPublished`,
 `EpisodeUploaded`, `EpisodeProcessed`, `EpisodePublished`, `EpisodeDownloaded` (source/ip/UA).

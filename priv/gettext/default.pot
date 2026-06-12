@@ -6599,3 +6599,15 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Website"
 msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Unique listeners"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Downloads (last 30 days)"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "No downloads yet."
+msgstr ""

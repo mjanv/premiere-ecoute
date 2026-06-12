@@ -6600,3 +6600,15 @@ msgstr "App di podcast"
 #, elixir-autogen, elixir-format
 msgid "Website"
 msgstr "Sito web"
+
+#, elixir-autogen, elixir-format
+msgid "Unique listeners"
+msgstr "Ascoltatori unici"
+
+#, elixir-autogen, elixir-format
+msgid "Downloads (last 30 days)"
+msgstr "Download (ultimi 30 giorni)"
+
+#, elixir-autogen, elixir-format
+msgid "No downloads yet."
+msgstr "Ancora nessun download."

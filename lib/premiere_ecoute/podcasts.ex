@@ -84,6 +84,8 @@ defmodule PremiereEcoute.Podcasts do
   defdelegate show_download_stats(show), to: Statistics, as: :show_downloads
   defdelegate show_downloads_last(show, days), to: Statistics
   defdelegate episode_downloads_over_time(episode, unit, opts \\ []), to: Statistics
+  defdelegate show_downloads_over_time(show, unit, opts \\ []), to: Statistics
+  defdelegate unique_listeners(show_or_episode), to: Statistics
 
   @doc """
   Uploads an episode's audio and creates the episode in `:processing`, then enqueues ingestion to

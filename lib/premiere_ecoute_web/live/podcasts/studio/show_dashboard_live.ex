@@ -31,14 +31,24 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
     episodes = Podcasts.episodes_for_show(show)
     counts = Map.new(episodes, fn e -> {e.id, Podcasts.download_count(e)} end)
 
+    to = DateTime.utc_now()
+    from = DateTime.add(to, -29, :day)
+    series = Podcasts.show_downloads_over_time(show, :day, from: from, to: to, fill_gaps: true)
+
     assign(socket,
       show: show,
       episodes: episodes,
       counts: counts,
       stats: Podcasts.show_download_stats(show),
-      last_30: Podcasts.show_downloads_last(show, 30)
+      last_30: Podcasts.show_downloads_last(show, 30),
+      unique: Podcasts.unique_listeners(show),
+      series: series,
+      series_max: Enum.reduce(series, 0, &max(&1.count, &2))
     )
   end
+
+  defp bar_height(_count, 0), do: 0
+  defp bar_height(count, max), do: round(count / max * 100)
 
   @impl true
   def handle_event("publish_show", _params, socket) do
@@ -122,10 +132,14 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
           </p>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           <div class="border rounded-lg p-4">
             <div class="text-2xl font-bold">{@stats.total}</div>
             <div class="text-xs text-gray-500">{gettext("Total downloads")}</div>
+          </div>
+          <div class="border rounded-lg p-4">
+            <div class="text-2xl font-bold">{@unique}</div>
+            <div class="text-xs text-gray-500">{gettext("Unique listeners")}</div>
           </div>
           <div class="border rounded-lg p-4">
             <div class="text-2xl font-bold">{@last_30}</div>
@@ -138,6 +152,20 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
           <div class="border rounded-lg p-4">
             <div class="text-2xl font-bold">{@stats.web}</div>
             <div class="text-xs text-gray-500">{gettext("Website")}</div>
+          </div>
+        </div>
+
+        <div class="border rounded-lg p-4 mb-6">
+          <div class="text-sm font-semibold mb-3">{gettext("Downloads (last 30 days)")}</div>
+          <div :if={@series_max == 0} class="text-xs text-gray-500">{gettext("No downloads yet.")}</div>
+          <div :if={@series_max > 0} class="flex items-end gap-px h-24" aria-hidden="true">
+            <div
+              :for={point <- @series}
+              class="flex-1 bg-indigo-500/80 rounded-t min-h-px"
+              style={"height: #{bar_height(point.count, @series_max)}%"}
+              title={"#{Calendar.strftime(point.period, "%d/%m")}: #{point.count}"}
+            >
+            </div>
           </div>
         </div>
 
