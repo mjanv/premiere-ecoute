@@ -74,6 +74,7 @@ defmodule PremiereEcoute.Podcasts.Show do
   def changeset(show, attrs) do
     show
     |> cast(attrs, [:title, :description, :author, :language, :category, :explicit, :cover_url, :published, :user_id])
+    |> update_change(:category, fn cat -> if cat in [nil, ""], do: nil, else: cat end)
     |> validate_required([:title, :user_id, :language])
     |> validate_inclusion(:category, @categories, message: "is not a valid Apple Podcasts category")
     |> Slug.maybe_generate_slug()
