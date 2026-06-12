@@ -20,7 +20,6 @@ defmodule PremiereEcoute.Podcasts do
   defdelegate create_show(attrs), to: Show, as: :create
   defdelegate get_show(id), to: Show, as: :get
   defdelegate update_show(show, attrs), to: Show, as: :update
-  defdelegate delete_show(show), to: Show, as: :delete
   defdelegate publish_show(show), to: Show, as: :publish
   defdelegate shows_for_user(user), to: Show, as: :all_for_user
   defdelegate get_published_show(username, slug), to: Show, as: :get_published
@@ -30,7 +29,6 @@ defmodule PremiereEcoute.Podcasts do
   defdelegate create_episode(attrs), to: Episode, as: :create
   defdelegate get_episode(id), to: Episode, as: :get
   defdelegate update_episode(episode, attrs), to: Episode, as: :update
-  defdelegate delete_episode(episode), to: Episode, as: :delete
   defdelegate episodes_for_show(show), to: Episode, as: :all_for_show
   defdelegate feed_episodes(show), to: Episode
   defdelegate get_published_episode(show_id, guid), to: Episode, as: :get_published
@@ -42,6 +40,21 @@ defmodule PremiereEcoute.Podcasts do
   @doc "Renders the RSS feed XML for a show and its publishable episodes."
   @spec render_feed(Show.t(), map()) :: String.t()
   def render_feed(%Show{} = show, urls), do: Feed.render(show, feed_episodes(show), urls)
+
+  @doc "Deletes an episode and removes its audio object from storage."
+  @spec delete_episode(Episode.t()) :: {:ok, Episode.t()} | {:error, Ecto.Changeset.t()}
+  def delete_episode(%Episode{audio_key: key} = episode) do
+    if is_binary(key), do: Storage.delete(key)
+    Episode.delete(episode)
+  end
+
+  @doc "Deletes a show (cascading episodes) and removes its audio + cover objects from storage."
+  @spec delete_show(Show.t()) :: {:ok, Show.t()} | {:error, Ecto.Changeset.t()}
+  def delete_show(%Show{} = show) do
+    for %Episode{audio_key: key} <- episodes_for_show(show), is_binary(key), do: Storage.delete(key)
+    if is_binary(show.cover_url), do: Storage.delete(Storage.cover_key(show.id, Path.extname(show.cover_url)))
+    Show.delete(show)
+  end
 
   @doc "Lists every show (admin moderation), most recently updated first."
   @spec all_shows() :: [Show.t()]

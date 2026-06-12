@@ -38,13 +38,21 @@ defmodule PremiereEcoute.Podcasts.Services.Feed do
       {:language, %{}, show.language},
       {:description, %{}, show.description},
       {"itunes:author", %{}, show.author},
+      {"itunes:type", %{}, "episodic"},
       {"itunes:explicit", %{}, bool(show.explicit)},
       {"atom:link", %{href: urls[:self], rel: "self", type: "application/rss+xml"}, nil}
     ]
     |> maybe(show.cover_url, fn url -> {"itunes:image", %{href: url}, nil} end)
     |> maybe(show.category, fn cat -> {"itunes:category", %{text: cat}, nil} end)
+    |> maybe(owner_email(show), fn email ->
+      {"itunes:owner", %{}, [{"itunes:name", %{}, show.author}, {"itunes:email", %{}, email}]}
+    end)
     |> Kernel.++(Enum.map(episodes, &item(&1, show, urls)))
   end
+
+  # Apple requires an owner email for feed verification; only emit it when the owner is loaded.
+  defp owner_email(%{user: %{email: email}}) when is_binary(email), do: email
+  defp owner_email(_show), do: nil
 
   defp item(%Episode{} = episode, show, urls) do
     {:item, %{},

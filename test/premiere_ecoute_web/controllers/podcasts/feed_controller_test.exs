@@ -13,7 +13,7 @@ defmodule PremiereEcouteWeb.Podcasts.FeedControllerTest do
 
       conn = get(conn, ~p"/podcasts/feedstreamer/#{show.slug}/feed.xml")
 
-      assert response_content_type(conn, :xml) =~ "application/rss+xml"
+      assert conn |> get_resp_header("content-type") |> List.first() =~ "application/rss+xml"
       body = response(conn, 200)
       assert body =~ "<rss"
       assert body =~ "<title>Feed Show</title>"
