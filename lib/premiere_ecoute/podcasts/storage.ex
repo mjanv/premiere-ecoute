@@ -10,9 +10,31 @@ defmodule PremiereEcoute.Podcasts.Storage do
         public_base_url: "https://podcasts.premiere-ecoute.fr"
 
   Keys are write-once and stable so podcast apps never see an episode's enclosure URL change.
-  Upload (presigned PUT) and server-side fetch/delete are intentionally left to a later increment
-  that introduces the concrete S3 client; this module stays dependency-free and pure.
+
+  Binary operations (`fetch/1`, `delete/1`) go through a swappable adapter behaviour so the rest of
+  the app — notably episode ingestion — stays decoupled from the concrete S3 client. The adapter is
+  provisioned per environment (the owner's S3-compatible provider); when none is configured the
+  default `NotConfigured` adapter returns `{:error, :storage_not_configured}` rather than crashing:
+
+      config :premiere_ecoute, PremiereEcoute.Podcasts.Storage,
+        public_base_url: "https://podcasts.premiere-ecoute.fr",
+        adapter: PremiereEcoute.Podcasts.Storage.S3
   """
+
+  @callback fetch(key :: String.t()) :: {:ok, binary()} | {:error, term()}
+  @callback delete(key :: String.t()) :: :ok | {:error, term()}
+
+  @doc "Fetches an object's bytes via the configured adapter."
+  @spec fetch(String.t()) :: {:ok, binary()} | {:error, term()}
+  def fetch(key), do: adapter().fetch(key)
+
+  @doc "Deletes an object via the configured adapter."
+  @spec delete(String.t()) :: :ok | {:error, term()}
+  def delete(key), do: adapter().delete(key)
+
+  @doc "Returns the configured storage adapter module."
+  @spec adapter() :: module()
+  def adapter, do: config(:adapter, __MODULE__.NotConfigured)
 
   @doc "Returns the immutable storage key for an episode's audio file."
   @spec audio_key(integer(), String.t()) :: String.t()
