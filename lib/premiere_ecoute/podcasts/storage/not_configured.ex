@@ -8,6 +8,8 @@ defmodule PremiereEcoute.Podcasts.Storage.NotConfigured do
 
   @behaviour PremiereEcoute.Podcasts.Storage
 
+  import Plug.Conn
+
   @impl true
   def fetch(_key), do: {:error, :storage_not_configured}
 
@@ -16,4 +18,7 @@ defmodule PremiereEcoute.Podcasts.Storage.NotConfigured do
 
   @impl true
   def delete(_key), do: {:error, :storage_not_configured}
+
+  @impl true
+  def send_object(conn, _key, _content_type), do: send_resp(conn, 503, "Storage not configured")
 end

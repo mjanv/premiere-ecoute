@@ -16,6 +16,7 @@ defmodule PremiereEcoute.PodcastsTest do
     def fetch(key), do: Agent.get(__MODULE__, &Map.fetch(&1, key)) |> normalize()
     def put(key, bytes), do: Agent.update(__MODULE__, &Map.put(&1, key, bytes))
     def delete(key), do: Agent.update(__MODULE__, &Map.delete(&1, key)) && :ok
+    def send_object(conn, _key, _content_type), do: conn
 
     defp normalize({:ok, bytes}), do: {:ok, bytes}
     defp normalize(:error), do: {:error, :not_found}

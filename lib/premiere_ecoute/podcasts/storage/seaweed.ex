@@ -22,6 +22,42 @@ defmodule PremiereEcoute.Podcasts.Storage.Seaweed do
 
   @behaviour PremiereEcoute.Podcasts.Storage
 
+  import Plug.Conn
+
+  @impl true
+  def send_object(conn, key, content_type) do
+    # Forward the client's Range to the Filer (which serves ranges natively) and mirror its
+    # status/Content-Range back, so seeking works without exposing the Filer publicly.
+    range_headers =
+      case get_req_header(conn, "range") do
+        [range | _] -> [{"range", range}]
+        [] -> []
+      end
+
+    case Req.get(req(), url: url(key), headers: range_headers) do
+      {:ok, %{status: status, body: body, headers: headers}} when status in [200, 206] ->
+        conn
+        |> put_resp_header("content-type", content_type)
+        |> put_resp_header("accept-ranges", "bytes")
+        |> copy_upstream_header(headers, "content-range")
+        |> send_resp(status, body)
+
+      {:ok, %{status: 404}} ->
+        send_resp(conn, 404, "Not found")
+
+      _ ->
+        send_resp(conn, 502, "Upstream storage error")
+    end
+  end
+
+  defp copy_upstream_header(conn, headers, name) do
+    case Map.get(headers, name) do
+      [value | _] -> put_resp_header(conn, name, value)
+      value when is_binary(value) -> put_resp_header(conn, name, value)
+      _ -> conn
+    end
+  end
+
   @impl true
   def fetch(key) do
     case Req.get(req(), url: url(key)) do

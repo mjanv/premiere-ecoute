@@ -206,17 +206,20 @@ Implementation notes for the parser:
 ## 9. Audio delivery & analytics
 
 Because the owner wants download observability, the `<enclosure url>` in the feed points
-at a **tracking endpoint in our app**, not directly at storage:
+at a **streaming endpoint in our app**, not directly at storage:
 
 ```
 GET /podcasts/:username/:show_slug/episodes/:guid/audio
   -> log a download event (episode_id, ip, user-agent, timestamp)
-  -> 302 redirect to the public object-storage URL
+  -> stream the bytes from storage through the app, honoring HTTP Range
 ```
 
-- The app counts every download (countable analytics); the heavy bytes + byte-range are
-  served by storage after the redirect (cheap, scalable). This is the standard podcast-host
-  measurement pattern.
+- The app counts every download (countable analytics) and **proxies the bytes through Phoenix**
+  rather than redirecting, so the object store (SeaweedFS) stays fully private — no public bucket,
+  no CDN, one domain. `Storage.send_object/3` does the range-aware serving per adapter: `Local`
+  uses `send_file` (disk-streamed, offset/length); `Seaweed` forwards the client's `Range` to the
+  Filer and mirrors its `206`/`Content-Range`. At ~40 GB/month this proxy cost is negligible; if
+  volume grows, switch hot files to a CDN or SeaweedFS S3-gateway presigned URLs.
 - Store downloads as **events** (`EpisodeDownloaded`) via the Event Store, surfaced in the
   `Analytics` context / Telemetry. For honest "unique download" counts later, dedupe by
   IP+User-Agent within a 24h window (IAB-style) — can be a v1.1 refinement; v1 can store
@@ -231,7 +234,7 @@ Public (`pipe_through [:browser]`):
 - `live "/podcasts/:username"` — a streamer's shows index.
 - `live "/podcasts/:username/:show_slug"` — show page + episode list + in-page player.
 - `get "/podcasts/:username/:show_slug/feed.xml"` — RSS feed (controller).
-- `get "/podcasts/:username/:show_slug/episodes/:guid/audio"` — tracking redirect.
+- `get "/podcasts/:username/:show_slug/episodes/:guid/audio"` — counted, range-aware audio stream.
 
 Streamer-only (`pipe_through [:browser, :require_authenticated_user]`, role `:streamer`):
 - `live "/podcasts"` — my shows.
@@ -315,10 +318,15 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
 - Production storage: **`Storage.Seaweed`** adapter (SeaweedFS Filer HTTP API via `Req` — no S3
   signing/dependency). Wired in `runtime.exs` (`SEAWEEDFS_FILER_URL`, `PODCASTS_PUBLIC_BASE_URL`).
   Tested with `Req.Test` stubs.
+- Audio served **through Phoenix** (`Storage.send_object/3`), range-aware, so SeaweedFS stays
+  private. `Local` streams from disk via `send_file`; `Seaweed` proxies the Filer with `Range`
+  pass-through. Tested for full/partial/416/404.
 
 **Remaining (later):**
-- Optional: direct-to-storage uploads (presigned/streamed) instead of app-proxied `put` — the
-  current path streams bytes through the app, fine at this volume; revisit for scale.
+- Covers still resolve via `Storage.public_url` (`public_base_url`). If you want SeaweedFS fully
+  private, route covers through Phoenix too (a small cover endpoint + store `cover_key`).
+- Optional scale step: offload hot audio to a CDN or SeaweedFS S3-gateway presigned URLs; direct
+  (presigned) uploads instead of app-proxied `put`.
 - Telemetry/PromEx dashboards for downloads and egress; content-moderation/DMCA policy + ToS.
 
 ## 16. Implementation phases

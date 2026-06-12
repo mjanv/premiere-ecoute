@@ -1,11 +1,11 @@
 defmodule PremiereEcouteWeb.Podcasts.AudioController do
   @moduledoc """
-  Tracking redirect for episode audio.
+  Streams episode audio through the app.
 
-  Podcast feeds and the website player both point here rather than directly at object storage:
-  the request is recorded as an `EpisodeDownloaded` event (tagged `:feed` or `:web`) and then
-  302-redirected to the public storage URL, which serves the bytes (with HTTP range) itself. This
-  keeps downloads countable while the heavy traffic stays off the app server.
+  Podcast feeds and the website player point here rather than at the object store directly: the
+  request is recorded as an `EpisodeDownloaded` event (tagged `:feed` or `:web`) and the bytes are
+  then streamed from storage with HTTP Range support. The object store stays private (no public
+  bucket/URL needed) and every download is countable, on a single domain.
   """
 
   use PremiereEcouteWeb, :controller
@@ -22,7 +22,7 @@ defmodule PremiereEcouteWeb.Podcasts.AudioController do
     with %Show{id: show_id} <- Podcasts.get_published_show(username, slug),
          %Episode{audio_key: key} = episode when is_binary(key) <- Podcasts.get_published_episode(show_id, guid) do
       track_download(conn, episode, params)
-      redirect(conn, external: Storage.public_url(key))
+      Storage.send_object(conn, key, "audio/mpeg")
     else
       _ -> send_resp(conn, 404, "Episode not found")
     end

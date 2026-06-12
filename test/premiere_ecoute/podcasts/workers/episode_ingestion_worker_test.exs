@@ -18,6 +18,9 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorkerTest do
 
     @impl true
     def delete(_key), do: :ok
+
+    @impl true
+    def send_object(conn, _key, _content_type), do: conn
   end
 
   # Minimal constant-bitrate MPEG-1 Layer III audio (128 kbps, 44.1 kHz).
