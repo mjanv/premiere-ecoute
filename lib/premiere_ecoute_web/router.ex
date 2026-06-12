@@ -206,6 +206,19 @@ defmodule PremiereEcouteWeb.Router do
     get "/:username/:show_slug/episodes/:guid/audio", AudioController, :show
   end
 
+  scope "/studio/podcasts", PremiereEcouteWeb.Podcasts.Studio do
+    pipe_through [:browser]
+
+    live_session :podcasts_studio, on_mount: [{UserAuth, :streamer}] do
+      live "/", ShowsLive, :index
+      live "/new", ShowFormLive, :new
+      live "/:id", ShowDashboardLive, :show
+      live "/:id/edit", ShowFormLive, :edit
+      live "/:show_id/episodes/new", EpisodeFormLive, :new
+      live "/:show_id/episodes/:id/edit", EpisodeFormLive, :edit
+    end
+  end
+
   scope "/podcasts", PremiereEcouteWeb.Podcasts do
     pipe_through [:browser]
 
@@ -283,6 +296,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/reviews", AdminReviewsLive, :index
       live "/sessions", AdminSessionsLive, :index
       live "/billboards", AdminBillboardsLive, :index
+      live "/podcasts", PodcastsLive, :index
       live "/donations", Donations.DonationsLive, :index
       live "/donations/goals/:id", Donations.GoalLive, :show
       live "/broadcast", AdminBroadcastLive, :index

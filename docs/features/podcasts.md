@@ -292,17 +292,26 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
   against real `xml_builder` output.
 - Public read surface: `FeedController` (per-show RSS), `AudioController` (download tracking +
   302 to storage), `ShowsLive` / `ShowLive` website pages, routes + `:podcast_public` pipeline.
-- `Podcasts.Storage` — stable keys + public URL builder, and a swappable `fetch/delete` adapter
-  behaviour with a `NotConfigured` fallback.
+- `Podcasts.Storage` — stable keys + public URL builder, a swappable `fetch/put/delete` adapter
+  behaviour, a `Local` disk adapter (dev/test default, served at `/uploads`) and a `NotConfigured`
+  fallback. Upload routes bytes through `Storage.put`, so the streamer UI works today on `Local`.
 - `EpisodeIngestionWorker` — fetches audio, extracts duration/byte size, marks ready/failed,
   emits `EpisodeProcessed`. Tested with a stub storage adapter.
+- **Streamer studio LiveViews** (`/studio/podcasts`): shows index, show create/edit (+ cover
+  upload), show dashboard (publish toggles, download counts, feed URL + submission help), episode
+  upload/edit. Owner-scoped.
+- **Admin moderation LiveView** (`/admin/podcasts`): list all shows, unpublish/takedown, delete.
+- **Viewer LiveViews** (`/podcasts/:username`, `/podcasts/:username/:show_slug`): show listing +
+  in-page player.
+- Context orchestration (`upload_episode`, `upload_cover`, `download_count`, moderation helpers)
+  and management LiveViews are covered by unit + LiveView tests.
 
-**Remaining (blocked on owner-provisioned object storage):**
-- Concrete S3-compatible `Storage` adapter (presigned PUT, fetch, delete). Owner provisions the
-  provider/bucket; plug its module in via `config :premiere_ecoute, Podcasts.Storage, adapter: …`.
-- Streamer admin LiveViews: create/edit shows (+ cover upload), upload episodes via presigned
-  PUT, publish toggles. The upload step depends on the S3 adapter above.
-- Directory-submission help UI and telemetry dashboards.
+**Remaining (owner-provisioned / later):**
+- Concrete **S3-compatible `Storage` adapter** for production (presigned PUT for direct-to-storage
+  uploads, fetch, delete). Owner provisions the provider/bucket; plug it in via
+  `config :premiere_ecoute, Podcasts.Storage, adapter: …`. (`Local` covers dev today; the current
+  upload path streams bytes through the app — fine for dev, swap to presigned for production scale.)
+- Telemetry/PromEx dashboards for downloads and egress; content-moderation/DMCA policy + ToS.
 
 ## 16. Implementation phases
 

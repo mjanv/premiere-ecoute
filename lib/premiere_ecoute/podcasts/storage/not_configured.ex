@@ -12,5 +12,8 @@ defmodule PremiereEcoute.Podcasts.Storage.NotConfigured do
   def fetch(_key), do: {:error, :storage_not_configured}
 
   @impl true
+  def put(_key, _bytes), do: {:error, :storage_not_configured}
+
+  @impl true
   def delete(_key), do: {:error, :storage_not_configured}
 end

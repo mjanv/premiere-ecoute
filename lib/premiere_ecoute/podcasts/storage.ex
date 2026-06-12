@@ -22,11 +22,16 @@ defmodule PremiereEcoute.Podcasts.Storage do
   """
 
   @callback fetch(key :: String.t()) :: {:ok, binary()} | {:error, term()}
+  @callback put(key :: String.t(), bytes :: binary()) :: :ok | {:error, term()}
   @callback delete(key :: String.t()) :: :ok | {:error, term()}
 
   @doc "Fetches an object's bytes via the configured adapter."
   @spec fetch(String.t()) :: {:ok, binary()} | {:error, term()}
   def fetch(key), do: adapter().fetch(key)
+
+  @doc "Stores an object's bytes via the configured adapter."
+  @spec put(String.t(), binary()) :: :ok | {:error, term()}
+  def put(key, bytes), do: adapter().put(key, bytes)
 
   @doc "Deletes an object via the configured adapter."
   @spec delete(String.t()) :: :ok | {:error, term()}

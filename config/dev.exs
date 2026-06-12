@@ -33,6 +33,12 @@ config :premiere_ecoute, PremiereEcoute.Apis,
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 15
 
+# Podcasts: store audio/cover on local disk in dev (served at /uploads). Production swaps in an
+# S3-compatible adapter via runtime config.
+config :premiere_ecoute, PremiereEcoute.Podcasts.Storage,
+  adapter: PremiereEcoute.Podcasts.Storage.Local,
+  public_base_url: "http://localhost:4000/uploads"
+
 config :premiere_ecoute, PremiereEcoute.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
