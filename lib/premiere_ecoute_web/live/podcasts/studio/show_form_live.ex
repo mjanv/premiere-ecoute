@@ -121,7 +121,7 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowFormLive do
           <div>
             <label class="block text-sm font-medium mb-1">{gettext("Cover image (≥ 1400×1400)")}</label>
             <.live_file_input upload={@uploads.cover} />
-            <img :if={@show.cover_url} src={@show.cover_url} class="mt-2 w-24 h-24 rounded object-cover" />
+            <img :if={@show.cover_key} src={~p"/podcasts/shows/#{@show.id}/cover"} class="mt-2 w-24 h-24 rounded object-cover" />
           </div>
 
           <.button type="submit">{gettext("Save show")}</.button>

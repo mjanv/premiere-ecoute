@@ -21,6 +21,7 @@ defmodule PremiereEcouteWeb.Podcasts.FeedController do
         urls = %{
           self: url(~p"/podcasts/#{username}/#{slug}/feed.xml"),
           link: url(~p"/podcasts/#{username}/#{slug}"),
+          cover: show.cover_key && url(~p"/podcasts/shows/#{show.id}/cover"),
           audio: fn episode -> url(~p"/podcasts/#{username}/#{slug}/episodes/#{episode.guid}/audio") end
         }
 

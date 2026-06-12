@@ -202,6 +202,7 @@ defmodule PremiereEcouteWeb.Router do
   scope "/podcasts", PremiereEcouteWeb.Podcasts do
     pipe_through [:podcast_public]
 
+    get "/shows/:id/cover", CoverController, :show
     get "/:username/:show_slug/feed.xml", FeedController, :show
     get "/:username/:show_slug/episodes/:guid/audio", AudioController, :show
   end

@@ -8,7 +8,8 @@ defmodule PremiereEcoute.Podcasts.Services.Feed do
 
     * `:self` — the public URL of this feed (`<atom:link rel="self">`)
     * `:link` — the show's public web page
-    * `:audio` — a 1-arity function `episode -> enclosure_url` (the tracking redirect endpoint)
+    * `:cover` — the show's cover image URL, or nil (`<itunes:image>`)
+    * `:audio` — a 1-arity function `episode -> enclosure_url` (the audio streaming endpoint)
   """
 
   alias PremiereEcoute.Podcasts.Episode
@@ -42,7 +43,7 @@ defmodule PremiereEcoute.Podcasts.Services.Feed do
       {"itunes:explicit", %{}, bool(show.explicit)},
       {"atom:link", %{href: urls[:self], rel: "self", type: "application/rss+xml"}, nil}
     ]
-    |> maybe(show.cover_url, fn url -> {"itunes:image", %{href: url}, nil} end)
+    |> maybe(urls[:cover], fn url -> {"itunes:image", %{href: url}, nil} end)
     |> maybe(show.category, fn cat -> {"itunes:category", %{text: cat}, nil} end)
     |> maybe(owner_email(show), fn email ->
       {"itunes:owner", %{}, [{"itunes:name", %{}, show.author}, {"itunes:email", %{}, email}]}

@@ -20,7 +20,7 @@ defmodule PremiereEcoute.Podcasts.PodcastsFixtures do
       language: "en",
       category: "Music",
       explicit: false,
-      cover_url: "https://example.com/cover.jpg"
+      cover_key: "podcasts/cover.png"
     }
 
     {:ok, show} =

@@ -36,7 +36,12 @@ defmodule PremiereEcouteWeb.Podcasts.ShowLive do
     ~H"""
     <div class="max-w-3xl mx-auto p-6">
       <header class="flex items-center gap-4 mb-6">
-        <img :if={@show.cover_url} src={@show.cover_url} alt={@show.title} class="w-24 h-24 rounded object-cover" />
+        <img
+          :if={@show.cover_key}
+          src={~p"/podcasts/shows/#{@show.id}/cover"}
+          alt={@show.title}
+          class="w-24 h-24 rounded object-cover"
+        />
         <div>
           <h1 class="text-2xl font-bold">{@show.title}</h1>
           <p class="text-gray-500">{@show.description}</p>

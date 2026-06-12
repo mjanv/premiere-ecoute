@@ -57,7 +57,7 @@ defmodule PremiereEcoute.Podcasts do
   @spec delete_show(Show.t()) :: {:ok, Show.t()} | {:error, Ecto.Changeset.t()}
   def delete_show(%Show{} = show) do
     for %Episode{audio_key: key} <- episodes_for_show(show), is_binary(key), do: Storage.delete(key)
-    if is_binary(show.cover_url), do: Storage.delete(Storage.cover_key(show.id, Path.extname(show.cover_url)))
+    if is_binary(show.cover_key), do: Storage.delete(show.cover_key)
     Show.delete(show)
   end
 
@@ -109,7 +109,7 @@ defmodule PremiereEcoute.Podcasts do
       key = Storage.cover_key(show_id, ext)
 
       with :ok <- Storage.put(key, bytes) do
-        update_show(show, %{cover_url: Storage.public_url(key)})
+        update_show(show, %{cover_key: key})
       end
     end
   end
