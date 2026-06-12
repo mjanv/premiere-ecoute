@@ -43,6 +43,18 @@ defmodule PremiereEcoute.PodcastsTest do
     end
   end
 
+  describe "delete_episode/1" do
+    test "removes the episode and its stored audio", %{show: show} do
+      {:ok, episode} = Podcasts.upload_episode(show, %{"title" => "Ep"}, "AUDIO")
+      assert {:ok, "AUDIO"} = Storage.fetch(episode.audio_key)
+
+      {:ok, _} = Podcasts.delete_episode(episode)
+
+      assert is_nil(Episode.get(episode.id))
+      assert {:error, _} = Storage.fetch(episode.audio_key)
+    end
+  end
+
   describe "upload_cover/3" do
     test "stores the cover and saves its public URL on the show", %{show: show} do
       {:ok, updated} = Podcasts.upload_cover(show, ".png", "IMGBYTES")

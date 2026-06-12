@@ -76,6 +76,24 @@ defmodule PremiereEcoute.Podcasts.Services.FeedTest do
       assert xml =~ "<pubDate>Mon, 01 Jun 2026 09:00:00 GMT</pubDate>"
     end
 
+    test "declares an episodic show type" do
+      xml = Feed.render(show(), [episode()], urls())
+      assert xml =~ "<itunes:type>episodic</itunes:type>"
+    end
+
+    test "emits the owner email when the user is loaded (Apple verification)" do
+      with_owner = %{show() | user: %{email: "bob@example.com"}}
+      xml = Feed.render(with_owner, [episode()], urls())
+
+      assert xml =~ "<itunes:owner>"
+      assert xml =~ "<itunes:email>bob@example.com</itunes:email>"
+    end
+
+    test "omits the owner block when the user is not loaded" do
+      xml = Feed.render(show(), [episode()], urls())
+      refute xml =~ "itunes:owner"
+    end
+
     test "omits optional cover/category when absent" do
       bare = %{show() | cover_url: nil, category: nil}
       xml = Feed.render(bare, [], urls())

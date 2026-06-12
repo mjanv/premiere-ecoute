@@ -105,9 +105,19 @@ defmodule PremiereEcoute.Podcasts.Episode do
     |> Repo.all()
   end
 
-  @doc "Fetches a ready, published episode by GUID within a show, or nil."
+  @doc "Fetches a ready, published (published_at set and due) episode by GUID within a show, or nil."
   @spec get_published(integer(), String.t()) :: t() | nil
-  def get_published(show_id, guid), do: get_by(show_id: show_id, guid: guid, status: :ready)
+  def get_published(show_id, guid) do
+    now = DateTime.utc_now()
+
+    __MODULE__
+    |> where(
+      [e],
+      e.show_id == ^show_id and e.guid == ^guid and e.status == :ready and
+        not is_nil(e.published_at) and e.published_at <= ^now
+    )
+    |> Repo.one()
+  end
 
   @doc "Creates an episode and emits an EpisodeUploaded event."
   @spec create(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
