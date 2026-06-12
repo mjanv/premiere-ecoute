@@ -21,7 +21,7 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowFormLive do
         |> then(&{:ok, &1})
 
       :error ->
-        {:ok, socket |> put_flash(:error, "Show not found") |> redirect(to: ~p"/studio/podcasts")}
+        {:ok, socket |> put_flash(:error, gettext("Show not found")) |> redirect(to: ~p"/studio/podcasts")}
     end
   end
 
@@ -50,10 +50,11 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowFormLive do
 
     case result do
       {:ok, saved} ->
-        saved = maybe_upload_cover(socket, saved)
+        {saved, cover_error} = maybe_upload_cover(socket, saved)
 
         socket
-        |> put_flash(:info, "Show saved")
+        |> put_flash(:info, gettext("Show saved"))
+        |> maybe_cover_flash(cover_error)
         |> redirect(to: ~p"/studio/podcasts/#{saved.id}")
         |> then(&{:noreply, &1})
 
@@ -71,14 +72,28 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowFormLive do
     case entries do
       [{ext, bytes} | _] ->
         case Podcasts.upload_cover(show, ext, bytes) do
-          {:ok, updated} -> updated
-          _ -> show
+          {:ok, updated} -> {updated, nil}
+          {:error, reason} -> {show, reason}
         end
 
       [] ->
-        show
+        {show, nil}
     end
   end
+
+  defp maybe_cover_flash(socket, nil), do: socket
+
+  defp maybe_cover_flash(socket, :cover_not_square),
+    do: put_flash(socket, :error, gettext("Cover must be square — it was not saved"))
+
+  defp maybe_cover_flash(socket, :cover_too_small),
+    do: put_flash(socket, :error, gettext("Cover must be at least 1400×1400 — it was not saved"))
+
+  defp maybe_cover_flash(socket, :cover_too_large),
+    do: put_flash(socket, :error, gettext("Cover must be at most 3000×3000 — it was not saved"))
+
+  defp maybe_cover_flash(socket, _other),
+    do: put_flash(socket, :error, gettext("Cover image could not be read — it was not saved"))
 
   defp assign_form(socket, changeset), do: assign(socket, form: to_form(changeset, as: "show"))
 
@@ -87,23 +102,29 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowFormLive do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="max-w-2xl mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-6">{if @action == :new, do: "New show", else: "Edit show"}</h1>
+        <h1 class="text-2xl font-bold mb-6">{if @action == :new, do: gettext("New show"), else: gettext("Edit show")}</h1>
 
         <.form for={@form} id="show-form" phx-change="validate" phx-submit="save" class="space-y-4">
-          <.input field={@form[:title]} type="text" label="Title" required />
-          <.input field={@form[:description]} type="textarea" label="Description" />
-          <.input field={@form[:author]} type="text" label="Author" />
-          <.input field={@form[:language]} type="text" label="Language (e.g. en, fr)" />
-          <.input field={@form[:category]} type="select" label="Category" options={@categories} prompt="Choose a category" />
-          <.input field={@form[:explicit]} type="checkbox" label="Explicit content" />
+          <.input field={@form[:title]} type="text" label={gettext("Title")} required />
+          <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
+          <.input field={@form[:author]} type="text" label={gettext("Author")} />
+          <.input field={@form[:language]} type="text" label={gettext("Language (e.g. en, fr)")} />
+          <.input
+            field={@form[:category]}
+            type="select"
+            label={gettext("Category")}
+            options={@categories}
+            prompt={gettext("Choose a category")}
+          />
+          <.input field={@form[:explicit]} type="checkbox" label={gettext("Explicit content")} />
 
           <div>
-            <label class="block text-sm font-medium mb-1">Cover image (≥ 1400×1400)</label>
+            <label class="block text-sm font-medium mb-1">{gettext("Cover image (≥ 1400×1400)")}</label>
             <.live_file_input upload={@uploads.cover} />
             <img :if={@show.cover_url} src={@show.cover_url} class="mt-2 w-24 h-24 rounded object-cover" />
           </div>
 
-          <.button type="submit">Save show</.button>
+          <.button type="submit">{gettext("Save show")}</.button>
         </.form>
       </div>
     </Layouts.app>

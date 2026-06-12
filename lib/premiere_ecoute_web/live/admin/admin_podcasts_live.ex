@@ -21,12 +21,12 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
 
   @impl true
   def handle_event("unpublish", %{"id" => id}, socket) do
-    {:noreply, act(socket, id, &Podcasts.unpublish_show/1, "Show unpublished")}
+    {:noreply, act(socket, id, &Podcasts.unpublish_show/1, gettext("Show unpublished"))}
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    {:noreply, act(socket, id, &Podcasts.delete_show/1, "Show deleted")}
+    {:noreply, act(socket, id, &Podcasts.delete_show/1, gettext("Show deleted"))}
   end
 
   defp act(socket, id, fun, message) do
@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
 
     case show && fun.(show) do
       {:ok, _} -> socket |> put_flash(:info, message) |> load()
-      _ -> put_flash(socket, :error, "Action failed")
+      _ -> put_flash(socket, :error, gettext("Action failed"))
     end
   end
 
@@ -43,17 +43,17 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="max-w-4xl mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-6">Podcast moderation</h1>
+        <h1 class="text-2xl font-bold mb-6">{gettext("Podcast moderation")}</h1>
 
-        <div :if={@shows == []} class="text-gray-500">No shows.</div>
+        <div :if={@shows == []} class="text-gray-500">{gettext("No shows.")}</div>
 
         <table :if={@shows != []} class="w-full text-sm">
           <thead>
             <tr class="text-left border-b">
-              <th class="py-2">Show</th>
-              <th>Owner</th>
-              <th>Episodes</th>
-              <th>Status</th>
+              <th class="py-2">{gettext("Show")}</th>
+              <th>{gettext("Owner")}</th>
+              <th>{gettext("Episodes")}</th>
+              <th>{gettext("Status")}</th>
               <th></th>
             </tr>
           </thead>
@@ -62,7 +62,7 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
               <td class="py-2 font-medium">{show.title}</td>
               <td>{show.user && show.user.username}</td>
               <td>{@counts[show.id]}</td>
-              <td>{if show.published, do: "Published", else: "Draft"}</td>
+              <td>{if show.published, do: gettext("Published"), else: gettext("Draft")}</td>
               <td class="text-right">
                 <button
                   :if={show.published}
@@ -70,15 +70,15 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
                   phx-value-id={show.id}
                   class="px-2 py-1 rounded border text-xs mr-1"
                 >
-                  Unpublish
+                  {gettext("Unpublish")}
                 </button>
                 <button
                   phx-click="delete"
                   phx-value-id={show.id}
-                  data-confirm="Delete this show and all its episodes?"
+                  data-confirm={gettext("Delete this show and all its episodes?")}
                   class="px-2 py-1 rounded border border-red-300 text-red-600 text-xs"
                 >
-                  Delete
+                  {gettext("Delete")}
                 </button>
               </td>
             </tr>

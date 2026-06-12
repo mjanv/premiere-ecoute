@@ -6367,3 +6367,223 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "queued"
 msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Podcasts by %{username}"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "No podcasts published yet."
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Podcast not found"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "RSS feed"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "No episodes yet."
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "My podcasts"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "New show"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "You have no podcast shows yet."
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Published"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Draft"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Show not found"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Show saved"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Cover must be square — it was not saved"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Cover must be at least 1400×1400 — it was not saved"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Cover must be at most 3000×3000 — it was not saved"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Cover image could not be read — it was not saved"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Edit show"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Author"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Language (e.g. en, fr)"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Choose a category"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Explicit content"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Cover image (≥ 1400×1400)"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Save show"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Show published"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Show unpublished"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episode published"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episode unpublished"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episode deleted"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Action failed"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "New episode"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Publish show"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Unpublish"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Submit this feed URL once to Apple Podcasts, Spotify, and other apps to distribute your show."
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episodes"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "published"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "%{count} downloads"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Publish"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Delete this episode?"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Not found"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episode updated"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episode uploaded — processing audio"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Upload failed"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Please choose an MP3 file"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Edit episode"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Show notes"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Audio file (MP3)"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Duration is detected automatically after upload."
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Upload episode"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Save changes"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Podcast moderation"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "No shows."
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Show"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Delete this show and all its episodes?"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Podcasts"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Moderation"
+msgstr ""

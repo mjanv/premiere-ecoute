@@ -21,7 +21,7 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
         |> then(&{:ok, &1})
 
       :error ->
-        {:ok, socket |> put_flash(:error, "Not found") |> redirect(to: ~p"/studio/podcasts")}
+        {:ok, socket |> put_flash(:error, gettext("Not found")) |> redirect(to: ~p"/studio/podcasts")}
     end
   end
 
@@ -51,7 +51,8 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
   def handle_event("save", %{"episode" => params}, %{assigns: %{action: :edit, episode: episode}} = socket) do
     case Podcasts.update_episode(episode, params) do
       {:ok, _} ->
-        {:noreply, socket |> put_flash(:info, "Episode updated") |> redirect(to: ~p"/studio/podcasts/#{socket.assigns.show.id}")}
+        {:noreply,
+         socket |> put_flash(:info, gettext("Episode updated")) |> redirect(to: ~p"/studio/podcasts/#{socket.assigns.show.id}")}
 
       {:error, changeset} ->
         {:noreply, assign_form(socket, changeset)}
@@ -66,15 +67,15 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
           {:ok, _episode} ->
             {:noreply,
              socket
-             |> put_flash(:info, "Episode uploaded — processing audio")
+             |> put_flash(:info, gettext("Episode uploaded — processing audio"))
              |> redirect(to: ~p"/studio/podcasts/#{show.id}")}
 
           {:error, _reason} ->
-            {:noreply, put_flash(socket, :error, "Upload failed")}
+            {:noreply, put_flash(socket, :error, gettext("Upload failed"))}
         end
 
       :empty ->
-        {:noreply, put_flash(socket, :error, "Please choose an MP3 file")}
+        {:noreply, put_flash(socket, :error, gettext("Please choose an MP3 file"))}
     end
   end
 
@@ -98,19 +99,21 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="max-w-2xl mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-6">{if @action == :new, do: "New episode", else: "Edit episode"}</h1>
+        <h1 class="text-2xl font-bold mb-6">
+          {if @action == :new, do: gettext("New episode"), else: gettext("Edit episode")}
+        </h1>
 
         <.form for={@form} id="episode-form" phx-change="validate" phx-submit="save" class="space-y-4">
-          <.input field={@form[:title]} type="text" label="Title" required />
-          <.input field={@form[:description]} type="textarea" label="Show notes" />
+          <.input field={@form[:title]} type="text" label={gettext("Title")} required />
+          <.input field={@form[:description]} type="textarea" label={gettext("Show notes")} />
 
           <div :if={@action == :new}>
-            <label class="block text-sm font-medium mb-1">Audio file (MP3)</label>
+            <label class="block text-sm font-medium mb-1">{gettext("Audio file (MP3)")}</label>
             <.live_file_input upload={@uploads.audio} />
-            <p class="text-xs text-gray-500 mt-1">Duration is detected automatically after upload.</p>
+            <p class="text-xs text-gray-500 mt-1">{gettext("Duration is detected automatically after upload.")}</p>
           </div>
 
-          <.button type="submit">{if @action == :new, do: "Upload episode", else: "Save changes"}</.button>
+          <.button type="submit">{if @action == :new, do: gettext("Upload episode"), else: gettext("Save changes")}</.button>
         </.form>
       </div>
     </Layouts.app>

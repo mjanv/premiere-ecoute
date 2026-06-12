@@ -70,6 +70,15 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorkerTest do
       assert %EpisodeProcessed{id: id} = Store.last("podcasts_episode-#{episode.id}")
       assert id == episode.id
     end
+
+    test "broadcasts an update so the studio dashboard can refresh", %{episode: episode} do
+      Application.put_env(:premiere_ecoute, :stub_audio, {:ok, mp3_bytes(300)})
+      PremiereEcoute.PubSub.subscribe(EpisodeIngestionWorker.topic(episode.show_id))
+
+      assert :ok = EpisodeIngestionWorker.run(episode)
+      assert_receive {:episode_updated, episode_id}
+      assert episode_id == episode.id
+    end
   end
 
   describe "run/1 failure" do

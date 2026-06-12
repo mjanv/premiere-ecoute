@@ -27,7 +27,7 @@ defmodule PremiereEcouteWeb.Podcasts.ShowLive do
   def render(%{show: nil} = assigns) do
     ~H"""
     <div class="max-w-3xl mx-auto p-6">
-      <h1 class="text-xl font-semibold">Podcast not found</h1>
+      <h1 class="text-xl font-semibold">{gettext("Podcast not found")}</h1>
     </div>
     """
   end
@@ -41,12 +41,12 @@ defmodule PremiereEcouteWeb.Podcasts.ShowLive do
           <h1 class="text-2xl font-bold">{@show.title}</h1>
           <p class="text-gray-500">{@show.description}</p>
           <a href={~p"/podcasts/#{@username}/#{@show.slug}/feed.xml"} class="text-sm text-indigo-600">
-            RSS feed
+            {gettext("RSS feed")}
           </a>
         </div>
       </header>
 
-      <div :if={@episodes == []} class="text-gray-500">No episodes yet.</div>
+      <div :if={@episodes == []} class="text-gray-500">{gettext("No episodes yet.")}</div>
 
       <ul class="space-y-6">
         <li :for={episode <- @episodes} class="border rounded-lg p-4">

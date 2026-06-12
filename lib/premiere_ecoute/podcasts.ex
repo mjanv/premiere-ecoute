@@ -11,10 +11,15 @@ defmodule PremiereEcoute.Podcasts do
 
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Episode
+  alias PremiereEcoute.Podcasts.Image
   alias PremiereEcoute.Podcasts.Services.Feed
   alias PremiereEcoute.Podcasts.Show
   alias PremiereEcoute.Podcasts.Storage
   alias PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker
+
+  # Apple Podcasts requires square cover art between 1400×1400 and 3000×3000.
+  @min_cover 1400
+  @max_cover 3000
 
   # Shows
   defdelegate create_show(attrs), to: Show, as: :create
@@ -92,13 +97,25 @@ defmodule PremiereEcoute.Podcasts do
     end
   end
 
-  @doc "Uploads a show cover image and stores its public URL on the show."
+  @doc """
+  Uploads a show cover image (after validating Apple's square ≥1400×1400 requirement) and stores
+  its public URL on the show. Returns `{:error, :cover_too_small | :cover_too_large |
+  :cover_not_square | atom()}` on rejection.
+  """
   @spec upload_cover(Show.t(), String.t(), binary()) :: {:ok, Show.t()} | {:error, term()}
   def upload_cover(%Show{id: show_id} = show, ext, bytes) when is_binary(bytes) do
-    key = Storage.cover_key(show_id, ext)
+    with {:ok, {width, height}} <- Image.dimensions(bytes),
+         :ok <- validate_cover(width, height) do
+      key = Storage.cover_key(show_id, ext)
 
-    with :ok <- Storage.put(key, bytes) do
-      update_show(show, %{cover_url: Storage.public_url(key)})
+      with :ok <- Storage.put(key, bytes) do
+        update_show(show, %{cover_url: Storage.public_url(key)})
+      end
     end
   end
+
+  defp validate_cover(w, h) when w != h, do: {:error, :cover_not_square}
+  defp validate_cover(w, h) when w < @min_cover or h < @min_cover, do: {:error, :cover_too_small}
+  defp validate_cover(w, h) when w > @max_cover or h > @max_cover, do: {:error, :cover_too_large}
+  defp validate_cover(_w, _h), do: :ok
 end
