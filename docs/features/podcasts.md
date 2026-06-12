@@ -312,11 +312,13 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
 - i18n: all new UI strings wrapped in `gettext`, with French + Italian translations added to the
   PO files (POT/fr/it).
 
-**Remaining (owner-provisioned / later):**
-- Concrete **S3-compatible `Storage` adapter** for production (presigned PUT for direct-to-storage
-  uploads, fetch, delete). Owner provisions the provider/bucket; plug it in via
-  `config :premiere_ecoute, Podcasts.Storage, adapter: …`. (`Local` covers dev today; the current
-  upload path streams bytes through the app — fine for dev, swap to presigned for production scale.)
+- Production storage: **`Storage.Seaweed`** adapter (SeaweedFS Filer HTTP API via `Req` — no S3
+  signing/dependency). Wired in `runtime.exs` (`SEAWEEDFS_FILER_URL`, `PODCASTS_PUBLIC_BASE_URL`).
+  Tested with `Req.Test` stubs.
+
+**Remaining (later):**
+- Optional: direct-to-storage uploads (presigned/streamed) instead of app-proxied `put` — the
+  current path streams bytes through the app, fine at this volume; revisit for scale.
 - Telemetry/PromEx dashboards for downloads and egress; content-moderation/DMCA policy + ToS.
 
 ## 16. Implementation phases
