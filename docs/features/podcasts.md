@@ -265,9 +265,24 @@ integration with the directories.
 
 ## 13. Observability
 
-- Telemetry/PromEx: episodes uploaded, ingestion success/failure, feed fetches,
-  downloads per show/episode, storage egress proxy hits.
-- Surface per-episode download counts on the streamer's show dashboard.
+Two audiences, two stores — split by durability needs:
+
+**Streamer-facing → Postgres (durable forever).** All podcast events are persisted in the
+Postgres-backed **event store** (`event_store.events`), so streamer analytics survive indefinitely
+— the ~14-day Prometheus retention does *not* apply to them. `PremiereEcoute.Podcasts.Statistics`
+queries downloads via `Analytics.aggregate_events/3` (no extra projection table needed):
+- `show_download_stats/1`, `episode_download_stats/1` — totals split by source (`:web` vs `:feed`)
+- `show_downloads_last/2` — rolling window (e.g. last 30 days)
+- `episode_downloads_over_time/3` — time-bucketed rows for charts
+Surfaced on the studio show dashboard (total / last-30-days / podcast-apps / website + per-episode).
+
+Tracked domain events (all in the event store): `ShowCreated`, `ShowPublished`,
+`EpisodeUploaded`, `EpisodeProcessed`, `EpisodePublished`, `EpisodeDownloaded` (source/ip/UA).
+
+**Admin/operational → Prometheus + Grafana (ephemeral is fine).** `Telemetry.PodcastMetrics`
+(PromEx plugin) exposes system health: ingestion run count + duration distribution (by result),
+RSS feed requests (by status), audio requests (by source). Emitted from the worker / feed /
+audio controllers via `:telemetry`.
 
 ## 14. Risks & open items
 

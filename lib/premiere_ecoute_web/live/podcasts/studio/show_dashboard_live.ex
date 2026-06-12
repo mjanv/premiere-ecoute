@@ -30,7 +30,14 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
   defp load(socket, show) do
     episodes = Podcasts.episodes_for_show(show)
     counts = Map.new(episodes, fn e -> {e.id, Podcasts.download_count(e)} end)
-    assign(socket, show: show, episodes: episodes, counts: counts)
+
+    assign(socket,
+      show: show,
+      episodes: episodes,
+      counts: counts,
+      stats: Podcasts.show_download_stats(show),
+      last_30: Podcasts.show_downloads_last(show, 30)
+    )
   end
 
   @impl true
@@ -113,6 +120,25 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
           <p class="text-xs text-gray-500 mt-2">
             {gettext("Submit this feed URL once to Apple Podcasts, Spotify, and other apps to distribute your show.")}
           </p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div class="border rounded-lg p-4">
+            <div class="text-2xl font-bold">{@stats.total}</div>
+            <div class="text-xs text-gray-500">{gettext("Total downloads")}</div>
+          </div>
+          <div class="border rounded-lg p-4">
+            <div class="text-2xl font-bold">{@last_30}</div>
+            <div class="text-xs text-gray-500">{gettext("Last 30 days")}</div>
+          </div>
+          <div class="border rounded-lg p-4">
+            <div class="text-2xl font-bold">{@stats.feed}</div>
+            <div class="text-xs text-gray-500">{gettext("Podcast apps")}</div>
+          </div>
+          <div class="border rounded-lg p-4">
+            <div class="text-2xl font-bold">{@stats.web}</div>
+            <div class="text-xs text-gray-500">{gettext("Website")}</div>
+          </div>
         </div>
 
         <h2 class="text-lg font-semibold mb-3">{gettext("Episodes")}</h2>

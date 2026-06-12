@@ -6588,3 +6588,15 @@ msgstr "Podcast"
 #, elixir-autogen, elixir-format
 msgid "Moderation"
 msgstr "Moderazione"
+
+#, elixir-autogen, elixir-format
+msgid "Total downloads"
+msgstr "Download totali"
+
+#, elixir-autogen, elixir-format
+msgid "Podcast apps"
+msgstr "App di podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Website"
+msgstr "Sito web"
