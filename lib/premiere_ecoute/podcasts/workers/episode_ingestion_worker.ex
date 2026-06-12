@@ -16,6 +16,11 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
   alias PremiereEcoute.Podcasts.Audio.Mp3
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Storage
+  alias PremiereEcoute.PubSub
+
+  @doc "PubSub topic a show's studio dashboard subscribes to for ingestion updates."
+  @spec topic(integer()) :: String.t()
+  def topic(show_id), do: "podcast_show:#{show_id}"
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"id" => id}}), do: run(Episode.get(id))
@@ -35,11 +40,13 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
         stream: "podcasts_episode"
       )
 
+      PubSub.broadcast(topic(ready.show_id), {:episode_updated, ready.id})
       Logger.info("podcast episode #{ready.id} ingested (#{duration}s, #{byte_size} bytes)")
       :ok
     else
       {:error, reason} ->
         Episode.mark_failed(episode)
+        PubSub.broadcast(topic(episode.show_id), {:episode_updated, episode.id})
         Logger.warning("podcast episode #{episode.id} ingestion failed: #{inspect(reason)}")
         {:error, reason}
     end

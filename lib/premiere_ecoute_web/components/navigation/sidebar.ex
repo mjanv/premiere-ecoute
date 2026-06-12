@@ -103,6 +103,17 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 {gettext("Top Charts")}
               </.sidebar_link>
             <% end %>
+
+            <%= if @current_user.role in [:streamer, :admin] do %>
+              <.sidebar_link
+                href={~p"/studio/podcasts"}
+                page={@current_page}
+                page_id="podcasts"
+                icon="hero-microphone"
+              >
+                {gettext("Podcasts")}
+              </.sidebar_link>
+            <% end %>
           </nav>
         </div>
       </aside>

@@ -305,6 +305,12 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
   in-page player.
 - Context orchestration (`upload_episode`, `upload_cover`, `download_count`, moderation helpers)
   and management LiveViews are covered by unit + LiveView tests.
+- Cover validation: pure-Elixir `Image` reader enforces Apple's square 1400–3000px requirement.
+- Navigation: streamer sidebar "Podcasts" entry; admin dashboard "Podcasts" moderation card.
+- Live refresh: ingestion worker broadcasts over PubSub; the studio dashboard updates when an
+  episode finishes processing (no manual reload).
+- i18n: all new UI strings wrapped in `gettext`, with French + Italian translations added to the
+  PO files (POT/fr/it).
 
 **Remaining (owner-provisioned / later):**
 - Concrete **S3-compatible `Storage` adapter** for production (presigned PUT for direct-to-storage

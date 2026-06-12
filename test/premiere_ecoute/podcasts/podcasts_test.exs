@@ -56,11 +56,24 @@ defmodule PremiereEcoute.PodcastsTest do
   end
 
   describe "upload_cover/3" do
-    test "stores the cover and saves its public URL on the show", %{show: show} do
-      {:ok, updated} = Podcasts.upload_cover(show, ".png", "IMGBYTES")
+    # Minimal PNG header declaring the given square dimensions.
+    defp png(size), do: <<137, 80, 78, 71, 13, 10, 26, 10, 13::32, "IHDR", size::32, size::32, 0::64>>
+
+    test "stores a valid square cover and saves its public URL on the show", %{show: show} do
+      bytes = png(1400)
+      {:ok, updated} = Podcasts.upload_cover(show, ".png", bytes)
 
       assert updated.cover_url == Storage.public_url(Storage.cover_key(show.id, "png"))
-      assert {:ok, "IMGBYTES"} = Storage.fetch(Storage.cover_key(show.id, "png"))
+      assert {:ok, ^bytes} = Storage.fetch(Storage.cover_key(show.id, "png"))
+    end
+
+    test "rejects a cover smaller than 1400×1400", %{show: show} do
+      assert {:error, :cover_too_small} = Podcasts.upload_cover(show, ".png", png(800))
+    end
+
+    test "rejects a non-square cover", %{show: show} do
+      non_square = <<137, 80, 78, 71, 13, 10, 26, 10, 13::32, "IHDR", 1400::32, 1500::32, 0::64>>
+      assert {:error, :cover_not_square} = Podcasts.upload_cover(show, ".png", non_square)
     end
   end
 

@@ -23,9 +23,9 @@ defmodule PremiereEcouteWeb.Podcasts.ShowsLive do
   def render(assigns) do
     ~H"""
     <div class="max-w-3xl mx-auto p-6">
-      <h1 class="text-2xl font-bold mb-6">Podcasts by {@username}</h1>
+      <h1 class="text-2xl font-bold mb-6">{gettext("Podcasts by %{username}", username: @username)}</h1>
 
-      <div :if={@shows == []} class="text-gray-500">No podcasts published yet.</div>
+      <div :if={@shows == []} class="text-gray-500">{gettext("No podcasts published yet.")}</div>
 
       <ul class="space-y-4">
         <li :for={show <- @shows} class="border rounded-lg p-4">
