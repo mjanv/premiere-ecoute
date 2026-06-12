@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreatePodcasts do
       add :language, :string, null: false, default: "en"
       add :category, :string
       add :explicit, :boolean, null: false, default: false
-      add :cover_url, :string
+      add :cover_key, :string
       add :published, :boolean, null: false, default: false
 
       timestamps(type: :utc_datetime)

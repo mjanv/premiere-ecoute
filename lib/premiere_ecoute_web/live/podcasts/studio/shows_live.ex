@@ -29,7 +29,12 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowsLive do
         <ul class="space-y-3">
           <li :for={show <- @shows} class="border rounded-lg p-4 flex items-center justify-between">
             <.link navigate={~p"/studio/podcasts/#{show.id}"} class="flex items-center gap-3">
-              <img :if={show.cover_url} src={show.cover_url} alt={show.title} class="w-12 h-12 rounded object-cover" />
+              <img
+                :if={show.cover_key}
+                src={~p"/podcasts/shows/#{show.id}/cover"}
+                alt={show.title}
+                class="w-12 h-12 rounded object-cover"
+              />
               <span class="font-semibold">{show.title}</span>
             </.link>
             <span class={[

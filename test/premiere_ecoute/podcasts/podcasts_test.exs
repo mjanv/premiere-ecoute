@@ -64,7 +64,7 @@ defmodule PremiereEcoute.PodcastsTest do
       bytes = png(1400)
       {:ok, updated} = Podcasts.upload_cover(show, ".png", bytes)
 
-      assert updated.cover_url == Storage.public_url(Storage.cover_key(show.id, "png"))
+      assert updated.cover_key == Storage.cover_key(show.id, "png")
       assert {:ok, ^bytes} = Storage.fetch(Storage.cover_key(show.id, "png"))
     end
 

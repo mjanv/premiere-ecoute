@@ -9,6 +9,7 @@ defmodule PremiereEcoute.Podcasts.Services.FeedTest do
     %{
       self: "https://premiere-ecoute.fr/podcasts/bob/my-show/feed.xml",
       link: "https://premiere-ecoute.fr/podcasts/bob/my-show",
+      cover: "https://example.com/cover.jpg",
       audio: fn ep -> "https://premiere-ecoute.fr/podcasts/audio/#{ep.guid}" end
     }
   end
@@ -20,8 +21,7 @@ defmodule PremiereEcoute.Podcasts.Services.FeedTest do
       author: "Bob",
       language: "fr",
       category: "Music",
-      explicit: false,
-      cover_url: "https://example.com/cover.jpg"
+      explicit: false
     }
   end
 
@@ -95,8 +95,9 @@ defmodule PremiereEcoute.Podcasts.Services.FeedTest do
     end
 
     test "omits optional cover/category when absent" do
-      bare = %{show() | cover_url: nil, category: nil}
-      xml = Feed.render(bare, [], urls())
+      bare = %{show() | category: nil}
+      no_cover = %{urls() | cover: nil}
+      xml = Feed.render(bare, [], no_cover)
 
       refute xml =~ "itunes:image"
       refute xml =~ "itunes:category"

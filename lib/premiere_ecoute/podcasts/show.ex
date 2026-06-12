@@ -10,7 +10,7 @@ defmodule PremiereEcoute.Podcasts.Show do
   use PremiereEcouteCore.Aggregate,
     root: [:user],
     identity: [:user_id, :slug],
-    json: [:id, :slug, :title, :description, :author, :language, :category, :explicit, :cover_url, :published]
+    json: [:id, :slug, :title, :description, :author, :language, :category, :explicit, :published]
 
   defmodule Slug do
     @moduledoc false
@@ -38,7 +38,7 @@ defmodule PremiereEcoute.Podcasts.Show do
           language: String.t() | nil,
           category: String.t() | nil,
           explicit: boolean(),
-          cover_url: String.t() | nil,
+          cover_key: String.t() | nil,
           published: boolean(),
           user: entity(User.t()),
           inserted_at: DateTime.t() | nil,
@@ -53,7 +53,7 @@ defmodule PremiereEcoute.Podcasts.Show do
     field :language, :string, default: "en"
     field :category, :string
     field :explicit, :boolean, default: false
-    field :cover_url, :string
+    field :cover_key, :string
     field :published, :boolean, default: false
 
     belongs_to :user, User
@@ -73,7 +73,7 @@ defmodule PremiereEcoute.Podcasts.Show do
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(show, attrs) do
     show
-    |> cast(attrs, [:title, :description, :author, :language, :category, :explicit, :cover_url, :published, :user_id])
+    |> cast(attrs, [:title, :description, :author, :language, :category, :explicit, :cover_key, :published, :user_id])
     |> update_change(:category, fn cat -> if cat in [nil, ""], do: nil, else: cat end)
     |> validate_required([:title, :user_id, :language])
     |> validate_inclusion(:category, @categories, message: "is not a valid Apple Podcasts category")

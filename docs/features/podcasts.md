@@ -318,13 +318,13 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
 - Production storage: **`Storage.Seaweed`** adapter (SeaweedFS Filer HTTP API via `Req` — no S3
   signing/dependency). Wired in `runtime.exs` (`SEAWEEDFS_FILER_URL`, `PODCASTS_PUBLIC_BASE_URL`).
   Tested with `Req.Test` stubs.
-- Audio served **through Phoenix** (`Storage.send_object/3`), range-aware, so SeaweedFS stays
-  private. `Local` streams from disk via `send_file`; `Seaweed` proxies the Filer with `Range`
-  pass-through. Tested for full/partial/416/404.
+- Audio **and cover art** served **through Phoenix** (`Storage.send_object/3`), range-aware, so
+  SeaweedFS stays fully private (no public bucket/URL). `Local` streams from disk via `send_file`;
+  `Seaweed` proxies the Filer with `Range` pass-through. Covers stream from `CoverController`
+  (`/podcasts/shows/:id/cover`, id-stable, works for drafts); the show stores `cover_key`, and the
+  feed `<itunes:image>` + pages point at the cover endpoint. Tested for full/partial/416/404.
 
 **Remaining (later):**
-- Covers still resolve via `Storage.public_url` (`public_base_url`). If you want SeaweedFS fully
-  private, route covers through Phoenix too (a small cover endpoint + store `cover_key`).
 - Optional scale step: offload hot audio to a CDN or SeaweedFS S3-gateway presigned URLs; direct
   (presigned) uploads instead of app-proxied `put`.
 - Telemetry/PromEx dashboards for downloads and egress; content-moderation/DMCA policy + ToS.
