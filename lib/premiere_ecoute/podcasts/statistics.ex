@@ -12,6 +12,7 @@ defmodule PremiereEcoute.Podcasts.Statistics do
   alias PremiereEcoute.Events.EpisodeDownloaded
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Show
+  alias PremiereEcoute.Repo
 
   @type breakdown :: %{total: non_neg_integer(), web: non_neg_integer(), feed: non_neg_integer()}
 
@@ -34,6 +35,40 @@ defmodule PremiereEcoute.Podcasts.Statistics do
   @spec episode_downloads_over_time(Episode.t(), Analytics.Events.unit(), keyword()) :: [map()]
   def episode_downloads_over_time(%Episode{id: id}, unit, opts \\ []) do
     Analytics.aggregate_events(EpisodeDownloaded, unit, Keyword.merge([stream: stream(id)], opts))
+  end
+
+  @doc "A show's downloads bucketed by a time unit (pass `from:`/`to:`/`fill_gaps: true` for charts)."
+  @spec show_downloads_over_time(Show.t(), Analytics.Events.unit(), keyword()) :: [map()]
+  def show_downloads_over_time(%Show{} = show, unit, opts \\ []) do
+    case streams(show) do
+      [] -> []
+      streams -> Analytics.aggregate_events(EpisodeDownloaded, unit, Keyword.merge([stream: streams], opts))
+    end
+  end
+
+  @doc """
+  Unique listeners (IAB-style): distinct `ip` + `user_agent` fingerprints across the downloads of
+  an episode or a whole show. Approximates audience size, deduping replays and range requests.
+  """
+  @spec unique_listeners(Episode.t() | Show.t()) :: non_neg_integer()
+  def unique_listeners(%Episode{id: id}), do: distinct_listeners([stream(id)])
+  def unique_listeners(%Show{} = show), do: distinct_listeners(streams(show))
+
+  defp distinct_listeners([]), do: 0
+
+  defp distinct_listeners(streams) do
+    # COUNT(DISTINCT ip|user_agent) over the episodes' download streams. event_type and stream ids
+    # are internal (module name / integer-derived), so parameterized values carry no injection risk.
+    sql = """
+    SELECT COUNT(DISTINCT COALESCE(e.data->>'ip', '') || '|' || COALESCE(e.data->>'user_agent', ''))
+    FROM event_store.events e
+    JOIN event_store.stream_events se ON se.event_id = e.event_id
+    JOIN event_store.streams s ON s.stream_id = se.stream_id
+    WHERE e.event_type = $1 AND s.stream_uuid = ANY($2)
+    """
+
+    %{rows: [[count]]} = Repo.query!(sql, [Atom.to_string(EpisodeDownloaded), streams])
+    count
   end
 
   defp breakdown([], _opts), do: %{total: 0, web: 0, feed: 0}
