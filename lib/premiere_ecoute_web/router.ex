@@ -41,6 +41,12 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_session
   end
 
+  # AIDEV-NOTE: podcast feed/audio must not negotiate content (podcast apps send arbitrary Accept
+  # headers) — no `plug :accepts`, responses set their own content type / redirect.
+  pipeline :podcast_public do
+    plug :put_secure_browser_headers
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
     plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
@@ -190,6 +196,22 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :festivals, on_mount: [{UserAuth, :streamer}] do
       live "/new", PosterLive, :index
+    end
+  end
+
+  scope "/podcasts", PremiereEcouteWeb.Podcasts do
+    pipe_through [:podcast_public]
+
+    get "/:username/:show_slug/feed.xml", FeedController, :show
+    get "/:username/:show_slug/episodes/:guid/audio", AudioController, :show
+  end
+
+  scope "/podcasts", PremiereEcouteWeb.Podcasts do
+    pipe_through [:browser]
+
+    live_session :podcasts_public, on_mount: [{UserAuth, :current_scope}] do
+      live "/:username", ShowsLive, :index
+      live "/:username/:show_slug", ShowLive, :show
     end
   end
 
