@@ -16,12 +16,14 @@ defmodule PremiereEcouteWeb.Podcasts.AudioController do
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Show
   alias PremiereEcoute.Podcasts.Storage
+  alias PremiereEcoute.Telemetry.PodcastMetrics
 
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, %{"username" => username, "show_slug" => slug, "guid" => guid} = params) do
     with %Show{id: show_id} <- Podcasts.get_published_show(username, slug),
          %Episode{audio_key: key} = episode when is_binary(key) <- Podcasts.get_published_episode(show_id, guid) do
       track_download(conn, episode, params)
+      PodcastMetrics.audio(source(params))
       Storage.send_object(conn, key, "audio/mpeg")
     else
       _ -> send_resp(conn, 404, "Episode not found")

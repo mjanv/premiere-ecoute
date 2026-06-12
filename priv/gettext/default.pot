@@ -6587,3 +6587,15 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Moderation"
 msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Total downloads"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Podcast apps"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Website"
+msgstr ""

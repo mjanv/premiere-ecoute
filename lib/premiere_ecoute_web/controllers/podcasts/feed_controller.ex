@@ -10,14 +10,17 @@ defmodule PremiereEcouteWeb.Podcasts.FeedController do
   use PremiereEcouteWeb, :controller
 
   alias PremiereEcoute.Podcasts
+  alias PremiereEcoute.Telemetry.PodcastMetrics
 
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, %{"username" => username, "show_slug" => slug}) do
     case Podcasts.get_published_show(username, slug) do
       nil ->
+        PodcastMetrics.feed(404)
         send_resp(conn, 404, "Feed not found")
 
       show ->
+        PodcastMetrics.feed(200)
         urls = %{
           self: url(~p"/podcasts/#{username}/#{slug}/feed.xml"),
           link: url(~p"/podcasts/#{username}/#{slug}"),

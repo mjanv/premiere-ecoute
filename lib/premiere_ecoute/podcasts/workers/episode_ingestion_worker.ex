@@ -17,6 +17,7 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Storage
   alias PremiereEcoute.PubSub
+  alias PremiereEcoute.Telemetry.PodcastMetrics
 
   @doc "PubSub topic a show's studio dashboard subscribes to for ingestion updates."
   @spec topic(integer()) :: String.t()
@@ -29,7 +30,14 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
   def run(nil), do: {:error, :not_found}
   def run(%Episode{audio_key: nil}), do: {:error, :no_audio}
 
-  def run(%Episode{audio_key: key} = episode) do
+  def run(%Episode{} = episode) do
+    start = System.monotonic_time(:millisecond)
+    result = ingest(episode)
+    PodcastMetrics.ingestion(result_tag(result), System.monotonic_time(:millisecond) - start)
+    result
+  end
+
+  defp ingest(%Episode{audio_key: key} = episode) do
     with {:ok, bytes} <- Storage.fetch(key),
          {:ok, duration} <- Mp3.duration(bytes) do
       byte_size = byte_size(bytes)
@@ -51,4 +59,7 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
         {:error, reason}
     end
   end
+
+  defp result_tag(:ok), do: :ok
+  defp result_tag(_), do: :failed
 end

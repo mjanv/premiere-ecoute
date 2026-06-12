@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Podcasts do
   alias PremiereEcoute.Podcasts.Image
   alias PremiereEcoute.Podcasts.Services.Feed
   alias PremiereEcoute.Podcasts.Show
+  alias PremiereEcoute.Podcasts.Statistics
   alias PremiereEcoute.Podcasts.Storage
   alias PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker
 
@@ -77,6 +78,12 @@ defmodule PremiereEcoute.Podcasts do
   @spec download_count(Episode.t() | integer()) :: non_neg_integer()
   def download_count(%Episode{id: id}), do: download_count(id)
   def download_count(id) when is_integer(id), do: length(Store.read("podcast_download-#{id}", :event))
+
+  # Streamer-facing analytics (durable, from the Postgres event store)
+  defdelegate episode_download_stats(episode), to: Statistics, as: :episode_downloads
+  defdelegate show_download_stats(show), to: Statistics, as: :show_downloads
+  defdelegate show_downloads_last(show, days), to: Statistics
+  defdelegate episode_downloads_over_time(episode, unit, opts \\ []), to: Statistics
 
   @doc """
   Uploads an episode's audio and creates the episode in `:processing`, then enqueues ingestion to
