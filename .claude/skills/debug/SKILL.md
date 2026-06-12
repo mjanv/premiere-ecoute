@@ -111,7 +111,7 @@ A restart shortly before the error spike = likely a deploy or crash loop.
 ### 5. Resolve
 
 - Resolve false-positive Sentry issues: `mcp__sentry__update_issue(status="resolved")`
-- If a restart is needed: present findings to the user and **ask for explicit confirmation before restarting**
+- If a restart or a modification is needed: present findings to the user and **ask for explicit confirmation before**
 
 ## Key Loki queries
 

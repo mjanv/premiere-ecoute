@@ -1,5 +1,5 @@
 #!/bin/bash
-# AIDEV-NOTE: PostToolUse hook - runs mix format on .ex/.exs files after Write/Edit/NotebookEdit
+# PostToolUse hook - runs mix format on .ex/.exs files after Write/Edit/NotebookEdit
 
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 

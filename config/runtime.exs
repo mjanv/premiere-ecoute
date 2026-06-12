@@ -3,9 +3,11 @@ import Dotenvy
 
 source!([
   Path.absname(".env", "."),
-  Path.absname(".#{config_env()}.env", "."),
+  Path.absname(".env.#{config_env()}", "."),
   System.get_env()
 ])
+
+IO.inspect(env!("TWITCH_WEBHOOK_CALLBACK_URL"))
 
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: env!("PHX_SERVER", :boolean, false)
 
