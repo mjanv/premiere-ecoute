@@ -5,8 +5,30 @@ defmodule PremiereEcouteWeb.Podcasts.AudioControllerTest do
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Storage
 
+  # Stub adapter so the controller's streaming + tracking can be asserted without a real backend.
+  defmodule AudioStub do
+    @behaviour PremiereEcoute.Podcasts.Storage
+
+    import Plug.Conn
+
+    @impl true
+    def fetch(_key), do: {:error, :not_supported}
+    @impl true
+    def put(_key, _bytes), do: :ok
+    @impl true
+    def delete(_key), do: :ok
+
+    @impl true
+    def send_object(conn, key, content_type) do
+      conn
+      |> put_resp_header("content-type", content_type)
+      |> put_resp_header("accept-ranges", "bytes")
+      |> send_resp(200, "AUDIO:" <> key)
+    end
+  end
+
   setup do
-    Application.put_env(:premiere_ecoute, Storage, public_base_url: "https://cdn.test")
+    Application.put_env(:premiere_ecoute, Storage, adapter: AudioStub)
     on_exit(fn -> Application.delete_env(:premiere_ecoute, Storage) end)
 
     user = user_fixture(%{username: "audiostreamer"})
@@ -16,10 +38,12 @@ defmodule PremiereEcouteWeb.Podcasts.AudioControllerTest do
   end
 
   describe "GET episode audio" do
-    test "redirects to the public storage URL", %{conn: conn, show: show, episode: episode} do
+    test "streams the audio bytes through the app with Range support advertised", %{conn: conn, show: show, episode: episode} do
       conn = get(conn, ~p"/podcasts/audiostreamer/#{show.slug}/episodes/#{episode.guid}/audio")
 
-      assert redirected_to(conn, 302) == "https://cdn.test/#{episode.audio_key}"
+      assert response(conn, 200) == "AUDIO:#{episode.audio_key}"
+      assert get_resp_header(conn, "accept-ranges") == ["bytes"]
+      assert get_resp_header(conn, "content-type") == ["audio/mpeg"]
     end
 
     test "records an EpisodeDownloaded event tagged :feed by default", %{conn: conn, show: show, episode: episode} do

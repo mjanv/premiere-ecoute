@@ -24,10 +24,18 @@ defmodule PremiereEcoute.Podcasts.Storage do
   @callback fetch(key :: String.t()) :: {:ok, binary()} | {:error, term()}
   @callback put(key :: String.t(), bytes :: binary()) :: :ok | {:error, term()}
   @callback delete(key :: String.t()) :: :ok | {:error, term()}
+  @callback send_object(Plug.Conn.t(), key :: String.t(), content_type :: String.t()) :: Plug.Conn.t()
 
   @doc "Fetches an object's bytes via the configured adapter."
   @spec fetch(String.t()) :: {:ok, binary()} | {:error, term()}
   def fetch(key), do: adapter().fetch(key)
+
+  @doc """
+  Streams an object to the client through the app (honoring HTTP Range), keeping the object store
+  private. Each adapter handles range/sending in the way that suits its backend.
+  """
+  @spec send_object(Plug.Conn.t(), String.t(), String.t()) :: Plug.Conn.t()
+  def send_object(conn, key, content_type), do: adapter().send_object(conn, key, content_type)
 
   @doc "Stores an object's bytes via the configured adapter."
   @spec put(String.t(), binary()) :: :ok | {:error, term()}
