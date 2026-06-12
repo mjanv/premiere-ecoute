@@ -17,6 +17,7 @@ defmodule PremiereEcoute.PodcastsTest do
     def put(key, bytes), do: Agent.update(__MODULE__, &Map.put(&1, key, bytes))
     def delete(key), do: Agent.update(__MODULE__, &Map.delete(&1, key)) && :ok
     def send_object(conn, _key, _content_type), do: conn
+    def dump, do: Agent.get(__MODULE__, & &1)
 
     defp normalize({:ok, bytes}), do: {:ok, bytes}
     defp normalize(:error), do: {:error, :not_found}
@@ -30,6 +31,9 @@ defmodule PremiereEcoute.PodcastsTest do
     user = user_fixture()
     %{user: user, show: show_fixture(user)}
   end
+
+  # Minimal PNG header declaring the given square dimensions.
+  defp png(size), do: <<137, 80, 78, 71, 13, 10, 26, 10, 13::32, "IHDR", size::32, size::32, 0::64>>
 
   describe "upload_episode/3" do
     test "stores audio, creates a processing episode, and enqueues ingestion", %{show: show} do
@@ -56,10 +60,39 @@ defmodule PremiereEcoute.PodcastsTest do
     end
   end
 
-  describe "upload_cover/3" do
-    # Minimal PNG header declaring the given square dimensions.
-    defp png(size), do: <<137, 80, 78, 71, 13, 10, 26, 10, 13::32, "IHDR", size::32, size::32, 0::64>>
+  describe "upload_episode/3 — failure" do
+    test "does not store audio when metadata is invalid (no orphan object)", %{show: show} do
+      assert {:error, %Ecto.Changeset{}} = Podcasts.upload_episode(show, %{"title" => ""}, "AUDIO")
+      assert MapStore.dump() == %{}
+    end
+  end
 
+  describe "user_storage_keys/1 and purge_keys/1" do
+    test "collects a user's audio + cover keys and purges them", %{user: user, show: show} do
+      {:ok, _} = Podcasts.upload_cover(show, ".png", png(1400))
+      {:ok, episode} = Podcasts.upload_episode(show, %{"title" => "Ep"}, "AUDIO")
+
+      keys = Podcasts.user_storage_keys(user)
+      assert episode.audio_key in keys
+      assert Storage.cover_key(show.id, "png") in keys
+
+      :ok = Podcasts.purge_keys(keys)
+      assert {:error, _} = Storage.fetch(episode.audio_key)
+    end
+  end
+
+  describe "report_show/2 and report_count/1" do
+    test "records reports against a show", %{show: show} do
+      assert Podcasts.report_count(show) == 0
+
+      Podcasts.report_show(show, "copyright")
+      Podcasts.report_show(show, "spam")
+
+      assert Podcasts.report_count(show) == 2
+    end
+  end
+
+  describe "upload_cover/3" do
     test "stores a valid square cover and saves its public URL on the show", %{show: show} do
       bytes = png(1400)
       {:ok, updated} = Podcasts.upload_cover(show, ".png", bytes)

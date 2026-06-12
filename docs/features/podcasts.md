@@ -341,6 +341,14 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
   (`/podcasts/shows/:id/cover`, id-stable, works for drafts); the show stores `cover_key`, and the
   feed `<itunes:image>` + pages point at the cover endpoint. Tested for full/partial/416/404.
 
+- Hardening: per-IP **rate limiting** on the public feed/audio/cover endpoints (Hammer, fail-open);
+  **HEAD** support for audio (headers only, no byte fetch / no download count); episode row created
+  **before** storing bytes (no orphan object on invalid metadata); upload **progress UI** (bar,
+  cancel, errors).
+- Lifecycle: deleting an account **purges the user's podcast storage objects** (audio + covers).
+- Moderation: public **"report this podcast"** action → `ShowReported` events surfaced as a report
+  count in admin moderation; **content/DMCA policy** legal document (`priv/legal/podcast_policy.md`).
+
 **Remaining (later):**
 - Optional scale step: offload hot audio to a CDN or SeaweedFS S3-gateway presigned URLs; direct
   (presigned) uploads instead of app-proxied `put`.

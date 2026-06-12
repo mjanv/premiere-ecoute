@@ -48,6 +48,16 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
   end
 
   @impl true
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :audio, ref)}
+  end
+
+  defp upload_error_message(:too_large), do: gettext("File is too large (max 200 MB)")
+  defp upload_error_message(:not_accepted), do: gettext("Only MP3 files are allowed")
+  defp upload_error_message(:too_many_files), do: gettext("Only one file can be uploaded")
+  defp upload_error_message(_error), do: gettext("Upload error")
+
+  @impl true
   def handle_event("save", %{"episode" => params}, %{assigns: %{action: :edit, episode: episode}} = socket) do
     case Podcasts.update_episode(episode, params) do
       {:ok, _} ->
@@ -107,10 +117,35 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
           <.input field={@form[:title]} type="text" label={gettext("Title")} required />
           <.input field={@form[:description]} type="textarea" label={gettext("Show notes")} />
 
-          <div :if={@action == :new}>
+          <div :if={@action == :new} phx-drop-target={@uploads.audio.ref}>
             <label class="block text-sm font-medium mb-1">{gettext("Audio file (MP3)")}</label>
             <.live_file_input upload={@uploads.audio} />
             <p class="text-xs text-gray-500 mt-1">{gettext("Duration is detected automatically after upload.")}</p>
+
+            <div :for={entry <- @uploads.audio.entries} class="mt-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="truncate">{entry.client_name}</span>
+                <button
+                  type="button"
+                  phx-click="cancel-upload"
+                  phx-value-ref={entry.ref}
+                  class="text-red-600 ml-2"
+                  aria-label={gettext("Cancel")}
+                >
+                  &times;
+                </button>
+              </div>
+              <div class="w-full bg-gray-200 rounded h-2 mt-1">
+                <div class="bg-indigo-500 h-2 rounded" style={"width: #{entry.progress}%"}></div>
+              </div>
+              <p :for={err <- upload_errors(@uploads.audio, entry)} class="text-xs text-red-600 mt-1">
+                {upload_error_message(err)}
+              </p>
+            </div>
+
+            <p :for={err <- upload_errors(@uploads.audio)} class="text-xs text-red-600 mt-1">
+              {upload_error_message(err)}
+            </p>
           </div>
 
           <.button type="submit">{if @action == :new, do: gettext("Upload episode"), else: gettext("Save changes")}</.button>

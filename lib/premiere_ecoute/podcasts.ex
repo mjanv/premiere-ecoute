@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Podcasts do
 
   use PremiereEcouteCore.Context
 
+  alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Events.ShowReported
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Image
@@ -79,6 +81,28 @@ defmodule PremiereEcoute.Podcasts do
   def download_count(%Episode{id: id}), do: download_count(id)
   def download_count(id) when is_integer(id), do: length(Store.read("podcast_download-#{id}", :event))
 
+  @doc "Lists every storage key (audio + cover) owned by a user — used to purge on account deletion."
+  @spec user_storage_keys(User.t()) :: [String.t()]
+  def user_storage_keys(%User{} = user) do
+    shows = shows_for_user(user)
+    covers = shows |> Enum.map(& &1.cover_key) |> Enum.filter(&is_binary/1)
+    audios = shows |> Enum.flat_map(&episodes_for_show/1) |> Enum.map(& &1.audio_key) |> Enum.filter(&is_binary/1)
+    covers ++ audios
+  end
+
+  @doc "Best-effort deletion of storage objects by key (account deletion / cleanup)."
+  @spec purge_keys([String.t()]) :: :ok
+  def purge_keys(keys) when is_list(keys), do: Enum.each(keys, &Storage.delete/1)
+
+  @doc "Records an abuse/DMCA report against a show (surfaced to admins)."
+  @spec report_show(Show.t(), String.t()) :: :ok
+  def report_show(%Show{id: id}, reason), do: Store.append(%ShowReported{id: id, reason: reason}, stream: "podcast_report")
+
+  @doc "Counts reports recorded against a show."
+  @spec report_count(Show.t() | integer()) :: non_neg_integer()
+  def report_count(%Show{id: id}), do: report_count(id)
+  def report_count(id) when is_integer(id), do: length(Store.read("podcast_report-#{id}", :event))
+
   # Streamer-facing analytics (durable, from the Postgres event store)
   defdelegate episode_download_stats(episode), to: Statistics, as: :episode_downloads
   defdelegate show_download_stats(show), to: Statistics, as: :show_downloads
@@ -89,20 +113,30 @@ defmodule PremiereEcoute.Podcasts do
 
   @doc """
   Uploads an episode's audio and creates the episode in `:processing`, then enqueues ingestion to
-  extract duration/byte size. Storage and the ingestion worker do the heavy lifting.
+  extract duration/byte size. The episode row is created (and validated) *before* the bytes are
+  stored, so invalid metadata never leaves an orphaned object; a failed store marks it `:failed`.
   """
   @spec upload_episode(Show.t(), map(), binary()) :: {:ok, Episode.t()} | {:error, term()}
   def upload_episode(%Show{id: show_id}, attrs, bytes) when is_binary(bytes) do
     guid = Ecto.UUID.generate()
     key = Storage.audio_key(show_id, guid)
+    attrs = Map.merge(attrs, %{show_id: show_id, guid: guid, audio_key: key, status: :processing})
 
-    with :ok <- Storage.put(key, bytes),
-         {:ok, episode} <-
-           attrs
-           |> Map.merge(%{show_id: show_id, guid: guid, audio_key: key, status: :processing})
-           |> create_episode() do
+    with {:ok, episode} <- create_episode(attrs),
+         :ok <- store_audio(episode, key, bytes) do
       EpisodeIngestionWorker.start(%{id: episode.id})
       {:ok, episode}
+    end
+  end
+
+  defp store_audio(episode, key, bytes) do
+    case Storage.put(key, bytes) do
+      :ok ->
+        :ok
+
+      {:error, reason} ->
+        mark_episode_failed(episode)
+        {:error, reason}
     end
   end
 

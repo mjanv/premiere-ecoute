@@ -16,7 +16,8 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
   defp load(socket) do
     shows = Podcasts.all_shows()
     counts = Map.new(shows, fn s -> {s.id, length(Podcasts.episodes_for_show(s))} end)
-    assign(socket, shows: shows, counts: counts)
+    reports = Map.new(shows, fn s -> {s.id, Podcasts.report_count(s)} end)
+    assign(socket, shows: shows, counts: counts, reports: reports)
   end
 
   @impl true
@@ -53,6 +54,7 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
               <th class="py-2">{gettext("Show")}</th>
               <th>{gettext("Owner")}</th>
               <th>{gettext("Episodes")}</th>
+              <th>{gettext("Reports")}</th>
               <th>{gettext("Status")}</th>
               <th></th>
             </tr>
@@ -62,6 +64,7 @@ defmodule PremiereEcouteWeb.Admin.PodcastsLive do
               <td class="py-2 font-medium">{show.title}</td>
               <td>{show.user && show.user.username}</td>
               <td>{@counts[show.id]}</td>
+              <td class={if @reports[show.id] > 0, do: "text-red-600 font-semibold", else: ""}>{@reports[show.id]}</td>
               <td>{if show.published, do: gettext("Published"), else: gettext("Draft")}</td>
               <td class="text-right">
                 <button
