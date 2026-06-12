@@ -73,7 +73,7 @@ Three roles. A paid platform plays all three; we play the first two.
 |---|---|
 | Distribution | Self-host audio **and** RSS feed. Manual directory submission. No Apple/Spotify API. |
 | Audio format | **MP3 only.** Reject other formats at upload. |
-| Duration metadata | **Automatic** extraction (see §7 for the one technical decision). |
+| Duration metadata | **Automatic**, via a **pure-Elixir** MP3 frame parser (no ffmpeg). |
 | Feed granularity | **One RSS feed per show.** A streamer with N shows has N feeds. |
 | Cover art | Each show has its **own** square cover image (≥ 1400×1400), separate from user avatar. |
 | Visibility | **Public**, unauthenticated. |
@@ -173,20 +173,22 @@ sourced from env — mirrors how Spotify/Twitch creds are configured.
    - **Extracts `duration_seconds`.** → see decision below.
    - Sets `status: :ready`. Publishes `EpisodePublished` when the streamer publishes.
 
-### One real technical decision: MP3 duration extraction
+### MP3 duration extraction — **decided: pure Elixir**
 
-MP3 duration is not in a single header for VBR files; it requires either a metadata tool
-or scanning frames. Options for the doc reviewer to pick:
+MP3 duration is not in a single header for VBR files; it requires scanning frames. We
+extract it with a **pure-Elixir MP3 frame parser** in the worker — **no system
+dependency** (no ffmpeg/ffprobe in the runtime image), consistent with MP3-only/no-transcode.
 
-- **(Recommended) `ffprobe`** (ffmpeg) shelled out in the worker — most robust for CBR
-  **and** VBR, one line, battle-tested. Cost: ffmpeg must be present in the runtime image.
-  Note: we chose MP3-only to avoid *transcoding*; `ffprobe` only *reads* metadata, no
-  re-encoding, so this is consistent with that decision.
-- **Pure-Elixir frame parser** — no system dependency, but VBR accuracy is fiddly and is
-  more code to own.
-
-Recommendation: **ffprobe**, with the streamer able to override duration manually as a
-fallback if probing fails. Decide before implementation starts.
+Implementation notes for the parser:
+- Skip any leading **ID3v2** tag (read its size from the 10-byte header) and trailing
+  **ID3v1** (128 bytes) before frame scanning.
+- Detect **VBR** via a `Xing`/`Info` (or `VBRI`) header in the first frame: if present,
+  duration = `frame_count * samples_per_frame / sample_rate` — exact and cheap, no full scan.
+- If no VBR header (**CBR**), duration = `(file_size - tag_bytes) * 8 / bitrate` from the
+  first valid frame header.
+- Last resort, if both fail: scan frames to count them. Keep this bounded.
+- The streamer can **override duration manually** as a fallback if parsing fails; ingestion
+  must not hard-fail solely on duration extraction.
 
 ## 8. RSS feed generation
 
@@ -219,8 +221,9 @@ GET /podcasts/:username/:show_slug/episodes/:guid/audio
   `Analytics` context / Telemetry. For honest "unique download" counts later, dedupe by
   IP+User-Agent within a 24h window (IAB-style) — can be a v1.1 refinement; v1 can store
   raw hits.
-- The website in-page player can hit the same tracking endpoint or the storage URL
-  directly (decide whether website plays count as "downloads").
+- **Website plays count as listens** (decided). The in-page player hits the same tracking
+  endpoint so on-site listens and podcast-app downloads are measured uniformly. Tag the
+  event with its source (`:web` vs `:feed`) so the two can still be told apart in analytics.
 
 ## 10. Web surface
 
@@ -265,14 +268,16 @@ integration with the directories.
 
 ## 14. Risks & open items
 
-- **Duration extraction approach** (§7) — decide ffprobe vs pure parser before coding.
 - **Object storage provider + bucket public-access model** — owner provisions; confirm
   public-read vs stable-signed URLs (public-read recommended).
 - **Content moderation / DMCA** — feeds are world-readable under our domain. Need a
   takedown path and ToS coverage. Out of v1 code scope but a product/legal must.
 - **Storage cost monitoring** — add an alert if egress materially exceeds the ~40 GB/mo
   baseline (guards against a viral episode surprise).
-- **Website-play vs app-download counting** — define what counts as a "listen".
+- **VBR parser edge cases** — exotic/corrupt MP3s may defeat the pure-Elixir parser;
+  manual duration override is the safety valve (§7).
+
+_Resolved: duration extraction → pure-Elixir parser (§7); website plays count as listens (§9)._
 
 ## 15. Implementation phases
 
