@@ -102,5 +102,5 @@ if config_env() == :prod do
     public_base_url: env!("PODCASTS_PUBLIC_BASE_URL", :string, "https://podcasts.premiere-ecoute.fr")
 
   config :premiere_ecoute, PremiereEcoute.Podcasts.Storage.Seaweed,
-    filer_url: env!("SEAWEEDFS_FILER_URL", :string, "http://seaweedfs-filer:8888")
+    filer_url: env!("SEAWEEDFS_FILER_URL", :string, "http://127.0.0.1:8888")
 end
