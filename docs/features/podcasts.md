@@ -347,11 +347,15 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
   cancel, errors).
 - Lifecycle: deleting an account **purges the user's podcast storage objects** (audio + covers).
 - Moderation: public **"report this podcast"** action → `ShowReported` events surfaced as a report
-  count in admin moderation; **content/DMCA policy** legal document (`priv/legal/podcast_policy.md`).
+  count in admin moderation; **content/DMCA policy** legal document (`priv/legal/podcast_policy.md`),
+  linked from the Terms of Service (`/legal/podcast`).
+- Polish: subscribe/RSS section with copy-to-clipboard on the show page; shareable per-episode
+  page (`/podcasts/:username/:show_slug/episodes/:guid`); feed capped at 300 episodes; scheduled
+  publishing (future `published_at` from the dashboard); downloads chart split by source (apps vs web).
 
-**Remaining (later):**
-- Optional scale step: offload hot audio to a CDN or SeaweedFS S3-gateway presigned URLs; direct
-  (presigned) uploads instead of app-proxied `put`.
+**Remaining (later / declined):**
+- Per-episode artwork, season/episode numbers, transcripts/chapters (Podcasting 2.0) — not built.
+- Scale step (CDN / presigned uploads) — explicitly out of scope per owner.
 - Telemetry/PromEx dashboards for downloads and egress; content-moderation/DMCA policy + ToS.
 
 ## 16. Implementation phases

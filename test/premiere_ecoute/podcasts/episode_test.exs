@@ -61,6 +61,16 @@ defmodule PremiereEcoute.Podcasts.EpisodeTest do
 
       assert {:error, :not_ready} = Episode.publish(episode)
     end
+
+    test "schedules a future publication that stays out of the feed until due", %{show: show} do
+      episode = episode_fixture(show, %{status: :ready, published_at: nil})
+      future = DateTime.add(DateTime.utc_now(), 7, :day)
+
+      {:ok, published} = Episode.publish(episode, future)
+
+      assert DateTime.compare(published.published_at, DateTime.utc_now()) == :gt
+      refute Enum.any?(Episode.feed_episodes(show), &(&1.id == episode.id))
+    end
   end
 
   describe "feed_episodes/1" do

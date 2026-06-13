@@ -93,7 +93,7 @@ defmodule PremiereEcoute.Podcasts.Episode do
 
   @doc """
   Lists episodes that should appear in a show's public feed: ready and published at or before now,
-  newest first.
+  newest first. Capped (Apple recommends limiting very long feeds).
   """
   @spec feed_episodes(Show.t()) :: [t()]
   def feed_episodes(%Show{id: show_id}) do
@@ -102,6 +102,7 @@ defmodule PremiereEcoute.Podcasts.Episode do
     __MODULE__
     |> where([e], e.show_id == ^show_id and e.status == :ready and not is_nil(e.published_at) and e.published_at <= ^now)
     |> order_by([e], desc: e.published_at)
+    |> limit(300)
     |> Repo.all()
   end
 

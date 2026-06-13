@@ -33,7 +33,13 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
 
     to = DateTime.utc_now()
     from = DateTime.add(to, -29, :day)
-    series = Podcasts.show_downloads_over_time(show, :day, from: from, to: to, fill_gaps: true)
+    opts = [from: from, to: to, fill_gaps: true]
+    feed = Podcasts.show_downloads_over_time(show, :day, Keyword.put(opts, :filters, %{source: "feed"}))
+    web = Podcasts.show_downloads_over_time(show, :day, Keyword.put(opts, :filters, %{source: "web"}))
+
+    series =
+      Enum.zip(feed, web)
+      |> Enum.map(fn {f, w} -> %{period: f.period, feed: f.count, web: w.count, total: f.count + w.count} end)
 
     assign(socket,
       show: show,
@@ -43,12 +49,21 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
       last_30: Podcasts.show_downloads_last(show, 30),
       unique: Podcasts.unique_listeners(show),
       series: series,
-      series_max: Enum.reduce(series, 0, &max(&1.count, &2))
+      series_max: Enum.reduce(series, 0, &max(&1.total, &2))
     )
   end
 
   defp bar_height(_count, 0), do: 0
   defp bar_height(count, max), do: round(count / max * 100)
+
+  defp parse_datetime(blank) when blank in ["", nil], do: :now
+
+  defp parse_datetime(string) do
+    case NaiveDateTime.from_iso8601(string <> ":00") do
+      {:ok, naive} -> {:ok, DateTime.from_naive!(naive, "Etc/UTC")}
+      _ -> :now
+    end
+  end
 
   @impl true
   def handle_event("publish_show", _params, socket) do
@@ -63,8 +78,21 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
   end
 
   @impl true
-  def handle_event("publish_episode", %{"id" => id}, socket) do
-    socket = with_episode(socket, id, &Podcasts.publish_episode/1, gettext("Episode published"))
+  def handle_event("publish_episode", %{"id" => id} = params, socket) do
+    episode = Enum.find(socket.assigns.episodes, &(to_string(&1.id) == id))
+
+    result =
+      case parse_datetime(Map.get(params, "at", "")) do
+        {:ok, at} -> episode && Podcasts.publish_episode_at(episode, at)
+        :now -> episode && Podcasts.publish_episode(episode)
+      end
+
+    socket =
+      case result do
+        {:ok, _} -> socket |> put_flash(:info, gettext("Episode published")) |> load(socket.assigns.show)
+        _ -> put_flash(socket, :error, gettext("Action failed"))
+      end
+
     {:noreply, socket}
   end
 
@@ -156,15 +184,26 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
         </div>
 
         <div class="border rounded-lg p-4 mb-6">
-          <div class="text-sm font-semibold mb-3">{gettext("Downloads (last 30 days)")}</div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold">{gettext("Downloads (last 30 days)")}</div>
+            <div class="flex items-center gap-3 text-xs text-gray-500">
+              <span class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-sm bg-indigo-500"></span>{gettext("Podcast apps")}
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-sm bg-emerald-400"></span>{gettext("Website")}
+              </span>
+            </div>
+          </div>
           <div :if={@series_max == 0} class="text-xs text-gray-500">{gettext("No downloads yet.")}</div>
-          <div :if={@series_max > 0} class="flex items-end gap-px h-24" aria-hidden="true">
+          <div :if={@series_max > 0} class="flex items-end gap-px h-24">
             <div
               :for={point <- @series}
-              class="flex-1 bg-indigo-500/80 rounded-t min-h-px"
-              style={"height: #{bar_height(point.count, @series_max)}%"}
-              title={"#{Calendar.strftime(point.period, "%d/%m")}: #{point.count}"}
+              class="flex-1 flex flex-col justify-end"
+              title={"#{Calendar.strftime(point.period, "%d/%m")}: #{point.total}"}
             >
+              <div class="bg-emerald-400" style={"height: #{bar_height(point.web, @series_max)}%"}></div>
+              <div class="bg-indigo-500 rounded-b" style={"height: #{bar_height(point.feed, @series_max)}%"}></div>
             </div>
           </div>
         </div>
@@ -184,14 +223,22 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
                 </div>
               </div>
               <div class="flex gap-2">
-                <button
+                <form
                   :if={episode.status == :ready and is_nil(episode.published_at)}
-                  phx-click="publish_episode"
-                  phx-value-id={episode.id}
-                  class="px-3 py-1 rounded bg-green-600 text-white text-sm"
+                  phx-submit="publish_episode"
+                  class="flex items-center gap-1"
                 >
-                  {gettext("Publish")}
-                </button>
+                  <input type="hidden" name="id" value={episode.id} />
+                  <input
+                    type="datetime-local"
+                    name="at"
+                    title={gettext("Leave empty to publish now")}
+                    class="border rounded text-xs px-1 py-0.5"
+                  />
+                  <button type="submit" class="px-3 py-1 rounded bg-green-600 text-white text-sm">
+                    {gettext("Publish")}
+                  </button>
+                </form>
                 <button
                   :if={episode.published_at}
                   phx-click="unpublish_episode"
