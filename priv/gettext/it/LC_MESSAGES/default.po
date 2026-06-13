@@ -6644,3 +6644,15 @@ msgstr "È possibile caricare un solo file"
 #, elixir-autogen, elixir-format
 msgid "Upload error"
 msgstr "Errore di caricamento"
+
+#, elixir-autogen, elixir-format
+msgid "Subscribe in your podcast app"
+msgstr "Iscriviti dalla tua app di podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Leave empty to publish now"
+msgstr "Lascia vuoto per pubblicare ora"
+
+#, elixir-autogen, elixir-format
+msgid "Episode not found"
+msgstr "Episodio non trovato"

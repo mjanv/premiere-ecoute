@@ -45,9 +45,27 @@ defmodule PremiereEcouteWeb.Podcasts.ShowLive do
         <div>
           <h1 class="text-2xl font-bold">{@show.title}</h1>
           <p class="text-gray-500">{@show.description}</p>
-          <a href={~p"/podcasts/#{@username}/#{@show.slug}/feed.xml"} class="text-sm text-indigo-600">
-            {gettext("RSS feed")}
-          </a>
+          <div class="mt-3">
+            <div class="text-xs text-gray-500 mb-1">{gettext("Subscribe in your podcast app")}</div>
+            <div class="flex items-center gap-2">
+              <input
+                type="text"
+                readonly
+                value={url(~p"/podcasts/#{@username}/#{@show.slug}/feed.xml")}
+                class="border rounded px-2 py-1 text-xs flex-1 max-w-md bg-gray-50"
+              />
+              <button
+                type="button"
+                onclick={"navigator.clipboard.writeText('#{url(~p"/podcasts/#{@username}/#{@show.slug}/feed.xml")}')"}
+                class="px-2 py-1 rounded border text-xs"
+              >
+                {gettext("Copy")}
+              </button>
+              <a href={~p"/podcasts/#{@username}/#{@show.slug}/feed.xml"} class="px-2 py-1 rounded border text-xs">
+                {gettext("RSS feed")}
+              </a>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -55,7 +73,12 @@ defmodule PremiereEcouteWeb.Podcasts.ShowLive do
 
       <ul class="space-y-6">
         <li :for={episode <- @episodes} class="border rounded-lg p-4">
-          <div class="font-semibold">{episode.title}</div>
+          <.link
+            navigate={~p"/podcasts/#{@username}/#{@show.slug}/episodes/#{episode.guid}"}
+            class="font-semibold hover:underline"
+          >
+            {episode.title}
+          </.link>
           <p class="text-sm text-gray-500 mb-2">{episode.description}</p>
           <audio
             controls

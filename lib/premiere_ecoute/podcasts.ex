@@ -43,6 +43,7 @@ defmodule PremiereEcoute.Podcasts do
   defdelegate mark_episode_ready(episode, attrs), to: Episode, as: :mark_ready
   defdelegate mark_episode_failed(episode), to: Episode, as: :mark_failed
   defdelegate publish_episode(episode), to: Episode, as: :publish
+  defdelegate publish_episode_at(episode, at), to: Episode, as: :publish
   defdelegate change_episode(episode, attrs \\ %{}), to: Episode, as: :form
 
   @doc "Renders the RSS feed XML for a show and its publishable episodes."

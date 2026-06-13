@@ -6643,3 +6643,15 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Upload error"
 msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Subscribe in your podcast app"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Leave empty to publish now"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episode not found"
+msgstr ""

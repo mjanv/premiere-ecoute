@@ -227,6 +227,7 @@ defmodule PremiereEcouteWeb.Router do
     live_session :podcasts_public, on_mount: [{UserAuth, :current_scope}] do
       live "/:username", ShowsLive, :index
       live "/:username/:show_slug", ShowLive, :show
+      live "/:username/:show_slug/episodes/:guid", EpisodeLive, :show
     end
   end
 
@@ -392,6 +393,7 @@ defmodule PremiereEcouteWeb.Router do
     get "/privacy", LegalController, :privacy
     get "/cookies", LegalController, :cookies
     get "/terms", LegalController, :terms
+    get "/podcast", LegalController, :podcast
     get "/contact", LegalController, :contact
   end
 

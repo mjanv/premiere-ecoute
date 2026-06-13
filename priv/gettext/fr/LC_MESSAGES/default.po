@@ -6644,3 +6644,15 @@ msgstr "Un seul fichier peut être téléversé"
 #, elixir-autogen, elixir-format
 msgid "Upload error"
 msgstr "Erreur de téléversement"
+
+#, elixir-autogen, elixir-format
+msgid "Subscribe in your podcast app"
+msgstr "Abonnez-vous dans votre application de podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Leave empty to publish now"
+msgstr "Laisser vide pour publier maintenant"
+
+#, elixir-autogen, elixir-format
+msgid "Episode not found"
+msgstr "Épisode introuvable"
