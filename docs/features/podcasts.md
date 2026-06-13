@@ -333,8 +333,12 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
   PO files (POT/fr/it).
 
 - Production storage: **`Storage.Seaweed`** adapter (SeaweedFS Filer HTTP API via `Req` — no S3
-  signing/dependency). Wired in `runtime.exs` (`SEAWEEDFS_FILER_URL`, `PODCASTS_PUBLIC_BASE_URL`).
+  signing/dependency). Wired in `runtime.exs` (`SEAWEEDFS_FILER_URL`, default `http://127.0.0.1:8888`).
   Tested with `Req.Test` stubs.
+- Infra provisioned: **SeaweedFS in `docker-compose.yml`** for local dev (dev config points at the
+  Filer); **native systemd** unit (`apps/digital_ocean/systemd/seaweedfs.service`, Filer bound to
+  loopback) installed by `setup.sh`/`deploy.sh`; **backup/restore** scripts
+  (`apps/digital_ocean/seaweedfs-backup.sh` / `-restore.sh`).
 - Audio **and cover art** served **through Phoenix** (`Storage.send_object/3`), range-aware, so
   SeaweedFS stays fully private (no public bucket/URL). `Local` streams from disk via `send_file`;
   `Seaweed` proxies the Filer with `Range` pass-through. Covers stream from `CoverController`

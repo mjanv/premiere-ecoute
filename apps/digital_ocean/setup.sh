@@ -44,6 +44,31 @@ echo "Configuring PostgreSQL..."
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';" || true
 sudo -u postgres psql -c "CREATE DATABASE premiere_ecoute_prod;" || echo "Database already exists"
 
+# Install SeaweedFS (podcast object storage)
+if ! command -v weed &> /dev/null; then
+    echo "Installing SeaweedFS..."
+    SEAWEEDFS_VERSION="4.33"
+    wget -q "https://github.com/seaweedfs/seaweedfs/releases/download/${SEAWEEDFS_VERSION}/linux_amd64.tar.gz" -O seaweedfs.tar.gz
+    tar -xzf seaweedfs.tar.gz
+    mv weed /usr/local/bin/
+    chmod +x /usr/local/bin/weed
+    rm seaweedfs.tar.gz
+    echo "SeaweedFS installed successfully!"
+else
+    echo "SeaweedFS is already installed."
+fi
+
+# Create seaweedfs service user and data directory
+if ! id -u seaweedfs &>/dev/null; then
+    echo "Creating seaweedfs user..."
+    useradd -r -s /bin/false -d /var/lib/seaweedfs seaweedfs
+    echo "User 'seaweedfs' created."
+else
+    echo "User 'seaweedfs' already exists."
+fi
+mkdir -p /var/lib/seaweedfs
+chown -R seaweedfs:seaweedfs /var/lib/seaweedfs
+
 # Create application user
 if ! id -u premiere &>/dev/null; then
     echo "Creating application user..."

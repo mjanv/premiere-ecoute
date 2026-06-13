@@ -11,6 +11,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.33
+    container_name: seaweedfs
+    # All-in-one (master + volume + filer). The app talks to the Filer HTTP API on :8888.
+    command: "server -dir=/data -filer -ip.bind=0.0.0.0 -master.volumeSizeLimitMB=1024"
+    ports:
+      - "8888:8888" # Filer HTTP API (used by the app for podcast audio/cover)
+      - "9333:9333" # Master (dashboard/debug, optional)
+    volumes:
+      - seaweedfs_data:/data
+
   prometheus:
     image: prom/prometheus:v3.7.2
     container_name: prometheus
@@ -37,4 +48,5 @@ services:
 
 volumes:
   postgres_data:
+  seaweedfs_data:
   grafana_data:

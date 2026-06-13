@@ -67,6 +67,7 @@ run_remote "
     # Copy systemd service files
     cp /tmp/systemd/premiere-ecoute.service /etc/systemd/system/
     cp /tmp/systemd/traefik.service /etc/systemd/system/
+    cp /tmp/systemd/seaweedfs.service /etc/systemd/system/
 
     # Setup Traefik config
     mkdir -p /opt/traefik
@@ -88,6 +89,10 @@ run_remote "
     # Start PostgreSQL if not running
     systemctl start postgresql
     systemctl enable postgresql
+
+    # Start/restart SeaweedFS (podcast storage) before the app
+    systemctl restart seaweedfs
+    systemctl enable seaweedfs
 
     # Start/restart Traefik
     systemctl restart traefik

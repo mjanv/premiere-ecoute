@@ -1,8 +1,10 @@
 # AIDEV-NOTE: Systemd service for Premiere Ecoute Phoenix application
 [Unit]
 Description=Premiere Ecoute Phoenix Application
-After=network.target postgresql.service
+After=network.target postgresql.service seaweedfs.service
 Requires=postgresql.service
+# Soft dependency: podcasts need SeaweedFS, but the app should still boot if it's briefly down.
+Wants=seaweedfs.service
 
 [Service]
 Type=exec
