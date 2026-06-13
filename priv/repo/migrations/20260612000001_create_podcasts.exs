@@ -28,6 +28,9 @@ defmodule PremiereEcoute.Repo.Migrations.CreatePodcasts do
       add :audio_key, :string
       add :audio_byte_size, :bigint
       add :duration_seconds, :integer
+      add :season, :integer
+      add :episode_number, :integer
+      add :episode_type, :string, null: false, default: "full"
       add :status, :string, null: false, default: "uploading"
       add :published_at, :utc_datetime
 

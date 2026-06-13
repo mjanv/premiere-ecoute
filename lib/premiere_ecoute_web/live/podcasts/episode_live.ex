@@ -38,8 +38,12 @@ defmodule PremiereEcouteWeb.Podcasts.EpisodeLive do
         ← {@show.title}
       </.link>
 
-      <h1 class="text-2xl font-bold mt-2 mb-2">{@episode.title}</h1>
-      <p class="text-gray-500 mb-4 whitespace-pre-line">{@episode.description}</p>
+      <h1 class="text-2xl font-bold mt-2">{@episode.title}</h1>
+      <div :if={@episode.season || @episode.episode_number} class="text-xs text-gray-500 mb-2">
+        <span :if={@episode.season}>S{@episode.season}</span>
+        <span :if={@episode.episode_number}>E{@episode.episode_number}</span>
+      </div>
+      <p class="text-gray-500 mt-2 mb-4 whitespace-pre-line">{@episode.description}</p>
 
       <audio
         controls

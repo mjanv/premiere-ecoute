@@ -15,7 +15,7 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
     case load(params, scope) do
       {:ok, show, episode, action} ->
         socket
-        |> assign(show: show, episode: episode, action: action)
+        |> assign(show: show, episode: episode, action: action, episode_types: Episode.episode_types())
         |> assign_form(Podcasts.change_episode(episode))
         |> allow_upload(:audio, accept: ~w(.mp3), max_entries: 1, max_file_size: 200_000_000)
         |> then(&{:ok, &1})
@@ -73,7 +73,9 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
   def handle_event("save", %{"episode" => params}, %{assigns: %{action: :new, show: show}} = socket) do
     case consume_audio(socket) do
       {:ok, bytes} ->
-        case Podcasts.upload_episode(show, Map.take(params, ["title", "description"]), bytes) do
+        attrs = Map.take(params, ["title", "description", "season", "episode_number", "episode_type"])
+
+        case Podcasts.upload_episode(show, attrs, bytes) do
           {:ok, _episode} ->
             {:noreply,
              socket
@@ -116,6 +118,12 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
         <.form for={@form} id="episode-form" phx-change="validate" phx-submit="save" class="space-y-4">
           <.input field={@form[:title]} type="text" label={gettext("Title")} required />
           <.input field={@form[:description]} type="textarea" label={gettext("Show notes")} />
+
+          <div class="grid grid-cols-3 gap-3">
+            <.input field={@form[:season]} type="number" label={gettext("Season")} min="1" />
+            <.input field={@form[:episode_number]} type="number" label={gettext("Episode number")} min="1" />
+            <.input field={@form[:episode_type]} type="select" label={gettext("Type")} options={@episode_types} />
+          </div>
 
           <div :if={@action == :new} phx-drop-target={@uploads.audio.ref}>
             <label class="block text-sm font-medium mb-1">{gettext("Audio file (MP3)")}</label>

@@ -6656,3 +6656,15 @@ msgstr "Lascia vuoto per pubblicare ora"
 #, elixir-autogen, elixir-format
 msgid "Episode not found"
 msgstr "Episodio non trovato"
+
+#, elixir-autogen, elixir-format
+msgid "Season"
+msgstr "Stagione"
+
+#, elixir-autogen, elixir-format
+msgid "Episode number"
+msgstr "Numero dell'episodio"
+
+#, elixir-autogen, elixir-format
+msgid "Type"
+msgstr "Tipo"
