@@ -81,6 +81,20 @@ defmodule PremiereEcoute.Podcasts.Services.FeedTest do
       assert xml =~ "<itunes:type>episodic</itunes:type>"
     end
 
+    test "includes season/episode/episodeType when set, omits the optional ones when absent" do
+      numbered = %{episode() | season: 3, episode_number: 7, episode_type: :bonus}
+      xml = Feed.render(show(), [numbered], urls())
+
+      assert xml =~ "<itunes:season>3</itunes:season>"
+      assert xml =~ "<itunes:episode>7</itunes:episode>"
+      assert xml =~ "<itunes:episodeType>bonus</itunes:episodeType>"
+
+      bare = Feed.render(show(), [episode()], urls())
+      refute bare =~ "<itunes:season>"
+      refute bare =~ "<itunes:episode>"
+      assert bare =~ "<itunes:episodeType>full</itunes:episodeType>"
+    end
+
     test "emits the owner email when the user is loaded (Apple verification)" do
       with_owner = %{show() | user: %{email: "bob@example.com"}}
       xml = Feed.render(with_owner, [episode()], urls())

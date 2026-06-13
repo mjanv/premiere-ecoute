@@ -6655,3 +6655,15 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Episode not found"
 msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Season"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Episode number"
+msgstr ""
+
+#, elixir-autogen, elixir-format
+msgid "Type"
+msgstr ""

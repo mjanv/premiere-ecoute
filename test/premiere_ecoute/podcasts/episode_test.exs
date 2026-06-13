@@ -32,6 +32,23 @@ defmodule PremiereEcoute.Podcasts.EpisodeTest do
       assert "can't be blank" in errors_on(changeset).title
       assert "can't be blank" in errors_on(changeset).show_id
     end
+
+    test "casts season, episode number, and type", %{show: show} do
+      changeset =
+        Episode.changeset(%Episode{}, %{show_id: show.id, title: "E", season: 2, episode_number: 4, episode_type: "bonus"})
+
+      assert changeset.valid?
+      assert get_change(changeset, :season) == 2
+      assert get_change(changeset, :episode_number) == 4
+      assert get_change(changeset, :episode_type) == :bonus
+    end
+
+    test "rejects non-positive episode numbers", %{show: show} do
+      changeset = Episode.changeset(%Episode{}, %{show_id: show.id, title: "E", episode_number: 0})
+
+      refute changeset.valid?
+      assert "must be greater than 0" in errors_on(changeset).episode_number
+    end
   end
 
   describe "create/1" do

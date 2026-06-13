@@ -56,16 +56,21 @@ defmodule PremiereEcoute.Podcasts.Services.Feed do
   defp owner_email(_show), do: nil
 
   defp item(%Episode{} = episode, show, urls) do
-    {:item, %{},
-     [
-       {:title, %{}, episode.title},
-       {:description, %{}, episode.description},
-       {:guid, %{isPermaLink: "false"}, episode.guid},
-       {:pubDate, %{}, rfc822(episode.published_at)},
-       {:enclosure, %{url: urls[:audio].(episode), length: episode.audio_byte_size, type: "audio/mpeg"}, nil},
-       {"itunes:duration", %{}, episode.duration_seconds},
-       {"itunes:explicit", %{}, bool(show.explicit)}
-     ]}
+    elements =
+      [
+        {:title, %{}, episode.title},
+        {:description, %{}, episode.description},
+        {:guid, %{isPermaLink: "false"}, episode.guid},
+        {:pubDate, %{}, rfc822(episode.published_at)},
+        {:enclosure, %{url: urls[:audio].(episode), length: episode.audio_byte_size, type: "audio/mpeg"}, nil},
+        {"itunes:duration", %{}, episode.duration_seconds},
+        {"itunes:episodeType", %{}, to_string(episode.episode_type || :full)},
+        {"itunes:explicit", %{}, bool(show.explicit)}
+      ]
+      |> maybe(episode.season, fn season -> {"itunes:season", %{}, season} end)
+      |> maybe(episode.episode_number, fn number -> {"itunes:episode", %{}, number} end)
+
+    {:item, %{}, elements}
   end
 
   defp maybe(elements, nil, _fun), do: elements

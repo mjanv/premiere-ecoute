@@ -21,6 +21,7 @@ defmodule PremiereEcoute.Podcasts.Episode do
   alias PremiereEcoute.Podcasts.Show
 
   @statuses [:uploading, :processing, :ready, :failed]
+  @episode_types [:full, :trailer, :bonus]
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -30,6 +31,9 @@ defmodule PremiereEcoute.Podcasts.Episode do
           audio_key: String.t() | nil,
           audio_byte_size: integer() | nil,
           duration_seconds: integer() | nil,
+          season: integer() | nil,
+          episode_number: integer() | nil,
+          episode_type: :full | :trailer | :bonus,
           status: :uploading | :processing | :ready | :failed,
           published_at: DateTime.t() | nil,
           show: entity(Show.t()),
@@ -44,6 +48,9 @@ defmodule PremiereEcoute.Podcasts.Episode do
     field :audio_key, :string
     field :audio_byte_size, :integer
     field :duration_seconds, :integer
+    field :season, :integer
+    field :episode_number, :integer
+    field :episode_type, Ecto.Enum, values: @episode_types, default: :full
     field :status, Ecto.Enum, values: @statuses, default: :uploading
     field :published_at, :utc_datetime
 
@@ -67,6 +74,9 @@ defmodule PremiereEcoute.Podcasts.Episode do
       :audio_key,
       :audio_byte_size,
       :duration_seconds,
+      :season,
+      :episode_number,
+      :episode_type,
       :status,
       :published_at,
       :show_id
@@ -75,9 +85,15 @@ defmodule PremiereEcoute.Podcasts.Episode do
     |> validate_required([:guid, :title, :show_id])
     |> validate_number(:audio_byte_size, greater_than: 0)
     |> validate_number(:duration_seconds, greater_than: 0)
+    |> validate_number(:season, greater_than: 0)
+    |> validate_number(:episode_number, greater_than: 0)
     |> unique_constraint(:guid)
     |> foreign_key_constraint(:show_id)
   end
+
+  @doc "Returns the valid Apple episode types."
+  @spec episode_types() :: [atom()]
+  def episode_types, do: @episode_types
 
   defp maybe_put_guid(changeset) do
     case get_field(changeset, :guid) do
