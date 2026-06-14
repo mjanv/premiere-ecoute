@@ -6368,3 +6368,303 @@ msgstr "Scrivi il tuo messaggio…"
 #, elixir-autogen, elixir-format
 msgid "queued"
 msgstr "in coda"
+
+#, elixir-autogen, elixir-format
+msgid "Podcasts by %{username}"
+msgstr "Podcast di %{username}"
+
+#, elixir-autogen, elixir-format
+msgid "No podcasts published yet."
+msgstr "Nessun podcast pubblicato per ora."
+
+#, elixir-autogen, elixir-format
+msgid "Podcast not found"
+msgstr "Podcast non trovato"
+
+#, elixir-autogen, elixir-format
+msgid "RSS feed"
+msgstr "Feed RSS"
+
+#, elixir-autogen, elixir-format
+msgid "No episodes yet."
+msgstr "Nessun episodio per ora."
+
+#, elixir-autogen, elixir-format
+msgid "My podcasts"
+msgstr "I miei podcast"
+
+#, elixir-autogen, elixir-format
+msgid "New show"
+msgstr "Nuovo programma"
+
+#, elixir-autogen, elixir-format
+msgid "You have no podcast shows yet."
+msgstr "Non hai ancora programmi podcast."
+
+#, elixir-autogen, elixir-format
+msgid "Published"
+msgstr "Pubblicato"
+
+#, elixir-autogen, elixir-format
+msgid "Draft"
+msgstr "Bozza"
+
+#, elixir-autogen, elixir-format
+msgid "Show not found"
+msgstr "Programma non trovato"
+
+#, elixir-autogen, elixir-format
+msgid "Show saved"
+msgstr "Programma salvato"
+
+#, elixir-autogen, elixir-format
+msgid "Cover must be square — it was not saved"
+msgstr "La copertina deve essere quadrata — non è stata salvata"
+
+#, elixir-autogen, elixir-format
+msgid "Cover must be at least 1400×1400 — it was not saved"
+msgstr "La copertina deve essere almeno 1400×1400 — non è stata salvata"
+
+#, elixir-autogen, elixir-format
+msgid "Cover must be at most 3000×3000 — it was not saved"
+msgstr "La copertina deve essere al massimo 3000×3000 — non è stata salvata"
+
+#, elixir-autogen, elixir-format
+msgid "Cover image could not be read — it was not saved"
+msgstr "Impossibile leggere l'immagine di copertina — non è stata salvata"
+
+#, elixir-autogen, elixir-format
+msgid "Edit show"
+msgstr "Modifica programma"
+
+#, elixir-autogen, elixir-format
+msgid "Author"
+msgstr "Autore"
+
+#, elixir-autogen, elixir-format
+msgid "Language (e.g. en, fr)"
+msgstr "Lingua (es. en, fr)"
+
+#, elixir-autogen, elixir-format
+msgid "Choose a category"
+msgstr "Scegli una categoria"
+
+#, elixir-autogen, elixir-format
+msgid "Explicit content"
+msgstr "Contenuto esplicito"
+
+#, elixir-autogen, elixir-format
+msgid "Cover image (≥ 1400×1400)"
+msgstr "Immagine di copertina (≥ 1400×1400)"
+
+#, elixir-autogen, elixir-format
+msgid "Save show"
+msgstr "Salva programma"
+
+#, elixir-autogen, elixir-format
+msgid "Show published"
+msgstr "Programma pubblicato"
+
+#, elixir-autogen, elixir-format
+msgid "Show unpublished"
+msgstr "Programma rimosso dalla pubblicazione"
+
+#, elixir-autogen, elixir-format
+msgid "Episode published"
+msgstr "Episodio pubblicato"
+
+#, elixir-autogen, elixir-format
+msgid "Episode unpublished"
+msgstr "Episodio rimosso dalla pubblicazione"
+
+#, elixir-autogen, elixir-format
+msgid "Episode deleted"
+msgstr "Episodio eliminato"
+
+#, elixir-autogen, elixir-format
+msgid "Action failed"
+msgstr "Azione non riuscita"
+
+#, elixir-autogen, elixir-format
+msgid "New episode"
+msgstr "Nuovo episodio"
+
+#, elixir-autogen, elixir-format
+msgid "Publish show"
+msgstr "Pubblica programma"
+
+#, elixir-autogen, elixir-format
+msgid "Unpublish"
+msgstr "Rimuovi pubblicazione"
+
+#, elixir-autogen, elixir-format
+msgid "Submit this feed URL once to Apple Podcasts, Spotify, and other apps to distribute your show."
+msgstr "Invia questo URL del feed una volta ad Apple Podcasts, Spotify e altre app per distribuire il tuo programma."
+
+#, elixir-autogen, elixir-format
+msgid "Episodes"
+msgstr "Episodi"
+
+#, elixir-autogen, elixir-format
+msgid "published"
+msgstr "pubblicato"
+
+#, elixir-autogen, elixir-format
+msgid "%{count} downloads"
+msgstr "%{count} download"
+
+#, elixir-autogen, elixir-format
+msgid "Publish"
+msgstr "Pubblica"
+
+#, elixir-autogen, elixir-format
+msgid "Delete this episode?"
+msgstr "Eliminare questo episodio?"
+
+#, elixir-autogen, elixir-format
+msgid "Not found"
+msgstr "Non trovato"
+
+#, elixir-autogen, elixir-format
+msgid "Episode updated"
+msgstr "Episodio aggiornato"
+
+#, elixir-autogen, elixir-format
+msgid "Episode uploaded — processing audio"
+msgstr "Episodio caricato — elaborazione audio"
+
+#, elixir-autogen, elixir-format
+msgid "Upload failed"
+msgstr "Caricamento non riuscito"
+
+#, elixir-autogen, elixir-format
+msgid "Please choose an MP3 file"
+msgstr "Scegli un file MP3"
+
+#, elixir-autogen, elixir-format
+msgid "Edit episode"
+msgstr "Modifica episodio"
+
+#, elixir-autogen, elixir-format
+msgid "Show notes"
+msgstr "Note dell'episodio"
+
+#, elixir-autogen, elixir-format
+msgid "Audio file (MP3)"
+msgstr "File audio (MP3)"
+
+#, elixir-autogen, elixir-format
+msgid "Duration is detected automatically after upload."
+msgstr "La durata viene rilevata automaticamente dopo il caricamento."
+
+#, elixir-autogen, elixir-format
+msgid "Upload episode"
+msgstr "Carica episodio"
+
+#, elixir-autogen, elixir-format
+msgid "Save changes"
+msgstr "Salva modifiche"
+
+#, elixir-autogen, elixir-format
+msgid "Podcast moderation"
+msgstr "Moderazione podcast"
+
+#, elixir-autogen, elixir-format
+msgid "No shows."
+msgstr "Nessun programma."
+
+#, elixir-autogen, elixir-format
+msgid "Show"
+msgstr "Programma"
+
+#, elixir-autogen, elixir-format
+msgid "Delete this show and all its episodes?"
+msgstr "Eliminare questo programma e tutti i suoi episodi?"
+
+#, elixir-autogen, elixir-format
+msgid "Podcasts"
+msgstr "Podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Moderation"
+msgstr "Moderazione"
+
+#, elixir-autogen, elixir-format
+msgid "Total downloads"
+msgstr "Download totali"
+
+#, elixir-autogen, elixir-format
+msgid "Podcast apps"
+msgstr "App di podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Website"
+msgstr "Sito web"
+
+#, elixir-autogen, elixir-format
+msgid "Unique listeners"
+msgstr "Ascoltatori unici"
+
+#, elixir-autogen, elixir-format
+msgid "Downloads (last 30 days)"
+msgstr "Download (ultimi 30 giorni)"
+
+#, elixir-autogen, elixir-format
+msgid "No downloads yet."
+msgstr "Ancora nessun download."
+
+#, elixir-autogen, elixir-format
+msgid "Reason"
+msgstr "Motivo"
+
+#, elixir-autogen, elixir-format
+msgid "Report this podcast"
+msgstr "Segnala questo podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Thanks — this podcast has been reported to moderators."
+msgstr "Grazie — questo podcast è stato segnalato ai moderatori."
+
+#, elixir-autogen, elixir-format
+msgid "Reports"
+msgstr "Segnalazioni"
+
+#, elixir-autogen, elixir-format
+msgid "File is too large (max 200 MB)"
+msgstr "Il file è troppo grande (max 200 MB)"
+
+#, elixir-autogen, elixir-format
+msgid "Only MP3 files are allowed"
+msgstr "Sono ammessi solo file MP3"
+
+#, elixir-autogen, elixir-format
+msgid "Only one file can be uploaded"
+msgstr "È possibile caricare un solo file"
+
+#, elixir-autogen, elixir-format
+msgid "Upload error"
+msgstr "Errore di caricamento"
+
+#, elixir-autogen, elixir-format
+msgid "Subscribe in your podcast app"
+msgstr "Iscriviti dalla tua app di podcast"
+
+#, elixir-autogen, elixir-format
+msgid "Leave empty to publish now"
+msgstr "Lascia vuoto per pubblicare ora"
+
+#, elixir-autogen, elixir-format
+msgid "Episode not found"
+msgstr "Episodio non trovato"
+
+#, elixir-autogen, elixir-format
+msgid "Season"
+msgstr "Stagione"
+
+#, elixir-autogen, elixir-format
+msgid "Episode number"
+msgstr "Numero dell'episodio"
+
+#, elixir-autogen, elixir-format
+msgid "Type"
+msgstr "Tipo"

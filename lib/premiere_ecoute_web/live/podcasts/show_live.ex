@@ -1,0 +1,113 @@
+defmodule PremiereEcouteWeb.Podcasts.ShowLive do
+  @moduledoc """
+  Public podcast show page: show metadata, a link to the RSS feed, and an in-page player per
+  episode. The player points at the tracking redirect with `source=web` so website listens are
+  counted alongside podcast-app downloads.
+  """
+
+  use PremiereEcouteWeb, :live_view
+
+  alias PremiereEcoute.Podcasts
+
+  @impl true
+  def mount(%{"username" => username, "show_slug" => slug}, _session, socket) do
+    socket =
+      case Podcasts.get_published_show(username, slug) do
+        nil ->
+          assign(socket, username: username, show: nil, episodes: [])
+
+        show ->
+          assign(socket, username: username, show: show, episodes: Podcasts.feed_episodes(show))
+      end
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def render(%{show: nil} = assigns) do
+    ~H"""
+    <div class="max-w-3xl mx-auto p-6">
+      <h1 class="text-xl font-semibold">{gettext("Podcast not found")}</h1>
+    </div>
+    """
+  end
+
+  def render(assigns) do
+    ~H"""
+    <div class="max-w-3xl mx-auto p-6">
+      <header class="flex items-center gap-4 mb-6">
+        <img
+          :if={@show.cover_key}
+          src={~p"/podcasts/shows/#{@show.id}/cover"}
+          alt={@show.title}
+          class="w-24 h-24 rounded object-cover"
+        />
+        <div>
+          <h1 class="text-2xl font-bold">{@show.title}</h1>
+          <p class="text-gray-500">{@show.description}</p>
+          <div class="mt-3">
+            <div class="text-xs text-gray-500 mb-1">{gettext("Subscribe in your podcast app")}</div>
+            <div class="flex items-center gap-2">
+              <input
+                type="text"
+                readonly
+                value={url(~p"/podcasts/#{@username}/#{@show.slug}/feed.xml")}
+                class="border rounded px-2 py-1 text-xs flex-1 max-w-md bg-gray-50"
+              />
+              <button
+                type="button"
+                onclick={"navigator.clipboard.writeText('#{url(~p"/podcasts/#{@username}/#{@show.slug}/feed.xml")}')"}
+                class="px-2 py-1 rounded border text-xs"
+              >
+                {gettext("Copy")}
+              </button>
+              <a href={~p"/podcasts/#{@username}/#{@show.slug}/feed.xml"} class="px-2 py-1 rounded border text-xs">
+                {gettext("RSS feed")}
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div :if={@episodes == []} class="text-gray-500">{gettext("No episodes yet.")}</div>
+
+      <ul class="space-y-6">
+        <li :for={episode <- @episodes} class="border rounded-lg p-4">
+          <.link
+            navigate={~p"/podcasts/#{@username}/#{@show.slug}/episodes/#{episode.guid}"}
+            class="font-semibold hover:underline"
+          >
+            {episode.title}
+          </.link>
+          <p class="text-sm text-gray-500 mb-2">{episode.description}</p>
+          <audio
+            controls
+            preload="none"
+            class="w-full"
+            src={~p"/podcasts/#{@username}/#{@show.slug}/episodes/#{episode.guid}/audio?#{[source: "web"]}"}
+          >
+          </audio>
+        </li>
+      </ul>
+
+      <form phx-submit="report" class="mt-10 flex items-center gap-2 text-xs text-gray-400">
+        <input
+          type="text"
+          name="reason"
+          placeholder={gettext("Reason")}
+          class="border rounded px-2 py-1 flex-1 max-w-xs"
+        />
+        <button type="submit" class="underline">{gettext("Report this podcast")}</button>
+      </form>
+    </div>
+    """
+  end
+
+  @impl true
+  def handle_event("report", %{"reason" => reason}, %{assigns: %{show: %{} = show}} = socket) do
+    Podcasts.report_show(show, reason)
+    {:noreply, put_flash(socket, :info, gettext("Thanks — this podcast has been reported to moderators."))}
+  end
+
+  def handle_event("report", _params, socket), do: {:noreply, socket}
+end

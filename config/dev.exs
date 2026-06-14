@@ -33,6 +33,13 @@ config :premiere_ecoute, PremiereEcoute.Apis,
 
 config :premiere_ecoute, PremiereEcoute.Sessions, vote_cooldown: 15
 
+# Podcasts: store audio/cover in the local SeaweedFS Filer (started via `docker compose up`).
+# Swap `adapter` to `PremiereEcoute.Podcasts.Storage.Local` if you'd rather not run the container.
+config :premiere_ecoute, PremiereEcoute.Podcasts.Storage,
+  adapter: PremiereEcoute.Podcasts.Storage.Seaweed
+
+config :premiere_ecoute, PremiereEcoute.Podcasts.Storage.Seaweed, filer_url: "http://localhost:8888"
+
 config :premiere_ecoute, PremiereEcoute.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
