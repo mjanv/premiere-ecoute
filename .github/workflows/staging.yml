@@ -1,0 +1,238 @@
+name: Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        type: choice
+        options: [create, destroy]
+        default: create
+      pr_number:
+        description: 'PR number (required for create)'
+        type: string
+        required: false
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create:
+    name: Spin up staging from PR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'create'
+
+    steps:
+      - name: Resolve PR branch
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "${{ github.event.inputs.pr_number }}" ]; then
+            echo "::error::pr_number input is required for create"
+            exit 1
+          fi
+          BRANCH=$(gh pr view ${{ github.event.inputs.pr_number }} \
+            --repo ${{ github.repository }} \
+            --json headRefName --jq '.headRefName')
+          echo "branch=${BRANCH}" >> $GITHUB_OUTPUT
+          echo "Building from branch: ${BRANCH}"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.branch }}
+
+      - name: Set up Elixir and Erlang
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.20.0'
+          otp-version: '29.0.1'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+            ~/.mix
+            ~/.hex
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Restore assets cache
+        uses: actions/cache@v4
+        with:
+          path: assets/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('assets/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: mix deps.get --only prod
+        env:
+          MIX_ENV: prod
+
+      - name: Deploy assets
+        run: mix assets.deploy
+        env:
+          MIX_ENV: prod
+
+      - name: Build release
+        run: mix release --overwrite --quiet
+        env:
+          MIX_ENV: prod
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: ssh-keyscan -H 68.183.219.251 >> ~/.ssh/known_hosts
+
+      - name: Fail if staging already exists
+        run: |
+          if ssh root@68.183.219.251 'systemctl is-active --quiet premiere-ecoute-staging 2>/dev/null'; then
+            echo "::error::Staging is already running. Destroy it first (action: destroy)."
+            exit 1
+          fi
+
+      - name: Create .env.staging
+        # AIDEV-NOTE: Redirect URIs are hardcoded for staging subdomain, not taken from prod secrets
+        run: |
+          cat > .env.staging <<EOF
+          PHX_HOST=staging.premiere-ecoute.fr
+          PHX_SERVER=true
+          PORT=4001
+          SECRET_KEY_BASE=${SECRET_KEY_BASE}
+          MIX_ENV=prod
+
+          POSTGRES_DATABASE=premiere_ecoute_staging
+          POSTGRES_USERNAME=${POSTGRES_USERNAME}
+          POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+          POSTGRES_HOSTNAME=localhost
+          POSTGRES_ENCRYPTION_KEY=${POSTGRES_ENCRYPTION_KEY}
+
+          SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+          SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+          SPOTIFY_REDIRECT_URI=https://staging.premiere-ecoute.fr/auth/spotify/callback
+
+          TWITCH_CLIENT_ID=${TWITCH_CLIENT_ID}
+          TWITCH_CLIENT_SECRET=${TWITCH_CLIENT_SECRET}
+          TWITCH_REDIRECT_URI=https://staging.premiere-ecoute.fr/auth/twitch/callback
+          TWITCH_WEBHOOK_CALLBACK_URL=https://staging.premiere-ecoute.fr/webhooks/twitch
+          TWITCH_WEBHOOK_SECRET=${TWITCH_WEBHOOK_SECRET}
+          TWITCH_EXTENSION_SECRET=${TWITCH_EXTENSION_SECRET}
+
+          DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+          BUYMEACOFFEE_API_KEY=${BUYMEACOFFEE_API_KEY}
+          RESEND_API_KEY=${RESEND_API_KEY}
+          OPENAI_API_KEY=${OPENAI_API_KEY}
+          MISTRAL_API_KEY=${MISTRAL_API_KEY}
+          YOUTUBE_DATA_API_V3_KEY=${YOUTUBE_DATA_API_V3_KEY}
+          GENIUS_ACCESS_TOKEN=${GENIUS_ACCESS_TOKEN}
+          TIDAL_CLIENT_ID=${TIDAL_CLIENT_ID}
+          TIDAL_CLIENT_SECRET=${TIDAL_CLIENT_SECRET}
+
+          AUTH_USERNAME=${AUTH_USERNAME}
+          AUTH_PASSWORD=${AUTH_PASSWORD}
+
+          SENTRY_DSN=
+          GRAFANA_HOST=https://mjanv.grafana.net/
+          GRAFANA_API_TOKEN=
+          EOF
+        env:
+          SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+          POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_ENCRYPTION_KEY: ${{ secrets.POSTGRES_ENCRYPTION_KEY }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          TWITCH_WEBHOOK_SECRET: ${{ secrets.TWITCH_WEBHOOK_SECRET }}
+          TWITCH_EXTENSION_SECRET: ${{ secrets.TWITCH_EXTENSION_SECRET }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          BUYMEACOFFEE_API_KEY: ${{ secrets.BUYMEACOFFEE_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          YOUTUBE_DATA_API_V3_KEY: ${{ secrets.YOUTUBE_DATA_API_V3_KEY }}
+          GENIUS_ACCESS_TOKEN: ${{ secrets.GENIUS_ACCESS_TOKEN }}
+          TIDAL_CLIENT_ID: ${{ secrets.TIDAL_CLIENT_ID }}
+          TIDAL_CLIENT_SECRET: ${{ secrets.TIDAL_CLIENT_SECRET }}
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+
+      - name: Clone production DB into staging DB
+        run: |
+          ssh root@68.183.219.251 '
+            set -e
+            sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '"'"'premiere_ecoute_staging'"'"' AND pid <> pg_backend_pid();" 2>/dev/null || true
+            sudo -u postgres psql -c "DROP DATABASE IF EXISTS premiere_ecoute_staging;"
+            sudo -u postgres psql -c "CREATE DATABASE premiere_ecoute_staging;"
+            sudo -u postgres pg_dump --no-privileges --no-owner premiere_ecoute_prod \
+              | sudo -u postgres psql -d premiere_ecoute_staging -q
+          '
+
+      - name: Deploy release and start service
+        run: |
+          rsync -avzq --delete --exclude='.env' --exclude='cache' \
+            _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute-staging/
+          scp .env.staging root@68.183.219.251:/opt/premiere-ecoute-staging/.env
+          scp apps/digital_ocean/systemd/premiere-ecoute-staging.service \
+            root@68.183.219.251:/etc/systemd/system/
+          ssh root@68.183.219.251 '
+            chown -R premiere:premiere /opt/premiere-ecoute-staging
+            find /opt/premiere-ecoute-staging \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -name "*.so" \) -type f -exec chmod +x {} \;
+            systemctl daemon-reload
+            systemctl start premiere-ecoute-staging
+            journalctl -u premiere-ecoute-staging -n 30 --no-pager
+          '
+
+      - name: Comment staging URL on PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.inputs.pr_number }} \
+            --repo ${{ github.repository }} \
+            --body "Staging deployed from this branch: https://staging.premiere-ecoute.fr"
+
+  destroy:
+    name: Tear down staging
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy') ||
+      github.event_name == 'pull_request'
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: ssh-keyscan -H 68.183.219.251 >> ~/.ssh/known_hosts
+
+      - name: Destroy staging environment
+        run: |
+          ssh root@68.183.219.251 '
+            systemctl stop premiere-ecoute-staging 2>/dev/null || true
+            systemctl disable premiere-ecoute-staging 2>/dev/null || true
+            rm -f /etc/systemd/system/premiere-ecoute-staging.service
+            systemctl daemon-reload
+            sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '"'"'premiere_ecoute_staging'"'"' AND pid <> pg_backend_pid();" 2>/dev/null || true
+            sudo -u postgres psql -c "DROP DATABASE IF EXISTS premiere_ecoute_staging;" 2>/dev/null || true
+            rm -rf /opt/premiere-ecoute-staging
+          '
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "Staging environment destroyed (PR closed)."
