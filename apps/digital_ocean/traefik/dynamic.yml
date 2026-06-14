@@ -30,6 +30,28 @@ http:
         - websecure
       tls: {}
 
+    # AIDEV-NOTE: Staging subdomain - only active while premiere-ecoute-staging.service is running
+    staging-twitch-ws:
+      rule: "Host(`staging.premiere-ecoute.fr`) && PathPrefix(`/twitch`)"
+      service: twitch-ws
+      middlewares:
+        - strip-twitch-prefix
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+        options: no-h2
+      priority: 100
+
+    staging-app-domain:
+      rule: "Host(`staging.premiere-ecoute.fr`)"
+      service: app-staging
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+        options: no-h2
+
   middlewares:
     strip-twitch-prefix:
       stripPrefix:
@@ -41,6 +63,12 @@ http:
       loadBalancer:
         servers:
           - url: "http://localhost:4000"
+
+    # AIDEV-NOTE: Staging instance on port 4001 — isolated DB, same release binary as prod
+    app-staging:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:4001"
 
     # AIDEV-NOTE: Proxies /twitch WSS connections to Twitch IRC WebSocket endpoint
     # Raw text frames required — no compression, no rewriting, HTTP/1.1 only on upstream
