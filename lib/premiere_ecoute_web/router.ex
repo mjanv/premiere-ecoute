@@ -41,6 +41,13 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_session
   end
 
+  # AIDEV-NOTE: podcast feed/audio must not negotiate content (podcast apps send arbitrary Accept
+  # headers) — no `plug :accepts`, responses set their own content type / redirect.
+  pipeline :podcast_public do
+    plug Plugs.PodcastRateLimit
+    plug :put_secure_browser_headers
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
     plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
@@ -193,6 +200,37 @@ defmodule PremiereEcouteWeb.Router do
     end
   end
 
+  scope "/podcasts", PremiereEcouteWeb.Podcasts do
+    pipe_through [:podcast_public]
+
+    get "/shows/:id/cover", CoverController, :show
+    get "/:username/:show_slug/feed.xml", FeedController, :show
+    get "/:username/:show_slug/episodes/:guid/audio", AudioController, :show
+  end
+
+  scope "/studio/podcasts", PremiereEcouteWeb.Podcasts.Studio do
+    pipe_through [:browser]
+
+    live_session :podcasts_studio, on_mount: [{UserAuth, :streamer}] do
+      live "/", ShowsLive, :index
+      live "/new", ShowFormLive, :new
+      live "/:id", ShowDashboardLive, :show
+      live "/:id/edit", ShowFormLive, :edit
+      live "/:show_id/episodes/new", EpisodeFormLive, :new
+      live "/:show_id/episodes/:id/edit", EpisodeFormLive, :edit
+    end
+  end
+
+  scope "/podcasts", PremiereEcouteWeb.Podcasts do
+    pipe_through [:browser]
+
+    live_session :podcasts_public, on_mount: [{UserAuth, :current_scope}] do
+      live "/:username", ShowsLive, :index
+      live "/:username/:show_slug", ShowLive, :show
+      live "/:username/:show_slug/episodes/:guid", EpisodeLive, :show
+    end
+  end
+
   scope "/sessions", PremiereEcouteWeb.Sessions do
     pipe_through [:browser]
 
@@ -261,6 +299,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/reviews", AdminReviewsLive, :index
       live "/sessions", AdminSessionsLive, :index
       live "/billboards", AdminBillboardsLive, :index
+      live "/podcasts", PodcastsLive, :index
       live "/donations", Donations.DonationsLive, :index
       live "/donations/goals/:id", Donations.GoalLive, :show
       live "/broadcast", AdminBroadcastLive, :index
@@ -354,6 +393,7 @@ defmodule PremiereEcouteWeb.Router do
     get "/privacy", LegalController, :privacy
     get "/cookies", LegalController, :cookies
     get "/terms", LegalController, :terms
+    get "/podcast", LegalController, :podcast
     get "/contact", LegalController, :contact
   end
 

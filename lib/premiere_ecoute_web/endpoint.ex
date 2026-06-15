@@ -61,6 +61,7 @@ defmodule PremiereEcouteWeb.Endpoint do
     length: 20_000_000
 
   plug Plug.MethodOverride
+  plug PremiereEcouteWeb.Plugs.StashMethod
   plug Plug.Head
   plug Plug.Session, @session_options
 

@@ -62,7 +62,11 @@ Nous nous réservons le droit de suspendre ou supprimer l'accès de tout utilisa
 
 La suppression d'un compte entraîne la suppression des données associées conformément à notre politique de conservation.
 
-# 8. Droit applicable
+# 8. Podcasts
+
+Les streamers peuvent héberger et diffuser des podcasts publiquement via le service. Cette fonctionnalité est soumise à notre [politique de contenu des podcasts](/legal/podcast), qui précise les responsabilités, les contenus interdits et la procédure de signalement et de retrait (DMCA).
+
+# 9. Droit applicable
 
 Les présentes CGU sont régies par le droit français. Les tribunaux français sont seuls compétents en cas de litige.
 

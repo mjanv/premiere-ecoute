@@ -16,6 +16,7 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.PersonalDataRequested
   alias PremiereEcoute.Events.Store
+  alias PremiereEcoute.Podcasts
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
@@ -80,6 +81,9 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
   @spec delete_account(Scope.t()) :: {:ok, User.t()} | {:error, term()}
   def delete_account(scope) do
     user = scope.user
+    # Collected before the transaction: the DB cascade removes podcast rows, so we capture the
+    # storage keys first and purge the (external) objects after a successful deletion.
+    podcast_keys = Podcasts.user_storage_keys(user)
 
     Ecto.Multi.new()
     |> Ecto.Multi.delete_all(:tokens, Token.by_user_and_contexts_query(user, :all))
@@ -94,8 +98,12 @@ defmodule PremiereEcoute.Accounts.Services.AccountCompliance do
     end)
     |> Repo.transaction()
     |> case do
-      {:ok, %{user: deleted_user}} -> {:ok, deleted_user}
-      {:error, _step, changeset, _changes} -> {:error, changeset}
+      {:ok, %{user: deleted_user}} ->
+        Podcasts.purge_keys(podcast_keys)
+        {:ok, deleted_user}
+
+      {:error, _step, changeset, _changes} ->
+        {:error, changeset}
     end
   end
 end

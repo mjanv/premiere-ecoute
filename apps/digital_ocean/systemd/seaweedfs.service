@@ -1,0 +1,35 @@
+# AIDEV-NOTE: Systemd service for SeaweedFS — podcast object storage. Filer is bound to loopback
+# (127.0.0.1) and never exposed publicly: the Phoenix app proxies audio/cover, so the store stays private.
+[Unit]
+Description=SeaweedFS (master/volume/filer) for Premiere Ecoute podcast storage
+After=network.target
+Before=premiere-ecoute.service
+
+[Service]
+Type=exec
+User=seaweedfs
+Group=seaweedfs
+WorkingDirectory=/var/lib/seaweedfs
+# AIDEV-NOTE: -volume.port=8082 avoids a clash with Traefik on the default volume port 8080.
+ExecStart=/usr/local/bin/weed server -dir=/var/lib/seaweedfs -filer -ip=127.0.0.1 -ip.bind=127.0.0.1 -volume.port=8082 -master.volumeSizeLimitMB=1024
+
+Restart=on-failure
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=seaweedfs
+
+# AIDEV-NOTE: modest footprint — small podcast workload. Review the host memory budget when adding
+# this alongside Phoenix + PostgreSQL (the 1GB droplet sizing assumes a resize for this service).
+MemoryMax=256M
+MemoryHigh=200M
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/seaweedfs
+
+[Install]
+WantedBy=multi-user.target

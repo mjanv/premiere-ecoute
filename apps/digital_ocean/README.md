@@ -8,6 +8,7 @@ The application runs on a Digital Ocean droplet with the following components:
 
 - **Premiere Ecoute**: Phoenix application (Elixir/OTP)
 - **PostgreSQL**: Database server
+- **SeaweedFS**: Object storage for podcast audio/covers ([setup guide](SEAWEEDFS_SETUP.md))
 - **Traefik**: Reverse proxy and SSL termination
 - **Grafana Alloy**: Metrics collection agent (sends to Grafana Cloud)
 
@@ -23,9 +24,12 @@ apps/digital_ocean/
 ├── deploy.sh                    # Deploy application updates
 ├── backup.sh                    # Database backup
 ├── restore.sh                   # Database restoration
+├── seaweedfs-backup.sh          # SeaweedFS (podcast storage) backup
+├── seaweedfs-restore.sh         # SeaweedFS (podcast storage) restoration
 ├── load-github-secrets.sh       # Load secrets to GitHub Actions
 ├── systemd/
 │   ├── premiere-ecoute.service  # Application systemd service
+│   ├── seaweedfs.service        # SeaweedFS podcast storage systemd service
 │   ├── traefik.service          # Traefik systemd service
 │   └── alloy.service            # Grafana Alloy systemd service
 ├── traefik/
@@ -161,6 +165,25 @@ sudo systemctl restart traefik
 sudo journalctl -u traefik -f
 ```
 
+### SeaweedFS (podcast storage)
+
+```bash
+# Status
+sudo systemctl status seaweedfs
+
+# Start/Stop/Restart
+sudo systemctl start seaweedfs
+sudo systemctl stop seaweedfs
+sudo systemctl restart seaweedfs
+
+# View logs
+sudo journalctl -u seaweedfs -f
+```
+
+The Filer is bound to `127.0.0.1:8888` and is never exposed publicly — the Phoenix app proxies
+podcast audio/cover, so the object store stays private. Data lives in `/var/lib/seaweedfs`. The app
+reaches it via `SEAWEEDFS_FILER_URL` (defaults to `http://127.0.0.1:8888`).
+
 ### Grafana Alloy
 
 ```bash
@@ -275,6 +298,26 @@ Restore from a backup:
 
 ```bash
 ./restore.sh /path/to/backup.sql
+```
+
+## Podcast Storage Operations (SeaweedFS)
+
+### Backup
+
+Snapshot the SeaweedFS data directory (SeaweedFS is briefly stopped for a consistent archive):
+
+```bash
+./seaweedfs-backup.sh
+```
+
+Backups are stored in `backups/seaweedfs_<timestamp>.tar.gz`.
+
+### Restore
+
+Restore from a backup (DESTRUCTIVE — replaces the current data directory):
+
+```bash
+./seaweedfs-restore.sh backups/seaweedfs_<timestamp>.tar.gz
 ```
 
 ## Troubleshooting

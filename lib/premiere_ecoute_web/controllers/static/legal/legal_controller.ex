@@ -33,6 +33,10 @@ defmodule PremiereEcouteWeb.Static.Legal.LegalController do
   @spec terms(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def terms(conn, _params), do: render(conn, "document.html", document: Legal.document(:terms))
 
+  @doc "Renders the podcast content policy document."
+  @spec podcast(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def podcast(conn, _params), do: render(conn, "document.html", document: Legal.document(:podcast_policy))
+
   @doc """
   Renders contact information page.
 
