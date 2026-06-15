@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.HomeLive do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Playlists
+  alias PremiereEcoute.Podcasts
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Wantlists
@@ -53,6 +54,10 @@ defmodule PremiereEcouteWeb.HomeLive do
 
     subscribed_playlist_ids = Playlists.subscribed_playlist_ids(user, open_playlists)
 
+    # AIDEV-NOTE: published podcasts of followed streamers, grouped by streamer id — drives the
+    # per-streamer "Podcasts" section in the home page.
+    podcasts_per_streamer = Podcasts.published_shows_by_users(streamer_ids)
+
     socket
     |> assign(:current_user, current_user)
     |> assign(:sessions_per_streamer, sessions_per_streamer)
@@ -61,6 +66,7 @@ defmodule PremiereEcouteWeb.HomeLive do
     |> assign(:wantlisted_album_ids, wantlisted_album_ids)
     |> assign(:open_playlists_per_streamer, open_playlists_per_streamer)
     |> assign(:subscribed_playlist_ids, subscribed_playlist_ids)
+    |> assign(:podcasts_per_streamer, podcasts_per_streamer)
     |> assign(:subscription_modal, nil)
     |> then(fn socket -> {:noreply, socket} end)
   end

@@ -63,8 +63,10 @@
         <%!-- One block per followed streamer --%>
         <% upcoming_by_streamer = Enum.group_by(@upcoming_sessions, & &1.user_id) %>
         <% playlists_map = Map.new(assigns[:open_playlists_per_streamer] || [], fn {s, p} -> {s.id, p} end) %>
+        <% podcasts_map = assigns[:podcasts_per_streamer] || %{} %>
         <%= for {streamer, sessions} <- @sessions_per_streamer do %>
           <% streamer_playlists = Map.get(playlists_map, streamer.id, []) %>
+          <% streamer_podcasts = Map.get(podcasts_map, streamer.id, []) %>
           <% streamer_upcoming = Map.get(upcoming_by_streamer, streamer.id, []) %>
           <section class="mb-10 rounded-2xl border border-white/10 bg-white/[0.025] overflow-hidden">
             <%!-- Streamer header --%>
@@ -158,6 +160,37 @@
                       </button>
                     <% end %>
                   </div>
+                </div>
+              <% end %>
+
+              <%!-- Podcasts --%>
+              <%= if streamer_podcasts != [] do %>
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">{gettext("Podcasts")}</p>
+                  <.scroll_carousel id={"podcast-carousel-#{streamer.id}"}>
+                    <%= for show <- streamer_podcasts do %>
+                      <.link
+                        navigate={~p"/podcasts/#{streamer.username}/#{show.slug}"}
+                        class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg block"
+                      >
+                        <%= if show.cover_key do %>
+                          <img
+                            src={~p"/podcasts/shows/#{show.id}/cover"}
+                            alt={show.title}
+                            loading="lazy"
+                            class="w-full h-full object-cover"
+                          />
+                        <% else %>
+                          <div class="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
+                            <span class="hero-microphone w-10 h-10 text-white/40"></span>
+                          </div>
+                        <% end %>
+                        <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2">
+                          <p class="text-white text-xs font-semibold leading-tight line-clamp-2">{show.title}</p>
+                        </div>
+                      </.link>
+                    <% end %>
+                  </.scroll_carousel>
                 </div>
               <% end %>
 

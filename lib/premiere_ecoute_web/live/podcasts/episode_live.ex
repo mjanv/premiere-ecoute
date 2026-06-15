@@ -6,6 +6,8 @@ defmodule PremiereEcouteWeb.Podcasts.EpisodeLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Podcasts.Components
+
   alias PremiereEcoute.Podcasts
   alias PremiereEcoute.Podcasts.Show
 
@@ -25,42 +27,52 @@ defmodule PremiereEcouteWeb.Podcasts.EpisodeLive do
   @impl true
   def render(%{episode: nil} = assigns) do
     ~H"""
-    <div class="max-w-3xl mx-auto p-6">
-      <h1 class="text-xl font-semibold">{gettext("Episode not found")}</h1>
-    </div>
+    <Layouts.app flash={@flash} current_scope={@current_scope} current_page="podcasts">
+      <div class="synthwave-bg min-h-screen text-white">
+        <div class="max-w-3xl mx-auto px-6 py-12">
+          <h1 class="text-xl font-semibold text-white">{gettext("Episode not found")}</h1>
+        </div>
+      </div>
+    </Layouts.app>
     """
   end
 
   def render(assigns) do
     ~H"""
-    <div class="max-w-3xl mx-auto p-6">
-      <.link navigate={~p"/podcasts/#{@username}/#{@show.slug}"} class="text-sm text-indigo-600">
-        ← {@show.title}
-      </.link>
+    <Layouts.app flash={@flash} current_scope={@current_scope} current_page="podcasts">
+      <div class="synthwave-bg min-h-screen text-white">
+        <div class="max-w-3xl mx-auto px-6 py-12">
+          <.link
+            navigate={~p"/podcasts/#{@username}/#{@show.slug}"}
+            class="text-sm text-purple-300 hover:text-purple-200 transition-colors"
+          >
+            ← {@show.title}
+          </.link>
 
-      <h1 class="text-2xl font-bold mt-2">{@episode.title}</h1>
-      <div :if={@episode.season || @episode.episode_number} class="text-xs text-gray-500 mb-2">
-        <span :if={@episode.season}>S{@episode.season}</span>
-        <span :if={@episode.episode_number}>E{@episode.episode_number}</span>
+          <h1 class="text-2xl font-bold text-white mt-2">{@episode.title}</h1>
+          <div :if={@episode.season || @episode.episode_number} class="text-xs text-gray-400 mb-2">
+            <span :if={@episode.season}>S{@episode.season}</span>
+            <span :if={@episode.episode_number}>E{@episode.episode_number}</span>
+          </div>
+          <p class="text-gray-300 mt-2 mb-4 whitespace-pre-line">{@episode.description}</p>
+
+          <div class="mb-4">
+            <.audio_player
+              id={"player-#{@episode.guid}"}
+              src={~p"/podcasts/#{@username}/#{@show.slug}/episodes/#{@episode.guid}/audio?#{[source: "web"]}"}
+            />
+          </div>
+
+          <button
+            type="button"
+            onclick={"navigator.clipboard.writeText('#{url(~p"/podcasts/#{@username}/#{@show.slug}/episodes/#{@episode.guid}")}')"}
+            class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs transition-colors"
+          >
+            {gettext("Copy link")}
+          </button>
+        </div>
       </div>
-      <p class="text-gray-500 mt-2 mb-4 whitespace-pre-line">{@episode.description}</p>
-
-      <audio
-        controls
-        preload="none"
-        class="w-full mb-4"
-        src={~p"/podcasts/#{@username}/#{@show.slug}/episodes/#{@episode.guid}/audio?#{[source: "web"]}"}
-      >
-      </audio>
-
-      <button
-        type="button"
-        onclick={"navigator.clipboard.writeText('#{url(~p"/podcasts/#{@username}/#{@show.slug}/episodes/#{@episode.guid}")}')"}
-        class="px-2 py-1 rounded border text-xs"
-      >
-        {gettext("Copy link")}
-      </button>
-    </div>
+    </Layouts.app>
     """
   end
 end

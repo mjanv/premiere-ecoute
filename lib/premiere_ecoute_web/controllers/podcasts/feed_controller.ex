@@ -21,6 +21,7 @@ defmodule PremiereEcouteWeb.Podcasts.FeedController do
 
       show ->
         PodcastMetrics.feed(200)
+
         urls = %{
           self: url(~p"/podcasts/#{username}/#{slug}/feed.xml"),
           link: url(~p"/podcasts/#{username}/#{slug}"),

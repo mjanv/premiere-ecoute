@@ -3,8 +3,6 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorkerTest do
 
   import Bitwise
 
-  alias PremiereEcoute.Events.EpisodeProcessed
-  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Storage
   alias PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker
@@ -15,6 +13,9 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorkerTest do
 
     @impl true
     def fetch(_key), do: Application.get_env(:premiere_ecoute, :stub_audio, {:error, :missing})
+
+    @impl true
+    def put(_key, _bytes), do: :ok
 
     @impl true
     def delete(_key), do: :ok
@@ -33,6 +34,7 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorkerTest do
 
   setup do
     Application.put_env(:premiere_ecoute, Storage, adapter: StorageStub)
+
     on_exit(fn ->
       Application.delete_env(:premiere_ecoute, Storage)
       Application.delete_env(:premiere_ecoute, :stub_audio)
@@ -64,14 +66,6 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorkerTest do
       assert ready.status == :ready
       assert ready.audio_byte_size == byte_size(audio)
       assert ready.duration_seconds == round(byte_size(audio) * 8 / 128_000)
-    end
-
-    test "emits an EpisodeProcessed event", %{episode: episode} do
-      Application.put_env(:premiere_ecoute, :stub_audio, {:ok, mp3_bytes(300)})
-
-      assert :ok = EpisodeIngestionWorker.run(episode)
-      assert %EpisodeProcessed{id: id} = Store.last("podcasts_episode-#{episode.id}")
-      assert id == episode.id
     end
 
     test "broadcasts an update so the studio dashboard can refresh", %{episode: episode} do

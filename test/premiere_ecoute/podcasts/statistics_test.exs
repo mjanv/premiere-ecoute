@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Podcasts.StatisticsTest do
   use PremiereEcoute.DataCase, async: false
 
-  alias PremiereEcoute.Events.EpisodeDownloaded
+  alias PremiereEcoute.Events.PodcastEpisodeDownloaded
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts
 
@@ -11,7 +11,7 @@ defmodule PremiereEcoute.Podcasts.StatisticsTest do
 
   defp download(episode, source, ip \\ "1.1.1.1", ua \\ "agent") do
     Store.append(
-      %EpisodeDownloaded{id: episode.id, source: source, ip: ip, user_agent: ua},
+      %PodcastEpisodeDownloaded{id: episode.id, source: source, ip: ip, user_agent: ua},
       stream: "podcast_download"
     )
   end

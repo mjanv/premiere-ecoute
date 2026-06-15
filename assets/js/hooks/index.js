@@ -25,6 +25,7 @@ import { PlaySound } from "./play_sound";
 import { ShareButton } from "./share_button";
 import { AnalyticsChart } from "./analytics_chart";
 import { NoteHud } from "./note_hud";
+import { AudioPlayer } from "./audio_player";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -53,5 +54,6 @@ export const Hooks = {
   PlaySound: PlaySound,
   ShareButton: ShareButton,
   AnalyticsChart: AnalyticsChart,
-  NoteHud: NoteHud
+  NoteHud: NoteHud,
+  AudioPlayer: AudioPlayer
 };

@@ -45,26 +45,14 @@ defmodule PremiereEcouteWeb.Podcasts.StudioLiveTest do
       assert Podcasts.get_show(show.id).published
     end
 
-    test "publishes a ready episode now (empty schedule)", %{conn: conn, streamer: streamer} do
+    test "publishes a ready episode", %{conn: conn, streamer: streamer} do
       show = show_fixture(streamer, %{published: true})
       episode = episode_fixture(show, %{status: :ready, published_at: nil})
 
       {:ok, lv, _html} = live(conn, ~p"/studio/podcasts/#{show.id}")
-      lv |> form("form[phx-submit='publish_episode']") |> render_submit()
+      lv |> element("button[phx-click='publish_episode'][phx-value-id='#{episode.id}']") |> render_click()
 
       assert Podcasts.get_episode(episode.id).published_at
-    end
-
-    test "schedules a ready episode for a future date", %{conn: conn, streamer: streamer} do
-      show = show_fixture(streamer, %{published: true})
-      episode = episode_fixture(show, %{status: :ready, published_at: nil})
-
-      {:ok, lv, _html} = live(conn, ~p"/studio/podcasts/#{show.id}")
-      lv |> form("form[phx-submit='publish_episode']", %{"at" => "2099-01-01T10:00"}) |> render_submit()
-
-      published_at = Podcasts.get_episode(episode.id).published_at
-      assert published_at
-      assert DateTime.compare(published_at, DateTime.utc_now()) == :gt
     end
 
     test "blocks access to another streamer's show", %{conn: conn} do

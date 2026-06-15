@@ -18,7 +18,7 @@ Sont notamment interdits : les contenus illégaux, les contenus portant atteinte
 
 ## Signalement et retrait (DMCA)
 
-Toute personne peut signaler un podcast directement depuis sa page publique, ou nous contacter par e-mail. Pour une réclamation relative aux droits d'auteur, merci d'indiquer : l'URL du podcast ou de l'épisode concerné, la description de l'œuvre protégée, vos coordonnées, et une déclaration de bonne foi.
+Toute personne peut nous contacter par e-mail pour signaler un podcast. Pour une réclamation relative aux droits d'auteur, merci d'indiquer : l'URL du podcast ou de l'épisode concerné, la description de l'œuvre protégée, vos coordonnées, et une déclaration de bonne foi.
 
 Nous nous réservons le droit de dépublier ou de supprimer sans préavis tout podcast signalé ou contraire à cette politique. Les épisodes supprimés voient leurs fichiers audio retirés de l'hébergement.
 

@@ -15,8 +15,7 @@ defmodule PremiereEcoute.Podcasts.Episode do
     identity: [:guid],
     json: [:id, :guid, :title, :description, :duration_seconds, :audio_byte_size, :status, :published_at]
 
-  alias PremiereEcoute.Events.EpisodePublished
-  alias PremiereEcoute.Events.EpisodeUploaded
+  alias PremiereEcoute.Events.PodcastEpisodePublished
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Show
 
@@ -136,33 +135,29 @@ defmodule PremiereEcoute.Podcasts.Episode do
     |> Repo.one()
   end
 
-  @doc "Creates an episode and emits an EpisodeUploaded event."
-  @spec create(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def create(attrs) do
-    attrs
-    |> super()
-    |> Store.ok("podcasts_episode", fn episode -> %EpisodeUploaded{id: episode.id, show_id: episode.show_id} end)
-  end
-
   @doc "Stores extracted metadata and marks the episode ready."
   @spec mark_ready(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def mark_ready(%__MODULE__{} = episode, attrs) do
-    update(episode, Map.merge(attrs, %{status: :ready}))
+    # AIDEV-NOTE: use changeset + Repo.update (not the generated update/2) — the aggregate imports
+    # Ecto.Query, whose update/2 macro otherwise shadows the call. Same pattern throughout this module.
+    preload(Repo.update(changeset(episode, Map.merge(attrs, %{status: :ready}))))
   end
 
   @doc "Marks the episode failed."
   @spec mark_failed(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def mark_failed(%__MODULE__{} = episode), do: update(episode, %{status: :failed})
+  def mark_failed(%__MODULE__{} = episode), do: preload(Repo.update(changeset(episode, %{status: :failed})))
 
-  @doc "Publishes a ready episode into the feed (sets published_at) and emits EpisodePublished."
-  @spec publish(t(), DateTime.t()) :: {:ok, t()} | {:error, Ecto.Changeset.t() | :not_ready}
-  def publish(episode, at \\ DateTime.utc_now())
+  @doc "Publishes a ready episode into the feed (sets published_at) and emits PodcastEpisodePublished."
+  @spec publish(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t() | :not_ready}
+  def publish(%__MODULE__{status: :ready} = episode) do
+    now = DateTime.truncate(DateTime.utc_now(), :second)
 
-  def publish(%__MODULE__{status: :ready} = episode, at) do
     episode
-    |> update(%{published_at: DateTime.truncate(at, :second)})
-    |> Store.ok("podcasts_episode", fn e -> %EpisodePublished{id: e.id, show_id: e.show_id} end)
+    |> changeset(%{published_at: now})
+    |> Repo.update()
+    |> preload()
+    |> Store.ok("podcasts_episode", fn e -> %PodcastEpisodePublished{id: e.id, show_id: e.show_id} end)
   end
 
-  def publish(%__MODULE__{}, _at), do: {:error, :not_ready}
+  def publish(%__MODULE__{}), do: {:error, :not_ready}
 end

@@ -1,8 +1,7 @@
 defmodule PremiereEcoute.Podcasts.EpisodeTest do
   use PremiereEcoute.DataCase, async: true
 
-  alias PremiereEcoute.Events.EpisodePublished
-  alias PremiereEcoute.Events.EpisodeUploaded
+  alias PremiereEcoute.Events.PodcastEpisodePublished
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Episode
 
@@ -52,24 +51,22 @@ defmodule PremiereEcoute.Podcasts.EpisodeTest do
   end
 
   describe "create/1" do
-    test "persists with default :uploading status and emits EpisodeUploaded", %{show: show} do
+    test "persists with default :uploading status", %{show: show} do
       {:ok, episode} = Episode.create(%{show_id: show.id, title: "Ep"})
 
       assert episode.status == :uploading
-      assert %EpisodeUploaded{id: id, show_id: show_id} = Store.last("podcasts_episode-#{episode.id}")
-      assert id == episode.id
-      assert show_id == show.id
+      assert episode.show_id == show.id
     end
   end
 
   describe "publish/2" do
-    test "publishes a ready episode and emits EpisodePublished", %{show: show} do
+    test "publishes a ready episode and emits PodcastEpisodePublished", %{show: show} do
       episode = episode_fixture(show, %{status: :ready, published_at: nil})
 
       {:ok, published} = Episode.publish(episode)
 
       assert published.published_at
-      assert %EpisodePublished{id: id} = Store.last("podcasts_episode-#{episode.id}")
+      assert %PodcastEpisodePublished{id: id} = Store.last("podcasts_episode-#{episode.id}")
       assert id == episode.id
     end
 
@@ -77,16 +74,6 @@ defmodule PremiereEcoute.Podcasts.EpisodeTest do
       episode = episode_fixture(show, %{status: :processing, published_at: nil})
 
       assert {:error, :not_ready} = Episode.publish(episode)
-    end
-
-    test "schedules a future publication that stays out of the feed until due", %{show: show} do
-      episode = episode_fixture(show, %{status: :ready, published_at: nil})
-      future = DateTime.add(DateTime.utc_now(), 7, :day)
-
-      {:ok, published} = Episode.publish(episode, future)
-
-      assert DateTime.compare(published.published_at, DateTime.utc_now()) == :gt
-      refute Enum.any?(Episode.feed_episodes(show), &(&1.id == episode.id))
     end
   end
 

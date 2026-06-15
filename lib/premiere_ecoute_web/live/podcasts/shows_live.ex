@@ -22,28 +22,37 @@ defmodule PremiereEcouteWeb.Podcasts.ShowsLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="max-w-3xl mx-auto p-6">
-      <h1 class="text-2xl font-bold mb-6">{gettext("Podcasts by %{username}", username: @username)}</h1>
+    <Layouts.app flash={@flash} current_scope={@current_scope} current_page="podcasts">
+      <div class="synthwave-bg min-h-screen text-white">
+        <div class="max-w-3xl mx-auto px-6 py-12">
+          <h1 class="text-2xl font-bold text-white mb-6">
+            {gettext("Podcasts by %{username}", username: @username)}
+          </h1>
 
-      <div :if={@shows == []} class="text-gray-500">{gettext("No podcasts published yet.")}</div>
+          <div :if={@shows == []} class="text-gray-400">{gettext("No podcasts published yet.")}</div>
 
-      <ul class="space-y-4">
-        <li :for={show <- @shows} class="border rounded-lg p-4">
-          <.link navigate={~p"/podcasts/#{@username}/#{show.slug}"} class="flex items-center gap-4">
-            <img
-              :if={show.cover_key}
-              src={~p"/podcasts/shows/#{show.id}/cover"}
-              alt={show.title}
-              class="w-16 h-16 rounded object-cover"
-            />
-            <div>
-              <div class="font-semibold">{show.title}</div>
-              <div class="text-sm text-gray-500">{show.description}</div>
-            </div>
-          </.link>
-        </li>
-      </ul>
-    </div>
+          <ul class="space-y-4">
+            <li
+              :for={show <- @shows}
+              class="rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-colors"
+            >
+              <.link navigate={~p"/podcasts/#{@username}/#{show.slug}"} class="flex items-center gap-4 p-4">
+                <img
+                  :if={show.cover_key}
+                  src={~p"/podcasts/shows/#{show.id}/cover"}
+                  alt={show.title}
+                  class="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                />
+                <div class="min-w-0">
+                  <div class="font-semibold text-white truncate">{show.title}</div>
+                  <div class="text-sm text-gray-400 line-clamp-2">{show.description}</div>
+                </div>
+              </.link>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </Layouts.app>
     """
   end
 end

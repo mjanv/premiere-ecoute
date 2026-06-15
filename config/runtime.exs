@@ -96,10 +96,9 @@ if config_env() == :prod do
       annotate_app_lifecycle: true
     ]
 
-  # Podcasts: store audio/cover in SeaweedFS via its Filer HTTP API.
-  config :premiere_ecoute, PremiereEcoute.Podcasts.Storage,
-    adapter: PremiereEcoute.Podcasts.Storage.Seaweed,
-    public_base_url: env!("PODCASTS_PUBLIC_BASE_URL", :string, "https://podcasts.premiere-ecoute.fr")
+  # Podcasts: store audio/cover in SeaweedFS via its Filer HTTP API. Audio/cover are streamed
+  # through Phoenix (the Filer stays private), so no public base URL is needed.
+  config :premiere_ecoute, PremiereEcoute.Podcasts.Storage, adapter: PremiereEcoute.Podcasts.Storage.Seaweed
 
   config :premiere_ecoute, PremiereEcoute.Podcasts.Storage.Seaweed,
     filer_url: env!("SEAWEEDFS_FILER_URL", :string, "http://127.0.0.1:8888")

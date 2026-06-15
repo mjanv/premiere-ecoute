@@ -350,12 +350,12 @@ Tracks what is built on `claude/feature-design-discussion-dc8m46`.
   **before** storing bytes (no orphan object on invalid metadata); upload **progress UI** (bar,
   cancel, errors).
 - Lifecycle: deleting an account **purges the user's podcast storage objects** (audio + covers).
-- Moderation: public **"report this podcast"** action → `ShowReported` events surfaced as a report
-  count in admin moderation; **content/DMCA policy** legal document (`priv/legal/podcast_policy.md`),
-  linked from the Terms of Service (`/legal/podcast`).
+- Moderation: admin can unpublish/take down or delete any show; **content/DMCA policy** legal
+  document (`priv/legal/podcast_policy.md`), linked from the Terms of Service (`/legal/podcast`).
+  Abuse reports are handled by e-mail (no in-app reporting).
 - Polish: subscribe/RSS section with copy-to-clipboard on the show page; shareable per-episode
-  page (`/podcasts/:username/:show_slug/episodes/:guid`); feed capped at 300 episodes; scheduled
-  publishing (future `published_at` from the dashboard); downloads chart split by source (apps vs web).
+  page (`/podcasts/:username/:show_slug/episodes/:guid`); feed capped at 300 episodes; downloads
+  chart split by source (apps vs web). Episodes are published/unpublished immediately (no scheduling).
 
 **Remaining (later / declined):**
 - Per-episode artwork, season/episode numbers, transcripts/chapters (Podcasting 2.0) — not built.

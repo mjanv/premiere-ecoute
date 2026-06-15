@@ -1,12 +1,11 @@
 defmodule PremiereEcoute.PodcastsTest do
   use PremiereEcoute.DataCase, async: false
 
-  alias PremiereEcoute.Events.EpisodeDownloaded
+  alias PremiereEcoute.Events.PodcastEpisodeDownloaded
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Storage
-  alias PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker
 
   # Agent-backed storage stub so uploads can be asserted without touching disk.
   defmodule MapStore do
@@ -35,16 +34,28 @@ defmodule PremiereEcoute.PodcastsTest do
   # Minimal PNG header declaring the given square dimensions.
   defp png(size), do: <<137, 80, 78, 71, 13, 10, 26, 10, 13::32, "IHDR", size::32, size::32, 0::64>>
 
-  describe "upload_episode/3" do
-    test "stores audio, creates a processing episode, and enqueues ingestion", %{show: show} do
-      {:ok, episode} = Podcasts.upload_episode(show, %{"title" => "Ep 1", "description" => "notes"}, "AUDIOBYTES")
+  # A small valid CBR MPEG-1 Layer III stream (128 kbps, 44.1 kHz) so ingestion can parse a duration.
+  defp mp3_bytes(frames) do
+    frame_len = trunc(144 * 128 * 1000 / 44_100)
+    frame = <<0xFF, 0xFB, 0x90, 0x00>> <> :binary.copy(<<0>>, frame_len - 4)
+    :binary.copy(frame, frames)
+  end
 
-      assert episode.status == :processing
+  describe "upload_episode/3" do
+    test "stores audio, creates the episode, and ingests it to :ready", %{show: show} do
+      audio = mp3_bytes(50)
+      {:ok, episode} = Podcasts.upload_episode(show, %{"title" => "Ep 1", "description" => "notes"}, audio)
+
       assert episode.show_id == show.id
       assert episode.guid
       assert episode.audio_key == Storage.audio_key(show.id, episode.guid)
-      assert {:ok, "AUDIOBYTES"} = Storage.fetch(episode.audio_key)
-      assert_enqueued(worker: EpisodeIngestionWorker, args: %{id: episode.id})
+      assert {:ok, ^audio} = Storage.fetch(episode.audio_key)
+
+      # Oban runs inline in test, so ingestion has already run synchronously.
+      ready = Episode.get(episode.id)
+      assert ready.status == :ready
+      assert ready.duration_seconds > 0
+      assert ready.audio_byte_size == byte_size(audio)
     end
   end
 
@@ -81,17 +92,6 @@ defmodule PremiereEcoute.PodcastsTest do
     end
   end
 
-  describe "report_show/2 and report_count/1" do
-    test "records reports against a show", %{show: show} do
-      assert Podcasts.report_count(show) == 0
-
-      Podcasts.report_show(show, "copyright")
-      Podcasts.report_show(show, "spam")
-
-      assert Podcasts.report_count(show) == 2
-    end
-  end
-
   describe "upload_cover/3" do
     test "stores a valid square cover and saves its public URL on the show", %{show: show} do
       bytes = png(1400)
@@ -112,12 +112,12 @@ defmodule PremiereEcoute.PodcastsTest do
   end
 
   describe "download_count/1" do
-    test "counts EpisodeDownloaded events for the episode", %{show: show} do
+    test "counts PodcastEpisodeDownloaded events for the episode", %{show: show} do
       episode = episode_fixture(show)
       assert Podcasts.download_count(episode) == 0
 
-      Store.append(%EpisodeDownloaded{id: episode.id, source: :feed}, stream: "podcast_download")
-      Store.append(%EpisodeDownloaded{id: episode.id, source: :web}, stream: "podcast_download")
+      Store.append(%PodcastEpisodeDownloaded{id: episode.id, source: :feed}, stream: "podcast_download")
+      Store.append(%PodcastEpisodeDownloaded{id: episode.id, source: :web}, stream: "podcast_download")
 
       assert Podcasts.download_count(episode) == 2
     end

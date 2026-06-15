@@ -75,7 +75,7 @@ defmodule PremiereEcoute.Podcasts.Audio.Mp3 do
     footer = if Bitwise.band(flags, 0x10) != 0, do: 10, else: 0
 
     case rest do
-      <<_skip::binary-size(tag_size), after_tag::binary>> ->
+      <<_skip::binary-size(^tag_size), after_tag::binary>> ->
         {:ok, strip_id3v1(after_tag) |> skip_to_footer(footer)}
 
       _ ->
@@ -104,7 +104,7 @@ defmodule PremiereEcoute.Podcasts.Audio.Mp3 do
 
   defp synchsafe(<<b1, b2, b3, b4>>) do
     import Bitwise
-    (b1 <<< 21) ||| (b2 <<< 14) ||| (b3 <<< 7) ||| b4
+    b1 <<< 21 ||| b2 <<< 14 ||| b3 <<< 7 ||| b4
   end
 
   # --- Frame header parsing ---
@@ -177,7 +177,7 @@ defmodule PremiereEcoute.Podcasts.Audio.Mp3 do
   # Xing: "Xing"/"Info" (4) + flags (4); bit 0 of flags => frame count present (next 4 bytes).
   defp xing_frames(frame, offset) do
     case frame do
-      <<_::binary-size(offset), _tag::binary-size(4), _::24, flags::8, frames::32, _::binary>> ->
+      <<_::binary-size(^offset), _tag::binary-size(4), _::24, flags::8, frames::32, _::binary>> ->
         import Bitwise
         if band(flags, 0x01) != 0, do: {:ok, frames}, else: :error
 

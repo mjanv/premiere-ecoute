@@ -26,8 +26,10 @@ defmodule PremiereEcoute.Podcasts.Image do
   defp jpeg(<<0xFF, marker, rest::binary>>) when marker in 0xD0..0xD9 or marker == 0x01, do: jpeg(rest)
 
   defp jpeg(<<0xFF, _marker, len::16, rest::binary>>) do
+    payload = len - 2
+
     case rest do
-      <<_skip::binary-size(len - 2), more::binary>> -> jpeg(more)
+      <<_skip::binary-size(^payload), more::binary>> -> jpeg(more)
       _ -> {:error, :invalid_jpeg}
     end
   end

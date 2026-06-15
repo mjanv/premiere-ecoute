@@ -10,7 +10,6 @@ defmodule PremiereEcoute.Podcasts do
   use PremiereEcouteCore.Context
 
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Events.ShowReported
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Image
@@ -30,6 +29,7 @@ defmodule PremiereEcoute.Podcasts do
   defdelegate update_show(show, attrs), to: Show, as: :update
   defdelegate publish_show(show), to: Show, as: :publish
   defdelegate shows_for_user(user), to: Show, as: :all_for_user
+  defdelegate published_shows_by_users(user_ids), to: Show, as: :published_by_users
   defdelegate get_published_show(username, slug), to: Show, as: :get_published
   defdelegate change_show(show, attrs \\ %{}), to: Show, as: :form
 
@@ -43,7 +43,6 @@ defmodule PremiereEcoute.Podcasts do
   defdelegate mark_episode_ready(episode, attrs), to: Episode, as: :mark_ready
   defdelegate mark_episode_failed(episode), to: Episode, as: :mark_failed
   defdelegate publish_episode(episode), to: Episode, as: :publish
-  defdelegate publish_episode_at(episode, at), to: Episode, as: :publish
   defdelegate change_episode(episode, attrs \\ %{}), to: Episode, as: :form
 
   @doc "Renders the RSS feed XML for a show and its publishable episodes."
@@ -95,15 +94,6 @@ defmodule PremiereEcoute.Podcasts do
   @spec purge_keys([String.t()]) :: :ok
   def purge_keys(keys) when is_list(keys), do: Enum.each(keys, &Storage.delete/1)
 
-  @doc "Records an abuse/DMCA report against a show (surfaced to admins)."
-  @spec report_show(Show.t(), String.t()) :: :ok
-  def report_show(%Show{id: id}, reason), do: Store.append(%ShowReported{id: id, reason: reason}, stream: "podcast_report")
-
-  @doc "Counts reports recorded against a show."
-  @spec report_count(Show.t() | integer()) :: non_neg_integer()
-  def report_count(%Show{id: id}), do: report_count(id)
-  def report_count(id) when is_integer(id), do: length(Store.read("podcast_report-#{id}", :event))
-
   # Streamer-facing analytics (durable, from the Postgres event store)
   defdelegate episode_download_stats(episode), to: Statistics, as: :episode_downloads
   defdelegate show_download_stats(show), to: Statistics, as: :show_downloads
@@ -121,7 +111,10 @@ defmodule PremiereEcoute.Podcasts do
   def upload_episode(%Show{id: show_id}, attrs, bytes) when is_binary(bytes) do
     guid = Ecto.UUID.generate()
     key = Storage.audio_key(show_id, guid)
-    attrs = Map.merge(attrs, %{show_id: show_id, guid: guid, audio_key: key, status: :processing})
+    # AIDEV-NOTE: caller attrs are string-keyed (forms); merge string keys so the changeset cast
+    # doesn't choke on a mixed atom/string key map.
+    server_attrs = %{"show_id" => show_id, "guid" => guid, "audio_key" => key, "status" => "processing"}
+    attrs = Map.merge(Map.new(attrs, fn {k, v} -> {to_string(k), v} end), server_attrs)
 
     with {:ok, episode} <- create_episode(attrs),
          :ok <- store_audio(episode, key, bytes) do

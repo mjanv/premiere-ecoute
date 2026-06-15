@@ -19,8 +19,7 @@ defmodule PremiereEcoute.Podcasts.Show do
   end
 
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Events.ShowCreated
-  alias PremiereEcoute.Events.ShowPublished
+  alias PremiereEcoute.Events.PodcastShowPublished
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Show.Slug
 
@@ -78,13 +77,27 @@ defmodule PremiereEcoute.Podcasts.Show do
     |> validate_required([:title, :user_id, :language])
     |> validate_inclusion(:category, @categories, message: "is not a valid Apple Podcasts category")
     |> Slug.maybe_generate_slug()
-    |> unique_constraint([:user_id, :slug])
+    # Attach the per-user uniqueness error to :slug (the conflicting field) for clearer UX.
+    |> unique_constraint(:slug, name: :podcasts_shows_user_id_slug_index)
     |> foreign_key_constraint(:user_id)
   end
 
   @doc "Lists all shows owned by a user, most recently updated first."
   @spec all_for_user(User.t()) :: [t()]
   def all_for_user(%User{id: user_id}), do: all(where: [user_id: user_id], order_by: [desc: :updated_at])
+
+  @doc """
+  Returns published shows owned by the given `user_ids`, grouped by `user_id`
+  (`%{user_id => [show]}`). Used to list each followed streamer's podcasts on the home page.
+  """
+  @spec published_by_users([integer()]) :: %{optional(integer()) => [t()]}
+  def published_by_users(user_ids) do
+    __MODULE__
+    |> where([s], s.user_id in ^user_ids and s.published == true)
+    |> order_by([s], desc: s.updated_at)
+    |> Repo.all()
+    |> Enum.group_by(& &1.user_id)
+  end
 
   @doc "Fetches a published show by owner username and slug, or nil."
   @spec get_published(String.t(), String.t()) :: t() | nil
@@ -95,19 +108,14 @@ defmodule PremiereEcoute.Podcasts.Show do
     end
   end
 
-  @doc "Creates a show and emits a ShowCreated event."
-  @spec create(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  def create(attrs) do
-    attrs
-    |> super()
-    |> Store.ok("podcasts_show", fn show -> %ShowCreated{id: show.id, user_id: show.user_id} end)
-  end
-
-  @doc "Marks a show as published and emits a ShowPublished event."
+  @doc "Marks a show as published and emits a PodcastShowPublished event."
   @spec publish(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def publish(%__MODULE__{} = show) do
+    # AIDEV-NOTE: changeset + Repo.update, not the generated update/2 (Ecto.Query.update/2 shadows it).
     show
-    |> update(%{published: true})
-    |> Store.ok("podcasts_show", fn show -> %ShowPublished{id: show.id} end)
+    |> changeset(%{published: true})
+    |> Repo.update()
+    |> preload()
+    |> Store.ok("podcasts_show", fn show -> %PodcastShowPublished{id: show.id} end)
   end
 end

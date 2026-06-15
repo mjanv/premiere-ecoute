@@ -1,7 +1,7 @@
 defmodule PremiereEcouteWeb.Podcasts.AudioControllerTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
-  alias PremiereEcoute.Events.EpisodeDownloaded
+  alias PremiereEcoute.Events.PodcastEpisodeDownloaded
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Storage
 
@@ -46,17 +46,18 @@ defmodule PremiereEcouteWeb.Podcasts.AudioControllerTest do
       assert get_resp_header(conn, "content-type") == ["audio/mpeg"]
     end
 
-    test "records an EpisodeDownloaded event tagged :feed by default", %{conn: conn, show: show, episode: episode} do
+    test "records a PodcastEpisodeDownloaded event tagged :feed by default", %{conn: conn, show: show, episode: episode} do
       get(conn, ~p"/podcasts/audiostreamer/#{show.slug}/episodes/#{episode.guid}/audio")
 
-      assert %EpisodeDownloaded{id: id, source: :feed} = Store.last("podcast_download-#{episode.id}")
+      # The event store round-trips events through JSON, so the atom `source` reads back as a string.
+      assert %PodcastEpisodeDownloaded{id: id, source: "feed"} = Store.last("podcast_download-#{episode.id}")
       assert id == episode.id
     end
 
     test "tags website plays as :web", %{conn: conn, show: show, episode: episode} do
       get(conn, ~p"/podcasts/audiostreamer/#{show.slug}/episodes/#{episode.guid}/audio?source=web")
 
-      assert %EpisodeDownloaded{source: :web} = Store.last("podcast_download-#{episode.id}")
+      assert %PodcastEpisodeDownloaded{source: "web"} = Store.last("podcast_download-#{episode.id}")
     end
 
     test "returns 404 for an unknown episode", %{conn: conn, show: show} do

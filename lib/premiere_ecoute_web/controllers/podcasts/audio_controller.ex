@@ -3,14 +3,14 @@ defmodule PremiereEcouteWeb.Podcasts.AudioController do
   Streams episode audio through the app.
 
   Podcast feeds and the website player point here rather than at the object store directly: the
-  request is recorded as an `EpisodeDownloaded` event (tagged `:feed` or `:web`) and the bytes are
+  request is recorded as an `PodcastEpisodeDownloaded` event (tagged `:feed` or `:web`) and the bytes are
   then streamed from storage with HTTP Range support. The object store stays private (no public
   bucket/URL needed) and every download is countable, on a single domain.
   """
 
   use PremiereEcouteWeb, :controller
 
-  alias PremiereEcoute.Events.EpisodeDownloaded
+  alias PremiereEcoute.Events.PodcastEpisodeDownloaded
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts
   alias PremiereEcoute.Podcasts.Episode
@@ -53,7 +53,7 @@ defmodule PremiereEcouteWeb.Podcasts.AudioController do
 
   defp track_download(conn, %Episode{} = episode, params) do
     Store.append(
-      %EpisodeDownloaded{
+      %PodcastEpisodeDownloaded{
         id: episode.id,
         source: source(params),
         ip: client_ip(conn),

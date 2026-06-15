@@ -9,6 +9,11 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowFormLive do
   alias PremiereEcoute.Podcasts
   alias PremiereEcoute.Podcasts.Show
 
+  # AIDEV-NOTE: dark form-control classes matching the playlists/automations form (the bare daisyUI
+  # `<.input>` defaults render unstyled-white on the synthwave background).
+  @field_class "w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+  @checkbox_class "checkbox checkbox-sm border-gray-600 bg-gray-700"
+
   @impl true
   def mount(params, _session, %{assigns: %{current_scope: scope}} = socket) do
     case load(params, scope) do
@@ -99,33 +104,67 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowFormLive do
 
   @impl true
   def render(assigns) do
+    assigns = assign(assigns, field_class: @field_class, checkbox_class: @checkbox_class)
+
     ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="max-w-2xl mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-6">{if @action == :new, do: gettext("New show"), else: gettext("Edit show")}</h1>
+    <Layouts.app flash={@flash} current_scope={@current_scope} current_page="podcasts">
+      <div class="synthwave-bg min-h-screen text-white">
+        <div class="max-w-2xl mx-auto px-6 py-12">
+          <h1 class="text-2xl font-bold text-white mb-6">
+            {if @action == :new, do: gettext("New show"), else: gettext("Edit show")}
+          </h1>
 
-        <.form for={@form} id="show-form" phx-change="validate" phx-submit="save" class="space-y-4">
-          <.input field={@form[:title]} type="text" label={gettext("Title")} required />
-          <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
-          <.input field={@form[:author]} type="text" label={gettext("Author")} />
-          <.input field={@form[:language]} type="text" label={gettext("Language (e.g. en, fr)")} />
-          <.input
-            field={@form[:category]}
-            type="select"
-            label={gettext("Category")}
-            options={@categories}
-            prompt={gettext("Choose a category")}
-          />
-          <.input field={@form[:explicit]} type="checkbox" label={gettext("Explicit content")} />
+          <.form
+            for={@form}
+            id="show-form"
+            phx-change="validate"
+            phx-submit="save"
+            class="space-y-4 rounded-xl bg-gray-800/50 border border-gray-700 p-6"
+          >
+            <.input field={@form[:title]} type="text" label={gettext("Title")} class={@field_class} required />
+            <.input field={@form[:description]} type="textarea" label={gettext("Description")} class={@field_class} />
+            <.input field={@form[:author]} type="text" label={gettext("Author")} class={@field_class} />
+            <.input
+              field={@form[:language]}
+              type="text"
+              label={gettext("Language (e.g. en, fr)")}
+              class={@field_class}
+            />
+            <.input
+              field={@form[:category]}
+              type="select"
+              label={gettext("Category")}
+              options={@categories}
+              prompt={gettext("Choose a category")}
+              class={@field_class}
+            />
+            <.input
+              field={@form[:explicit]}
+              type="checkbox"
+              label={gettext("Explicit content")}
+              class={@checkbox_class}
+            />
 
-          <div>
-            <label class="block text-sm font-medium mb-1">{gettext("Cover image (≥ 1400×1400)")}</label>
-            <.live_file_input upload={@uploads.cover} />
-            <img :if={@show.cover_key} src={~p"/podcasts/shows/#{@show.id}/cover"} class="mt-2 w-24 h-24 rounded object-cover" />
-          </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">
+                {gettext("Cover image (≥ 1400×1400)")}
+              </label>
+              <.live_file_input upload={@uploads.cover} class="text-sm text-gray-300" />
+              <img
+                :if={@show.cover_key}
+                src={~p"/podcasts/shows/#{@show.id}/cover"}
+                class="mt-2 w-24 h-24 rounded-lg object-cover"
+              />
+            </div>
 
-          <.button type="submit">{gettext("Save show")}</.button>
-        </.form>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {gettext("Save show")}
+            </button>
+          </.form>
+        </div>
       </div>
     </Layouts.app>
     """

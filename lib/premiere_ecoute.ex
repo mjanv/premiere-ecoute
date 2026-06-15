@@ -23,6 +23,7 @@ defmodule PremiereEcoute do
       {Models, except: []},
       {Notifications, except: []},
       {Playlists, except: []},
+      {Podcasts, except: []},
       {Radio, except: []},
       {Sessions, except: []},
       {Telemetry, except: []},

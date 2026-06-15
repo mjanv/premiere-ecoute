@@ -10,6 +10,10 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Show
 
+  # AIDEV-NOTE: dark form-control class matching the playlists/automations form (bare daisyUI
+  # `<.input>` defaults render unstyled-white on the synthwave background).
+  @field_class "w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+
   @impl true
   def mount(params, _session, %{assigns: %{current_scope: scope}} = socket) do
     case load(params, scope) do
@@ -51,11 +55,6 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do
     {:noreply, cancel_upload(socket, :audio, ref)}
   end
-
-  defp upload_error_message(:too_large), do: gettext("File is too large (max 200 MB)")
-  defp upload_error_message(:not_accepted), do: gettext("Only MP3 files are allowed")
-  defp upload_error_message(:too_many_files), do: gettext("Only one file can be uploaded")
-  defp upload_error_message(_error), do: gettext("Upload error")
 
   @impl true
   def handle_event("save", %{"episode" => params}, %{assigns: %{action: :edit, episode: episode}} = socket) do
@@ -106,58 +105,90 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
 
   defp assign_form(socket, changeset), do: assign(socket, form: to_form(changeset, as: "episode"))
 
+  defp upload_error_message(:too_large), do: gettext("File is too large (max 200 MB)")
+  defp upload_error_message(:not_accepted), do: gettext("Only MP3 files are allowed")
+  defp upload_error_message(:too_many_files), do: gettext("Only one file can be uploaded")
+  defp upload_error_message(_error), do: gettext("Upload error")
+
   @impl true
   def render(assigns) do
+    assigns = assign(assigns, :field_class, @field_class)
+
     ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="max-w-2xl mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-6">
-          {if @action == :new, do: gettext("New episode"), else: gettext("Edit episode")}
-        </h1>
+    <Layouts.app flash={@flash} current_scope={@current_scope} current_page="podcasts">
+      <div class="synthwave-bg min-h-screen text-white">
+        <div class="max-w-2xl mx-auto px-6 py-12">
+          <h1 class="text-2xl font-bold text-white mb-6">
+            {if @action == :new, do: gettext("New episode"), else: gettext("Edit episode")}
+          </h1>
 
-        <.form for={@form} id="episode-form" phx-change="validate" phx-submit="save" class="space-y-4">
-          <.input field={@form[:title]} type="text" label={gettext("Title")} required />
-          <.input field={@form[:description]} type="textarea" label={gettext("Show notes")} />
+          <.form
+            for={@form}
+            id="episode-form"
+            phx-change="validate"
+            phx-submit="save"
+            class="space-y-4 rounded-xl bg-gray-800/50 border border-gray-700 p-6"
+          >
+            <.input field={@form[:title]} type="text" label={gettext("Title")} class={@field_class} required />
+            <.input field={@form[:description]} type="textarea" label={gettext("Show notes")} class={@field_class} />
 
-          <div class="grid grid-cols-3 gap-3">
-            <.input field={@form[:season]} type="number" label={gettext("Season")} min="1" />
-            <.input field={@form[:episode_number]} type="number" label={gettext("Episode number")} min="1" />
-            <.input field={@form[:episode_type]} type="select" label={gettext("Type")} options={@episode_types} />
-          </div>
+            <div class="grid grid-cols-3 gap-3">
+              <.input field={@form[:season]} type="number" label={gettext("Season")} min="1" class={@field_class} />
+              <.input
+                field={@form[:episode_number]}
+                type="number"
+                label={gettext("Episode number")}
+                min="1"
+                class={@field_class}
+              />
+              <.input
+                field={@form[:episode_type]}
+                type="select"
+                label={gettext("Type")}
+                options={@episode_types}
+                class={@field_class}
+              />
+            </div>
 
-          <div :if={@action == :new} phx-drop-target={@uploads.audio.ref}>
-            <label class="block text-sm font-medium mb-1">{gettext("Audio file (MP3)")}</label>
-            <.live_file_input upload={@uploads.audio} />
-            <p class="text-xs text-gray-500 mt-1">{gettext("Duration is detected automatically after upload.")}</p>
+            <div :if={@action == :new} phx-drop-target={@uploads.audio.ref}>
+              <label class="block text-sm font-medium text-gray-300 mb-1">{gettext("Audio file (MP3)")}</label>
+              <.live_file_input upload={@uploads.audio} class="text-sm text-gray-300" />
+              <p class="text-xs text-gray-400 mt-1">{gettext("Duration is detected automatically after upload.")}</p>
 
-            <div :for={entry <- @uploads.audio.entries} class="mt-2">
-              <div class="flex items-center justify-between text-xs">
-                <span class="truncate">{entry.client_name}</span>
-                <button
-                  type="button"
-                  phx-click="cancel-upload"
-                  phx-value-ref={entry.ref}
-                  class="text-red-600 ml-2"
-                  aria-label={gettext("Cancel")}
-                >
-                  &times;
-                </button>
+              <div :for={entry <- @uploads.audio.entries} class="mt-2">
+                <div class="flex items-center justify-between text-xs text-gray-300">
+                  <span class="truncate">{entry.client_name}</span>
+                  <button
+                    type="button"
+                    phx-click="cancel-upload"
+                    phx-value-ref={entry.ref}
+                    class="text-red-400 hover:text-red-300 ml-2"
+                    aria-label={gettext("Cancel")}
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div class="w-full bg-white/10 rounded h-2 mt-1">
+                  <div class="bg-purple-500 h-2 rounded" style={"width: #{entry.progress}%"}></div>
+                </div>
+                <p :for={err <- upload_errors(@uploads.audio, entry)} class="text-xs text-red-400 mt-1">
+                  {upload_error_message(err)}
+                </p>
               </div>
-              <div class="w-full bg-gray-200 rounded h-2 mt-1">
-                <div class="bg-indigo-500 h-2 rounded" style={"width: #{entry.progress}%"}></div>
-              </div>
-              <p :for={err <- upload_errors(@uploads.audio, entry)} class="text-xs text-red-600 mt-1">
+
+              <p :for={err <- upload_errors(@uploads.audio)} class="text-xs text-red-400 mt-1">
                 {upload_error_message(err)}
               </p>
             </div>
 
-            <p :for={err <- upload_errors(@uploads.audio)} class="text-xs text-red-600 mt-1">
-              {upload_error_message(err)}
-            </p>
-          </div>
-
-          <.button type="submit">{if @action == :new, do: gettext("Upload episode"), else: gettext("Save changes")}</.button>
-        </.form>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {if @action == :new, do: gettext("Upload episode"), else: gettext("Save changes")}
+            </button>
+          </.form>
+        </div>
       </div>
     </Layouts.app>
     """

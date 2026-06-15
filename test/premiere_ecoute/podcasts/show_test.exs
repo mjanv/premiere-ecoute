@@ -1,8 +1,7 @@
 defmodule PremiereEcoute.Podcasts.ShowTest do
   use PremiereEcoute.DataCase, async: true
 
-  alias PremiereEcoute.Events.ShowCreated
-  alias PremiereEcoute.Events.ShowPublished
+  alias PremiereEcoute.Events.PodcastShowPublished
   alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Show
 
@@ -37,15 +36,13 @@ defmodule PremiereEcoute.Podcasts.ShowTest do
   end
 
   describe "create/1" do
-    test "persists and emits ShowCreated" do
+    test "persists a show" do
       user = user_fixture()
 
       {:ok, show} = Show.create(%{user_id: user.id, title: "Pod"})
 
       assert show.id
-      assert %ShowCreated{id: show_id, user_id: user_id} = Store.last("podcasts_show-#{show.id}")
-      assert show_id == show.id
-      assert user_id == user.id
+      assert show.user_id == user.id
     end
 
     test "enforces unique slug per user" do
@@ -58,7 +55,7 @@ defmodule PremiereEcoute.Podcasts.ShowTest do
   end
 
   describe "publish/1" do
-    test "marks published and emits ShowPublished" do
+    test "marks published and emits PodcastShowPublished" do
       user = user_fixture()
       {:ok, show} = Show.create(%{user_id: user.id, title: "Pod"})
 
@@ -66,7 +63,7 @@ defmodule PremiereEcoute.Podcasts.ShowTest do
       {:ok, published} = Show.publish(show)
 
       assert published.published
-      assert %ShowPublished{id: show_id} = Store.last("podcasts_show-#{show.id}")
+      assert %PodcastShowPublished{id: show_id} = Store.last("podcasts_show-#{show.id}")
       assert show_id == show.id
     end
   end
@@ -80,6 +77,25 @@ defmodule PremiereEcoute.Podcasts.ShowTest do
       show_fixture(other, %{title: "C"})
 
       assert length(Show.all_for_user(user)) == 2
+    end
+  end
+
+  describe "published_by_users/1" do
+    test "groups only published shows by owner id" do
+      published = user_fixture()
+      draft_only = user_fixture()
+      none = user_fixture()
+
+      a = show_fixture(published, %{title: "A", published: true})
+      b = show_fixture(published, %{title: "B", published: true})
+      show_fixture(published, %{published: false})
+      show_fixture(draft_only, %{published: false})
+
+      result = Show.published_by_users([published.id, draft_only.id, none.id])
+
+      assert MapSet.new(Enum.map(result[published.id], & &1.id)) == MapSet.new([a.id, b.id])
+      refute Map.has_key?(result, draft_only.id)
+      refute Map.has_key?(result, none.id)
     end
   end
 

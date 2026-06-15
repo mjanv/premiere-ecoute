@@ -3,13 +3,13 @@ defmodule PremiereEcoute.Podcasts.Statistics do
   Streamer-facing podcast analytics.
 
   Sourced from the **Postgres-backed event store** (`event_store.events`), so these numbers are
-  durable indefinitely — unlike Prometheus, which only retains ~14 days. Built on `EpisodeDownloaded`
+  durable indefinitely — unlike Prometheus, which only retains ~14 days. Built on `PodcastEpisodeDownloaded`
   events (stream `podcast_download-<episode_id>`), each tagged by source (`:web` vs `:feed`), via
   `Analytics.aggregate_events/3`.
   """
 
   alias PremiereEcoute.Analytics
-  alias PremiereEcoute.Events.EpisodeDownloaded
+  alias PremiereEcoute.Events.PodcastEpisodeDownloaded
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Show
   alias PremiereEcoute.Repo
@@ -34,7 +34,7 @@ defmodule PremiereEcoute.Podcasts.Statistics do
   @doc "Episode downloads bucketed by a time unit (`:day`, `:week`, …) for charts."
   @spec episode_downloads_over_time(Episode.t(), Analytics.Events.unit(), keyword()) :: [map()]
   def episode_downloads_over_time(%Episode{id: id}, unit, opts \\ []) do
-    Analytics.aggregate_events(EpisodeDownloaded, unit, Keyword.merge([stream: stream(id)], opts))
+    Analytics.aggregate_events(PodcastEpisodeDownloaded, unit, Keyword.merge([stream: stream(id)], opts))
   end
 
   @doc "A show's downloads bucketed by a time unit (pass `from:`/`to:`/`fill_gaps: true` for charts)."
@@ -42,7 +42,7 @@ defmodule PremiereEcoute.Podcasts.Statistics do
   def show_downloads_over_time(%Show{} = show, unit, opts \\ []) do
     case streams(show) do
       [] -> []
-      streams -> Analytics.aggregate_events(EpisodeDownloaded, unit, Keyword.merge([stream: streams], opts))
+      streams -> Analytics.aggregate_events(PodcastEpisodeDownloaded, unit, Keyword.merge([stream: streams], opts))
     end
   end
 
@@ -67,14 +67,14 @@ defmodule PremiereEcoute.Podcasts.Statistics do
     WHERE e.event_type = $1 AND s.stream_uuid = ANY($2)
     """
 
-    %{rows: [[count]]} = Repo.query!(sql, [Atom.to_string(EpisodeDownloaded), streams])
+    %{rows: [[count]]} = Repo.query!(sql, [Atom.to_string(PodcastEpisodeDownloaded), streams])
     count
   end
 
   defp breakdown([], _opts), do: %{total: 0, web: 0, feed: 0}
 
   defp breakdown(streams, opts) do
-    EpisodeDownloaded
+    PodcastEpisodeDownloaded
     |> Analytics.aggregate_events(:year, Keyword.merge([stream: streams, fields: [:source]], opts))
     |> Enum.reduce(%{total: 0, web: 0, feed: 0}, fn %{count: count} = row, acc ->
       acc

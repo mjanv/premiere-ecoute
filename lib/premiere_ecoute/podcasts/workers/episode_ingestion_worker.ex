@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
   @moduledoc """
   Processes a freshly-uploaded episode: fetches the audio from storage, validates it is an MP3,
   extracts its duration (pure-Elixir parser) and byte size, and marks the episode `:ready`. On any
-  failure the episode is marked `:failed`. Emits `EpisodeProcessed` on success.
+  failure the episode is marked `:failed`.
 
   Enqueue after the upload is finalized: `EpisodeIngestionWorker.start(%{id: episode.id})`.
   """
@@ -11,8 +11,6 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
 
   require Logger
 
-  alias PremiereEcoute.Events.EpisodeProcessed
-  alias PremiereEcoute.Events.Store
   alias PremiereEcoute.Podcasts.Audio.Mp3
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Storage
@@ -42,11 +40,6 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
          {:ok, duration} <- Mp3.duration(bytes) do
       byte_size = byte_size(bytes)
       {:ok, ready} = Episode.mark_ready(episode, %{duration_seconds: duration, audio_byte_size: byte_size})
-
-      Store.append(
-        %EpisodeProcessed{id: ready.id, duration_seconds: duration, audio_byte_size: byte_size},
-        stream: "podcasts_episode"
-      )
 
       PubSub.broadcast(topic(ready.show_id), {:episode_updated, ready.id})
       Logger.info("podcast episode #{ready.id} ingested (#{duration}s, #{byte_size} bytes)")
