@@ -8,6 +8,7 @@ The application runs on a Digital Ocean droplet with the following components:
 
 - **Premiere Ecoute**: Phoenix application (Elixir/OTP)
 - **PostgreSQL**: Database server
+- **SeaweedFS**: Object storage for podcast audio/covers ([setup guide](SEAWEEDFS_SETUP.md))
 - **Traefik**: Reverse proxy and SSL termination
 - **Grafana Alloy**: Metrics collection agent (sends to Grafana Cloud)
 

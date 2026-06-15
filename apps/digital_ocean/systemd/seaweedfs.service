@@ -10,7 +10,8 @@ Type=exec
 User=seaweedfs
 Group=seaweedfs
 WorkingDirectory=/var/lib/seaweedfs
-ExecStart=/usr/local/bin/weed server -dir=/var/lib/seaweedfs -filer -ip.bind=127.0.0.1 -master.volumeSizeLimitMB=1024
+# AIDEV-NOTE: -volume.port=8082 avoids a clash with Traefik on the default volume port 8080.
+ExecStart=/usr/local/bin/weed server -dir=/var/lib/seaweedfs -filer -ip.bind=127.0.0.1 -volume.port=8082 -master.volumeSizeLimitMB=1024
 
 Restart=on-failure
 RestartSec=5
