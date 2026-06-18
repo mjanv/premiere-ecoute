@@ -220,171 +220,99 @@
 
 <!-- Session Modal -->
 <%= if @show_modal and @selected_session do %>
-  <div class="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" phx-click="close_modal">
-    <div class="bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[80vh] flex flex-col">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-700">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 mr-4">
-            <span class={"inline-flex items-center px-3 py-1 rounded-full text-sm font-medium #{status_class(@selected_session.status)}"}>
-              {status_text(@selected_session.status)}
-            </span>
-          </div>
-          <div>
-            <h2 class="text-xl font-semibold text-white">{gettext("Session Details")}</h2>
-            <p class="text-gray-400">
-              {gettext("Created")}: {PremiereEcouteCore.Date.datetime(@selected_session.inserted_at)}
-            </p>
+  <.modal id="session-modal" show on_cancel="close_modal" size="xl">
+    <:header>
+      <div class="flex items-center gap-3">
+        <span class={"badge #{status_class(@selected_session.status)}"}>
+          {status_text(@selected_session.status)}
+        </span>
+        <div>
+          <div>{gettext("Session Details")}</div>
+          <div class="text-sm text-base-content/50 font-normal">
+            {gettext("Created")}: {PremiereEcouteCore.Date.datetime(@selected_session.inserted_at)}
           </div>
         </div>
-        <button phx-click="close_modal" class="text-gray-400 hover:text-white">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
       </div>
-      
-<!-- Modal Content -->
-      <div class="flex-1 overflow-y-auto p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Session Info -->
-          <div class="bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-medium text-white mb-4">{gettext("Session Information")}</h3>
-            <div class="space-y-3">
-              <div>
-                <span class="text-sm text-gray-400">{gettext("ID")}:</span>
-                <div class="text-white font-mono text-sm">{@selected_session.id}</div>
-              </div>
-              <div>
-                <span class="text-sm text-gray-400">{gettext("Started")}:</span>
-                <div class="text-white">{PremiereEcouteCore.Date.datetime(@selected_session.started_at)}</div>
-              </div>
-              <div>
-                <span class="text-sm text-gray-400">{gettext("Ended")}:</span>
-                <div class="text-white">{PremiereEcouteCore.Date.datetime(@selected_session.ended_at)}</div>
-              </div>
-              <div>
-                <span class="text-sm text-gray-400">{gettext("Duration")}:</span>
-                <div class="text-white">
-                  {PremiereEcouteCore.Duration.timer(@selected_session.started_at, @selected_session.ended_at)}
-                </div>
-              </div>
+    </:header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-base-300 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">{gettext("Session Information")}</h3>
+        <div class="space-y-2 text-sm">
+          <div><span class="text-base-content/50">{gettext("ID")}:</span> <span class="font-mono">{@selected_session.id}</span></div>
+          <div><span class="text-base-content/50">{gettext("Started")}:</span> {PremiereEcouteCore.Date.datetime(@selected_session.started_at)}</div>
+          <div><span class="text-base-content/50">{gettext("Ended")}:</span> {PremiereEcouteCore.Date.datetime(@selected_session.ended_at)}</div>
+          <div><span class="text-base-content/50">{gettext("Duration")}:</span> {PremiereEcouteCore.Duration.timer(@selected_session.started_at, @selected_session.ended_at)}</div>
+        </div>
+      </div>
+
+      <div class="bg-base-300 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">{gettext("User Information")}</h3>
+        <%= if @selected_session.user do %>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-neutral flex items-center justify-center shrink-0">
+              <span class="text-sm font-medium">
+                {String.first(@selected_session.user.email || "?") |> String.upcase()}
+              </span>
+            </div>
+            <div>
+              <div class="text-sm font-medium">{@selected_session.user.email}</div>
+              <%= if @selected_session.user.twitch do %>
+                <div class="text-sm text-base-content/50">@{@selected_session.user.twitch.username}</div>
+              <% end %>
             </div>
           </div>
-          
-<!-- User Info -->
-          <div class="bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-medium text-white mb-4">{gettext("User Information")}</h3>
-            <%= if @selected_session.user do %>
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-12 w-12">
-                  <div class="h-12 w-12 rounded-full bg-gray-600 flex items-center justify-center">
-                    <%= if @selected_session.user.email do %>
-                      <span class="text-sm font-medium text-white">
-                        {String.first(@selected_session.user.email) |> String.upcase()}
-                      </span>
-                    <% else %>
-                      <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                      </svg>
-                    <% end %>
-                  </div>
-                </div>
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-white">{@selected_session.user.email}</div>
-                  <%= if @selected_session.user.twitch do %>
-                    <div class="text-sm text-gray-400">@{@selected_session.user.twitch.username}</div>
-                  <% end %>
-                </div>
-              </div>
-            <% else %>
-              <div class="text-gray-400">{gettext("No user associated with this session")}</div>
+        <% else %>
+          <p class="text-sm text-base-content/30">{gettext("No user associated with this session")}</p>
+        <% end %>
+      </div>
+    </div>
+
+    <%= if @selected_session.album do %>
+      <div class="mt-4 bg-base-300 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">{gettext("Album Information")}</h3>
+        <div class="flex items-center gap-4">
+          <%= if @selected_session.album.cover_url do %>
+            <.cover class="h-14 w-14 rounded-lg object-cover shrink-0" src={@selected_session.album.cover_url} alt={@selected_session.album.name} />
+          <% else %>
+            <div class="h-14 w-14 rounded-lg bg-neutral flex items-center justify-center shrink-0">
+              <.icon name="hero-musical-note" class="w-6 h-6 text-base-content/50" />
+            </div>
+          <% end %>
+          <div>
+            <div class="font-medium">{@selected_session.album.name}</div>
+            <div class="text-sm text-base-content/50">{@selected_session.album.artist}</div>
+            <%= if @selected_session.album.release_date do %>
+              <div class="text-xs text-base-content/30">{Calendar.strftime(@selected_session.album.release_date, "%B %d, %Y")}</div>
             <% end %>
           </div>
         </div>
-        
-<!-- Album Info -->
-        <%= if @selected_session.album do %>
-          <div class="mt-6 bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-medium text-white mb-4">{gettext("Album Information")}</h3>
-            <div class="flex items-center">
-              <div class="flex-shrink-0 h-16 w-16">
-                <%= if @selected_session.album.cover_url do %>
-                  <.cover
-                    class="h-16 w-16 rounded-lg object-cover"
-                    src={@selected_session.album.cover_url}
-                    alt={@selected_session.album.name}
-                  />
-                <% else %>
-                  <div class="h-16 w-16 rounded-lg bg-gray-600 flex items-center justify-center">
-                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                      />
-                    </svg>
-                  </div>
-                <% end %>
-              </div>
-              <div class="ml-4">
-                <div class="text-lg font-medium text-white">{@selected_session.album.name}</div>
-                <div class="text-gray-400">{@selected_session.album.artist}</div>
-                <%= if @selected_session.album.release_date do %>
-                  <div class="text-sm text-gray-500">
-                    {Calendar.strftime(@selected_session.album.release_date, "%B %d, %Y")}
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        <% end %>
-        
-<!-- Current Track Info -->
-        <%= if @selected_session.current_track do %>
-          <div class="mt-6 bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-medium text-white mb-4">{gettext("Current Track")}</h3>
-            <div class="flex items-center">
-              <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                <span class="text-xs font-medium text-white">{@selected_session.current_track.track_number}</span>
-              </div>
-              <div>
-                <div class="text-white font-medium">{@selected_session.current_track.name}</div>
-              </div>
-            </div>
-          </div>
-        <% end %>
       </div>
-    </div>
-  </div>
-<% end %>
+    <% end %>
 
-<!-- Delete Confirmation Modal -->
-<%= if @show_delete_modal and @session_to_delete do %>
-  <div class="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" phx-click="close_delete_modal">
-    <div class="bg-gray-800 rounded-lg shadow-xl max-w-sm w-full mx-4" phx-click="ignore">
-      <div class="p-6">
-        <h3 class="text-lg font-medium text-white mb-4">{gettext("Delete Session")}</h3>
-        <p class="text-gray-300 mb-6">
-          {gettext("Are you sure you want to delete this session? This action cannot be undone.")}
-        </p>
-
-        <div class="flex justify-end space-x-3">
-          <button
-            phx-click="close_delete_modal"
-            class="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 hover:text-white transition-colors"
-          >
-            {gettext("Cancel")}
-          </button>
-          <button
-            phx-click="confirm_delete_session"
-            class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
-          >
-            {gettext("Delete")}
-          </button>
+    <%= if @selected_session.current_track do %>
+      <div class="mt-4 bg-base-300 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">{gettext("Current Track")}</h3>
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 bg-neutral rounded-full flex items-center justify-center shrink-0">
+            <span class="text-xs font-medium">{@selected_session.current_track.track_number}</span>
+          </div>
+          <div class="font-medium">{@selected_session.current_track.name}</div>
         </div>
       </div>
-    </div>
-  </div>
+    <% end %>
+  </.modal>
+<% end %>
+
+<%= if @show_delete_modal and @session_to_delete do %>
+  <.modal id="delete-session-modal" show on_cancel="close_delete_modal" size="sm">
+    <:header>{gettext("Delete Session")}</:header>
+    <p class="text-sm text-base-content/70">
+      {gettext("Are you sure you want to delete this session? This action cannot be undone.")}
+    </p>
+    <:footer>
+      <.button phx-click="close_delete_modal">{gettext("Cancel")}</.button>
+      <.button phx-click="confirm_delete_session" class="btn-error">{gettext("Delete")}</.button>
+    </:footer>
+  </.modal>
 <% end %>

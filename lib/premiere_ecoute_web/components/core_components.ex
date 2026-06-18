@@ -99,23 +99,51 @@ defmodule PremiereEcouteWeb.CoreComponents do
       <.button navigate={~p"/"}>Home</.button>
   """
   @spec button(map()) :: Phoenix.LiveView.Rendered.t()
-  attr :rest, :global, include: ~w(href navigate patch method)
-  attr :variant, :string, values: ~w(primary)
+  attr :rest, :global, include: ~w(href navigate patch method type disabled)
+
+  attr :variant, :string,
+    default: "default",
+    values: ~w(default primary secondary ghost outline danger icon),
+    doc: "Visual style. 'default' renders primary soft."
+
+  attr :size, :string,
+    default: "md",
+    values: ~w(xs sm md lg),
+    doc: "Size modifier."
+
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-primary", nil => "btn-primary btn-soft"}
-    assigns = assign(assigns, :class, Map.fetch!(variants, assigns[:variant]))
+    variant_class =
+      case assigns[:variant] do
+        "primary" -> "btn-primary"
+        "secondary" -> "btn-secondary"
+        "ghost" -> "btn-ghost"
+        "outline" -> "btn-outline"
+        "danger" -> "btn-error"
+        "icon" -> "btn-ghost btn-square"
+        _ -> "btn-primary btn-soft"
+      end
+
+    size_class =
+      case assigns[:size] do
+        "xs" -> "btn-xs"
+        "sm" -> "btn-sm"
+        "lg" -> "btn-lg"
+        _ -> nil
+      end
+
+    assigns = assign(assigns, :cls, [variant_class, size_class])
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
       ~H"""
-      <.link class={["btn", @class]} {@rest}>
+      <.link class={["btn", @cls]} {@rest}>
         {render_slot(@inner_block)}
       </.link>
       """
     else
       ~H"""
-      <button class={["btn", @class]} {@rest}>
+      <button class={["btn", @cls]} {@rest}>
         {render_slot(@inner_block)}
       </button>
       """

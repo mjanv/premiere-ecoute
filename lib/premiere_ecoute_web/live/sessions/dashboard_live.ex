@@ -10,7 +10,6 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   require Logger
 
   import PremiereEcouteWeb.Sessions.Components.SessionComponents
-  import PremiereEcouteWeb.Components.Backgrounds
 
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Discography.Playlist

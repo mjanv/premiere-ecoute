@@ -610,84 +610,44 @@
 
             <%!-- End session modal --%>
             <%= if @show_end_modal do %>
-              <div
-                class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
-                phx-click="hide_end_modal"
-              >
-                <div
-                  class="bg-gray-900 border border-white/10 rounded-2xl p-8 w-full max-w-md shadow-2xl"
-                  phx-click="modal_content_click"
-                >
-                  <h2 class="text-xl font-bold text-white mb-2">{gettext("End session")}</h2>
-                  <p class="text-gray-400 text-sm mb-6">
-                    {gettext(
-                      "%{kept} tracks will be synced to %{playlist}.",
-                      kept: length(@session.kept),
-                      playlist: @session.destination_playlist && @session.destination_playlist.title
-                    )}
-                  </p>
-
-                  <form phx-submit="complete" class="space-y-4">
-                    <label class="flex items-start gap-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        name="remove_kept"
-                        value="true"
-                        class="mt-0.5 accent-purple-500"
-                      />
-                      <div>
-                        <p class="text-white text-sm font-medium">
-                          {gettext("Remove kept tracks from origin")}
-                        </p>
-                        <p class="text-gray-500 text-xs mt-0.5">
-                          {gettext(
-                            "Delete the %{count} kept tracks from %{playlist}",
-                            count: length(@session.kept),
-                            playlist: @session.origin_playlist && @session.origin_playlist.title
-                          )}
-                        </p>
-                      </div>
-                    </label>
-
-                    <label class="flex items-start gap-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        name="remove_rejected"
-                        value="true"
-                        class="mt-0.5 accent-purple-500"
-                      />
-                      <div>
-                        <p class="text-white text-sm font-medium">
-                          {gettext("Remove rejected tracks from origin")}
-                        </p>
-                        <p class="text-gray-500 text-xs mt-0.5">
-                          {gettext(
-                            "Delete the %{count} rejected tracks from %{playlist}",
-                            count: length(@session.rejected),
-                            playlist: @session.origin_playlist && @session.origin_playlist.title
-                          )}
-                        </p>
-                      </div>
-                    </label>
-
-                    <div class="flex gap-3 pt-2">
-                      <button
-                        type="button"
-                        phx-click="hide_end_modal"
-                        class="flex-1 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
-                      >
-                        {gettext("Cancel")}
-                      </button>
-                      <button
-                        type="submit"
-                        class="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition-colors"
-                      >
-                        {gettext("Confirm & complete")}
-                      </button>
+              <.modal id="end-session-modal" show on_cancel="hide_end_modal" size="sm">
+                <:header>{gettext("End session")}</:header>
+                <p class="text-sm text-base-content/70 mb-4">
+                  {gettext(
+                    "%{kept} tracks will be synced to %{playlist}.",
+                    kept: length(@session.kept),
+                    playlist: @session.destination_playlist && @session.destination_playlist.title
+                  )}
+                </p>
+                <form phx-submit="complete" class="space-y-4">
+                  <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" name="remove_kept" value="true" class="mt-0.5 accent-purple-500" />
+                    <div>
+                      <p class="text-sm font-medium">{gettext("Remove kept tracks from origin")}</p>
+                      <p class="text-xs text-base-content/50 mt-0.5">
+                        {gettext("Delete the %{count} kept tracks from %{playlist}",
+                          count: length(@session.kept),
+                          playlist: @session.origin_playlist && @session.origin_playlist.title)}
+                      </p>
                     </div>
-                  </form>
-                </div>
-              </div>
+                  </label>
+                  <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" name="remove_rejected" value="true" class="mt-0.5 accent-purple-500" />
+                    <div>
+                      <p class="text-sm font-medium">{gettext("Remove rejected tracks from origin")}</p>
+                      <p class="text-xs text-base-content/50 mt-0.5">
+                        {gettext("Delete the %{count} rejected tracks from %{playlist}",
+                          count: length(@session.rejected),
+                          playlist: @session.origin_playlist && @session.origin_playlist.title)}
+                      </p>
+                    </div>
+                  </label>
+                  <div class="flex justify-end gap-2 pt-2">
+                    <.button type="button" phx-click="hide_end_modal">{gettext("Cancel")}</.button>
+                    <.button type="submit" variant="primary">{gettext("Confirm & complete")}</.button>
+                  </div>
+                </form>
+              </.modal>
             <% end %>
           <% end %>
         <% end %>

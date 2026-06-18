@@ -138,12 +138,16 @@
 </div>
 
 <%= if @selected do %>
-  <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" phx-click="close_modal">
-    <div
-      class="bg-gray-900 border-2 border-purple-500 rounded-lg p-8 max-w-4xl w-full mx-4 relative"
-      phx-click="stop_propagation"
-    >
-      <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" phx-click="close_modal">×</button>
+  <.modal id="dashboard-detail-modal" show on_cancel="close_modal" size="xl">
+    <:header>
+      <%= cond do %>
+        <% @display_mode == :track -> %>{@selected.track.artist} — {@selected.track.name}
+        <% @display_mode == :artist -> %>{@selected.artist}
+        <% @display_mode == :year -> %>{@selected.year}
+        <% @display_mode == :playlist -> %>{@selected.title}
+        <% true -> %>
+      <% end %>
+    </:header>
 
       <%= if @display_mode == :track do %>
         <div class="text-center mb-6">
@@ -388,6 +392,5 @@
           <% end %>
         </div>
       <% end %>
-    </div>
-  </div>
+  </.modal>
 <% end %>

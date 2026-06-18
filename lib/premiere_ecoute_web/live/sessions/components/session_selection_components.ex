@@ -359,116 +359,95 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
 
   def random_album_modal(assigns) do
     ~H"""
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" phx-click="close_random_modal">
-      <div class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
-      <div
-        class="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl border border-white/10"
-        style="background-color: var(--color-dark-900);"
-        phx-click-away="close_random_modal"
-      >
-        <div class="flex items-center justify-between p-6 border-b border-white/10">
-          <div>
-            <h2 class="text-xl font-bold text-white">{gettext("Random Album Pick")}</h2>
-            <p class="text-sm text-gray-400 mt-1">{gettext("Spin to pick a random album from your list")}</p>
-          </div>
-          <button
-            type="button"
-            phx-click="close_random_modal"
-            class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
+    <.modal id="random-album-modal" show on_cancel="close_random_modal" size="lg">
+      <:header>
+        <div>
+          <div>{gettext("Random Album Pick")}</div>
+          <div class="text-sm text-base-content/50 font-normal">{gettext("Spin to pick a random album from your list")}</div>
         </div>
-
-        <div class="p-6">
-          <%= cond do %>
-            <% @picks_empty -> %>
-              <div class="text-center py-10">
-                <div class="text-4xl mb-3">🎲</div>
-                <p class="text-gray-400 mb-1">{gettext("Your pick list is empty.")}</p>
-                <p class="text-gray-500 text-sm">{gettext("Add albums from the pick management page.")}</p>
-              </div>
-            <% @random_pick != nil -> %>
-              <div class="text-center">
-                <div class="flex items-center space-x-4 p-4 rounded-xl bg-purple-600/10 border border-purple-500/30 mx-auto max-w-sm mb-5">
-                  <%= if @random_pick.cover_url do %>
-                    <.cover src={@random_pick.cover_url} alt={@random_pick.name} class="w-20 h-20 rounded-lg shadow-lg flex-shrink-0" />
-                  <% else %>
-                    <div class="w-20 h-20 rounded-lg bg-purple-900/50 flex items-center justify-center flex-shrink-0">
-                      <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
-                      </svg>
-                    </div>
-                  <% end %>
-                  <div class="text-left">
-                    <p class="font-bold text-white text-lg leading-tight">{@random_pick.name}</p>
-                    <p class="text-gray-300 text-sm">{@random_pick.artist}</p>
-                    <%= if @random_pick.source == :viewer && @random_pick.submitter && @random_pick.submitter != "" do %>
-                      <p class="text-purple-400 text-xs mt-1">{gettext("Submitted by")} {@random_pick.submitter}</p>
-                    <% end %>
+      </:header>
+      <div>
+        <%= cond do %>
+          <% @picks_empty -> %>
+            <div class="text-center py-10">
+              <div class="text-4xl mb-3">🎲</div>
+              <p class="text-gray-400 mb-1">{gettext("Your pick list is empty.")}</p>
+              <p class="text-gray-500 text-sm">{gettext("Add albums from the pick management page.")}</p>
+            </div>
+          <% @random_pick != nil -> %>
+            <div class="text-center">
+              <div class="flex items-center space-x-4 p-4 rounded-xl bg-purple-600/10 border border-purple-500/30 mx-auto max-w-sm mb-5">
+                <%= if @random_pick.cover_url do %>
+                  <.cover src={@random_pick.cover_url} alt={@random_pick.name} class="w-20 h-20 rounded-lg shadow-lg flex-shrink-0" />
+                <% else %>
+                  <div class="w-20 h-20 rounded-lg bg-purple-900/50 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M18 3a1 1 0 00-1.196-.98L3 6.687a1 1 0 000 1.838l4.49 1.497L9.5 14.75a1 1 0 001.838 0L15.014 10H18a1 1 0 001-1V4a1 1 0 00-1-1z" />
+                    </svg>
                   </div>
-                </div>
-                <div class="flex items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    phx-click="use_random_album"
-                    class="px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-200 shadow-lg"
-                  >
-                    {gettext("Use this album")}
-                  </button>
-                  <button
-                    type="button"
-                    phx-click="spin_wheel"
-                    class="px-4 py-2.5 rounded-xl font-medium text-purple-300 border border-purple-500/50 hover:bg-purple-600/20 transition-colors"
-                  >
-                    {gettext("Spin again")}
-                  </button>
+                <% end %>
+                <div class="text-left">
+                  <p class="font-bold text-white text-lg leading-tight">{@random_pick.name}</p>
+                  <p class="text-gray-300 text-sm">{@random_pick.artist}</p>
+                  <%= if @random_pick.source == :viewer && @random_pick.submitter && @random_pick.submitter != "" do %>
+                    <p class="text-purple-400 text-xs mt-1">{gettext("Submitted by")} {@random_pick.submitter}</p>
+                  <% end %>
                 </div>
               </div>
-            <% @pick_spinning -> %>
-              <div class="flex flex-col items-center justify-center py-10 space-y-4">
-                <div class="animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent"></div>
-                <p class="text-purple-400 text-sm animate-pulse">{gettext("Spinning...")}</p>
-              </div>
-            <% true -> %>
-              <div class="text-center py-10">
+              <div class="flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  phx-click="use_random_album"
+                  class="px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-200 shadow-lg"
+                >
+                  {gettext("Use this album")}
+                </button>
                 <button
                   type="button"
                   phx-click="spin_wheel"
-                  class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-200 shadow-lg text-lg"
+                  class="px-4 py-2.5 rounded-xl font-medium text-purple-300 border border-purple-500/50 hover:bg-purple-600/20 transition-colors"
                 >
-                  🎲 {gettext("Spin!")}
+                  {gettext("Spin again")}
                 </button>
               </div>
-          <% end %>
-        </div>
-
-        <div class="px-6 pb-5 pt-3 border-t border-white/10 flex justify-end">
-          <.link
-            navigate={~p"/sessions/pick/albums"}
-            class="inline-flex items-center space-x-1.5 text-sm text-purple-400 hover:text-purple-300 transition-colors"
-            onclick="event.stopPropagation()"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-              />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span>{gettext("Manage picks")}</span>
-          </.link>
-        </div>
+            </div>
+          <% @pick_spinning -> %>
+            <div class="flex flex-col items-center justify-center py-10 space-y-4">
+              <div class="animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent"></div>
+              <p class="text-purple-400 text-sm animate-pulse">{gettext("Spinning...")}</p>
+            </div>
+          <% true -> %>
+            <div class="text-center py-10">
+              <button
+                type="button"
+                phx-click="spin_wheel"
+                class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-200 shadow-lg text-lg"
+              >
+                🎲 {gettext("Spin!")}
+              </button>
+            </div>
+        <% end %>
       </div>
-    </div>
+
+      <div class="px-6 pb-5 pt-3 border-t border-white/10 flex justify-end">
+        <.link
+          navigate={~p"/sessions/pick/albums"}
+          class="inline-flex items-center space-x-1.5 text-sm text-purple-400 hover:text-purple-300 transition-colors"
+          onclick="event.stopPropagation()"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>{gettext("Manage picks")}</span>
+        </.link>
+      </div>
+    </.modal>
     """
   end
 

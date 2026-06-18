@@ -159,80 +159,50 @@
 
 <!-- Album Modal -->
 <%= if @show_modal and @selected_album do %>
-  <div class="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" phx-click="close_modal">
-    <div class="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-700">
-        <div class="flex items-center">
-          <%= if @selected_album.cover_url do %>
-            <.cover class="h-16 w-16 rounded-lg object-cover mr-4" src={@selected_album.cover_url} alt={@selected_album.name} />
-          <% else %>
-            <div class="h-16 w-16 rounded-lg bg-gray-600 flex items-center justify-center mr-4">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                />
-              </svg>
-            </div>
-          <% end %>
-          <div>
-            <h2 class="text-xl font-semibold text-white">{@selected_album.name}</h2>
-            <p class="text-gray-400">{@selected_album.artist}</p>
+  <.modal id="album-modal" show on_cancel="close_modal" size="lg">
+    <:header>
+      <div class="flex items-center gap-3">
+        <%= if @selected_album.cover_url do %>
+          <.cover class="h-10 w-10 rounded-lg object-cover flex-shrink-0" src={@selected_album.cover_url} alt={@selected_album.name} />
+        <% else %>
+          <div class="h-10 w-10 rounded-lg bg-neutral flex items-center justify-center flex-shrink-0">
+            <.icon name="hero-musical-note" class="w-5 h-5 text-base-content/50" />
+          </div>
+        <% end %>
+        <div>
+          <div class="font-semibold">{@selected_album.name}</div>
+          <div class="text-sm text-base-content/50">
+            {@selected_album.artist}
             <%= if @selected_album.release_date do %>
-              <p class="text-sm text-gray-500">
-                {Calendar.strftime(@selected_album.release_date, "%B %d, %Y")}
-              </p>
+              · {Calendar.strftime(@selected_album.release_date, "%B %d, %Y")}
             <% end %>
           </div>
         </div>
-        <button phx-click="close_modal" class="text-gray-400 hover:text-white">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
       </div>
-      
-<!-- Modal Content -->
-      <div class="flex-1 overflow-y-auto p-6">
-        <h3 class="text-lg font-medium text-white mb-4">
-          {gettext("Tracks")} ({length(@selected_album.tracks)})
-        </h3>
+    </:header>
 
-        <%= if @selected_album.tracks != [] do %>
-          <div class="space-y-2">
-            <%= for track <- Enum.sort_by(@selected_album.tracks, & &1.track_number) do %>
-              <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                <div class="flex items-center">
-                  <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                    <span class="text-xs font-medium text-white">{track.track_number}</span>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-white">{track.name}</p>
-                  </div>
-                </div>
-                <div class="text-sm text-gray-400">
-                  {PremiereEcouteCore.Duration.timer(track.duration_ms)}
-                </div>
+    <h3 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">
+      {gettext("Tracks")} ({length(@selected_album.tracks)})
+    </h3>
+
+    <%= if @selected_album.tracks != [] do %>
+      <div class="space-y-2">
+        <%= for track <- Enum.sort_by(@selected_album.tracks, & &1.track_number) do %>
+          <div class="flex items-center justify-between p-3 bg-base-300 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 bg-neutral rounded-full flex items-center justify-center shrink-0">
+                <span class="text-xs font-medium">{track.track_number}</span>
               </div>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="text-center py-8 text-gray-400">
-            <svg class="w-12 h-12 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-              />
-            </svg>
-            <p>{gettext("No tracks found for this album")}</p>
+              <p class="text-sm font-medium">{track.name}</p>
+            </div>
+            <div class="text-sm text-base-content/50">
+              {PremiereEcouteCore.Duration.timer(track.duration_ms)}
+            </div>
           </div>
         <% end %>
       </div>
-    </div>
-  </div>
+    <% else %>
+      <.empty_state icon="hero-musical-note" title={gettext("No tracks")} description={gettext("No tracks found for this album")} />
+    <% end %>
+  </.modal>
 <% end %>

@@ -165,136 +165,102 @@
 
 <!-- Billboard Management Modal -->
 <%= if @show_billboard_modal do %>
-  <div class="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" phx-click="close_billboard_modal">
-    <div
-      class="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto"
-      phx-click="modal_content_click"
-    >
-      <div class="px-6 py-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <%= if @selected_billboard do %>
-              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
-                {gettext("Manage Billboard")}: {@selected_billboard.title}
-              </h3>
-              <p class="text-sm text-gray-400 mt-1">
-                {gettext("ID")}: {@selected_billboard.billboard_id} | {gettext("Streamer")}: {@selected_billboard.streamer.username}
-              </p>
-            <% else %>
-              <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
-                {gettext("Billboard Not Found")}
-              </h3>
-              <p class="text-sm text-red-400 mt-1">
-                {gettext("The selected billboard could not be loaded.")}
-              </p>
+  <.modal id="billboard-modal" show on_cancel="close_billboard_modal" size="xl">
+    <:header>
+      <%= if @selected_billboard do %>
+        <div>
+          <div>{gettext("Manage Billboard")}: {@selected_billboard.title}</div>
+          <div class="text-sm text-base-content/50 font-normal">
+            {gettext("ID")}: {@selected_billboard.billboard_id} | {gettext("Streamer")}: {@selected_billboard.streamer.username}
+          </div>
+        </div>
+      <% else %>
+        <div class="text-error">{gettext("Billboard Not Found")}</div>
+      <% end %>
+    </:header>
+
+    <%= if @selected_billboard do %>
+      <div class="space-y-6">
+        <div>
+          <h4 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">{gettext("Status Management")}</h4>
+          <div class="flex flex-wrap gap-2">
+            <%= for status <- [:created, :active, :stopped] do %>
+              <button
+                type="button"
+                phx-click="change_status"
+                phx-value-billboard_id={@selected_billboard.id}
+                phx-value-status={status}
+                class={["btn btn-sm", if(@selected_billboard.status == status, do: "btn-primary", else: "btn-ghost")]}
+              >
+                {String.capitalize(to_string(status))}
+              </button>
             <% end %>
           </div>
-          <button
-            type="button"
-            class="bg-gray-800 rounded-md text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-            phx-click="close_billboard_modal"
-          >
-            <span class="sr-only">{gettext("Close")}</span>
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </div>
 
-        <%= if @selected_billboard do %>
-          <!-- Status Management -->
-          <div class="mt-6 border-t border-gray-700 pt-6">
-            <h4 class="text-sm font-medium text-white mb-4">{gettext("Status Management")}</h4>
-            <div class="flex flex-wrap gap-2">
-              <%= for status <- [:created, :active, :stopped] do %>
-                <button
-                  type="button"
-                  phx-click="change_status"
-                  phx-value-billboard_id={@selected_billboard.id}
-                  phx-value-status={status}
-                  class={"px-3 py-2 rounded-md text-sm font-medium transition-colors #{if @selected_billboard.status == status, do: "bg-blue-600 text-white", else: "bg-gray-700 text-gray-300 hover:bg-gray-600"}"}
-                >
-                  {String.capitalize(to_string(status))}
-                </button>
-              <% end %>
-            </div>
-          </div>
-          
-<!-- Submissions Management -->
-          <div class="mt-6 border-t border-gray-700 pt-6">
-            <h4 class="text-sm font-medium text-white mb-4">
-              {gettext("Submissions")} ({length(@selected_billboard.submissions || [])})
-            </h4>
-
-            <%= if Enum.empty?(@selected_billboard.submissions || []) do %>
-              <p class="text-gray-400 text-sm">{gettext("No submissions yet.")}</p>
-            <% else %>
-              <div class="space-y-3 max-h-64 overflow-y-auto">
-                <%= for {submission, index} <- Enum.with_index(@selected_billboard.submissions) do %>
-                  <div class="bg-gray-800 rounded-lg p-4">
-                    <div class="flex items-start justify-between">
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center space-x-3">
-                          <div class={"w-3 h-3 rounded-full #{if submission_reviewed?(submission), do: "bg-green-500", else: "bg-yellow-500"}"}>
-                          </div>
-                          <span class="text-sm text-gray-300">
-                            {gettext("Pseudo")}: <span class="font-medium">{submission["pseudo"] || gettext("Anonymous")}</span>
-                          </span>
-                        </div>
-                        <p class="text-sm text-blue-400 mt-1 truncate">
-                          {submission["url"]}
-                        </p>
-                        <p class="text-xs text-gray-500 mt-1">
-                          {gettext("Submitted")}: {format_datetime(elem(DateTime.from_iso8601(submission["submitted_at"]), 1))}
-                        </p>
+        <div class="border-t border-neutral pt-6">
+          <h4 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">
+            {gettext("Submissions")} ({length(@selected_billboard.submissions || [])})
+          </h4>
+          <%= if Enum.empty?(@selected_billboard.submissions || []) do %>
+            <p class="text-sm text-base-content/30">{gettext("No submissions yet.")}</p>
+          <% else %>
+            <div class="space-y-3 max-h-64 overflow-y-auto">
+              <%= for {submission, index} <- Enum.with_index(@selected_billboard.submissions) do %>
+                <div class="bg-base-300 rounded-lg p-4">
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2 mb-1">
+                        <div class={["w-2.5 h-2.5 rounded-full", if(submission_reviewed?(submission), do: "bg-success", else: "bg-warning")]}></div>
+                        <span class="text-sm">
+                          {gettext("Pseudo")}: <span class="font-medium">{submission["pseudo"] || gettext("Anonymous")}</span>
+                        </span>
                       </div>
-                      <div class="flex space-x-2 ml-4">
-                        <button
-                          type="button"
-                          phx-click="toggle_submission_review"
-                          phx-value-billboard_id={@selected_billboard.id}
-                          phx-value-index={index}
-                          class={"px-2 py-1 rounded text-xs font-medium #{if submission_reviewed?(submission), do: "bg-green-600 text-white", else: "bg-yellow-600 text-white"}"}
-                        >
-                          <%= if submission_reviewed?(submission) do %>
-                            {gettext("Reviewed")}
-                          <% else %>
-                            {gettext("Review")}
-                          <% end %>
-                        </button>
-                        <button
-                          type="button"
-                          phx-click="remove_submission"
-                          phx-value-billboard_id={@selected_billboard.id}
-                          phx-value-index={index}
-                          class="px-2 py-1 rounded text-xs font-medium bg-red-600 text-white hover:bg-red-700"
-                          data-confirm={gettext("Are you sure you want to remove this submission?")}
-                        >
-                          {gettext("Remove")}
-                        </button>
-                      </div>
+                      <p class="text-sm text-info truncate">{submission["url"]}</p>
+                      <p class="text-xs text-base-content/30 mt-1">
+                        {gettext("Submitted")}: {format_datetime(elem(DateTime.from_iso8601(submission["submitted_at"]), 1))}
+                      </p>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                      <button
+                        type="button"
+                        phx-click="toggle_submission_review"
+                        phx-value-billboard_id={@selected_billboard.id}
+                        phx-value-index={index}
+                        class={["btn btn-xs", if(submission_reviewed?(submission), do: "btn-success", else: "btn-warning")]}
+                      >
+                        {if submission_reviewed?(submission), do: gettext("Reviewed"), else: gettext("Review")}
+                      </button>
+                      <button
+                        type="button"
+                        phx-click="remove_submission"
+                        phx-value-billboard_id={@selected_billboard.id}
+                        phx-value-index={index}
+                        class="btn btn-xs btn-error"
+                        data-confirm={gettext("Are you sure you want to remove this submission?")}
+                      >
+                        {gettext("Remove")}
+                      </button>
                     </div>
                   </div>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-          
-<!-- Danger Zone -->
-          <div class="mt-6 border-t border-red-900 pt-6">
-            <h4 class="text-sm font-medium text-red-400 mb-4">{gettext("Danger Zone")}</h4>
-            <button
-              type="button"
-              phx-click="confirm_delete_billboard"
-              phx-value-billboard_id={@selected_billboard.id}
-              data-confirm={gettext("Are you sure you want to delete this billboard? This action cannot be undone.")}
-              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              {gettext("Delete Billboard")}
-            </button>
-          </div>
-        <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="border-t border-error/30 pt-6">
+          <h4 class="text-sm font-medium text-error mb-3">{gettext("Danger Zone")}</h4>
+          <.button
+            phx-click="confirm_delete_billboard"
+            phx-value-billboard_id={@selected_billboard.id}
+            class="btn-error"
+            data-confirm={gettext("Are you sure you want to delete this billboard? This action cannot be undone.")}
+          >
+            {gettext("Delete Billboard")}
+          </.button>
+        </div>
       </div>
-    </div>
-  </div>
+    <% end %>
+  </.modal>
 <% end %>

@@ -409,12 +409,16 @@
 
 <!-- Details Modal - Outside synthwave container for proper layering -->
 <%= if @show_modal do %>
-  <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" phx-click="close_modal">
-    <div
-      class="bg-gray-900 border-2 border-purple-500 rounded-lg p-8 max-w-4xl w-full mx-4 relative"
-      phx-click="stop_propagation"
-    >
-      <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" phx-click="close_modal">×</button>
+  <.modal id="billboard-detail-modal" show on_cancel="close_modal" size="xl">
+    <:header>
+      <%= cond do %>
+        <% @selected_track -> %>{@selected_track.track.artist} — {@selected_track.track.name}
+        <% @selected_artist -> %>{@selected_artist.artist}
+        <% @selected_year -> %>{@selected_year.year}
+        <% @selected_playlist -> %>{@selected_playlist.title}
+        <% true -> %>
+      <% end %>
+    </:header>
 
       <%= if @selected_track do %>
         <!-- Track Modal -->
@@ -645,6 +649,5 @@
           <% end %>
         </div>
       <% end %>
-    </div>
-  </div>
+  </.modal>
 <% end %>

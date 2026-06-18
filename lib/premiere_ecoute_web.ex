@@ -19,6 +19,7 @@ defmodule PremiereEcouteWeb do
       CoreComponents,
       Components.ActivityCard,
       Components.AlbumTrackDisplay,
+      Components.Backgrounds,
       Components.Images,
       Components.Card,
       Components.EmptyState,
@@ -26,6 +27,7 @@ defmodule PremiereEcouteWeb do
       Components.Modal,
       Components.PageHeader,
       Components.Search,
+      Components.MediaCard,
       Components.StatsCard,
       Components.StatusBadge
     ]
@@ -138,6 +140,11 @@ defmodule PremiereEcouteWeb do
       import PremiereEcouteWeb.CoreComponents
       import PremiereEcouteWeb.Components.Images
       import PremiereEcouteWeb.Components.Modal
+      import PremiereEcouteWeb.Components.Backgrounds
+      import PremiereEcouteWeb.Components.Card
+      import PremiereEcouteWeb.Components.EmptyState
+      import PremiereEcouteWeb.Components.MediaCard
+      import PremiereEcouteWeb.Components.StatsCard
 
       alias Phoenix.LiveView.AsyncResult
       alias Phoenix.LiveView.JS

@@ -168,124 +168,84 @@
 </div>
 
 <%= if @selected_review do %>
-  <div class="fixed inset-0 backdrop-blur-sm bg-black/50 flex items-center justify-center z-50" phx-click="close_modal">
-    <div
-      class="bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 flex flex-col"
-      phx-click-away="close_modal"
-    >
-      <%!-- Header --%>
-      <div class="flex items-start justify-between p-6 border-b border-gray-700">
+  <.modal id="review-modal" show on_cancel="close_modal">
+    <:header>
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class={["badge badge-sm", if(@selected_review.role == :streamer, do: "badge-primary", else: "badge-ghost")]}>
+            {@selected_review.role}
+          </span>
+          <%= cond do %>
+            <% @selected_review.album != nil -> %>
+              <span class="badge badge-sm badge-warning">album</span>
+            <% @selected_review.session_id != nil -> %>
+              <span class="badge badge-sm badge-success">session</span>
+            <% true -> %>
+          <% end %>
+        </div>
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class={[
-              "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium",
-              if @selected_review.role == :streamer do
-                "bg-purple-900 text-purple-300"
-              else
-                "bg-gray-700 text-gray-300"
-              end
-            ]}>
-              {@selected_review.role}
-            </span>
-            <%= cond do %>
-              <% @selected_review.album != nil -> %>
-                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-yellow-900 text-yellow-300">album</span>
-              <% @selected_review.session_id != nil -> %>
-                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-900 text-green-300">session</span>
-              <% true -> %>
-            <% end %>
-          </div>
-          <h2 class="text-lg font-semibold text-white">
-            <%= cond do %>
-              <% @selected_review.album != nil -> %>
-                {@selected_review.album.name}
-              <% @selected_review.session_id != nil -> %>
-                {gettext("Session #%{id}", id: @selected_review.session_id)}
-              <% true -> %>
-                {gettext("Review")}
-            <% end %>
-          </h2>
-          <p class="text-sm text-gray-400 mt-0.5">
-            {gettext("by %{user}", user: @selected_review.user && @selected_review.user.username)} · {Calendar.strftime(
-              @selected_review.inserted_at,
-              "%b %d, %Y"
-            )}
-          </p>
+          <%= cond do %>
+            <% @selected_review.album != nil -> %>{@selected_review.album.name}
+            <% @selected_review.session_id != nil -> %>{gettext("Session #%{id}", id: @selected_review.session_id)}
+            <% true -> %>{gettext("Review")}
+          <% end %>
         </div>
-        <button phx-click="close_modal" class="text-gray-400 hover:text-white ml-4 flex-shrink-0">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div class="text-sm text-base-content/50 font-normal">
+          {gettext("by %{user}", user: @selected_review.user && @selected_review.user.username)}
+          · {Calendar.strftime(@selected_review.inserted_at, "%b %d, %Y")}
+        </div>
       </div>
+    </:header>
 
-      <%!-- Body --%>
-      <div class="p-6 space-y-4">
-        <%!-- Rating + likes --%>
-        <div class="flex items-center gap-6">
-          <%= if @selected_review.rating && @selected_review.rating > 0 do %>
-            <div>
-              <p class="text-xs text-gray-500 mb-0.5">{gettext("Rating")}</p>
-              <p class="text-2xl font-bold text-yellow-400">
-                {Float.round(@selected_review.rating, 1)}<span class="text-sm text-gray-500 font-normal"> / 5</span>
-              </p>
-            </div>
-          <% end %>
+    <div class="space-y-4">
+      <div class="flex items-center gap-6">
+        <%= if @selected_review.rating && @selected_review.rating > 0 do %>
           <div>
-            <p class="text-xs text-gray-500 mb-0.5">{gettext("Likes")}</p>
-            <p class="text-xl font-semibold text-white">{length(@selected_review.likes)}</p>
+            <p class="text-xs text-base-content/50 mb-0.5">{gettext("Rating")}</p>
+            <p class="text-2xl font-bold text-warning">
+              {Float.round(@selected_review.rating, 1)}<span class="text-sm text-base-content/30 font-normal"> / 5</span>
+            </p>
           </div>
-          <%= if @selected_review.watched_before do %>
-            <div>
-              <p class="text-xs text-gray-500 mb-0.5">{gettext("Listened before")}</p>
-              <p class="text-sm text-white">{gettext("Yes")}</p>
-            </div>
-          <% end %>
-          <%= if @selected_review.tags != [] do %>
-            <div class="flex flex-wrap gap-1">
-              <%= for tag <- @selected_review.tags do %>
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-700 text-gray-300">{tag}</span>
-              <% end %>
-            </div>
-          <% end %>
+        <% end %>
+        <div>
+          <p class="text-xs text-base-content/50 mb-0.5">{gettext("Likes")}</p>
+          <p class="text-xl font-semibold">{length(@selected_review.likes)}</p>
         </div>
-
-        <%!-- Content --%>
-        <%= if @selected_review.content && @selected_review.content != "" do %>
+        <%= if @selected_review.watched_before do %>
           <div>
-            <p class="text-xs text-gray-500 mb-1">{gettext("Content")}</p>
-            <p class="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">{@selected_review.content}</p>
+            <p class="text-xs text-base-content/50 mb-0.5">{gettext("Listened before")}</p>
+            <p class="text-sm">{gettext("Yes")}</p>
           </div>
-        <% else %>
-          <p class="text-sm text-gray-600 italic">{gettext("No written content.")}</p>
+        <% end %>
+        <%= if @selected_review.tags != [] do %>
+          <div class="flex flex-wrap gap-1">
+            <%= for tag <- @selected_review.tags do %>
+              <span class="badge badge-ghost badge-sm">{tag}</span>
+            <% end %>
+          </div>
         <% end %>
       </div>
 
-      <%!-- Footer --%>
-      <div class="flex items-center justify-between px-6 py-4 border-t border-gray-700">
-        <button
-          phx-click="close_modal"
-          class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
-        >
-          {gettext("Close")}
-        </button>
-        <button
-          phx-click="delete_review"
-          phx-value-id={@selected_review.id}
-          class="inline-flex items-center px-4 py-2 bg-red-700 hover:bg-red-600 text-white text-sm font-medium rounded-md transition-colors"
-          data-confirm={gettext("Delete this review? This cannot be undone.")}
-        >
-          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-          {gettext("Delete")}
-        </button>
-      </div>
+      <%= if @selected_review.content && @selected_review.content != "" do %>
+        <div>
+          <p class="text-xs text-base-content/50 mb-1">{gettext("Content")}</p>
+          <p class="text-sm whitespace-pre-wrap leading-relaxed">{@selected_review.content}</p>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/30 italic">{gettext("No written content.")}</p>
+      <% end %>
     </div>
-  </div>
+
+    <:footer>
+      <.button phx-click="close_modal">{gettext("Close")}</.button>
+      <.button
+        phx-click="delete_review"
+        phx-value-id={@selected_review.id}
+        class="btn-error"
+        data-confirm={gettext("Delete this review? This cannot be undone.")}
+      >
+        {gettext("Delete")}
+      </.button>
+    </:footer>
+  </.modal>
 <% end %>

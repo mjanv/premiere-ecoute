@@ -10,6 +10,7 @@ Read those documents before working on the codebase:
 - Application summary: @README.md
 - Coding standards: @docs/coding_standards.md
 - Development guide: @docs/guides/development.md
+- Frontend & design system: @docs/guides/frontend.md
 
 ---
 
@@ -30,6 +31,9 @@ AI assistant MUST NOT do:
 3. Delete or mangle existing AIDEV- comments.
 4. Re-format code to any other style.
 5. Refactor large modules without human guidance.
+6. Write raw HTML for any repeated UI pattern (modal overlays, cards, badges, buttons, empty states) without first checking `docs/guides/frontend.md` for an existing component. If none exists, create the component before using it.
+7. Use `<div class="fixed inset-0 ...">` as a modal shell — always use `<.modal>`.
+8. Use raw `<button class="...">` for action buttons — always use `<.button>` with a variant.
 
 ---
 

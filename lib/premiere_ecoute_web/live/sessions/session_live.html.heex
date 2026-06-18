@@ -605,16 +605,8 @@
 
       <%!-- Replays modal --%>
       <%= if @replays_modal_open do %>
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-lg shadow-2xl">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-bold text-white">{gettext("Edit replays")}</h3>
-              <button phx-click="close_replays_modal" class="text-slate-500 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+        <.modal id="replays-modal" show on_cancel="close_replays_modal">
+          <:header>{gettext("Edit replays")}</:header>
 
             <form phx-submit="save_replays" class="space-y-3">
               <%= for {entry, index} <- Enum.with_index(@replays_entries) do %>
@@ -673,25 +665,13 @@
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+        </.modal>
       <% end %>
 
       <%!-- Review modal --%>
       <%= if @review_modal_open && @review_form do %>
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-2xl shadow-2xl">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-bold text-white">
-                {if @editing_review, do: gettext("Edit your review"), else: gettext("Write a review")}
-              </h3>
-              <button phx-click="close_review_modal" class="text-slate-500 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
+        <.modal id="review-modal" show on_cancel="close_review_modal" size="lg">
+          <:header>{if @editing_review, do: gettext("Edit your review"), else: gettext("Write a review")}</:header>
             <.form for={@review_form} phx-submit="save_review" phx-change="update_review_form" class="space-y-4">
               <input type="hidden" name="review[role]" value={@review_form[:role].value} />
 
@@ -838,8 +818,7 @@
                 </button>
               </div>
             </.form>
-          </div>
-        </div>
+        </.modal>
       <% end %>
 
       <%!-- Post-session voting modal --%>
@@ -850,17 +829,9 @@
             :playlist -> @listening_session.playlist.tracks
             _ -> []
           end %>
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div class="bg-gray-900 border border-purple-500/30 rounded-2xl p-8 w-full max-w-3xl shadow-2xl max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between mb-2 shrink-0">
-              <h3 class="text-xl font-bold text-white">{gettext("Cast your votes")}</h3>
-              <button phx-click="close_post_vote_modal" class="text-slate-500 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <p class="text-xs text-slate-500 mb-5 shrink-0">
+        <.modal id="post-vote-modal" show on_cancel="close_post_vote_modal" size="xl">
+          <:header>{gettext("Cast your votes")}</:header>
+            <p class="text-xs text-base-content/50 mb-5 shrink-0">
               {gettext("Rate each track you heard. You can skip tracks you didn't listen to.")}
             </p>
 
@@ -918,8 +889,7 @@
                 {gettext("Cancel")}
               </button>
             </div>
-          </div>
-        </div>
+        </.modal>
       <% end %>
     <% else %>
       <div class="max-w-6xl mx-auto px-6 py-20 text-center">

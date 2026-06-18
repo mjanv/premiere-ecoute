@@ -25,7 +25,7 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
   @spec status_badge(map()) :: Phoenix.LiveView.Rendered.t()
   attr :status, :string,
     default: "info",
-    values: ~w(active preparing completed stopped success warning error info),
+    values: ~w(active preparing completed stopped cancelled success warning error info secondary),
     doc: "Predefined status type"
 
   attr :variant, :string,
@@ -85,6 +85,7 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
       "active" -> "success"
       "preparing" -> "warning"
       "completed" -> "info"
+      "stopped" -> "secondary"
       _ -> "secondary"
     end
   end
@@ -109,6 +110,6 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
   defp variant("error"), do: "bg-red-600/15 text-red-300 border-red-600/25"
   defp variant("info"), do: "bg-blue-600/15 text-blue-300 border-blue-600/25"
   defp variant("primary"), do: "bg-purple-600/15 text-purple-300 border-purple-600/25"
-  defp variant("secondary"), do: "bg-surface-interactive/50 text-surface-muted border-surface"
-  defp variant(_), do: "bg-surface-interactive/50 text-surface-muted border-surface"
+  defp variant("secondary"), do: "bg-white/10 text-white/70 border-white/20"
+  defp variant(_), do: "bg-white/10 text-white/70 border-white/20"
 end

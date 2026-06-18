@@ -234,14 +234,9 @@
     <% playlist = @subscription_modal.playlist %>
     <% channels = @subscription_modal.channels %>
     <% any_subscribed = Enum.any?(channels, fn {_ch, v} -> v end) %>
-    <div
-      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
-      phx-click="close_subscription_modal"
-    >
-      <div
-        class="bg-gray-800 rounded-xl border border-gray-700 p-8 w-full max-w-lg mx-4"
-        phx-click-away="close_subscription_modal"
-      >
+    <.modal id="subscription-modal" show on_cancel="close_subscription_modal">
+      <:header>{playlist.title}</:header>
+      <div>
         <%!-- Header --%>
         <div class="flex items-start gap-5 mb-8">
           <%= if playlist.cover_url do %>
@@ -348,14 +343,9 @@
           >
             {if any_subscribed, do: gettext("Unsubscribe"), else: gettext("Subscribe")}
           </button>
-          <button
-            phx-click="close_subscription_modal"
-            class="flex-1 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
-          >
-            {gettext("Close")}
-          </button>
+          <.button phx-click="close_subscription_modal">{gettext("Close")}</.button>
         </div>
       </div>
-    </div>
+    </.modal>
   <% end %>
 </Layouts.app>

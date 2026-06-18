@@ -13,20 +13,20 @@
   box-shadow: 0 10px 40px 0 rgba(139, 79, 255, 0.35);
 }
 
-/* Border utilities */
-.border-surface { border-color: var(--color-dark-700); }
-.border-surface-light { border-color: var(--color-dark-600); }
-.border-surface-interactive { border-color: var(--color-dark-500); }
+/* Border utilities — mapped to daisyUI neutral/base tokens */
+.border-surface { border-color: var(--color-neutral); }
+.border-surface-light { border-color: color-mix(in oklch, var(--color-neutral) 80%, var(--color-base-200)); }
+.border-surface-interactive { border-color: color-mix(in oklch, var(--color-neutral) 60%, var(--color-base-200)); }
 
-/* Text utilities */
-.text-surface { color: var(--color-dark-300); }
-.text-surface-muted { color: var(--color-dark-400); }
-.text-surface-bright { color: var(--color-dark-200); }
-.text-surface-primary { color: white; }
+/* Text utilities — mapped to daisyUI base-content tokens */
+.text-surface { color: var(--color-base-content); }
+.text-surface-muted { color: color-mix(in oklch, var(--color-base-content) 50%, transparent); }
+.text-surface-bright { color: var(--color-base-content); }
+.text-surface-primary { color: var(--color-base-content); }
 
 /* Hover states for interactive elements */
-.hover-surface:hover { background-color: var(--color-dark-700); }
-.hover-surface-elevated:hover { background-color: var(--color-dark-700); }
+.hover-surface:hover { background-color: var(--color-neutral); }
+.hover-surface-elevated:hover { background-color: var(--color-neutral); }
 
 /* Spin-highlight animation for random album pick wheel tiles */
 @keyframes spin-highlight {

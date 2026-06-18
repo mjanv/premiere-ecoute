@@ -18,10 +18,7 @@
               {ngettext("1 artist", "%{count} artists", @artist_count, count: @artist_count)}
             </p>
           </div>
-          <.link
-            navigate={~p"/discography/artists"}
-            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-          >
+          <.link navigate={~p"/discography/artists"} class="text-sm text-purple-400 hover:text-purple-300 transition-colors">
             {gettext("More") <> " →"}
           </.link>
         </div>
@@ -31,24 +28,18 @@
         <% else %>
           <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 gap-4">
             <%= for artist <- @last_artists do %>
-              <.link navigate={~p"/discography/artists/#{artist.slug}"} class="group block">
-                <div class="relative aspect-square overflow-hidden rounded-full shadow-lg mb-2 bg-purple-900/30 flex items-center justify-center border border-purple-500/20">
-                  <%= if url = Artist.image_url(artist, 160) do %>
-                    <.cover
-                      src={url}
-                      alt={artist.name}
-                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  <% else %>
-                    <span class="text-2xl font-bold text-purple-300 group-hover:text-white transition-colors">
-                      {String.upcase(String.first(artist.name || "?"))}
-                    </span>
-                  <% end %>
-                </div>
-                <p class="text-white text-xs font-medium truncate text-center group-hover:text-purple-300 transition-colors">
-                  {artist.name}
-                </p>
-              </.link>
+              <.media_card
+                src={Artist.image_url(artist, 160)}
+                alt={artist.name}
+                title={artist.name}
+                shape="circle"
+                placeholder_class="bg-purple-900/30 border border-purple-500/20"
+                navigate={~p"/discography/artists/#{artist.slug}"}
+              >
+                <span class="text-2xl font-bold text-purple-300 group-hover:text-white transition-colors">
+                  {String.upcase(String.first(artist.name || "?"))}
+                </span>
+              </.media_card>
             <% end %>
           </div>
         <% end %>
@@ -63,10 +54,7 @@
               {ngettext("1 album", "%{count} albums", @album_count, count: @album_count)}
             </p>
           </div>
-          <.link
-            navigate={~p"/discography/albums"}
-            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-          >
+          <.link navigate={~p"/discography/albums"} class="text-sm text-purple-400 hover:text-purple-300 transition-colors">
             {gettext("More") <> " →"}
           </.link>
         </div>
@@ -76,19 +64,13 @@
         <% else %>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
             <%= for album <- @last_albums do %>
-              <.link navigate={~p"/discography/albums/#{album.slug}"} class="group block">
-                <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
-                  <.cover
-                    src={album.cover_url}
-                    alt={album.name}
-                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <p class="text-white text-sm font-semibold truncate group-hover:text-purple-300 transition-colors">
-                  {album.name}
-                </p>
-                <p class="text-slate-500 text-xs truncate mt-0.5">{album.artist}</p>
-              </.link>
+              <.media_card
+                src={album.cover_url}
+                alt={album.name}
+                title={album.name}
+                subtitle={album.artist}
+                navigate={~p"/discography/albums/#{album.slug}"}
+              />
             <% end %>
           </div>
         <% end %>
@@ -103,10 +85,7 @@
               {ngettext("1 single", "%{count} singles", @single_count, count: @single_count)}
             </p>
           </div>
-          <.link
-            navigate={~p"/discography/singles"}
-            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-          >
+          <.link navigate={~p"/discography/singles"} class="text-sm text-purple-400 hover:text-purple-300 transition-colors">
             {gettext("More") <> " →"}
           </.link>
         </div>
@@ -116,19 +95,13 @@
         <% else %>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
             <%= for single <- @last_singles do %>
-              <.link navigate={~p"/discography/singles/#{single.slug}"} class="group block">
-                <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
-                  <.cover
-                    src={single.cover_url}
-                    alt={single.name}
-                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <p class="text-white text-sm font-semibold truncate group-hover:text-cyan-300 transition-colors">
-                  {single.name}
-                </p>
-                <p class="text-slate-500 text-xs truncate mt-0.5">{single.artist}</p>
-              </.link>
+              <.media_card
+                src={single.cover_url}
+                alt={single.name}
+                title={single.name}
+                subtitle={single.artist}
+                navigate={~p"/discography/singles/#{single.slug}"}
+              />
             <% end %>
           </div>
         <% end %>

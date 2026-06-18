@@ -29,8 +29,8 @@
   box-shadow: 0 0 0 4px rgb(168 85 247 / 0.3), var(--tw-shadow, 0 0 #0000) !important;
 }
 
-/* Background utilities using CSS variables instead of Tailwind gray classes */
-.bg-surface { background-color: var(--color-dark-900); }
-.bg-surface-elevated { background-color: var(--color-dark-800); }
-.bg-surface-card { background-color: var(--color-dark-850); }
-.bg-surface-interactive { background-color: var(--color-dark-700); }
+/* Background utilities — surface scale mapped to daisyUI base tokens */
+.bg-surface { background-color: var(--color-base-300); }
+.bg-surface-elevated { background-color: var(--color-base-200); }
+.bg-surface-card { background-color: color-mix(in oklch, var(--color-base-300) 50%, var(--color-base-200)); }
+.bg-surface-interactive { background-color: var(--color-neutral); }

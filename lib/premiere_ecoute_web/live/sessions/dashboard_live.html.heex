@@ -53,8 +53,10 @@
 
         <.gradient_bg class="p-6">
           <div class="flex items-center space-x-3 mb-4">
-            <div class="flex items-center w-full">
-              <.status_badge size="sm">{gettext("Vote Format")}: {vote_type_display(@listening_session)}</.status_badge>
+            <div class="flex items-center gap-2 w-full">
+              <.status_badge variant="primary" size="sm">
+                {gettext("Votes")}: {vote_type_display(@listening_session)}
+              </.status_badge>
               <div class="flex-1"></div>
               <.status_badge status={Atom.to_string(@listening_session.status)} size="sm" />
             </div>
@@ -800,34 +802,17 @@
   <.live_component module={PremiereEcouteWeb.Components.WikipediaDrawer} id="wiki" />
 
   <%= if @show_reminder_modal do %>
-    <div class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" phx-click="close_reminder_modal"></div>
-      <div class="relative z-10 w-full max-w-lg mx-4 rounded-xl shadow-2xl bg-gray-900/95 border border-white/10 overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            <h3 class="text-white font-medium text-sm">{gettext("Session Reminder")}</h3>
-          </div>
-          <button phx-click="close_reminder_modal" class="text-white/40 hover:text-white transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+    <.modal id="reminder-modal" show on_cancel="close_reminder_modal" size="md">
+      <:header>
+        <div class="flex items-center gap-2">
+          <.icon name="hero-clipboard-document-list" class="w-4 h-4 text-primary" />
+          {gettext("Session Reminder")}
         </div>
-        <div class="px-5 py-5">
-          <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
-            {String.trim(@current_scope.user.profile.session_reminder)}
-          </p>
-        </div>
-      </div>
-    </div>
+      </:header>
+      <p class="text-sm leading-relaxed whitespace-pre-wrap">
+        {String.trim(@current_scope.user.profile.session_reminder)}
+      </p>
+    </.modal>
   <% end %>
 
   <%= if @show_note_hud do %>

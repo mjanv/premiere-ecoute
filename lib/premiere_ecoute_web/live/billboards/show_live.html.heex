@@ -348,86 +348,35 @@
   </div>
 </Layouts.app>
 
-<!-- Delete confirmation modal - Outside layout containers for proper overlay -->
 <%= if @show_delete_modal do %>
-  <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4" id="delete-modal">
-    <!-- Background overlay -->
-    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" phx-click="hide_delete_modal"></div>
-    
-<!-- Modal panel -->
-    <div class="relative bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-red-500/30">
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 px-6 pt-6 pb-4">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <div class="w-12 h-12 bg-red-600/20 rounded-full flex items-center justify-center border border-red-500/30">
-              <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-          </div>
-          <div class="ml-4 flex-1">
-            <h3 class="text-xl font-semibold text-white mb-2">{gettext("Delete Billboard")}</h3>
-            <p class="text-slate-300 text-base leading-relaxed">
-              {gettext("Are you sure you want to delete \"%{title}\"?", title: @billboard.title)}
-              {gettext("This action cannot be undone and will permanently remove the billboard and all its submissions.")}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-slate-900/50 px-6 py-4 flex flex-row-reverse gap-3">
-        <.button
-          phx-click="confirm_delete"
-          class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-lg"
-        >
-          {gettext("Delete Billboard")}
-        </.button>
-        <.button
-          phx-click="hide_delete_modal"
-          class="px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium"
-        >
-          {gettext("Cancel")}
-        </.button>
-      </div>
-    </div>
-  </div>
+  <.modal id="delete-billboard-modal" show on_cancel="hide_delete_modal" size="sm">
+    <:header><span class="text-error">{gettext("Delete Billboard")}</span></:header>
+    <p class="text-sm text-base-content/70">
+      {gettext("Are you sure you want to delete \"%{title}\"?", title: @billboard.title)}
+      {gettext("This action cannot be undone and will permanently remove the billboard and all its submissions.")}
+    </p>
+    <:footer>
+      <.button phx-click="hide_delete_modal">{gettext("Cancel")}</.button>
+      <.button phx-click="confirm_delete" variant="danger">{gettext("Delete Billboard")}</.button>
+    </:footer>
+  </.modal>
 <% end %>
 
-<!-- Export to Spotify Modal - Outside all layout containers -->
 <%= if @show_export_modal do %>
-  <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4" id="export-modal">
-    <!-- Background overlay -->
-    <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" phx-click="hide_export_modal"></div>
-    
-<!-- Modal panel -->
-    <div class="relative bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-green-500/30">
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 px-6 pt-6 pb-4">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <div class="w-12 h-12 bg-green-600/20 rounded-full flex items-center justify-center border border-green-500/30">
-              <svg class="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
-              </svg>
-            </div>
-          </div>
-          <div class="ml-4 flex-1">
-            <h3 class="text-xl font-semibold text-white mb-2">{gettext("Export Top Tracks to Spotify")}</h3>
-            <p class="text-slate-300 text-base leading-relaxed">
-              {gettext(
-                "Export your billboard's top tracks to a Spotify playlist. This will replace all existing tracks in the selected playlist."
-              )}
-            </p>
-          </div>
-          <button class="text-gray-400 hover:text-white text-2xl ml-4" phx-click="hide_export_modal">×</button>
+  <.modal id="export-modal" show on_cancel="hide_export_modal" size="lg">
+    <:header>{gettext("Export Top Tracks to Spotify")}</:header>
+      <div class="flex items-start gap-4 mb-4">
+        <div class="w-10 h-10 bg-green-600/20 rounded-full flex items-center justify-center border border-green-500/30 shrink-0">
+          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" />
+          </svg>
         </div>
+        <p class="text-sm text-base-content/70">
+          {gettext("Export your billboard's top tracks to a Spotify playlist. This will replace all existing tracks in the selected playlist.")}
+        </p>
       </div>
 
-      <div class="bg-slate-900/50 px-6 py-6 space-y-6">
+      <div class="space-y-6 mt-4">
         <%= if @export_error do %>
           <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
             <div class="flex items-start space-x-3">
@@ -530,41 +479,15 @@
         </div>
       </div>
 
-      <div class="bg-slate-900/50 px-6 py-4 flex flex-row-reverse gap-3">
-        <button
+      <:footer>
+        <.button phx-click="hide_export_modal" disabled={@export_loading}>{gettext("Cancel")}</.button>
+        <.button
           phx-click="export_tracks"
           disabled={@export_loading || is_nil(@selected_export_playlist)}
-          class={[
-            "px-6 py-3 text-white rounded-lg transition-colors font-medium shadow-lg",
-            if(@export_loading || is_nil(@selected_export_playlist),
-              do: "bg-gray-600 cursor-not-allowed",
-              else: "bg-green-600 hover:bg-green-700"
-            )
-          ]}
+          variant="primary"
         >
-          <%= if @export_loading do %>
-            <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              >
-              </path>
-            </svg>
-            {gettext("Exporting...")}
-          <% else %>
-            {gettext("Export tracks")}
-          <% end %>
-        </button>
-        <button
-          phx-click="hide_export_modal"
-          disabled={@export_loading}
-          class="px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {gettext("Cancel")}
-        </button>
-      </div>
-    </div>
-  </div>
+          {if @export_loading, do: gettext("Exporting..."), else: gettext("Export tracks")}
+        </.button>
+      </:footer>
+  </.modal>
 <% end %>

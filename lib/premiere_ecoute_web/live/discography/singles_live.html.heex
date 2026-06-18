@@ -19,19 +19,13 @@
       <% else %>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           <%= for single <- @singles do %>
-            <.link navigate={~p"/discography/singles/#{single.slug}"} class="group block">
-              <div class="relative aspect-square overflow-hidden rounded-lg shadow-lg mb-3">
-                <.cover
-                  src={single.cover_url}
-                  alt={single.name}
-                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <p class="text-white text-sm font-semibold truncate group-hover:text-cyan-300 transition-colors">
-                {single.name}
-              </p>
-              <p class="text-slate-500 text-xs truncate mt-0.5">{single.artist}</p>
-            </.link>
+            <.media_card
+              src={single.cover_url}
+              alt={single.name}
+              title={single.name}
+              subtitle={single.artist}
+              navigate={~p"/discography/singles/#{single.slug}"}
+            />
           <% end %>
         </div>
       <% end %>

@@ -909,98 +909,62 @@
     <% end %>
   </div>
   
-<!-- Notify subscribers modal -->
   <%= if @show_notify_modal do %>
-    <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" phx-click="hide_notify_modal">
-      <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 w-full max-w-md mx-4" phx-click-away="hide_notify_modal">
-        <h3 class="text-lg font-semibold text-white mb-2">{gettext("Notify subscribers")}</h3>
-        <p class="text-sm text-gray-400 mb-6">
-          {gettext("An email will be sent to all subscribers of this playlist.")}
-        </p>
-
-        <div class="space-y-2 mb-8">
-          <%= for {channel, count} <- @counts_per_channel do %>
-            <div class="flex items-center justify-between px-4 py-3 bg-gray-700/50 rounded-lg">
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                <span class="text-sm font-medium text-white">{String.capitalize(to_string(channel))}</span>
-              </div>
-              <span class="text-sm text-gray-300">
-                {ngettext("%{n} subscriber", "%{n} subscribers", count, n: count)}
-              </span>
-            </div>
-          <% end %>
-        </div>
-
-        <div class="flex gap-3">
-          <button
-            phx-click="notify_subscribers"
-            class="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-semibold transition-colors"
-          >
-            {gettext("Send")}
-          </button>
-          <button
-            phx-click="hide_notify_modal"
-            class="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
-          >
-            {gettext("Cancel")}
-          </button>
-        </div>
+    <.modal id="notify-modal" show on_cancel="hide_notify_modal" size="sm">
+      <:header>{gettext("Notify subscribers")}</:header>
+      <p class="text-sm text-base-content/70 mb-4">
+        {gettext("An email will be sent to all subscribers of this playlist.")}
+      </p>
+      <div class="space-y-2">
+        <%= for {channel, count} <- @counts_per_channel do %>
+          <div class="flex items-center justify-between px-4 py-3 bg-base-300 rounded-lg">
+            <span class="text-sm font-medium">{String.capitalize(to_string(channel))}</span>
+            <span class="text-sm text-base-content/70">
+              {ngettext("%{n} subscriber", "%{n} subscribers", count, n: count)}
+            </span>
+          </div>
+        <% end %>
       </div>
-    </div>
+      <:footer>
+        <.button phx-click="hide_notify_modal">{gettext("Cancel")}</.button>
+        <.button phx-click="notify_subscribers" variant="primary">{gettext("Send")}</.button>
+      </:footer>
+    </.modal>
   <% end %>
-  
-<!-- Automations modal -->
+
   <%= if assigns[:show_automations_modal] do %>
-    <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" phx-click="hide_automations_modal">
-      <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 w-full max-w-md mx-4" phx-click-away="hide_automations_modal">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-semibold text-white">{gettext("Automations")}</h3>
-          <.link
-            navigate={~p"/playlists/automations/new"}
-            class="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-          >
+    <.modal id="automations-modal" show on_cancel="hide_automations_modal" size="sm">
+      <:header>
+        <div class="flex items-center justify-between w-full pr-8">
+          {gettext("Automations")}
+          <.link navigate={~p"/playlists/automations/new"} class="text-sm text-primary font-normal">
             {gettext("Create automation")}
           </.link>
         </div>
-        <%= if Enum.empty?(@automations) do %>
-          <p class="text-sm text-gray-500 italic">{gettext("No automations reference this playlist.")}</p>
-        <% else %>
-          <div class="space-y-2">
-            <%= for automation <- @automations do %>
-              <.link
-                navigate={~p"/playlists/automations/#{automation.id}"}
-                class="flex items-center justify-between p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <div>
-                  <p class="text-sm font-medium text-white">{automation.name}</p>
-                  <p class="text-xs text-gray-400">
-                    <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={
-                      automation
-                    } />
-                  </p>
-                </div>
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </.link>
-            <% end %>
-          </div>
-        <% end %>
-        <button
-          phx-click="hide_automations_modal"
-          class="mt-4 w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
-        >
-          {gettext("Close")}
-        </button>
-      </div>
-    </div>
+      </:header>
+      <%= if Enum.empty?(@automations) do %>
+        <p class="text-sm text-base-content/50 italic">{gettext("No automations reference this playlist.")}</p>
+      <% else %>
+        <div class="space-y-2">
+          <%= for automation <- @automations do %>
+            <.link
+              navigate={~p"/playlists/automations/#{automation.id}"}
+              class="flex items-center justify-between p-3 bg-base-300 hover:bg-neutral rounded-lg transition-colors"
+            >
+              <div>
+                <p class="text-sm font-medium">{automation.name}</p>
+                <p class="text-xs text-base-content/50">
+                  <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={automation} />
+                </p>
+              </div>
+              <.icon name="hero-chevron-right" class="w-4 h-4 text-base-content/30" />
+            </.link>
+          <% end %>
+        </div>
+      <% end %>
+      <:footer>
+        <.button phx-click="hide_automations_modal">{gettext("Close")}</.button>
+      </:footer>
+    </.modal>
   <% end %>
 </Layouts.app>

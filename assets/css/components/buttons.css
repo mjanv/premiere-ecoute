@@ -5,27 +5,27 @@ button:disabled {
 }
 
 .btn-primary {
-  background: var(--color-primary-600);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-primary-content);
   border: none;
   transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-700);
+  background: color-mix(in oklch, var(--color-primary) 90%, black);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px 0 rgba(139, 79, 255, 0.4);
+  box-shadow: 0 6px 20px 0 color-mix(in oklch, var(--color-primary) 40%, transparent);
 }
 
 .btn-secondary {
-  background: var(--color-dark-900);
-  color: var(--color-dark-300);
-  border: 1px solid var(--color-dark-700);
+  background: var(--color-base-300);
+  color: var(--color-base-content);
+  border: 1px solid var(--color-neutral);
   transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background: var(--color-dark-800);
-  color: white;
-  border-color: var(--color-dark-600);
+  background: var(--color-base-200);
+  color: var(--color-base-content);
+  border-color: color-mix(in oklch, var(--color-neutral) 80%, var(--color-base-200));
 }
