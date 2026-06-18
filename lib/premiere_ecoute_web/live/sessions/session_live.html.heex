@@ -608,63 +608,63 @@
         <.modal id="replays-modal" show on_cancel="close_replays_modal">
           <:header>{gettext("Edit replays")}</:header>
 
-            <form phx-submit="save_replays" class="space-y-3">
-              <%= for {entry, index} <- Enum.with_index(@replays_entries) do %>
-                <div class="flex items-center gap-2">
-                  <input
-                    type="text"
-                    name={"replays[#{index}][label]"}
-                    value={entry["label"]}
-                    placeholder={gettext("Label (e.g. YouTube VOD)")}
-                    class="w-32 shrink-0 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
-                  />
-                  <input
-                    type="url"
-                    name={"replays[#{index}][url]"}
-                    value={entry["url"]}
-                    placeholder="https://..."
-                    class="flex-1 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
-                  />
-                  <button
-                    type="button"
-                    phx-click="remove_replay_entry"
-                    phx-value-index={index}
-                    class="text-slate-600 hover:text-red-400 transition-colors shrink-0"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              <% end %>
-
-              <button
-                type="button"
-                phx-click="add_replay_entry"
-                class="flex items-center gap-1.5 text-slate-500 hover:text-white text-sm transition-colors"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                {gettext("Add link")}
-              </button>
-
-              <div class="flex gap-3 pt-2">
-                <button
-                  type="submit"
-                  class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
-                >
-                  {gettext("Save")}
-                </button>
+          <form phx-submit="save_replays" class="space-y-3">
+            <%= for {entry, index} <- Enum.with_index(@replays_entries) do %>
+              <div class="flex items-center gap-2">
+                <input
+                  type="text"
+                  name={"replays[#{index}][label]"}
+                  value={entry["label"]}
+                  placeholder={gettext("Label (e.g. YouTube VOD)")}
+                  class="w-32 shrink-0 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                />
+                <input
+                  type="url"
+                  name={"replays[#{index}][url]"}
+                  value={entry["url"]}
+                  placeholder="https://..."
+                  class="flex-1 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                />
                 <button
                   type="button"
-                  phx-click="close_replays_modal"
-                  class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                  phx-click="remove_replay_entry"
+                  phx-value-index={index}
+                  class="text-slate-600 hover:text-red-400 transition-colors shrink-0"
                 >
-                  {gettext("Cancel")}
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
-            </form>
+            <% end %>
+
+            <button
+              type="button"
+              phx-click="add_replay_entry"
+              class="flex items-center gap-1.5 text-slate-500 hover:text-white text-sm transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              {gettext("Add link")}
+            </button>
+
+            <div class="flex gap-3 pt-2">
+              <button
+                type="submit"
+                class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+              >
+                {gettext("Save")}
+              </button>
+              <button
+                type="button"
+                phx-click="close_replays_modal"
+                class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+              >
+                {gettext("Cancel")}
+              </button>
+            </div>
+          </form>
         </.modal>
       <% end %>
 
@@ -672,152 +672,152 @@
       <%= if @review_modal_open && @review_form do %>
         <.modal id="review-modal" show on_cancel="close_review_modal" size="lg">
           <:header>{if @editing_review, do: gettext("Edit your review"), else: gettext("Write a review")}</:header>
-            <.form for={@review_form} phx-submit="save_review" phx-change="update_review_form" class="space-y-4">
-              <input type="hidden" name="review[role]" value={@review_form[:role].value} />
+          <.form for={@review_form} phx-submit="save_review" phx-change="update_review_form" class="space-y-4">
+            <input type="hidden" name="review[role]" value={@review_form[:role].value} />
 
-              <%!-- Line 1: Watched on + Watched before --%>
-              <div class="flex items-end gap-4">
-                <div class="flex items-center gap-3">
-                  <label class="text-xs font-medium text-slate-400 shrink-0">{gettext("Listened on")}</label>
-                  <input
-                    type="date"
-                    name="review[watched_on]"
-                    value={to_string(@review_form[:watched_on].value || Date.utc_today())}
-                    class="bg-black/40 border border-white/20 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-purple-400"
-                  />
-                </div>
-                <div class="flex items-center gap-2 pb-2">
-                  <input
-                    type="checkbox"
-                    name="review[watched_before]"
-                    id="watched_before_modal"
-                    value="true"
-                    checked={@review_form[:watched_before].value}
-                    class="w-4 h-4 accent-purple-500"
-                  />
-                  <label for="watched_before_modal" class="text-xs text-slate-400">{gettext("Knew it before")}</label>
-                </div>
+            <%!-- Line 1: Watched on + Watched before --%>
+            <div class="flex items-end gap-4">
+              <div class="flex items-center gap-3">
+                <label class="text-xs font-medium text-slate-400 shrink-0">{gettext("Listened on")}</label>
+                <input
+                  type="date"
+                  name="review[watched_on]"
+                  value={to_string(@review_form[:watched_on].value || Date.utc_today())}
+                  class="bg-black/40 border border-white/20 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-purple-400"
+                />
               </div>
+              <div class="flex items-center gap-2 pb-2">
+                <input
+                  type="checkbox"
+                  name="review[watched_before]"
+                  id="watched_before_modal"
+                  value="true"
+                  checked={@review_form[:watched_before].value}
+                  class="w-4 h-4 accent-purple-500"
+                />
+                <label for="watched_before_modal" class="text-xs text-slate-400">{gettext("Knew it before")}</label>
+              </div>
+            </div>
 
-              <%!-- Line 2: Content --%>
+            <%!-- Line 2: Content --%>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Your thoughts")}</label>
+              <textarea
+                name="review[content]"
+                rows="10"
+                class="w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400 resize-none"
+                placeholder={gettext("Share your thoughts about this session...")}
+              >{@review_form[:content].value}</textarea>
+            </div>
+
+            <%!-- Line 3: Tags + Rating + Like --%>
+            <div class="flex items-end gap-4">
+              <div class="flex-1">
+                <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Tags")}</label>
+                <input
+                  type="text"
+                  name="review[tags_input]"
+                  value={@review_form[:tags_input].value || Enum.join(@review_form[:tags].value || [], ", ")}
+                  class="w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
+                  placeholder={gettext("jazz, chill...")}
+                />
+              </div>
               <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Your thoughts")}</label>
-                <textarea
-                  name="review[content]"
-                  rows="10"
-                  class="w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400 resize-none"
-                  placeholder={gettext("Share your thoughts about this session...")}
-                >{@review_form[:content].value}</textarea>
-              </div>
-
-              <%!-- Line 3: Tags + Rating + Like --%>
-              <div class="flex items-end gap-4">
-                <div class="flex-1">
-                  <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Tags")}</label>
-                  <input
-                    type="text"
-                    name="review[tags_input]"
-                    value={@review_form[:tags_input].value || Enum.join(@review_form[:tags].value || [], ", ")}
-                    class="w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-purple-400"
-                    placeholder={gettext("jazz, chill...")}
-                  />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Rating")}</label>
-                  <% rating_val =
-                    (@review_form[:rating].value || 0.0) |> then(&if(is_binary(&1), do: String.to_float(&1), else: &1 * 1.0)) %>
-                  <input type="hidden" name="review[rating]" value={rating_val} />
-                  <div class="flex items-center gap-0.5">
-                    <%= for star <- 1..5 do %>
-                      <div class="relative w-8 h-8 cursor-pointer">
-                        <svg class="w-8 h-8 absolute inset-0 pointer-events-none" viewBox="0 0 24 24">
-                          <defs>
-                            <clipPath id={"star-left-#{star}"}>
-                              <rect x="0" y="0" width="12" height="24" />
-                            </clipPath>
-                            <clipPath id={"star-right-#{star}"}>
-                              <rect x="12" y="0" width="12" height="24" />
-                            </clipPath>
-                          </defs>
+                <label class="block text-xs font-medium text-slate-400 mb-1.5">{gettext("Rating")}</label>
+                <% rating_val =
+                  (@review_form[:rating].value || 0.0) |> then(&if(is_binary(&1), do: String.to_float(&1), else: &1 * 1.0)) %>
+                <input type="hidden" name="review[rating]" value={rating_val} />
+                <div class="flex items-center gap-0.5">
+                  <%= for star <- 1..5 do %>
+                    <div class="relative w-8 h-8 cursor-pointer">
+                      <svg class="w-8 h-8 absolute inset-0 pointer-events-none" viewBox="0 0 24 24">
+                        <defs>
+                          <clipPath id={"star-left-#{star}"}>
+                            <rect x="0" y="0" width="12" height="24" />
+                          </clipPath>
+                          <clipPath id={"star-right-#{star}"}>
+                            <rect x="12" y="0" width="12" height="24" />
+                          </clipPath>
+                        </defs>
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                          class="text-slate-700"
+                          fill="currentColor"
+                        />
+                        <%= if rating_val >= star - 0.5 do %>
                           <path
                             d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                            class="text-slate-700"
+                            class="text-yellow-400"
                             fill="currentColor"
+                            clip-path={"url(#star-left-#{star})"}
                           />
-                          <%= if rating_val >= star - 0.5 do %>
-                            <path
-                              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                              class="text-yellow-400"
-                              fill="currentColor"
-                              clip-path={"url(#star-left-#{star})"}
-                            />
-                          <% end %>
-                          <%= if rating_val >= star do %>
-                            <path
-                              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                              class="text-yellow-400"
-                              fill="currentColor"
-                              clip-path={"url(#star-right-#{star})"}
-                            />
-                          <% end %>
-                        </svg>
-                        <button
-                          type="button"
-                          phx-click="set_review_rating"
-                          phx-value-rating={star - 0.5}
-                          class="absolute inset-y-0 left-0 w-1/2"
-                        />
-                        <button
-                          type="button"
-                          phx-click="set_review_rating"
-                          phx-value-rating={star}
-                          class="absolute inset-y-0 right-0 w-1/2"
-                        />
-                      </div>
-                    <% end %>
-                  </div>
-                </div>
-                <div class="flex flex-col items-center">
-                  <label class="text-xs font-medium text-slate-400 mb-1.5">{gettext("Like")}</label>
-                  <% like_val = @review_form[:like].value %>
-                  <input type="hidden" name="review[like]" value={if like_val == nil, do: "", else: to_string(like_val)} />
-                  <button
-                    type="button"
-                    phx-click="toggle_review_like"
-                    class="flex items-center justify-center w-8 h-8 transition-transform active:scale-90"
-                  >
-                    <svg
-                      class={"w-8 h-8 transition-colors #{if like_val == true, do: "fill-red-500 text-red-500", else: "fill-none text-slate-400 hover:text-red-400"}"}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        <% end %>
+                        <%= if rating_val >= star do %>
+                          <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                            class="text-yellow-400"
+                            fill="currentColor"
+                            clip-path={"url(#star-right-#{star})"}
+                          />
+                        <% end %>
+                      </svg>
+                      <button
+                        type="button"
+                        phx-click="set_review_rating"
+                        phx-value-rating={star - 0.5}
+                        class="absolute inset-y-0 left-0 w-1/2"
                       />
-                    </svg>
-                  </button>
+                      <button
+                        type="button"
+                        phx-click="set_review_rating"
+                        phx-value-rating={star}
+                        class="absolute inset-y-0 right-0 w-1/2"
+                      />
+                    </div>
+                  <% end %>
                 </div>
               </div>
-
-              <div class="flex gap-3 pt-1">
-                <button
-                  type="submit"
-                  class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
-                >
-                  {gettext("Save")}
-                </button>
+              <div class="flex flex-col items-center">
+                <label class="text-xs font-medium text-slate-400 mb-1.5">{gettext("Like")}</label>
+                <% like_val = @review_form[:like].value %>
+                <input type="hidden" name="review[like]" value={if like_val == nil, do: "", else: to_string(like_val)} />
                 <button
                   type="button"
-                  phx-click="close_review_modal"
-                  class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                  phx-click="toggle_review_like"
+                  class="flex items-center justify-center w-8 h-8 transition-transform active:scale-90"
                 >
-                  {gettext("Cancel")}
+                  <svg
+                    class={"w-8 h-8 transition-colors #{if like_val == true, do: "fill-red-500 text-red-500", else: "fill-none text-slate-400 hover:text-red-400"}"}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
                 </button>
               </div>
-            </.form>
+            </div>
+
+            <div class="flex gap-3 pt-1">
+              <button
+                type="submit"
+                class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+              >
+                {gettext("Save")}
+              </button>
+              <button
+                type="button"
+                phx-click="close_review_modal"
+                class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+              >
+                {gettext("Cancel")}
+              </button>
+            </div>
+          </.form>
         </.modal>
       <% end %>
 
@@ -831,64 +831,64 @@
           end %>
         <.modal id="post-vote-modal" show on_cancel="close_post_vote_modal" size="xl">
           <:header>{gettext("Cast your votes")}</:header>
-            <p class="text-xs text-base-content/50 mb-5 shrink-0">
-              {gettext("Rate each track you heard. You can skip tracks you didn't listen to.")}
-            </p>
+          <p class="text-xs text-base-content/50 mb-5 shrink-0">
+            {gettext("Rate each track you heard. You can skip tracks you didn't listen to.")}
+          </p>
 
-            <% vote_options = @listening_session.vote_options || [] %>
-            <% many_options = length(vote_options) > 5 %>
-            <div class="overflow-y-auto flex-1 space-y-3 pr-1">
-              <%= for track <- vote_tracks do %>
-                <% selected = Map.get(@post_vote_selections, track.id) %>
-                <div class="flex items-center gap-3">
-                  <div class="flex items-center gap-2 min-w-0 flex-1">
-                    <%= if @listening_session.source == :album && track.track_number do %>
-                      <span class="text-slate-600 font-mono text-xs w-4 text-right shrink-0">
-                        {track.track_number}
-                      </span>
-                    <% end %>
-                    <p class="text-slate-300 text-sm truncate">{track.name}</p>
-                  </div>
-                  <div class={if many_options, do: "flex gap-1 flex-1 justify-end", else: "flex gap-1 shrink-0"}>
-                    <%= for option <- vote_options do %>
-                      <button
-                        type="button"
-                        phx-click="set_post_vote"
-                        phx-value-track_id={track.id}
-                        phx-value-note={option}
-                        class={"#{if many_options, do: "flex-1 py-1 text-center", else: "px-2.5 py-1"} rounded text-xs font-semibold transition-all border #{if selected == option, do: "bg-purple-600 border-purple-400 text-white", else: "bg-white/5 border-white/10 text-slate-400 hover:border-purple-400 hover:text-white"}"}
-                      >
-                        {option}
-                      </button>
-                    <% end %>
-                  </div>
+          <% vote_options = @listening_session.vote_options || [] %>
+          <% many_options = length(vote_options) > 5 %>
+          <div class="overflow-y-auto flex-1 space-y-3 pr-1">
+            <%= for track <- vote_tracks do %>
+              <% selected = Map.get(@post_vote_selections, track.id) %>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                  <%= if @listening_session.source == :album && track.track_number do %>
+                    <span class="text-slate-600 font-mono text-xs w-4 text-right shrink-0">
+                      {track.track_number}
+                    </span>
+                  <% end %>
+                  <p class="text-slate-300 text-sm truncate">{track.name}</p>
                 </div>
-              <% end %>
-            </div>
+                <div class={if many_options, do: "flex gap-1 flex-1 justify-end", else: "flex gap-1 shrink-0"}>
+                  <%= for option <- vote_options do %>
+                    <button
+                      type="button"
+                      phx-click="set_post_vote"
+                      phx-value-track_id={track.id}
+                      phx-value-note={option}
+                      class={"#{if many_options, do: "flex-1 py-1 text-center", else: "px-2.5 py-1"} rounded text-xs font-semibold transition-all border #{if selected == option, do: "bg-purple-600 border-purple-400 text-white", else: "bg-white/5 border-white/10 text-slate-400 hover:border-purple-400 hover:text-white"}"}
+                    >
+                      {option}
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
 
-            <div class="flex gap-3 pt-5 shrink-0 border-t border-white/10 mt-4">
-              <% any_selected = map_size(@post_vote_selections) > 0 %>
-              <button
-                type="button"
-                phx-click="submit_post_votes"
-                disabled={!any_selected}
-                class={"flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all #{if any_selected, do: "bg-purple-600 hover:bg-purple-500 text-white", else: "bg-purple-900/30 text-slate-600 cursor-not-allowed"}"}
-              >
-                {ngettext(
-                  "Submit %{count} vote",
-                  "Submit %{count} votes",
-                  map_size(@post_vote_selections),
-                  count: map_size(@post_vote_selections)
-                )}
-              </button>
-              <button
-                type="button"
-                phx-click="close_post_vote_modal"
-                class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
-              >
-                {gettext("Cancel")}
-              </button>
-            </div>
+          <div class="flex gap-3 pt-5 shrink-0 border-t border-white/10 mt-4">
+            <% any_selected = map_size(@post_vote_selections) > 0 %>
+            <button
+              type="button"
+              phx-click="submit_post_votes"
+              disabled={!any_selected}
+              class={"flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all #{if any_selected, do: "bg-purple-600 hover:bg-purple-500 text-white", else: "bg-purple-900/30 text-slate-600 cursor-not-allowed"}"}
+            >
+              {ngettext(
+                "Submit %{count} vote",
+                "Submit %{count} votes",
+                map_size(@post_vote_selections),
+                count: map_size(@post_vote_selections)
+              )}
+            </button>
+            <button
+              type="button"
+              phx-click="close_post_vote_modal"
+              class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+            >
+              {gettext("Cancel")}
+            </button>
+          </div>
         </.modal>
       <% end %>
     <% else %>

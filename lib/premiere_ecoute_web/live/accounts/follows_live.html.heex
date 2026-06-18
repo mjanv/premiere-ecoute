@@ -104,8 +104,7 @@
           <.modal id="unfollow-modal" show on_cancel="hide_unfollow_modal" size="sm">
             <:header>Unfollow Streamer</:header>
             <p class="text-sm text-base-content/70">
-              Are you sure you want to unfollow
-              <strong class="text-base-content">
+              Are you sure you want to unfollow <strong class="text-base-content">
                 <%= @to_unfollow.twitch.username || String.split(@to_unfollow.email, "@") |> List.first() %>
               </strong>?
             </p>

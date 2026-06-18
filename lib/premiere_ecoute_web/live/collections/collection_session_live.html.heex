@@ -627,7 +627,8 @@
                       <p class="text-xs text-base-content/50 mt-0.5">
                         {gettext("Delete the %{count} kept tracks from %{playlist}",
                           count: length(@session.kept),
-                          playlist: @session.origin_playlist && @session.origin_playlist.title)}
+                          playlist: @session.origin_playlist && @session.origin_playlist.title
+                        )}
                       </p>
                     </div>
                   </label>
@@ -638,7 +639,8 @@
                       <p class="text-xs text-base-content/50 mt-0.5">
                         {gettext("Delete the %{count} rejected tracks from %{playlist}",
                           count: length(@session.rejected),
-                          playlist: @session.origin_playlist && @session.origin_playlist.title)}
+                          playlist: @session.origin_playlist && @session.origin_playlist.title
+                        )}
                       </p>
                     </div>
                   </label>

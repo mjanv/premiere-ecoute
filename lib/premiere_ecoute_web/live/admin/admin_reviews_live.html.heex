@@ -185,14 +185,19 @@
         </div>
         <div>
           <%= cond do %>
-            <% @selected_review.album != nil -> %>{@selected_review.album.name}
-            <% @selected_review.session_id != nil -> %>{gettext("Session #%{id}", id: @selected_review.session_id)}
-            <% true -> %>{gettext("Review")}
+            <% @selected_review.album != nil -> %>
+              {@selected_review.album.name}
+            <% @selected_review.session_id != nil -> %>
+              {gettext("Session #%{id}", id: @selected_review.session_id)}
+            <% true -> %>
+              {gettext("Review")}
           <% end %>
         </div>
         <div class="text-sm text-base-content/50 font-normal">
-          {gettext("by %{user}", user: @selected_review.user && @selected_review.user.username)}
-          · {Calendar.strftime(@selected_review.inserted_at, "%b %d, %Y")}
+          {gettext("by %{user}", user: @selected_review.user && @selected_review.user.username)} · {Calendar.strftime(
+            @selected_review.inserted_at,
+            "%b %d, %Y"
+          )}
         </div>
       </div>
     </:header>

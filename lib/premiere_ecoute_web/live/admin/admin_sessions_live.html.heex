@@ -239,10 +239,25 @@
       <div class="bg-base-300 rounded-lg p-4">
         <h3 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">{gettext("Session Information")}</h3>
         <div class="space-y-2 text-sm">
-          <div><span class="text-base-content/50">{gettext("ID")}:</span> <span class="font-mono">{@selected_session.id}</span></div>
-          <div><span class="text-base-content/50">{gettext("Started")}:</span> {PremiereEcouteCore.Date.datetime(@selected_session.started_at)}</div>
-          <div><span class="text-base-content/50">{gettext("Ended")}:</span> {PremiereEcouteCore.Date.datetime(@selected_session.ended_at)}</div>
-          <div><span class="text-base-content/50">{gettext("Duration")}:</span> {PremiereEcouteCore.Duration.timer(@selected_session.started_at, @selected_session.ended_at)}</div>
+          <div>
+            <span class="text-base-content/50">{gettext("ID")}:</span> <span class="font-mono">{@selected_session.id}</span>
+          </div>
+          <div>
+            <span class="text-base-content/50">{gettext("Started")}:</span> {PremiereEcouteCore.Date.datetime(
+              @selected_session.started_at
+            )}
+          </div>
+          <div>
+            <span class="text-base-content/50">{gettext("Ended")}:</span> {PremiereEcouteCore.Date.datetime(
+              @selected_session.ended_at
+            )}
+          </div>
+          <div>
+            <span class="text-base-content/50">{gettext("Duration")}:</span> {PremiereEcouteCore.Duration.timer(
+              @selected_session.started_at,
+              @selected_session.ended_at
+            )}
+          </div>
         </div>
       </div>
 
@@ -273,7 +288,11 @@
         <h3 class="text-sm font-medium text-base-content/50 uppercase tracking-wider mb-3">{gettext("Album Information")}</h3>
         <div class="flex items-center gap-4">
           <%= if @selected_session.album.cover_url do %>
-            <.cover class="h-14 w-14 rounded-lg object-cover shrink-0" src={@selected_session.album.cover_url} alt={@selected_session.album.name} />
+            <.cover
+              class="h-14 w-14 rounded-lg object-cover shrink-0"
+              src={@selected_session.album.cover_url}
+              alt={@selected_session.album.name}
+            />
           <% else %>
             <div class="h-14 w-14 rounded-lg bg-neutral flex items-center justify-center shrink-0">
               <.icon name="hero-musical-note" class="w-6 h-6 text-base-content/50" />
@@ -283,7 +302,9 @@
             <div class="font-medium">{@selected_session.album.name}</div>
             <div class="text-sm text-base-content/50">{@selected_session.album.artist}</div>
             <%= if @selected_session.album.release_date do %>
-              <div class="text-xs text-base-content/30">{Calendar.strftime(@selected_session.album.release_date, "%B %d, %Y")}</div>
+              <div class="text-xs text-base-content/30">
+                {Calendar.strftime(@selected_session.album.release_date, "%B %d, %Y")}
+              </div>
             <% end %>
           </div>
         </div>

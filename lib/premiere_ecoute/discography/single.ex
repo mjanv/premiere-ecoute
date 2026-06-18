@@ -118,6 +118,22 @@ defmodule PremiereEcoute.Discography.Single do
     |> unique_constraint(:provider_ids, name: :singles_deezer_id_unique)
   end
 
+  @doc "Returns the last N singles ordered by insertion date."
+  @spec last(non_neg_integer()) :: [t()]
+  def last(n \\ 5), do: all(order_by: [desc: :inserted_at], limit: n) |> Enum.map(&put_artist/1)
+
+  @doc "Returns all singles associated with a given artist."
+  @spec list_for_artist(integer()) :: [t()]
+  def list_for_artist(artist_id) do
+    __MODULE__
+    |> join(:inner, [s], sa in "single_artists", on: sa.single_id == s.id)
+    |> where([_s, sa], sa.artist_id == ^artist_id)
+    |> order_by([s, _sa], desc: s.inserted_at)
+    |> Repo.all()
+    |> preload()
+    |> Enum.map(&put_artist/1)
+  end
+
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 

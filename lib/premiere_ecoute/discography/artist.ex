@@ -99,6 +99,10 @@ defmodule PremiereEcoute.Discography.Artist do
     url
   end
 
+  @doc "Returns the last N artists ordered by insertion date."
+  @spec last(non_neg_integer()) :: [t()]
+  def last(n \\ 5), do: all(order_by: [desc: :inserted_at], limit: n)
+
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 

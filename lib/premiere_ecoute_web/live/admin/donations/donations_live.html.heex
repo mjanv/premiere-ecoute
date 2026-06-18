@@ -232,128 +232,128 @@
 
 <.modal :if={@show_goal_modal} id="goal-modal" show on_cancel="close_goal_modal" size="lg">
   <:header>{if @modal_action == :create, do: gettext("Create Goal"), else: gettext("Edit Goal")}</:header>
-    <%= if @goal_form do %>
-      <form phx-change="validate_goal_form" phx-submit="save_goal">
-          <!-- Title Field -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              {gettext("Title")} <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="goal[title]"
-              value={@goal_form.params["title"] || ""}
-              placeholder={gettext("Enter goal title")}
-              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <%= if @goal_form.errors[:title] do %>
-              <p class="mt-1 text-sm text-red-500">{gettext("Title is required")}</p>
-            <% end %>
-          </div>
-          
+  <%= if @goal_form do %>
+    <form phx-change="validate_goal_form" phx-submit="save_goal">
+      <!-- Title Field -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          {gettext("Title")} <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          name="goal[title]"
+          value={@goal_form.params["title"] || ""}
+          placeholder={gettext("Enter goal title")}
+          class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+        <%= if @goal_form.errors[:title] do %>
+          <p class="mt-1 text-sm text-red-500">{gettext("Title is required")}</p>
+        <% end %>
+      </div>
+      
 <!-- Description Field -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              {gettext("Description")}
-            </label>
-            <textarea
-              name="goal[description]"
-              placeholder={gettext("Enter goal description")}
-              rows="3"
-              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            ><%= @goal_form.params["description"] || "" %></textarea>
-          </div>
-          
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          {gettext("Description")}
+        </label>
+        <textarea
+          name="goal[description]"
+          placeholder={gettext("Enter goal description")}
+          rows="3"
+          class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        ><%= @goal_form.params["description"] || "" %></textarea>
+      </div>
+      
 <!-- Target Amount and Currency -->
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                {gettext("Target Amount")} <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                name="goal[target_amount]"
-                value={@goal_form.params["target_amount"] || ""}
-                placeholder={gettext("100.00")}
-                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-              <%= if @goal_form.errors[:target_amount] do %>
-                <p class="mt-1 text-sm text-red-500">{gettext("Target amount is required")}</p>
-              <% end %>
-            </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            {gettext("Target Amount")} <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            name="goal[target_amount]"
+            value={@goal_form.params["target_amount"] || ""}
+            placeholder={gettext("100.00")}
+            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+          <%= if @goal_form.errors[:target_amount] do %>
+            <p class="mt-1 text-sm text-red-500">{gettext("Target amount is required")}</p>
+          <% end %>
+        </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                {gettext("Currency")} <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                maxlength="3"
-                name="goal[currency]"
-                value={@goal_form.params["currency"] || ""}
-                placeholder={gettext("USD")}
-                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-              <%= if @goal_form.errors[:currency] do %>
-                <p class="mt-1 text-sm text-red-500">{gettext("Currency is required")}</p>
-              <% end %>
-            </div>
-          </div>
-          
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            {gettext("Currency")} <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            maxlength="3"
+            name="goal[currency]"
+            value={@goal_form.params["currency"] || ""}
+            placeholder={gettext("USD")}
+            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+          <%= if @goal_form.errors[:currency] do %>
+            <p class="mt-1 text-sm text-red-500">{gettext("Currency is required")}</p>
+          <% end %>
+        </div>
+      </div>
+      
 <!-- Start Date and End Date -->
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                {gettext("Start Date")} <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="goal[start_date]"
-                value={@goal_form.params["start_date"] || ""}
-                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-              <%= if @goal_form.errors[:start_date] do %>
-                <p class="mt-1 text-sm text-red-500">{gettext("Start date is required")}</p>
-              <% end %>
-            </div>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            {gettext("Start Date")} <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            name="goal[start_date]"
+            value={@goal_form.params["start_date"] || ""}
+            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+          <%= if @goal_form.errors[:start_date] do %>
+            <p class="mt-1 text-sm text-red-500">{gettext("Start date is required")}</p>
+          <% end %>
+        </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                {gettext("End Date")} <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="goal[end_date]"
-                value={@goal_form.params["end_date"] || ""}
-                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-              <%= if @goal_form.errors[:end_date] do %>
-                <p class="mt-1 text-sm text-red-500">{gettext("End date must be after start date")}</p>
-              <% end %>
-            </div>
-          </div>
-          
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            {gettext("End Date")} <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            name="goal[end_date]"
+            value={@goal_form.params["end_date"] || ""}
+            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+          <%= if @goal_form.errors[:end_date] do %>
+            <p class="mt-1 text-sm text-red-500">{gettext("End date must be after start date")}</p>
+          <% end %>
+        </div>
+      </div>
+      
 <!-- Form Actions -->
-          <div class="flex gap-3">
-            <button
-              type="submit"
-              class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
-            >
-              <%= if @modal_action == :create do %>
-                {gettext("Create Goal")}
-              <% else %>
-                {gettext("Update Goal")}
-              <% end %>
-            </button>
-            <button
-              type="button"
-              phx-click="close_goal_modal"
-              class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md font-medium transition-colors"
-            >
-              {gettext("Cancel")}
-            </button>
-          </div>
-      </form>
-    <% end %>
+      <div class="flex gap-3">
+        <button
+          type="submit"
+          class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+        >
+          <%= if @modal_action == :create do %>
+            {gettext("Create Goal")}
+          <% else %>
+            {gettext("Update Goal")}
+          <% end %>
+        </button>
+        <button
+          type="button"
+          phx-click="close_goal_modal"
+          class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md font-medium transition-colors"
+        >
+          {gettext("Cancel")}
+        </button>
+      </div>
+    </form>
+  <% end %>
 </.modal>

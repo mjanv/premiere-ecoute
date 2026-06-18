@@ -8,8 +8,6 @@ defmodule PremiereEcoute.Wantlists do
 
   use PremiereEcouteCore.Context
 
-  # TODO: Refactor overall Wantlists context
-
   alias PremiereEcoute.Wantlists.Services.AddTrack
   alias PremiereEcoute.Wantlists.Wantlist
   alias PremiereEcoute.Wantlists.WantlistItem

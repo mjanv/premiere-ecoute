@@ -163,7 +163,11 @@
     <:header>
       <div class="flex items-center gap-3">
         <%= if @selected_album.cover_url do %>
-          <.cover class="h-10 w-10 rounded-lg object-cover flex-shrink-0" src={@selected_album.cover_url} alt={@selected_album.name} />
+          <.cover
+            class="h-10 w-10 rounded-lg object-cover flex-shrink-0"
+            src={@selected_album.cover_url}
+            alt={@selected_album.name}
+          />
         <% else %>
           <div class="h-10 w-10 rounded-lg bg-neutral flex items-center justify-center flex-shrink-0">
             <.icon name="hero-musical-note" class="w-5 h-5 text-base-content/50" />

@@ -203,6 +203,22 @@ defmodule PremiereEcoute.Discography.Album do
     end
   end
 
+  @doc "Returns the last N albums ordered by insertion date."
+  @spec last(non_neg_integer()) :: [t()]
+  def last(n \\ 5), do: all(order_by: [desc: :inserted_at], limit: n) |> Enum.map(&put_artist/1)
+
+  @doc "Returns all albums associated with a given artist."
+  @spec list_for_artist(integer()) :: [t()]
+  def list_for_artist(artist_id) do
+    __MODULE__
+    |> join(:inner, [a], aa in "album_artists", on: aa.album_id == a.id)
+    |> where([_a, aa], aa.artist_id == ^artist_id)
+    |> order_by([a, _aa], desc: a.release_date)
+    |> Repo.all()
+    |> preload()
+    |> Enum.map(&put_artist/1)
+  end
+
   @doc "Fetches paginated albums for admin, optionally filtered by album name or artist name."
   @spec list_for_admin(String.t(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
   def list_for_admin(search \\ "", page_number, page_size) do

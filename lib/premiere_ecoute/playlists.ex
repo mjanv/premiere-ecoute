@@ -7,7 +7,7 @@ defmodule PremiereEcoute.Playlists do
 
   use PremiereEcouteCore.Context
 
-  # TODO: Cross-context ?
+  # AIDEV-NOTE: LibraryPlaylist schema lives in Discography but is managed here — shared schema, separate context boundary
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.LibraryPlaylist.Submission
   alias PremiereEcoute.Playlists.PlaylistSubscription

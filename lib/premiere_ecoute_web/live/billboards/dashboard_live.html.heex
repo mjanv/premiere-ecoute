@@ -141,256 +141,260 @@
   <.modal id="dashboard-detail-modal" show on_cancel="close_modal" size="xl">
     <:header>
       <%= cond do %>
-        <% @display_mode == :track -> %>{@selected.track.artist} — {@selected.track.name}
-        <% @display_mode == :artist -> %>{@selected.artist}
-        <% @display_mode == :year -> %>{@selected.year}
-        <% @display_mode == :playlist -> %>{@selected.title}
+        <% @display_mode == :track -> %>
+          {@selected.track.artist} — {@selected.track.name}
+        <% @display_mode == :artist -> %>
+          {@selected.artist}
+        <% @display_mode == :year -> %>
+          {@selected.year}
+        <% @display_mode == :playlist -> %>
+          {@selected.title}
         <% true -> %>
       <% end %>
     </:header>
 
-      <%= if @display_mode == :track do %>
-        <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
-          <div class="flex items-center justify-center space-x-4">
-            <h2 class="text-xl font-bold text-white">
-              {@selected.track.artist} - <span class="text-gray-300">{@selected.track.name}</span>
-            </h2>
-            <div class="flex space-x-2">
-              <a
-                href={PremiereEcoute.Discography.url(@selected.track, @selected.track.provider)}
-                target="_blank"
-                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
-              >
-                {String.capitalize(Atom.to_string(@selected.track.provider))}
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Found in playlists:")}</h3>
-            <div class="space-y-2 max-h-96 overflow-y-auto">
-              <%= for track <- @selected.tracks |> Enum.uniq_by(&{&1.provider, &1.playlist_id}) do %>
-                <div class="bg-gray-800 p-3 rounded-lg">
-                  <a
-                    href={PremiereEcoute.Discography.url(track, track.provider)}
-                    target="_blank"
-                    class="text-purple-400 hover:text-purple-300 text-sm text-center block break-all"
-                  >
-                    {PremiereEcoute.Discography.title(track)}
-                  </a>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-
-      <%= if @display_mode == :artist do %>
-        <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
-          <h2 class="text-2xl font-bold text-white mb-2">{@selected.artist}</h2>
-          <div class="text-lg text-gray-300">
-            {ngettext("%{count} occurrence", "%{count} occurrences", @selected.count, count: @selected.count)} • {ngettext(
-              "%{count} track",
-              "%{count} tracks",
-              length(@selected.tracks),
-              count: length(@selected.tracks)
-            )}
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks by this artist:")}</h3>
-            <div class="space-y-2 max-h-96 overflow-y-auto">
-              <%= for track_group <- @selected.tracks do %>
-                <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
-                  <div class="flex-1">
-                    <div class="text-white font-semibold">{track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">
-                      {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
-                    </div>
-                  </div>
-                  <div class="flex space-x-2 ml-4">
-                    <a
-                      href={PremiereEcoute.Discography.url(track_group.track, track_group.track.provider)}
-                      target="_blank"
-                      class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                    >
-                      {String.capitalize(Atom.to_string(track_group.track.provider))}
-                    </a>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-
-      <%= if @display_mode == :year do %>
-        <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
-          <h2 class="text-2xl font-bold text-white mb-2">{@selected.year}</h2>
-          <div class="text-lg text-gray-300">
-            {ngettext("%{count} occurrence", "%{count} occurrences", @selected.count, count: @selected.count)} • {ngettext(
-              "%{count} track",
-              "%{count} tracks",
-              length(@selected.tracks),
-              count: length(@selected.tracks)
-            )}
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="border-t border-gray-700 pt-4">
-            <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks from this year:")}</h3>
-            <div class="space-y-2 max-h-96 overflow-y-auto">
-              <%= for track_group <- @selected.tracks do %>
-                <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
-                  <div class="flex-1">
-                    <div class="text-white font-semibold">{track_group.track.artist} - {track_group.track.name}</div>
-                    <div class="text-gray-400 text-sm">
-                      {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
-                    </div>
-                  </div>
-                  <div class="flex space-x-2 ml-4">
-                    <a
-                      href={PremiereEcoute.Discography.url(track_group.track, track_group.track.provider)}
-                      target="_blank"
-                      class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                    >
-                      {String.capitalize(Atom.to_string(track_group.track.provider))}
-                    </a>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-
-      <%= if @display_mode == :playlists do %>
-        <!-- Playlist Modal -->
-        <div class="text-center mb-6">
-          <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
-          <h2 class="text-2xl font-bold text-white mb-2">{@selected.title}</h2>
-          <div class="text-lg text-gray-400 mb-2">by {@selected.owner_name}</div>
-          <div class="text-lg text-gray-300">
-            {ngettext("%{count} track", "%{count} tracks", length(@selected.tracks), count: length(@selected.tracks))} • {gettext(
-              "Mean year: %{year}",
-              year: @selected.mean_year
-            )}
-          </div>
-          <div class="mt-4">
+    <%= if @display_mode == :track do %>
+      <div class="text-center mb-6">
+        <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
+        <div class="flex items-center justify-center space-x-4">
+          <h2 class="text-xl font-bold text-white">
+            {@selected.track.artist} - <span class="text-gray-300">{@selected.track.name}</span>
+          </h2>
+          <div class="flex space-x-2">
             <a
-              href={PremiereEcoute.Discography.url(@selected, @selected.provider)}
+              href={PremiereEcoute.Discography.url(@selected.track, @selected.track.provider)}
               target="_blank"
-              class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
             >
-              {gettext("Open %{provider} Playlist", provider: String.capitalize(Atom.to_string(@selected.provider)))}
+              {String.capitalize(Atom.to_string(@selected.track.provider))}
             </a>
           </div>
         </div>
-        
-<!-- Tab Navigation -->
-        <div class="mb-6">
-          <div class="flex space-x-2 border-b border-gray-700">
-            <button
-              phx-click="switch_playlist_tab"
-              phx-value-tab="tracks"
-              class={[
-                "px-4 py-2 font-mono font-bold transition-colors duration-200",
-                if(@playlist_modal_tab == :tracks,
-                  do: "bg-purple-600 text-white border-b-2 border-purple-300",
-                  else: "text-purple-400 hover:text-purple-300"
-                )
-              ]}
-            >
-              {gettext("Tracks (%{count})", count: length(@selected.tracks))}
-            </button>
-            <button
-              phx-click="switch_playlist_tab"
-              phx-value-tab="similar"
-              class={[
-                "px-4 py-2 font-mono font-bold transition-colors duration-200",
-                if(@playlist_modal_tab == :similar,
-                  do: "bg-purple-600 text-white border-b-2 border-purple-300",
-                  else: "text-purple-400 hover:text-purple-300"
-                )
-              ]}
-            >
-              {gettext("Similar (%{count})", count: length(@selected.top_similar))}
-            </button>
+      </div>
+
+      <div class="space-y-4">
+        <div class="border-t border-gray-700 pt-4">
+          <h3 class="text-lg font-semibold text-white mb-4">{gettext("Found in playlists:")}</h3>
+          <div class="space-y-2 max-h-96 overflow-y-auto">
+            <%= for track <- @selected.tracks |> Enum.uniq_by(&{&1.provider, &1.playlist_id}) do %>
+              <div class="bg-gray-800 p-3 rounded-lg">
+                <a
+                  href={PremiereEcoute.Discography.url(track, track.provider)}
+                  target="_blank"
+                  class="text-purple-400 hover:text-purple-300 text-sm text-center block break-all"
+                >
+                  {PremiereEcoute.Discography.title(track)}
+                </a>
+              </div>
+            <% end %>
           </div>
         </div>
-        
-<!-- Tab Content -->
-        <div class="space-y-4">
-          <%= if @playlist_modal_tab == :tracks do %>
-            <div>
-              <div class="space-y-2 max-h-96 overflow-y-auto">
-                <%= for track <- @selected.tracks do %>
-                  <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
-                    <div class="flex-1">
-                      <div class="text-white font-semibold">{track.artist} - {track.name}</div>
-                      <div class="text-gray-400 text-sm">{track.release_date.year}</div>
-                    </div>
-                    <div class="flex space-x-2 ml-4">
-                      <a
-                        href={PremiereEcoute.Discography.url(track, track.provider)}
-                        target="_blank"
-                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                      >
-                        {String.capitalize(Atom.to_string(track.provider))}
-                      </a>
-                    </div>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+      </div>
+    <% end %>
 
-          <%= if @playlist_modal_tab == :similar do %>
-            <div>
-              <div class="space-y-2 max-h-96 overflow-y-auto">
-                <%= for {similar_playlist, index} <- Enum.with_index(@selected.top_similar, 1) do %>
-                  <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <span class="text-lg">
-                        <%= case index do %>
-                          <% 1 -> %>
-                            🥇
-                          <% 2 -> %>
-                            🥈
-                          <% 3 -> %>
-                            🥉
-                        <% end %>
-                      </span>
-                      <div class="flex-1">
-                        <div class="text-white font-semibold">
-                          {similar_playlist.similarity_score}% - {similar_playlist.title}
-                        </div>
-                        <div class="text-gray-400 text-sm">({similar_playlist.mean_year}) by {similar_playlist.owner_name}</div>
+    <%= if @display_mode == :artist do %>
+      <div class="text-center mb-6">
+        <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
+        <h2 class="text-2xl font-bold text-white mb-2">{@selected.artist}</h2>
+        <div class="text-lg text-gray-300">
+          {ngettext("%{count} occurrence", "%{count} occurrences", @selected.count, count: @selected.count)} • {ngettext(
+            "%{count} track",
+            "%{count} tracks",
+            length(@selected.tracks),
+            count: length(@selected.tracks)
+          )}
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="border-t border-gray-700 pt-4">
+          <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks by this artist:")}</h3>
+          <div class="space-y-2 max-h-96 overflow-y-auto">
+            <%= for track_group <- @selected.tracks do %>
+              <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="text-white font-semibold">{track_group.track.name}</div>
+                  <div class="text-gray-400 text-sm">
+                    {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
+                  </div>
+                </div>
+                <div class="flex space-x-2 ml-4">
+                  <a
+                    href={PremiereEcoute.Discography.url(track_group.track, track_group.track.provider)}
+                    target="_blank"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                  >
+                    {String.capitalize(Atom.to_string(track_group.track.provider))}
+                  </a>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= if @display_mode == :year do %>
+      <div class="text-center mb-6">
+        <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
+        <h2 class="text-2xl font-bold text-white mb-2">{@selected.year}</h2>
+        <div class="text-lg text-gray-300">
+          {ngettext("%{count} occurrence", "%{count} occurrences", @selected.count, count: @selected.count)} • {ngettext(
+            "%{count} track",
+            "%{count} tracks",
+            length(@selected.tracks),
+            count: length(@selected.tracks)
+          )}
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="border-t border-gray-700 pt-4">
+          <h3 class="text-lg font-semibold text-white mb-4">{gettext("Tracks from this year:")}</h3>
+          <div class="space-y-2 max-h-96 overflow-y-auto">
+            <%= for track_group <- @selected.tracks do %>
+              <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="text-white font-semibold">{track_group.track.artist} - {track_group.track.name}</div>
+                  <div class="text-gray-400 text-sm">
+                    {ngettext("%{count} occurrence", "%{count} occurrences", track_group.count, count: track_group.count)}
+                  </div>
+                </div>
+                <div class="flex space-x-2 ml-4">
+                  <a
+                    href={PremiereEcoute.Discography.url(track_group.track, track_group.track.provider)}
+                    target="_blank"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                  >
+                    {String.capitalize(Atom.to_string(track_group.track.provider))}
+                  </a>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= if @display_mode == :playlists do %>
+      <!-- Playlist Modal -->
+      <div class="text-center mb-6">
+        <div class="text-3xl mb-4">{rank_icon(@selected.rank, @display_mode)} {@selected.rank}</div>
+        <h2 class="text-2xl font-bold text-white mb-2">{@selected.title}</h2>
+        <div class="text-lg text-gray-400 mb-2">by {@selected.owner_name}</div>
+        <div class="text-lg text-gray-300">
+          {ngettext("%{count} track", "%{count} tracks", length(@selected.tracks), count: length(@selected.tracks))} • {gettext(
+            "Mean year: %{year}",
+            year: @selected.mean_year
+          )}
+        </div>
+        <div class="mt-4">
+          <a
+            href={PremiereEcoute.Discography.url(@selected, @selected.provider)}
+            target="_blank"
+            class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            {gettext("Open %{provider} Playlist", provider: String.capitalize(Atom.to_string(@selected.provider)))}
+          </a>
+        </div>
+      </div>
+      
+<!-- Tab Navigation -->
+      <div class="mb-6">
+        <div class="flex space-x-2 border-b border-gray-700">
+          <button
+            phx-click="switch_playlist_tab"
+            phx-value-tab="tracks"
+            class={[
+              "px-4 py-2 font-mono font-bold transition-colors duration-200",
+              if(@playlist_modal_tab == :tracks,
+                do: "bg-purple-600 text-white border-b-2 border-purple-300",
+                else: "text-purple-400 hover:text-purple-300"
+              )
+            ]}
+          >
+            {gettext("Tracks (%{count})", count: length(@selected.tracks))}
+          </button>
+          <button
+            phx-click="switch_playlist_tab"
+            phx-value-tab="similar"
+            class={[
+              "px-4 py-2 font-mono font-bold transition-colors duration-200",
+              if(@playlist_modal_tab == :similar,
+                do: "bg-purple-600 text-white border-b-2 border-purple-300",
+                else: "text-purple-400 hover:text-purple-300"
+              )
+            ]}
+          >
+            {gettext("Similar (%{count})", count: length(@selected.top_similar))}
+          </button>
+        </div>
+      </div>
+      
+<!-- Tab Content -->
+      <div class="space-y-4">
+        <%= if @playlist_modal_tab == :tracks do %>
+          <div>
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+              <%= for track <- @selected.tracks do %>
+                <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                  <div class="flex-1">
+                    <div class="text-white font-semibold">{track.artist} - {track.name}</div>
+                    <div class="text-gray-400 text-sm">{track.release_date.year}</div>
+                  </div>
+                  <div class="flex space-x-2 ml-4">
+                    <a
+                      href={PremiereEcoute.Discography.url(track, track.provider)}
+                      target="_blank"
+                      class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                    >
+                      {String.capitalize(Atom.to_string(track.provider))}
+                    </a>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <%= if @playlist_modal_tab == :similar do %>
+          <div>
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+              <%= for {similar_playlist, index} <- Enum.with_index(@selected.top_similar, 1) do %>
+                <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <span class="text-lg">
+                      <%= case index do %>
+                        <% 1 -> %>
+                          🥇
+                        <% 2 -> %>
+                          🥈
+                        <% 3 -> %>
+                          🥉
+                      <% end %>
+                    </span>
+                    <div class="flex-1">
+                      <div class="text-white font-semibold">
+                        {similar_playlist.similarity_score}% - {similar_playlist.title}
                       </div>
-                    </div>
-                    <div class="flex space-x-2 ml-4">
-                      <a
-                        href={PremiereEcoute.Discography.url(similar_playlist, similar_playlist.provider)}
-                        target="_blank"
-                        class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
-                      >
-                        {gettext("Open")}
-                      </a>
+                      <div class="text-gray-400 text-sm">({similar_playlist.mean_year}) by {similar_playlist.owner_name}</div>
                     </div>
                   </div>
-                <% end %>
-              </div>
+                  <div class="flex space-x-2 ml-4">
+                    <a
+                      href={PremiereEcoute.Discography.url(similar_playlist, similar_playlist.provider)}
+                      target="_blank"
+                      class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded font-semibold transition-colors text-sm"
+                    >
+                      {gettext("Open")}
+                    </a>
+                  </div>
+                </div>
+              <% end %>
             </div>
-          <% end %>
-        </div>
-      <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </.modal>
 <% end %>

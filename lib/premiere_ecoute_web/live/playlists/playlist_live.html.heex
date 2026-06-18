@@ -908,7 +908,7 @@
       <% end %>
     <% end %>
   </div>
-  
+
   <%= if @show_notify_modal do %>
     <.modal id="notify-modal" show on_cancel="hide_notify_modal" size="sm">
       <:header>{gettext("Notify subscribers")}</:header>
@@ -954,7 +954,9 @@
               <div>
                 <p class="text-sm font-medium">{automation.name}</p>
                 <p class="text-xs text-base-content/50">
-                  <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={automation} />
+                  <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.schedule_summary automation={
+                    automation
+                  } />
                 </p>
               </div>
               <.icon name="hero-chevron-right" class="w-4 h-4 text-base-content/30" />

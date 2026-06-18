@@ -211,7 +211,11 @@
                   <div class="flex items-start justify-between gap-4">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2 mb-1">
-                        <div class={["w-2.5 h-2.5 rounded-full", if(submission_reviewed?(submission), do: "bg-success", else: "bg-warning")]}></div>
+                        <div class={[
+                          "w-2.5 h-2.5 rounded-full",
+                          if(submission_reviewed?(submission), do: "bg-success", else: "bg-warning")
+                        ]}>
+                        </div>
                         <span class="text-sm">
                           {gettext("Pseudo")}: <span class="font-medium">{submission["pseudo"] || gettext("Anonymous")}</span>
                         </span>

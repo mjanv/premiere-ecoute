@@ -319,105 +319,105 @@
 <!-- Expense Modal -->
 <.modal :if={@show_expense_modal} id="expense-modal" show on_cancel="close_expense_modal" size="lg">
   <:header>{gettext("Add Expense")}</:header>
-    <%= if @expense_form do %>
-      <form id="expense-form" phx-change="validate_expense_form" phx-submit="save_expense" method="post">
-          <!-- Title Field -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              {gettext("Title")} <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="expense[title]"
-              value={@expense_form.params["title"] || ""}
-              placeholder={gettext("Enter expense title")}
-              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <%= if @expense_form.errors[:title] do %>
-              <p class="mt-1 text-sm text-red-500">{gettext("Title is required")}</p>
-            <% end %>
-          </div>
-          
+  <%= if @expense_form do %>
+    <form id="expense-form" phx-change="validate_expense_form" phx-submit="save_expense" method="post">
+      <!-- Title Field -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          {gettext("Title")} <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          name="expense[title]"
+          value={@expense_form.params["title"] || ""}
+          placeholder={gettext("Enter expense title")}
+          class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+        <%= if @expense_form.errors[:title] do %>
+          <p class="mt-1 text-sm text-red-500">{gettext("Title is required")}</p>
+        <% end %>
+      </div>
+      
 <!-- Description Field -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              {gettext("Description")}
-            </label>
-            <textarea
-              name="expense[description]"
-              placeholder={gettext("Enter expense description")}
-              rows="2"
-              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            ><%= @expense_form.params["description"] || "" %></textarea>
-          </div>
-          
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          {gettext("Description")}
+        </label>
+        <textarea
+          name="expense[description]"
+          placeholder={gettext("Enter expense description")}
+          rows="2"
+          class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        ><%= @expense_form.params["description"] || "" %></textarea>
+      </div>
+      
 <!-- Category Field -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              {gettext("Category")} <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="expense[category]"
-              value={@expense_form.params["category"] || ""}
-              placeholder={gettext("e.g., hosting, server, bandwidth")}
-              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <%= if @expense_form.errors[:category] do %>
-              <p class="mt-1 text-sm text-red-500">{gettext("Category is required")}</p>
-            <% end %>
-          </div>
-          
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          {gettext("Category")} <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          name="expense[category]"
+          value={@expense_form.params["category"] || ""}
+          placeholder={gettext("e.g., hosting, server, bandwidth")}
+          class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+        <%= if @expense_form.errors[:category] do %>
+          <p class="mt-1 text-sm text-red-500">{gettext("Category is required")}</p>
+        <% end %>
+      </div>
+      
 <!-- Amount Field -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              {gettext("Amount")} <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              name="expense[amount]"
-              value={@expense_form.params["amount"] || ""}
-              placeholder={gettext("100.00")}
-              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <%= if @expense_form.errors[:amount] do %>
-              <p class="mt-1 text-sm text-red-500">{gettext("Amount is required")}</p>
-            <% end %>
-          </div>
-          
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          {gettext("Amount")} <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="number"
+          step="0.01"
+          name="expense[amount]"
+          value={@expense_form.params["amount"] || ""}
+          placeholder={gettext("100.00")}
+          class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+        <%= if @expense_form.errors[:amount] do %>
+          <p class="mt-1 text-sm text-red-500">{gettext("Amount is required")}</p>
+        <% end %>
+      </div>
+      
 <!-- Date Field -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              {gettext("Date")} <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              name="expense[incurred_at]"
-              value={@expense_form.params["incurred_at"] || ""}
-              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <%= if @expense_form.errors[:incurred_at] do %>
-              <p class="mt-1 text-sm text-red-500">{gettext("Date is required")}</p>
-            <% end %>
-          </div>
-          
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+          {gettext("Date")} <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          name="expense[incurred_at]"
+          value={@expense_form.params["incurred_at"] || ""}
+          class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+        <%= if @expense_form.errors[:incurred_at] do %>
+          <p class="mt-1 text-sm text-red-500">{gettext("Date is required")}</p>
+        <% end %>
+      </div>
+      
 <!-- Form Actions -->
-          <div class="flex gap-3">
-            <button
-              type="submit"
-              class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
-            >
-              {gettext("Add Expense")}
-            </button>
-            <button
-              type="button"
-              phx-click="close_expense_modal"
-              class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md font-medium transition-colors"
-            >
-              {gettext("Cancel")}
-            </button>
-          </div>
-      </form>
-    <% end %>
+      <div class="flex gap-3">
+        <button
+          type="submit"
+          class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+        >
+          {gettext("Add Expense")}
+        </button>
+        <button
+          type="button"
+          phx-click="close_expense_modal"
+          class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md font-medium transition-colors"
+        >
+          {gettext("Cancel")}
+        </button>
+      </div>
+    </form>
+  <% end %>
 </.modal>
