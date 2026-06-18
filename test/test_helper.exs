@@ -17,5 +17,5 @@ for api <- apis do
   Mox.defmock(Module.concat([api, Mock]), for: api.behaviours())
 end
 
-ExUnit.start(capture_log: true, exclude: [:api, :wip])
+ExUnit.start(capture_log: true, exclude: [:api, :wip, :skip])
 Ecto.Adapters.SQL.Sandbox.mode(PremiereEcoute.Repo, :manual)
