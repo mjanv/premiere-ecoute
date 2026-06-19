@@ -9,6 +9,8 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
 
   @cache :rate_limits
   @status_codes [429]
+  @transient_error_codes [502, 503]
+  @transient_ttl_seconds 300
 
   @spec run(Req.Request.t(), Keyword.t()) :: Req.Request.t()
   def run(request, opts \\ []) do
@@ -26,9 +28,16 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
   end
 
   defp maybe_open({request, %{status: status} = response}, opts) do
-    if status in @status_codes do
-      retry_after = String.to_integer(hd(response.headers["retry-after"] || ["60"]))
-      Cache.put(@cache, opts[:api], response.body, expire: retry_after * 1_000)
+    cond do
+      status in @status_codes ->
+        retry_after = String.to_integer(hd(response.headers["retry-after"] || ["60"]))
+        Cache.put(@cache, opts[:api], response.body, expire: retry_after * 1_000)
+
+      status in @transient_error_codes ->
+        Cache.put(@cache, opts[:api], "service unavailable (#{status})", expire: @transient_ttl_seconds * 1_000)
+
+      true ->
+        :ok
     end
 
     {request, response}

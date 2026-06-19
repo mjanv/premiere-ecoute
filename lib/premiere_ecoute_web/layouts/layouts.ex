@@ -99,9 +99,9 @@ defmodule PremiereEcouteWeb.Layouts do
                   />
                 </svg>
                 <span class="text-white font-medium">
-                  {gettext("%{api} API rate-limited", api: api |> to_string() |> String.capitalize())}
+                  {gettext("%{api} API unavailable", api: api |> to_string() |> String.capitalize())}
                   {" — "}
-                  <span class="font-normal">{inspect(message)}</span>
+                  <span class="font-normal">{message}</span>
                   <%= if expires_at do %>
                     {" — "}
                     {gettext("retrying at %{time}", time: Calendar.strftime(expires_at, "%H:%M:%S UTC"))}
