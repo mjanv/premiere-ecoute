@@ -98,6 +98,25 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewalTest do
       assert %Scope{user: nil} = result
     end
 
+    test "disconnects Spotify when refresh token has expired (invalid_grant)", %{user: user, scope: scope} do
+      stub(SpotifyApi, :renew_token, fn _refresh_token -> {:error, :invalid_grant} end)
+
+      {:ok, user} =
+        OauthToken.create(user, :spotify, %{
+          user_id: "spotify_user_id",
+          username: "spotify_username",
+          access_token: "old_access_token",
+          refresh_token: "expired_refresh_token",
+          expires_in: -3600
+        })
+
+      scope = %{scope | user: user}
+
+      result = TokenRenewal.maybe_renew_token(scope, :spotify)
+
+      assert %Scope{user: %User{spotify: nil}} = result
+    end
+
     test "handles API renewal failure gracefully", %{user: user, scope: scope} do
       stub(SpotifyApi, :renew_token, fn _refresh_token -> {:error, "Nope"} end)
 

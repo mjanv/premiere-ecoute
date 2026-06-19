@@ -23,6 +23,11 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
          {:ok, user} <- User.refresh_token(user, provider, tokens) do
       %{scope | user: user}
     else
+      {:error, :invalid_grant} ->
+        %Scope{user: %User{} = user} = scope
+        {:ok, user} = User.disconnect_provider(user, provider)
+        %{scope | user: user}
+
       {:error, reason} ->
         Logger.error("Failed to renew #{provider} token: #{inspect(reason)}")
         scope

@@ -105,6 +105,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Accounts do
            expires_in: body["expires_in"]
          }}
 
+      {:ok, %{status: 400, body: %{"error" => "invalid_grant"}}} ->
+        Logger.warning("Spotify refresh token expired (invalid_grant) — user must re-authorize")
+        {:error, :invalid_grant}
+
       {:ok, %{status: status, body: body}} ->
         Logger.error("Spotify token refresh failed: #{status} - #{inspect(body)}")
         {:error, "Spotify token refresh failed: #{status} - #{inspect(body)}"}

@@ -129,7 +129,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AccountsTest do
              } = token_data
     end
 
-    test "returns error when token refresh fails with HTTP error" do
+    test "returns :invalid_grant when refresh token has expired" do
       client_id = Application.get_env(:premiere_ecoute, :spotify_client_id)
       client_secret = Application.get_env(:premiere_ecoute, :spotify_client_secret)
       auth_header = Base.encode64("#{client_id}:#{client_secret}")
@@ -145,10 +145,28 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AccountsTest do
         status: 400
       )
 
-      {:error, error_message} = SpotifyApi.Accounts.renew_token("invalid_refresh_token")
+      assert {:error, :invalid_grant} = SpotifyApi.Accounts.renew_token("expired_refresh_token")
+    end
 
-      assert error_message =~ "Spotify token refresh failed: 400"
-      assert error_message =~ "invalid_grant"
+    test "returns error string when token refresh fails for other reasons" do
+      client_id = Application.get_env(:premiere_ecoute, :spotify_client_id)
+      client_secret = Application.get_env(:premiere_ecoute, :spotify_client_secret)
+      auth_header = Base.encode64("#{client_id}:#{client_secret}")
+
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:post, "/api/token"},
+        headers: [
+          {"authorization", "Basic #{auth_header}"},
+          {"content-type", "application/x-www-form-urlencoded"}
+        ],
+        response: "spotify_api/accounts/renew_token/server_error_response.json",
+        status: 500
+      )
+
+      {:error, error_message} = SpotifyApi.Accounts.renew_token("some_refresh_token")
+
+      assert error_message =~ "Spotify token refresh failed: 500"
     end
   end
 
