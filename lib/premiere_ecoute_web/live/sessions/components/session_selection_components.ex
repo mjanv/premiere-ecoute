@@ -177,6 +177,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
               class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
               style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
               error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+              phx-debounce="300"
             />
           </.form>
 
@@ -592,6 +593,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
               class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50"
               style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
               error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+              phx-debounce="300"
             />
           </.form>
           <div class="fieldset mb-2">

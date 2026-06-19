@@ -22,9 +22,11 @@ ExecStartPre=/opt/premiere-ecoute/bin/migrate
 # Start the server (PHX_SERVER=true is set in the server script)
 ExecStart=/opt/premiere-ecoute/bin/server
 
-# Restart on failure
-Restart=on-failure
+# Restart always (including OOM kills which exit with status 0)
+Restart=always
 RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
 
 # Logging
 StandardOutput=journal
