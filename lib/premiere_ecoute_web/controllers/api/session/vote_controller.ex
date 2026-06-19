@@ -9,15 +9,10 @@ defmodule PremiereEcouteWeb.Api.Session.VoteController do
   use PremiereEcouteWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias OpenApiSpex.Schema
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Events.Chat.MessageSent
   alias PremiereEcoute.Sessions
-
-  @error_response %Schema{
-    type: :object,
-    properties: %{error: %Schema{type: :string}}
-  }
+  alias PremiereEcouteWeb.Schemas
 
   operation(:create,
     summary: "Vote on current track",
@@ -26,28 +21,11 @@ defmodule PremiereEcouteWeb.Api.Session.VoteController do
     tags: ["Session"],
     security: [%{"bearer" => []}],
     "x-role": ["streamer", "viewer"],
-    request_body:
-      {"Vote payload", "application/json",
-       %Schema{
-         type: :object,
-         required: [:rating],
-         properties: %{
-           rating: %Schema{type: :integer, minimum: 0, maximum: 10},
-           username: %Schema{type: :string, description: "Broadcaster username (required for viewers)"}
-         }
-       }, required: true},
+    request_body: {"Vote payload", "application/json", Schemas.SessionVoteRequest, required: true},
     responses: [
-      ok:
-        {"Vote accepted", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{
-             ok: %Schema{type: :boolean, example: true},
-             rating: %Schema{type: :integer}
-           }
-         }},
-      not_found: {"Broadcaster not found", "application/json", @error_response},
-      unprocessable_entity: {"Invalid rating", "application/json", @error_response},
+      ok: {"Vote accepted", "application/json", Schemas.SessionVoteResponse},
+      not_found: {"Broadcaster not found", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Invalid rating", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )

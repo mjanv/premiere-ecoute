@@ -6,16 +6,11 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
   use PremiereEcouteWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias OpenApiSpex.Schema
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Wantlists
-
-  @ok_schema %Schema{
-    type: :object,
-    properties: %{ok: %Schema{type: :boolean}}
-  }
+  alias PremiereEcouteWeb.Schemas
 
   operation(:create,
     summary: "Save current track",
@@ -27,7 +22,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
       broadcaster_id: [in: :query, description: "Twitch user ID of the broadcaster", type: :string, required: true]
     ],
     responses: [
-      ok: {"Track saved", "application/json", @ok_schema},
+      ok: {"Track saved", "application/json", Schemas.OkResponse},
       bad_request: "Missing broadcaster_id parameter",
       not_found: "Broadcaster not found or no track currently playing",
       unprocessable_entity: "Track could not be saved",

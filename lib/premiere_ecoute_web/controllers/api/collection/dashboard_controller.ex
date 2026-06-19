@@ -9,7 +9,6 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
   use PremiereEcouteWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias OpenApiSpex.Schema
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcoute.Collections.CollectionSession.Commands.CloseVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.CompleteCollectionSession
@@ -17,28 +16,7 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
   alias PremiereEcoute.Collections.CollectionSession.Commands.OpenVoteWindow
   alias PremiereEcoute.Collections.CollectionSession.Commands.StartCollectionSession
   alias PremiereEcouteCore.Cache
-
-  @ok_response %Schema{
-    type: :object,
-    properties: %{ok: %Schema{type: :boolean, example: true}}
-  }
-
-  @error_response %Schema{
-    type: :object,
-    properties: %{error: %Schema{type: :string}}
-  }
-
-  @session_response %Schema{
-    type: :object,
-    properties: %{
-      id: %Schema{type: :integer},
-      status: %Schema{type: :string, enum: ["pending", "active", "completed"]},
-      current_index: %Schema{type: :integer},
-      kept_count: %Schema{type: :integer},
-      rejected_count: %Schema{type: :integer},
-      skipped_count: %Schema{type: :integer}
-    }
-  }
+  alias PremiereEcouteWeb.Schemas
 
   operation(:show,
     summary: "Get active collection session",
@@ -47,8 +25,8 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Collection session state", "application/json", @session_response},
-      not_found: {"No active session", "application/json", @error_response},
+      ok: {"Collection session state", "application/json", Schemas.CollectionSession},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -70,9 +48,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No pending session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No pending session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -98,20 +76,11 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     tags: ["Collection"],
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
-    request_body:
-      {"Vote window options", "application/json",
-       %Schema{
-         type: :object,
-         required: [:mode],
-         properties: %{
-           mode: %Schema{type: :string, enum: ["viewer_vote", "duel", "streamer_choice"]},
-           duration: %Schema{type: :integer, description: "Vote duration in seconds", default: 60}
-         }
-       }, required: true},
+    request_body: {"Vote window options", "application/json", Schemas.OpenVoteRequest, required: true},
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -150,9 +119,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -178,19 +147,11 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     tags: ["Collection"],
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
-    request_body:
-      {"Decision payload", "application/json",
-       %Schema{
-         type: :object,
-         required: [:decision],
-         properties: %{
-           decision: %Schema{type: :string, enum: ["kept", "rejected", "skipped"]}
-         }
-       }, required: true},
+    request_body: {"Decision payload", "application/json", Schemas.DecideRequest, required: true},
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed or invalid decision", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed or invalid decision", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -229,19 +190,11 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     tags: ["Collection"],
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
-    request_body:
-      {"Completion options", "application/json",
-       %Schema{
-         type: :object,
-         properties: %{
-           remove_kept: %Schema{type: :boolean, default: false, description: "Remove kept tracks from origin playlist"},
-           remove_rejected: %Schema{type: :boolean, default: false, description: "Remove rejected tracks from origin playlist"}
-         }
-       }, required: false},
+    request_body: {"Completion options", "application/json", Schemas.CompleteRequest, required: false},
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )

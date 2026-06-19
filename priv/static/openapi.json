@@ -1,0 +1,1508 @@
+{
+  "components": {
+    "responses": {},
+    "schemas": {
+      "CollectionSession": {
+        "properties": {
+          "current_index": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "id": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "kept_count": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "rejected_count": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "skipped_count": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "active",
+              "completed"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "CollectionSession",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.CollectionSession",
+        "x-validate": null
+      },
+      "CollectionVoteRequest": {
+        "properties": {
+          "choice": {
+            "description": "1 for option A, 2 for option B",
+            "enum": [
+              1,
+              2
+            ],
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "username": {
+            "description": "Broadcaster username (required for viewers)",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "choice"
+        ],
+        "title": "CollectionVoteRequest",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.CollectionVoteRequest",
+        "x-validate": null
+      },
+      "CompleteRequest": {
+        "properties": {
+          "remove_kept": {
+            "default": false,
+            "description": "Remove kept tracks from origin playlist",
+            "type": "boolean",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "remove_rejected": {
+            "default": false,
+            "description": "Remove rejected tracks from origin playlist",
+            "type": "boolean",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "CompleteRequest",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.CompleteRequest",
+        "x-validate": null
+      },
+      "DecideRequest": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "kept",
+              "rejected",
+              "skipped"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "DecideRequest",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.DecideRequest",
+        "x-validate": null
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "ErrorResponse",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.ErrorResponse",
+        "x-validate": null
+      },
+      "ListeningSession": {
+        "properties": {
+          "cover_url": {
+            "format": "uri",
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "id": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "source": {
+            "enum": [
+              "album",
+              "playlist",
+              "track"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "status": {
+            "example": "started",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "viewer_score": {
+            "nullable": true,
+            "type": "number",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "ListeningSession",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.ListeningSession",
+        "x-validate": null
+      },
+      "OkResponse": {
+        "properties": {
+          "ok": {
+            "example": true,
+            "type": "boolean",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "OkResponse",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.OkResponse",
+        "x-validate": null
+      },
+      "OpenVoteRequest": {
+        "properties": {
+          "duration": {
+            "default": 60,
+            "description": "Vote duration in seconds",
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "mode": {
+            "enum": [
+              "viewer_vote",
+              "duel",
+              "streamer_choice"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "title": "OpenVoteRequest",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.OpenVoteRequest",
+        "x-validate": null
+      },
+      "Profile": {
+        "properties": {
+          "color_scheme": {
+            "enum": [
+              "light",
+              "dark",
+              "system"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "language": {
+            "enum": [
+              "en",
+              "fr",
+              "it"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "radio_settings": {
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "retention_days": {
+                "minimum": 1,
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "visibility": {
+                "enum": [
+                  "private",
+                  "public"
+                ],
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "timezone": {
+            "example": "Europe/Paris",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "widget_settings": {
+            "properties": {
+              "color_primary": {
+                "example": "#5b21b6",
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "color_secondary": {
+                "example": "#be123c",
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "Profile",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.Profile",
+        "x-validate": null
+      },
+      "ProviderIds": {
+        "additionalProperties": {
+          "type": "string",
+          "x-struct": null,
+          "x-validate": null
+        },
+        "description": "Provider IDs keyed by provider name (spotify, deezer, tidal)",
+        "title": "ProviderIds",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "SessionVoteRequest": {
+        "properties": {
+          "rating": {
+            "maximum": 10,
+            "minimum": 0,
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "username": {
+            "description": "Broadcaster username (required for viewers)",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "rating"
+        ],
+        "title": "SessionVoteRequest",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.SessionVoteRequest",
+        "x-validate": null
+      },
+      "SessionVoteResponse": {
+        "properties": {
+          "ok": {
+            "example": true,
+            "type": "boolean",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "rating": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "SessionVoteResponse",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.SessionVoteResponse",
+        "x-validate": null
+      },
+      "StatusResponse": {
+        "properties": {
+          "status": {
+            "example": "ok",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "user": {
+            "properties": {
+              "id": {
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "role": {
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "username": {
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "StatusResponse",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.StatusResponse",
+        "x-validate": null
+      },
+      "Wantlist": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WantlistItem"
+            },
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "Wantlist",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.Wantlist",
+        "x-validate": null
+      },
+      "WantlistItem": {
+        "properties": {
+          "artist": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "provider_ids": {
+            "additionalProperties": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            },
+            "description": "Provider IDs keyed by provider name (spotify, deezer, tidal)",
+            "title": "ProviderIds",
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "type": {
+            "enum": [
+              "album",
+              "track",
+              "artist"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "WantlistItem",
+        "type": "object",
+        "x-struct": "Elixir.PremiereEcouteWeb.Schemas.WantlistItem",
+        "x-validate": null
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "description": "API token obtained from the application settings page",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "Premiere Ecoute API",
+    "version": "1.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/collection": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns the authenticated streamer's current active collection session.",
+        "operationId": "PremiereEcouteWeb.Api.Collection.DashboardController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionSession"
+                }
+              }
+            },
+            "description": "Collection session state"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get active collection session",
+        "tags": [
+          "Collection"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/collection/complete": {
+      "post": {
+        "callbacks": {},
+        "description": "Completes the collection session and syncs kept tracks to the destination playlist.",
+        "operationId": "PremiereEcouteWeb.Api.Collection.DashboardController.complete",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRequest"
+              }
+            }
+          },
+          "description": "Completion options",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Complete collection session",
+        "tags": [
+          "Collection"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/collection/decide": {
+      "post": {
+        "callbacks": {},
+        "description": "Records the streamer's decision (kept/rejected/skipped) for the current track.",
+        "operationId": "PremiereEcouteWeb.Api.Collection.DashboardController.decide",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideRequest"
+              }
+            }
+          },
+          "description": "Decision payload",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed or invalid decision"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Decide current track",
+        "tags": [
+          "Collection"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/collection/start": {
+      "post": {
+        "callbacks": {},
+        "description": "Starts the authenticated streamer's pending collection session.",
+        "operationId": "PremiereEcouteWeb.Api.Collection.DashboardController.start",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No pending session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Start collection session",
+        "tags": [
+          "Collection"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/collection/vote": {
+      "post": {
+        "callbacks": {},
+        "description": "Submits a binary choice (1 or 2) for the active vote window. Streamers vote on their own session; viewers must supply a `username` body param (the broadcaster's username).",
+        "operationId": "PremiereEcouteWeb.Api.Collection.VoteController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollectionVoteRequest"
+              }
+            }
+          },
+          "description": "Vote payload",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Vote accepted"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Broadcaster not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid choice or missing username"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit collection vote",
+        "tags": [
+          "Collection"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      }
+    },
+    "/api/collection/vote/close": {
+      "post": {
+        "callbacks": {},
+        "description": "Closes the active vote window in the current collection session.",
+        "operationId": "PremiereEcouteWeb.Api.Collection.DashboardController.close_vote",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Close vote window",
+        "tags": [
+          "Collection"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/collection/vote/open": {
+      "post": {
+        "callbacks": {},
+        "description": "Opens a vote window for the current track(s) in the active collection session.",
+        "operationId": "PremiereEcouteWeb.Api.Collection.DashboardController.open_vote",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenVoteRequest"
+              }
+            }
+          },
+          "description": "Vote window options",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Open vote window",
+        "tags": [
+          "Collection"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/session": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns the authenticated user's current active session state.",
+        "operationId": "PremiereEcouteWeb.Api.Session.DashboardController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListeningSession"
+                }
+              }
+            },
+            "description": "Session state"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current session",
+        "tags": [
+          "Session"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/session/next": {
+      "post": {
+        "callbacks": {},
+        "description": "Skips to the next track in the authenticated user's current session.",
+        "operationId": "PremiereEcouteWeb.Api.Session.DashboardController.next",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Next track",
+        "tags": [
+          "Session"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/session/previous": {
+      "post": {
+        "callbacks": {},
+        "description": "Skips to the previous track in the authenticated user's current session.",
+        "operationId": "PremiereEcouteWeb.Api.Session.DashboardController.previous",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Previous track",
+        "tags": [
+          "Session"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/session/start": {
+      "post": {
+        "callbacks": {},
+        "description": "Starts the authenticated user's current session and advances to the first track.",
+        "operationId": "PremiereEcouteWeb.Api.Session.DashboardController.start",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Start session",
+        "tags": [
+          "Session"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/session/stop": {
+      "post": {
+        "callbacks": {},
+        "description": "Stops the authenticated user's current session.",
+        "operationId": "PremiereEcouteWeb.Api.Session.DashboardController.stop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No active session"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Command failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stop session",
+        "tags": [
+          "Session"
+        ],
+        "x-role": [
+          "streamer"
+        ]
+      }
+    },
+    "/api/session/vote": {
+      "post": {
+        "callbacks": {},
+        "description": "Submits a rating (0–10) for the current track in the session. Streamers vote on their own session directly; viewers must supply a `username` body param (the broadcaster's username).",
+        "operationId": "PremiereEcouteWeb.Api.Session.VoteController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionVoteRequest"
+              }
+            }
+          },
+          "description": "Vote payload",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionVoteResponse"
+                }
+              }
+            },
+            "description": "Vote accepted"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Broadcaster not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid rating"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Vote on current track",
+        "tags": [
+          "Session"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      }
+    },
+    "/api/user/profile": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns the authenticated user's profile settings.",
+        "operationId": "PremiereEcouteWeb.Api.User.ProfileController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            },
+            "description": "Profile"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get profile",
+        "tags": [
+          "Profile"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "description": "Partially updates the authenticated user's profile settings. Only fields present in the request body are changed.",
+        "operationId": "PremiereEcouteWeb.Api.User.ProfileController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Profile"
+              }
+            }
+          },
+          "description": "Profile fields to update",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            },
+            "description": "Updated profile"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "422": {
+            "description": "Validation errors"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update profile",
+        "tags": [
+          "Profile"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      }
+    },
+    "/api/user/status": {
+      "get": {
+        "callbacks": {},
+        "description": "Smoke-test route that confirms authentication is working and returns basic information about the authenticated user.",
+        "operationId": "PremiereEcouteWeb.Api.User.StatusController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            },
+            "description": "Status response"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "API status",
+        "tags": [
+          "Status"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      }
+    },
+    "/api/wantlist": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns the authenticated user's wantlist with all items.",
+        "operationId": "PremiereEcouteWeb.Api.Wantlist.WantlistController.show",
+        "parameters": [
+          {
+            "description": "Filter by item type",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "album",
+                "track",
+                "artist"
+              ],
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wantlist"
+                }
+              }
+            },
+            "description": "Wantlist"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get wantlist",
+        "tags": [
+          "Wantlist"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      }
+    },
+    "/api/wantlist/items/{id}": {
+      "delete": {
+        "callbacks": {},
+        "description": "Removes an item from the authenticated user's wantlist.",
+        "operationId": "PremiereEcouteWeb.Api.Wantlist.ItemController.delete",
+        "parameters": [
+          {
+            "description": "Wantlist item ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Item removed"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "description": "Item not found or not owned by user"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove wantlist item",
+        "tags": [
+          "Wantlist"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      }
+    },
+    "/api/wantlist/tracks/current": {
+      "post": {
+        "callbacks": {},
+        "description": "Saves the track currently playing on the broadcaster's stream to the authenticated user's wantlist.",
+        "operationId": "PremiereEcouteWeb.Api.Wantlist.TrackController.create",
+        "parameters": [
+          {
+            "description": "Twitch user ID of the broadcaster",
+            "in": "query",
+            "name": "broadcaster_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Track saved"
+          },
+          "400": {
+            "description": "Missing broadcaster_id parameter"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "description": "Broadcaster not found or no track currently playing"
+          },
+          "422": {
+            "description": "Track could not be saved"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Save current track",
+        "tags": [
+          "Wantlist"
+        ],
+        "x-role": [
+          "streamer",
+          "viewer"
+        ]
+      }
+    }
+  },
+  "security": [],
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "variables": {}
+    }
+  ],
+  "tags": []
+}

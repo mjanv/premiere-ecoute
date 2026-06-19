@@ -9,33 +9,9 @@ defmodule PremiereEcouteWeb.Api.User.ProfileController do
   use PremiereEcouteWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias OpenApiSpex.Schema
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Repo
-
-  @profile_schema %Schema{
-    type: :object,
-    properties: %{
-      color_scheme: %Schema{type: :string, enum: ["light", "dark", "system"]},
-      language: %Schema{type: :string, enum: ["en", "fr", "it"]},
-      timezone: %Schema{type: :string, example: "Europe/Paris"},
-      widget_settings: %Schema{
-        type: :object,
-        properties: %{
-          color_primary: %Schema{type: :string, pattern: "^#[0-9A-Fa-f]{6}$", example: "#5b21b6"},
-          color_secondary: %Schema{type: :string, pattern: "^#[0-9A-Fa-f]{6}$", example: "#be123c"}
-        }
-      },
-      radio_settings: %Schema{
-        type: :object,
-        properties: %{
-          enabled: %Schema{type: :boolean},
-          retention_days: %Schema{type: :integer, minimum: 1},
-          visibility: %Schema{type: :string, enum: ["private", "public"]}
-        }
-      }
-    }
-  }
+  alias PremiereEcouteWeb.Schemas
 
   operation(:show,
     summary: "Get profile",
@@ -44,7 +20,7 @@ defmodule PremiereEcouteWeb.Api.User.ProfileController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer", "viewer"],
     responses: [
-      ok: {"Profile", "application/json", @profile_schema},
+      ok: {"Profile", "application/json", Schemas.Profile},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -66,9 +42,9 @@ defmodule PremiereEcouteWeb.Api.User.ProfileController do
     tags: ["Profile"],
     security: [%{"bearer" => []}],
     "x-role": ["streamer", "viewer"],
-    request_body: {"Profile fields to update", "application/json", @profile_schema},
+    request_body: {"Profile fields to update", "application/json", Schemas.Profile},
     responses: [
-      ok: {"Updated profile", "application/json", @profile_schema},
+      ok: {"Updated profile", "application/json", Schemas.Profile},
       unprocessable_entity: "Validation errors",
       unauthorized: "Missing or invalid Authorization header"
     ]

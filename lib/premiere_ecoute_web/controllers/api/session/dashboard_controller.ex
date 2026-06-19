@@ -9,34 +9,13 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
   use PremiereEcouteWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias OpenApiSpex.Schema
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StopListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
-
-  @session_response %Schema{
-    type: :object,
-    properties: %{
-      id: %Schema{type: :integer},
-      status: %Schema{type: :string, example: "started"},
-      source: %Schema{type: :string, enum: ["album", "playlist", "track"]},
-      cover_url: %Schema{type: :string, format: :uri, nullable: true},
-      viewer_score: %Schema{type: :number, nullable: true}
-    }
-  }
-
-  @ok_response %Schema{
-    type: :object,
-    properties: %{ok: %Schema{type: :boolean, example: true}}
-  }
-
-  @error_response %Schema{
-    type: :object,
-    properties: %{error: %Schema{type: :string}}
-  }
+  alias PremiereEcouteWeb.Schemas
 
   operation(:show,
     summary: "Get current session",
@@ -45,8 +24,8 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Session state", "application/json", @session_response},
-      not_found: {"No active session", "application/json", @error_response},
+      ok: {"Session state", "application/json", Schemas.ListeningSession},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -107,9 +86,9 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -145,9 +124,9 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -177,9 +156,9 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )
@@ -209,9 +188,9 @@ defmodule PremiereEcouteWeb.Api.Session.DashboardController do
     security: [%{"bearer" => []}],
     "x-role": ["streamer"],
     responses: [
-      ok: {"Success", "application/json", @ok_response},
-      not_found: {"No active session", "application/json", @error_response},
-      unprocessable_entity: {"Command failed", "application/json", @error_response},
+      ok: {"Success", "application/json", Schemas.OkResponse},
+      not_found: {"No active session", "application/json", Schemas.ErrorResponse},
+      unprocessable_entity: {"Command failed", "application/json", Schemas.ErrorResponse},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )

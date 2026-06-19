@@ -222,6 +222,11 @@ defmodule PremiereEcoute.MixProject do
         "coveralls.html",
         "cmd firefox cover/excoveralls.html"
       ],
+      # API
+      "openapi.gen": [
+        "openapi.spec.json --spec PremiereEcouteWeb.ApiSpec --pretty --output priv/static/openapi.json",
+        "cmd assets/node_modules/.bin/openapi-typescript priv/static/openapi.json -o assets/ts/api.d.ts"
+      ],
       # Deployment
       doc: ["doctor", "docs --output priv/docs"],
       ready: ["format", "quality", "cmd mix test --color", "docs"],

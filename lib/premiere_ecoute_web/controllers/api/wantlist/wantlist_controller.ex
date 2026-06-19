@@ -8,29 +8,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.WantlistController do
 
   alias OpenApiSpex.Schema
   alias PremiereEcoute.Wantlists
-
-  @provider_ids_schema %Schema{
-    type: :object,
-    description: "Provider IDs keyed by provider name (spotify, deezer, tidal)",
-    additionalProperties: %Schema{type: :string}
-  }
-
-  @item_schema %Schema{
-    type: :object,
-    properties: %{
-      type: %Schema{type: :string, enum: ["album", "track", "artist"]},
-      name: %Schema{type: :string},
-      artist: %Schema{type: :string, nullable: true},
-      provider_ids: @provider_ids_schema
-    }
-  }
-
-  @wantlist_schema %Schema{
-    type: :object,
-    properties: %{
-      items: %Schema{type: :array, items: @item_schema}
-    }
-  }
+  alias PremiereEcouteWeb.Schemas
 
   operation(:show,
     summary: "Get wantlist",
@@ -47,7 +25,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.WantlistController do
       ]
     ],
     responses: [
-      ok: {"Wantlist", "application/json", @wantlist_schema},
+      ok: {"Wantlist", "application/json", Schemas.Wantlist},
       unauthorized: "Missing or invalid Authorization header"
     ]
   )

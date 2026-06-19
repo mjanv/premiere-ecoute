@@ -6,13 +6,8 @@ defmodule PremiereEcouteWeb.Api.Wantlist.ItemController do
   use PremiereEcouteWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias OpenApiSpex.Schema
   alias PremiereEcoute.Wantlists
-
-  @ok_schema %Schema{
-    type: :object,
-    properties: %{ok: %Schema{type: :boolean}}
-  }
+  alias PremiereEcouteWeb.Schemas
 
   operation(:delete,
     summary: "Remove wantlist item",
@@ -24,7 +19,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.ItemController do
       id: [in: :path, description: "Wantlist item ID", type: :integer, required: true]
     ],
     responses: [
-      ok: {"Item removed", "application/json", @ok_schema},
+      ok: {"Item removed", "application/json", Schemas.OkResponse},
       not_found: "Item not found or not owned by user",
       unauthorized: "Missing or invalid Authorization header"
     ]
