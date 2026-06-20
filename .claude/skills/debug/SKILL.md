@@ -12,7 +12,7 @@ description: Production debugging session for Premiere Ecoute. Pull live signals
 | Tool | What it gives you |
 |---|---|
 | Sentry MCP | Unresolved issues, event details, stacktraces |
-| Grafana MCP | PromQL queries, dashboard panels, metric history |
+| Grafana MCP | PromQL queries, Loki log queries, dashboard panels, metric history |
 | SSH to prod | Live logs, process status |
 
 ## Workflow
@@ -66,7 +66,16 @@ mcp__grafana__query_prometheus(
 )
 ```
 
-**Prod logs** — last 50 error lines:
+**Loki** — last 50 error log lines:
+```
+mcp__grafana__query_loki_logs(
+  datasourceUid="grafanacloud-logs",
+  logql="{app=\"premiere-ecoute\", detected_level=\"error\"}",
+  limit=50
+)
+```
+
+**Prod logs** (fallback if Loki has no data yet) — last 50 error lines:
 ```bash
 journalctl -u premiere-ecoute --no-pager -n 50 -p err
 ```
@@ -77,7 +86,7 @@ Based on triage, narrow down:
 
 - **Sentry issue** → `mcp__sentry__get_sentry_resource` for full stacktrace and breadcrumbs
 - **Metric spike** → query Grafana for the specific metric with finer resolution, break down by label (path, status, source)
-- **Log pattern** → grep for the error in logs, check timestamps against deploy history
+- **Log pattern** → query Loki with `|= "keyword"` to filter by message, or use `detected_level="error"` for errors; fall back to SSH grep if needed
 
 ### 3. Correlate with deploys
 
@@ -103,6 +112,24 @@ A restart shortly before the error spike = likely a deploy or crash loop.
 
 - Resolve false-positive Sentry issues: `mcp__sentry__update_issue(status="resolved")`
 - If a restart is needed: present findings to the user and **ask for explicit confirmation before restarting**
+
+## Key Loki queries
+
+```logql
+# All errors
+{app="premiere-ecoute", detected_level="error"}
+
+# Errors in a time window
+{app="premiere-ecoute", detected_level="error"} | since="30m"
+
+# Filter by keyword
+{app="premiere-ecoute"} |= "SpotifyApi"
+{app="premiere-ecoute"} |= "Postgrex.Error"
+{app="premiere-ecoute"} |= "GenServer"
+
+# Error rate over time (metric query)
+sum(count_over_time({app="premiere-ecoute", detected_level="error"}[5m]))
+```
 
 ## Key metrics
 
