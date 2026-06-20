@@ -163,7 +163,7 @@ defmodule PremiereEcoute.MixProject do
       # Development
       {:doctor, "~> 0.22", only: :dev},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:tidewave, "~> 0.1", only: :dev},
+      {:tidewave, "~> 0.5", only: :dev},
       {:igniter, "~> 0.5", only: :dev}
     ]
   end

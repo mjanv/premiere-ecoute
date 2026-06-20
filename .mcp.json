@@ -5,7 +5,7 @@
       "url": "https://premiere-ecoute.fr/mcp"
     },
     "tidewave": {
-      "type": "sse",
+      "type": "http",
       "url": "http://localhost:4000/tidewave/mcp"
     },
     "context7": {
@@ -16,6 +16,14 @@
         "@upstash/context7-mcp@latest"
       ],
       "env": {}
+    },
+    "grafana": {
+      "type": "http",
+      "url": "https://mcp.grafana.com/mcp"
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
     }
   }
 }
