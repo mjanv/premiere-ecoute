@@ -40,7 +40,8 @@ defmodule PremiereEcoute.Telemetry.PromEx do
       {:prom_ex, "oban.json"},
       {:prom_ex, "phoenix.json"},
       {:prom_ex, "phoenix_live_view.json"},
-      {:premiere_ecoute, "/dashboards/premiere_ecoute.json"}
+      {:premiere_ecoute, "/dashboards/premiere_ecoute.json"},
+      {:premiere_ecoute, "/dashboards/logs.json"}
     ]
   end
 end

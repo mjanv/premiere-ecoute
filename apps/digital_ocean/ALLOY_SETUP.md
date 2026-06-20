@@ -6,8 +6,9 @@ Grafana Alloy has been successfully installed on your Digital Ocean droplet! How
 
 ✅ Alloy v1.5.1 installed
 ✅ Configuration files in place
-✅ Systemd service enabled
-⏸️ Service NOT started (waiting for credentials)
+✅ Systemd service enabled and running
+✅ Metrics pushing to Grafana Cloud Prometheus
+✅ Logs pushing to Grafana Cloud Loki (`{app="premiere-ecoute"}`)
 
 ## Add Your Grafana Cloud Credentials
 

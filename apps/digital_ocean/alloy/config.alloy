@@ -63,3 +63,22 @@ prometheus.remote_write "grafana_cloud" {
     environment = "production",
   }
 }
+
+// Loki log collection from systemd journal
+loki.source.journal "premiere_ecoute" {
+  matches = "_SYSTEMD_UNIT=premiere-ecoute.service"
+  labels  = { app = "premiere-ecoute", env = "prod" }
+
+  forward_to = [loki.write.grafana_cloud.receiver]
+}
+
+loki.write "grafana_cloud" {
+  endpoint {
+    url = env("GRAFANA_CLOUD_LOKI_URL")
+
+    basic_auth {
+      username = env("GRAFANA_CLOUD_LOKI_USERNAME")
+      password = env("GRAFANA_CLOUD_API_KEY")
+    }
+  }
+}

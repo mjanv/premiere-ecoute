@@ -10,7 +10,7 @@ The application runs on a Digital Ocean droplet with the following components:
 - **PostgreSQL**: Database server
 - **SeaweedFS**: Object storage for podcast audio/covers ([setup guide](SEAWEEDFS_SETUP.md))
 - **Traefik**: Reverse proxy and SSL termination
-- **Grafana Alloy**: Metrics collection agent (sends to Grafana Cloud)
+- **Grafana Alloy**: Metrics and logs collection agent (sends to Grafana Cloud)
 
 All services run natively via systemd (no Docker on production).
 
@@ -279,6 +279,26 @@ erlang_vm_memory_bytes_total{kind="total"}
 # Active connections
 phoenix_endpoint_stop_duration_count
 ```
+
+### Viewing Logs
+
+Alloy tails `premiere-ecoute.service` from the systemd journal and ships logs to Grafana Cloud Loki.
+
+Access logs in Grafana Cloud:
+1. Go to your Grafana Cloud instance
+2. Navigate to Explore
+3. Select the `grafanacloud-mjanv-logs` datasource
+
+Common LogQL queries:
+
+```logql
+{app="premiere-ecoute"}                          # all logs
+{app="premiere-ecoute", detected_level="error"}  # errors only
+{app="premiere-ecoute"} |= "request_id"          # HTTP requests
+{app="premiere-ecoute"} |= "exception"           # exceptions
+```
+
+The `detected_level` label is auto-populated by Loki from the log line content (`[info]`, `[error]`, etc.).
 
 ## Database Operations
 
