@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Schemas.Wantlist do
+  @moduledoc false
+
   require OpenApiSpex
 
   OpenApiSpex.schema(%{

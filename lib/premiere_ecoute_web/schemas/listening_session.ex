@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Schemas.ListeningSession do
+  @moduledoc false
+
   require OpenApiSpex
 
   OpenApiSpex.schema(%{

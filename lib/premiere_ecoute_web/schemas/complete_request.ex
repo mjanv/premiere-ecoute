@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Schemas.CompleteRequest do
+  @moduledoc false
+
   require OpenApiSpex
 
   OpenApiSpex.schema(%{

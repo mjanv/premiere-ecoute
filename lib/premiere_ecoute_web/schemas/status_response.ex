@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Schemas.StatusResponse do
+  @moduledoc false
+
   require OpenApiSpex
 
   OpenApiSpex.schema(%{

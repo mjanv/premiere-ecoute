@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Schemas.Profile do
+  @moduledoc false
+
   require OpenApiSpex
 
   OpenApiSpex.schema(%{

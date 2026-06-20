@@ -1,4 +1,6 @@
 defmodule PremiereEcouteWeb.Schemas.CollectionVoteRequest do
+  @moduledoc false
+
   require OpenApiSpex
 
   OpenApiSpex.schema(%{
