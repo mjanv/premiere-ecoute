@@ -1,6 +1,31 @@
 # Changelog
 
-<!-- Last analyzed commit: c0675e9 (2026-05-01) -->
+<!-- Last analyzed commit: c3e04540 (2026-05-30) -->
+
+## May 2026
+
+* [Feature] Session notes: take freeform notes during a listening session via a keyboard-driven HUD (Tab to toggle, Enter to save) — notes are automatically linked to the track playing at the time and grouped into pre/during/post-session sections.
+* [Feature] Session reminder: save a persistent checklist or talking-point text in account settings, then press R during any session to open it in a modal overlay without leaving the dashboard.
+* [Feature] Post-session voting: viewers who missed the live stream can now rate each track individually via a modal on the session page, as long as they haven't voted before.
+* [Feature] Playlist subscriptions: viewers can subscribe to a streamer's playlist and receive email or in-app notifications when it is updated; streamers trigger notifications manually or via playlist automations.
+* [Feature] Twitch channel point rewards: create, list, update, and delete custom channel point rewards and handle real-time redemption events via EventSub webhooks — including a built-in reward catalog with locale-aware presets (song request, skip track).
+* [Feature] Image proxy: cover art from music provider CDNs is now cached server-side and served through a local proxy endpoint, reducing external requests and enabling long-lived browser caching.
+* [Feature] Admin broadcast dashboard: admins can send chat messages or highlighted announcements to one or all streamer channels via the PremiereEcouteBot, with a live delivery log.
+* [Feature] Discography enrichment from playlists: scanning a library playlist (e.g., New Music Friday) now schedules full discography enrichment for any new artists or albums found — triggerable manually from the playlist page or via automations.
+* [Feature] Daily radio-to-discography sync: a nightly cron job automatically enriches the discography with artists and albums discovered from the previous day's radio tracks across all streamers.
+* [Feature] Explicit content badges: albums and tracks flagged as explicit in Spotify now show an "E" badge in the session creation UI.
+* [Feature] Wantlist REST API: authenticated API endpoints to fetch the user's wantlist, save the currently playing track, and remove items — enabling Stream Deck and browser extension integrations.
+* [Feature] Collection session REST API: programmatic control of collection session lifecycle (start, open/close vote windows, decide track, complete session) and binary voting via API, for Stream Deck control.
+* [Feature] Configurable YouTube title template: set a show name and title format in account settings (e.g. `{show_name} | {artist} – {title} | {score}`) and preview it live before exporting.
+* [Improvement] Viewer home page redesigned with per-streamer cards consolidating radio, playlists, and recent sessions — with a "My last sessions" carousel at the top and a cleaner playlist subscription modal.
+* [Improvement] Discography enrichment now triggers when a track is kept in a collection session, mirroring the behavior already in place for wantlist and radio saves.
+* [Improvement] Session summary link sent to Twitch chat 20 seconds after a session ends, so viewers can find the retrospective without searching.
+* [Improvement] Premiere Pro export time bias slider now includes ±10ms and ±100ms fine-tuning buttons with live timestamp preview, and the range is extended to 10 minutes.
+* [Improvement] Premiere Pro export gains 50fps, 59.94fps, and 60fps frame rate options for European broadcasting, NTSC gaming streams, and PC/mobile recordings.
+* [Improvement] SwaggerUI shows only the API endpoints relevant to the authenticated user's role (streamer, viewer, or admin).
+* [Fix] Duel reminder sound now plays on every trigger — previously it silently failed on repeat triggers due to a LiveView diff optimization.
+* [Fix] Stopping a session no longer crashes when Spotify fails to return the active device list, ensuring the summary link is always sent to chat.
+* [Fix] Image proxy cache is now stored outside the deployment directory so it survives rsync deploys without causing 500 errors.
 
 ## April 2026
 
