@@ -55,7 +55,13 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
   end
 
   @impl true
-  def handle_params(_params, _url, socket), do: {:noreply, socket}
+  def handle_params(_params, _url, socket) do
+    # user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
+    # album = socket.assigns.album
+    # if user && connected?(socket), do: PremiereEcoute.Analytics.Tracking.album_viewed(user, album)
+
+    {:noreply, socket}
+  end
 
   @impl true
   def handle_event("open_review_modal", _params, socket) do

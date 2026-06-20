@@ -210,6 +210,9 @@ defmodule PremiereEcouteWeb.Layouts do
     end
   end
 
+  @spec posthog_api_key() :: String.t() | nil
+  def posthog_api_key, do: Application.get_env(:posthog, :api_key)
+
   @doc """
   Shows the flash group with standard titles and content.
 

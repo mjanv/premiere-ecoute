@@ -202,6 +202,11 @@ config :tailwind,
     cd: Path.expand("../assets", __DIR__)
   ]
 
+config :posthog,
+  api_url: "https://eu.i.posthog.com",
+  api_key: System.get_env("POSTHOG_API_KEY"),
+  test_mode: config_env() in [:test]
+
 config :sentry,
   environment_name: Mix.env(),
   enable_source_code_context: true,

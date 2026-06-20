@@ -71,6 +71,8 @@ config :instructor,
 
 config :sentry, dsn: env!("SENTRY_DSN")
 
+config :posthog, api_key: env!("POSTHOG_API_KEY", :string, nil)
+
 if config_env() == :prod do
   # config :premiere_ecoute, :dns_cluster_query, env!("DNS_CLUSTER_QUERY")
 
