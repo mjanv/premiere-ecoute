@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17.6
+    image: postgres:18.4
     container_name: postgres
     environment:
       POSTGRES_DB: premiere_ecoute
@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
 
   seaweedfs:
     image: chrislusf/seaweedfs:4.33

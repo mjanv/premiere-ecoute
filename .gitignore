@@ -36,6 +36,7 @@ phx_new_cache-*.tar
 *.db-shm
 *.db-wal
 *.sql
+*.sql.gz
 
 # Environment files
 .env
