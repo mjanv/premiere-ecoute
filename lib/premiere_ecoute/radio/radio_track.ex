@@ -113,18 +113,35 @@ defmodule PremiereEcoute.Radio.RadioTrack do
       [%RadioTrack{}, ...]
 
   """
-  @spec for_date(integer(), Date.t()) :: [t()]
-  def for_date(user_id, date) do
-    start = DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
-    stop = DateTime.new!(date, ~T[23:59:59], "Etc/UTC")
+  @spec for_date(integer(), Date.t(), keyword()) :: [t()]
+  def for_date(user_id, date, filters \\ []), do: for_range(user_id, date, date, filters)
+
+  @spec for_range(integer(), Date.t(), Date.t(), keyword()) :: [t()]
+  def for_range(user_id, date_from, date_to, filters \\ []) do
+    start = DateTime.new!(date_from, ~T[00:00:00], "Etc/UTC")
+    stop = DateTime.new!(date_to, ~T[23:59:59], "Etc/UTC")
 
     from(t in __MODULE__,
       where: t.user_id == ^user_id,
       where: t.started_at >= ^start and t.started_at <= ^stop,
       order_by: [asc: t.started_at]
     )
+    |> maybe_filter_name(filters[:name])
+    |> maybe_filter_artist(filters[:artist])
+    |> maybe_filter_spotify_id(filters[:spotify_id])
     |> Repo.all()
   end
+
+  defp maybe_filter_name(query, nil), do: query
+  defp maybe_filter_name(query, name), do: where(query, [t], ilike(t.name, ^"%#{name}%"))
+
+  defp maybe_filter_artist(query, nil), do: query
+  defp maybe_filter_artist(query, artist), do: where(query, [t], ilike(t.artist, ^"%#{artist}%"))
+
+  defp maybe_filter_spotify_id(query, nil), do: query
+
+  defp maybe_filter_spotify_id(query, id),
+    do: where(query, [t], fragment("?->>'spotify' = ?", t.provider_ids, ^id))
 
   @doc """
   Returns distinct provider track IDs played across all users on the given date.

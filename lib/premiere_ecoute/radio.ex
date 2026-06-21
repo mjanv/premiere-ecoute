@@ -13,7 +13,8 @@ defmodule PremiereEcoute.Radio do
   defdelegate get_track(track_id), to: RadioTrack, as: :get
   defdelegate last_tracks(user_id, limit \\ 10), to: RadioTrack, as: :last_tracks
   defdelegate add_provider(track, new_ids), to: RadioTrack, as: :update_provider_ids
-  defdelegate get_tracks(user_id, date), to: RadioTrack, as: :for_date
+  def get_tracks(user_id, date, filters \\ []), do: RadioTrack.for_date(user_id, date, filters)
+  def get_tracks_range(user_id, date_from, date_to, filters \\ []), do: RadioTrack.for_range(user_id, date_from, date_to, filters)
   defdelegate delete_tracks_before(user_id, cutoff_datetime), to: RadioTrack, as: :delete_before
 
   # Services
