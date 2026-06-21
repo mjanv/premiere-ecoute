@@ -164,4 +164,21 @@ defmodule PremiereEcoute.Discography.Artist do
     |> limit(1)
     |> Repo.one()
   end
+
+  @doc "Searches artists by name using case-insensitive fuzzy matching."
+  @spec search(String.t()) :: [t()]
+  def search(term) do
+    pattern = "%#{term}%"
+
+    __MODULE__
+    |> where([a], ilike(a.name, ^pattern))
+    |> order_by([a], asc: a.name)
+    |> Repo.all()
+  end
+end
+
+defimpl JSON.Encoder, for: PremiereEcoute.Discography.Artist do
+  def encode(artist, encoder) do
+    JSON.Encoder.Map.encode(Map.take(artist, [:id, :name, :slug]), encoder)
+  end
 end

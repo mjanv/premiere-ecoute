@@ -219,6 +219,21 @@ defmodule PremiereEcoute.Discography.Album do
     |> Enum.map(&put_artist/1)
   end
 
+  @doc "Searches albums by album name or artist name using case-insensitive fuzzy matching."
+  @spec search(String.t()) :: [t()]
+  def search(term) do
+    pattern = "%#{term}%"
+
+    __MODULE__
+    |> join(:left, [a], ar in assoc(a, :artists), as: :artist)
+    |> where([a, artist: ar], ilike(a.name, ^pattern) or ilike(ar.name, ^pattern))
+    |> distinct(true)
+    |> order_by([a], asc: a.name)
+    |> preload([:artists])
+    |> Repo.all()
+    |> Enum.map(&put_artist/1)
+  end
+
   @doc "Fetches paginated albums for admin, optionally filtered by album name or artist name."
   @spec list_for_admin(String.t(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
   def list_for_admin(search \\ "", page_number, page_size) do

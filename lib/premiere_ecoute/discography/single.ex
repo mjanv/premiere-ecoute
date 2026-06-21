@@ -137,6 +137,21 @@ defmodule PremiereEcoute.Discography.Single do
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 
+  @doc "Searches singles by name or artist name using case-insensitive fuzzy matching."
+  @spec search(String.t()) :: [t()]
+  def search(term) do
+    pattern = "%#{term}%"
+
+    __MODULE__
+    |> join(:left, [s], ar in assoc(s, :artists), as: :artist)
+    |> where([s, artist: ar], ilike(s.name, ^pattern) or ilike(ar.name, ^pattern))
+    |> distinct(true)
+    |> order_by([s], asc: s.name)
+    |> preload([:artists])
+    |> Repo.all()
+    |> Enum.map(&put_artist/1)
+  end
+
   defimpl Jason.Encoder do
     def encode(single, opts) do
       single

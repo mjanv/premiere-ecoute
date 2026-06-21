@@ -2,7 +2,10 @@
   "mcpServers": {
     "premiere-ecoute": {
       "type": "http",
-      "url": "https://premiere-ecoute.fr/mcp"
+      "url": "http://localhost:4000/mcp",
+      "headers": {
+        "x-api-key": "M-Br8k9wGVzzoReGtxWuFq02LO5YmLVEzLkKnng9coQ"
+      }
     },
     "tidewave": {
       "type": "http",
