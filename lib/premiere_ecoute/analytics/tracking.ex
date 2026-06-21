@@ -12,7 +12,7 @@ defmodule PremiereEcoute.Analytics.Tracking do
   end
 
   defp capture(event, user_id, properties) do
-    PostHog.capture(event, [distinct_id: user_id] ++ properties, [])
+    PostHog.capture(event, Map.new([{:distinct_id, user_id} | properties]))
     :ok
   end
 end

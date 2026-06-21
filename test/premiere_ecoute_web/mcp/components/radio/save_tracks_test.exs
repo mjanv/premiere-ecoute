@@ -20,7 +20,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.Radio.SaveTracksTest do
     user
   end
 
-  defp insert_radio_track(user, attrs \\ %{}) do
+  defp insert_radio_track(user, attrs) do
     defaults = %{
       user_id: user.id,
       name: "Track #{System.unique_integer([:positive])}",
