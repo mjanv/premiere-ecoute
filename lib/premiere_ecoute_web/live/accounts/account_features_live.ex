@@ -29,8 +29,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
        socket
        |> assign(current_user: current_user, profile_form: profile_form)
        |> assign(:streamer_features?, streamer_features?)
-       |> assign(:api_tokens, Accounts.list_user_api_tokens(current_user))
-       |> assign(:new_api_token, nil)
        |> assign(:overlay_score_type, "streamer")}
     end
   end
@@ -67,27 +65,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
         |> put_flash(:error, "Failed to save settings")
         |> then(fn socket -> {:noreply, socket} end)
     end
-  end
-
-  @impl true
-  def handle_event("generate_api_token", _params, socket) do
-    token = Accounts.generate_user_api_token(socket.assigns.current_user)
-    tokens = Accounts.list_user_api_tokens(socket.assigns.current_user)
-
-    socket
-    |> assign(:api_tokens, tokens)
-    |> assign(:new_api_token, token)
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  @impl true
-  def handle_event("revoke_api_tokens", _params, socket) do
-    Accounts.delete_user_api_tokens(socket.assigns.current_user)
-
-    socket
-    |> assign(:api_tokens, [])
-    |> assign(:new_api_token, nil)
-    |> then(fn socket -> {:noreply, socket} end)
   end
 
   defp overlay_url(username, "collections") do

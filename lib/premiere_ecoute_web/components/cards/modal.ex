@@ -62,7 +62,6 @@ defmodule PremiereEcouteWeb.Components.Modal do
     <div
       id={@id}
       class={[@backdrop_class, "fixed inset-0 items-center justify-center z-50 backdrop-blur-sm bg-black/50"]}
-      phx-click={cancel_event(@on_cancel)}
       {@rest}
     >
       <div

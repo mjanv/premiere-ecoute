@@ -30,6 +30,10 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
     |> assign(:show_delete_modal, false)
     |> assign(:profile_form, profile_form)
     |> assign(:timezones, PremiereEcouteCore.Timezone.list())
+    |> assign(:api_tokens, if(current_user, do: Accounts.list_user_api_tokens(current_user), else: []))
+    |> assign(:show_token_modal, false)
+    |> assign(:new_api_token, nil)
+    |> assign(:new_token_name, "")
     |> then(fn socket -> {:ok, socket} end)
   end
 
@@ -186,6 +190,56 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
             |> put_flash(:error, "Failed to update profile")
         end
     end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("show_token_modal", _params, socket) do
+    {:noreply, assign(socket, show_token_modal: true, new_api_token: nil, new_token_name: "")}
+  end
+
+  @impl true
+  def handle_event("hide_token_modal", _params, socket) do
+    {:noreply, assign(socket, show_token_modal: false, new_api_token: nil, new_token_name: "")}
+  end
+
+  @impl true
+  def handle_event("set_token_name", %{"name" => name}, socket) do
+    {:noreply, assign(socket, :new_token_name, name)}
+  end
+
+  @impl true
+  def handle_event("generate_api_token", params, socket) do
+    user = socket.assigns.current_user
+    name = (params["name"] || socket.assigns.new_token_name) |> String.trim() |> then(&if(&1 == "", do: nil, else: &1))
+    token = Accounts.generate_user_api_token(user, name)
+    tokens = Accounts.list_user_api_tokens(user)
+
+    socket
+    |> assign(:api_tokens, tokens)
+    |> assign(:new_api_token, token)
+    |> assign(:new_token_name, "")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("revoke_api_token", %{"id" => id}, socket) do
+    user = socket.assigns.current_user
+    Accounts.delete_user_api_token(user, String.to_integer(id))
+    tokens = Accounts.list_user_api_tokens(user)
+
+    socket
+    |> assign(:api_tokens, tokens)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("revoke_all_api_tokens", _params, socket) do
+    Accounts.delete_user_api_tokens(socket.assigns.current_user)
+
+    socket
+    |> assign(:api_tokens, [])
+    |> assign(:new_api_token, nil)
     |> then(fn socket -> {:noreply, socket} end)
   end
 

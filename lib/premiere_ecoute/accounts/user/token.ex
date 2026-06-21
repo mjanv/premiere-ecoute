@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Accounts.User.Token do
           id: integer() | nil,
           token: binary(),
           context: String.t(),
+          name: String.t() | nil,
           sent_to: String.t() | nil,
           authenticated_at: DateTime.t() | nil,
           user_id: integer(),
@@ -31,6 +32,7 @@ defmodule PremiereEcoute.Accounts.User.Token do
   schema "user_tokens" do
     field :token, :binary
     field :context, :string
+    field :name, :string
     field :sent_to, :string
     field :authenticated_at, :utc_datetime
 
@@ -251,11 +253,24 @@ defmodule PremiereEcoute.Accounts.User.Token do
   Returns the token as a URL-safe base64-encoded string (shown once at creation).
   The raw binary is stored in the database under context "api" with no expiry.
   """
-  @spec generate_user_api_token(User.t()) :: String.t()
-  def generate_user_api_token(user) do
+  @spec generate_user_api_token(User.t(), String.t() | nil) :: String.t()
+  def generate_user_api_token(user, name \\ nil) do
     token = :crypto.strong_rand_bytes(@rand_size)
-    Repo.insert!(%__MODULE__{token: token, context: "api", user_id: user.id})
+    Repo.insert!(%__MODULE__{token: token, context: "api", name: name, user_id: user.id})
     Base.url_encode64(token, padding: false)
+  end
+
+  @doc """
+  Deletes a single API token by id for the given user.
+  """
+  @spec delete_user_api_token(User.t(), integer()) :: :ok
+  def delete_user_api_token(user, token_id) do
+    Repo.delete_all(
+      from t in __MODULE__,
+        where: t.id == ^token_id and t.user_id == ^user.id and t.context == "api"
+    )
+
+    :ok
   end
 
   @doc """

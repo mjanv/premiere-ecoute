@@ -47,9 +47,10 @@ defmodule PremiereEcoute.Accounts do
   defdelegate edit_user_profile(user, attrs), to: User
 
   ## User Token
-  defdelegate generate_user_api_token(user), to: Token
+  defdelegate generate_user_api_token(user, name \\ nil), to: Token
   defdelegate get_user_by_api_token(token), to: Token
   defdelegate list_user_api_tokens(user), to: Token
+  defdelegate delete_user_api_token(user, token_id), to: Token
   defdelegate delete_user_api_tokens(user), to: Token
   defdelegate generate_user_session_token(user), to: Token
   defdelegate get_user_by_session_token(token), to: Token

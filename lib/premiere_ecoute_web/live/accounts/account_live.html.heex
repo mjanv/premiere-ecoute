@@ -185,6 +185,182 @@
           <% end %>
         </div>
       </div>
+
+      <%!-- API Tokens Section --%>
+      <div class="mt-12">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-700 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-3xl font-bold text-white">{gettext("API Tokens")}</h2>
+              <p class="text-gray-400">{gettext("Manage tokens for programmatic access")}</p>
+            </div>
+          </div>
+          <.button phx-click="show_token_modal" variant="primary" size="sm">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            {gettext("New token")}
+          </.button>
+        </div>
+
+        <div class="bg-gray-800/50 rounded-xl border border-gray-700/30 divide-y divide-gray-700/30">
+          <%!-- Endpoints header --%>
+          <div class="px-6 py-2">
+            <p class="text-gray-500 text-xs font-medium uppercase tracking-wide">{gettext("Endpoints")}</p>
+          </div>
+
+          <%!-- MCP server address --%>
+          <div class="flex items-center justify-between px-5 py-3 gap-3">
+            <p class="text-white text-sm font-medium shrink-0">MCP</p>
+            <div class="flex items-center gap-1.5 min-w-0">
+              <code class="text-amber-400 text-xs bg-gray-900/60 px-2 py-1 rounded font-mono truncate">
+                {PremiereEcouteWeb.Endpoint.url()}/mcp
+              </code>
+              <button
+                type="button"
+                onclick={"navigator.clipboard.writeText('#{PremiereEcouteWeb.Endpoint.url()}/mcp')"}
+                class="text-gray-500 hover:text-white transition-colors shrink-0"
+                title={gettext("Copy")}
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <%!-- API Documentation --%>
+          <div class="flex items-center justify-between px-5 py-3 gap-3">
+            <p class="text-white text-sm font-medium shrink-0">API</p>
+            <div class="flex items-center gap-1.5">
+              <.link
+                href={~p"/api/openapi"}
+                target="_blank"
+                class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded font-medium transition-colors"
+              >
+                OpenAPI
+              </.link>
+              <.link
+                href={~p"/api/swaggerui"}
+                target="_blank"
+                class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded font-medium transition-colors"
+              >
+                Swagger UI
+              </.link>
+            </div>
+          </div>
+
+          <%!-- Token list --%>
+          <div class="flex items-center justify-between px-6 py-2">
+            <p class="text-gray-500 text-xs font-medium uppercase tracking-wide">{gettext("Tokens")}</p>
+            <.button
+              :if={@api_tokens != []}
+              phx-click="revoke_all_api_tokens"
+              data-confirm={gettext("Revoke all API tokens? All clients will lose access.")}
+              variant="danger"
+              size="xs"
+            >
+              {gettext("Revoke all")}
+            </.button>
+          </div>
+          <%= if @api_tokens == [] do %>
+            <div class="px-6 py-5 text-center">
+              <p class="text-gray-500 text-sm">{gettext("No API tokens yet")}</p>
+            </div>
+          <% else %>
+            <div
+              :for={token <- @api_tokens}
+              class="flex items-center justify-between px-6 py-2"
+            >
+              <div class="flex items-center gap-2 min-w-0">
+                <p class="text-white text-sm font-medium truncate">
+                  {token.name || gettext("Unnamed token")}
+                </p>
+                <span class="text-gray-600 shrink-0">·</span>
+                <p class="text-gray-500 text-xs shrink-0">
+                  {Calendar.strftime(token.inserted_at, "%B %d, %Y")}
+                </p>
+              </div>
+              <.button
+                phx-click="revoke_api_token"
+                phx-value-id={token.id}
+                data-confirm={gettext("Revoke this token? Any client using it will lose access.")}
+                variant="danger"
+                size="xs"
+              >
+                {gettext("Revoke")}
+              </.button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%!-- New token modal — form step --%>
+      <%= if @show_token_modal and is_nil(@new_api_token) do %>
+        <.modal id="token-modal" show on_cancel="hide_token_modal" size="sm">
+          <:header>{gettext("New API token")}</:header>
+          <p class="text-sm text-base-content/70 mb-3">
+            {gettext("Give your token a name to identify where it's used.")}
+          </p>
+          <form phx-submit="generate_api_token" phx-change="set_token_name" id="token-form">
+            <input
+              type="text"
+              name="name"
+              value={@new_token_name}
+              placeholder={gettext("e.g. Stream Deck, Home server…")}
+              maxlength="64"
+              autofocus
+              class="input input-bordered w-full text-sm"
+            />
+          </form>
+          <:footer>
+            <.button phx-click="hide_token_modal" type="button">{gettext("Cancel")}</.button>
+            <%!-- AIDEV-NOTE: plain <button> needed here — <.button> doesn't forward the `form` attr via :global --%>
+            <button type="submit" form="token-form" class="btn btn-primary">
+              {gettext("Generate")}
+            </button>
+          </:footer>
+        </.modal>
+      <% end %>
+
+      <%!-- New token modal — reveal step --%>
+      <%= if @show_token_modal and not is_nil(@new_api_token) do %>
+        <.modal id="token-reveal-modal" show on_cancel="hide_token_modal" size="sm">
+          <:header>{gettext("Token created")}</:header>
+          <p class="text-sm text-base-content/70 mb-3">
+            {gettext("Copy this token now — it won't be shown again")}
+          </p>
+          <div class="flex items-center gap-2 p-3 rounded-lg bg-base-300 border border-base-content/10">
+            <code class="text-base-content text-xs break-all flex-1 font-mono">{@new_api_token}</code>
+            <button
+              type="button"
+              onclick={"navigator.clipboard.writeText('#{@new_api_token}')"}
+              class="text-base-content/50 hover:text-base-content transition-colors shrink-0"
+              title={gettext("Copy")}
+            >
+              <.icon name="hero-clipboard-document" class="w-4 h-4" />
+            </button>
+          </div>
+          <:footer>
+            <.button phx-click="hide_token_modal">{gettext("Done")}</.button>
+          </:footer>
+        </.modal>
+      <% end %>
       
 <!-- APIs Section -->
       <div class="mt-12">
