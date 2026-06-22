@@ -85,6 +85,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:browser]
 
     get "/health", HealthController, :index
+    get "/health/spotify", HealthController, :spotify
     get "/img", Images.ImageProxyController, :show
     oban_dashboard("/oban", resolver: PremiereEcouteWeb.ObanResolver)
 
