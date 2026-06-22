@@ -1,8 +1,8 @@
 defmodule PremiereEcoute.Apis.Players.PlaybackState do
   @moduledoc """
-  Caches playback state for Spotify.
+  Typed representation of Spotify playback state.
 
-  Stores playback state with a configurable TTL per user (broadcaster).
+  Caches playback state for Spotify with a configurable TTL per user (broadcaster).
   """
 
   alias PremiereEcoute.Accounts.Scope
@@ -11,6 +11,35 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
 
   @cache :playback
   @default_ttl 60_000
+
+  defstruct [:is_playing, :progress_ms, :device, :item]
+
+  @type device :: %{name: String.t(), is_active: boolean()}
+  @type item :: %{
+          uri: String.t(),
+          name: String.t(),
+          duration_ms: pos_integer(),
+          artists: [%{name: String.t()}],
+          type: :album | :single
+        }
+
+  @type t :: %__MODULE__{
+          is_playing: boolean(),
+          progress_ms: non_neg_integer(),
+          device: device() | nil,
+          item: item() | nil
+        }
+
+  @doc "Converts raw Spotify API JSON map to a PlaybackState struct."
+  @spec from_json(map()) :: t()
+  def from_json(json) do
+    %__MODULE__{
+      is_playing: json["is_playing"],
+      progress_ms: json["progress_ms"],
+      device: convert_device(json["device"]),
+      item: convert_item(json["item"])
+    }
+  end
 
   @doc """
   Gets playback state from cache or fetches fresh if expired/missing.
@@ -27,6 +56,24 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
       _ -> {:ok, old_state}
     end
   end
+
+  defp convert_device(nil), do: nil
+  defp convert_device(%{"name" => name, "is_active" => is_active}), do: %{name: name, is_active: is_active}
+
+  defp convert_item(nil), do: nil
+
+  defp convert_item(item) do
+    %{
+      uri: item["uri"],
+      name: item["name"],
+      duration_ms: item["duration_ms"],
+      artists: Enum.map(item["artists"] || [], fn a -> %{name: a["name"]} end),
+      type: item |> get_in(["album", "album_type"]) |> parse_type()
+    }
+  end
+
+  defp parse_type("single"), do: :single
+  defp parse_type(_), do: :album
 
   defp ttl(%{"item" => %{"duration_ms" => duration_ms}, "progress_ms" => progress_ms})
        when is_integer(duration_ms) and is_integer(progress_ms) do
