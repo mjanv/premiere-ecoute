@@ -38,6 +38,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     """
 
     alias PremiereEcoute.Accounts.Scope
+    alias PremiereEcoute.Apis.Players.PlaybackState
     alias PremiereEcoute.Discography.Album
     alias PremiereEcoute.Discography.Album.Track
     alias PremiereEcoute.Discography.Artist
@@ -57,7 +58,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
 
     # Player
     @callback devices(scope :: Scope.t()) :: any()
-    @callback get_playback_state(scope :: Scope.t(), state :: map()) :: {:ok, map()} | {:error, term()}
+    @callback get_playback_state(scope :: Scope.t(), state :: PlaybackState.t()) :: {:ok, PlaybackState.t()} | {:error, term()}
     @callback start_playback(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
     @callback pause_playback(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}
     @callback next_track(scope :: Scope.t()) :: {:ok, atom()} | {:error, term()}

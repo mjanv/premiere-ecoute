@@ -2,19 +2,19 @@ defmodule PremiereEcoute.ExtensionTest do
   use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Extension
   alias PremiereEcouteCore.Cache
 
   setup_all do
     start_supervised({Cache, name: :playback})
-
     :ok
   end
 
   describe "get_current_track/1" do
     setup do
       Cache.clear(:playback)
-      stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
       :ok
     end
 
@@ -27,18 +27,19 @@ defmodule PremiereEcoute.ExtensionTest do
 
       broadcaster_id = user.twitch.user_id
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
+      expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
         {:ok,
-         %{
-           "is_playing" => true,
-           "item" => %{
-             "id" => "track_123",
-             "name" => "Test Song",
-             "artists" => [%{"name" => "Test Artist"}],
-             "album" => %{"name" => "Test Album"},
-             "track_number" => 1,
-             "duration_ms" => 180_000,
-             "preview_url" => nil
+         %PlaybackState{
+           is_playing: true,
+           progress_ms: 0,
+           item: %{
+             uri: "spotify:track:track_123",
+             name: "Test Song",
+             duration_ms: 180_000,
+             artists: [%{name: "Test Artist"}],
+             type: :album,
+             track_number: nil,
+             album: nil
            }
          }}
       end)

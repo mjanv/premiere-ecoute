@@ -18,6 +18,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player, as: SpotifyPlayer
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Collections
   alias PremiereEcoute.Collections.CollectionSession
@@ -71,7 +72,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
       |> assign(:countdown, nil)
       |> assign(:next_duel_at, next_duel_at)
       |> assign(:duel_countdown_secs, next_duel_at && max(0, DateTime.diff(next_duel_at, DateTime.utc_now(), :second)))
-      |> assign(:player_state, if(session.status == :active, do: SpotifyPlayer.default(), else: nil))
+      |> assign(:player_state, if(session.status == :active, do: PlaybackState.default(), else: nil))
       |> assign(:playing_track_id, nil)
       |> assign(:hide_decided, false)
       |> assign(:show_end_modal, false)
@@ -213,8 +214,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   @impl true
   def handle_info({:player, :start_track, state}, socket) do
-    track_uri = get_in(state, ["item", "uri"])
-    track_id = track_uri && String.replace(track_uri, "spotify:track:", "")
+    track_id = state.item && String.replace_prefix(state.item.uri || "", "spotify:track:", "")
     {:noreply, assign(socket, player_state: state, playing_track_id: track_id)}
   end
 
@@ -259,7 +259,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
            tracks: tracks,
            original_tracks: tracks,
            rewards: rewards,
-           player_state: SpotifyPlayer.default()
+           player_state: PlaybackState.default()
          )}
 
       {:error, reason} ->

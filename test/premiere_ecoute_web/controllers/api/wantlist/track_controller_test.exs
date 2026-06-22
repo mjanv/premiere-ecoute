@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackControllerTest do
   use PremiereEcouteWeb.ApiCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcouteWeb.Api.Wantlist.TrackController
 
   setup_mock(PremiereEcoute.Wantlists)
@@ -16,13 +17,29 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackControllerTest do
     :ok
   end
 
+  defp playing(id) do
+    %PlaybackState{
+      is_playing: true,
+      progress_ms: 0,
+      item: %{
+        uri: "spotify:track:#{id}",
+        name: "Some Track",
+        duration_ms: 180_000,
+        artists: [%{name: "Artist"}],
+        type: :album,
+        track_number: nil,
+        album: nil
+      }
+    }
+  end
+
   describe "POST /api/wantlist/tracks/current" do
     test "saves the currently playing track to the wantlist", %{conn: conn} do
       broadcaster = user_fixture(%{role: :streamer, twitch: %{user_id: "broadcaster123"}})
       viewer = user_fixture(%{role: :viewer})
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
-        {:ok, %{"item" => %{"id" => "spotify123", "name" => "Some Track", "artists" => [%{"name" => "Artist"}]}}}
+      expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
+        {:ok, playing("spotify123")}
       end)
 
       expect(PremiereEcoute.Wantlists.Mock, :add_radio_track, fn user_id, spotify_id ->
@@ -59,8 +76,8 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackControllerTest do
       broadcaster = user_fixture(%{role: :streamer, twitch: %{user_id: "broadcaster123"}})
       viewer = user_fixture(%{role: :viewer})
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
-        {:ok, %{}}
+      expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
+        {:ok, PlaybackState.default()}
       end)
 
       conn
@@ -73,8 +90,8 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackControllerTest do
       broadcaster = user_fixture(%{role: :streamer, twitch: %{user_id: "broadcaster123"}})
       viewer = user_fixture(%{role: :viewer})
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
-        {:ok, %{"item" => %{"id" => "spotify123", "name" => "Some Track", "artists" => []}}}
+      expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
+        {:ok, playing("spotify123")}
       end)
 
       expect(PremiereEcoute.Wantlists.Mock, :add_radio_track, fn _user_id, _spotify_id ->

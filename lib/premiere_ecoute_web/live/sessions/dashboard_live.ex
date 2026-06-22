@@ -541,8 +541,8 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
         %{assigns: %{listening_session: %ListeningSession{status: :active, source: source}, current_scope: scope}} = socket
       )
       when source != :free do
-    # AIDEV-NOTE: state["item"] is nil between tracks — guard before accessing duration_ms.
-    duration_ms = get_in(state, ["item", "duration_ms"])
+    # AIDEV-NOTE: state.item is nil between tracks — guard before accessing duration_ms.
+    duration_ms = state.item && state.item.duration_ms
 
     if is_integer(duration_ms) and duration_ms >= 60_000 do
       threshold = round(100 * (1 - 30_000 / duration_ms))

@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Presence
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
@@ -39,11 +40,11 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
     with {:ok, phx_ref} <- Presence.join(scope.user.id, :player),
          :ok <- PremiereEcoute.PubSub.subscribe("player:#{scope.user.id}"),
-         {:ok, state} <- Apis.spotify().get_playback_state(scope, %{}) do
+         {:ok, state} <- Apis.spotify().get_playback_state(scope, PlaybackState.default()) do
       {:ok, %{phx_ref: phx_ref, scope: scope, state: state, polls: @polls}}
     else
       {:error, reason} ->
-        publish(scope, {:error, reason}, %{})
+        publish(scope, {:error, reason}, PlaybackState.default())
         {:stop, {:error, reason}}
     end
   end
@@ -91,11 +92,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   Returns playback progress percentage (0-100) from current position and total track duration in playback state.
   """
-  @spec progress(map()) :: integer()
-  def progress(state) do
-    duration_ms = state["item"]["duration_ms"]
-    progress_ms = state["progress_ms"]
-
+  @spec progress(PlaybackState.t()) :: integer()
+  def progress(%PlaybackState{item: %{duration_ms: duration_ms}, progress_ms: progress_ms}) do
     if duration_ms - progress_ms <= @poll_interval do
       100
     else
@@ -108,14 +106,14 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   Compares old and new playback states to identify transitions (play/pause, track changes, progress updates) and returns the new state with corresponding event list.
   """
-  @spec handle(map(), map()) :: {:ok, map(), list()}
-  def handle(old_state, new_state) when old_state == %{}, do: {:ok, new_state, []}
-  def handle(%{"device" => nil}, new_state), do: {:ok, new_state, []}
-  def handle(_old_state, %{"device" => nil} = new_state), do: {:ok, new_state, [:no_device]}
-  def handle(%{"is_playing" => false}, %{"is_playing" => true} = state), do: {:ok, state, [:start]}
-  def handle(%{"is_playing" => true}, %{"is_playing" => false} = state), do: {:ok, state, [:stop]}
+  @spec handle(PlaybackState.t(), PlaybackState.t()) :: {:ok, PlaybackState.t(), list()}
+  def handle(old_state, new_state) when old_state == %PlaybackState{}, do: {:ok, new_state, []}
+  def handle(%PlaybackState{device: nil}, new_state), do: {:ok, new_state, []}
+  def handle(_old_state, %PlaybackState{device: nil} = new_state), do: {:ok, new_state, [:no_device]}
+  def handle(%PlaybackState{is_playing: false}, %PlaybackState{is_playing: true} = state), do: {:ok, state, [:start]}
+  def handle(%PlaybackState{is_playing: true}, %PlaybackState{is_playing: false} = state), do: {:ok, state, [:stop]}
 
-  def handle(%{"item" => %{"uri" => uri1}}, %{"item" => %{"uri" => uri2}} = state) when uri1 != uri2,
+  def handle(%PlaybackState{item: %{uri: uri1}}, %PlaybackState{item: %{uri: uri2}} = state) when uri1 != uri2,
     do: {:ok, state, [:new_track]}
 
   def handle(old_state, new_state) do

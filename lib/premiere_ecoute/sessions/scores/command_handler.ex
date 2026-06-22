@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Commands.Chat.SendChatCommand
   alias PremiereEcoute.Gettext
   alias PremiereEcoute.Notifications
@@ -52,9 +53,9 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandler do
     with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_id),
          scope <- Scope.for_user(broadcaster),
          true <- Accounts.profile(broadcaster, [:chat_settings, :save_wantlist], false),
-         {:ok, %{"item" => %{"id" => id, "name" => name} = item}} when not is_nil(id) <-
-           Apis.cache(:spotify).get_playback_state(scope, %{}) do
-      artist_name = item |> Map.get("artists", []) |> Enum.map_join(", ", & &1["name"])
+         {:ok, %PlaybackState{item: %{uri: "spotify:track:" <> id, name: name, artists: artists}}} when not is_nil(id) <-
+           Apis.cache(:spotify).get_playback_state(scope, PlaybackState.default()) do
+      artist_name = Enum.map_join(artists, ", ", & &1.name)
 
       case Accounts.get_user_by_twitch_id(viewer_twitch_id) do
         nil ->

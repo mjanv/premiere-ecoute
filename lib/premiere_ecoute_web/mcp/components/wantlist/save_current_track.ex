@@ -7,6 +7,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrack do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Wantlists
 
   schema do
@@ -27,6 +28,6 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrack do
     end
   end
 
-  defp current_track_id(%{"item" => %{"id" => id}}) when not is_nil(id), do: {:ok, id}
+  defp current_track_id(%PlaybackState{item: %{uri: "spotify:track:" <> id}}), do: {:ok, id}
   defp current_track_id(_), do: :no_track
 end

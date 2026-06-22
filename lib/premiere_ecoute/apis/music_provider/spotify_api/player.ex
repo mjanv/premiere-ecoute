@@ -7,6 +7,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Playlist
@@ -191,7 +192,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
 
   Returns playback information including playing status, current track, device, and position. Falls back to provided state or default on errors.
   """
-  @spec get_playback_state(Scope.t(), map()) :: {:ok, map()} | {:error, String.t()}
+  @spec get_playback_state(Scope.t(), PlaybackState.t()) :: {:ok, PlaybackState.t()} | {:error, String.t()}
   def get_playback_state(%Scope{} = scope, state) do
     scope
     |> SpotifyApi.api()
@@ -200,10 +201,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
     |> Req.get()
     |> case do
       {:ok, %{status: 200, body: body}} ->
-        {:ok, body}
+        {:ok, PlaybackState.from_json(body)}
 
       {:ok, %{status: 204}} ->
-        {:ok, if(state == %{}, do: default(), else: state)}
+        {:ok, if(state == PlaybackState.default(), do: PlaybackState.default(), else: state)}
 
       {:ok, %{status: 400}} ->
         {:ok, state}
@@ -214,7 +215,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
 
       {:ok, %{status: 502, body: body}} ->
         Logger.warning("Spotify get playback state failed with status 502: #{inspect(body)}")
-        {:ok, if(state == %{}, do: default(), else: state)}
+        {:ok, if(state == PlaybackState.default(), do: PlaybackState.default(), else: state)}
 
       {:ok, %{status: status, body: body}} ->
         Logger.error("Spotify get playback state failed with status #{status}: #{inspect(body)}")
@@ -225,10 +226,6 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
         {:error, "Network error during playback state"}
     end
   end
-
-  @doc "Returns default playback state when no active playback exists"
-  @spec default :: map()
-  def default, do: %{"is_playing" => false, "item" => %{"duration_ms" => 1}, "device" => nil, "progress_ms" => 0}
 
   @doc """
   Starts or resumes playback of album, track, or playlist.

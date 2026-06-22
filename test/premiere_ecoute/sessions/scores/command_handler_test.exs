@@ -9,6 +9,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
   alias PremiereEcouteCore.CommandBus
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
 
   setup_all do
@@ -336,9 +337,18 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
         single_fixture(%{provider_ids: %{spotify: "spotify_track_123"}})
         |> Single.create_if_not_exists()
 
-      playback_state = %{
-        "item" => %{"id" => "spotify_track_123", "name" => "Awesome Song", "artists" => [%{"name" => "Daft Punk"}]},
-        "is_playing" => true
+      playback_state = %PlaybackState{
+        is_playing: true,
+        progress_ms: 0,
+        item: %{
+          uri: "spotify:track:spotify_track_123",
+          name: "Awesome Song",
+          duration_ms: 180_000,
+          artists: [%{name: "Daft Punk"}],
+          type: :album,
+          track_number: nil,
+          album: nil
+        }
       }
 
       {:ok,
@@ -464,7 +474,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
           "chat_settings" => %{"save_wantlist" => true}
         })
 
-      Cache.put(:playback, broadcaster.id, %{"item" => nil, "is_playing" => false})
+      Cache.put(:playback, broadcaster.id, %PlaybackState{is_playing: false, item: nil})
 
       command = %SendChatCommand{
         broadcaster_id: "1971641",

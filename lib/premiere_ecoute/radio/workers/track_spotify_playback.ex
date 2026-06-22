@@ -17,7 +17,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Repo
 
@@ -45,7 +45,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
     with user <- user_id |> Accounts.User.get!() |> Repo.preload(:spotify),
          scope <- Accounts.maybe_renew_token(Scope.for_user(user), :spotify),
          {:enabled?, true} <- {:enabled?, Accounts.profile(user, [:radio_settings, :enabled], false)},
-         {:ok, playback} <- Apis.cache(:spotify).get_playback_state(scope, Player.default()),
+         {:ok, playback} <- Apis.cache(:spotify).get_playback_state(scope, PlaybackState.default()),
          {:ok, _track} <- store_track_if_new(user_id, playback),
          :ok <- schedule_next_poll(user_id, playback) do
       :ok
@@ -75,29 +75,29 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
     end
   end
 
-  defp store_track_if_new(_user_id, %{"item" => nil}), do: {:error, :no_track_playing}
+  defp store_track_if_new(_user_id, %PlaybackState{item: nil}), do: {:error, :no_track_playing}
 
-  defp store_track_if_new(user_id, %{"item" => %{"id" => provider_id}} = playback) do
+  defp store_track_if_new(user_id, %PlaybackState{item: %{uri: "spotify:track:" <> provider_id} = item, progress_ms: progress_ms}) do
     started_at =
-      case playback["progress_ms"] do
+      case progress_ms do
         ms when is_integer(ms) -> DateTime.add(DateTime.utc_now(), -ms, :millisecond)
         _ -> DateTime.utc_now()
       end
 
     Radio.insert_track(user_id, "spotify", %{
       provider_ids: %{spotify: provider_id},
-      name: get_in(playback, ["item", "name"]),
-      artist: get_in(playback, ["item", "artists"]) |> List.first() |> Map.get("name"),
-      album: get_in(playback, ["item", "album", "name"]),
-      duration_ms: get_in(playback, ["item", "duration_ms"]),
+      name: item.name,
+      artist: item.artists |> List.first() |> then(&(&1 && Map.get(&1, :name))),
+      album: nil,
+      duration_ms: item.duration_ms,
       started_at: started_at
     })
   end
 
-  defp schedule_next_poll(user_id, playback \\ %{}) do
+  defp schedule_next_poll(user_id, playback \\ %PlaybackState{}) do
     delay_s =
       case playback do
-        %{"progress_ms" => progress_ms, "item" => %{"duration_ms" => duration_ms}} ->
+        %PlaybackState{progress_ms: progress_ms, item: %{duration_ms: duration_ms}} when not is_nil(progress_ms) ->
           div(duration_ms - progress_ms + 30_000, 1000)
 
         _ ->

@@ -2,6 +2,7 @@ defmodule PremiereEcouteWeb.Api.Extension.WidgetControllerTest do
   use PremiereEcouteWeb.ConnCase, async: false
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcouteCore.Cache
 
   @test_secret "test_secret_key_for_twitch_extension"
@@ -31,16 +32,17 @@ defmodule PremiereEcouteWeb.Api.Extension.WidgetControllerTest do
 
       Mox.expect(SpotifyApi.Mock, :get_playback_state, fn _scope, _state ->
         {:ok,
-         %{
-           "is_playing" => true,
-           "item" => %{
-             "id" => "4HCcvFdHfwR2u3WPPPVRv6",
-             "name" => "Test Song",
-             "artists" => [%{"name" => "Test Artist"}],
-             "album" => %{"name" => "Test Album"},
-             "track_number" => 1,
-             "duration_ms" => 180_000,
-             "preview_url" => "https://example.com/preview.mp3"
+         %PlaybackState{
+           is_playing: true,
+           progress_ms: 0,
+           item: %{
+             uri: "spotify:track:4HCcvFdHfwR2u3WPPPVRv6",
+             name: "Test Song",
+             duration_ms: 180_000,
+             artists: [%{name: "Test Artist"}],
+             type: :album,
+             track_number: nil,
+             album: nil
            }
          }}
       end)
@@ -55,11 +57,8 @@ defmodule PremiereEcouteWeb.Api.Extension.WidgetControllerTest do
                  "id" => nil,
                  "name" => "Test Song",
                  "artist" => "Test Artist",
-                 "album" => "Test Album",
-                 "track_number" => 1,
                  "duration_ms" => 180_000,
-                 "spotify_id" => "4HCcvFdHfwR2u3WPPPVRv6",
-                 "preview_url" => "https://example.com/preview.mp3"
+                 "spotify_id" => "4HCcvFdHfwR2u3WPPPVRv6"
                },
                "broadcaster_id" => user.twitch.user_id
              }
@@ -69,7 +68,7 @@ defmodule PremiereEcouteWeb.Api.Extension.WidgetControllerTest do
       user = insert_user_with_spotify()
 
       Mox.expect(SpotifyApi.Mock, :get_playback_state, fn _scope, _state ->
-        {:ok, %{"is_playing" => false, "item" => nil}}
+        {:ok, %PlaybackState{is_playing: false, item: nil}}
       end)
 
       conn =

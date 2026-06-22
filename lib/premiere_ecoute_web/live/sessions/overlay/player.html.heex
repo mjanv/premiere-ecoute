@@ -33,7 +33,7 @@
     <!-- Album Cover -->
     <div style="flex-shrink: 0;">
       <img
-        src={hd(progress["item"]["album"]["images"])["url"]}
+        src={progress.item && progress.item.album && hd(progress.item.album.images).url}
         style="width: 180px; height: 180px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);"
       />
     </div>
@@ -42,22 +42,21 @@
     <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
       <!-- Album Name -->
       <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"}>
-        {progress["item"]["track_number"]} / {progress["item"]["album"]["total_tracks"]} - {hd(progress["item"]["artists"])[
-          "name"
-        ]} - {progress["item"]["album"]["name"]}
+        {progress.item && progress.item.track_number} / {progress.item && progress.item.album && progress.item.album.total_tracks} - {progress.item &&
+          hd(progress.item.artists).name} - {progress.item && progress.item.album && progress.item.album.name}
       </div>
       
 <!-- Track Name -->
       <div style={"font-size: 48px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"}>
-        {progress["item"]["name"]}
+        {progress.item && progress.item.name}
       </div>
       
 <!-- Track and Timer Row -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <!-- Track -->
         <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
-          {PremiereEcouteCore.Duration.timer(progress["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
-            progress["item"]["duration_ms"]
+          {PremiereEcouteCore.Duration.timer(progress.progress_ms)} / {PremiereEcouteCore.Duration.timer(
+            progress.item && progress.item.duration_ms
           )}
         </div>
       </div>

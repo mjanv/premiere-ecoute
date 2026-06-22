@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Extension.TrackReader do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.Players.PlaybackState
 
   @doc """
   Gets the current playing track for a broadcaster.
@@ -30,7 +31,7 @@ defmodule PremiereEcoute.Extension.TrackReader do
   def get_current_track(broadcaster_id) do
     with {:ok, user} <- get_broadcaster_user(broadcaster_id),
          true <- user.spotify != nil or {:error, :no_spotify},
-         {:ok, state} <- Apis.cache(:spotify).get_playback_state(Scope.for_user(user), %{}),
+         {:ok, state} <- Apis.cache(:spotify).get_playback_state(Scope.for_user(user), PlaybackState.default()),
          {:ok, track_data} <- extract_track_from_playback(state) do
       {:ok, track_data}
     else
@@ -47,30 +48,20 @@ defmodule PremiereEcoute.Extension.TrackReader do
     end
   end
 
-  defp extract_track_from_playback(%{"is_playing" => false}), do: {:error, :no_track}
-  defp extract_track_from_playback(%{"item" => nil}), do: {:error, :no_track}
+  defp extract_track_from_playback(%PlaybackState{is_playing: false}), do: {:error, :no_track}
+  defp extract_track_from_playback(%PlaybackState{item: nil}), do: {:error, :no_track}
 
-  defp extract_track_from_playback(%{"item" => item, "is_playing" => true}) do
+  defp extract_track_from_playback(%PlaybackState{item: %{uri: "spotify:track:" <> spotify_id} = item, is_playing: true}) do
     track_data = %{
-      # We don't have internal track ID
       id: nil,
-      name: item["name"],
-      artist: get_artist_names(item["artists"]),
-      album: item["album"]["name"],
-      track_number: item["track_number"],
-      duration_ms: item["duration_ms"],
-      spotify_id: item["id"],
-      preview_url: item["preview_url"]
+      name: item.name,
+      artist: Enum.map_join(item.artists, ", ", & &1.name),
+      duration_ms: item.duration_ms,
+      spotify_id: spotify_id
     }
 
     {:ok, track_data}
   end
 
   defp extract_track_from_playback(_), do: {:error, :no_track}
-
-  defp get_artist_names(artists) when is_list(artists) do
-    Enum.map_join(artists, ", ", & &1["name"])
-  end
-
-  defp get_artist_names(_), do: "Unknown Artist"
 end

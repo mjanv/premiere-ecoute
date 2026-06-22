@@ -2,6 +2,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   use PremiereEcoute.DataCase, async: false
 
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Sessions.ListeningSession
@@ -1011,8 +1012,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
 
-      expect(SpotifyApi, :get_playback_state, fn %Scope{user: ^user}, %{} ->
-        {:ok, %{"item" => %{"id" => Map.get(single.provider_ids, :spotify)}, "is_playing" => true}}
+      expect(SpotifyApi, :get_playback_state, fn %Scope{user: ^user}, %PlaybackState{} ->
+        {:ok,
+         %PlaybackState{
+           is_playing: true,
+           progress_ms: 0,
+           item: %{
+             uri: "spotify:track:#{Map.get(single.provider_ids, :spotify)}",
+             name: "Track",
+             duration_ms: 180_000,
+             artists: [],
+             type: :album,
+             track_number: nil,
+             album: nil
+           }
+         }}
       end)
 
       expect(SpotifyApi, :get_single, fn _track_id -> {:ok, single} end)
@@ -1044,8 +1058,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
       expect(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
 
-      expect(SpotifyApi, :get_playback_state, fn %Scope{user: ^user}, %{} ->
-        {:ok, %{"is_playing" => false}}
+      expect(SpotifyApi, :get_playback_state, fn %Scope{user: ^user}, %PlaybackState{} ->
+        {:ok, %PlaybackState{is_playing: false}}
       end)
 
       {:ok, _, [%SessionPrepared{} = prepared]} =
@@ -1075,8 +1089,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       stub(TwitchApi, :resubscribe, fn _, _ -> {:ok, %{}} end)
       stub(TwitchApi, :send_chat_message, fn _, _ -> :ok end)
 
-      expect(SpotifyApi, :get_playback_state, fn _, _ ->
-        {:ok, %{"item" => %{"id" => Map.get(single.provider_ids, :spotify)}, "is_playing" => true}}
+      expect(SpotifyApi, :get_playback_state, fn _, %PlaybackState{} ->
+        {:ok,
+         %PlaybackState{
+           is_playing: true,
+           progress_ms: 0,
+           item: %{
+             uri: "spotify:track:#{Map.get(single.provider_ids, :spotify)}",
+             name: "Track",
+             duration_ms: 180_000,
+             artists: [],
+             type: :album,
+             track_number: nil,
+             album: nil
+           }
+         }}
       end)
 
       expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
@@ -1136,8 +1163,21 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       stub(TwitchApi, :resubscribe, fn _, _ -> {:ok, %{}} end)
       stub(TwitchApi, :send_chat_message, fn _, _ -> :ok end)
 
-      expect(SpotifyApi, :get_playback_state, fn _, _ ->
-        {:ok, %{"item" => %{"id" => Map.get(single.provider_ids, :spotify)}, "is_playing" => true}}
+      expect(SpotifyApi, :get_playback_state, fn _, %PlaybackState{} ->
+        {:ok,
+         %PlaybackState{
+           is_playing: true,
+           progress_ms: 0,
+           item: %{
+             uri: "spotify:track:#{Map.get(single.provider_ids, :spotify)}",
+             name: "Track",
+             duration_ms: 180_000,
+             artists: [],
+             type: :album,
+             track_number: nil,
+             album: nil
+           }
+         }}
       end)
 
       expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)

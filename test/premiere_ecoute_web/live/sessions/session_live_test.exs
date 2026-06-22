@@ -5,6 +5,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
@@ -25,7 +26,20 @@ defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
       end)
 
       stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state ->
-        {:ok, %{"item" => %{"id" => "track123"}, "is_playing" => true}}
+        {:ok,
+         %PlaybackState{
+           is_playing: true,
+           progress_ms: 0,
+           item: %{
+             uri: "spotify:track:track123",
+             name: "Track",
+             duration_ms: 1,
+             artists: [],
+             type: :album,
+             track_number: nil,
+             album: nil
+           }
+         }}
       end)
 
       expect(SpotifyApi.Mock, :devices, fn _scope -> {:ok, [%{"is_active" => true}]} end)
@@ -54,7 +68,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLiveTest do
       end)
 
       stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state ->
-        {:ok, %{"is_playing" => false}}
+        {:ok, %PlaybackState{is_playing: false}}
       end)
 
       {:ok, session, _} =

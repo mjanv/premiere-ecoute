@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Wantlists
   alias PremiereEcouteWeb.Schemas
 
@@ -56,6 +57,6 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
     |> json(%{error: "Missing required parameter: broadcaster_id"})
   end
 
-  defp current_track_id(%{"item" => %{"id" => id}}) when not is_nil(id), do: {:ok, id}
+  defp current_track_id(%PlaybackState{item: %{uri: "spotify:track:" <> id}}), do: {:ok, id}
   defp current_track_id(_), do: :no_track
 end

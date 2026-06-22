@@ -116,7 +116,9 @@ defmodule PremiereEcoute.Apis.Players.PlaybackStateTest do
                  name: "BLACC*",
                  duration_ms: 158_229,
                  artists: [%{name: "LinLin"}],
-                 type: :album
+                 type: :album,
+                 track_number: 2,
+                 album: %{name: "DISCO INFERNO", total_tracks: nil, images: []}
                }
              }
     end
@@ -131,7 +133,9 @@ defmodule PremiereEcoute.Apis.Players.PlaybackStateTest do
                  name: "What You Want",
                  duration_ms: 188_320,
                  artists: [%{name: "Angèle"}, %{name: "Justice"}],
-                 type: :single
+                 type: :single,
+                 track_number: 1,
+                 album: %{name: "What You Want", total_tracks: nil, images: []}
                }
              }
     end

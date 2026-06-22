@@ -16,19 +16,31 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
 
   @type device :: %{name: String.t(), is_active: boolean()}
   @type item :: %{
-          uri: String.t(),
-          name: String.t(),
+          uri: String.t() | nil,
+          name: String.t() | nil,
           duration_ms: pos_integer(),
           artists: [%{name: String.t()}],
-          type: :album | :single
+          type: :album | :single,
+          track_number: non_neg_integer() | nil,
+          album: %{name: String.t(), total_tracks: non_neg_integer(), images: [%{url: String.t()}]} | nil
         }
 
   @type t :: %__MODULE__{
           is_playing: boolean(),
-          progress_ms: non_neg_integer(),
+          progress_ms: non_neg_integer() | nil,
           device: device() | nil,
           item: item() | nil
         }
+
+  @doc "Returns default playback state when no active playback exists."
+  @spec default :: t()
+  def default,
+    do: %__MODULE__{
+      is_playing: false,
+      item: %{uri: nil, name: nil, duration_ms: 1, artists: [], type: :album, track_number: nil, album: nil},
+      device: nil,
+      progress_ms: 0
+    }
 
   @doc "Converts raw Spotify API JSON map to a PlaybackState struct."
   @spec from_json(map()) :: t()
@@ -44,10 +56,10 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
   @doc """
   Gets playback state from cache or fetches fresh if expired/missing.
   """
-  @spec get_playback_state(Scope.t(), map()) :: {:ok, map()} | {:error, term()}
+  @spec get_playback_state(Scope.t(), t()) :: {:ok, t()} | {:error, term()}
   def get_playback_state(%Scope{user: %{id: user_id}} = scope, old_state) do
     with {:ok, nil} <- Cache.get(@cache, user_id),
-         {:ok, state} <- Apis.spotify().get_playback_state(scope, %{}),
+         {:ok, state} <- Apis.spotify().get_playback_state(scope, __MODULE__.default()),
          _ <- Cache.put(@cache, user_id, state, expire: ttl(state)) do
       {:ok, state}
     else
@@ -63,19 +75,29 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
   defp convert_item(nil), do: nil
 
   defp convert_item(item) do
+    album = item["album"]
+
     %{
       uri: item["uri"],
       name: item["name"],
       duration_ms: item["duration_ms"],
       artists: Enum.map(item["artists"] || [], fn a -> %{name: a["name"]} end),
-      type: item |> get_in(["album", "album_type"]) |> parse_type()
+      type: album && album["album_type"] |> parse_type(),
+      track_number: item["track_number"],
+      album:
+        album &&
+          %{
+            name: album["name"],
+            total_tracks: album["total_tracks"],
+            images: Enum.map(album["images"] || [], fn i -> %{url: i["url"]} end)
+          }
     }
   end
 
   defp parse_type("single"), do: :single
   defp parse_type(_), do: :album
 
-  defp ttl(%{"item" => %{"duration_ms" => duration_ms}, "progress_ms" => progress_ms})
+  defp ttl(%__MODULE__{item: %{duration_ms: duration_ms}, progress_ms: progress_ms})
        when is_integer(duration_ms) and is_integer(progress_ms) do
     min(duration_ms - progress_ms, @default_ttl)
   end

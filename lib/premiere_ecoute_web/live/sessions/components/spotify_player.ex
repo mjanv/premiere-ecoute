@@ -8,12 +8,13 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   use PremiereEcouteWeb, :live_component
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipNextTrackListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.SkipPreviousTrackListeningSession
 
   @impl true
   def mount(socket) do
-    {:ok, assign(socket, :player_state, Player.default())}
+    {:ok, assign(socket, :player_state, PlaybackState.default())}
   end
 
   @impl true
@@ -21,31 +22,31 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
     socket
     |> assign(:current_scope, assigns.current_scope)
     |> assign(:listening_session, assigns.listening_session)
-    |> assign(:player_state, assigns.player_state)
+    |> assign(:player_state, assigns.player_state || PlaybackState.default())
     |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
   def handle_event("toggle_playback", _params, socket) do
     case socket.assigns.player_state do
-      %{"device" => nil} ->
+      %PlaybackState{device: nil} ->
         send(self(), {:flash, :error, "No active device"})
         {:noreply, socket}
 
-      %{"is_playing" => true} = state ->
+      %PlaybackState{is_playing: true} = state ->
         case Player.pause_playback(socket.assigns.current_scope) do
           {:ok, _} ->
-            socket = assign(socket, :player_state, %{state | "is_playing" => false})
+            socket = assign(socket, :player_state, %{state | is_playing: false})
             {:noreply, socket}
 
           {:error, reason} ->
             {:noreply, put_flash(socket, :error, gettext("Failed to pause: %{reason}", reason: reason))}
         end
 
-      %{"is_playing" => false} = state ->
+      %PlaybackState{is_playing: false} = state ->
         case Player.start_playback(socket.assigns.current_scope, nil) do
           {:ok, _} ->
-            socket = assign(socket, :player_state, %{state | "is_playing" => true})
+            socket = assign(socket, :player_state, %{state | is_playing: true})
             {:noreply, socket}
 
           {:error, reason} ->
@@ -95,16 +96,16 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           Spotify
         </h4>
         <div class="flex items-center space-x-2">
-          <%= if @player_state["is_playing"] do %>
+          <%= if @player_state.is_playing do %>
             <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span class="text-xs text-green-400">
-              {@player_state["device"]["name"]} - {gettext("Playing")}
+              {if @player_state.device, do: "#{@player_state.device.name} - ", else: ""}{gettext("Playing")}
             </span>
           <% else %>
             <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-            <%= if @player_state["device"] do %>
+            <%= if @player_state.device do %>
               <span class="text-xs text-red-500">
-                {@player_state["device"]["name"]} - {gettext("Not playing")}
+                {@player_state.device.name} - {gettext("Not playing")}
               </span>
             <% else %>
               <span class="text-xs text-red-500">{gettext("No device")}</span>
@@ -114,16 +115,16 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
       </div>
       
     <!-- Current Track Status -->
-      <%= if @player_state["item"] do %>
+      <%= if @player_state.item do %>
         <div class="bg-white/20 rounded-lg p-3 space-y-3">
           <p class="text-sm font-medium text-white truncate">
-            {@player_state["item"]["name"]}
+            {@player_state.item.name}
           </p>
           <div class="flex items-center justify-between text-xs text-gray-200">
             <span>{gettext("Progress:")}</span>
             <span>
-              {PremiereEcouteCore.Duration.timer(@player_state["progress_ms"])} / {PremiereEcouteCore.Duration.timer(
-                @player_state["item"]["duration_ms"]
+              {PremiereEcouteCore.Duration.timer(@player_state.progress_ms)} / {PremiereEcouteCore.Duration.timer(
+                @player_state.item.duration_ms
               )}
             </span>
           </div>
@@ -134,7 +135,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
         </div>
       <% end %>
 
-      <%= if @player_state["device"] do %>
+      <%= if @player_state.device do %>
         <div class="flex space-x-2">
           <button
             phx-click="previous_track"
@@ -151,7 +152,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
             phx-target={@myself}
             class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-2"
           >
-            <%= if @player_state["is_playing"] do %>
+            <%= if @player_state.is_playing do %>
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fill-rule="evenodd"

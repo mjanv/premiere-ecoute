@@ -150,9 +150,13 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def handle_info({:player, _event, %{item: nil} = state}, %{assigns: assigns} = socket) do
+    {:noreply, assign(socket, :progress, AsyncResult.ok(assigns.progress, state))}
+  end
+
   def handle_info({:player, _event, state}, %{assigns: assigns} = socket) do
     socket
-    |> assign(:percent, round(100 * state["progress_ms"] / state["item"]["duration_ms"]))
+    |> assign(:percent, round(100 * state.progress_ms / state.item.duration_ms))
     |> assign(:progress, AsyncResult.ok(assigns.progress, state))
     |> then(fn socket -> {:noreply, socket} end)
   end

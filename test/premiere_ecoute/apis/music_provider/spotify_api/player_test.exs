@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcouteCore.Cache
 
   alias PremiereEcoute.Discography.Album
@@ -92,172 +93,29 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
         status: 200
       )
 
-      {:ok, state} = SpotifyApi.get_playback_state(scope, %{})
+      {:ok, state} = SpotifyApi.get_playback_state(scope, PlaybackState.default())
 
-      assert state == %{
-               "device" => %{
-                 "id" => "1e463fc3e7d2bd24126918bde04abee6cbfb4ff2",
-                 "is_active" => true,
-                 "name" => "HPE-5CG3313SL4",
-                 "is_private_session" => false,
-                 "is_restricted" => false,
-                 "supports_volume" => true,
-                 "type" => "Computer",
-                 "volume_percent" => 82
-               },
-               "is_playing" => true,
-               "item" => %{
-                 "duration_ms" => 197_636,
-                 "id" => "3m2VVaBylHoKBngpUflwUM",
-                 "name" => "Marche ou rêve",
-                 "track_number" => 1,
-                 "album" => %{
-                   "album_type" => "single",
-                   "artists" => [
-                     %{
-                       "external_urls" => %{"spotify" => "https://open.spotify.com/artist/00CTomLgA78xvwEwL0woWx"},
-                       "href" => "https://api.spotify.com/v1/artists/00CTomLgA78xvwEwL0woWx",
-                       "id" => "00CTomLgA78xvwEwL0woWx",
-                       "name" => "Suzane",
-                       "type" => "artist",
-                       "uri" => "spotify:artist:00CTomLgA78xvwEwL0woWx"
-                     }
-                   ],
-                   "available_markets" => [
-                     "AR",
-                     "AU",
-                     "AT",
-                     "BE",
-                     "BO",
-                     "BR",
-                     "BG",
-                     "CA",
-                     "CL",
-                     "CO",
-                     "CR",
-                     "CY",
-                     "CZ",
-                     "DK",
-                     "DO",
-                     "DE",
-                     "EC",
-                     "EE",
-                     "SV",
-                     "FI",
-                     "FR",
-                     "GR",
-                     "GT",
-                     "HN",
-                     "HK",
-                     "HU",
-                     "IS",
-                     "IE",
-                     "IT",
-                     "LV",
-                     "LT",
-                     "LU",
-                     "MY",
-                     "MT",
-                     "MX",
-                     "NL"
-                   ],
-                   "external_urls" => %{"spotify" => "https://open.spotify.com/album/7kS5ShCz4QHayBwumXSdUO"},
-                   "href" => "https://api.spotify.com/v1/albums/7kS5ShCz4QHayBwumXSdUO",
-                   "id" => "7kS5ShCz4QHayBwumXSdUO",
-                   "images" => [
-                     %{
-                       "height" => 640,
-                       "url" => "https://i.scdn.co/image/ab67616d0000b2737231f713d20c86543c6b6717",
-                       "width" => 640
-                     },
-                     %{
-                       "height" => 300,
-                       "url" => "https://i.scdn.co/image/ab67616d00001e027231f713d20c86543c6b6717",
-                       "width" => 300
-                     },
-                     %{"height" => 64, "url" => "https://i.scdn.co/image/ab67616d000048517231f713d20c86543c6b6717", "width" => 64}
-                   ],
-                   "name" => "Marche ou rêve",
-                   "release_date" => "2025-07-04",
-                   "release_date_precision" => "day",
-                   "total_tracks" => 1,
-                   "type" => "album",
-                   "uri" => "spotify:album:7kS5ShCz4QHayBwumXSdUO"
-                 },
-                 "artists" => [
-                   %{
-                     "external_urls" => %{"spotify" => "https://open.spotify.com/artist/00CTomLgA78xvwEwL0woWx"},
-                     "href" => "https://api.spotify.com/v1/artists/00CTomLgA78xvwEwL0woWx",
-                     "id" => "00CTomLgA78xvwEwL0woWx",
-                     "name" => "Suzane",
-                     "type" => "artist",
-                     "uri" => "spotify:artist:00CTomLgA78xvwEwL0woWx"
-                   }
-                 ],
-                 "available_markets" => [
-                   "AR",
-                   "AU",
-                   "AT",
-                   "BE",
-                   "BO",
-                   "BR",
-                   "BG",
-                   "CA",
-                   "CL",
-                   "CO",
-                   "CR",
-                   "CY",
-                   "CZ",
-                   "DK",
-                   "DO",
-                   "DE",
-                   "EC",
-                   "EE",
-                   "SV",
-                   "FI",
-                   "FR",
-                   "GR",
-                   "GT",
-                   "HN",
-                   "HK",
-                   "HU",
-                   "IS",
-                   "IE",
-                   "IT",
-                   "LV",
-                   "LT",
-                   "LU",
-                   "MY",
-                   "MT",
-                   "MX",
-                   "NL"
-                 ],
-                 "disc_number" => 1,
-                 "explicit" => false,
-                 "external_ids" => %{"isrc" => "FRERA2500020"},
-                 "external_urls" => %{"spotify" => "https://open.spotify.com/track/3m2VVaBylHoKBngpUflwUM"},
-                 "href" => "https://api.spotify.com/v1/tracks/3m2VVaBylHoKBngpUflwUM",
-                 "is_local" => false,
-                 "popularity" => 13,
-                 "preview_url" => nil,
-                 "type" => "track",
-                 "uri" => "spotify:track:3m2VVaBylHoKBngpUflwUM"
-               },
-               "actions" => %{"disallows" => %{"resuming" => true}},
-               "context" => %{
-                 "external_urls" => %{"spotify" => "https://open.spotify.com/playlist/2gW4sqiC2OXZLe9m0yDQX7"},
-                 "href" => "https://api.spotify.com/v1/playlists/2gW4sqiC2OXZLe9m0yDQX7",
-                 "type" => "playlist",
-                 "uri" => "spotify:playlist:2gW4sqiC2OXZLe9m0yDQX7"
-               },
-               "currently_playing_type" => "track",
-               "private" => %{},
-               "progress_ms" => 139_418,
-               "repeat_state" => "off",
-               "shuffle_state" => false,
-               "smart_shuffle" => false,
-               "timestamp" => 1_751_794_690_009,
-               "trailers" => %{}
+      assert state == %PlaybackState{
+               is_playing: true,
+               progress_ms: 139_418,
+               device: %{name: "HPE-5CG3313SL4", is_active: true},
+               item: %{
+                 uri: "spotify:track:3m2VVaBylHoKBngpUflwUM",
+                 name: "Marche ou rêve",
+                 duration_ms: 197_636,
+                 artists: [%{name: "Suzane"}],
+                 type: :single,
+                 track_number: 1,
+                 album: %{
+                   name: "Marche ou rêve",
+                   total_tracks: 1,
+                   images: [
+                     %{url: "https://i.scdn.co/image/ab67616d0000b2737231f713d20c86543c6b6717"},
+                     %{url: "https://i.scdn.co/image/ab67616d00001e027231f713d20c86543c6b6717"},
+                     %{url: "https://i.scdn.co/image/ab67616d000048517231f713d20c86543c6b6717"}
+                   ]
+                 }
+               }
              }
     end
 
@@ -270,13 +128,13 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
         status: 204
       )
 
-      {:ok, state} = SpotifyApi.get_playback_state(scope, %{})
+      {:ok, state} = SpotifyApi.get_playback_state(scope, PlaybackState.default())
 
-      assert state == %{"is_playing" => false, "item" => %{"duration_ms" => 1}, "device" => nil, "progress_ms" => 0}
+      assert state == PlaybackState.default()
     end
 
     test "returns previous state when no active playback (204) and previous state exists", %{scope: scope} do
-      previous_state = %{"is_playing" => true, "item" => %{"duration_ms" => 1000}, "progress_ms" => 500}
+      previous_state = %PlaybackState{is_playing: true, item: %{duration_ms: 1000}, progress_ms: 500}
 
       ApiMock.expect(
         SpotifyApi,
@@ -300,13 +158,13 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
         status: 502
       )
 
-      {:ok, state} = SpotifyApi.get_playback_state(scope, %{})
+      {:ok, state} = SpotifyApi.get_playback_state(scope, PlaybackState.default())
 
-      assert state == %{"is_playing" => false, "item" => %{"duration_ms" => 1}, "device" => nil, "progress_ms" => 0}
+      assert state == PlaybackState.default()
     end
 
     test "returns previous state when Spotify is temporarily unavailable (502) and previous state exists", %{scope: scope} do
-      previous_state = %{"is_playing" => true, "item" => %{"duration_ms" => 1000}, "progress_ms" => 500}
+      previous_state = %PlaybackState{is_playing: true, item: %{duration_ms: 1000}, progress_ms: 500}
 
       ApiMock.expect(
         SpotifyApi,
@@ -330,7 +188,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
         status: 429
       )
 
-      {:error, error} = SpotifyApi.get_playback_state(scope, %{})
+      {:error, error} = SpotifyApi.get_playback_state(scope, PlaybackState.default())
 
       assert error == "Spotify rate limit exceeded"
     end

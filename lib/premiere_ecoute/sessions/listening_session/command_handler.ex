@@ -11,6 +11,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   require Logger
 
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
@@ -415,8 +416,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%CaptureCurrentTrackListeningSession{session_id: session_id, scope: scope}) do
-    with {:ok, %{"item" => item, "is_playing" => true}} <- Apis.cache(:spotify).get_playback_state(scope, %{}),
-         {:ok, single} <- Apis.spotify().get_single(item["id"]),
+    with {:ok, %PlaybackState{item: item, is_playing: true}} <-
+           Apis.cache(:spotify).get_playback_state(scope, PlaybackState.default()),
+         {:ok, single} <- Apis.spotify().get_single(item.uri |> String.replace_prefix("spotify:track:", "")),
          {:ok, single} <- Single.create_if_not_exists(single),
          session <- ListeningSession.get(session_id),
          {:ok, session} <- set_single_id(session, single.id) do

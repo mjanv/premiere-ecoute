@@ -5,6 +5,7 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrackTest do
 
   alias Hermes.Server.Frame
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Wantlists
   alias PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrack
 
@@ -22,14 +23,30 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrackTest do
 
   defp frame(user), do: Frame.assign(%Frame{}, :current_user, user)
 
+  defp playing(id) do
+    %PlaybackState{
+      is_playing: true,
+      progress_ms: 0,
+      item: %{
+        uri: "spotify:track:#{id}",
+        name: "Track",
+        duration_ms: 180_000,
+        artists: [],
+        type: :album,
+        track_number: nil,
+        album: nil
+      }
+    }
+  end
+
   describe "execute/2" do
     test "saves the currently playing track for any role" do
       for role <- [:viewer, :streamer, :admin] do
         broadcaster = user_fixture(%{role: :streamer, twitch: %{user_id: "bc-#{role}"}})
         user = user_fixture(%{role: role})
 
-        expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
-          {:ok, %{"item" => %{"id" => "spotify123", "name" => "Track"}}}
+        expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
+          {:ok, playing("spotify123")}
         end)
 
         expect(Wantlists.Mock, :add_radio_track, fn user_id, spotify_id ->
@@ -60,7 +77,9 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrackTest do
       broadcaster = user_fixture(%{role: :streamer, twitch: %{user_id: "bc-no-track"}})
       user = user_fixture()
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
+        {:ok, PlaybackState.default()}
+      end)
 
       assert {:reply, resp, _} =
                SaveCurrentTrack.execute(%{broadcaster_twitch_id: broadcaster.twitch.user_id}, frame(user))
@@ -74,7 +93,9 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrackTest do
       broadcaster = user_fixture(%{role: :streamer, twitch: %{user_id: "bc-error"}})
       user = user_fixture()
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} -> {:error, :timeout} end)
+      expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
+        {:error, :timeout}
+      end)
 
       assert {:reply, resp, _} =
                SaveCurrentTrack.execute(%{broadcaster_twitch_id: broadcaster.twitch.user_id}, frame(user))
@@ -86,8 +107,8 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrackTest do
       broadcaster = user_fixture(%{role: :streamer, twitch: %{user_id: "bc-save-fail"}})
       user = user_fixture()
 
-      expect(SpotifyApi, :get_playback_state, fn _scope, %{} ->
-        {:ok, %{"item" => %{"id" => "spotify999"}}}
+      expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
+        {:ok, playing("spotify999")}
       end)
 
       expect(Wantlists.Mock, :add_radio_track, fn _user_id, _spotify_id ->

@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted
@@ -38,7 +39,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     with %Scope{user: %{spotify: spotify}} = scope when not is_nil(spotify) <-
            Scope.for_user(Accounts.get_user!(user_id)),
          session <- ListeningSession.get(session_id),
-         {:ok, %{"item" => %{"id" => track_id}, "is_playing" => true}} <- Apis.cache(:spotify).get_playback_state(scope, %{}),
+         {:ok, %PlaybackState{item: %{uri: "spotify:track:" <> track_id}, is_playing: true}} <-
+           Apis.cache(:spotify).get_playback_state(scope, PlaybackState.default()),
          true <- track_id == Map.get(session.single.provider_ids, :spotify) do
       PremiereEcoute.apply(%StartListeningSession{source: :track, session_id: session_id, scope: scope, resume: true})
     else

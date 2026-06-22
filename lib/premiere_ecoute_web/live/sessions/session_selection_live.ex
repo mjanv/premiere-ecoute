@@ -12,6 +12,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions.AlbumPicks
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
 
   @impl true
@@ -69,9 +70,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     socket
     |> assign(:selected_track, AsyncResult.loading())
     |> start_async(:select_track, fn ->
-      case PremiereEcoute.Apis.cache(:spotify).get_playback_state(scope, %{}) do
-        {:ok, %{"item" => item, "currently_playing_type" => "track"}} when not is_nil(item) ->
-          PremiereEcoute.Apis.spotify().get_single(item["id"])
+      case PremiereEcoute.Apis.cache(:spotify).get_playback_state(scope, PlaybackState.default()) do
+        {:ok, %PlaybackState{item: %{uri: "spotify:track:" <> track_id} = item}} when not is_nil(item) ->
+          PremiereEcoute.Apis.spotify().get_single(track_id)
 
         _ ->
           {:error, :nothing_playing}

@@ -9,8 +9,8 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
 
   @cache :rate_limits
   @status_codes [429]
-  @transient_error_codes [502, 503]
-  @transient_ttl_seconds 300
+  @transient_error_codes [503]
+  @transient_ttl_seconds 30
 
   @spec run(Req.Request.t(), Keyword.t()) :: Req.Request.t()
   def run(request, opts \\ []) do

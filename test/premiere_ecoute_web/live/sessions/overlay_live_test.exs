@@ -5,6 +5,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
   import Hammox
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
 
@@ -31,7 +32,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
 
   describe "mount/3 with active session" do
     test "displays overlay for active session when user has one", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _session} = ListeningSession.start(session)
@@ -46,7 +47,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
     end
 
     test "displays overlay with correct score type from query params", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _session} = ListeningSession.start(session)
@@ -73,7 +74,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
 
     test "displays default overlay when user has only preparing session", %{conn: conn, user: user, album: album} do
       # Stub for any background PlayerSupervisor calls
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, _session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
 
@@ -87,7 +88,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
 
     test "displays default overlay when user has only stopped session", %{conn: conn, user: user, album: album} do
       # Stub for any background PlayerSupervisor calls
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, session} = ListeningSession.start(session)
@@ -104,7 +105,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
 
   describe "mount/3 with multiple sessions" do
     test "displays most recently updated active session", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session1} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, session1} = ListeningSession.start(session1)
@@ -129,7 +130,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       user: user,
       album: album
     } do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _session} = ListeningSession.start(session)
@@ -152,7 +153,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
     end
 
     test "updates progress when :player event received", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _session} = ListeningSession.start(session)
@@ -162,9 +163,18 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
 
       assert html =~ "width: 100vw"
 
-      player_state = %{
-        "progress_ms" => 60_000,
-        "item" => %{"duration_ms" => 180_000}
+      player_state = %PlaybackState{
+        is_playing: true,
+        progress_ms: 60_000,
+        item: %{
+          uri: "spotify:track:abc",
+          name: "Song",
+          duration_ms: 180_000,
+          artists: [],
+          type: :album,
+          track_number: nil,
+          album: nil
+        }
       }
 
       send(view.pid, {:player, :playing, player_state})
@@ -175,7 +185,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
     end
 
     test "handles :session_summary event", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _session} = ListeningSession.start(session)
@@ -195,7 +205,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
     end
 
     test "handles :player :no_device event", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _session} = ListeningSession.start(session)
@@ -215,7 +225,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
 
   describe "handle_params/3" do
     test "updates score when score param changes", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _session} = ListeningSession.start(session)
@@ -246,7 +256,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
       user: user,
       album: album
     } do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _active_session} = ListeningSession.start(session)
@@ -261,7 +271,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLiveTest do
     end
 
     test "overlay updates when session is stopped", %{conn: conn, user: user, album: album} do
-      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, %{}} end)
+      stub(SpotifyApi.Mock, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
 
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, session} = ListeningSession.start(session)
