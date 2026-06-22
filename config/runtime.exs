@@ -90,6 +90,8 @@ if config_env() == :prod do
       "//www.#{env!("PHX_HOST")}"
     ]
 
+  config :boruta, Boruta.Oauth, issuer: "https://#{env!("PHX_HOST")}"
+
   config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
     manual_metrics_start_delay: :no_delay,
     grafana: [
