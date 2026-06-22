@@ -261,7 +261,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
              }
     end
 
-    test "return a non-playing playback state", %{scope: scope} do
+    test "returns default state when no active playback (204) and no previous state", %{scope: scope} do
       ApiMock.expect(
         SpotifyApi,
         path: {:get, "/v1/me/player"},
@@ -272,11 +272,53 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
       {:ok, state} = SpotifyApi.get_playback_state(scope, %{})
 
-      assert state == %{
-               "is_playing" => false,
-               "device" => nil,
-               "item" => nil
-             }
+      assert state == %{"is_playing" => false, "item" => %{"duration_ms" => 1}, "device" => nil, "progress_ms" => 0}
+    end
+
+    test "returns previous state when no active playback (204) and previous state exists", %{scope: scope} do
+      previous_state = %{"is_playing" => true, "item" => %{"duration_ms" => 1000}, "progress_ms" => 500}
+
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
+        response: %{},
+        status: 204
+      )
+
+      {:ok, state} = SpotifyApi.get_playback_state(scope, previous_state)
+
+      assert state == previous_state
+    end
+
+    test "returns default state when Spotify is temporarily unavailable (502) and no previous state", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
+        response: %{"error" => "upstream connect error"},
+        status: 502
+      )
+
+      {:ok, state} = SpotifyApi.get_playback_state(scope, %{})
+
+      assert state == %{"is_playing" => false, "item" => %{"duration_ms" => 1}, "device" => nil, "progress_ms" => 0}
+    end
+
+    test "returns previous state when Spotify is temporarily unavailable (502) and previous state exists", %{scope: scope} do
+      previous_state = %{"is_playing" => true, "item" => %{"duration_ms" => 1000}, "progress_ms" => 500}
+
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
+        response: %{"error" => "upstream connect error"},
+        status: 502
+      )
+
+      {:ok, state} = SpotifyApi.get_playback_state(scope, previous_state)
+
+      assert state == previous_state
     end
 
     test "returns error when rate limited", %{scope: scope} do

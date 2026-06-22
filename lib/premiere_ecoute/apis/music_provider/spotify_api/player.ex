@@ -203,7 +203,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
         {:ok, body}
 
       {:ok, %{status: 204}} ->
-        {:ok, default()}
+        {:ok, if(state == %{}, do: default(), else: state)}
 
       {:ok, %{status: 400}} ->
         {:ok, state}
@@ -214,7 +214,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
 
       {:ok, %{status: 502, body: body}} ->
         Logger.warning("Spotify get playback state failed with status 502: #{inspect(body)}")
-        {:ok, state}
+        {:ok, if(state == %{}, do: default(), else: state)}
 
       {:ok, %{status: status, body: body}} ->
         Logger.error("Spotify get playback state failed with status #{status}: #{inspect(body)}")
@@ -228,7 +228,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
 
   @doc "Returns default playback state when no active playback exists"
   @spec default :: map()
-  def default, do: %{"is_playing" => false, "item" => nil, "device" => nil}
+  def default, do: %{"is_playing" => false, "item" => %{"duration_ms" => 1}, "device" => nil, "progress_ms" => 0}
 
   @doc """
   Starts or resumes playback of album, track, or playlist.

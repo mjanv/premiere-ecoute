@@ -228,7 +228,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.start(session),
          {:ok, _} <- Apis.spotify().toggle_playback_shuffle(scope, false),
          {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
-         _ <- Apis.spotify().start_resume_playback(scope, session.playlist) do
+         {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.playlist) do
       {:ok, session, [%SessionStarted{source: :playlist, session_id: session.id, user_id: scope.user.id}]}
     else
       false ->
