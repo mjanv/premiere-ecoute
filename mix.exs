@@ -82,7 +82,7 @@ defmodule PremiereEcoute.MixProject do
     [
       # Web
       {:bandit, "~> 1.5"},
-      {:phoenix, "~> 1.8", override: true},
+      {:phoenix, "~> 1.8"},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -138,6 +138,7 @@ defmodule PremiereEcoute.MixProject do
       {:hammer, "~> 7.0"},
       {:decimal, "~> 3.0", override: true},
       # Data / Machine Learning
+      {:req_llm, "~> 1.17"},
       {:instructor, "~> 0.1"},
       {:hermes_mcp, "~> 0.14"},
       {:bumblebee, "~> 0.7"},
