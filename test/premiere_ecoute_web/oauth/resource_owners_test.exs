@@ -15,10 +15,10 @@ defmodule PremiereEcouteWeb.Oauth.ResourceOwnersTest do
       assert username == user.email
     end
 
-    test "finds a user by email" do
+    test "finds a user by username (email)" do
       user = user_fixture()
 
-      assert {:ok, %ResourceOwner{sub: sub}} = ResourceOwners.get_by(email: user.email)
+      assert {:ok, %ResourceOwner{sub: sub}} = ResourceOwners.get_by(username: user.email)
       assert sub == to_string(user.id)
     end
 
@@ -26,8 +26,8 @@ defmodule PremiereEcouteWeb.Oauth.ResourceOwnersTest do
       assert {:error, _reason} = ResourceOwners.get_by(sub: "0")
     end
 
-    test "returns an error when the email does not match any user" do
-      assert {:error, _reason} = ResourceOwners.get_by(email: "nobody@example.com")
+    test "returns an error when the username does not match any user" do
+      assert {:error, _reason} = ResourceOwners.get_by(username: "nobody@example.com")
     end
   end
 

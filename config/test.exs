@@ -6,6 +6,8 @@ config :premiere_ecoute,
 
 config :boruta, Boruta.Oauth, issuer: "http://localhost:4002"
 
+config :premiere_ecoute, :oauth_module, Boruta.OauthMock
+
 config :premiere_ecoute, Oban, testing: :inline
 
 config :premiere_ecoute, :broadway_batch_timeout_ms, 50

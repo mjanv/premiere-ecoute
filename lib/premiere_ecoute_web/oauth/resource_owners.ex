@@ -21,8 +21,8 @@ defmodule PremiereEcouteWeb.Oauth.ResourceOwners do
     end
   end
 
-  def get_by(email: email) do
-    case User.get_user_by_email(email) do
+  def get_by(username: username) do
+    case User.get_user_by_email(username) do
       nil -> {:error, "User not found."}
       user -> {:ok, to_resource_owner(user)}
     end

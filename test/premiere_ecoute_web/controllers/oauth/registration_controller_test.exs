@@ -1,19 +1,51 @@
 defmodule PremiereEcouteWeb.Oauth.RegistrationControllerTest do
   use PremiereEcouteWeb.ConnCase, async: true
 
+  alias Boruta.Ecto.Admin
+  alias Boruta.Oauth.Client
   alias PremiereEcouteWeb.Oauth.RegistrationController
 
-  # AIDEV-NOTE: exercises only the response-shaping callbacks (RFC 7591 success/error bodies).
-  # The `create/2` action itself delegates to Boruta.Openid.register_client/3, which needs the
-  # boruta_clients table from `mix boruta.gen.migration` — add a full request/response
-  # integration test once that migration has been generated and run.
+  describe "POST /oauth/register" do
+    test "registers a new client and returns its credentials as RFC 7591 JSON", %{conn: conn} do
+      conn =
+        post(conn, ~p"/oauth/register", %{
+          "redirect_uris" => ["https://claude.ai/api/mcp/auth_callback"],
+          "client_name" => "claude.ai",
+          "grant_types" => ["authorization_code", "refresh_token"],
+          "token_endpoint_auth_method" => "none"
+        })
+
+      assert %{"client_id" => client_id, "client_secret" => client_secret} = json_response(conn, 201)
+      assert is_binary(client_id)
+      assert is_binary(client_secret)
+
+      body = json_response(conn, 201)
+      assert body["redirect_uris"] == ["https://claude.ai/api/mcp/auth_callback"]
+      assert body["client_name"] == "claude.ai"
+      assert body["grant_types"] == ["authorization_code", "refresh_token"]
+      assert is_integer(body["client_id_issued_at"])
+
+      stored = Admin.get_client!(client_id)
+      refute stored.confidential
+      assert stored.pkce
+    end
+
+    test "rejects registration with invalid metadata", %{conn: conn} do
+      conn =
+        post(conn, ~p"/oauth/register", %{
+          "redirect_uris" => ["https://claude.ai/api/mcp/auth_callback"],
+          "supported_grant_types" => ["not_a_real_grant_type"]
+        })
+
+      assert json_response(conn, 400)["error"] == "invalid_client_metadata"
+    end
+  end
 
   describe "client_registered/2" do
     test "returns the client credentials as RFC 7591 JSON", %{conn: conn} do
-      client = %{
+      client = %Client{
         id: "11111111-1111-1111-1111-111111111111",
         secret: "s3cr3t",
-        inserted_at: ~U[2026-06-22 10:00:00Z],
         name: "claude.ai",
         redirect_uris: ["https://claude.ai/api/mcp/auth_callback"],
         supported_grant_types: ["authorization_code", "refresh_token"],
@@ -28,7 +60,7 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationControllerTest do
       assert body["client_secret"] == client.secret
       assert body["client_name"] == "claude.ai"
       assert body["redirect_uris"] == client.redirect_uris
-      assert body["client_id_issued_at"] == DateTime.to_unix(client.inserted_at)
+      assert is_integer(body["client_id_issued_at"])
     end
   end
 
@@ -39,6 +71,7 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationControllerTest do
       conn = RegistrationController.registration_failure(conn, changeset)
 
       assert conn.status == 400
+
       assert Jason.decode!(conn.resp_body) == %{
                "error" => "invalid_client_metadata",
                "error_description" => "Client registration parameters are invalid."

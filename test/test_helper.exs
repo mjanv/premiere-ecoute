@@ -17,5 +17,7 @@ for api <- apis do
   Mox.defmock(Module.concat([api, Mock]), for: api.behaviours())
 end
 
+Mox.defmock(Boruta.OauthMock, for: Boruta.OauthModule)
+
 ExUnit.start(capture_log: true, exclude: [:api, :wip, :skip])
 Ecto.Adapters.SQL.Sandbox.mode(PremiereEcoute.Repo, :manual)

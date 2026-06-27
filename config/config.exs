@@ -38,7 +38,9 @@ config :premiere_ecoute, PremiereEcoute.Accounts,
 # (claude.ai custom connectors) — see lib/premiere_ecoute_web/oauth and docs/guides/development.md
 config :boruta, Boruta.Oauth,
   repo: PremiereEcoute.Repo,
-  resource_owners: PremiereEcouteWeb.Oauth.ResourceOwners
+  contexts: [
+    resource_owners: PremiereEcouteWeb.Oauth.ResourceOwners
+  ]
 
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [

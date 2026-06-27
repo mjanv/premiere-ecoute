@@ -429,31 +429,31 @@ defmodule PremiereEcouteWeb.Router do
     forward "/", Hermes.Server.Transport.StreamableHTTP.Plug, server: PremiereEcouteWeb.Mcp.Server
   end
 
-  # AIDEV-NOTE: Boruta OAuth authorization server fronting the MCP connector flow.
-  # `/oauth/register` (Dynamic Client Registration) is hand-written below.
-  # Run `mix do deps.get, boruta.gen.migration, ecto.migrate, boruta.gen.controllers` locally to
-  # generate authorize/token/introspect/revoke (oauth scope) and userinfo/jwks (openid scope)
-  # controllers + views from Boruta's own templates, then mount them here, e.g.:
-  #
-  #   scope "/oauth", PremiereEcouteWeb.Oauth do
-  #     pipe_through [:browser, :require_authenticated_user]
-  #     get "/authorize", AuthorizeController, :authorize
-  #
-  #     pipe_through [:oauth]
-  #     post "/token", TokenController, :token
-  #     post "/revoke", RevokeController, :revoke
-  #     post "/introspect", IntrospectController, :introspect
-  #   end
-  #
-  #   scope "/openid", PremiereEcouteWeb.Openid do
-  #     pipe_through [:oauth]
-  #     get "/userinfo", UserinfoController, :userinfo
-  #     get "/jwks", JwksController, :jwks
-  #   end
+  # AIDEV-NOTE: Boruta OAuth authorization server fronting the MCP connector flow (see
+  # PremiereEcouteWeb.Mcp.Server.authenticate/2 for the Bearer-token validation side).
+  # `/oauth/authorize` needs the user's browser session (login + consent screen), so it runs
+  # through :browser + :require_authenticated_user; the other endpoints are stateless JSON/REST
+  # and run through :oauth.
+  scope "/oauth", PremiereEcouteWeb.Oauth do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/authorize", AuthorizeController, :authorize
+    post "/authorize", AuthorizeController, :authorize
+  end
+
   scope "/oauth", PremiereEcouteWeb.Oauth do
     pipe_through [:oauth]
 
     post "/register", RegistrationController, :create
+    post "/token", TokenController, :token
+    post "/revoke", RevokeController, :revoke
+    post "/introspect", IntrospectController, :introspect
+  end
+
+  scope "/.well-known", PremiereEcouteWeb.Oauth do
+    pipe_through [:oauth]
+
+    get "/oauth-authorization-server", DiscoveryController, :show
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do

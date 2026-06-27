@@ -1,0 +1,29 @@
+<div class="min-h-screen flex items-center justify-center bg-base-200 px-4">
+  <.card class="max-w-md w-full p-8 space-y-6">
+    <div class="space-y-2 text-center">
+      <h1 class="text-xl font-semibold text-surface-primary">{@client.name || "An application"}</h1>
+      <p class="text-surface-muted">wants to access your Premiere Ecoute account</p>
+    </div>
+
+    <div class="rounded-md bg-surface-card p-4">
+      <p class="text-sm text-surface-muted mb-2">This will allow it to:</p>
+      <ul class="text-sm text-surface-primary list-disc list-inside space-y-1">
+        <li>Read and manage your sessions, wantlist, and discography on your behalf</li>
+      </ul>
+      <p class="text-xs text-surface-muted mt-2">Scope: {@scope}</p>
+    </div>
+
+    <div class="flex gap-3">
+      <form method="post" action={"/oauth/authorize?" <> @query_string} class="flex-1">
+        <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+        <input type="hidden" name="approved" value="false" />
+        <.button variant="ghost" type="submit" class="w-full">Deny</.button>
+      </form>
+      <form method="post" action={"/oauth/authorize?" <> @query_string} class="flex-1">
+        <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+        <input type="hidden" name="approved" value="true" />
+        <.button variant="primary" type="submit" class="w-full">Approve</.button>
+      </form>
+    </div>
+  </.card>
+</div>
