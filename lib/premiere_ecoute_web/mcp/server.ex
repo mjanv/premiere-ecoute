@@ -2,7 +2,9 @@ defmodule PremiereEcouteWeb.Mcp.Server do
   @moduledoc false
 
   alias Boruta.Oauth.Authorization.AccessToken
+  alias Hermes.MCP.Error
   alias Hermes.Server.Frame
+  alias Hermes.Server.Handlers
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Repo
@@ -29,6 +31,9 @@ defmodule PremiereEcouteWeb.Mcp.Server do
   component(Components.Radio.GetTracks)
   component(Components.Radio.SaveTracks)
 
+  # AIDEV-NOTE: must always return {:ok, frame} — the Hermes notifications/initialized handler
+  # (hermes_mcp's base.ex) only pattern-matches {:ok, frame} from init/2 and crashes the session
+  # GenServer on anything else. Rejection happens per-request in handle_request/2 below instead.
   @impl true
   def init(_client_info, frame) do
     api_key = Frame.get_req_header(frame, "x-api-key")
@@ -36,7 +41,21 @@ defmodule PremiereEcouteWeb.Mcp.Server do
 
     case authenticate(api_key, authorization) do
       {:ok, user} -> {:ok, Frame.assign(frame, :current_user, user)}
-      :error -> {:stop, :unauthorized}
+      :error -> {:ok, frame}
+    end
+  end
+
+  # AIDEV-NOTE: tools/list, prompts/list, resources/list and similar discovery calls stay
+  # unauthenticated so claude.ai can display the connector's capabilities before OAuth completes;
+  # only calls that actually execute something require an authenticated current_user. The
+  # fallback clause for every other method is injected by Hermes.Server's @before_compile hook
+  # (def handle_request(%{} = request, frame), do: Handlers.handle(...)) — do not redefine it here.
+  @impl true
+  def handle_request(%{"method" => method} = request, frame)
+      when method in ["tools/call", "prompts/get", "resources/read"] do
+    case frame.assigns[:current_user] do
+      %User{} -> Handlers.handle(request, __MODULE__, frame)
+      _ -> {:error, Error.execution("Unauthorized"), frame}
     end
   end
 

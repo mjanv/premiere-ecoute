@@ -7,6 +7,8 @@ defmodule PremiereEcouteWeb.Mcp.ServerTest do
   alias Boruta.Oauth.AuthorizeResponse
   alias Boruta.Oauth.ResourceOwner
   alias Boruta.Oauth.TokenResponse
+  alias Hermes.MCP.Error
+  alias Hermes.Server.Frame
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcouteWeb.Mcp.Server
 
@@ -91,6 +93,40 @@ defmodule PremiereEcouteWeb.Mcp.ServerTest do
 
       assert {:ok, authenticated} = Server.authenticate(nil, ["Bearer #{access_token}"])
       assert authenticated.id == user.id
+    end
+  end
+
+  describe "handle_request/2" do
+    test "rejects tools/call when current_user is not assigned" do
+      frame = Frame.new()
+      request = %{"method" => "tools/call", "params" => %{"name" => "profile"}}
+
+      assert {:error, %Error{message: "Unauthorized"}, ^frame} = Server.handle_request(request, frame)
+    end
+
+    test "rejects prompts/get and resources/read when current_user is not assigned" do
+      frame = Frame.new()
+
+      for method <- ["prompts/get", "resources/read"] do
+        request = %{"method" => method, "params" => %{}}
+        assert {:error, %Error{message: "Unauthorized"}, ^frame} = Server.handle_request(request, frame)
+      end
+    end
+
+    test "allows tools/list without an authenticated current_user" do
+      frame = Frame.new()
+      request = %{"method" => "tools/list", "params" => %{}}
+
+      assert {:reply, _response, ^frame} = Server.handle_request(request, frame)
+    end
+
+    test "routes tools/call through to the real handler when current_user is assigned" do
+      user = user_fixture()
+      frame = Frame.new() |> Frame.assign(:current_user, user)
+      request = %{"method" => "tools/call", "params" => %{"name" => "unknown_tool", "arguments" => %{}}}
+
+      assert {:error, %Error{message: message}, _frame} = Server.handle_request(request, frame)
+      refute message == "Unauthorized"
     end
   end
 end
