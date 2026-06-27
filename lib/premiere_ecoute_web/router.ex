@@ -52,6 +52,10 @@ defmodule PremiereEcouteWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :mcp do
+    plug Plugs.McpAuth
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
     plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
@@ -426,6 +430,8 @@ defmodule PremiereEcouteWeb.Router do
   end
 
   scope "/mcp" do
+    pipe_through [:mcp]
+
     forward "/", Hermes.Server.Transport.StreamableHTTP.Plug, server: PremiereEcouteWeb.Mcp.Server
   end
 
@@ -454,6 +460,7 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:oauth]
 
     get "/oauth-authorization-server", DiscoveryController, :show
+    get "/oauth-protected-resource", ProtectedResourceController, :show
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do
