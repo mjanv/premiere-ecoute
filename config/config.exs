@@ -34,6 +34,14 @@ config :premiere_ecoute, PremiereEcoute.Accounts,
   bots: ["premiereecoutebot"],
   streamers: ["bebealc8"]
 
+# AIDEV-NOTE: Boruta acts as the OAuth 2.1 authorization server fronting the MCP endpoint
+# (claude.ai custom connectors) — see lib/premiere_ecoute_web/oauth and docs/guides/development.md
+config :boruta, Boruta.Oauth,
+  repo: PremiereEcoute.Repo,
+  contexts: [
+    resource_owners: PremiereEcouteWeb.Oauth.ResourceOwners
+  ]
+
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [
     api: PremiereEcoute.Apis.Streaming.TwitchApi,

@@ -48,6 +48,10 @@ defmodule PremiereEcouteWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :oauth do
+    plug :accepts, ["json"]
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
     plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
@@ -423,6 +427,33 @@ defmodule PremiereEcouteWeb.Router do
 
   scope "/mcp" do
     forward "/", Hermes.Server.Transport.StreamableHTTP.Plug, server: PremiereEcouteWeb.Mcp.Server
+  end
+
+  # AIDEV-NOTE: Boruta OAuth authorization server fronting the MCP connector flow (see
+  # PremiereEcouteWeb.Mcp.Server.authenticate/2 for the Bearer-token validation side).
+  # `/oauth/authorize` needs the user's browser session (login + consent screen), so it runs
+  # through :browser + :require_authenticated_user; the other endpoints are stateless JSON/REST
+  # and run through :oauth.
+  scope "/oauth", PremiereEcouteWeb.Oauth do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/authorize", AuthorizeController, :authorize
+    post "/authorize", AuthorizeController, :authorize
+  end
+
+  scope "/oauth", PremiereEcouteWeb.Oauth do
+    pipe_through [:oauth]
+
+    post "/register", RegistrationController, :create
+    post "/token", TokenController, :token
+    post "/revoke", RevokeController, :revoke
+    post "/introspect", IntrospectController, :introspect
+  end
+
+  scope "/.well-known", PremiereEcouteWeb.Oauth do
+    pipe_through [:oauth]
+
+    get "/oauth-authorization-server", DiscoveryController, :show
   end
 
   if Application.compile_env(:premiere_ecoute, :dev_routes) do

@@ -93,4 +93,24 @@ mix ecto.migrate # Run database migrations
 docker compose up -d # Start observability stack (Grafana, Prometheus)
 ```
 
+### OAuth (Boruta)
+
+The MCP server (`/mcp`) accepts the long-lived `x-api-key` token (for CLI agents) and OAuth Bearer
+access tokens issued by [Boruta](https://hexdocs.pm/boruta), our authorization server, for browser
+connectors (e.g. claude.ai custom connectors) that only need the `/mcp` URL — no client
+credentials, thanks to Dynamic Client Registration at `POST /oauth/register`.
+
+After adding the `:boruta` dependency, generate its migrations and reference controllers once:
+
+```bash
+mix deps.get
+mix boruta.gen.migration
+mix ecto.migrate
+mix boruta.gen.controllers # generates authorize/token/introspect/revoke/userinfo/jwks controllers
+```
+
+See `lib/premiere_ecoute_web/router.ex` for the router scope where the generated controllers must
+be mounted, and `lib/premiere_ecoute_web/oauth/resource_owners.ex` for how Boruta resolves access
+tokens back to a `PremiereEcoute.Accounts.User`.
+
 Grafana dashboards are accessible without admin login, for **local development**, at [http://localhost:3000](http://localhost:3000). Dashboards are automatically uploaded at startup from [PromEx dashboards](https://hexdocs.pm/prom_ex/all.html) and application dashboards written in `priv/dashboards/` folder.

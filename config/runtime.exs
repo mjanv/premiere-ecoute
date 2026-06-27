@@ -7,8 +7,6 @@ source!([
   System.get_env()
 ])
 
-IO.inspect(env!("TWITCH_WEBHOOK_CALLBACK_URL"))
-
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint, server: env!("PHX_SERVER", :boolean, false)
 
 config :premiere_ecoute,
@@ -89,6 +87,8 @@ if config_env() == :prod do
       "//#{env!("PHX_HOST")}",
       "//www.#{env!("PHX_HOST")}"
     ]
+
+  config :boruta, Boruta.Oauth, issuer: "https://#{env!("PHX_HOST")}"
 
   config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
     manual_metrics_start_delay: :no_delay,

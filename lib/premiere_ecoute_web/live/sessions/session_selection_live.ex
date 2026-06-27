@@ -10,9 +10,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   import PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents
 
   alias Phoenix.LiveView.AsyncResult
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Sessions.AlbumPicks
   alias PremiereEcoute.Sessions.ListeningSession
-  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
 
   @impl true

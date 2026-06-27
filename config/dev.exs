@@ -2,6 +2,8 @@ import Config
 
 config :open_api_spex, :cache_adapter, OpenApiSpex.Plug.NoneCache
 
+config :boruta, Boruta.Oauth, issuer: "http://localhost:4000"
+
 config :premiere_ecoute, PremiereEcoute.Apis,
   twitch: [
     api: PremiereEcoute.Apis.Streaming.TwitchApi,

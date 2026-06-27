@@ -120,6 +120,7 @@ defmodule PremiereEcoute.MixProject do
       {:cloak_ecto, "~> 1.3"},
       {:eventstore, "~> 1.4"},
       {:scrivener_ecto, "~> 3.0"},
+      {:boruta, "~> 2.3"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_twitch, "~> 0.1"},
       {:ueberauth_spotify, "~> 0.2"},
