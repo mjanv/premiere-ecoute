@@ -6,6 +6,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   """
 
   use Phoenix.Component
+  use Gettext, backend: PremiereEcoute.Gettext
 
   use PremiereEcouteWeb, :verified_routes
 
@@ -89,10 +90,12 @@ defmodule PremiereEcouteWeb.Home.Components do
   Renders a square album card with a hover overlay that includes an "Add to Wantlist" button.
 
   Accepts `session_id` to link to the session page. The wantlist button fires a
-  `add_album_to_wantlist` event with the album_id.
+  `add_album_to_wantlist` event with the album_id. When `missed` is true, a small
+  indicator is shown to flag a session the viewer didn't vote in.
   """
   attr :session, :map, required: true
   attr :in_wantlist, :boolean, default: false
+  attr :missed, :boolean, default: false
 
   def album_square_wantlist(assigns) do
     ~H"""
@@ -112,6 +115,13 @@ defmodule PremiereEcouteWeb.Home.Components do
           <p class="text-slate-300 text-xs truncate">{@session.album && @session.album.artist}</p>
         </div>
       </.link>
+      <%= if @missed do %>
+        <span
+          class="absolute top-2 left-2 w-2.5 h-2.5 rounded-full bg-pink-500 ring-2 ring-black/40"
+          title={gettext("You didn't vote in this session")}
+        >
+        </span>
+      <% end %>
       <%= if @session.album do %>
         <button
           phx-click="add_album_to_wantlist"

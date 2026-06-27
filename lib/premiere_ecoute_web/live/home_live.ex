@@ -33,10 +33,18 @@ defmodule PremiereEcouteWeb.HomeLive do
       current_user.channels
       |> Enum.map(fn streamer -> {streamer, Map.get(sessions_by_user, streamer.id, [])} end)
 
-    my_sessions =
+    {my_sessions, missed_session_ids} =
       case current_user.twitch do
-        %{user_id: twitch_id} -> Sessions.viewer_voted_sessions(twitch_id)
-        _ -> []
+        %{user_id: twitch_id} ->
+          missed_ids =
+            user
+            |> Sessions.missed_sessions_from_followed(twitch_id)
+            |> MapSet.new(& &1.id)
+
+          {Sessions.viewer_voted_sessions(twitch_id), missed_ids}
+
+        _ ->
+          {[], MapSet.new()}
       end
 
     # AIDEV-NOTE: collect album ids in wantlist for the viewer to mark them visually
@@ -63,6 +71,7 @@ defmodule PremiereEcouteWeb.HomeLive do
     |> assign(:sessions_per_streamer, sessions_per_streamer)
     |> assign(:upcoming_sessions, upcoming_sessions)
     |> assign(:my_sessions, my_sessions)
+    |> assign(:missed_session_ids, missed_session_ids)
     |> assign(:wantlisted_album_ids, wantlisted_album_ids)
     |> assign(:open_playlists_per_streamer, open_playlists_per_streamer)
     |> assign(:subscribed_playlist_ids, subscribed_playlist_ids)

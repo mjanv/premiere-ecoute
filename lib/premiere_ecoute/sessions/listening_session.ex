@@ -504,6 +504,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   @doc """
+  Returns stopped album sessions from streamers the given user follows where the
+  user (identified by their Twitch viewer id) cast no vote, ordered by most recent first.
+  """
+  @spec missed_sessions_from_followed(User.t(), String.t(), integer()) :: [t()]
+  def missed_sessions_from_followed(user, twitch_viewer_id, limit \\ 10) do
+    alias PremiereEcoute.Sessions.Scores.Vote
+
+    from(s in __MODULE__,
+      as: :session,
+      join: f in Follow,
+      on: f.followed_id == s.user_id,
+      where: f.follower_id == ^user.id and s.status == :stopped and s.source == :album,
+      where: not exists(from(v in Vote, where: v.session_id == parent_as(:session).id and v.viewer_id == ^twitch_viewer_id)),
+      order_by: [desc: s.started_at],
+      limit: ^limit
+    )
+    |> Repo.all()
+    |> preload()
+  end
+
+  @doc """
   Returns all stopped sessions for a given album, ordered by most recent first.
   """
   @spec list_for_album(integer()) :: [t()]

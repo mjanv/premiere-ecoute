@@ -483,6 +483,87 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     end
   end
 
+  describe "missed_sessions_from_followed/3" do
+    test "lists a stopped session from a followed streamer the viewer did not vote in", %{
+      viewer: viewer,
+      user: user,
+      album: album
+    } do
+      {:ok, _} = Accounts.follow(viewer, user)
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.stop(session)
+
+      sessions = ListeningSession.missed_sessions_from_followed(viewer, "twitch_viewer_1")
+
+      assert sessions == [session]
+    end
+
+    test "excludes a stopped session the viewer voted in", %{viewer: viewer, user: user, album: album} do
+      {:ok, _} = Accounts.follow(viewer, user)
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.stop(session)
+
+      vote_fixture(%{
+        viewer_id: "twitch_viewer_1",
+        session_id: session.id,
+        track_id: hd(session.album.tracks).id,
+        value: "8"
+      })
+
+      sessions = ListeningSession.missed_sessions_from_followed(viewer, "twitch_viewer_1")
+
+      assert sessions == []
+    end
+
+    test "excludes sessions that are not stopped", %{viewer: viewer, user: user, album: album} do
+      {:ok, _} = Accounts.follow(viewer, user)
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, _session} = ListeningSession.start(session)
+
+      sessions = ListeningSession.missed_sessions_from_followed(viewer, "twitch_viewer_1")
+
+      assert sessions == []
+    end
+
+    test "excludes sessions from streamers the viewer does not follow", %{user: user, album: album} do
+      other_viewer = user_fixture(%{role: :viewer})
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, _session} = ListeningSession.stop(session)
+
+      sessions = ListeningSession.missed_sessions_from_followed(other_viewer, "twitch_viewer_1")
+
+      assert sessions == []
+    end
+
+    test "respects the limit", %{viewer: viewer, user: user} do
+      {:ok, _} = Accounts.follow(viewer, user)
+
+      for n <- 1..3 do
+        {:ok, album} =
+          Album.create(
+            album_fixture(%{
+              provider_ids: %{spotify: "album_limit_#{n}"},
+              tracks: [
+                %Track{provider_ids: %{spotify: "track_limit_#{n}_1"}, name: "Track One", track_number: 1, duration_ms: 210_000},
+                %Track{provider_ids: %{spotify: "track_limit_#{n}_2"}, name: "Track Two", track_number: 2, duration_ms: 180_000}
+              ]
+            })
+          )
+
+        {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+        {:ok, session} = ListeningSession.start(session)
+        {:ok, _session} = ListeningSession.stop(session)
+      end
+
+      sessions = ListeningSession.missed_sessions_from_followed(viewer, "twitch_viewer_1", 2)
+
+      assert length(sessions) == 2
+    end
+  end
+
   describe "add_track_marker/1" do
     test "can add a track marker for an album session with a current track", %{
       user: user,
