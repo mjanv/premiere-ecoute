@@ -138,7 +138,6 @@ defmodule PremiereEcoute.MixProject do
       {:hammer, "~> 7.0"},
       {:decimal, "~> 3.0", override: true},
       # Data / Machine Learning
-      {:req_llm, "~> 1.17"},
       {:instructor, "~> 0.1"},
       {:hermes_mcp, "~> 0.14"},
       {:bumblebee, "~> 0.7"},
