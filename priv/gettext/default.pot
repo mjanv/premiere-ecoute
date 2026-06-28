@@ -550,7 +550,7 @@ msgstr ""
 msgid "Sessions Management"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:95
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:98
 #, elixir-autogen, elixir-format
 msgid "Start Listening Session"
 msgstr ""
@@ -1029,7 +1029,7 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:102
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:105
 #, elixir-autogen, elixir-format
 msgid "Start Over"
 msgstr ""
@@ -6889,4 +6889,9 @@ msgstr ""
 #: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:103
 #, elixir-autogen, elixir-format
 msgid "Widget is not displaying progress"
+msgstr ""
+
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:88
+#, elixir-autogen, elixir-format
+msgid "Make sure Spotify has played something in the last 10 minutes so the app can control it."
 msgstr ""
