@@ -16,8 +16,8 @@ defmodule PremiereEcouteWeb.Mcp.Components.Wantlist.SaveCurrentTrack do
 
   @impl true
   def execute(%{broadcaster_twitch_id: broadcaster_twitch_id}, %{assigns: %{current_user: user}} = frame) do
-    with broadcaster when not is_nil(broadcaster) <- Accounts.get_user_by_twitch_id(broadcaster_twitch_id),
-         {:ok, playback} <- Apis.cache(:spotify).get_playback_state(Scope.for_user(broadcaster), %{}),
+    with %Accounts.User{} = broadcaster <- Accounts.get_user_by_twitch_id(broadcaster_twitch_id),
+         {:ok, playback} <- Apis.cache(:spotify).get_playback_state(Scope.for_user(broadcaster), PlaybackState.default()),
          {:ok, spotify_id} <- current_track_id(playback),
          {:ok, _item} <- Wantlists.impl().add_radio_track(user.id, spotify_id) do
       {:reply, Response.text(Response.tool(), "Track saved to wantlist."), frame}

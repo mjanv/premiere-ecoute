@@ -6732,7 +6732,7 @@ msgstr "écouter"
 #: lib/premiere_ecoute_web/layouts/layouts.ex:102
 #, elixir-autogen, elixir-format
 msgid "%{api} API unavailable"
-msgstr ""
+msgstr "API %{api} indisponible"
 
 #: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:460
 #: lib/premiere_ecoute_web/live/accounts/account_live.html.heex:204

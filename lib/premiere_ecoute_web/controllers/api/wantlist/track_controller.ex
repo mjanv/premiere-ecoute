@@ -8,6 +8,7 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Wantlists
@@ -33,11 +34,9 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
 
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(%{assigns: %{current_scope: %{user: user}}} = conn, %{"broadcaster_id" => broadcaster_twitch_id}) do
-    broadcaster_lookup = Accounts.get_user_by_twitch_id(broadcaster_twitch_id)
-
-    with broadcaster when not is_nil(broadcaster) <- broadcaster_lookup,
+    with %User{} = broadcaster <- Accounts.get_user_by_twitch_id(broadcaster_twitch_id),
          {:playback, {:ok, playback}} <-
-           {:playback, Apis.cache(:spotify).get_playback_state(Scope.for_user(broadcaster), %{})},
+           {:playback, Apis.cache(:spotify).get_playback_state(Scope.for_user(broadcaster), PlaybackState.default())},
          {:ok, spotify_id} <- current_track_id(playback),
          {:ok, _item} <- Wantlists.impl().add_radio_track(user.id, spotify_id) do
       conn
