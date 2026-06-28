@@ -22,6 +22,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Follow
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Single
@@ -30,6 +31,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   alias PremiereEcoute.Sessions.ListeningSession.SpeechMarker
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Sessions.Scores.Vote
 
   @vote_options %{
     "0-10" => ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -509,8 +511,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   """
   @spec missed_sessions_from_followed(User.t(), String.t(), integer()) :: [t()]
   def missed_sessions_from_followed(user, twitch_viewer_id, limit \\ 10) do
-    alias PremiereEcoute.Sessions.Scores.Vote
-
     from(s in __MODULE__,
       as: :session,
       join: f in Follow,
@@ -522,6 +522,22 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     )
     |> Repo.all()
     |> preload()
+  end
+
+  @doc """
+  Returns ids of followers of the session's streamer (identified by linked Twitch account) who cast no vote in this session.
+  """
+  @spec followers_who_missed(t()) :: [integer()]
+  def followers_who_missed(%__MODULE__{id: session_id, user_id: streamer_id}) do
+    from(f in Follow,
+      join: t in OauthToken,
+      as: :token,
+      on: t.parent_id == f.follower_id and t.provider == :twitch,
+      where: f.followed_id == ^streamer_id,
+      where: not exists(from(v in Vote, where: v.session_id == ^session_id and v.viewer_id == parent_as(:token).user_id)),
+      select: f.follower_id
+    )
+    |> Repo.all()
   end
 
   @doc """
@@ -583,8 +599,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @doc "Returns distinct stopped sessions a viewer has voted in, most recent first, up to limit."
   @spec viewer_voted_sessions(String.t(), integer()) :: [t()]
   def viewer_voted_sessions(twitch_user_id, limit \\ 12) do
-    alias PremiereEcoute.Sessions.Scores.Vote
-
     session_ids =
       from(v in Vote,
         where: v.viewer_id == ^twitch_user_id,

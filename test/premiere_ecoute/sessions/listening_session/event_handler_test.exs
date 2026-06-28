@@ -1,9 +1,11 @@
 defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
+  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Sessions.ListeningSession.EventHandler
   alias PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
+  alias PremiereEcoute.Sessions.ListeningSession.Workers.MissedSessionNotificationWorker
   alias PremiereEcoute.Sessions.ListeningSessionWorker
 
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
@@ -68,6 +70,23 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
         assert_enqueued worker: ListeningSessionWorker,
                         args: %{"action" => "send_session_link", "session_id" => session.id, "user_id" => user.id},
                         scheduled_at: DateTime.add(DateTime.utc_now(), 20, :second)
+      end)
+    end
+
+    test "enqueues a missed-session notification job for each follower who did not vote" do
+      streamer = user_fixture(%{role: :streamer})
+      follower = user_fixture(%{role: :viewer, twitch: %{user_id: "twitch_viewer_handler"}})
+      {:ok, _} = Accounts.follow(follower, streamer)
+      session = session_fixture(%{user_id: streamer.id, status: :active})
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped{
+          session_id: session.id,
+          user_id: streamer.id
+        })
+
+        assert_enqueued worker: MissedSessionNotificationWorker,
+                        args: %{"session_id" => session.id, "user_id" => follower.id}
       end)
     end
   end

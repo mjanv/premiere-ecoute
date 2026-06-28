@@ -29,6 +29,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate upcoming_sessions_from_followed(user), to: ListeningSession
   defdelegate viewer_voted_sessions(twitch_user_id, limit \\ 12), to: ListeningSession
   defdelegate missed_sessions_from_followed(user, twitch_user_id, limit \\ 10), to: ListeningSession
+  defdelegate followers_who_missed(session), to: ListeningSession
   defdelegate get_active_session(user), to: ListeningSession
   defdelegate current_session(user), to: ListeningSession
   defdelegate can_view_retrospective?(session, scope), to: ListeningSession

@@ -22,6 +22,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowClosed
   alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowOpened
   alias PremiereEcoute.Sessions.ListeningSessionWorker
+  alias PremiereEcoute.Sessions.Services.MissedSessionNotification
 
   event(PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared)
   event(PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted)
@@ -110,6 +111,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 10)
     ListeningSessionWorker.in_seconds(%{action: "send_session_link", session_id: session_id, user_id: user_id}, 20)
+
+    MissedSessionNotification.notify(session_id)
+
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_stopped, session_id})
     :ok

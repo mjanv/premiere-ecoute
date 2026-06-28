@@ -116,7 +116,7 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
         <div class="fixed inset-0 z-40" phx-click="close" phx-target={@myself}></div>
 
         <div
-          class="absolute right-0 mt-2 w-80 rounded-lg shadow-xl border z-50 flex flex-col max-h-96"
+          class="absolute right-0 mt-2 w-[28rem] rounded-lg shadow-xl border z-50 flex flex-col max-h-96"
           style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
         >
           
@@ -185,8 +185,8 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
                   </div>
                   <!-- Content -->
                   <div class="flex-1 min-w-0 relative z-10 pointer-events-none">
-                    <p class="text-sm font-medium text-white truncate">{rendered.title}</p>
-                    <p class="text-xs text-gray-400 mt-0.5 line-clamp-2">{rendered.body}</p>
+                    <p class="text-sm font-medium text-white break-words">{rendered.title}</p>
+                    <p class="text-xs text-gray-400 mt-0.5 break-words">{rendered.body}</p>
                   </div>
                   <!-- Dismiss button -->
                   <button

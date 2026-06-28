@@ -564,6 +564,62 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     end
   end
 
+  describe "followers_who_missed/1" do
+    test "includes a follower who did not vote", %{user: user, album: album} do
+      viewer = user_fixture(%{role: :viewer, twitch: %{user_id: "twitch_viewer_missed"}})
+      {:ok, _} = Accounts.follow(viewer, user)
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.stop(session)
+
+      followers = ListeningSession.followers_who_missed(session)
+
+      assert followers == [viewer.id]
+    end
+
+    test "excludes a follower who voted", %{user: user, album: album} do
+      viewer = user_fixture(%{role: :viewer, twitch: %{user_id: "twitch_viewer_missed"}})
+      {:ok, _} = Accounts.follow(viewer, user)
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.stop(session)
+
+      vote_fixture(%{
+        viewer_id: "twitch_viewer_missed",
+        session_id: session.id,
+        track_id: hd(session.album.tracks).id,
+        value: "8"
+      })
+
+      followers = ListeningSession.followers_who_missed(session)
+
+      assert followers == []
+    end
+
+    test "excludes users who do not follow the streamer", %{user: user, album: album} do
+      _unrelated_viewer = user_fixture(%{role: :viewer, twitch: %{user_id: "twitch_viewer_unrelated"}})
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.stop(session)
+
+      followers = ListeningSession.followers_who_missed(session)
+
+      assert followers == []
+    end
+
+    test "excludes followers with no linked Twitch account", %{user: user, album: album} do
+      viewer_without_twitch = user_fixture(%{role: :viewer})
+      {:ok, _} = Accounts.follow(viewer_without_twitch, user)
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session} = ListeningSession.start(session)
+      {:ok, session} = ListeningSession.stop(session)
+
+      followers = ListeningSession.followers_who_missed(session)
+
+      assert followers == []
+    end
+  end
+
   describe "add_track_marker/1" do
     test "can add a track marker for an album session with a current track", %{
       user: user,
