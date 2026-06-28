@@ -25,6 +25,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
         scope: scope,
         phx_ref: phx_ref,
         polls: 100,
+        failures: 0,
         state: %PlaybackState{
           is_playing: false,
           device: %{name: "device123", is_active: true},
@@ -88,13 +89,137 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       assert {:stop, :normal, _state} = SpotifyPlayer.handle_info(:poll, exhausted_state)
     end
 
-    test "stops with error when get_playback_state fails", %{initial_state: initial_state} do
+    test "keeps polling and increments failures when get_playback_state fails", %{initial_state: initial_state} do
       expect(SpotifyApi, :get_playback_state, fn _scope, _old_state ->
         {:error, "Spotify API error"}
       end)
 
-      assert {:stop, {:error, "Spotify API error"}, _state} =
-               SpotifyPlayer.handle_info(:poll, initial_state)
+      assert {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, initial_state)
+
+      assert new_state.failures == 1
+      assert new_state.state.status == :normal
+    end
+  end
+
+  describe "resilience: status transitions and backoff" do
+    setup %{user: user} do
+      scope = user_scope_fixture(user)
+      {:ok, phx_ref} = Presence.join(scope.user.id, :player)
+
+      initial_state = %{
+        scope: scope,
+        phx_ref: phx_ref,
+        polls: 100,
+        failures: 0,
+        state: PlaybackState.default()
+      }
+
+      {:ok, %{initial_state: initial_state}}
+    end
+
+    test "stays :normal for the first two consecutive failures", %{initial_state: initial_state} do
+      expect(SpotifyApi, :get_playback_state, 2, fn _scope, _old_state -> {:error, "boom"} end)
+
+      assert {:noreply, state1} = SpotifyPlayer.handle_info(:poll, initial_state)
+      assert state1.failures == 1
+      assert state1.state.status == :normal
+
+      assert {:noreply, state2} = SpotifyPlayer.handle_info(:poll, state1)
+      assert state2.failures == 2
+      assert state2.state.status == :normal
+    end
+
+    test "becomes :degraded on the third consecutive failure", %{initial_state: initial_state} do
+      expect(SpotifyApi, :get_playback_state, 3, fn _scope, _old_state -> {:error, "boom"} end)
+
+      state =
+        Enum.reduce(1..3, initial_state, fn _i, acc ->
+          {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, acc)
+          new_state
+        end)
+
+      assert state.failures == 3
+      assert state.state.status == :degraded
+    end
+
+    test "becomes :down on the twentieth consecutive failure and never stops", %{initial_state: initial_state} do
+      expect(SpotifyApi, :get_playback_state, 20, fn _scope, _old_state -> {:error, "boom"} end)
+
+      state =
+        Enum.reduce(1..20, initial_state, fn _i, acc ->
+          {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, acc)
+          new_state
+        end)
+
+      assert state.failures == 20
+      assert state.state.status == :down
+
+      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state -> {:error, "boom"} end)
+      assert {:noreply, state} = SpotifyPlayer.handle_info(:poll, state)
+      assert state.failures == 21
+      assert state.state.status == :down
+    end
+
+    test "recovers to :normal and resets failures after a successful call", %{initial_state: initial_state} do
+      expect(SpotifyApi, :get_playback_state, 3, fn _scope, _old_state -> {:error, "boom"} end)
+
+      degraded_state =
+        Enum.reduce(1..3, initial_state, fn _i, acc ->
+          {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, acc)
+          new_state
+        end)
+
+      assert degraded_state.state.status == :degraded
+
+      recovered_playback = %PlaybackState{
+        is_playing: false,
+        device: nil,
+        item: nil,
+        progress_ms: 0
+      }
+
+      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state -> {:ok, recovered_playback} end)
+
+      assert {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, degraded_state)
+
+      assert new_state.failures == 0
+      assert new_state.state.status == :normal
+    end
+
+    test "does not publish a status event while still :normal", %{initial_state: initial_state} do
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{initial_state.scope.user.id}")
+
+      expect(SpotifyApi, :get_playback_state, fn _scope, _old_state -> {:error, "boom"} end)
+
+      assert {:noreply, _state} = SpotifyPlayer.handle_info(:poll, initial_state)
+
+      refute_receive {:player, _event, _state}
+    end
+
+    test "publishes a :degraded event on the third consecutive failure", %{initial_state: initial_state} do
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{initial_state.scope.user.id}")
+
+      expect(SpotifyApi, :get_playback_state, 3, fn _scope, _old_state -> {:error, "boom"} end)
+
+      Enum.reduce(1..3, initial_state, fn _i, acc ->
+        {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, acc)
+        new_state
+      end)
+
+      assert_receive {:player, :degraded, %PlaybackState{status: :degraded}}
+    end
+
+    test "publishes a :down event on the twentieth consecutive failure", %{initial_state: initial_state} do
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{initial_state.scope.user.id}")
+
+      expect(SpotifyApi, :get_playback_state, 20, fn _scope, _old_state -> {:error, "boom"} end)
+
+      Enum.reduce(1..20, initial_state, fn _i, acc ->
+        {:noreply, new_state} = SpotifyPlayer.handle_info(:poll, acc)
+        new_state
+      end)
+
+      assert_receive {:player, :down, %PlaybackState{status: :down}}
     end
   end
 
@@ -331,28 +456,28 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
   end
 
   describe "init" do
-    test "fails to start when get_playback_state returns error during init", %{user: user} do
-      Process.flag(:trap_exit, true)
-
+    test "starts successfully (degraded, retrying) when get_playback_state returns error during init", %{user: user} do
       expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
         {:error, "Spotify API unavailable"}
       end)
 
-      assert {:error, {:error, "Spotify API unavailable"}} = SpotifyPlayer.start_link(user.id)
+      assert {:ok, pid} = SpotifyPlayer.start_link(user.id)
+
+      GenServer.stop(pid)
     end
 
-    test "publishes error event when init fails", %{user: user} do
-      Process.flag(:trap_exit, true)
-
+    test "does not publish a status event after a single failed init (still :normal)", %{user: user} do
       Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{user.id}")
 
       expect(SpotifyApi, :get_playback_state, fn _scope, %PlaybackState{} ->
         {:error, "Spotify API unavailable"}
       end)
 
-      assert {:error, {:error, "Spotify API unavailable"}} = SpotifyPlayer.start_link(user.id)
+      assert {:ok, pid} = SpotifyPlayer.start_link(user.id)
 
-      assert_receive {:player, {:error, "Spotify API unavailable"}, %PlaybackState{}}
+      refute_receive {:player, _event, _state}
+
+      GenServer.stop(pid)
     end
   end
 
@@ -441,9 +566,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
       GenServer.stop(pid1)
     end
 
-    test "publishes :failed event when player stops due to error", %{user: user} do
-      Process.flag(:trap_exit, true)
-
+    test "keeps running without publishing when a single poll fails", %{user: user} do
       playback = %PlaybackState{
         is_playing: true,
         device: %{name: "device123", is_active: true},
@@ -478,8 +601,10 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
 
       send(pid, :poll)
 
-      assert_receive {:player, {:error, "Spotify rate limit exceeded"}, _state}
-      assert_receive {:EXIT, ^pid, {:error, "Spotify rate limit exceeded"}}
+      refute_receive {:player, _event, _state}
+      assert Process.alive?(pid)
+
+      GenServer.stop(pid)
     end
   end
 end

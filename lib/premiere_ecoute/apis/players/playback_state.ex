@@ -12,7 +12,9 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
   @cache :playback
   @default_ttl 60_000
 
-  defstruct [:is_playing, :progress_ms, :device, :item]
+  defstruct [:is_playing, :progress_ms, :device, :item, status: :normal]
+
+  @type status :: :normal | :degraded | :down
 
   @type device :: %{name: String.t(), is_active: boolean()}
   @type item :: %{
@@ -29,7 +31,8 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
           is_playing: boolean(),
           progress_ms: non_neg_integer() | nil,
           device: device() | nil,
-          item: item() | nil
+          item: item() | nil,
+          status: status()
         }
 
   @doc "Returns default playback state when no active playback exists."
@@ -39,7 +42,8 @@ defmodule PremiereEcoute.Apis.Players.PlaybackState do
       is_playing: false,
       item: %{uri: nil, name: nil, duration_ms: 1, artists: [], type: :album, track_number: nil, album: nil},
       device: nil,
-      progress_ms: 0
+      progress_ms: 0,
+      status: :normal
     }
 
   @doc "Converts raw Spotify API JSON map to a PlaybackState struct."

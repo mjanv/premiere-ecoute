@@ -229,7 +229,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
          {:ok, session} <- ListeningSession.start(session),
          {:ok, _} <- Apis.spotify().toggle_playback_shuffle(scope, false),
          {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
-         {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.playlist) do
+         _ <- Apis.spotify().start_resume_playback(scope, session.playlist) do
       {:ok, session, [%SessionStarted{source: :playlist, session_id: session.id, user_id: scope.user.id}]}
     else
       false ->
@@ -247,7 +247,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
-         {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
+         _ <- Apis.spotify().start_resume_playback(scope, session.current_track),
          :ok <-
            Apis.twitch().send_chat_message(
              scope,
@@ -263,7 +263,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%SkipNextTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
-         {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_playlist_track) do
+         _ <- Apis.spotify().start_resume_playback(scope, session.current_playlist_track) do
       {:ok, session,
        [
          %NextTrackStarted{
@@ -281,7 +281,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   def handle(%SkipPreviousTrackListeningSession{session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.previous_track(session),
-         {:ok, _} <- Apis.spotify().start_resume_playback(scope, session.current_track),
+         _ <- Apis.spotify().start_resume_playback(scope, session.current_track),
          :ok <-
            Apis.twitch().send_chat_message(
              scope,

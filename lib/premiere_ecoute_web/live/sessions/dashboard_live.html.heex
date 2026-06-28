@@ -41,7 +41,11 @@
 
     <div class="max-w-7xl mx-auto px-6 flex h-screen">
       <div class="w-1/3 p-6 overflow-y-auto">
-        <.gradient_bg class="p-6 mb-6" status={@listening_session.status} statutes={[:preparing, :active]}>
+        <.gradient_bg
+          class={"p-6 mb-6 #{player_status_classes(@player_state)}"}
+          status={@listening_session.status}
+          statutes={[:preparing, :active]}
+        >
           <.live_component
             module={PremiereEcouteWeb.Sessions.Components.SpotifyPlayer}
             id="spotify-player"

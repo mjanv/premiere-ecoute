@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
 
   import PremiereEcouteWeb.Sessions.Components.SessionComponents
 
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Events.Chat.MessageSent
@@ -797,6 +798,16 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   def visibility_label(:private), do: gettext("Private")
   def visibility_label(:protected), do: gettext("Protected")
   def visibility_label(:public), do: gettext("Public")
+
+  @doc """
+  Returns the extra CSS classes for the Spotify player card based on playback status.
+
+  Adds a colored ring around the card when the Spotify connection is degraded or down.
+  """
+  @spec player_status_classes(PlaybackState.t() | nil) :: String.t()
+  def player_status_classes(%PlaybackState{status: :degraded}), do: "ring-2 ring-yellow-500/70"
+  def player_status_classes(%PlaybackState{status: :down}), do: "ring-2 ring-red-500/70"
+  def player_status_classes(_player_state), do: ""
 
   @doc """
   Returns SVG icon for visibility level.
