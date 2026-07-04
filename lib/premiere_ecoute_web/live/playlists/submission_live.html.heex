@@ -89,8 +89,8 @@
             <% end %>
           </div>
         </div>
-        
-<!-- Selected track + submit -->
+
+        <!-- Selected track + submit -->
         <%= if @selected_track do %>
           <div class="rounded-xl overflow-hidden mb-6 relative" style="background-color: var(--color-dark-900);">
             <%= if @selected_track.cover_url do %>
@@ -169,8 +169,8 @@
             </div>
           </div>
         <% end %>
-        
-<!-- Feedback messages -->
+
+        <!-- Feedback messages -->
         <%= if @success do %>
           <div class="flex items-center gap-3 px-4 py-3 bg-green-600/20 border border-green-600/40 rounded-lg mb-6 text-sm text-green-300">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,8 +194,8 @@
           </div>
         <% end %>
       <% end %>
-      
-<!-- My submissions -->
+
+      <!-- My submissions -->
       <%= if @viewer_submissions != [] do %>
         <div class="bg-slate-800/30 rounded-xl border border-gray-700/50 p-6 mt-6">
           <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-4">
@@ -233,8 +233,8 @@
           </div>
         </div>
       <% end %>
-      
-<!-- Current playlist tracks (optional) -->
+
+      <!-- Current playlist tracks (optional) -->
       <%= if @tracks && LibraryPlaylist.show_tracks_to_viewers?(@library_playlist) do %>
         <div class="bg-slate-800/30 rounded-xl border border-gray-700/50 p-6 mt-6">
           <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-4">

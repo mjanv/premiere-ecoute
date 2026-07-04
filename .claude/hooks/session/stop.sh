@@ -1,6 +1,6 @@
 #!/bin/bash
-# AIDEV-NOTE: Stop hook - on first invocation asks Claude to update SESSION.md;
-#             on second invocation (stop_hook_active=true) runs mix test and auto-commits.
+# Stop hook: on first invocation asks Claude to update SESSION.md;
+#            on second invocation (stop_hook_active=true) runs mix test and auto-commits.
 
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 

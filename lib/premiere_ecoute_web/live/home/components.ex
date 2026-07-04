@@ -119,8 +119,7 @@ defmodule PremiereEcouteWeb.Home.Components do
         <span
           class="absolute top-2 left-2 w-2.5 h-2.5 rounded-full bg-pink-500 ring-2 ring-black/40"
           title={gettext("You didn't vote in this session")}
-        >
-        </span>
+        ></span>
       <% end %>
       <%= if @session.album do %>
         <button

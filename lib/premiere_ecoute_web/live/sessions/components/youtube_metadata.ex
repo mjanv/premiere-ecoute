@@ -113,8 +113,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
     >
       <!-- Background overlay -->
       <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" phx-click="close_modal" phx-target={@myself}></div>
-      
-    <!-- Modal panel -->
+
+      <!-- Modal panel -->
       <div class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-gray-900 p-8 shadow-2xl transition-all border border-purple-500/30">
         <!-- Header -->
         <div class="mb-6">
@@ -125,8 +125,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             {gettext("Copy and paste this title and description into your YouTube video")}
           </p>
         </div>
-        
-    <!-- Rendered title -->
+
+        <!-- Rendered title -->
         <div class="mb-4">
           <div class="flex items-center justify-between mb-2">
             <label class="text-sm font-medium text-purple-300">
@@ -155,8 +155,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
           >{@youtube_title}</textarea>
         </div>
-        
-    <!-- YouTube Chapters Textbox -->
+
+        <!-- YouTube Chapters Textbox -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <label class="text-sm font-medium text-purple-300">
@@ -237,8 +237,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
     {gettext("Viewer score")}: {inspect(@report.session_summary["viewer_score"])}&#013; &#010;<% end %><%= if @options.chapters do %>{@youtube_chapters}<% end %>
           </textarea>
         </div>
-        
-    <!-- Time Bias Slider -->
+
+        <!-- Time Bias Slider -->
         <div class="mt-6">
           <div class="flex items-center justify-between mb-2">
             <label class="text-sm font-medium text-purple-300">

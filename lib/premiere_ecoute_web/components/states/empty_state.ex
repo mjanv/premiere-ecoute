@@ -66,8 +66,8 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
       ]}>
         <CoreComponents.icon name={@icon} class={@icon_classes} />
       </div>
-      
-    <!-- Content -->
+
+      <!-- Content -->
       <h3 class={[
         "font-medium text-surface-bright mb-2",
         size_title_classes(@size)
@@ -81,8 +81,8 @@ defmodule PremiereEcouteWeb.Components.EmptyState do
       ]}>
         {@description}
       </p>
-      
-    <!-- Action -->
+
+      <!-- Action -->
       <%= if @action != [] do %>
         <div class="flex justify-center">
           {render_slot(@action)}

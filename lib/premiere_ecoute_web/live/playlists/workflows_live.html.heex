@@ -12,14 +12,13 @@
             title={gettext("Workflows")}
             subtitle={gettext("Automate and manage your playlist workflows")}
           />
-          
-<!-- Workflow Form -->
+
+          <!-- Workflow Form -->
           <div class="mt-8">
             <form phx-submit="create_workflow" class="space-y-8">
               <!-- Three Column Layout -->
               <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 bg-gray-800/50 p-6 rounded-lg border border-gray-700">
-                
-<!-- SOURCE Column -->
+                <!-- SOURCE Column -->
                 <div class="space-y-6">
                   <div class="pb-2 border-b border-gray-600">
                     <h3 class="text-lg font-semibold text-white uppercase tracking-wider flex items-center">
@@ -52,8 +51,8 @@
                         </select>
                       </div>
                     </div>
-                    
-<!-- Track Count Controls -->
+
+                    <!-- Track Count Controls -->
                     <div class="space-y-3">
                       <label for="track_count" class="block text-sm font-medium text-gray-300">
                         {gettext("Number of tracks")}
@@ -102,8 +101,8 @@
                         </div>
                       </div>
                     </div>
-                    
-<!-- Time Period Controls -->
+
+                    <!-- Time Period Controls -->
                     <div class="space-y-3">
                       <label class="block text-sm font-medium text-gray-300">
                         {gettext("Time period")}
@@ -138,8 +137,8 @@
                         </div>
                       </div>
                     </div>
-                    
-<!-- Preview Action -->
+
+                    <!-- Preview Action -->
                     <div class="pt-2 border-t border-gray-700">
                       <button
                         type="button"
@@ -165,8 +164,8 @@
                     </div>
                   </div>
                 </div>
-                
-<!-- TRACKS Column -->
+
+                <!-- TRACKS Column -->
                 <div class="space-y-4 lg:col-span-2">
                   <h3 class="text-lg font-semibold text-white uppercase tracking-wider">
                     {gettext("Tracks")}
@@ -225,8 +224,8 @@
                     <% end %>
                   </div>
                 </div>
-                
-<!-- TARGET Column -->
+
+                <!-- TARGET Column -->
                 <div class="space-y-6">
                   <!-- Section Header -->
                   <div class="border-b border-gray-600 pb-3">
@@ -262,8 +261,8 @@
                         </select>
                       </div>
                     </div>
-                    
-<!-- Target Playlist Selection -->
+
+                    <!-- Target Playlist Selection -->
                     <div class="space-y-3">
                       <label for="target_playlist" class="block text-sm font-medium text-gray-300">
                         {gettext("Destination playlist")}
@@ -290,8 +289,8 @@
                         <% end %>
                       </div>
                     </div>
-                    
-<!-- Workflow Info -->
+
+                    <!-- Workflow Info -->
                     <div class="space-y-3">
                       <div class="p-4 bg-blue-900/30 border border-blue-700/50 rounded-lg">
                         <div class="flex items-start space-x-2">
@@ -314,8 +313,8 @@
                         </div>
                       </div>
                     </div>
-                    
-<!-- Action Section -->
+
+                    <!-- Action Section -->
                     <div class="border-t border-gray-600 pt-6">
                       <button
                         type="submit"

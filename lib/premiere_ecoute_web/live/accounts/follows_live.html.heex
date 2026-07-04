@@ -78,8 +78,8 @@
                         </.button>
                       </div>
                     </div>
-                    
-<!-- Follow date info -->
+
+                    <!-- Follow date info -->
                     <div class="mt-4 pt-4 border-t border-gray-700">
                       <%= if follow = Enum.find(@current_user.follows, &(&1.streamer_id == streamer.id)) do %>
                         <p class="text-xs text-gray-500">
@@ -98,8 +98,8 @@
             </div>
           <% end %>
         </div>
-        
-<!-- Unfollow Confirmation Modal -->
+
+        <!-- Unfollow Confirmation Modal -->
         <%= if @show_unfollow_modal and @to_unfollow do %>
           <.modal id="unfollow-modal" show on_cancel="hide_unfollow_modal" size="sm">
             <:header>Unfollow Streamer</:header>

@@ -8,8 +8,8 @@
     <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
     </div>
   </div>
-  
-<!-- Main content -->
+
+  <!-- Main content -->
   <div class="relative z-10 flex flex-col min-h-screen">
     <!-- Header -->
     <header class="border-b border-amber-500/20 backdrop-blur-md bg-slate-950/40">
@@ -33,8 +33,8 @@
         </div>
       </div>
     </header>
-    
-<!-- Main content area -->
+
+    <!-- Main content area -->
     <main class="flex-1 flex flex-col px-4 py-8">
       <div class="w-full max-w-7xl mx-auto space-y-6">
         <.async_result :let={ads} assign={@ads}>
@@ -65,8 +65,8 @@
               <p class="text-slate-300">Could not load ads data</p>
             </div>
           </:failed>
-          
-<!-- Stats Cards -->
+
+          <!-- Stats Cards -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="rounded-xl border border-amber-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 backdrop-blur">
               <div class="text-center">
@@ -85,8 +85,8 @@
               </div>
             <% end %>
           </div>
-          
-<!-- Ad Impressions Over Time Graph -->
+
+          <!-- Ad Impressions Over Time Graph -->
           <div class="rounded-xl border border-amber-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-700/50">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -138,8 +138,8 @@
               />
             </div>
           </div>
-          
-<!-- Ads Per Hour Graph -->
+
+          <!-- Ads Per Hour Graph -->
           <.async_result :let={minutes} assign={@minutes}>
             <:loading></:loading>
             <:failed></:failed>
@@ -197,8 +197,8 @@
               </div>
             <% end %>
           </.async_result>
-          
-<!-- Top Channels by Ads -->
+
+          <!-- Top Channels by Ads -->
           <div class="rounded-xl border border-amber-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-700/50">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -240,8 +240,8 @@
         </.async_result>
       </div>
     </main>
-    
-<!-- Footer -->
+
+    <!-- Footer -->
     <footer class="border-t border-slate-800 backdrop-blur-md bg-slate-950/40 text-center py-6">
       <p class="text-sm text-slate-500">
         No data is stored. Your file is processed and discarded immediately.

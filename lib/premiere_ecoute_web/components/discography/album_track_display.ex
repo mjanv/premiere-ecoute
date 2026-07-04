@@ -69,8 +69,8 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
           </div>
         <% end %>
       </div>
-      
-    <!-- Album details -->
+
+      <!-- Album details -->
       <div class={[
         content_spacing_classes(@orientation),
         if(@orientation == "vertical", do: "text-center", else: "flex-1 min-w-0")
@@ -226,8 +226,8 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
             </svg>
           </div>
         <% end %>
-        
-    <!-- Provider badge -->
+
+        <!-- Provider badge -->
         <%= if @show_provider && Map.get(@playlist, :provider) do %>
           <div class="absolute -top-1 -right-1">
             <div class={[
@@ -246,8 +246,8 @@ defmodule PremiereEcouteWeb.Components.AlbumTrackDisplay do
           </div>
         <% end %>
       </div>
-      
-    <!-- Playlist details -->
+
+      <!-- Playlist details -->
       <div class={[
         content_spacing_classes(@orientation),
         if(@orientation == "vertical", do: "text-center", else: "flex-1 min-w-0")

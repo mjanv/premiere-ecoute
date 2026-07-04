@@ -109,8 +109,8 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
           </span>
         <% end %>
       </button>
-      
-    <!-- Dropdown -->
+
+      <!-- Dropdown -->
       <%= if @open do %>
         <!-- Click-away overlay -->
         <div class="fixed inset-0 z-40" phx-click="close" phx-target={@myself}></div>
@@ -119,8 +119,7 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
           class="absolute right-0 mt-2 w-[28rem] rounded-lg shadow-xl border z-50 flex flex-col max-h-96"
           style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
         >
-          
-    <!-- Header -->
+          <!-- Header -->
           <div
             class="flex items-center justify-between px-4 py-3 border-b"
             style="border-color: var(--color-dark-700);"
@@ -136,8 +135,8 @@ defmodule PremiereEcouteWeb.Live.Components.NotificationsComponent do
               </button>
             <% end %>
           </div>
-          
-    <!-- List -->
+
+          <!-- List -->
           <div class="overflow-y-auto flex-1">
             <%= if @notifications == [] do %>
               <div class="flex flex-col items-center justify-center py-10 text-gray-500">

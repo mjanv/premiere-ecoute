@@ -11,8 +11,8 @@
 <span class="text-purple-500">╚═════╝ ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝</span>
       </pre>
     </div>
-    
-<!-- Input Form -->
+
+    <!-- Input Form -->
     <%= if @tracks == [] and not @loading do %>
       <div class="border border-purple-500 p-6 mb-8">
         <.form for={@playlist_form} phx-submit="generate_billboard" phx-change="update_playlist_input" class="space-y-4">
@@ -41,8 +41,8 @@
         </.form>
       </div>
     <% end %>
-    
-<!-- Clear Button (when results exist) -->
+
+    <!-- Clear Button (when results exist) -->
     <%= if @tracks != [] do %>
       <div class="border border-purple-500 p-6 mb-8">
         <div class="flex justify-center">
@@ -56,8 +56,8 @@
         </div>
       </div>
     <% end %>
-    
-<!-- Error Display -->
+
+    <!-- Error Display -->
     <%= if @error do %>
       <div class="mt-4 p-4 border border-purple-500">
         <div class="text-purple-500 whitespace-pre-line">
@@ -67,12 +67,11 @@
         </div>
       </div>
     <% end %>
-    
-<!-- Results -->
+
+    <!-- Results -->
     <%= if @tracks != [] do %>
       <div class="border border-purple-500 p-6 overflow-x-auto">
-        
-<!-- Tab Navigation -->
+        <!-- Tab Navigation -->
         <div class="mb-8">
           <div class="flex space-x-2 border-b border-purple-500">
             <button
@@ -105,8 +104,8 @@
             </button>
           </div>
         </div>
-        
-<!-- Top 3 Podium -->
+
+        <!-- Top 3 Podium -->
 
         <div class="mb-12">
           <%= cond do %>
@@ -133,8 +132,8 @@
                     <% end %>
                   </div>
                 </div>
-                
-<!-- 1st Place -->
+
+                <!-- 1st Place -->
                 <div class="text-center">
                   <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
                     <div class="text-5xl mb-2">👑</div>
@@ -154,8 +153,8 @@
                     <% end %>
                   </div>
                 </div>
-                
-<!-- 3rd Place -->
+
+                <!-- 3rd Place -->
                 <div class="text-center">
                   <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
                     <div class="text-3xl mb-2">🥉</div>
@@ -199,8 +198,8 @@
                     <% end %>
                   </div>
                 </div>
-                
-<!-- 1st Place -->
+
+                <!-- 1st Place -->
                 <div class="text-center">
                   <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
                     <div class="text-5xl mb-2">👑</div>
@@ -220,8 +219,8 @@
                     <% end %>
                   </div>
                 </div>
-                
-<!-- 3rd Place -->
+
+                <!-- 3rd Place -->
                 <div class="text-center">
                   <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
                     <div class="text-3xl mb-2">🥉</div>
@@ -248,8 +247,8 @@
                 <% first_place = Enum.find(@year_podium, fn year -> year.rank == 1 end)
                 second_place = Enum.find(@year_podium, fn year -> year.rank == 2 end)
                 third_place = Enum.find(@year_podium, fn year -> year.rank == 3 end) %>
-                
-<!-- 2nd Place -->
+
+                <!-- 2nd Place -->
                 <div class="text-center">
                   <div class="bg-yellow-600 border-4 border-yellow-400 p-4 rounded-t-lg h-28 flex flex-col justify-end w-64">
                     <div class="text-4xl mb-2">🥈</div>
@@ -267,8 +266,8 @@
                     <% end %>
                   </div>
                 </div>
-                
-<!-- 1st Place -->
+
+                <!-- 1st Place -->
                 <div class="text-center">
                   <div class="bg-pink-600 border-4 border-pink-400 p-4 rounded-t-lg h-32 flex flex-col justify-end w-64">
                     <div class="text-5xl mb-2">👑</div>
@@ -286,8 +285,8 @@
                     <% end %>
                   </div>
                 </div>
-                
-<!-- 3rd Place -->
+
+                <!-- 3rd Place -->
                 <div class="text-center">
                   <div class="bg-cyan-700 border-4 border-cyan-500 p-4 rounded-t-lg h-24 flex flex-col justify-end w-64">
                     <div class="text-3xl mb-2">🥉</div>
@@ -311,8 +310,8 @@
               <div></div>
           <% end %>
         </div>
-        
-<!-- Full List -->
+
+        <!-- Full List -->
         <div class="font-mono text-lg">
           <%= cond do %>
             <% @display_mode == :track -> %>
@@ -379,8 +378,8 @@
         </div>
       </div>
     <% end %>
-    
-<!-- Loading State -->
+
+    <!-- Loading State -->
     <%= if @loading do %>
       <div class="synthwave-loading p-8 text-center max-w-4xl mx-auto">
         <div class="synthwave-progress-text mb-6 text-2xl font-bold">
@@ -555,8 +554,8 @@
           </a>
         </div>
       </div>
-      
-<!-- Tab Navigation -->
+
+      <!-- Tab Navigation -->
       <div class="mb-6">
         <div class="flex space-x-2 border-b border-gray-700">
           <button
@@ -587,8 +586,8 @@
           </button>
         </div>
       </div>
-      
-<!-- Tab Content -->
+
+      <!-- Tab Content -->
       <div class="space-y-4">
         <%= if @playlist_modal_tab == :tracks do %>
           <div>

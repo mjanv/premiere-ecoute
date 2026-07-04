@@ -9,20 +9,20 @@
         <div style="width: 200px; height: 200px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
         </div>
       </div>
-      
-<!-- Track Information Skeleton -->
+
+      <!-- Track Information Skeleton -->
       <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
         <!-- Album Name Skeleton -->
         <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px;"}>
           - / - - -
         </div>
-        
-<!-- Track Name Skeleton -->
+
+        <!-- Track Name Skeleton -->
         <div style={"font-size: 48px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px;"}>
           -
         </div>
-        
-<!-- Track and Timer Row Skeleton -->
+
+        <!-- Track and Timer Row Skeleton -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
             --:-- / --:--
@@ -37,21 +37,21 @@
         style="width: 180px; height: 180px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);"
       />
     </div>
-    
-<!-- Track Information -->
+
+    <!-- Track Information -->
     <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1; padding: 0 20px;">
       <!-- Album Name -->
       <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); margin-bottom: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"}>
         {progress.item && progress.item.track_number} / {progress.item && progress.item.album && progress.item.album.total_tracks} - {progress.item &&
           hd(progress.item.artists).name} - {progress.item && progress.item.album && progress.item.album.name}
       </div>
-      
-<!-- Track Name -->
+
+      <!-- Track Name -->
       <div style={"font-size: 48px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"}>
         {progress.item && progress.item.name}
       </div>
-      
-<!-- Track and Timer Row -->
+
+      <!-- Track and Timer Row -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <!-- Track -->
         <div style={"font-size: 24px; font-weight: 500; color: #{@text_color}; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"}>
@@ -62,8 +62,8 @@
       </div>
     </div>
   </.async_result>
-  
-<!-- Notes Row -->
+
+  <!-- Notes Row -->
   <.async_result :let={summary} assign={@summary}>
     <:loading>
       <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 40px; padding: 0 16px; height: 180px;">
@@ -76,8 +76,8 @@
             {score_label(@user, :viewer)}
           </div>
         </div>
-        
-<!-- Streamer Note Skeleton -->
+
+        <!-- Streamer Note Skeleton -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <span style={"font-size: 100px; font-weight: 700; color: #{@text_color}; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"}>
             -
@@ -127,8 +127,8 @@
           {score_label(@user, :viewer)}
         </div>
       </div>
-      
-<!-- Streamer Note -->
+
+      <!-- Streamer Note -->
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <%= if @widget_state == :closed do %>
           <svg

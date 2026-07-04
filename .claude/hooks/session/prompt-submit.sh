@@ -1,5 +1,5 @@
 #!/bin/bash
-# AIDEV-NOTE: UserPromptSubmit hook - injects SESSION.md into Claude's context on claude/ branches
+# UserPromptSubmit hook - injects SESSION.md into Claude's context on claude/ branches
 
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 

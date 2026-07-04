@@ -1,5 +1,5 @@
 #!/bin/bash
-# AIDEV-NOTE: SessionStart hook - creates SESSION.md memory file for claude/ branches
+# SessionStart hook - creates SESSION.md memory file for claude/ branches
 
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 

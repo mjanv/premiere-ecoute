@@ -36,8 +36,8 @@
         </div>
       </div>
     </div>
-    
-<!-- Stats Cards -->
+
+    <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       <!-- Total Goals -->
       <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
@@ -58,8 +58,8 @@
           </div>
         </div>
       </div>
-      
-<!-- Active Goals -->
+
+      <!-- Active Goals -->
       <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
         <div class="flex items-center">
           <div class="p-3 rounded-full bg-green-900">
@@ -78,8 +78,8 @@
           </div>
         </div>
       </div>
-      
-<!-- Upcoming Goals -->
+
+      <!-- Upcoming Goals -->
       <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
         <div class="flex items-center">
           <div class="p-3 rounded-full bg-purple-900">
@@ -101,8 +101,8 @@
         </div>
       </div>
     </div>
-    
-<!-- Goals Section -->
+
+    <!-- Goals Section -->
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
         <div>
@@ -250,8 +250,8 @@
           <p class="mt-1 text-sm text-red-500">{gettext("Title is required")}</p>
         <% end %>
       </div>
-      
-<!-- Description Field -->
+
+      <!-- Description Field -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-300 mb-2">
           {gettext("Description")}
@@ -263,8 +263,8 @@
           class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         ><%= @goal_form.params["description"] || "" %></textarea>
       </div>
-      
-<!-- Target Amount and Currency -->
+
+      <!-- Target Amount and Currency -->
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">
@@ -300,8 +300,8 @@
           <% end %>
         </div>
       </div>
-      
-<!-- Start Date and End Date -->
+
+      <!-- Start Date and End Date -->
       <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">
@@ -333,8 +333,8 @@
           <% end %>
         </div>
       </div>
-      
-<!-- Form Actions -->
+
+      <!-- Form Actions -->
       <div class="flex gap-3">
         <button
           type="submit"

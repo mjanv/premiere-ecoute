@@ -49,8 +49,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-      
-    <!-- Album Cover -->
+
+      <!-- Album Cover -->
       <div class="flex-shrink-0">
         <%= if @album.cover_url do %>
           <img
@@ -98,8 +98,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-      
-    <!-- Track Cover -->
+
+      <!-- Track Cover -->
       <div class="flex-shrink-0">
         <%= if @single.cover_url do %>
           <img
@@ -149,8 +149,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </div>
         </div>
       </div>
-      
-    <!-- Playlist Cover -->
+
+      <!-- Playlist Cover -->
       <div class="flex-shrink-0">
         <%= if @playlist.cover_url do %>
           <img
@@ -267,8 +267,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           <span class={[
             "inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out translate-y-0.5",
             if(@checked, do: "translate-x-4", else: "translate-x-0.5")
-          ]}>
-          </span>
+          ]}></span>
         </div>
         <span class="text-purple-200 text-sm font-medium">
           {@legend}
@@ -642,8 +641,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
           </svg>
         <% end %>
       </button>
-      
-    <!-- Dropdown menu -->
+
+      <!-- Dropdown menu -->
       <div
         id="visibility-dropdown-menu"
         class={[

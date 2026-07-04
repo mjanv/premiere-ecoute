@@ -26,8 +26,7 @@ defmodule PremiereEcouteWeb.Models.AudioLive do
           phx-update="ignore"
           data-endianness={System.endianness()}
           class="rounded-xl border border-gray-800 block max-w-full"
-        >
-        </canvas>
+        ></canvas>
       </div>
 
       <%!-- Record button --%>
@@ -64,8 +63,7 @@ defmodule PremiereEcouteWeb.Models.AudioLive do
           >
             <div class="flex items-center gap-3 text-sm font-mono">
               <span class="text-gray-500">{i + 1}</span>
-              <span class={["w-2 h-2 rounded-full shrink-0", if(seg.class == :speech, do: "bg-green-500", else: "bg-yellow-500")]}>
-              </span>
+              <span class={["w-2 h-2 rounded-full shrink-0", if(seg.class == :speech, do: "bg-green-500", else: "bg-yellow-500")]}></span>
               <span class="text-white">
                 {format_ms(seg.start_ms)} – {format_ms(seg.end_ms)}
               </span>

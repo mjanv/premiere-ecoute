@@ -8,8 +8,8 @@
     <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
     </div>
   </div>
-  
-<!-- Main content -->
+
+  <!-- Main content -->
   <div class="relative z-10 flex flex-col min-h-screen">
     <!-- Header -->
     <header class="border-b border-purple-500/20 backdrop-blur-md bg-slate-950/40">
@@ -28,8 +28,8 @@
         </div>
       </div>
     </header>
-    
-<!-- Main content area -->
+
+    <!-- Main content area -->
     <main class="flex-1 flex flex-col items-center justify-center px-4 py-12">
       <div class="w-full max-w-2xl">
         <!-- Upload Area -->
@@ -42,8 +42,8 @@
               Upload your Twitch data export to view your chat history. No account needed, no data is saved.
             </p>
           </div>
-          
-<!-- Error display -->
+
+          <!-- Error display -->
           <%= if @upload_error do %>
             <div class="rounded-lg border border-red-500/50 bg-red-950/30 backdrop-blur p-4 flex gap-3 items-start animate-slideDown">
               <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -62,13 +62,13 @@
               </div>
             </div>
           <% end %>
-          
-<!-- Upload Form -->
+
+          <!-- Upload Form -->
           <form id="upload-form" phx-submit="save" phx-change="validate" class="space-y-4">
             <!-- Hidden file input -->
             <.live_file_input upload={@uploads.request} class="hidden" />
-            
-<!-- Drop Zone -->
+
+            <!-- Drop Zone -->
             <div
               class="group relative flex flex-col items-center justify-center w-full h-64 rounded-2xl border-2 border-dashed border-purple-500/40 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur cursor-pointer transition-all duration-300 hover:border-purple-500/70 hover:bg-slate-800/60 active:scale-98"
               phx-drop-target="#upload-form"
@@ -104,8 +104,8 @@
                 <p class="text-xs text-slate-500">ZIP file • Up to 999 MB</p>
               </div>
             </div>
-            
-<!-- File preview and progress -->
+
+            <!-- File preview and progress -->
             <%= for entry <- @uploads.request.entries do %>
               <div class="space-y-3 animate-slideDown">
                 <div class="flex items-center gap-3 p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
@@ -124,8 +124,8 @@
                     <p class="text-xs text-slate-400">{Float.round(entry.client_size / 1024 / 1024, 2)} MB</p>
                   </div>
                 </div>
-                
-<!-- Progress bar -->
+
+                <!-- Progress bar -->
                 <div class="space-y-2">
                   <div class="h-1 w-full bg-slate-700/50 rounded-full overflow-hidden">
                     <div
@@ -150,8 +150,8 @@
                 </div>
               </div>
             <% end %>
-            
-<!-- Submit button -->
+
+            <!-- Submit button -->
             <%= if Enum.any?(@uploads.request.entries) do %>
               <button
                 type="submit"
@@ -165,8 +165,8 @@
               </button>
             <% end %>
           </form>
-          
-<!-- Info section -->
+
+          <!-- Info section -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
             <div class="flex gap-3 p-4 rounded-lg bg-slate-800/30 border border-slate-700/30 hover:border-slate-600/50 transition-all duration-300">
               <svg class="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -216,8 +216,8 @@
         </div>
       </div>
     </main>
-    
-<!-- Footer -->
+
+    <!-- Footer -->
     <footer class="border-t border-slate-800 backdrop-blur-md bg-slate-950/40 text-center py-6">
       <p class="text-sm text-slate-500">
         No data is stored. Your file is processed and discarded immediately.

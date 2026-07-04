@@ -28,8 +28,8 @@
         </div>
       </div>
     </div>
-    
-<!-- Balance Cards -->
+
+    <!-- Balance Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
       <!-- Collected Amount -->
       <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
@@ -50,8 +50,8 @@
           </div>
         </div>
       </div>
-      
-<!-- Spent Amount -->
+
+      <!-- Spent Amount -->
       <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
         <div class="flex items-center">
           <div class="p-3 rounded-full bg-orange-900">
@@ -65,8 +65,8 @@
           </div>
         </div>
       </div>
-      
-<!-- Remaining Amount -->
+
+      <!-- Remaining Amount -->
       <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
         <div class="flex items-center">
           <div class="p-3 rounded-full bg-blue-900">
@@ -85,8 +85,8 @@
           </div>
         </div>
       </div>
-      
-<!-- Progress -->
+
+      <!-- Progress -->
       <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
         <div class="flex items-center">
           <div class="p-3 rounded-full bg-purple-900">
@@ -106,8 +106,8 @@
         </div>
       </div>
     </div>
-    
-<!-- Expenses Section -->
+
+    <!-- Expenses Section -->
     <div class="bg-gray-800 rounded-lg shadow mb-8">
       <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
         <div>
@@ -217,8 +217,8 @@
         </table>
       </div>
     </div>
-    
-<!-- Donations Section -->
+
+    <!-- Donations Section -->
     <div class="bg-gray-800 rounded-lg shadow">
       <div class="px-6 py-4 border-b border-gray-700">
         <div>
@@ -337,8 +337,8 @@
           <p class="mt-1 text-sm text-red-500">{gettext("Title is required")}</p>
         <% end %>
       </div>
-      
-<!-- Description Field -->
+
+      <!-- Description Field -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-300 mb-2">
           {gettext("Description")}
@@ -350,8 +350,8 @@
           class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         ><%= @expense_form.params["description"] || "" %></textarea>
       </div>
-      
-<!-- Category Field -->
+
+      <!-- Category Field -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-300 mb-2">
           {gettext("Category")} <span class="text-red-500">*</span>
@@ -367,8 +367,8 @@
           <p class="mt-1 text-sm text-red-500">{gettext("Category is required")}</p>
         <% end %>
       </div>
-      
-<!-- Amount Field -->
+
+      <!-- Amount Field -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-300 mb-2">
           {gettext("Amount")} <span class="text-red-500">*</span>
@@ -385,8 +385,8 @@
           <p class="mt-1 text-sm text-red-500">{gettext("Amount is required")}</p>
         <% end %>
       </div>
-      
-<!-- Date Field -->
+
+      <!-- Date Field -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-300 mb-2">
           {gettext("Date")} <span class="text-red-500">*</span>
@@ -401,8 +401,8 @@
           <p class="mt-1 text-sm text-red-500">{gettext("Date is required")}</p>
         <% end %>
       </div>
-      
-<!-- Form Actions -->
+
+      <!-- Form Actions -->
       <div class="flex gap-3">
         <button
           type="submit"

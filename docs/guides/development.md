@@ -63,6 +63,12 @@ mix dialyzer       # Type checking
 mix quality        # Run all quality checks
 ```
 
+### Introspection
+
+```bash
+iex --remsh dev --sname local # Connect in a remote console to running local application
+```
+
 ### Audit
 
 ```bash

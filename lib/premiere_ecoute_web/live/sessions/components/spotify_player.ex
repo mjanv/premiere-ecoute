@@ -157,8 +157,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
           </div>
         </div>
       <% end %>
-      
-    <!-- Current Track Status -->
+
+      <!-- Current Track Status -->
       <%= if @player_state.item do %>
         <div class="bg-white/20 rounded-lg p-3 space-y-3">
           <p class="text-sm font-medium text-white truncate">

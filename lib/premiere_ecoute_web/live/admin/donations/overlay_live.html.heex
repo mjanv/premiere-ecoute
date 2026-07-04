@@ -6,8 +6,8 @@
         <p class="text-2xl font-semibold text-white">Premiere</p>
         <p class="text-2xl font-semibold text-white">Ecoute</p>
       </div>
-      
-<!-- Main Content -->
+
+      <!-- Main Content -->
       <div class="flex-grow p-4">
         <!-- Title and Amount Header -->
         <div class="mb-2 flex items-center justify-between">
@@ -19,8 +19,8 @@
             {raised} / {Decimal.to_string(@goal.target_amount)} {@goal.currency}
           </p>
         </div>
-        
-<!-- Progress Bar -->
+
+        <!-- Progress Bar -->
         <div class="mb-2">
           <% progress = if @balance, do: @balance.progress, else: 0.0 %>
           <div class="bg-gray-200 rounded-full h-15 flex items-center relative overflow-hidden shadow-md">
@@ -34,8 +34,8 @@
             </div>
           </div>
         </div>
-        
-<!-- Last Donation -->
+
+        <!-- Last Donation -->
         <div class="text-left">
           <%= if @last_donation do %>
             <p class="text-2xl text-gray-500 mb-2">
@@ -54,8 +54,8 @@
         <p class="text-2xl font-semibold text-white">Premiere</p>
         <p class="text-2xl font-semibold text-white">Ecoute</p>
       </div>
-      
-<!-- Main Content -->
+
+      <!-- Main Content -->
       <div class="flex-grow p-4 flex items-center justify-center">
         <p class="text-3xl font-bold text-gray-500">{gettext("No Active Goal")}</p>
       </div>

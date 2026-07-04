@@ -15,8 +15,8 @@
           data-progress-step={@step}
         >
         </div>
-        
-<!-- Step 1: Source -->
+
+        <!-- Step 1: Source -->
         <div class="mb-8 relative">
           <div class="flex items-center mb-6">
             <div
@@ -29,8 +29,8 @@
           </div>
           <.source_buttons source_type={@source_type} current_scope={@current_scope} />
         </div>
-        
-<!-- Step 2: Content selection -->
+
+        <!-- Step 2: Content selection -->
         <.album_step
           :if={@source_type == "album"}
           selected_album={@selected_album}
@@ -51,16 +51,16 @@
           search_form={@search_form}
         />
         <.free_step :if={@source_type == "free"} free_session_name={@free_session_name} />
-        
-<!-- Step 3: Vote options -->
+
+        <!-- Step 3: Vote options -->
         <.vote_options_step
           :if={@content_selected}
           vote_options_preset={@vote_options_preset}
           source_type={@source_type}
           free_vote_mode={@free_vote_mode}
         />
-        
-<!-- Step 3b: Session options -->
+
+        <!-- Step 3b: Session options -->
         <%= if @step in ["3", "4"] do %>
           <div class="mb-8 relative">
             <div class="ml-16 space-y-2">
@@ -71,8 +71,8 @@
             </div>
           </div>
         <% end %>
-        
-<!-- Step 4: Start -->
+
+        <!-- Step 4: Start -->
         <%= if @step == "4" do %>
           <div class="pt-6 relative" id="step-4">
             <div class="flex items-center mb-6">

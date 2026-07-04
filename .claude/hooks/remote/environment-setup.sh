@@ -18,12 +18,12 @@ apt-get install -y --no-install-recommends libssl3 libsctp1 curl unzip ca-certif
 # clone. This sandbox's proxy 403s on the git protocol against github.com but allows
 # plain HTTPS downloads, so this avoids asdf/git entirely.
 curl -fsSO https://elixir-lang.org/install.sh
-sh install.sh elixir@1.20.1 otp@29.0.2
+sh install.sh elixir@1.20.2 otp@29.0.2
 rm install.sh
 
 installs_dir="$HOME/.elixir-install/installs"
 otp_bin=$(echo "$installs_dir"/otp/29.0.2/bin)
-elixir_bin=$(echo "$installs_dir"/elixir/1.20.1-otp-*/bin)
+elixir_bin=$(echo "$installs_dir"/elixir/1.20.2-otp-*/bin)
 echo "export PATH=\"$elixir_bin:$otp_bin:\$PATH\"" > /etc/profile.d/elixir.sh
 export PATH="$elixir_bin:$otp_bin:$PATH"
 

@@ -8,8 +8,8 @@
     <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000">
     </div>
   </div>
-  
-<!-- Main content -->
+
+  <!-- Main content -->
   <div class="relative z-10 flex flex-col min-h-screen">
     <!-- Header -->
     <header class="border-b border-purple-500/20 backdrop-blur-md bg-slate-950/40">
@@ -33,8 +33,8 @@
         </div>
       </div>
     </header>
-    
-<!-- Main content area -->
+
+    <!-- Main content area -->
     <main class="flex-1 flex flex-col px-4 py-8">
       <div class="w-full max-w-7xl mx-auto">
         <.async_result :let={history} assign={@history}>
@@ -94,8 +94,8 @@
                     <p class="text-2xl font-bold text-white truncate">{history.username}</p>
                   </div>
                 </div>
-                
-<!-- User ID Card -->
+
+                <!-- User ID Card -->
                 <div class="group relative rounded-xl border border-cyan-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 backdrop-blur hover:border-cyan-500/60 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10">
                   <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-cyan-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:to-purple-500/5 transition-all duration-300">
                   </div>
@@ -104,8 +104,8 @@
                     <p class="text-lg font-mono text-cyan-400 truncate">{history.user_id}</p>
                   </div>
                 </div>
-                
-<!-- History ID Card -->
+
+                <!-- History ID Card -->
                 <div class="group relative rounded-xl border border-pink-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 backdrop-blur hover:border-pink-500/60 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/10">
                   <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-pink-500/0 to-purple-500/0 group-hover:from-pink-500/5 group-hover:to-purple-500/5 transition-all duration-300">
                   </div>
@@ -114,8 +114,8 @@
                     <p class="text-lg font-mono text-pink-400 truncate">{history.request_id}</p>
                   </div>
                 </div>
-                
-<!-- Date Range Card -->
+
+                <!-- Date Range Card -->
                 <div class="group relative rounded-xl border border-orange-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 backdrop-blur hover:border-orange-500/60 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10">
                   <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/0 to-yellow-500/0 group-hover:from-orange-500/5 group-hover:to-yellow-500/5 transition-all duration-300">
                   </div>
@@ -129,8 +129,8 @@
                   </div>
                 </div>
               </div>
-              
-<!-- Follows Data Section -->
+
+              <!-- Follows Data Section -->
               <.async_result :let={follows} assign={@follows}>
                 <:loading>
                   <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-6">
@@ -243,8 +243,8 @@
                   </div>
                 <% end %>
               </.async_result>
-              
-<!-- Messages Data Section -->
+
+              <!-- Messages Data Section -->
               <.async_result :let={messages} assign={@messages}>
                 <:loading>
                   <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-6">
@@ -380,8 +380,8 @@
                   </div>
                 <% end %>
               </.async_result>
-              
-<!-- Emotes Data Section -->
+
+              <!-- Emotes Data Section -->
               <.async_result :let={emotes} assign={@emotes}>
                 <:loading>
                   <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-6">
@@ -494,8 +494,8 @@
                   </div>
                 <% end %>
               </.async_result>
-              
-<!-- Minutes Watched Data Section -->
+
+              <!-- Minutes Watched Data Section -->
               <.async_result :let={minutes} assign={@minutes}>
                 <:loading>
                   <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-6">
@@ -618,8 +618,8 @@
                   </div>
                 <% end %>
               </.async_result>
-              
-<!-- Subscriptions Data Section -->
+
+              <!-- Subscriptions Data Section -->
               <.async_result :let={subscriptions} assign={@subscriptions}>
                 <:loading>
                   <div class="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur p-6">
@@ -727,8 +727,8 @@
                 <% end %>
               </.async_result>
             </div>
-            
-<!-- Bits Cheered -->
+
+            <!-- Bits Cheered -->
             <div class="space-y-6 mt-8">
               <.async_result :let={bits} assign={@bits}>
                 <:loading></:loading>
@@ -804,8 +804,8 @@
                 <% end %>
               </.async_result>
             </div>
-            
-<!-- Ad Impressions -->
+
+            <!-- Ad Impressions -->
             <div class="space-y-6 mt-8">
               <.async_result :let={ads} assign={@ads}>
                 <:loading></:loading>
@@ -897,8 +897,8 @@
                 <% end %>
               </.async_result>
             </div>
-            
-<!-- Games Section -->
+
+            <!-- Games Section -->
             <div class="space-y-6 mt-8">
               <div class="rounded-xl border border-purple-500/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur overflow-hidden">
                 <div class="px-6 py-3 border-b border-slate-700/50 flex items-center justify-between">
@@ -953,8 +953,8 @@
         </.async_result>
       </div>
     </main>
-    
-<!-- Footer -->
+
+    <!-- Footer -->
     <footer class="border-t border-slate-800 backdrop-blur-md bg-slate-950/40 text-center py-6">
       <p class="text-sm text-slate-500">
         No data is stored. Your file is processed and discarded immediately.

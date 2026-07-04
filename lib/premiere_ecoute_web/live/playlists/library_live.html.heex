@@ -93,8 +93,8 @@
               </div>
             </:action>
           </.page_header>
-          
-<!-- Library playlists grid with add playlist button -->
+
+          <!-- Library playlists grid with add playlist button -->
           <%= if PremiereEcouteCore.FeatureFlag.enabled?(:playlists, for: @current_user) do %>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
               <!-- Existing playlists -->
@@ -118,18 +118,18 @@
                       </svg>
                     </div>
                   <% end %>
-                  
-<!-- Overlay gradient for text readability -->
+
+                  <!-- Overlay gradient for text readability -->
                   <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-                  
-<!-- Title at bottom -->
+
+                  <!-- Title at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4 bg-black/40 backdrop-blur-sm">
                     <h4 class="font-bold text-white text-base leading-tight drop-shadow-xl shadow-black/80" title={playlist.title}>
                       {playlist.title}
                     </h4>
                   </div>
-                  
-<!-- Tags at top - visible on hover -->
+
+                  <!-- Tags at top - visible on hover -->
                   <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div class="flex flex-col space-y-1">
                       <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-black/60 text-white/90 backdrop-blur-sm">
@@ -166,8 +166,8 @@
                 </.link>
               <% end %>
             </div>
-            
-<!-- Empty state when no playlists -->
+
+            <!-- Empty state when no playlists -->
             <%= if is_nil(assigns[:library_playlists]) || Enum.empty?(assigns[:library_playlists] || []) do %>
               <div class="text-center py-16">
                 <div class="w-24 h-24 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -204,8 +204,8 @@
       </div>
     </div>
   </div>
-  
-<!-- Playlist search modal for displaying user's Spotify playlists -->
+
+  <!-- Playlist search modal for displaying user's Spotify playlists -->
   <%= if assigns[:show_playlist_modal] do %>
     <.modal id="playlist-modal" show on_cancel="hide_playlist_modal" size="xl">
       <:header>{gettext("My Spotify Playlists")}</:header>
@@ -290,8 +290,8 @@
                 </div>
               <% end %>
             </div>
-            
-<!-- Load More button for pagination -->
+
+            <!-- Load More button for pagination -->
             <%= if assigns[:has_more_playlists] && @has_more_playlists do %>
               <div class="text-center mt-6">
                 <button
@@ -333,8 +333,8 @@
           <% end %>
         <% end %>
       </div>
-      
-<!-- Modal Footer -->
+
+      <!-- Modal Footer -->
       <div class="border-t border-gray-700">
         <!-- Selected playlist info section - separate from scrollable content -->
         <%= if @selected_playlist do %>
@@ -387,8 +387,8 @@
   <%= if assigns[:show_create_playlist_modal] do %>
     <.modal id="create-playlist-modal" show on_cancel="hide_create_playlist_modal" size="sm">
       <:header>{gettext("Create New Playlist")}</:header>
-      
-<!-- Modal Content -->
+
+      <!-- Modal Content -->
       <form
         phx-submit="create_playlist"
         class="p-6 space-y-4"

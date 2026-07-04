@@ -21,8 +21,8 @@
           <% else %>
             <div class="px-4 py-2 w-14"></div>
           <% end %>
-          
-<!-- Period Label -->
+
+          <!-- Period Label -->
           <div class="px-8 py-3 rounded-lg text-white font-medium min-w-64 text-center text-xl">
             <%= case @selected_period do %>
               <% :all -> %>
@@ -45,8 +45,8 @@
           <% else %>
             <div class="px-4 py-2 w-14"></div>
           <% end %>
-          
-<!-- Period Toggle -->
+
+          <!-- Period Toggle -->
           <div class="ml-8 flex items-center">
             <div class="bg-gray-800 rounded-lg p-1 flex">
               <button
@@ -72,8 +72,8 @@
               </button>
             </div>
           </div>
-          
-<!-- Source Toggle -->
+
+          <!-- Source Toggle -->
           <div class="ml-4 flex items-center">
             <div class="bg-gray-800 rounded-lg p-1 flex">
               <button
@@ -102,8 +102,8 @@
         </div>
       </div>
     </div>
-    
-<!-- Track List -->
+
+    <!-- Track List -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <.async_result :let={tops_data} assign={@tops_data}>
         <:loading>

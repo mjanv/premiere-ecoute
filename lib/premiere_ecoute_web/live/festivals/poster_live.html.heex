@@ -15,8 +15,8 @@
           {gettext("Upload festival posters and create playlists for your events")}
         </p>
       </div>
-      
-<!-- Main Content Grid -->
+
+      <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
         <!-- Left Side - Image Upload -->
         <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
@@ -30,8 +30,8 @@
               <!-- File Input -->
               <div class="space-y-4">
                 <.live_file_input upload={@uploads.poster} class="hidden" />
-                
-<!-- Custom Upload Area -->
+
+                <!-- Custom Upload Area -->
                 <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-gray-500 transition-colors">
                   <div class="space-y-4">
                     <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto">
@@ -59,8 +59,8 @@
                     </div>
                   </div>
                 </div>
-                
-<!-- Upload Errors -->
+
+                <!-- Upload Errors -->
                 <%= for entry <- @uploads.poster.entries do %>
                   <div class="space-y-2">
                     <!-- Progress Bar -->
@@ -71,8 +71,8 @@
                       >
                       </div>
                     </div>
-                    
-<!-- File Info and Cancel Button -->
+
+                    <!-- File Info and Cancel Button -->
                     <div class="flex items-center justify-between text-sm">
                       <span class="text-gray-300">{entry.client_name}</span>
                       <button
@@ -84,8 +84,8 @@
                         {gettext("Cancel")}
                       </button>
                     </div>
-                    
-<!-- Entry Errors -->
+
+                    <!-- Entry Errors -->
                     <%= for err <- upload_errors(@uploads.poster, entry) do %>
                       <p class="text-red-400 text-sm">
                         {Phoenix.Naming.humanize(err)}
@@ -93,16 +93,16 @@
                     <% end %>
                   </div>
                 <% end %>
-                
-<!-- General Upload Errors -->
+
+                <!-- General Upload Errors -->
                 <%= for err <- upload_errors(@uploads.poster) do %>
                   <p class="text-red-400 text-sm">
                     {Phoenix.Naming.humanize(err)}
                   </p>
                 <% end %>
               </div>
-              
-<!-- Submit Button -->
+
+              <!-- Submit Button -->
               <button
                 type="submit"
                 disabled={Enum.empty?(@uploads.poster.entries)}
@@ -112,8 +112,8 @@
               </button>
             </.form>
           <% end %>
-          
-<!-- Uploaded Images Display -->
+
+          <!-- Uploaded Images Display -->
           <%= if not Enum.empty?(@uploaded_files) do %>
             <div class="mt-6 space-y-4">
               <%= for file_url <- @uploaded_files do %>
@@ -128,8 +128,8 @@
             </div>
           <% end %>
         </div>
-        
-<!-- Right Side - Artists Display -->
+
+        <!-- Right Side - Artists Display -->
         <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-2xl font-semibold text-white">
@@ -205,8 +205,8 @@
                     <% end %>
                   </div>
                 <% end %>
-                
-<!-- Spotify Playlist Export Section -->
+
+                <!-- Spotify Playlist Export Section -->
                 <%= if @festival.result.concerts && not Enum.empty?(@festival.result.concerts) do %>
                   <div class="mt-6 mb-3 p-4 bg-green-600/20 rounded-lg border border-green-500/30">
                     <div class="flex items-center justify-between mb-3">
@@ -244,8 +244,8 @@
                         <p class="text-sm text-gray-400 mb-4">
                           {gettext("Found %{count} tracks! Ready to create festival playlist.", count: length(@tracks.result))}
                         </p>
-                        
-<!-- Export Button -->
+
+                        <!-- Export Button -->
                         <button
                           phx-click="create_festival_playlist"
                           disabled={@export.ok? && @export.result}

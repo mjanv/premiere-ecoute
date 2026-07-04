@@ -6,7 +6,11 @@ default:
 # Start development server
 server:
     docker compose up -d
-    iex -S mix phx.server
+    iex --sname dev -S mix phx.server
+
+# Connect to development server
+connect:
+    iex --remsh dev --sname local
 
 # SSH in production server
 ssh:

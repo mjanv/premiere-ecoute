@@ -7,8 +7,7 @@
   <div class="synthwave-bg text-white flex flex-col" style="min-height: calc(100vh - 5rem);">
     <div class="flex-1 py-12">
       <div class="max-w-4xl mx-auto px-6">
-        
-<!-- Header -->
+        <!-- Header -->
         <div class="flex items-start justify-between gap-4 mb-8">
           <div class="flex items-center gap-3">
             <.link navigate={~p"/playlists/automations"} class="text-gray-400 hover:text-white transition-colors">
@@ -71,8 +70,8 @@
             </button>
           </div>
         </div>
-        
-<!-- Steps -->
+
+        <!-- Steps -->
         <div class="mb-8 p-6 bg-gray-800/50 rounded-xl border border-gray-700">
           <h2 class="text-base font-semibold mb-4">{gettext("Steps")}</h2>
           <PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponents.steps_list
@@ -80,8 +79,8 @@
             registry={Automations.action_registry()}
           />
         </div>
-        
-<!-- Run history -->
+
+        <!-- Run history -->
         <div class="p-6 bg-gray-800/50 rounded-xl border border-gray-700">
           <h2 class="text-base font-semibold mb-4">{gettext("Run history")}</h2>
 

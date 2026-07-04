@@ -54,12 +54,12 @@ defmodule PremiereEcouteWeb.Layouts do
         <%= if (@current_scope && Map.get(@current_scope, :user)) do %>
           <div class="w-20 flex-shrink-0"></div>
         <% end %>
-        
-    <!-- Right column: header + banners + main content -->
+
+        <!-- Right column: header + banners + main content -->
         <div class="flex flex-col flex-1 min-w-0">
           <.app_header current_user={(@current_scope && Map.get(@current_scope, :user)) || nil} current_scope={@current_scope} />
-          
-    <!-- Spotify connection notification for streamers -->
+
+          <!-- Spotify connection notification for streamers -->
           <%= if @current_scope && Map.get(@current_scope, :user) && Map.get(@current_scope, :user).role in [:streamer, :admin] && needs_spotify_connection?(Map.get(@current_scope, :user)) do %>
             <div class="bg-green-600 px-6 py-2">
               <div class="flex items-center justify-between">
@@ -80,8 +80,8 @@ defmodule PremiereEcouteWeb.Layouts do
               </div>
             </div>
           <% end %>
-          
-    <!-- Rate limit banners for circuit-broken APIs -->
+
+          <!-- Rate limit banners for circuit-broken APIs -->
           <%= for {api, message, expires_at} <- @banners do %>
             <div class="bg-yellow-600 px-6 py-2">
               <div class="flex items-center space-x-3">
@@ -110,15 +110,15 @@ defmodule PremiereEcouteWeb.Layouts do
               </div>
             </div>
           <% end %>
-          
-    <!-- Main content area -->
+
+          <!-- Main content area -->
           <main class="flex-1">
             {render_slot(@inner_block)}
           </main>
         </div>
       </div>
-      
-    <!-- Footer - spans full width under both sidebar and content -->
+
+      <!-- Footer - spans full width under both sidebar and content -->
       <footer class="py-4 px-6 mt-auto" style="border-top: 1px solid var(--color-dark-800); background-color: var(--color-dark-900);">
         <div class="max-w-5xl mx-auto text-center">
           <div class="flex justify-center items-center space-x-3">
