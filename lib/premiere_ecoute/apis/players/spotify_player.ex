@@ -62,7 +62,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   end
 
   def handle_info(:poll, %{scope: scope, state: old_state, polls: polls} = data) do
-    with scope <- Accounts.maybe_renew_token(scope, :spotify),
+    with {:ok, scope} <- maybe_renew_token(scope),
          {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
          {:ok, state, events} <- handle(old_state, %{new_state | status: :normal}),
          :ok <- Enum.each(events, fn event -> publish(scope, event, state) end) do
@@ -91,6 +91,15 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
     :ok
   end
+
+  defp maybe_renew_token(old_scope) do
+    scope = Accounts.maybe_renew_token(old_scope, :spotify)
+    if at(scope) != at(old_scope), do: publish(scope, :token_refreshed, scope)
+    {:ok, scope}
+  end
+
+  defp at(%Scope{user: %{spotify: %{access_token: access_token}}}), do: access_token
+  defp at(_), do: nil
 
   defp publish(scope, event, state) do
     PremiereEcoute.PubSub.broadcast("playback:#{scope.user.id}", {:player, event, state})

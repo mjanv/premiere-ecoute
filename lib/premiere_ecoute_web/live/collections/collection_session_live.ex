@@ -213,6 +213,11 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
   def handle_info(:duel_tick, socket), do: {:noreply, socket}
 
   @impl true
+  def handle_info({:player, :token_refreshed, scope}, socket) do
+    {:noreply, assign(socket, :scope, scope)}
+  end
+
+  @impl true
   def handle_info({:player, :start_track, state}, socket) do
     track_id = state.item && String.replace_prefix(state.item.uri || "", "spotify:track:", "")
     {:noreply, assign(socket, player_state: state, playing_track_id: track_id)}

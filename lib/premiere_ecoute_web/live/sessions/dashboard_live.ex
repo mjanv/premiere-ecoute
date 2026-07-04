@@ -513,6 +513,11 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   end
 
   @impl true
+  def handle_info({:player, :token_refreshed, scope}, socket) do
+    {:noreply, assign(socket, :current_scope, scope)}
+  end
+
+  @impl true
   def handle_info({:player, :start_track, state}, %{assigns: %{listening_session: session}} = socket) do
     case state do
       %{"context" => %{"type" => "playlist", "uri" => "spotify:playlist:" <> _playlist_id}} = payload
