@@ -1,6 +1,18 @@
 # Changelog
 
-<!-- Last analyzed commit: c3e04540 (2026-05-30) -->
+<!-- Last analyzed commit: f7e8ca1a (2026-06-28) -->
+
+## June 2026
+
+* [Feature] Podcasts: streamers can now run self-hosted podcast shows alongside listening sessions — upload episodes, get a standard RSS feed for Apple/Spotify Podcasts, a public show website with an in-page player, season/episode numbering, and a studio dashboard with unique-listener and 30-day download charts.
+* [Feature] Claude/MCP connector: added a browser-friendly sign-in (OAuth) for the MCP connector, so linking it from claude.ai no longer requires manually pasting an API key.
+* [Feature] MCP tools expanded: Claude/MCP clients can now search the discography, browse radio history, manage wantlists, and control sessions; API tokens can also be given a name to keep track of them.
+* [Feature] Missed-session catch-up: viewers now see a badge for followed-streamer sessions they missed voting in, and get an instant notification (with the album/artist) when a streamer stops a session they didn't vote in.
+* [Feature] Added a reminder on session setup to open Spotify within 10 minutes of starting, so playback control doesn't silently fail.
+* [Improvement] The app now recovers automatically from Spotify account disconnects: an expired Spotify link (after ~6 months) prompts reconnection, and outages show a temporary incident banner instead of failing silently.
+* [Improvement] Listening sessions keep running through Spotify outages — streamers can advance tracks manually and voting/auto-skip keep working while Spotify is degraded.
+* [Fix] Fixed crashes and unsafe playback state handling when Spotify returned empty or error responses (204/502) mid-session.
+* [Fix] Updated playlist track fetching to Spotify's current API after they deprecated the old endpoint, preventing playlist session failures.
 
 ## May 2026
 
