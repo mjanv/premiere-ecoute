@@ -131,7 +131,7 @@ defmodule PremiereEcoute.MixProject do
       {:crontab, "~> 1.1"},
       {:oban_web, "~> 2.11"},
       {:swoosh, "~> 1.19"},
-      {:resend, "~> 0.4"},
+      {:resend, "~> 1.0.0-rc.3"},
       {:broadway, "~> 1.2"},
       {:xml_builder, "~> 2.1"},
       {:jose, "~> 1.11"},
