@@ -43,7 +43,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> assign(:tracks, tracks)
     |> assign(:reviews, reviews)
     |> assign(:liked_ids, liked_ids)
-    |> assign(:post_vote_eligible, Sessions.has_voted?(listening_session, current_user))
+    |> assign(:post_vote_eligible, !Sessions.has_voted?(listening_session, current_user))
     |> assign(:post_vote_modal_open, false)
     |> assign(:post_vote_selections, %{})
     |> assign(:review_modal_open, false)

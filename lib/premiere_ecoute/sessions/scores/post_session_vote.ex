@@ -15,17 +15,19 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
   alias PremiereEcoute.Sessions.Scores.Vote
 
   @doc """
-  Returns true when the viewer has cast zero votes in this stopped session.
+  Returns true when the viewer has cast more than one vote in a stopped session.
   """
   @spec has_voted?(ListeningSession.t(), User.t()) :: boolean()
   def has_voted?(%ListeningSession{id: session_id, status: :stopped}, %User{twitch: %{user_id: user_id}}) do
-    !Repo.exists?(
+    Repo.exists?(
       from(v in Vote,
         where: v.session_id == ^session_id and v.viewer_id == ^user_id,
         select: count(v.id)
       )
     )
   end
+
+  def has_voted?(_, _), do: false
 
   @doc """
   Inserts post-session votes and regenerates the session report.
@@ -51,7 +53,10 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
       }
     end)
     |> Vote.create_all(on_conflict: :nothing)
-    |> tap(fn _ -> Report.generate(session) end)
+    |> then(fn
+      {:ok, _} -> Report.generate(session)
+      error -> error
+    end)
   end
 
   def submit(_session, _viewer_id, _votes), do: {:error, :invalid}
