@@ -22,7 +22,7 @@
       {
         "matcher": "Write|Edit|MultiEdit",
         "hooks": [
-          {"type": "command", "command": "mix format \"$CLAUDE_TOOL_INPUT_FILE_PATH\""}
+          {"type": "command", "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.ex|*.exs) mix format \"$f\" ;; esac"}
         ]
       }
     ],

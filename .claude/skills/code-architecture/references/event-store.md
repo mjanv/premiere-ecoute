@@ -1,8 +1,3 @@
----
-name: event-store
-description: How to define events, store them, retrieve them, and handle them via EventBus.
----
-
 # Event Store
 
 ## Define an event

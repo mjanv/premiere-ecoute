@@ -1,8 +1,3 @@
----
-name: aggregate
-description: How to define and use Aggregates (Ecto schemas with generated CRUD) in this codebase.
----
-
 # Aggregate
 
 Aggregates are Ecto schemas with auto-generated CRUD via `use PremiereEcouteCore.Aggregate`.
