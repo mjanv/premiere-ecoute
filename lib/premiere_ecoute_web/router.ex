@@ -254,11 +254,6 @@ defmodule PremiereEcouteWeb.Router do
       live "/retrospective", Retrospective.StreamerLive, :index
     end
 
-    live_session :viewer_retrospective, on_mount: [{UserAuth, :viewer}] do
-      live "/retrospective/votes", Retrospective.VotesLive, :index
-      live "/retrospective/tops", Retrospective.TopsLive, :index
-    end
-
     live_session :picks, on_mount: [{UserAuth, :current_scope}] do
       live "/:username/pick", AlbumPickSubmissionLive, :new
     end
@@ -270,7 +265,11 @@ defmodule PremiereEcouteWeb.Router do
       live "/pick/albums", AlbumPickAdminLive, :index
     end
 
+    # AIDEV-NOTE: viewer_retrospective merged into sessions_viewer (same :viewer on_mount) so
+    # SessionLive -> Retrospective.VotesLive/TopsLive navigates in-process instead of full reload.
     live_session :sessions_viewer, on_mount: [{UserAuth, :viewer}] do
+      live "/retrospective/votes", Retrospective.VotesLive, :index
+      live "/retrospective/tops", Retrospective.TopsLive, :index
       live "/:username/:share_token", SessionLive, :show
     end
   end
