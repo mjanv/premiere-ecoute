@@ -164,8 +164,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
     case {progress(old_state), progress(new_state)} do
       {0, b} when b >= 1 -> {:ok, new_state, [:start_track]}
       {a, b} when a < 99 and b >= 99 -> {:ok, new_state, [:end_track]}
-      {a, b} when abs(b - a) > 5 -> {:ok, new_state, [{:skip, b}]}
-      {a, b} when b > a -> {:ok, new_state, [{:percent, b}]}
+      {a, b} when abs(b - a) > 5 -> {:ok, new_state, [{:skip, {b, new_state.progress_ms, new_state.item.duration_ms}}]}
+      {a, b} when b > a -> {:ok, new_state, [{:percent, {b, new_state.progress_ms, new_state.item.duration_ms}}]}
       _ -> {:ok, new_state, []}
     end
   end

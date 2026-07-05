@@ -419,7 +419,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
         device: %{name: "device123", is_active: true}
       }
 
-      assert {:ok, ^new_state, [{:skip, 49}]} = SpotifyPlayer.handle(old_state, new_state)
+      assert {:ok, ^new_state, [{:skip, {49, 90_000, 180_000}}]} = SpotifyPlayer.handle(old_state, new_state)
     end
 
     test "detects normal progress update" do
@@ -435,7 +435,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
         device: %{name: "device123", is_active: true}
       }
 
-      assert {:ok, ^new_state, [{:percent, 14}]} = SpotifyPlayer.handle(old_state, new_state)
+      assert {:ok, ^new_state, [{:percent, {14, 27_000, 180_000}}]} = SpotifyPlayer.handle(old_state, new_state)
     end
 
     test "returns empty events for backward progress or no change" do

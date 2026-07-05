@@ -8,6 +8,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
   use PremiereEcouteCore.Worker,
     queue: :sessions,
     max_attempts: 1,
+    timeout: :timer.seconds(60),
     unique: [period: 5, keys: [:action, :session_id]]
 
   use Gettext, backend: PremiereEcoute.Gettext

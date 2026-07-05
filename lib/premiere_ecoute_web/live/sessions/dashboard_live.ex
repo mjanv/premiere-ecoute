@@ -62,6 +62,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       |> assign(:report, nil)
       |> assign(:vote_trends, nil)
       |> assign(:next_track_at, nil)
+      |> assign(:last_remaining_ms, nil)
       |> assign(:show_youtube_modal, false)
       |> assign(:show_premiere_modal, false)
       |> assign(:show_reminder_modal, false)
@@ -537,28 +538,32 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
         socket
     end
     |> assign(:next_track_at, nil)
+    |> assign(:last_remaining_ms, nil)
     |> assign(:player_state, state)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
   def handle_info(
-        {:player, {:percent, percent}, state},
+        {:player, {:percent, {_percent, progress_ms, duration_ms}}, state},
         %{assigns: %{listening_session: %ListeningSession{status: :active, source: source}, current_scope: scope}} = socket
       )
       when source != :free do
-    # AIDEV-NOTE: state.item is nil between tracks — guard before accessing duration_ms.
-    duration_ms = state.item && state.item.duration_ms
+    new_remaining_ms = duration_ms - progress_ms
+    old_remaining_ms = socket.assigns.last_remaining_ms
 
-    if is_integer(duration_ms) and duration_ms >= 60_000 do
-      threshold = round(100 * (1 - 30_000 / duration_ms))
-
-      if abs(percent - threshold) <= 1 do
-        ListeningSessionWorker.in_seconds(%{action: "votes_closing", user_id: scope.user.id}, 0)
-      end
+    if duration_ms >= 60_000 and is_integer(old_remaining_ms) and old_remaining_ms > 30_000 and
+         new_remaining_ms <= 30_000 do
+      ListeningSessionWorker.in_seconds(
+        %{action: "votes_closing", user_id: scope.user.id, session_id: socket.assigns.session_id},
+        0
+      )
     end
 
-    {:noreply, assign(socket, :player_state, state)}
+    socket
+    |> assign(:last_remaining_ms, new_remaining_ms)
+    |> assign(:player_state, state)
+    |> then(fn socket -> {:noreply, socket} end)
   end
 
   @impl true
@@ -587,6 +592,14 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
     socket
     |> clear_flash()
     |> put_flash(:error, gettext("Spotify down: %{reason}", reason: inspect(reason)))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:player, :new_track, state}, socket) do
+    socket
+    |> assign(:last_remaining_ms, nil)
+    |> assign(:player_state, state)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
