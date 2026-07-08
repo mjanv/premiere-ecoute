@@ -186,6 +186,14 @@ defmodule PremiereEcouteWeb.Router do
     end
   end
 
+  scope "/chat", PremiereEcouteWeb.Chat do
+    pipe_through [:browser]
+
+    live_session :chat_overlays, on_mount: [{UserAuth, :current_scope}] do
+      live "/overlay/:username", HashtagBannerLive, :show
+    end
+  end
+
   scope "/collections", PremiereEcouteWeb.Collections do
     pipe_through [:browser]
 

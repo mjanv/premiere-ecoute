@@ -1,0 +1,19 @@
+<div style="width: 100vw; height: 100px; overflow: hidden; background: rgba(0,0,0,0.75); display: flex; align-items: center; position: relative;">
+  <div
+    :if={@messages != []}
+    id="hashtag-ticker"
+    style="display: flex; align-items: center; white-space: nowrap; animation: hashtag-scroll 30s linear infinite;"
+  >
+    <%= for {entry, i} <- Enum.with_index(@messages) do %>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 0 40px;">
+        <span style="font-size: 24px; font-weight: 800; color: #a855f7; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
+          {entry.hashtag}
+        </span>
+        <span style="font-size: 24px; font-weight: 500; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
+          {entry.message}
+        </span>
+      </div>
+      <div :if={i < length(@messages) - 1} style="width: 2px; height: 32px; background: rgba(255,255,255,0.2);"></div>
+    <% end %>
+  </div>
+</div>

@@ -9,6 +9,7 @@ defmodule PremiereEcoute.Sessions do
 
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Collections.CollectionSession
+  alias PremiereEcoute.Sessions.Chat.HashtagPipeline
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores
@@ -39,6 +40,7 @@ defmodule PremiereEcoute.Sessions do
   def publish_message(event) do
     PremiereEcouteCore.publish(Scores.MessagePipeline, event)
     PremiereEcouteCore.publish(CollectionSession.MessagePipeline, event)
+    PremiereEcouteCore.publish(HashtagPipeline, event)
   end
 
   @doc "Publishes poll event to Broadway pipeline for vote processing"

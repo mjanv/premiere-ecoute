@@ -18,6 +18,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchControllerTest do
   setup do
     start_supervised(PremiereEcoute.Sessions.Scores.MessagePipeline)
     start_supervised(PremiereEcoute.Collections.CollectionSession.MessagePipeline)
+    start_supervised(PremiereEcoute.Sessions.Chat.HashtagPipeline)
 
     :ok
   end

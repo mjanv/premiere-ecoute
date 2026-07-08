@@ -71,6 +71,10 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
     "#{PremiereEcouteWeb.Endpoint.url()}/collections/overlay/#{username}"
   end
 
+  defp overlay_url(username, "hashtags") do
+    "#{PremiereEcouteWeb.Endpoint.url()}/chat/overlay/#{username}"
+  end
+
   defp overlay_url(username, score_type) do
     "#{PremiereEcouteWeb.Endpoint.url()}/sessions/overlay/#{username}?score=#{score_type}"
   end
@@ -81,5 +85,6 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
   defp obs_size_hint("player"), do: "1200 × 240"
   defp obs_size_hint("votes"), do: "800 × 240"
   defp obs_size_hint("collections"), do: "800 × 600"
+  defp obs_size_hint("hashtags"), do: "1920 × 100"
   defp obs_size_hint(_), do: "300 × 300"
 end
