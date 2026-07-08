@@ -19,13 +19,20 @@ defmodule PremiereEcoute.Sessions.Chat.HashtagMessage do
   @doc """
   Extracts the first hashtag from a chat message.
 
-  Returns `{:ok, {hashtag, message}}` if a `#hashtag` is found, `:error` otherwise.
+  Returns `{:ok, {hashtag, remaining_text}}` if a `#hashtag` is found, with the matched hashtag
+  stripped out of the returned text, `:error` otherwise.
   """
   @spec parse(String.t()) :: {:ok, {String.t(), String.t()}} | :error
   def parse(message) do
-    case Regex.run(@hashtag_regex, message) do
-      [_, hashtag] -> {:ok, {"#" <> hashtag, message}}
-      nil -> :error
+    case Regex.run(@hashtag_regex, message, return: :index) do
+      [{start, length}, _] ->
+        hashtag = binary_part(message, start, length)
+        text = binary_part(message, 0, start) <> binary_part(message, start + length, byte_size(message) - start - length)
+
+        {:ok, {hashtag, String.trim(text)}}
+
+      nil ->
+        :error
     end
   end
 

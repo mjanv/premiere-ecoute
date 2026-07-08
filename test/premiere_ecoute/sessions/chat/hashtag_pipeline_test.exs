@@ -27,7 +27,7 @@ defmodule PremiereEcoute.Sessions.Chat.HashtagPipelineTest do
 
       :timer.sleep(100)
 
-      assert [%{hashtag: "#hype", message: "#hype this album is fire"}] = HashtagMessage.list("1234")
+      assert [%{hashtag: "#hype", message: "this album is fire"}] = HashtagMessage.list("1234")
     end
 
     test "ignores messages without a hashtag" do
@@ -68,7 +68,7 @@ defmodule PremiereEcoute.Sessions.Chat.HashtagPipelineTest do
 
       :timer.sleep(100)
 
-      assert [%{message: "#hype first"}, %{message: "#newalbum second"}] = HashtagMessage.list("1234")
+      assert [%{message: "first"}, %{message: "second"}] = HashtagMessage.list("1234")
     end
   end
 end
