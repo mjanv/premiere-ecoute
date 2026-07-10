@@ -244,6 +244,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
+  def handle(%SkipNextTrackListeningSession{source: :track, session_id: session_id}) do
+    {:ok, ListeningSession.get(session_id), []}
+  end
+
   def handle(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
