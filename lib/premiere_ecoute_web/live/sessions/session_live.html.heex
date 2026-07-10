@@ -41,7 +41,7 @@
             <.link
               id="back-link"
               phx-hook="BackLink"
-              navigate={if is_viewer, do: ~p"/sessions/retrospective/votes", else: ~p"/sessions/retrospective"}
+              href={if is_viewer, do: ~p"/sessions/retrospective/votes", else: ~p"/sessions/retrospective"}
               class="inline-flex items-center gap-1.5 ml-6 px-2.5 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,7 +170,7 @@
                     {gettext("Dashboard")}
                   </.link>
                   <.link
-                    navigate={~p"/sessions/#{@listening_session.user.username}/#{@listening_session}/retrospective"}
+                    href={~p"/sessions/#{@listening_session.user.username}/#{@listening_session}/retrospective"}
                     class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm transition-all"
                   >
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -896,7 +896,7 @@
         <p class="text-slate-400 mb-4">{gettext("Session not found")}</p>
         <% is_viewer = assigns[:current_scope] && assigns[:current_scope].user && assigns[:current_scope].user.role == :viewer %>
         <.link
-          navigate={if is_viewer, do: ~p"/sessions/retrospective/votes", else: ~p"/sessions/retrospective"}
+          href={if is_viewer, do: ~p"/sessions/retrospective/votes", else: ~p"/sessions/retrospective"}
           class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 text-sm"
         >
           {gettext("Back to history")}
