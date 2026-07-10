@@ -77,14 +77,38 @@ defmodule PremiereEcouteCore.Worker do
         |> Enum.each(fn {x, i} -> start(f.(x), schedule_in: i * unquote(rate_limit)) end)
       end
 
-      @doc "Cancel all worker jobs"
-      @spec cancel_all :: {:ok, non_neg_integer()}
-      def cancel_all do
-        worker = Atom.to_string(__MODULE__)
-
-        Oban.Job
-        |> Ecto.Query.where(worker: ^worker)
+      @doc "Cancel all worker jobs, optionally filtered by args key/value pairs."
+      @spec cancel_all(keyword()) :: {:ok, non_neg_integer()}
+      def cancel_all(args \\ []) do
+        args
+        |> __MODULE__.job_query()
         |> Oban.cancel_all_jobs()
+      end
+
+      @doc "Returns the scheduled_at of the next scheduled job, optionally filtered by args key/value pairs."
+      @spec next_in?(keyword()) :: DateTime.t() | nil
+      def next_in?(args \\ []) do
+        args
+        |> __MODULE__.job_query()
+        |> Ecto.Query.where([j], j.state == "scheduled")
+        |> Ecto.Query.order_by([j], asc: j.scheduled_at)
+        |> Ecto.Query.select([j], j.scheduled_at)
+        |> Ecto.Query.limit(1)
+        |> PremiereEcoute.Repo.one(prefix: "oban")
+      end
+
+      @doc """
+      Builds the base query for this worker's jobs, optionally filtered by args key/value pairs.
+
+      Uses `Oban.Worker.to_string/1` (strips the "Elixir." prefix) to match how Oban stores `j.worker`.
+      """
+      @spec job_query(keyword()) :: Ecto.Query.t()
+      def job_query(args) do
+        worker = Oban.Worker.to_string(__MODULE__)
+
+        Enum.reduce(args, Ecto.Query.where(Oban.Job, worker: ^worker), fn {k, v}, q ->
+          Ecto.Query.where(q, [j], fragment("?->>? = ?", j.args, ^Atom.to_string(k), ^to_string(v)))
+        end)
       end
 
       @doc "Perform the job"

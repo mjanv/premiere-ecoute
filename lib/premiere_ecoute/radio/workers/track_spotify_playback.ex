@@ -11,34 +11,12 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
 
   require Logger
 
-  import Ecto.Query, only: [where: 3, from: 2]
-
-  alias Oban.Job
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Radio
   alias PremiereEcoute.Repo
-
-  @worker "PremiereEcoute.Radio.Workers.TrackSpotifyPlayback"
-
-  def next_in?(user_id) do
-    query =
-      from j in Oban.Job,
-        where: j.state == "scheduled" and fragment("args->>'user_id' = ?", ^to_string(user_id)),
-        order_by: [asc: j.scheduled_at],
-        select: j.scheduled_at,
-        limit: 1
-
-    Repo.one(query, prefix: "oban")
-  end
-
-  def cancel_all(user_id) do
-    Job
-    |> where([j], j.worker == @worker and fragment("args->>'user_id' = ?", ^to_string(user_id)))
-    |> Oban.cancel_all_jobs()
-  end
 
   @impl true
   def perform(%Oban.Job{args: %{"user_id" => user_id}}) do

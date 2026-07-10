@@ -42,12 +42,12 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorker do
          session <- ListeningSession.get(session_id),
          cache_entry <- %{id: session.id, vote_options: session.vote_options, current_track_id: session.single_id},
          {:ok, _} <- Cache.put(:sessions, scope.user.twitch.user_id, cache_entry),
-         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open),
-         :ok <-
-           Apis.twitch().send_chat_message(
-             scope,
-             Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
-           ) do
+         :ok <- PremiereEcoute.PubSub.broadcast("session:#{session_id}", :vote_open) do
+      Apis.twitch().send_chat_message(
+        scope,
+        Gettext.with_locale(Atom.to_string(scope.user.profile.language), fn -> gettext("Votes are open !") end)
+      )
+
       :ok
     end
 

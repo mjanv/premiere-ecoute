@@ -19,10 +19,10 @@ defmodule PremiereEcoute.Radio do
 
   # Services
   def start_radio(user), do: TrackSpotifyPlayback.in_seconds(%{user_id: user.id}, 15)
-  def stop_radio(user), do: TrackSpotifyPlayback.cancel_all(user.id)
+  def stop_radio(user), do: TrackSpotifyPlayback.cancel_all(user_id: user.id)
   defdelegate insert_track(user_id, provider, track_data), to: Backfill
   defdelegate backward_fill(provider), to: Backfill
 
   # Workers
-  defdelegate next_in?(user_id), to: TrackSpotifyPlayback
+  def next_in?(user_id), do: TrackSpotifyPlayback.next_in?(user_id: user_id)
 end

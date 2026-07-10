@@ -54,7 +54,7 @@ defmodule PremiereEcoute.Radio.EventHandler do
       user ->
         if Accounts.profile(user, [:radio_settings, :enabled], false) do
           Logger.info("[PremiereEcoute.Radio] stopping radio for user #{user.username}")
-          TrackSpotifyPlayback.cancel_all(user.id)
+          TrackSpotifyPlayback.cancel_all(user_id: user.id)
         end
 
         if Accounts.profile(user, [:chat_settings, :save_wantlist], false) do

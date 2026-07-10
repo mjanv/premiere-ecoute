@@ -173,4 +173,96 @@ defmodule PremiereEcouteCore.WorkerTest do
       end)
     end
   end
+
+  describe "cancel_all/0" do
+    test "cancels all scheduled jobs for the worker" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Worker.in_hours(%{id: 234}, 1)
+        Worker.in_hours(%{id: 567}, 1)
+
+        assert {:ok, 2} = Worker.cancel_all()
+
+        refute_enqueued worker: Worker, args: %{"id" => 234}
+        refute_enqueued worker: Worker, args: %{"id" => 567}
+      end)
+    end
+  end
+
+  describe "cancel_all/1" do
+    test "cancels only jobs matching the given args" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Worker.in_hours(%{id: 234}, 1)
+        Worker.in_hours(%{id: 567}, 1)
+
+        assert {:ok, 1} = Worker.cancel_all(id: 234)
+
+        refute_enqueued worker: Worker, args: %{"id" => 234}
+        assert_enqueued worker: Worker, args: %{"id" => 567}
+      end)
+    end
+
+    test "matches on multiple args" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Worker.in_hours(%{id: 234, action: "poll"}, 1)
+        Worker.in_hours(%{id: 234, action: "cleanup"}, 1)
+
+        assert {:ok, 1} = Worker.cancel_all(id: 234, action: "poll")
+
+        refute_enqueued worker: Worker, args: %{"id" => 234, "action" => "poll"}
+        assert_enqueued worker: Worker, args: %{"id" => 234, "action" => "cleanup"}
+      end)
+    end
+
+    test "returns {:ok, 0} when nothing matches" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Worker.in_hours(%{id: 234}, 1)
+
+        assert {:ok, 0} = Worker.cancel_all(id: 999)
+
+        assert_enqueued worker: Worker, args: %{"id" => 234}
+      end)
+    end
+  end
+
+  describe "next_in?/0" do
+    test "returns the scheduled_at of the next scheduled job" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        in_an_hour = DateTime.add(DateTime.utc_now(), 60, :minute)
+        in_two_hours = DateTime.add(DateTime.utc_now(), 120, :minute)
+
+        Worker.at(%{id: 234}, in_two_hours)
+        Worker.at(%{id: 567}, in_an_hour)
+
+        assert DateTime.diff(Worker.next_in?(), in_an_hour, :second) == 0
+      end)
+    end
+
+    test "returns nil when no job is scheduled" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        assert Worker.next_in?() == nil
+      end)
+    end
+  end
+
+  describe "next_in?/1" do
+    test "returns the scheduled_at of the next scheduled job matching the given args" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        in_an_hour = DateTime.add(DateTime.utc_now(), 60, :minute)
+        in_two_hours = DateTime.add(DateTime.utc_now(), 120, :minute)
+
+        Worker.at(%{id: 234}, in_an_hour)
+        Worker.at(%{id: 567}, in_two_hours)
+
+        assert DateTime.diff(Worker.next_in?(id: 567), in_two_hours, :second) == 0
+      end)
+    end
+
+    test "returns nil when no job matches the given args" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        Worker.in_hours(%{id: 234}, 1)
+
+        assert Worker.next_in?(id: 999) == nil
+      end)
+    end
+  end
 end
