@@ -51,31 +51,43 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
       :ok
     else
       {:enabled?, false} ->
-        Logger.debug("Radio tracking disabled for user #{user_id}")
+        Logger.info("[TrackSpotifyPlayback] user #{user_id}: radio disabled, not rescheduling")
         :ok
 
       {:error, "Spotify rate limit exceeded"} ->
-        Logger.warning("Rate limit hit for user #{user_id}, backing off for 5 minutes")
+        Logger.warning("[TrackSpotifyPlayback] user #{user_id}: rate limited, rescheduling in 300s")
         __MODULE__.in_seconds(%{user_id: user_id}, 300)
         :ok
 
       {:error, :consecutive_duplicate} ->
+        Logger.info("[TrackSpotifyPlayback] user #{user_id}: consecutive duplicate, rescheduling (60s default)")
         schedule_next_poll(user_id)
         :ok
 
       {:error, :no_track_playing} ->
+        Logger.info("[TrackSpotifyPlayback] user #{user_id}: no track playing, rescheduling (60s default)")
         schedule_next_poll(user_id)
         :ok
 
       {:error, reason} ->
-        Logger.error("Playback tracking failed for user #{user_id}: #{inspect(reason)}")
+        Logger.error("[TrackSpotifyPlayback] user #{user_id}: playback tracking failed (#{inspect(reason)}), rescheduling in 30s")
         # AIDEV-NOTE: reschedule after failure to keep loop alive (e.g. transient 401 on expired token)
         __MODULE__.in_seconds(%{user_id: user_id}, 30)
         :ok
     end
+  rescue
+    error ->
+      Logger.error(
+        "[TrackSpotifyPlayback] user #{user_id}: perform/1 raised #{Exception.format(:error, error, __STACKTRACE__)} — NOT rescheduling, job will retry/discard per Oban max_attempts"
+      )
+
+      reraise error, __STACKTRACE__
   end
 
-  defp store_track_if_new(_user_id, %PlaybackState{item: nil}), do: {:error, :no_track_playing}
+  defp store_track_if_new(_user_id, %PlaybackState{item: nil}) do
+    Logger.info("[TrackSpotifyPlayback] no track playing (nil item)")
+    {:error, :no_track_playing}
+  end
 
   defp store_track_if_new(user_id, %PlaybackState{item: %{uri: "spotify:track:" <> provider_id} = item, progress_ms: progress_ms}) do
     started_at =
@@ -84,14 +96,40 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
         _ -> DateTime.utc_now()
       end
 
-    Radio.insert_track(user_id, "spotify", %{
-      provider_ids: %{spotify: provider_id},
-      name: item.name,
-      artist: item.artists |> List.first() |> then(&(&1 && Map.get(&1, :name))),
-      album: nil,
-      duration_ms: item.duration_ms,
-      started_at: started_at
-    })
+    result =
+      Radio.insert_track(user_id, "spotify", %{
+        provider_ids: %{spotify: provider_id},
+        name: item.name,
+        artist: item.artists |> List.first() |> then(&(&1 && Map.get(&1, :name))),
+        album: nil,
+        duration_ms: item.duration_ms,
+        started_at: started_at
+      })
+
+    case result do
+      {:ok, _track} ->
+        Logger.info(
+          "[TrackSpotifyPlayback] user #{user_id}: stored track #{inspect(item.name)} (duration_ms=#{item.duration_ms}, progress_ms=#{inspect(progress_ms)})"
+        )
+
+      {:error, :consecutive_duplicate} ->
+        Logger.info(
+          "[TrackSpotifyPlayback] user #{user_id}: skip duplicate #{inspect(item.name)} (duration_ms=#{item.duration_ms}, progress_ms=#{inspect(progress_ms)})"
+        )
+
+      {:error, reason} ->
+        Logger.error("[TrackSpotifyPlayback] user #{user_id}: insert_track failed (#{inspect(reason)})")
+    end
+
+    result
+  end
+
+  defp store_track_if_new(user_id, %PlaybackState{item: %{uri: uri}}) do
+    Logger.warning(
+      "[TrackSpotifyPlayback] user #{user_id}: item with unrecognized uri #{inspect(uri)}, treating as no track playing"
+    )
+
+    {:error, :no_track_playing}
   end
 
   defp schedule_next_poll(user_id, playback \\ %PlaybackState{}) do
@@ -103,6 +141,8 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
         _ ->
           60
       end
+
+    Logger.info("[TrackSpotifyPlayback] user #{user_id}: scheduling next poll in #{delay_s}s")
 
     __MODULE__.in_seconds(%{user_id: user_id}, delay_s)
     :ok
