@@ -150,6 +150,11 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   end
 
   @impl true
+  def handle_info({:player, :token_refreshed, _scope}, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info({:player, _event, %{item: nil} = state}, %{assigns: assigns} = socket) do
     {:noreply, assign(socket, :progress, AsyncResult.ok(assigns.progress, state))}
   end
