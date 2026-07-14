@@ -40,6 +40,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.Videos do
             get_in(snippet, ["thumbnails", "high", "url"]),
         tags: snippet["tags"] || [],
         duration: details["duration"],
+        channel_title: snippet["channelTitle"],
         view_count: String.to_integer(stats["viewCount"] || "0"),
         like_count: String.to_integer(stats["likeCount"] || "0"),
         comment_count: String.to_integer(stats["commentCount"] || "0")

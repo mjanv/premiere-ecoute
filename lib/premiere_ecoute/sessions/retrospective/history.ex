@@ -90,6 +90,41 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
   end
 
   @doc """
+  Get all clip sessions listened by a specific streamer during a time period.
+  """
+  @spec get_clips_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_clips_by_period(%User{id: user_id} = user, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from s in ListeningSession,
+        join: sg in Single,
+        on: s.single_id == sg.id,
+        left_join: r in Report,
+        on: s.id == r.session_id,
+        where: s.user_id == ^user_id,
+        where: s.status == :stopped,
+        where: s.source == :clip,
+        select: %{session: s, single: sg, report: r},
+        order_by: [desc: s.started_at]
+
+    case period do
+      :month ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.started_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", s.started_at, ^month)
+
+      :year ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.started_at, ^year)
+    end
+    |> Repo.all()
+    |> Enum.map(fn item -> %{item | session: %{item.session | user: user}} end)
+  end
+
+  @doc """
   Get all playlist sessions listened by a specific streamer during a time period.
   """
   @spec get_playlists_by_period(User.t(), time_period(), map()) :: [map()]
@@ -185,6 +220,58 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
         on: v.session_id == s.id,
         join: sg in Single,
         on: s.single_id == sg.id,
+        left_join: sa in SingleArtist,
+        on: sa.single_id == sg.id,
+        left_join: ar in Artist,
+        on: ar.id == sa.artist_id,
+        join: u in User,
+        on: u.id == s.user_id,
+        where: v.viewer_id == ^user_id,
+        where: v.value not in ["smash", "pass"],
+        group_by: [s.id, s.share_token, u.username, sg.id, sg.name, sg.cover_url, ar.name],
+        select: %{
+          session_id: s.id,
+          share_token: s.share_token,
+          username: u.username,
+          single: %Single{
+            id: sg.id,
+            name: sg.name,
+            cover_url: sg.cover_url,
+            artist: ar.name
+          },
+          score: fragment("ROUND(AVG(CAST(? AS DECIMAL)), 1)", v.value)
+        },
+        order_by: [desc: count(v.id)]
+
+    case period do
+      :month ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year),
+          where: fragment("EXTRACT(month FROM ?) = ?", s.inserted_at, ^month)
+
+      :year ->
+        from s in query,
+          where: fragment("EXTRACT(year FROM ?) = ?", s.inserted_at, ^year)
+    end
+    |> Repo.all()
+  end
+
+  @doc """
+  Get all votes casted on clip sessions by a specific viewer during a time period.
+  """
+  @spec get_clip_votes_by_period(User.t(), time_period(), map()) :: [map()]
+  def get_clip_votes_by_period(%User{twitch: %{user_id: user_id}}, period, opts \\ %{}) do
+    current_date = DateTime.utc_now()
+    year = Map.get(opts, :year, current_date.year)
+    month = Map.get(opts, :month, current_date.month)
+
+    query =
+      from v in Vote,
+        join: s in ListeningSession,
+        on: v.session_id == s.id,
+        join: sg in Single,
+        on: s.single_id == sg.id,
+        where: s.source == :clip,
         left_join: sa in SingleArtist,
         on: sa.single_id == sg.id,
         left_join: ar in Artist,

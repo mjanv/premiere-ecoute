@@ -252,6 +252,7 @@ defmodule PremiereEcouteWeb.Router do
 
     live_session :sessions_overlays, on_mount: [{UserAuth, :current_scope}] do
       live "/overlay/:username", OverlayLive, :show
+      live "/overlay/:username/clip", ClipOverlayLive, :show
     end
 
     live_session :sessions_retrospective, on_mount: [{UserAuth, :current_scope}] do

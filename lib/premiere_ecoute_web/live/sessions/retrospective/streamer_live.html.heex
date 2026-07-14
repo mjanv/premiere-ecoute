@@ -76,6 +76,13 @@
               >
                 {gettext("Playlists")}
               </button>
+              <button
+                phx-click={if @selected_source != :clip, do: "change_source"}
+                phx-value-source="clip"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :clip, do: "bg-red-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Clips")}
+              </button>
             </div>
           </div>
         </div>
@@ -117,6 +124,9 @@
               <% :playlist -> %>
                 <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Playlists Found")}</h3>
                 <p class="text-gray-400">{gettext("No playlists listened during this period")}</p>
+              <% :clip -> %>
+                <h3 class="text-lg font-medium text-gray-300 mb-2">{gettext("No Clips Found")}</h3>
+                <p class="text-gray-400">{gettext("No clips listened during this period")}</p>
             <% end %>
           </div>
         <% else %>
@@ -206,6 +216,36 @@
                       <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <p class="text-white font-semibold truncate drop-shadow">{item.playlist.title}</p>
                         <p class="text-emerald-300 text-sm truncate">{item.playlist.owner_name}</p>
+                      </div>
+                    </div>
+                  </.link>
+                <% end %>
+              </div>
+            <% :clip -> %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
+                <%= for item <- albums_data.items do %>
+                  <.link
+                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
+                    class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
+                  >
+                    <.cover
+                      src={item.single.cover_url}
+                      alt={item.single.name}
+                      class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    <div class="absolute inset-0 flex flex-col justify-between p-3">
+                      <div class="flex justify-end">
+                        <div
+                          class="text-white font-bold drop-shadow-2xl leading-none"
+                          style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
+                        >
+                          {item.report && item.report.session_summary["viewer_score"]}
+                        </div>
+                      </div>
+                      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p class="text-white font-semibold truncate drop-shadow">{item.single.name}</p>
+                        <p class="text-red-300 text-sm truncate">{item.single.artist}</p>
                       </div>
                     </div>
                   </.link>

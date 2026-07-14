@@ -26,6 +26,9 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:selected_playlist, AsyncResult.ok(nil))
     |> assign(:search_tracks, AsyncResult.ok([]))
     |> assign(:selected_track, AsyncResult.ok(nil))
+    |> assign(:clip_search_form, to_form(%{"query" => ""}))
+    |> assign(:search_clip_videos, AsyncResult.ok([]))
+    |> assign(:selected_clip_video, AsyncResult.ok(nil))
     |> assign(:current_scope, socket.assigns[:current_scope] || %{})
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
@@ -120,18 +123,55 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  def handle_event("search_clip_videos", %{"query" => query}, socket) when byte_size(query) > 2 do
+    socket
+    |> assign(:search_clip_videos, AsyncResult.loading())
+    |> start_async(:search_clip_videos, fn -> PremiereEcoute.Apis.provider(:youtube).search_track_videos(query) end)
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("search_clip_videos", _params, socket) do
+    socket
+    |> assign(:search_clip_videos, AsyncResult.ok([]))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event("select_clip_video", %{"video_id" => video_id}, socket) do
+    case socket.assigns.search_clip_videos do
+      %{result: videos} when is_list(videos) ->
+        case Enum.find(videos, fn v -> v.id == video_id end) do
+          nil ->
+            socket
+            |> assign(:search_clip_videos, AsyncResult.ok([]))
+
+          video ->
+            socket
+            |> assign(:search_clip_videos, AsyncResult.ok([]))
+            |> assign(:selected_clip_video, AsyncResult.ok(video))
+            |> update_state()
+        end
+
+      _ ->
+        socket
+    end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_event("select_source", %{"source" => source}, socket) do
     socket
     |> assign(:source_type, source)
     # Clear previous searches
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:search_tracks, AsyncResult.ok([]))
+    |> assign(:search_clip_videos, AsyncResult.ok([]))
     # Clear previous selection
     |> assign(:selected_album, AsyncResult.ok(nil))
     |> assign(:selected_playlist, AsyncResult.ok(nil))
     |> assign(:selected_track, AsyncResult.ok(nil))
+    |> assign(:selected_clip_video, AsyncResult.ok(nil))
     # Reset search form
     |> assign(:search_form, to_form(%{"query" => ""}))
+    |> assign(:clip_search_form, to_form(%{"query" => ""}))
     # Reset vote options state
     |> assign(:vote_options_preset, nil)
     |> assign(:vote_options_configured, false)
@@ -197,6 +237,27 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       source: :track,
       user_id: get_user_id(socket),
       track_id: Map.get(track.provider_ids, :spotify),
+      vote_options: get_vote_options(socket.assigns),
+      autostart: socket.assigns.autostart
+    }
+    |> PremiereEcoute.apply()
+    |> case do
+      {:ok, session, _} -> push_navigate(socket, to: ~p"/sessions/#{session.share_token}/dashboard")
+      {:error, _} -> put_flash(socket, :error, "Cannot create the listening session")
+    end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_event(
+        "prepare_session",
+        _params,
+        %{assigns: %{selected_clip_video: %{result: video}}} = socket
+      )
+      when not is_nil(video) do
+    %PrepareListeningSession{
+      source: :clip,
+      user_id: get_user_id(socket),
+      youtube_video_id: video.id,
       vote_options: get_vote_options(socket.assigns),
       autostart: socket.assigns.autostart
     }
@@ -463,6 +524,26 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  def handle_async(:search_clip_videos, {:ok, {:ok, videos}}, socket) do
+    socket
+    |> assign(:search_clip_videos, AsyncResult.ok(videos))
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:search_clip_videos, {:ok, {:error, reason}}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:search_clip_videos, AsyncResult.failed(assigns.search_clip_videos, {:error, reason}))
+    |> put_flash(:error, "Video search failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_async(:search_clip_videos, {:exit, reason}, %{assigns: assigns} = socket) do
+    socket
+    |> assign(:search_clip_videos, AsyncResult.failed(assigns.search_clip_videos, {:error, reason}))
+    |> put_flash(:error, "Video search failed. Please try again.")
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
   def handle_async(:load_playlists, {:ok, {:ok, playlists}}, socket) do
     socket
     |> assign(:user_playlists, AsyncResult.ok(playlists))
@@ -542,6 +623,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       selected_album: selected_album,
       selected_playlist: selected_playlist,
       selected_track: selected_track,
+      selected_clip_video: selected_clip_video,
       free_session_name: free_session_name,
       vote_options_configured: vote_options_configured,
       free_vote_mode: free_vote_mode
@@ -551,6 +633,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       (source_type == "album" && selected_album.ok? && selected_album.result) ||
         (source_type == "playlist" && selected_playlist.ok? && selected_playlist.result) ||
         (source_type == "track" && selected_track.ok? && selected_track.result) ||
+        (source_type == "clip" && selected_clip_video.ok? && selected_clip_video.result) ||
         (source_type == "free" && free_session_name != "")
 
     step =

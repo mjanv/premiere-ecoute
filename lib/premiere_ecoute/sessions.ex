@@ -65,9 +65,11 @@ defmodule PremiereEcoute.Sessions do
   defdelegate get_albums_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_singles_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_playlists_by_period(user, period, opts \\ %{}), to: Retrospective.History
+  defdelegate get_clips_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_votes_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_single_votes_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_playlist_votes_by_period(user, period, opts \\ %{}), to: Retrospective.History
+  defdelegate get_clip_votes_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_top_tracks_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_top_singles_by_period(user, period, opts \\ %{}), to: Retrospective.History
   defdelegate get_top_playlist_tracks_by_period(user, period, opts \\ %{}), to: Retrospective.History

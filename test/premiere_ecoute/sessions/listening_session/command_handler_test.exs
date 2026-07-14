@@ -29,6 +29,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.Streaming.TwitchApi.Mock, as: TwitchApi
+  alias PremiereEcoute.Apis.Video.YoutubeApi.Mock, as: YoutubeApi
 
   setup_all do
     start_supervised({Cache, name: :playback})
@@ -171,6 +172,224 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert event.user_id == user_id
     end
 
+    test "successfully creates clip session and returns SessionPrepared event" do
+      user = user_fixture()
+      single = single_fixture()
+
+      expect(YoutubeApi, :get_video, fn "yt_abc123" ->
+        {:ok,
+         %{
+           id: "yt_abc123",
+           title: "Sample Track (Official Video)",
+           channel_title: "Sample Artist",
+           duration: "PT3M30S",
+           thumbnail_url: "https://i.ytimg.com/vi/yt_abc123/maxresdefault.jpg"
+         }}
+      end)
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, [single]} end)
+
+      command = %PrepareListeningSession{
+        source: :clip,
+        user_id: user.id,
+        youtube_video_id: "yt_abc123",
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+      }
+
+      {:ok, session, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      assert session.user_id == user.id
+      assert session.status == :preparing
+      assert session.source == :clip
+      assert session.single.name == single.name
+      assert session.single.provider_ids.youtube == "yt_abc123"
+      assert event.single_id == session.single_id
+    end
+
+    test "returns SessionNotPrepared when no Spotify match is found for the clip" do
+      user_id = 1
+
+      expect(YoutubeApi, :get_video, fn "yt_no_match" ->
+        {:ok,
+         %{
+           id: "yt_no_match",
+           title: "Some random video",
+           channel_title: "Some random channel",
+           duration: "PT1M0S",
+           thumbnail_url: nil
+         }}
+      end)
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, []} end)
+
+      command = %PrepareListeningSession{
+        source: :clip,
+        user_id: user_id,
+        youtube_video_id: "yt_no_match"
+      }
+
+      {:error, [%SessionNotPrepared{} = event]} = CommandBus.apply(command)
+
+      assert event.user_id == user_id
+    end
+  end
+
+  describe "handle/1 - StartListeningSession :clip" do
+    test "starts a clip session without checking Spotify devices or starting playback" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      single = single_fixture()
+
+      expect(YoutubeApi, :get_video, fn "yt_abc123" ->
+        {:ok,
+         %{
+           id: "yt_abc123",
+           title: "Sample Track (Official Video)",
+           channel_title: "Sample Artist",
+           duration: "PT3M30S",
+           thumbnail_url: "https://i.ytimg.com/vi/yt_abc123/maxresdefault.jpg"
+         }}
+      end)
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, [single]} end)
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{user: ^user}, "Welcome to the premiere of Sample Track by Sample Artist" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can vote between 0 and 10 included and without comma. The note is a single message or at the end of a message" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :clip,
+          user_id: user.id,
+          youtube_video_id: "yt_abc123",
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
+
+      {:ok, _, [%SessionStarted{} = event]} =
+        CommandBus.apply(%StartListeningSession{source: :clip, session_id: prepared.session_id, scope: scope})
+
+      session = ListeningSession.get(event.session_id)
+
+      assert session.status == :active
+      assert event.source == :clip
+
+      assert Report.get_by(session_id: session.id) != nil
+    end
+  end
+
+  describe "handle/1 - StopListeningSession :clip" do
+    test "stops clip session without pausing Spotify and sends end chat message" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      single = single_fixture()
+
+      expect(YoutubeApi, :get_video, fn "yt_abc123" ->
+        {:ok,
+         %{
+           id: "yt_abc123",
+           title: "Sample Track (Official Video)",
+           channel_title: "Sample Artist",
+           duration: "PT3M30S",
+           thumbnail_url: "https://i.ytimg.com/vi/yt_abc123/maxresdefault.jpg"
+         }}
+      end)
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, [single]} end)
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Welcome to the premiere of Sample Track by Sample Artist" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Votes are open !" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can vote between 0 and 10 included and without comma. The note is a single message or at the end of a message" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      # Stop messages
+      expect(TwitchApi, :send_chat_message, fn %Scope{}, "Sample Track by Sample Artist is over" -> :ok end)
+
+      expect(TwitchApi, :send_chat_message, fn %Scope{},
+                                               "You can retrieve all your notes by registering to premiere-ecoute.fr using your Twitch account" ->
+        :ok
+      end)
+
+      expect(TwitchApi, :send_chat_message, fn _scope, msg ->
+        assert msg =~ "/sessions/"
+        :ok
+      end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :clip,
+          user_id: user.id,
+          youtube_video_id: "yt_abc123",
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :clip, session_id: prepared.session_id, scope: scope})
+
+      {:ok, session, [%SessionStopped{}]} =
+        CommandBus.apply(%StopListeningSession{source: :clip, session_id: started.session_id, scope: scope})
+
+      assert session.status == :stopped
+    end
+  end
+
+  describe "handle/1 - SkipNextTrackListeningSession :clip" do
+    test "is a no-op that returns the session unchanged" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      single = single_fixture()
+
+      expect(YoutubeApi, :get_video, fn "yt_abc123" ->
+        {:ok,
+         %{
+           id: "yt_abc123",
+           title: "Sample Track (Official Video)",
+           channel_title: "Sample Artist",
+           duration: "PT3M30S",
+           thumbnail_url: "https://i.ytimg.com/vi/yt_abc123/maxresdefault.jpg"
+         }}
+      end)
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, [single]} end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :clip,
+          user_id: user.id,
+          youtube_video_id: "yt_abc123",
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
+
+      {:ok, session, []} = CommandBus.apply(%SkipNextTrackListeningSession{source: :clip, session_id: prepared.session_id})
+
+      assert session.id == prepared.session_id
+    end
+  end
+
+  describe "handle/1 - PrepareListeningSession :playlist" do
     test "successfully creates playlist session and returns SessionPrepared event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
       playlist = playlist_fixture()

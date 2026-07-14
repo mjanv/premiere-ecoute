@@ -39,6 +39,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.VotesLive do
         "track" -> :track
         "album" -> :album
         "playlist" -> :playlist
+        "clip" -> :clip
         _ -> socket.assigns.selected_source
       end
 
@@ -60,6 +61,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.VotesLive do
           :album -> Sessions.get_votes_by_period(user, period, %{year: year, month: month})
           :track -> Sessions.get_single_votes_by_period(user, period, %{year: year, month: month})
           :playlist -> Sessions.get_playlist_votes_by_period(user, period, %{year: year, month: month})
+          :clip -> Sessions.get_clip_votes_by_period(user, period, %{year: year, month: month})
         end
 
       {:ok, %{votes_data: %{source: source, items: votes}}}

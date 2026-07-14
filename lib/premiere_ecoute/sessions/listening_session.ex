@@ -61,7 +61,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   schema "listening_sessions" do
     field :status, Ecto.Enum, values: [:preparing, :active, :stopped], default: :preparing
-    field :source, Ecto.Enum, values: [:album, :playlist, :track, :free], default: :album
+    field :source, Ecto.Enum, values: [:album, :playlist, :track, :free, :clip], default: :album
     field :name, :string
     field :share_token, :string
     field :vote_mode, Ecto.Enum, values: [:chat, :poll], default: :chat
@@ -678,10 +678,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   Returns the shareable URL path segment for a session.
 
   Combines a slugified title with the unique share token:
-  `artist-album-name-<token>` for album/playlist/single modes,
+  `artist-album-name-<token>` for album/playlist/single/clip modes,
   `free-session-<token>` for free mode.
 
-  Works for all four session sources: :album, :playlist, :track, :free.
+  Works for all five session sources: :album, :playlist, :track, :free, :clip.
   """
   @spec share_path(t()) :: String.t()
   def share_path(%__MODULE__{share_token: token} = session) do
@@ -777,6 +777,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def entity(%__MODULE__{source: :album, album: album}), do: album
   def entity(%__MODULE__{source: :playlist, playlist: playlist}), do: playlist
   def entity(%__MODULE__{source: :track, single: single}), do: single
+  def entity(%__MODULE__{source: :clip, single: single}), do: single
   def entity(%__MODULE__{}), do: nil
 
   @doc """

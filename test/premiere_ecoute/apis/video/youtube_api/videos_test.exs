@@ -24,6 +24,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.VideosTest do
                published_at: "2026-03-17T16:30:17Z",
                thumbnail_url: "https://i.ytimg.com/vi/fWxv_yPImZ4/maxresdefault.jpg",
                duration: "PT54M1S",
+               channel_title: "Flonflon",
                view_count: 225,
                like_count: 13,
                comment_count: 6

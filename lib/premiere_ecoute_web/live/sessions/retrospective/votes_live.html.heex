@@ -76,6 +76,13 @@
               >
                 {gettext("Playlists")}
               </button>
+              <button
+                phx-click={if @selected_source != :clip, do: "change_source"}
+                phx-value-source="clip"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_source == :clip, do: "bg-red-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Clips")}
+              </button>
             </div>
           </div>
         </div>
@@ -193,6 +200,34 @@
                       <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <p class="text-white font-semibold truncate drop-shadow">{vote_data.playlist.title}</p>
                         <p class="text-emerald-300 text-sm truncate">{vote_data.playlist.owner_name}</p>
+                      </div>
+                    </div>
+                  </.link>
+                <% end %>
+              <% :clip -> %>
+                <%= for vote_data <- votes_data.items do %>
+                  <.link
+                    navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
+                    class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
+                  >
+                    <.cover
+                      src={vote_data.single.cover_url}
+                      alt={gettext("Clip cover")}
+                      class="w-full aspect-square object-cover group-hover:blur-xs transition-all duration-200"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    <div class="absolute inset-0 flex flex-col justify-between p-3">
+                      <div class="flex justify-end">
+                        <div
+                          class="text-white font-bold drop-shadow-2xl leading-none"
+                          style="font-size: clamp(1.75rem, 8vw, 4rem); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"
+                        >
+                          {vote_data.score}
+                        </div>
+                      </div>
+                      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p class="text-white font-semibold truncate drop-shadow">{vote_data.single.name}</p>
+                        <p class="text-red-300 text-sm truncate">{vote_data.single.artist}</p>
                       </div>
                     </div>
                   </.link>

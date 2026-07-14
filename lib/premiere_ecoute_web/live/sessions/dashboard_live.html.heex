@@ -47,6 +47,14 @@
           statutes={[:preparing, :active]}
         >
           <.live_component
+            :if={@listening_session.source == :clip}
+            module={PremiereEcouteWeb.Sessions.Components.YoutubeControlPanel}
+            id="youtube-control-panel"
+            listening_session={@listening_session}
+            clip_progress={@clip_progress}
+          />
+          <.live_component
+            :if={@listening_session.source != :clip}
             module={PremiereEcouteWeb.Sessions.Components.SpotifyPlayer}
             id="spotify-player"
             listening_session={@listening_session}
@@ -111,8 +119,8 @@
               />
             </div>
 
-            <!-- Next Track Timer/Slider — not shown for :track or :free -->
-            <%= if @listening_session.source not in [:track, :free] and @listening_session.status != :stopped do %>
+            <!-- Next Track Timer/Slider — not shown for :track, :clip, or :free -->
+            <%= if @listening_session.source not in [:track, :clip, :free] and @listening_session.status != :stopped do %>
               <div class="mt-4 pt-4 border-t border-white/20 space-y-2">
                 <.next_track value={@listening_session.options["next_track"]} at={@next_track_at} phx-change="update_next_track" />
               </div>
@@ -390,7 +398,7 @@
       <div class="w-2/3 p-6 overflow-y-auto">
         <.vote_bar listening_session={@listening_session} open_vote={@open_vote} user_current_rating={@user_current_rating} />
 
-        <%= if @listening_session.options["scores"] && @listening_session.source != :track do %>
+        <%= if @listening_session.options["scores"] && @listening_session.source not in [:track, :clip] do %>
           <.gradient_bg status={@listening_session.status} statutes={[:active, :stopped]}>
             <.note_graph listening_session={@listening_session} trends={@vote_trends} />
           </.gradient_bg>
@@ -602,8 +610,8 @@
             <% end %>
           <% end %>
 
-          <%= if @listening_session.source == :track do %>
-            <!-- Single track session: show the single prominently -->
+          <%= if @listening_session.source in [:track, :clip] do %>
+            <!-- Single track/clip session: show the single prominently -->
             <div class={[
               "rounded-lg overflow-hidden border-2",
               if(@open_vote, do: "border-green-500/50", else: "border-orange-500/50")
