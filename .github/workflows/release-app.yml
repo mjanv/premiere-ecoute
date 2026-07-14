@@ -61,7 +61,7 @@ jobs:
         with:
           name: premiere-ecoute-release
           path: _build/prod/rel/premiere_ecoute/
-          retention-days: 1
+          retention-days: 3
 
   deploy-to-digital-ocean:
     name: Deploy to Digital Ocean
@@ -85,11 +85,11 @@ jobs:
       - name: Add server to known_hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H 68.183.219.251 >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ vars.DO_HOST }} >> ~/.ssh/known_hosts
 
       - name: Create .env.production file
         run: |
-          # AIDEV-NOTE: Direct bash variable expansion in heredoc - unquoted EOF allows variable substitution
+          # Unquoted EOF allows variable substitution in the heredoc below.
           cat > .env.production <<EOF
           # Phoenix
           PHX_HOST=${PHX_HOST}
@@ -173,17 +173,53 @@ jobs:
           GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
           POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
 
+      - name: Backup current release
+        run: |
+          ssh root@${{ vars.DO_HOST }} '
+            rm -rf /opt/premiere-ecoute-backup
+            cp -a /opt/premiere-ecoute /opt/premiere-ecoute-backup
+          '
+
       - name: Deploy release to server
         run: |
-          rsync -avzq --delete --exclude='.env' --exclude='cache' _build/prod/rel/premiere_ecoute/ root@68.183.219.251:/opt/premiere-ecoute/
-          scp .env.production root@68.183.219.251:/opt/premiere-ecoute/.env
-          ssh root@68.183.219.251 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -path "*/releases/*/iex" -o -name "*.so" \) -type f -exec chmod +x {} \;'
+          rsync -avzq --delete --exclude='.env' --exclude='cache' _build/prod/rel/premiere_ecoute/ root@${{ vars.DO_HOST }}:/opt/premiere-ecoute/
+          scp .env.production root@${{ vars.DO_HOST }}:/opt/premiere-ecoute/.env
+          ssh root@${{ vars.DO_HOST }} 'chown -R premiere:premiere /opt/premiere-ecoute && find /opt/premiere-ecoute \( -path "*/bin/*" -o -path "*/priv/bin/*" -o -path "*/releases/*/elixir" -o -path "*/releases/*/iex" -o -name "*.so" \) -type f -exec chmod +x {} \;'
+
+      - name: Remove local secrets file
+        if: always()
+        run: rm -f .env.production
 
       - name: Restart application
         run: |
-          ssh root@68.183.219.251 '
+          ssh root@${{ vars.DO_HOST }} '
             systemctl is-active postgresql
             systemctl restart premiere-ecoute
             systemctl status premiere-ecoute --no-pager
             journalctl -u premiere-ecoute -n 50 --no-pager
+          '
+
+      - name: Health check
+        id: health_check
+        run: |
+          for i in $(seq 1 10); do
+            if ssh root@${{ vars.DO_HOST }} 'curl -fsS -o /dev/null http://localhost:4000/health'; then
+              echo "Application is healthy"
+              exit 0
+            fi
+            echo "Health check attempt $i failed, retrying in 3s..."
+            sleep 3
+          done
+          echo "Application failed health check"
+          exit 1
+
+      - name: Rollback on failed health check
+        if: failure() && steps.health_check.outcome == 'failure'
+        run: |
+          ssh root@${{ vars.DO_HOST }} '
+            rm -rf /opt/premiere-ecoute
+            mv /opt/premiere-ecoute-backup /opt/premiere-ecoute
+            chown -R premiere:premiere /opt/premiere-ecoute
+            systemctl restart premiere-ecoute
+            systemctl status premiere-ecoute --no-pager
           '

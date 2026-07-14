@@ -1,7 +1,11 @@
-name: Pull Request CI
+name: PR - App CI
 
 on:
   pull_request:
+    paths-ignore:
+      - 'apps/**'
+      - '.github/workflows/pr-extension.yml'
+      - '.github/workflows/pr-mobile.yml'
 
 jobs:
   deps:
@@ -14,8 +18,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.19.0-otp-28'
-          otp-version: '28.1'
+          elixir-version: '1.20.2'
+          otp-version: '29.0.2'
 
       - name: Restore dependencies cache
         uses: actions/cache/restore@v4
@@ -55,8 +59,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.19.0-otp-28'
-          otp-version: '28.1'
+          elixir-version: '1.20.2'
+          otp-version: '29.0.2'
 
       - name: Restore dependencies and build cache
         uses: actions/cache/restore@v4
@@ -81,6 +85,9 @@ jobs:
 
       - name: Run quality checks
         run: mix quality
+
+      - name: Run security and dependency audit
+        run: mix audit
 
   tests:
     name: Unit Tests
@@ -134,8 +141,8 @@ jobs:
       - name: Set up Elixir and Erlang
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.19.0-otp-28'
-          otp-version: '28.1'
+          elixir-version: '1.20.2'
+          otp-version: '29.0.2'
 
       - name: Restore dependencies and build cache
         uses: actions/cache/restore@v4
@@ -148,30 +155,3 @@ jobs:
 
       - name: Run tests
         run: mix test
-
-  extension-tests:
-    name: Extension Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Cache node modules
-        uses: actions/cache@v4
-        with:
-          path: apps/extension/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('apps/extension/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
-
-      - name: Install extension dependencies
-        working-directory: apps/extension
-        run: npm ci
-
-      - name: Run extension tests
-        working-directory: apps/extension
-        run: npm test
