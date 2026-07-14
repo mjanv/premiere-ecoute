@@ -4,10 +4,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.TidalApi.Albums do
 
   Fetches album data from Tidal Open API v2 and parses into Album aggregates with tracks.
 
-  AIDEV-NOTE: Track number is NOT in track attributes — it lives in the album's
-  relationships.items.data[].meta.trackNumber. We build a track_number lookup map
-  before processing included tracks.
-  Duration is ISO 8601 duration string (e.g. "PT5M38S") — parsed via Parser.parse_duration_ms/1.
+  Track number is NOT in track attributes — it lives in the album's
+  `relationships.items.data[].meta.trackNumber`. A track_number lookup map is built
+  before processing included tracks. Duration is an ISO 8601 duration string (e.g.
+  `"PT5M38S"`), parsed via `Parser.parse_duration_ms/1`.
   """
 
   alias PremiereEcoute.Apis.MusicProvider.TidalApi

@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: SeaweedFS (podcast storage) restore script for Digital Ocean droplet.
 # Replaces the Filer data directory with the contents of a backup archive. DESTRUCTIVE.
 
 set -e

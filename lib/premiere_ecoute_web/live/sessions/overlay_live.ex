@@ -21,7 +21,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   def mount(%{"username" => username}, _session, socket) do
     user = Accounts.User.get_user_by_username(username)
 
-    # AIDEV-NOTE: guard against nil user (unknown username) to prevent BadMapError on user.id
+    # Guard against nil user (unknown username) to prevent BadMapError on user.id.
     if is_nil(user) do
       {:ok, redirect(socket, to: "/")}
     else
@@ -256,7 +256,7 @@ defmodule PremiereEcouteWeb.Sessions.OverlayLive do
   defp parse_score("votes"), do: :votes
   defp parse_score(_), do: :player
 
-  # AIDEV-NOTE: single/streamer/viewer use 100vw/100vh to fill OBS browser source at any size
+  # single/streamer/viewer use 100vw/100vh to fill OBS browser source at any size.
   defp overlay_size(:player), do: "width: #{480 * 2.5}px; height: 240px; "
   defp overlay_size(:both), do: "width: 100vw; height: 100vh; "
   defp overlay_size(:votes), do: "width: 800px; height: 240px; "

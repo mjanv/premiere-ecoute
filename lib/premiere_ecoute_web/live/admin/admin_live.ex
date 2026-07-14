@@ -16,7 +16,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Review
 
-  # AIDEV-NOTE: High-signal events shown in the activity feed — noisy or
+  # High-signal events shown in the activity feed — noisy or
   # internal events (e.g. ConsentGiven) are intentionally excluded.
   @feed_events ~w(
     Elixir.PremiereEcoute.Events.AccountCreated
@@ -64,8 +64,8 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
     |> Jason.encode!()
   end
 
-  # AIDEV-NOTE: rescue ArgumentError from JsonbSerializer.keys_to_atoms/1 which
-  # crashes on String.to_existing_atom for stale field names in old stored events.
+  # Rescue ArgumentError from JsonbSerializer.keys_to_atoms/1, which crashes on
+  # String.to_existing_atom for stale field names in old stored events.
   defp load_feed do
     PremiereEcoute.paginate("$all", page: 1, size: 50)
     |> Enum.filter(&(&1.event_type in @feed_events))
@@ -105,7 +105,7 @@ defmodule PremiereEcouteWeb.Admin.AdminLive do
     end
   end
 
-  # AIDEV-NOTE: data can be an event struct or a plain map (older stored events)
+  # data can be an event struct or a plain map (older stored events).
   defp get_field(data, key) when is_struct(data), do: Map.get(data, key)
   defp get_field(data, key) when is_map(data), do: data[key] || data[to_string(key)]
 

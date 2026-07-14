@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Repo.Migrations.AddProviderIdsToDiscography do
   use Ecto.Migration
 
-  # AIDEV-NOTE: migrates albums, album_tracks, singles from (provider, album_id/track_id)
+  # Migrates albums, album_tracks, singles from (provider, album_id/track_id)
   # to a provider_ids JSONB map. Data is migrated before the old columns are dropped.
 
   def up do

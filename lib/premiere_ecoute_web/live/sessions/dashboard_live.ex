@@ -289,7 +289,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
 
   @impl true
   def handle_event("recording_started", _params, socket) do
-    # AIDEV-NOTE: Capture wall clock at recording start. Used to convert JS frame-counter
+    # Capture wall clock at recording start. Used to convert JS frame-counter
     # offsets (relative to record click) into session-relative offsets without network jitter.
     {:noreply, assign(socket, microphone_active: true, recording_started_at: DateTime.utc_now())}
   end

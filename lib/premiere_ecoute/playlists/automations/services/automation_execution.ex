@@ -72,7 +72,7 @@ defmodule PremiereEcoute.Playlists.Automations.Services.AutomationExecution do
     :ok
   end
 
-  # AIDEV-NOTE: fold over steps; first failure stops execution and marks rest as :skipped
+  # Folds over steps; first failure stops execution and marks the rest as :skipped.
   defp execute_steps(steps, scope) do
     {status, step_results, _context} =
       Enum.reduce(steps, {:running, [], %{}}, fn step, {status, results, context} ->

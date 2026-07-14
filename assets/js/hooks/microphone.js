@@ -1,10 +1,10 @@
-// AIDEV-NOTE: Hook for audio recording + waveform visualisation used by AudioLive.
+// Hook for audio recording + waveform visualisation used by AudioLive.
 //
 // Uses AudioWorklet (pcm-processor.js) to capture raw PCM directly from the audio
 // thread, avoiding MediaRecorder container format issues. Every CHUNK_SAMPLES frames
 // the worklet posts samples to the main thread → waveform accumulates + server notified.
 
-// AIDEV-NOTE: 48kHz matches OBS default — no resampling needed for audio/video alignment.
+// 48kHz matches OBS default — no resampling needed for audio/video alignment.
 const SAMPLING_RATE = 48_000;
 
 export const Microphone = {
@@ -82,7 +82,7 @@ export const Microphone = {
         }
 
         // Detect completed segments (speech → silence transitions)
-        // AIDEV-NOTE: is_clean is evaluated post-hoc at segment close via a full pass over
+        // is_clean is evaluated post-hoc at segment close via a full pass over
         // allFrames — avoids stale context from incremental smoothedClean calls mid-chunk.
         const FRAME_MS = 30;
         const completedSegments = [];
@@ -130,7 +130,7 @@ export const Microphone = {
         let binary = "";
         for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
         for (const seg of completedSegments) {
-          // AIDEV-NOTE: Only encode audio for clean segments — server only uses it for transcription.
+          // Only encode audio for clean segments — server only uses it for transcription.
           // Sending large base64 blobs for noisy segments overflows the longpoll body limit (1MB).
           if (seg.is_clean && seg.samples) {
             const bytes = new Uint8Array(seg.samples.buffer);
@@ -163,7 +163,7 @@ export const Microphone = {
     if (this.allSamples.length > 0) this.drawWaveform(this.allSamples, this.allFrames);
   },
 
-  // AIDEV-NOTE: Majority-vote smoothing over ±SMOOTH_HALF frames for isCleanSpeech.
+  // Majority-vote smoothing over ±SMOOTH_HALF frames for isCleanSpeech.
   // Absorbs short noisy bursts (plosives, fricatives) inside speech segments.
   // Only counts frames above RMS_MIN — hangover-tail frames (near-silence) are excluded
   // to avoid garbage flatness/attack values skewing the segment classification.
@@ -187,7 +187,7 @@ export const Microphone = {
 
   // Fixed-width canvas, scrolling window — always shows the most recent audio.
   // No canvas resize ever, so no flicker.
-  // AIDEV-NOTE: h is split: top 140px = waveform, bottom 16px = VAD segment bar
+  // h is split: top 140px = waveform, bottom 16px = VAD segment bar
   drawWaveform(samples, frames = []) {
     const S = this.SAMPLES_PER_PX;
     const FRAME_SAMPLES = 1440; // 30ms at 48kHz — must match pcm-processor.js

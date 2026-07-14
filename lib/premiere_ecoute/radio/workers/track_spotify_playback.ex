@@ -49,7 +49,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
 
       {:error, reason} ->
         Logger.error("[TrackSpotifyPlayback] user #{user_id}: playback tracking failed (#{inspect(reason)}), rescheduling in 30s")
-        # AIDEV-NOTE: reschedule after failure to keep loop alive (e.g. transient 401 on expired token)
+        # Reschedule after failure to keep the loop alive (e.g. transient 401 on expired token).
         __MODULE__.in_seconds(%{user_id: user_id}, 30)
         :ok
     end

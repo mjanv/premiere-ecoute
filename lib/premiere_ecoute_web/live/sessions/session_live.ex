@@ -158,7 +158,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("update_review_form", %{"review" => params}, socket) do
-    # AIDEV-NOTE: cast all user-editable fields to keep the form consistent between phx-change events
+    # Cast all user-editable fields to keep the form consistent between phx-change events.
     changeset =
       Ecto.Changeset.cast(socket.assigns.review_form.source, params, [
         :content,
@@ -179,7 +179,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     session_id = socket.assigns.listening_session.id
 
     if current_scope && current_scope.user do
-      # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
+      # Tags arrive as a comma-separated string from the text input; convert to list.
       params = normalize_review_params(params)
 
       session = socket.assigns.listening_session
@@ -187,7 +187,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       result =
         case socket.assigns.editing_review do
           nil ->
-            # AIDEV-NOTE: link review to both the session and its album (when album-sourced)
+            # Link review to both the session and its album (when album-sourced).
             extra = %{"session_id" => session_id, "album_id" => session.album_id}
             Reviews.create(current_scope.user, Map.merge(params, extra))
 
@@ -281,7 +281,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     session = socket.assigns.listening_session
 
     if current_scope && current_scope.user && current_scope.user.id == session.user_id do
-      # AIDEV-NOTE: params arrive as %{"0" => %{"label" => ..., "url" => ...}, "1" => ...}
+      # params arrive as %{"0" => %{"label" => ..., "url" => ...}, "1" => ...}.
       replays = params |> Enum.sort_by(fn {k, _} -> String.to_integer(k) end) |> Enum.map(&elem(&1, 1))
 
       case ListeningSession.update_replays(session, replays) do
@@ -330,7 +330,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> Map.put("like", like)
   end
 
-  # AIDEV-NOTE: builds [{track_album|playlist_track, track_summary}] from report summaries + preloaded tracks.
+  # Builds [{track_album|playlist_track, track_summary}] from report summaries + preloaded tracks.
   defp build_tracks(%ListeningSession{source: :album} = session, report) do
     Enum.map(report.track_summaries, fn summary ->
       id = summary[:track_id] || summary["track_id"]
@@ -347,14 +347,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   defp build_tracks(_session, _report), do: []
 
-  # AIDEV-NOTE: builds vote distribution for a single viewer's votes (my_votes map from my_votes_by_track).
+  @doc "Builds vote distribution for a single viewer's votes (my_votes map from my_votes_by_track)."
   def my_vote_distribution(my_votes, session) do
     votes = Enum.map(my_votes, fn {_track_id, value} -> %{value: value, is_streamer: false} end)
     individual = build_individual_distribution(votes, session)
     merge_distributions(individual, %{}, session)
   end
 
-  # AIDEV-NOTE: returns %{track_id => score_string} for a specific Twitch viewer from report votes.
+  @doc "Returns %{track_id => score_string} for a specific Twitch viewer from report votes."
   def my_votes_by_track(report, twitch_user_id) do
     report.votes
     |> Enum.reject(& &1.is_streamer)
@@ -362,8 +362,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     |> Map.new(fn v -> {v.track_id, v.value} end)
   end
 
-  # AIDEV-NOTE: builds distribution from report votes + polls for all vote options.
-  # Returns [{label, pct}] normalized 0-100 relative to max bucket, or [] if no votes.
+  @doc """
+  Builds distribution from report votes + polls for all vote options.
+
+  Returns `[{label, pct}]` normalized 0-100 relative to max bucket, or `[]` if no votes.
+  """
   def vote_distribution(report, session, :viewer) do
     individual =
       report.votes

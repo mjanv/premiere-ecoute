@@ -1,5 +1,5 @@
-// AIDEV-NOTE: Grafana Alloy configuration to scrape Premiere Ecoute metrics and push to Grafana Cloud
-// This config collects Prometheus metrics from localhost:4000/metrics and forwards to Grafana Cloud
+// Grafana Alloy configuration to scrape Premiere Ecoute metrics and push to Grafana Cloud.
+// This config collects Prometheus metrics from localhost:4000/metrics and forwards to Grafana Cloud.
 
 // Logging configuration
 logging {
@@ -45,8 +45,7 @@ prometheus.remote_write "grafana_cloud" {
       password = env("GRAFANA_CLOUD_API_KEY")
     }
 
-    // Queue configuration for reliability
-    // AIDEV-NOTE: Conservative settings for Grafana Cloud free tier (75 req/s limit)
+    // Queue configuration for reliability — conservative settings for Grafana Cloud free tier (75 req/s limit).
     queue_config {
       capacity             = 10000
       max_shards           = 1

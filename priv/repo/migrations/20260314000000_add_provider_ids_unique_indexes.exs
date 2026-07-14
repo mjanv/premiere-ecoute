@@ -1,7 +1,7 @@
 defmodule PremiereEcoute.Repo.Migrations.AddProviderIdsUniqueIndexes do
   use Ecto.Migration
 
-  # AIDEV-NOTE: enforces uniqueness of (provider, id) pairs in provider_ids JSONB
+  # Enforces uniqueness of (provider, id) pairs in provider_ids JSONB
   # using partial expression indexes per provider — one row per album/track/single
   # per provider key is guaranteed unique.
 

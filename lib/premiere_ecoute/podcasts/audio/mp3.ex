@@ -154,7 +154,7 @@ defmodule PremiereEcoute.Podcasts.Audio.Mp3 do
 
   # --- VBR header (Xing/Info/VBRI) ---
 
-  # AIDEV-NOTE: channel mode is the top 2 bits of the 4th header byte (not the 3rd) — getting this
+  # Channel mode is the top 2 bits of the 4th header byte (not the 3rd) — getting this
   # wrong mislocates the side-info/Xing offset and silently falls back to a CBR (often 0s) estimate.
   # Side-info size determines where Xing/Info sits within the first frame; 0b11 = mono.
   defp side_info_size(:v1, <<0xFF, _::8, _::8, channel::2, _::bitstring>>), do: if(channel == 0b11, do: 17, else: 32)

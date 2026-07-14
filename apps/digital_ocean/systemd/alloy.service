@@ -1,4 +1,3 @@
-# AIDEV-NOTE: Systemd service for Grafana Alloy metrics collection agent
 [Unit]
 Description=Grafana Alloy
 Documentation=https://grafana.com/docs/alloy/latest/
@@ -32,8 +31,7 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=alloy
 
-# Resource limits
-# AIDEV-NOTE: Light resource limits - Alloy is lightweight (~50-100MB typical usage)
+# Resource limits — light limits since Alloy is lightweight (~50-100MB typical usage).
 MemoryMax=200M
 MemoryHigh=150M
 CPUQuota=20%

@@ -1,4 +1,4 @@
-<%!-- AIDEV-NOTE: FileDownload hook must be on a persistent root element for push_event to reach it. --%>
+<%!-- FileDownload hook must be on a persistent root element for push_event to reach it. --%>
 <Layouts.app
   flash={@flash}
   banners={assigns[:banners] || []}
@@ -244,7 +244,7 @@
                     <% end %>
                   </button>
                 </div>
-                <%!-- AIDEV-NOTE: canvas must stay in DOM so the hook mounts with correct width.
+                <%!-- Canvas must stay in DOM so the hook mounts with correct width.
                      Height collapses to 0 when not recording via overflow-hidden + max-h. --%>
                 <div class={
                   if(@microphone_active, do: "mt-3 max-h-48 overflow-hidden rounded-lg", else: "max-h-0 overflow-hidden")

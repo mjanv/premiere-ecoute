@@ -89,8 +89,7 @@ while IFS= read -r line; do
             continue
         fi
 
-        # Set the secret using gh CLI
-        # AIDEV-NOTE: Use printf instead of echo to avoid newline issues, and quote variable properly
+        # Use printf instead of echo to avoid newline issues, and quote variable properly.
         if printf '%s' "$value" | gh secret set "$key" 2>/dev/null; then
             echo -e "${GREEN}✓ Set $key${NC}"
             secret_count=$((secret_count + 1))

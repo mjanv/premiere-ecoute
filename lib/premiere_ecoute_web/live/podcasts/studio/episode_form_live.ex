@@ -10,7 +10,7 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.EpisodeFormLive do
   alias PremiereEcoute.Podcasts.Episode
   alias PremiereEcoute.Podcasts.Show
 
-  # AIDEV-NOTE: dark form-control class matching the playlists/automations form (bare daisyUI
+  # Dark form-control class matching the playlists/automations form (bare daisyUI
   # `<.input>` defaults render unstyled-white on the synthwave background).
   @field_class "w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
 

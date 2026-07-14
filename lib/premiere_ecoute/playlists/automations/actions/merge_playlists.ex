@@ -22,7 +22,6 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylists do
     end
   end
 
-  # AIDEV-NOTE: overrides generated validate/1 to enforce the minimum-2 list constraint
   @impl true
   def validate(%{"sources" => ids, "target" => tgt})
       when is_list(ids) and length(ids) >= 2 and is_binary(tgt) and tgt != "",
@@ -42,7 +41,6 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.MergePlaylists do
   def execute(%{"sources" => source_ids, "target" => target_id_or_ref}, context, scope) do
     target_id = resolve_id(target_id_or_ref, context)
 
-    # AIDEV-NOTE: fetch all sources, halt on first error
     case fetch_all(source_ids) do
       {:ok, all_tracks} ->
         unique_tracks = deduplicate(all_tracks)

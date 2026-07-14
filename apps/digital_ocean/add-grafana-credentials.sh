@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: Script to add Grafana Cloud credentials for PromEx dashboard upload
 
 set -e
 

@@ -4,9 +4,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.TidalApi.Artists do
 
   Fetches artist data and albums from Tidal Open API v2.
 
-  AIDEV-NOTE: Tidal v2 uses JSON:API format. Artist images are in `included` artworks,
-  linked via relationships.profileArt. search_artist/1 filters results to exact name
-  matches (case-insensitive) to avoid false positives from Tidal's fuzzy search ranking.
+  Tidal v2 uses JSON:API format. Artist images are in `included` artworks, linked via
+  `relationships.profileArt`. `search_artist/1` filters results to exact name matches
+  (case-insensitive) to avoid false positives from Tidal's fuzzy search ranking.
   """
 
   alias PremiereEcoute.Apis.MusicProvider.TidalApi

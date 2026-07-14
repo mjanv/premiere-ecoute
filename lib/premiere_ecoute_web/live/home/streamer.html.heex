@@ -92,7 +92,7 @@
               <% end %>
             </div>
 
-            <%!-- AIDEV-NOTE: active sessions sorted first by query order_by fragment --%>
+            <%!-- Active sessions sorted first by query order_by fragment. --%>
             <div class="rounded-xl border border-white/10 bg-white/10 overflow-hidden">
               <%= if @upcoming_sessions == [] do %>
                 <.link href={~p"/sessions/new"} class="group block">

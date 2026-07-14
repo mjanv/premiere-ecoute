@@ -292,7 +292,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandlerTest do
       stub(SpotifyApi, :get_track, fn _id -> {:error, :not_found} end)
       {:ok, session, _} = CommandBus.apply(%StartCollectionSession{session_id: session.id, scope: scope})
 
-      # AIDEV-NOTE: LiveView remaps "Pick B" before sending: primary = B (kept), loser = A (rejected)
+      # LiveView remaps "Pick B" before sending: primary = B (kept), loser = A (rejected).
       command = %DecideTrack{
         session_id: session.id,
         scope: scope,

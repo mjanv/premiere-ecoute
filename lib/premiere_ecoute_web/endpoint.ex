@@ -56,7 +56,7 @@ defmodule PremiereEcouteWeb.Endpoint do
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library(),
-    # AIDEV-NOTE: Raised from default 1MB to 20MB to accommodate LiveView longpoll
+    # Raised from default 1MB to 20MB to accommodate LiveView longpoll
     # carrying base64-encoded PCM audio segments from the microphone hook.
     length: 20_000_000
 

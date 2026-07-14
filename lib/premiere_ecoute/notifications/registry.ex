@@ -7,7 +7,6 @@ defmodule PremiereEcoute.Notifications.Registry do
   - by type string for DB reload (string → module)
   """
 
-  # AIDEV-NOTE: add new notification type modules here; keys are built from the module itself
   @types [
     PremiereEcoute.Notifications.Types.AutomationFailure,
     PremiereEcoute.Notifications.Types.AutomationSuccess,

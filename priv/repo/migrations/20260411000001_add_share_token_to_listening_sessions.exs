@@ -6,7 +6,7 @@ defmodule PremiereEcoute.Repo.Migrations.AddShareTokenToListeningSessions do
       add :share_token, :string, null: false, default: ""
     end
 
-    # AIDEV-NOTE: backfill BEFORE the unique index; builds slug-token from joined title + 8-char hex suffix
+    # Backfill BEFORE the unique index; builds slug-token from joined title + 8-char hex suffix.
     execute(
       """
       WITH titles AS (

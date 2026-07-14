@@ -2,7 +2,7 @@ import streamDeck, { action, KeyAction, KeyDownEvent, SingletonAction, WillAppea
 import { api } from "../api-client";
 import { iconVote } from "../icons";
 
-// AIDEV-NOTE: vote state is shared across all three vote actions via module-level variables;
+// Vote state is shared across all three vote actions via module-level variables;
 // onRatingChange callback allows up/down actions to trigger a re-render of the vote button.
 let currentRating = 5;
 let onRatingChange: (() => void) | undefined;

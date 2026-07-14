@@ -230,7 +230,7 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     }
   end
 
-  # AIDEV-NOTE: resolves current track_id and duel_track_id from cache; falls back to {nil, nil} on cache miss
+  # Resolves current track_id and duel_track_id from cache; falls back to {nil, nil} on cache miss.
   defp current_track_ids(broadcaster_id, session, mode) do
     case Cache.get(:collections, broadcaster_id) do
       {:ok, %{tracks: tracks}} ->

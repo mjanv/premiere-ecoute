@@ -54,7 +54,7 @@ defmodule PremiereEcouteWeb.OpenApiRoleFilter do
   defp keep_operation?(nil, _role), do: false
 
   defp keep_operation?(operation, role) do
-    # AIDEV-NOTE: extensions is a map with string keys on OpenApiSpex.Operation structs; nil when no extensions set
+    # extensions is a map with string keys on OpenApiSpex.Operation structs; nil when no extensions set.
     roles = (operation.extensions || %{}) |> Map.get("x-role", [])
     roles == [] or role == "admin" or role in roles
   end

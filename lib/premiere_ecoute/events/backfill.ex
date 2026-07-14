@@ -131,8 +131,8 @@ defmodule PremiereEcoute.Events.Backfill do
           select: %{user_id: p.user_id, provider: p.provider, inserted_at: p.inserted_at}
       )
 
-    # AIDEV-NOTE: LibraryPlaylistAdded uses user_id as the event id (streams to
-    # the user aggregate). Idempotency checks against user_id, not playlist id.
+    # LibraryPlaylistAdded uses user_id as the event id (streams to the user aggregate).
+    # Idempotency checks against user_id, not playlist id.
     existing = existing_ids(event_type)
 
     {ins, skip} =
@@ -190,8 +190,8 @@ defmodule PremiereEcoute.Events.Backfill do
           }
       )
 
-    # AIDEV-NOTE: idempotency key is the wantlist_item id stored in a separate
-    # "item_id" field in metadata, since the event id field holds user_id.
+    # Idempotency key is the wantlist_item id stored in a separate "item_id" field
+    # in metadata, since the event id field holds user_id.
     existing = existing_item_ids(event_type)
 
     {ins, skip} =

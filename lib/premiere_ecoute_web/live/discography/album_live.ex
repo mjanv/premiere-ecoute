@@ -112,7 +112,7 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
 
   @impl true
   def handle_event("update_review_form", %{"review" => params}, socket) do
-    # AIDEV-NOTE: keeps changeset in sync on every keystroke so rating/like events don't lose text
+    # Keeps changeset in sync on every keystroke so rating/like events don't lose text.
     changeset =
       Ecto.Changeset.cast(socket.assigns.review_form.source, params, [:content, :tags_input, :watched_on, :watched_before])
 
@@ -125,7 +125,7 @@ defmodule PremiereEcouteWeb.Discography.AlbumLive do
     album = socket.assigns.album
 
     if current_scope && current_scope.user do
-      # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
+      # Tags arrive as a comma-separated string from the text input; convert to list.
       params = normalize_review_params(params)
 
       result =

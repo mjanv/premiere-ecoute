@@ -180,8 +180,6 @@ defmodule PremiereEcoute.Playlists.Automations.Action do
         }
       end
 
-      # AIDEV-NOTE: generated validate/1 checks presence of all required inputs;
-      # only injected when the module hasn't defined its own @impl validate/1
       if not Module.defines?(__MODULE__, {:validate, 1}, :def) do
         @impl true
         def validate(configg) do

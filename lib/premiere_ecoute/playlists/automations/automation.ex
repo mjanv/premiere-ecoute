@@ -67,7 +67,7 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
   @doc "Inserts a new automation for the given user."
   @spec insert(User.t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def insert(%User{id: id}, attrs) do
-    # AIDEV-NOTE: stringify all keys to avoid mixed atom/string key crash in Ecto.Changeset.cast
+    # Stringify all keys to avoid mixed atom/string key crash in Ecto.Changeset.cast.
     attrs =
       attrs
       |> Enum.map(fn {k, v} -> {to_string(k), v} end)
@@ -108,7 +108,7 @@ defmodule PremiereEcoute.Playlists.Automations.Automation do
     |> Repo.one()
   end
 
-  # AIDEV-NOTE: subqueries for last_run_at/next_run_at avoid N+1; used by both list and get
+  # Subqueries for last_run_at/next_run_at avoid N+1; used by both list and get.
   defp with_virtual_fields_query do
     worker = "PremiereEcoute.Playlists.Automations.Workers.AutomationRunWorker"
 

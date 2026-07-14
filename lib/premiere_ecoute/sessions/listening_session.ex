@@ -92,7 +92,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   def vote_options(key), do: @vote_options[key]
 
-  # AIDEV-NOTE: preload/1 override to populate Album.artist virtual field after association preload
   def preload({:ok, entity}), do: {:ok, preload(entity)}
   def preload({:error, reason}), do: {:error, reason}
   def preload(nil), do: nil
@@ -555,7 +554,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   @spec list_for_artist(integer()) :: [t()]
   def list_for_artist(artist_id) do
-    # AIDEV-NOTE: sessions linked to an artist via album_artists or single_artists join tables
     album_sessions =
       from(s in __MODULE__,
         join: aa in "album_artists",
@@ -897,7 +895,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 end
 
-# AIDEV-NOTE: Phoenix.Param returns share_token only; username is interpolated separately in ~p sigils
+# Returns share_token only; username is interpolated separately in ~p sigils.
 defimpl Phoenix.Param, for: PremiereEcoute.Sessions.ListeningSession do
   def to_param(%{share_token: token}), do: token
 end

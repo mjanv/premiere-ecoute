@@ -40,11 +40,10 @@ defmodule PremiereEcoute.Discography.Album.Track do
     field :slug, Slug.Type
     field :track_number, :integer
     field :duration_ms, :integer
-    # AIDEV-NOTE: virtual field used to carry album_spotify_id from Spotify API response without persisting it
+    # Virtual: carries album_spotify_id/artist_spotify_id/explicit from the Spotify API
+    # response through to callers without persisting them on the track row.
     field :album_spotify_id, :string, virtual: true
-    # AIDEV-NOTE: virtual field used to carry artist_spotify_id from Spotify API response without persisting it
     field :artist_spotify_id, :string, virtual: true
-    # AIDEV-NOTE: virtual field populated from Spotify API response; not persisted
     field :explicit, :boolean, virtual: true, default: false
 
     belongs_to :album, Album

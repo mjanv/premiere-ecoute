@@ -1,4 +1,3 @@
-# AIDEV-NOTE: Systemd service for Traefik reverse proxy
 [Unit]
 Description=Traefik Reverse Proxy
 Documentation=https://doc.traefik.io/traefik/

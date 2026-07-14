@@ -1,5 +1,4 @@
-# AIDEV-NOTE: Traefik dynamic configuration - routing rules
-# Separate routers needed because Let's Encrypt cannot issue certs for IP addresses
+# Separate routers needed because Let's Encrypt cannot issue certs for IP addresses.
 http:
   routers:
     twitch-ws:
@@ -42,8 +41,8 @@ http:
         servers:
           - url: "http://localhost:4000"
 
-    # AIDEV-NOTE: Proxies /twitch WSS connections to Twitch IRC WebSocket endpoint
-    # Raw text frames required — no compression, no rewriting, HTTP/1.1 only on upstream
+    # Proxies /twitch WSS connections to Twitch IRC WebSocket endpoint.
+    # Raw text frames required — no compression, no rewriting, HTTP/1.1 only on upstream.
     twitch-ws:
       loadBalancer:
         servers:
@@ -54,7 +53,7 @@ http:
     twitch-transport:
       disableHTTP2: true
 
-# AIDEV-NOTE: HTTP/2 disabled via ALPN — HTTP/2 strips Connection/Upgrade headers, breaking Phoenix LiveView WebSocket upgrades
+# HTTP/2 disabled via ALPN — HTTP/2 strips Connection/Upgrade headers, breaking Phoenix LiveView WebSocket upgrades.
 tls:
   options:
     no-h2:

@@ -25,7 +25,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.YoutubeMetadata do
     show_name = (video_settings && video_settings.show_name) || "PREMIÈRE ÉCOUTE"
     saved_template = (video_settings && video_settings.title_template) || "{show_name} : \"{title}\" by {artist}"
 
-    # AIDEV-NOTE: template_override lets the streamer tweak the template per-session without saving to profile
+    # template_override lets the streamer tweak the template per-session without saving to profile.
     template_override = socket.assigns[:template_override]
     active_template = template_override || saved_template
 

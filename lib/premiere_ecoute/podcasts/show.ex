@@ -108,10 +108,13 @@ defmodule PremiereEcoute.Podcasts.Show do
     end
   end
 
-  @doc "Marks a show as published and emits a PodcastShowPublished event."
+  @doc """
+  Marks a show as published and emits a PodcastShowPublished event.
+
+  Uses changeset + `Repo.update`, not the generated `update/2` (`Ecto.Query.update/2` shadows it).
+  """
   @spec publish(t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def publish(%__MODULE__{} = show) do
-    # AIDEV-NOTE: changeset + Repo.update, not the generated update/2 (Ecto.Query.update/2 shadows it).
     show
     |> changeset(%{published: true})
     |> Repo.update()

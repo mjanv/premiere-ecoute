@@ -175,7 +175,7 @@ defmodule PremiereEcouteWeb.Podcasts.Studio.ShowDashboardLive do
             </div>
           </div>
 
-          <%!-- AIDEV-NOTE: 30-day downloads chart hidden until the source-split series is fixed. --%>
+          <%!-- 30-day downloads chart hidden until the source-split series is fixed. --%>
 
           <h2 class="text-lg font-semibold text-white mb-3">{gettext("Episodes")}</h2>
           <div :if={@episodes == []} class="text-gray-400">{gettext("No episodes yet.")}</div>

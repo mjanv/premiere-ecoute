@@ -28,7 +28,7 @@ defmodule PremiereEcouteWeb.HomeLive do
     sessions_by_user = Sessions.stopped_sessions_from_followed(user) |> Enum.group_by(& &1.user_id)
     upcoming_sessions = Sessions.upcoming_sessions_from_followed(user)
 
-    # AIDEV-NOTE: preserves follow order from current_user.channels
+    # Preserves follow order from current_user.channels.
     sessions_per_streamer =
       current_user.channels
       |> Enum.map(fn streamer -> {streamer, Map.get(sessions_by_user, streamer.id, [])} end)
@@ -47,14 +47,13 @@ defmodule PremiereEcouteWeb.HomeLive do
           {[], MapSet.new()}
       end
 
-    # AIDEV-NOTE: collect album ids in wantlist for the viewer to mark them visually
     wantlisted_album_ids = build_wantlisted_album_ids(user.id, sessions_by_user, my_sessions)
 
     streamer_ids = Enum.map(current_user.channels, & &1.id)
     open_playlists = Playlists.list_open_for_subscriptions(streamer_ids)
     playlists_by_streamer = Enum.group_by(open_playlists, & &1.user_id)
 
-    # AIDEV-NOTE: preserves follow order from current_user.channels, same pattern as sessions_per_streamer
+    # Preserves follow order from current_user.channels, same pattern as sessions_per_streamer.
     open_playlists_per_streamer =
       current_user.channels
       |> Enum.map(fn streamer -> {streamer, Map.get(playlists_by_streamer, streamer.id, [])} end)
@@ -62,7 +61,7 @@ defmodule PremiereEcouteWeb.HomeLive do
 
     subscribed_playlist_ids = Playlists.subscribed_playlist_ids(user, open_playlists)
 
-    # AIDEV-NOTE: published podcasts of followed streamers, grouped by streamer id — drives the
+    # Published podcasts of followed streamers, grouped by streamer id — drives the
     # per-streamer "Podcasts" section in the home page.
     podcasts_per_streamer = Podcasts.published_shows_by_users(streamer_ids)
 
@@ -241,7 +240,6 @@ defmodule PremiereEcouteWeb.HomeLive do
     end
   end
 
-  # AIDEV-NOTE: collects album ids that are already in the viewer's wantlist for visual feedback
   defp build_wantlisted_album_ids(user_id, sessions_by_user, my_sessions) do
     all_album_ids =
       sessions_by_user
@@ -257,7 +255,6 @@ defmodule PremiereEcouteWeb.HomeLive do
     |> MapSet.new()
   end
 
-  # AIDEV-NOTE: render/1 dispatches to separate templates based on user role
   @impl true
   def render(%{current_user: %{role: :viewer}} = assigns) do
     viewer(assigns)

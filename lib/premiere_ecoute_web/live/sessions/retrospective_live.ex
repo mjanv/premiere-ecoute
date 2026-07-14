@@ -105,8 +105,8 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
 
     existing =
       if current_scope && current_scope.user do
-        # AIDEV-NOTE: prefer session review; fall back to album review so users who reviewed
-        # the album standalone can update it to also link to this session
+        # Prefer session review; fall back to album review so users who reviewed
+        # the album standalone can update it to also link to this session.
         Reviews.get_for_user_and_session(session.id, current_scope.user.id) ||
           (session.album_id && Reviews.get_for_user_and_album(session.album_id, current_scope.user.id))
       end
@@ -158,10 +158,10 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     if current_scope && current_scope.user do
       user = current_scope.user
 
-      # AIDEV-NOTE: tags arrive as comma-separated string from the text input; convert to list
+      # Tags arrive as a comma-separated string from the text input; convert to list.
       params = normalize_review_params(params)
 
-      # AIDEV-NOTE: always inject session_id/album_id so album-only reviews get linked to the session on save
+      # Always inject session_id/album_id so album-only reviews get linked to the session on save.
       extra = %{"session_id" => session.id, "album_id" => session.album_id}
 
       result =

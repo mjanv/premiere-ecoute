@@ -111,13 +111,10 @@ defmodule PremiereEcoute.Analytics.Aggregates do
     do: where(query, [r], r.inserted_at >= ^from_dt and r.inserted_at <= ^to_dt)
 
   defp aggregate_plain(base, unit_str, nil) do
-    # AIDEV-NOTE: selected_as/group_by(:period) ensures a single DATE_TRUNC
-    # expression is emitted in the SELECT and referenced by alias in GROUP BY
-    # and ORDER BY, avoiding Ecto's multi-param duplication bug where each
-    # fragment occurrence gets its own $N placeholder and Postgres rejects the
-    # query with "must appear in the GROUP BY clause".
-    # NaiveDateTime is returned by DATE_TRUNC on utc_datetime columns via Ecto
-    # fragment, so we normalize to UTC DateTime after the query.
+    # selected_as/group_by(:period) ensures a single DATE_TRUNC expression is emitted in the
+    # SELECT and referenced by alias in GROUP BY and ORDER BY, avoiding Ecto's multi-param
+    # duplication bug where each fragment occurrence gets its own $N placeholder and Postgres
+    # rejects the query with "must appear in the GROUP BY clause".
     base
     |> select([r], %{
       period: selected_as(fragment("DATE_TRUNC(?, ?)", ^unit_str, r.inserted_at), :period),
@@ -139,8 +136,8 @@ defmodule PremiereEcoute.Analytics.Aggregates do
     |> group_by([r], [selected_as(:period), field(r, ^field)])
     |> order_by([], selected_as(:period))
     |> Repo.all()
-    # AIDEV-NOTE: Rename :field_value to the caller's chosen field atom so the
-    # returned maps use the same key name as the schema column.
+    # Rename :field_value to the caller's chosen field atom so the returned maps
+    # use the same key name as the schema column.
     |> Enum.map(fn row ->
       row
       |> normalize_period()
@@ -150,11 +147,10 @@ defmodule PremiereEcoute.Analytics.Aggregates do
   end
 
   defp aggregate_with_gaps(base, unit_str, from_dt, to_dt) do
-    # AIDEV-NOTE: gap filling uses raw SQL because Ecto cannot select a scalar
-    # value directly from a fragment source (generate_series). The inner
-    # aggregation is expressed as an Ecto subquery and inlined as SQL via
-    # Repo.to_sql, then joined against the series in a hand-written CTE.
-    # NaiveDateTime normalization is applied post-query as with aggregate_plain.
+    # Gap filling uses raw SQL because Ecto cannot select a scalar value directly from a
+    # fragment source (generate_series). The inner aggregation is expressed as an Ecto
+    # subquery and inlined as SQL via Repo.to_sql, then joined against the series in a
+    # hand-written CTE.
     inner =
       base
       |> select([r], %{

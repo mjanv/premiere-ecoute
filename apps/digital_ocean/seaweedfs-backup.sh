@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: SeaweedFS (podcast storage) backup script for Digital Ocean droplet.
 # Snapshots the Filer data directory. SeaweedFS is briefly stopped to get a consistent archive.
 
 set -e

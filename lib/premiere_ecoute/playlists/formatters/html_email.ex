@@ -35,7 +35,7 @@ defmodule PremiereEcoute.Playlists.Formatters.HtmlEmail do
       {:ok, html}
     end
 
-    # AIDEV-NOTE: escape/1 prevents XSS from Spotify-sourced data (track names, artist names, playlist title, URLs)
+    # Prevents XSS from Spotify-sourced data (track names, artist names, playlist title, URLs).
     defp escape(value), do: value |> to_string() |> Plug.HTML.html_escape()
 
     defp header(playlist) do

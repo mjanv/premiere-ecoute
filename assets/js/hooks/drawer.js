@@ -1,6 +1,6 @@
 import { animate } from "motion"
 
-// AIDEV-NOTE: The hook owns ALL visibility state. Never call JS.show/JS.hide on
+// The hook owns ALL visibility state. Never call JS.show/JS.hide on
 // the drawer or backdrop from Elixir — the inline style they set conflicts with
 // classList.add("hidden") used here and breaks subsequent open/close cycles.
 const OPEN_DURATION = 0.28

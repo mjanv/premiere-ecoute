@@ -33,8 +33,8 @@ defmodule PremiereEcouteWeb.Admin.AdminEventsLive do
     {:noreply, assign(socket, page: page, events: events)}
   end
 
-  # AIDEV-NOTE: rescue ArgumentError from JsonbSerializer.keys_to_atoms/1 which
-  # crashes on String.to_existing_atom for stale field names in old stored events.
+  # Rescue ArgumentError from JsonbSerializer.keys_to_atoms/1, which crashes on
+  # String.to_existing_atom for stale field names in old stored events.
   defp load_events(stream, page, size) do
     PremiereEcoute.paginate(stream, page: page, size: size)
   rescue

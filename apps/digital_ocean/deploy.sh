@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: Native deployment script for Digital Ocean droplet (no Docker)
 
 set -e
 
@@ -44,11 +43,10 @@ echo "Step 2: Creating deployment directory on droplet..."
 run_remote "mkdir -p ${DEPLOY_DIR}"
 
 echo "Step 3: Copying release to droplet..."
-# AIDEV-NOTE: Exclude .env from deletion to preserve production environment variables
+# Exclude .env from deletion to preserve production environment variables.
 rsync -avz --delete --exclude='.env' _build/prod/rel/premiere_ecoute/ ${DROPLET_USER}@${DROPLET_IP}:${DEPLOY_DIR}/
 
 echo "Step 4: Copying configuration files..."
-# AIDEV-NOTE: Use .env.production for production deployments
 # Copy .env.production to server as .env (contains production URLs and config)
 if [ ! -f ".env.production" ]; then
     echo -e "${RED}ERROR: .env.production file not found!${NC}"

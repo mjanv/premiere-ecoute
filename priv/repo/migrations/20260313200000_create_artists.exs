@@ -19,7 +19,7 @@ defmodule PremiereEcoute.Repo.Migrations.CreateArtists do
 
     create unique_index(:album_artists, [:album_id, :artist_id])
 
-    # AIDEV-NOTE: data migration — seed artists from distinct album.artist values, then link albums
+    # Data migration — seed artists from distinct album.artist values, then link albums.
     execute """
             INSERT INTO artists (name, slug, inserted_at, updated_at)
             SELECT DISTINCT

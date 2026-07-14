@@ -67,7 +67,7 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
   attr :track, :map, required: true
   attr :label, :string, required: true
   attr :accent, :string, default: "purple"
-  # AIDEV-NOTE: color overrides accent with a hex string for dynamic profile colors (e.g. duel mode)
+  # color overrides accent with a hex string for dynamic profile colors (e.g. duel mode)
   attr :color, :string, default: nil
   attr :votes, :integer, default: nil
   attr :play_event, :string, default: nil
@@ -82,7 +82,7 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
   end
 
   def track_card(assigns) do
-    # AIDEV-NOTE: resolve color-dependent styles once here so the template stays clean
+    # Resolve color-dependent styles once here so the template stays clean.
     assigns =
       assign(assigns,
         border_style:

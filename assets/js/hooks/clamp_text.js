@@ -1,4 +1,4 @@
-// AIDEV-NOTE: hides the "more" button when text fits within the clamped height; must run after layout
+// Hides the "more" button when text fits within the clamped height; must run after layout.
 export const ClampText = {
   mounted() {
     requestAnimationFrame(() => {

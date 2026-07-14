@@ -29,7 +29,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Review do
     has_many :likes, ReviewLike
 
     field :likes_count, :integer, virtual: true, default: 0
-    # AIDEV-NOTE: virtual field to round-trip raw tag input string through the form without losing it on re-render
+    # Virtual: round-trips the raw tag input string through the form without losing it on re-render.
     field :tags_input, :string, virtual: true, default: ""
 
     timestamps(type: :utc_datetime)
@@ -85,7 +85,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Review do
     |> foreign_key_constraint(:user_id)
   end
 
-  # AIDEV-NOTE: mirrors DB check constraint — at least one of session_id/album_id must be set
+  # Mirrors DB check constraint — at least one of session_id/album_id must be set.
   defp validate_at_least_one_target(changeset) do
     session_id = get_field(changeset, :session_id)
     album_id = get_field(changeset, :album_id)

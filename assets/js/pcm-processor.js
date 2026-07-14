@@ -1,7 +1,7 @@
-// AIDEV-NOTE: AudioWorklet processor — runs in the audio thread.
+// AudioWorklet processor — runs in the audio thread.
 // Per 30ms frame computes: RMS VAD + spectral flatness + attack ratio.
 // Classification: isSpeech (VAD gate) + isCleanSpeech (flatness + attack filter).
-// AIDEV-NOTE: 48kHz matches OBS default capture rate — no resampling needed.
+// 48kHz matches OBS default capture rate — no resampling needed.
 
 const SAMPLE_RATE = 48000;
 const CHUNK_SAMPLES = SAMPLE_RATE * 0.5;  // 500ms chunks = 24000 samples
@@ -81,7 +81,7 @@ function attackRatio(samples, offset) {
 class PcmProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
-    // AIDEV-NOTE: Ring buffer — avoids push() + slice() + copy on every chunk flush.
+    // Ring buffer — avoids push() + slice() + copy on every chunk flush.
     this._ring = new Float32Array(CHUNK_SAMPLES);
     this._writePos = 0;
     this._count = 0;

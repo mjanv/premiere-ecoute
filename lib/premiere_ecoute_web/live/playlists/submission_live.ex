@@ -247,9 +247,9 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
 
   # Fetches current playlist tracks from Spotify, checks for duplicate, then adds.
   # Returns {:ok, provider_id} | :duplicate | :quota_exceeded | :submissions_closed | {:error, term}
-  # AIDEV-NOTE: Single has no provider/2 — wraps spotify ID in Album.Track which does,
+  # Single has no provider/2 — wraps the Spotify ID in an Album.Track which does,
   # since add_items_to_playlist only needs the ID via track_id/1.
-  # Re-fetches library_playlist and count from DB to avoid stale mount-time snapshot
+  # Re-fetches library_playlist and count from DB to avoid a stale mount-time snapshot
   # (submissions_open? toggled by streamer, or quota raced from multiple tabs).
   defp do_submit(playlist, single, viewer) do
     track_spotify_id = Map.get(single.provider_ids, :spotify)
@@ -318,7 +318,7 @@ defmodule PremiereEcouteWeb.Playlists.SubmissionLive do
     Scope.for_user(user)
   end
 
-  # AIDEV-NOTE: get_playlist uses client credentials; streamer token only needed for writes.
+  # get_playlist uses client credentials; streamer token only needed for writes.
   # Reconciliation always runs regardless of show_tracks_to_viewers? so stale submission
   # records are cleaned up even when the track list is hidden from viewers.
   # @tracks always holds the full list; the template gates display on show_tracks_to_viewers?.

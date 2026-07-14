@@ -12,7 +12,7 @@ defmodule PremiereEcouteWeb.Images.ImageProxyController do
 
   @cache_dir Application.app_dir(:premiere_ecoute, "priv/static/images/proxy")
 
-  # AIDEV-NOTE: SSRF guard — only fetch from known image CDNs, never arbitrary URLs
+  # SSRF guard — only fetch from known image CDNs, never arbitrary URLs.
   @allowed_hosts ~w(
     i.scdn.co
     mosaic.scdn.co

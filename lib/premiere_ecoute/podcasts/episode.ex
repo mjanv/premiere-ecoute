@@ -135,11 +135,15 @@ defmodule PremiereEcoute.Podcasts.Episode do
     |> Repo.one()
   end
 
-  @doc "Stores extracted metadata and marks the episode ready."
+  @doc """
+  Stores extracted metadata and marks the episode ready.
+
+  Uses changeset + `Repo.update` (not the generated `update/2`) — the aggregate imports
+  `Ecto.Query`, whose `update/2` macro would otherwise shadow the call. Same pattern
+  throughout this module.
+  """
   @spec mark_ready(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def mark_ready(%__MODULE__{} = episode, attrs) do
-    # AIDEV-NOTE: use changeset + Repo.update (not the generated update/2) — the aggregate imports
-    # Ecto.Query, whose update/2 macro otherwise shadows the call. Same pattern throughout this module.
     preload(Repo.update(changeset(episode, Map.merge(attrs, %{status: :ready}))))
   end
 

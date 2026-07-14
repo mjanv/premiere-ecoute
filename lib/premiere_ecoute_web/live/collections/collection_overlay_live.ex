@@ -115,8 +115,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
 
   # ── Helpers ───────────────────────────────────────────────────────────────
 
-  # AIDEV-NOTE: cache is keyed by broadcaster_id (Twitch user_id string);
-  # returns {session_id, votes_a, votes_b, vote_open}
+  # Cache is keyed by broadcaster_id (Twitch user_id string); returns {session_id, votes_a, votes_b, vote_open}.
   defp load_state(nil), do: {nil, 0, 0, false}
 
   defp load_state(broadcaster_id) do
@@ -143,7 +142,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
     end
   end
 
-  # Returns the percentage width for each side of the bar.
+  @doc "Returns the percentage width for each side of the bar."
   def bar_pct(0, 0, _side), do: 50
   def bar_pct(a, b, :a), do: trunc(a / (a + b) * 100)
   def bar_pct(a, b, :b), do: trunc(b / (a + b) * 100)

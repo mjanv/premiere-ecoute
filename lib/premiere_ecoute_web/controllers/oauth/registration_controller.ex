@@ -11,7 +11,7 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationController do
 
   require Logger
 
-  # AIDEV-NOTE: Boruta.Openid.register_client/3 both (a) pattern-matches `client_name`/
+  # Boruta.Openid.register_client/3 both (a) pattern-matches `client_name`/
   # `token_endpoint_auth_method`/`jwks`/`jwks_uri` as ATOM keys to translate them (see
   # parse_registration_params/2 in deps/boruta/lib/boruta/openid.ex), and (b) hands the result to
   # Ecto.Changeset.cast/3, which rejects maps with mixed atom/string keys — so every recognized RFC
@@ -40,7 +40,7 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationController do
     |> public_client_for_none_auth_method()
   end
 
-  # AIDEV-NOTE: RFC 7591's wire field is `grant_types`; Boruta.Ecto.Client's schema field is
+  # RFC 7591's wire field is `grant_types`; Boruta.Ecto.Client's schema field is
   # `supported_grant_types` — Boruta.Openid only translates client_name/token_endpoint_auth_method/
   # jwks/jwks_uri, not this one, so it must be renamed here or the value is silently dropped by cast/3.
   defp rename_grant_types(%{grant_types: grant_types} = params) do
@@ -51,7 +51,7 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationController do
 
   defp rename_grant_types(params), do: params
 
-  # AIDEV-NOTE: "none" (RFC 7591 §2 — no client authentication, e.g. PKCE public clients) is not a
+  # "none" (RFC 7591 §2 — no client authentication, e.g. PKCE public clients) is not a
   # member of Boruta.Ecto.Client's token_endpoint_auth_methods enum (basic/post/jwt variants only),
   # so it would fail create_changeset's validate_subset. `confidential: false` (the schema default)
   # already disables the secret check via Client.should_check_secret?/2, so drop the method instead

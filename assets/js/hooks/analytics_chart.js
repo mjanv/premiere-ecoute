@@ -1,6 +1,6 @@
 import { animate } from "motion"
 
-// AIDEV-NOTE: AnalyticsChart renders a bar chart from JSON data passed via
+// AnalyticsChart renders a bar chart from JSON data passed via
 // data-inline-data. Uses Motion.js for entrance animations and hover
 // micro-interactions. Grouped series render a DOM legend above the SVG.
 

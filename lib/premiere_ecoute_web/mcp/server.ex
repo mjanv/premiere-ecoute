@@ -31,7 +31,7 @@ defmodule PremiereEcouteWeb.Mcp.Server do
   component(Components.Radio.GetTracks)
   component(Components.Radio.SaveTracks)
 
-  # AIDEV-NOTE: must always return {:ok, frame} — the Hermes notifications/initialized handler
+  # Must always return {:ok, frame} — the Hermes notifications/initialized handler
   # (hermes_mcp's base.ex) only pattern-matches {:ok, frame} from init/2 and crashes the session
   # GenServer on anything else. Rejection happens per-request in handle_request/2 below instead.
   @impl true
@@ -45,7 +45,7 @@ defmodule PremiereEcouteWeb.Mcp.Server do
     end
   end
 
-  # AIDEV-NOTE: tools/list, prompts/list, resources/list and similar discovery calls stay
+  # tools/list, prompts/list, resources/list and similar discovery calls stay
   # unauthenticated so claude.ai can display the connector's capabilities before OAuth completes;
   # only calls that actually execute something require an authenticated current_user. The
   # fallback clause for every other method is injected by Hermes.Server's @before_compile hook
@@ -76,7 +76,7 @@ defmodule PremiereEcouteWeb.Mcp.Server do
     end
   end
 
-  # AIDEV-NOTE: OAuth path for browser-based connectors (e.g. claude.ai) registered via
+  # OAuth path for browser-based connectors (e.g. claude.ai) registered via
   # PremiereEcouteWeb.Oauth.RegistrationController; `sub` is the user id set in ResourceOwners.
   defp by_bearer_token(authorization) do
     with [header] <- authorization,

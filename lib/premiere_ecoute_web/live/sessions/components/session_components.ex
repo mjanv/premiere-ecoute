@@ -608,7 +608,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
 
   attr :current_visibility, :atom, required: true
   attr :visibility_options, :list, required: true
-  # AIDEV-NOTE: compact=true renders icon-only trigger (no text, no chevron) for use in split-button layouts
+  # compact=true renders icon-only trigger (no text, no chevron) for use in split-button layouts.
   attr :compact, :boolean, default: false
 
   @spec visibility_dropdown(map()) :: Phoenix.LiveView.Rendered.t()

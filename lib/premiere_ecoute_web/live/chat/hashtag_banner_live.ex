@@ -16,7 +16,7 @@ defmodule PremiereEcouteWeb.Chat.HashtagBannerLive do
   def mount(%{"username" => username}, _session, socket) do
     user = Accounts.User.get_user_by_username(username)
 
-    # AIDEV-NOTE: guard against nil user (unknown username) to prevent BadMapError on user.twitch
+    # Guard against nil user (unknown username) to prevent BadMapError on user.twitch.
     if is_nil(user) do
       {:ok, redirect(socket, to: "/")}
     else

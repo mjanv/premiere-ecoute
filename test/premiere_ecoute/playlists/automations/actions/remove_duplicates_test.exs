@@ -43,7 +43,7 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicatesTest do
       playlist = %Playlist{provider: :spotify, playlist_id: "pl1", tracks: tracks}
 
       expect(SpotifyApi, :get_playlist, fn "pl1" -> {:ok, playlist} end)
-      # AIDEV-NOTE: only the duplicate (second occurrence of t1) is removed
+      # Only the duplicate (second occurrence of t1) is removed.
       expect(SpotifyApi, :remove_playlist_items, fn _scope, "pl1", dups ->
         assert length(dups) == 1
         {:ok, %{}}

@@ -30,7 +30,7 @@ defmodule PremiereEcouteWeb.Hooks.Flash do
   defp maybe_flash({:info, message}, socket), do: {:halt, put_flash(socket, :info, message)}
   defp maybe_flash({:error, message}, socket), do: {:halt, put_flash(socket, :error, message)}
 
-  # AIDEV-NOTE: forward notification messages to the NotificationsComponent so
+  # Forward notification messages to the NotificationsComponent so
   # the parent LiveView doesn't need a catch-all handle_info for this message.
   defp maybe_flash({:user_notification, _record, _rendered} = msg, socket) do
     send_update(NotificationsComponent, id: "notifications", incoming: msg)

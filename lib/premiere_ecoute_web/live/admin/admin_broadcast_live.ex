@@ -49,7 +49,7 @@ defmodule PremiereEcouteWeb.Admin.AdminBroadcastLive do
     end
   end
 
-  # AIDEV-NOTE: sends synchronously — fine for small streamer counts; use Task.async_stream if it grows large
+  # Sends synchronously — fine for small streamer counts; use Task.async_stream if it grows large.
   defp do_send(streamers, "all", type, message, color) do
     streamers
     |> Enum.filter(&has_twitch?/1)

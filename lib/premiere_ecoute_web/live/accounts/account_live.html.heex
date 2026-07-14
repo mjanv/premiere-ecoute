@@ -330,7 +330,7 @@
           </form>
           <:footer>
             <.button phx-click="hide_token_modal" type="button">{gettext("Cancel")}</.button>
-            <%!-- AIDEV-NOTE: plain <button> needed here — <.button> doesn't forward the `form` attr via :global --%>
+            <%!-- Plain <button> needed here — <.button> doesn't forward the `form` attr via :global. --%>
             <button type="submit" form="token-form" class="btn btn-primary">
               {gettext("Generate")}
             </button>

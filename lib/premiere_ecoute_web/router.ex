@@ -41,7 +41,7 @@ defmodule PremiereEcouteWeb.Router do
     plug :fetch_session
   end
 
-  # AIDEV-NOTE: podcast feed/audio must not negotiate content (podcast apps send arbitrary Accept
+  # Podcast feed/audio must not negotiate content (podcast apps send arbitrary Accept
   # headers) — no `plug :accepts`, responses set their own content type / redirect.
   pipeline :podcast_public do
     plug Plugs.PodcastRateLimit
@@ -273,7 +273,7 @@ defmodule PremiereEcouteWeb.Router do
       live "/pick/albums", AlbumPickAdminLive, :index
     end
 
-    # AIDEV-NOTE: viewer_retrospective merged into sessions_viewer (same :viewer on_mount) so
+    # viewer_retrospective merged into sessions_viewer (same :viewer on_mount) so
     # SessionLive -> Retrospective.VotesLive/TopsLive navigates in-process instead of full reload.
     live_session :sessions_viewer, on_mount: [{UserAuth, :viewer}] do
       live "/retrospective/votes", Retrospective.VotesLive, :index
@@ -442,7 +442,7 @@ defmodule PremiereEcouteWeb.Router do
     forward "/", Hermes.Server.Transport.StreamableHTTP.Plug, server: PremiereEcouteWeb.Mcp.Server
   end
 
-  # AIDEV-NOTE: Boruta OAuth authorization server fronting the MCP connector flow (see
+  # Boruta OAuth authorization server fronting the MCP connector flow (see
   # PremiereEcouteWeb.Mcp.Server.authenticate/2 for the Bearer-token validation side).
   # `/oauth/authorize` needs the user's browser session (login + consent screen), so it runs
   # through :browser + :require_authenticated_user; the other endpoints are stateless JSON/REST

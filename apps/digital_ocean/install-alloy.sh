@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: Install Grafana Alloy on Digital Ocean droplet (systemd, no Docker)
 
 set -e
 

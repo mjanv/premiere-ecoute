@@ -6,7 +6,6 @@ defmodule PremiereEcoute.Playlists.Automations.ActionRegistry do
   To add a new action: implement `use Action`, then add the module to @modules below.
   """
 
-  # AIDEV-NOTE: only the module list needs updating when adding a new action
   @modules [
     PremiereEcoute.Playlists.Automations.Actions.CopyPlaylist,
     PremiereEcoute.Playlists.Automations.Actions.CreatePlaylist,

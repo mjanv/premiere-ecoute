@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: Database restore script for Digital Ocean droplet
 
 set -e
 

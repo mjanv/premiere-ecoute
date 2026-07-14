@@ -6,11 +6,11 @@ defmodule PremiereEcoute.Analytics.EventsTest do
   alias PremiereEcoute.Events.AccountDeleted
   alias PremiereEcoute.Events.Store
 
-  # AIDEV-NOTE: async: false — inserts go directly into event_store.events
-  # which is outside the sandboxed Ecto transaction. Each test uses a unique
-  # event_type string (scoped to a UUID marker) so rows from parallel or
-  # prior tests never pollute counts. No cleanup needed: the event store's
-  # DELETE trigger prevents row removal, and type-scoped queries are isolated.
+  # async: false — inserts go directly into event_store.events which is outside the
+  # sandboxed Ecto transaction. Each test uses a unique event_type string (scoped to a
+  # UUID marker) so rows from parallel or prior tests never pollute counts. No cleanup
+  # needed: the event store's DELETE trigger prevents row removal, and type-scoped
+  # queries are isolated.
 
   # ---------------------------------------------------------------------------
   # Helpers

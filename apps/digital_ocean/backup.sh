@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: Database backup script for Digital Ocean droplet
 
 set -e
 

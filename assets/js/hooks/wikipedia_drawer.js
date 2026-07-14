@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Bridges LiveView push_event → native DOM "drawer:open" event.
+// Bridges LiveView push_event → native DOM "drawer:open" event.
 // The server sends "wiki-drawer:open:<drawer-id>" via push_event when the
 // Wikipedia fetch succeeds. This hook dispatches the DOM event the Drawer
 // hook is listening for.

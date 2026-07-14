@@ -5,6 +5,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.SpeechMarker do
   Each marker represents a clean speech segment identified by VAD (Voice Activity Detection),
   transcribed via Whisper. Offsets are stored in milliseconds from session start for direct
   use in CSV/Premiere Pro export without recomputation.
+
+  `started_at` is wall-clock UTC — correlate with track markers to find the active track.
+  `start_ms`/`end_ms` are offsets from `session.started_at`, pre-computed for Premiere/CSV export.
   """
 
   use PremiereEcouteCore.Aggregate.Object
@@ -22,8 +25,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.SpeechMarker do
 
   @primary_key {:id, :id, autogenerate: true}
   schema "speech_markers" do
-    # AIDEV-NOTE: started_at is wall-clock UTC — correlate with track_markers to find active track.
-    # start_ms/end_ms are offsets from session.started_at, pre-computed for Premiere/CSV export.
     field :started_at, :utc_datetime
     field :start_ms, :integer
     field :end_ms, :integer

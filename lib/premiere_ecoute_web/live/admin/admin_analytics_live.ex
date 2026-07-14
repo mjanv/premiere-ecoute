@@ -48,7 +48,7 @@ defmodule PremiereEcouteWeb.Admin.AdminAnalyticsLive do
     {from_dt, to_dt} = date_range(range)
     unit = range_unit(range)
     opts = date_opts(from_dt, to_dt)
-    # AIDEV-NOTE: gap_opts adds fill_gaps: true only when a date range is set.
+    # gap_opts adds fill_gaps: true only when a date range is set.
     # Grouped queries (fields:) cannot use fill_gaps — passed plain opts instead.
     gap_opts = gap_opts(from_dt, to_dt, opts)
 
@@ -165,7 +165,7 @@ defmodule PremiereEcouteWeb.Admin.AdminAnalyticsLive do
   defp gap_opts(nil, nil, _opts), do: []
   defp gap_opts(_from, _to, opts), do: Keyword.put(opts, :fill_gaps, true)
 
-  # AIDEV-NOTE: Serialize analytics rows to JSON for the AnalyticsChart hook.
+  # Serializes analytics rows to JSON for the AnalyticsChart hook.
   # Grouped rows have a :series key derived from the grouped field value.
   defp period_to_iso(dt) when is_struct(dt, DateTime), do: DateTime.to_iso8601(dt)
   defp period_to_iso(ndt) when is_struct(ndt, NaiveDateTime), do: NaiveDateTime.to_iso8601(ndt)

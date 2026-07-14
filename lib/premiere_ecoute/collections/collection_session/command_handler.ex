@@ -92,7 +92,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
         duel_track_id: duel_track_id
       }) do
     session = CollectionSession.get(session_id)
-    # AIDEV-NOTE: duel advances by 2; winner goes to :kept, loser to :rejected in one update
+    # Duel advances by 2; winner goes to :kept, loser to :rejected in one update.
     step = if duel_track_id, do: 2, else: 1
 
     attrs =

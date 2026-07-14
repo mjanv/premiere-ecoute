@@ -35,8 +35,8 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.RemoveDuplicates do
     end
   end
 
-  # AIDEV-NOTE: keeps first occurrence of each track; deduplication key is
-  # Spotify track_id (ISRC-based dedup would require fetching track features)
+  # Keeps first occurrence of each track; deduplication key is Spotify track_id
+  # (ISRC-based dedup would require fetching track features).
   defp find_duplicates(tracks) do
     {_, duplicates} =
       Enum.reduce(tracks, {MapSet.new(), []}, fn track, {seen, dups} ->

@@ -111,7 +111,7 @@ defmodule PremiereEcoute.Podcasts do
   def upload_episode(%Show{id: show_id}, attrs, bytes) when is_binary(bytes) do
     guid = Ecto.UUID.generate()
     key = Storage.audio_key(show_id, guid)
-    # AIDEV-NOTE: caller attrs are string-keyed (forms); merge string keys so the changeset cast
+    # Caller attrs are string-keyed (forms); merge string keys so the changeset cast
     # doesn't choke on a mixed atom/string key map.
     server_attrs = %{"show_id" => show_id, "guid" => guid, "audio_key" => key, "status" => "processing"}
     attrs = Map.merge(Map.new(attrs, fn {k, v} -> {to_string(k), v} end), server_attrs)

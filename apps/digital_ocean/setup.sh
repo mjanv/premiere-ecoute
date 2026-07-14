@@ -1,5 +1,4 @@
 #!/bin/bash
-# AIDEV-NOTE: Native server setup script for Digital Ocean droplet (one-time setup)
 
 set -e
 

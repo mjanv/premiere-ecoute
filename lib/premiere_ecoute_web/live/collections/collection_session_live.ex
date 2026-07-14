@@ -409,7 +409,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     end
   end
 
-  # AIDEV-NOTE: duel "keep both" — applies two sequential DecideTrack commands (A then B), each advancing index by 1
+  # Duel "keep both" — applies two sequential DecideTrack commands (A then B), each advancing index by 1.
   @impl true
   def handle_event(
         "decide_both",

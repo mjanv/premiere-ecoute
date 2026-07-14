@@ -332,7 +332,7 @@ defmodule PremiereEcoute.Sessions.Scores.CommandHandlerTest do
 
       viewer = user_fixture(%{twitch: %{user_id: "9876543", access_token: "token2"}})
 
-      # AIDEV-NOTE: single_fixture returns an unsaved struct; create_if_not_exists persists it
+      # single_fixture returns an unsaved struct; create_if_not_exists persists it.
       {:ok, single} =
         single_fixture(%{provider_ids: %{spotify: "spotify_track_123"}})
         |> Single.create_if_not_exists()

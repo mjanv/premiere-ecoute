@@ -28,7 +28,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscographyTest do
     end)
   end
 
-  # AIDEV-NOTE: album fetches run in parallel via TaskSupervisor; stub (not expect) is required
+  # Album fetches run in parallel via TaskSupervisor; stub (not expect) is required
   # to avoid FIFO queue ordering issues when both tasks consume from the same mock queue.
   defp stub_get_albums do
     album_1 = %Album{

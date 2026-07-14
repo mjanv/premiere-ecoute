@@ -1,4 +1,3 @@
-# AIDEV-NOTE: Systemd service for Premiere Ecoute Phoenix application
 [Unit]
 Description=Premiere Ecoute Phoenix Application
 After=network.target postgresql.service seaweedfs.service
@@ -33,7 +32,7 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=premiere-ecoute
 
-# AIDEV-NOTE: Resource limits to prevent OOM issues on 1GB droplet
+# Resource limits to prevent OOM issues on 1GB droplet.
 # Allocate ~600MB for Phoenix app (remaining ~400MB for PostgreSQL, Traefik, OS)
 MemoryMax=600M
 MemoryHigh=500M

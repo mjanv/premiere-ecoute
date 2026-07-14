@@ -25,9 +25,6 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
 
   alias PremiereEcoute.Sessions.ListeningSession
 
-  # AIDEV-NOTE: title/1 accepts both ListeningSession structs and plain maps (used in tests)
-
-  # AIDEV-NOTE: ppro internal clock = 254016000000 ticks/second
   @ppro_ticks_per_second 254_016_000_000
 
   # {label, timebase, ntsc} — ntsc="TRUE" applies 1000/1001 pulldown (NTSC lineage rates)
@@ -92,7 +89,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
     total_ms = max(speech_end_ms, track_end_ms)
     total_frames = ms_to_frames(total_ms, timebase)
 
-    # AIDEV-NOTE: source_duration is the actual file length in frames (independent of sequence length).
+    # source_duration is the actual file length in frames (independent of sequence length).
     # Defaults to total_frames when unknown — sufficient for Premiere to link media.
     file_source_duration = source_duration || total_frames
 
@@ -276,7 +273,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
         end_f = ms_to_frames(end_ms + bias_ms, timebase)
         label = track_label(session, marker, i)
 
-        # AIDEV-NOTE: each chapter clipitem gets its own full file declaration to avoid
+        # Each chapter clipitem gets its own full file declaration to avoid
         # cross-track idref failures in Premiere's XMEML importer.
         file_id = "file-#{i + 1}"
 
@@ -555,7 +552,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
     "file://localhost/#{percent_encode(clean)}"
   end
 
-  # AIDEV-NOTE: URI.encode/1 does not encode ":" but Premiere Pro expects "C%3a" for Windows drive letters.
+  # URI.encode/1 does not encode ":" but Premiere Pro expects "C%3a" for Windows drive letters.
   defp percent_encode(path) do
     path
     |> String.split("/")

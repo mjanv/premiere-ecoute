@@ -31,7 +31,6 @@ defmodule PremiereEcoute.Playlists.Automations.Actions.CopyPlaylist do
     end
   end
 
-  # AIDEV-NOTE: "$created_playlist_id" pulls the ID set by a preceding create_playlist step
   defp resolve_id("$created_playlist_id", %{"created_playlist_id" => id}), do: id
   defp resolve_id(literal, _context), do: literal
 end
