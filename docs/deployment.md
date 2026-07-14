@@ -164,42 +164,10 @@ cd apps/digital_ocean
 
 Migrations run automatically via the systemd service's `ExecStartPre` directive.
 
-### Database Backup
+### Database Backup & Restore
 
-Using the provided backup script:
-
-```bash
-cd apps/digital_ocean
-./backup.sh
-```
-
-This creates a timestamped backup in `backups/premiere_ecoute_prod_YYYYMMDD_HHMMSS.sql.gz`.
-
-Or manually:
-
-```bash
-ssh root@68.183.219.251 'sudo -u postgres pg_dump premiere_ecoute_prod | gzip' > backup_$(date +%Y%m%d_%H%M%S).sql.gz
-```
-
-### Database Restore
-
-Using the provided restore script:
-
-```bash
-cd apps/digital_ocean
-./restore.sh backups/premiere_ecoute_prod_YYYYMMDD_HHMMSS.sql.gz
-```
-
-Or manually:
-
-```bash
-scp backup.sql.gz root@68.183.219.251:/tmp/
-ssh root@68.183.219.251 'systemctl stop premiere-ecoute && \
-  sudo -u postgres dropdb premiere_ecoute_prod && \
-  sudo -u postgres createdb premiere_ecoute_prod && \
-  gunzip -c /tmp/backup.sql.gz | sudo -u postgres psql premiere_ecoute_prod && \
-  systemctl start premiere-ecoute'
-```
+See the [backup guide](backup.md) for the automated daily backup (GitHub Actions), manual backup
+scripts, and restore procedures.
 
 ## SSL Certificates
 

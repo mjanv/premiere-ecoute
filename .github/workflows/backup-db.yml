@@ -1,0 +1,64 @@
+name: Backup Production Database
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 03:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  backup:
+    name: Dump PostgreSQL and upload as artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ vars.DO_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Dump database on droplet
+        id: dump
+        run: |
+          TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)
+          DUMP_NAME="premiere_ecoute_prod_${TIMESTAMP}.dump"
+          ssh root@${{ vars.DO_HOST }} "sudo -u postgres pg_dump -Fc premiere_ecoute_prod > /tmp/${DUMP_NAME}"
+          echo "dump_name=${DUMP_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Download dump from droplet
+        run: scp root@${{ vars.DO_HOST }}:/tmp/${{ steps.dump.outputs.dump_name }} .
+
+      - name: Remove remote temp dump
+        if: always()
+        run: ssh root@${{ vars.DO_HOST }} "rm -f /tmp/${{ steps.dump.outputs.dump_name }}"
+
+      - name: Upload dump as artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: postgres-backup
+          path: ${{ steps.dump.outputs.dump_name }}
+          retention-days: 2
+
+      - name: Remove local dump
+        if: always()
+        run: rm -f "${{ steps.dump.outputs.dump_name }}"
+
+      - name: Delete older backup artifacts
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ids=$(gh api "repos/${{ github.repository }}/actions/artifacts?name=postgres-backup&per_page=100" \
+            --jq '.artifacts[] | select(.id != ${{ steps.upload.outputs.artifact-id }}) | .id')
+          for id in $ids; do
+            gh api --method DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+          done
