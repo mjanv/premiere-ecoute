@@ -15,6 +15,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Services.EnrichClip
   alias PremiereEcoute.Discography.Services.EnrichDiscography
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
@@ -120,6 +121,44 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%PrepareListeningSession{
+        source: :clip,
+        user_id: user_id,
+        youtube_video_id: youtube_video_id,
+        vote_options: vote_options,
+        autostart: autostart
+      }) do
+    with {:ok, single, thumbnail_url} <- EnrichClip.resolve_single(youtube_video_id),
+         {:ok, session} <-
+           ListeningSession.create(%{
+             user_id: user_id,
+             source: :clip,
+             single_id: single.id,
+             vote_options: vote_options,
+             options: %{
+               "votes" => 0,
+               "scores" => 0,
+               "next_track" => 0,
+               "autostart" => autostart,
+               "clip_thumbnail_url" => thumbnail_url
+             }
+           }) do
+      {:ok, session,
+       [
+         %SessionPrepared{
+           source: :clip,
+           session_id: session.id,
+           user_id: session.user_id,
+           single_id: session.single_id
+         }
+       ]}
+    else
+      {:error, reason} ->
+        Logger.error("Cannot prepare clip listening session due to: #{inspect(reason)}")
+        {:error, [%SessionNotPrepared{user_id: user_id}]}
+    end
+  end
+
+  def handle(%PrepareListeningSession{
         source: :playlist,
         user_id: user_id,
         playlist_id: playlist_id,
@@ -157,6 +196,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
       {:error, reason} ->
         Logger.error("Cannot prepare listening session due to: #{inspect(reason)}")
         {:error, [%SessionNotPrepared{user_id: user_id}]}
+    end
+  end
+
+  def handle(%StartListeningSession{source: :clip, session_id: session_id, scope: scope}) do
+    with {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
+         session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         {:ok, %{single: single} = session} <- ListeningSession.start(session),
+         message <-
+           PremiereEcoute.Gettext.t(scope, fn ->
+             gettext("Welcome to the premiere of %{name} by %{artist}", name: single.name, artist: single.artist)
+           end),
+         :ok <- Apis.twitch().send_chat_message(scope, message) do
+      {:ok, session, [%SessionStarted{source: :clip, session_id: session.id, user_id: scope.user.id}]}
+    else
+      {:error, :active_session_exists} ->
+        {:error, "You already have an active listening session"}
+
+      reason ->
+        Logger.error("Cannot start clip listening session due to: #{inspect(reason)}")
+        {:error, []}
     end
   end
 
@@ -248,6 +308,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     {:ok, ListeningSession.get(session_id), []}
   end
 
+  def handle(%SkipNextTrackListeningSession{source: :clip, session_id: session_id}) do
+    {:ok, ListeningSession.get(session_id), []}
+  end
+
   def handle(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.next_track(session),
@@ -310,6 +374,23 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     else
       reason ->
         Logger.error("Cannot stop listening session due to: #{inspect(reason)}")
+        {:error, []}
+    end
+  end
+
+  def handle(%StopListeningSession{source: :clip, session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, _} <- Report.generate(session),
+         message <-
+           PremiereEcoute.Gettext.t(scope, fn ->
+             gettext("%{name} by %{artist} is over", name: session.single.name, artist: session.single.artist)
+           end),
+         :ok <- Apis.twitch().send_chat_message(scope, message),
+         {:ok, session} <- ListeningSession.stop(session) do
+      {:ok, session, [%SessionStopped{session_id: session.id, user_id: scope.user.id}]}
+    else
+      reason ->
+        Logger.error("Cannot stop clip listening session due to: #{inspect(reason)}")
         {:error, []}
     end
   end

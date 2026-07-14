@@ -4,6 +4,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Sessions.ListeningSession.EventHandler
   alias PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted
+  alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Workers.MissedSessionNotificationWorker
   alias PremiereEcoute.Sessions.ListeningSessionWorker
@@ -34,6 +35,69 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
                         args: %{"action" => "send_promo_message", "user_id" => user.id},
                         scheduled_at: DateTime.add(DateTime.utc_now(), 30, :second)
       end)
+    end
+  end
+
+  describe "dispatch/1 - SessionPrepared :clip" do
+    test "broadcasts session_prepared on the user's playback topic" do
+      user = user_fixture()
+      session = session_fixture(%{user_id: user.id, status: :preparing})
+
+      PremiereEcoute.PubSub.subscribe("playback:#{user.id}")
+
+      EventHandler.dispatch(%SessionPrepared{
+        source: :clip,
+        session_id: session.id,
+        user_id: user.id
+      })
+
+      assert_receive {:session_prepared, session_id}
+      assert session_id == session.id
+    end
+  end
+
+  describe "dispatch/1 - SessionStarted :clip" do
+    test "schedules open_clip immediately and promo message, broadcasts session_started" do
+      user = user_fixture()
+      session = session_fixture(%{user_id: user.id, status: :active})
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%SessionStarted{
+          source: :clip,
+          session_id: session.id,
+          user_id: user.id
+        })
+
+        assert_enqueued worker: ListeningSessionWorker,
+                        args: %{"action" => "open_clip", "session_id" => session.id},
+                        scheduled_at: DateTime.add(DateTime.utc_now(), 0, :second)
+
+        assert_enqueued worker: ListeningSessionWorker,
+                        args: %{"action" => "send_instructions", "user_id" => user.id},
+                        scheduled_at: DateTime.add(DateTime.utc_now(), 15, :second)
+
+        assert_enqueued worker: ListeningSessionWorker,
+                        args: %{"action" => "send_promo_message", "user_id" => user.id},
+                        scheduled_at: DateTime.add(DateTime.utc_now(), 30, :second)
+      end)
+    end
+
+    test "broadcasts session_started on the user's playback topic" do
+      user = user_fixture()
+      session = session_fixture(%{user_id: user.id, status: :active})
+
+      PremiereEcoute.PubSub.subscribe("playback:#{user.id}")
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        EventHandler.dispatch(%SessionStarted{
+          source: :clip,
+          session_id: session.id,
+          user_id: user.id
+        })
+      end)
+
+      assert_receive {:session_started, session_id}
+      assert session_id == session.id
     end
   end
 

@@ -50,6 +50,13 @@
           search_tracks={@search_tracks}
           search_form={@search_form}
         />
+        <.clip_step
+          :if={@source_type == "clip"}
+          selected_clip_video={@selected_clip_video}
+          search_clip_videos={@search_clip_videos}
+          clip_search_form={@clip_search_form}
+          resolved_clip_single={@resolved_clip_single}
+        />
         <.free_step :if={@source_type == "free"} free_session_name={@free_session_name} />
 
         <!-- Step 3: Vote options -->

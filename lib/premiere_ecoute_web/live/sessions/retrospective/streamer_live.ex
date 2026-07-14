@@ -42,6 +42,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
         "track" -> :track
         "album" -> :album
         "playlist" -> :playlist
+        "clip" -> :clip
         _ -> socket.assigns.selected_source
       end
 
@@ -63,6 +64,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
           :album -> Sessions.get_albums_by_period(user, period, %{year: year, month: month})
           :track -> Sessions.get_singles_by_period(user, period, %{year: year, month: month})
           :playlist -> Sessions.get_playlists_by_period(user, period, %{year: year, month: month})
+          :clip -> Sessions.get_clips_by_period(user, period, %{year: year, month: month})
         end
 
       {:ok, %{albums_data: %{source: source, items: items}}}

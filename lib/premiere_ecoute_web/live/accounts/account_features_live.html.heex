@@ -37,7 +37,7 @@
                 <p class="text-gray-400 text-xs mt-0.5">{gettext("Paste this in OBS as a browser source")}</p>
               </div>
               <div class="flex items-center gap-2 min-w-0 flex-1 justify-end">
-                <form phx-change="change_overlay_score_type" class="shrink-0">
+                <form id="overlay-score-type-form" phx-change="change_overlay_score_type" class="shrink-0">
                   <select
                     name="score_type"
                     id="overlay_score_type"
@@ -63,6 +63,9 @@
                     </option>
                     <option value="hashtags" selected={@overlay_score_type == "hashtags"} class="bg-gray-800 text-white">
                       {gettext("Hashtag banner")}
+                    </option>
+                    <option value="clip" selected={@overlay_score_type == "clip"} class="bg-gray-800 text-white">
+                      {gettext("Clip video")}
                     </option>
                   </select>
                 </form>

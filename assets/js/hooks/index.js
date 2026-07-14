@@ -26,6 +26,9 @@ import { ShareButton } from "./share_button";
 import { AnalyticsChart } from "./analytics_chart";
 import { NoteHud } from "./note_hud";
 import { AudioPlayer } from "./audio_player";
+import { YoutubePlayer } from "./youtube_player";
+import { ClipProgressBar } from "./clip_progress_bar";
+import { ClipVolumeBar } from "./clip_volume_bar";
 
 export const Hooks = {
   AutoDismissFlash: AutoDismissFlash,
@@ -55,5 +58,8 @@ export const Hooks = {
   ShareButton: ShareButton,
   AnalyticsChart: AnalyticsChart,
   NoteHud: NoteHud,
-  AudioPlayer: AudioPlayer
+  AudioPlayer: AudioPlayer,
+  YoutubePlayer: YoutubePlayer,
+  ClipProgressBar: ClipProgressBar,
+  ClipVolumeBar: ClipVolumeBar
 };

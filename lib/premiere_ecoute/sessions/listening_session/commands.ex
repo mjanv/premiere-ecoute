@@ -10,10 +10,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     @type t :: %__MODULE__{
             user_id: integer(),
-            source: :album | :playlist | :track | :free,
+            source: :album | :playlist | :track | :free | :clip,
             album_id: String.t() | nil,
             playlist_id: String.t() | nil,
             track_id: String.t() | nil,
+            youtube_video_id: String.t() | nil,
             name: String.t() | nil,
             vote_options: [String.t()],
             vote_mode: :chat | :poll | nil,
@@ -27,6 +28,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
       :album_id,
       :playlist_id,
       :track_id,
+      :youtube_video_id,
       :name,
       :vote_options,
       :vote_mode,
@@ -44,7 +46,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     @type t :: %__MODULE__{
             session_id: String.t(),
-            source: :album | :playlist | :track | :free,
+            source: :album | :playlist | :track | :free | :clip,
             scope: Scope.t(),
             resume: boolean()
           }
@@ -83,7 +85,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist | :track | :free, scope: Scope.t()}
+    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist | :track | :free | :clip, scope: Scope.t()}
 
     defstruct [:session_id, :source, :scope]
   end

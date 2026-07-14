@@ -41,6 +41,7 @@ defimpl PremiereEcoute.Discography.Links, for: PremiereEcoute.Discography.Single
   def url(%{provider_ids: %{spotify: id}}, :spotify), do: "https://open.spotify.com/track/#{id}"
   def url(%{provider_ids: %{deezer: id}}, :deezer), do: "https://www.deezer.com/track/#{id}"
   def url(%{provider_ids: %{tidal: id}}, :tidal), do: "https://www.tidal.com/browse/track/#{id}"
+  def url(%{provider_ids: %{youtube: id}}, :youtube), do: "https://www.youtube.com/watch?v=#{id}"
   def url(_, _), do: nil
 
   def title(%{name: name}), do: name

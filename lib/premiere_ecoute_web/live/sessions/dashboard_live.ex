@@ -42,7 +42,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
         {:ok, _} = Presence.join(current_scope.user.id, :overlay)
         PremiereEcoute.PubSub.subscribe(["playback:#{current_scope.user.id}", "session:#{session_id}"])
 
-        if listening_session.status != :stopped do
+        if listening_session.status != :stopped and listening_session.source != :clip do
           PlayerSupervisor.start(current_scope.user.id)
         end
       end
@@ -57,6 +57,7 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
       |> assign(:listening_session, listening_session)
       |> assign(:open_vote, open_vote)
       |> assign(:player_state, nil)
+      |> assign(:clip_progress, nil)
       |> assign(:session_id, session_id)
       |> assign(:user_current_rating, nil)
       |> assign(:report, nil)
@@ -625,6 +626,11 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
     socket
     |> assign(:listening_session, session)
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_info({:clip_progress, progress}, socket) do
+    {:noreply, assign(socket, :clip_progress, progress)}
   end
 
   @impl true

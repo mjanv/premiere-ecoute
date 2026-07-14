@@ -102,6 +102,7 @@
                           :album -> session.album.cover_url
                           :playlist -> session.playlist.cover_url
                           :track -> session.single.cover_url
+                          :clip -> session.single.cover_url
                           :free -> session.single.cover_url
                         end
                       }
@@ -114,6 +115,7 @@
                         :album -> session.album.name
                         :playlist -> session.playlist.title
                         :track -> session.single.name
+                        :clip -> session.single.name
                         :free -> session.name || gettext("Free session")
                       end}
                     </h4>
@@ -122,6 +124,7 @@
                         :album -> session.album.artist
                         :playlist -> session.playlist.owner_name
                         :track -> session.single.artist
+                        :clip -> session.single.artist
                         :free -> ""
                       end}
                     </p>
@@ -138,6 +141,7 @@
                         :album -> "bg-purple-600/20 text-purple-400 border-purple-500/30"
                         :playlist -> "bg-pink-600/20 text-pink-400 border-pink-500/30"
                         :track -> "bg-cyan-600/20 text-cyan-400 border-cyan-500/30"
+                        :clip -> "bg-red-600/20 text-red-400 border-red-500/30"
                         :free -> "bg-amber-600/20 text-amber-400 border-amber-500/30"
                       end
                     ]}>
@@ -145,6 +149,7 @@
                         :album -> gettext("Album")
                         :playlist -> gettext("Playlist")
                         :track -> gettext("Track")
+                        :clip -> gettext("Clip")
                         :free -> gettext("Free")
                       end}
                     </span>

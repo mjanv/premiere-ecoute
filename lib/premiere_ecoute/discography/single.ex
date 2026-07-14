@@ -94,11 +94,8 @@ defmodule PremiereEcoute.Discography.Single do
   def create_if_not_exists(%__MODULE__{provider_ids: provider_ids} = single) when map_size(provider_ids) > 0 do
     [{provider, id}] = Enum.take(provider_ids, 1)
 
-    from(s in __MODULE__,
-      where: fragment("?->>? = ?", s.provider_ids, ^to_string(provider), ^id)
-    )
-    |> Repo.one()
-    |> preload()
+    provider
+    |> get_by_provider_id(id)
     |> case do
       nil -> create(single)
       existing -> {:ok, existing}
@@ -106,6 +103,14 @@ defmodule PremiereEcoute.Discography.Single do
   end
 
   def create_if_not_exists(%__MODULE__{} = single), do: create(single)
+
+  @doc "Fetches a single by a specific provider key inside `provider_ids` (e.g. `:spotify`, `:youtube`)"
+  @spec get_by_provider_id(atom(), String.t()) :: t() | nil
+  def get_by_provider_id(provider, id) do
+    from(s in __MODULE__, where: fragment("?->>? = ?", s.provider_ids, ^to_string(provider), ^id))
+    |> Repo.one()
+    |> preload()
+  end
 
   @doc "Creates changeset for single validation."
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()

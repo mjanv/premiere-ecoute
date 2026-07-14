@@ -1,8 +1,11 @@
 defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
   use PremiereEcoute.DataCase, async: true
 
+  import PremiereEcoute.Discography.SingleFixtures
+
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.History
   alias PremiereEcoute.Sessions.Retrospective.Report
@@ -133,6 +136,69 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
                score: "7",
                voted_at: %DateTime{}
              } = second
+    end
+  end
+
+  describe "get_clips_by_period/3" do
+    setup %{user: user, viewer: viewer} do
+      {:ok, single} = Single.create(single_fixture(%{provider_ids: %{spotify: "spotify_clip_1", youtube: "yt_clip_1"}}))
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, source: :clip, single_id: single.id})
+      {:ok, session} = ListeningSession.start(session)
+
+      {:ok, _} =
+        Vote.create(%Vote{
+          viewer_id: viewer.twitch.user_id,
+          session_id: session.id,
+          track_id: single.id,
+          value: "8",
+          is_streamer: false
+        })
+
+      {:ok, session} = ListeningSession.stop(session)
+      {:ok, _report} = Report.generate(session)
+
+      # A sibling single-backed :track session in the same period, so the
+      # source filter itself is proven load-bearing: if `s.source == :clip`
+      # were dropped or swapped, this session would leak into the results too.
+      {:ok, track_single} = Single.create(single_fixture(%{provider_ids: %{spotify: "spotify_track_sibling"}}))
+      {:ok, track_session} = ListeningSession.create(%{user_id: user.id, source: :track, single_id: track_single.id})
+      {:ok, track_session} = ListeningSession.start(track_session)
+
+      {:ok, _} =
+        Vote.create(%Vote{
+          viewer_id: viewer.twitch.user_id,
+          session_id: track_session.id,
+          track_id: track_single.id,
+          value: "5",
+          is_streamer: false
+        })
+
+      {:ok, track_session} = ListeningSession.stop(track_session)
+      {:ok, _report} = Report.generate(track_session)
+
+      {:ok, clip_session: session, clip_single: single}
+    end
+
+    test "returns only clip sessions, not sibling single-backed sessions of other sources", %{
+      user: user,
+      clip_session: clip_session
+    } do
+      retrospective = History.get_clips_by_period(user, :month)
+
+      assert length(retrospective) == 1
+      assert [%{single: %Single{}, session: %ListeningSession{id: id}, report: %Report{}}] = retrospective
+      assert id == clip_session.id
+    end
+
+    test "returns only votes on clip sessions, not votes on sibling single-backed sessions", %{
+      viewer: viewer,
+      clip_single: clip_single
+    } do
+      retrospective = History.get_clip_votes_by_period(viewer, :month)
+
+      assert [%{single: %Single{id: id}, score: score}] = retrospective
+      assert id == clip_single.id
+      assert Decimal.equal?(score, Decimal.new("8.0"))
     end
   end
 

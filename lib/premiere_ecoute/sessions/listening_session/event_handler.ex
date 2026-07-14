@@ -49,6 +49,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     end
   end
 
+  def dispatch(%SessionPrepared{source: :clip, session_id: session_id, user_id: user_id}) do
+    PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_prepared, session_id})
+    :ok
+  end
+
   def dispatch(%SessionStarted{source: :album, session_id: session_id, user_id: user_id}) do
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
@@ -60,6 +65,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
 
   def dispatch(%SessionStarted{source: :track, session_id: session_id, user_id: user_id}) do
     ListeningSessionWorker.in_seconds(%{action: "open_track", session_id: session_id, user_id: user_id}, 0)
+    ListeningSessionWorker.in_seconds(%{action: "send_instructions", user_id: user_id}, 15)
+    ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 30)
+    PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_started, session_id})
+    :ok
+  end
+
+  def dispatch(%SessionStarted{source: :clip, session_id: session_id, user_id: user_id}) do
+    ListeningSessionWorker.in_seconds(%{action: "open_clip", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "send_instructions", user_id: user_id}, 15)
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 30)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_started, session_id})

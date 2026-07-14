@@ -1,0 +1,16 @@
+<div style="width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: #000;">
+  <div
+    :if={@youtube_video_id}
+    id="clip-player"
+    phx-hook="YoutubePlayer"
+    data-video-id={@youtube_video_id}
+    phx-update="ignore"
+    style="width: 100vw; height: 100vh;"
+  >
+  </div>
+  <img
+    :if={!@youtube_video_id && @thumbnail_url}
+    src={@thumbnail_url}
+    style="width: 100vw; height: 100vh; object-fit: contain;"
+  />
+</div>

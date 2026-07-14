@@ -24,8 +24,9 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
     <% album_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_album, for: @current_scope.user)
     playlist_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_playlist, for: @current_scope.user)
     single_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_single, for: @current_scope.user)
-    free_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_free, for: @current_scope.user) %>
-    <div class="grid grid-cols-4 gap-4 max-w-2xl ml-16">
+    free_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_free, for: @current_scope.user)
+    clip_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_clip, for: @current_scope.user) %>
+    <div class="grid grid-cols-5 gap-4 max-w-2xl ml-16">
       <button
         class={[
           "p-4 rounded-lg border-2 transition-all text-left",
@@ -138,6 +139,32 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
           <div>
             <h3 class="font-semibold">{gettext("Free")}</h3>
             <p class="text-sm opacity-70">{gettext("From Spotify")}</p>
+          </div>
+        </div>
+      </button>
+
+      <button
+        class={[
+          "p-4 rounded-lg border-2 transition-all text-left",
+          if !clip_enabled do
+            "border-gray-700 bg-gray-900/30 text-gray-600 cursor-not-allowed opacity-50"
+          else
+            if @source_type == "clip",
+              do: "border-red-500 bg-red-500/10 text-white",
+              else: "border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
+          end
+        ]}
+        phx-click={if clip_enabled, do: "select_source"}
+        phx-value-source="clip"
+        disabled={!clip_enabled}
+      >
+        <div class="flex items-center space-x-3">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm14.553 1.106A1 1 0 0016 8v4a1 1 0 00.553.894l2 1A1 1 0 0020 13V7a1 1 0 00-1.447-.894l-2 1z" />
+          </svg>
+          <div>
+            <h3 class="font-semibold">{gettext("Clip")}</h3>
+            <p class="text-sm opacity-70">{gettext("From YouTube")}</p>
           </div>
         </div>
       </button>
@@ -696,7 +723,157 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   end
 
   # ---------------------------------------------------------------------------
-  # Step 2D: Free mode session name
+  # Step 2D: Clip (YouTube) selection
+  # ---------------------------------------------------------------------------
+
+  @doc "Renders the YouTube video search input, results dropdown, and selected video info card."
+  attr :selected_clip_video, :any, required: true
+  attr :search_clip_videos, :any, required: true
+  attr :clip_search_form, :any, required: true
+  attr :resolved_clip_single, :any, required: true
+
+  def clip_step(assigns) do
+    ~H"""
+    <div class="mb-8 relative" id="step-2">
+      <div class="flex items-center mb-6">
+        <div
+          id="step-circle-2"
+          class="w-12 h-12 rounded-full text-white flex items-center justify-center text-lg font-bold mr-4 relative z-10 shadow-xl transition-all duration-500 bg-gray-600 ring-4 ring-gray-500/20"
+        >
+          2
+        </div>
+        <h2 class="text-2xl font-semibold text-white">{gettext("Clip Selection")}</h2>
+      </div>
+
+      <div class="mb-6 relative ml-16" phx-hook="ClickOutside" id="clip-search-container" data-event="clear_search_results">
+        <.form
+          for={@clip_search_form}
+          id="clip-search-form"
+          phx-change="search_clip_videos"
+          phx-submit="search_clip_videos"
+        >
+          <.input
+            field={@clip_search_form[:query]}
+            type="text"
+            placeholder={gettext("Search YouTube videos...")}
+            class="w-full rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            style="background-color: var(--color-dark-800); border-color: var(--color-dark-700);"
+            error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+            phx-debounce="300"
+          />
+        </.form>
+
+        <%= if @search_clip_videos.loading do %>
+          <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4">
+            <div class="flex items-center justify-center space-x-3">
+              <div class="animate-spin rounded-full h-5 w-5 border-2 border-red-400 border-t-transparent"></div>
+              <span class="text-gray-300 text-sm">{gettext("Searching videos...")}</span>
+            </div>
+          </div>
+        <% end %>
+
+        <%= if @search_clip_videos.ok? && length(@search_clip_videos.result) > 0 do %>
+          <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
+            <%= for video <- @search_clip_videos.result do %>
+              <div
+                class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center space-x-3"
+                style="background-color: var(--color-dark-800);"
+                phx-click="select_clip_video"
+                phx-value-video_id={video.id}
+              >
+                <%= if video.thumbnail_url do %>
+                  <img src={video.thumbnail_url} class="w-16 h-10 object-cover rounded flex-shrink-0" />
+                <% end %>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white font-medium truncate">{video.title}</p>
+                  <p class="text-gray-400 text-sm truncate">{video.channel_title}</p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%= if @selected_clip_video.ok? && @selected_clip_video.result do %>
+        <div class="mt-6" id="selected-clip-video">
+          <div class="rounded-xl overflow-hidden ml-16 relative" style="background-color: var(--color-dark-900);">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black/90"></div>
+            <div class="relative z-10 p-6 h-40 flex items-center">
+              <div class="flex items-center space-x-6">
+                <div class="flex-shrink-0">
+                  <%= if @selected_clip_video.result.thumbnail_url do %>
+                    <img
+                      src={@selected_clip_video.result.thumbnail_url}
+                      alt={@selected_clip_video.result.title}
+                      class="w-24 h-24 object-cover rounded-lg shadow-2xl border-2 border-white/10"
+                    />
+                  <% else %>
+                    <div class="w-24 h-24 bg-gradient-primary-diagonal rounded-lg flex items-center justify-center shadow-2xl">
+                      <svg class="w-12 h-12 text-white/60" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm14.553 1.106A1 1 0 0016 8v4a1 1 0 00.553.894l2 1A1 1 0 0020 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                      </svg>
+                    </div>
+                  <% end %>
+                </div>
+                <div>
+                  <h3 class="text-2xl font-bold text-white mb-1">{@selected_clip_video.result.title}</h3>
+                  <p class="text-white text-lg font-semibold mb-2">{@selected_clip_video.result.channel_title}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 ml-16" id="resolved-clip-single">
+          <%= if @resolved_clip_single.loading do %>
+            <div class="flex items-center space-x-3 text-gray-400 text-sm">
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-red-400 border-t-transparent"></div>
+              <span>{gettext("Checking this video against Spotify...")}</span>
+            </div>
+          <% end %>
+
+          <%= if @resolved_clip_single.ok? && @resolved_clip_single.result do %>
+            <div class="rounded-lg p-3 flex items-center space-x-3 border border-green-500/30 bg-green-500/10">
+              <img
+                :if={@resolved_clip_single.result.cover_url}
+                src={@resolved_clip_single.result.cover_url}
+                alt={@resolved_clip_single.result.name}
+                class="w-12 h-12 object-cover rounded shadow-lg flex-shrink-0"
+              />
+              <div class="min-w-0">
+                <p class="text-green-400 text-xs font-semibold uppercase tracking-wide mb-0.5">
+                  {gettext("Matched on Spotify")}
+                </p>
+                <p class="text-white font-medium truncate">{@resolved_clip_single.result.name}</p>
+                <p class="text-gray-400 text-sm truncate">
+                  {@resolved_clip_single.result.artist && @resolved_clip_single.result.artist.name}
+                </p>
+              </div>
+            </div>
+          <% end %>
+
+          <%= if @resolved_clip_single.failed do %>
+            <div class="rounded-lg p-3 flex items-center space-x-3 border border-yellow-500/30 bg-yellow-500/10">
+              <svg class="w-5 h-5 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <p class="text-yellow-100 text-sm">
+                {gettext("No Spotify match. Try another video.")}
+              </p>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  # ---------------------------------------------------------------------------
+  # Step 2E: Free mode session name
   # ---------------------------------------------------------------------------
 
   @doc "Renders the session name input for free mode."
