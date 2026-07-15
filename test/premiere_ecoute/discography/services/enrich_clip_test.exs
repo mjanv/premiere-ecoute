@@ -77,6 +77,65 @@ defmodule PremiereEcoute.Discography.Services.EnrichClipTest do
       assert {:error, :no_match} = EnrichClip.resolve_single("abc123")
     end
 
+    test "safely excludes a candidate with no artists instead of crashing" do
+      expect_youtube_video()
+
+      {:ok, artist} = Artist.create_if_not_exists(%{name: "Daft Punk"})
+
+      no_artist_candidate = %Single{
+        provider_ids: %{spotify: "spotify_track_no_artist"},
+        name: "One More Time",
+        artists: [],
+        duration_ms: 320_000,
+        cover_url: "https://example.com/cover.jpg"
+      }
+
+      matching_candidate =
+        %Single{
+          provider_ids: %{spotify: "spotify_track_1"},
+          name: "One More Time",
+          artists: [artist],
+          duration_ms: 320_000,
+          cover_url: "https://example.com/cover.jpg"
+        }
+        |> Single.put_artist()
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, [no_artist_candidate, matching_candidate]} end)
+
+      {:ok, single, _thumbnail_url} = EnrichClip.resolve_single("abc123")
+
+      assert single.provider_ids.spotify == "spotify_track_1"
+    end
+
+    test "returns an error when every candidate has no artists" do
+      expect_youtube_video()
+
+      no_artist_candidate = %Single{
+        provider_ids: %{spotify: "spotify_track_no_artist"},
+        name: "One More Time",
+        artists: [],
+        duration_ms: 320_000,
+        cover_url: "https://example.com/cover.jpg"
+      }
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, [no_artist_candidate]} end)
+
+      assert {:error, :no_match} = EnrichClip.resolve_single("abc123")
+    end
+
+    test "returns the underlying error when the Spotify search itself fails" do
+      expect_youtube_video()
+      expect(SpotifyApi, :search_singles, fn _query -> {:error, :timeout} end)
+
+      assert {:error, :timeout} = EnrichClip.resolve_single("abc123")
+    end
+
+    test "returns the underlying error when the YouTube video lookup fails" do
+      expect(YoutubeApi, :get_video, fn "abc123" -> {:error, :not_found} end)
+
+      assert {:error, :not_found} = EnrichClip.resolve_single("abc123")
+    end
+
     test "reuses an existing Single already created from the same Spotify track" do
       {:ok, artist} = Artist.create_if_not_exists(%{name: "Daft Punk"})
 

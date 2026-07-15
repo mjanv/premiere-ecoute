@@ -794,7 +794,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
       </div>
 
       <%= if @selected_clip_video.ok? && @selected_clip_video.result do %>
-        <div class="mt-6">
+        <div class="mt-6" id="selected-clip-video">
           <div class="rounded-xl overflow-hidden ml-16 relative" style="background-color: var(--color-dark-900);">
             <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black/90"></div>
             <div class="relative z-10 p-6 h-40 flex items-center">

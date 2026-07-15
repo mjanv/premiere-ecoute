@@ -1,8 +1,11 @@
 defmodule PremiereEcoute.Sessions.ListeningSessionWorkerTest do
   use PremiereEcoute.DataCase, async: false
 
+  import PremiereEcoute.Discography.SingleFixtures
+
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSessionWorker
   alias PremiereEcouteCore.Cache
@@ -17,6 +20,38 @@ defmodule PremiereEcoute.Sessions.ListeningSessionWorkerTest do
   setup do
     Cache.clear(:sessions)
     :ok
+  end
+
+  describe "perform/1 - open_clip" do
+    test "opens the vote window and sends the chat message" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      {:ok, single} = single_fixture(%{provider_ids: %{spotify: "spotify_id", youtube: "yt_id"}}) |> Single.create()
+
+      session =
+        session_fixture(%{
+          user_id: user.id,
+          source: :clip,
+          single_id: single.id,
+          status: :active,
+          options: %{"votes" => 0, "scores" => 0, "next_track" => 0}
+        })
+
+      expect(TwitchApi, :send_chat_message, fn _scope, msg ->
+        assert msg == "Votes are open !"
+        :ok
+      end)
+
+      PremiereEcoute.PubSub.subscribe("session:#{session.id}")
+
+      assert :ok =
+               perform_job(ListeningSessionWorker, %{"action" => "open_clip", "user_id" => user.id, "session_id" => session.id})
+
+      assert {:ok, cache} = Cache.get(:sessions, user.twitch.user_id)
+      assert cache.id == session.id
+      assert cache.current_track_id == single.id
+
+      assert_receive :vote_open
+    end
   end
 
   describe "perform/1 - open_album interlude" do

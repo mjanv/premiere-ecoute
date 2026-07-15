@@ -67,6 +67,18 @@ defmodule PremiereEcouteWeb.Sessions.YoutubeControlPanelTest do
       assert_receive {:clip_command, %{command: "seek", value: 80}}
     end
 
+    test "accepts string payloads for volume and seek (e.g. a form-submitted value)", %{conn: conn, session: session} do
+      PremiereEcoute.PubSub.subscribe("session:#{session.id}")
+
+      {:ok, view, _html} = live(conn, ~p"/sessions/#{session.share_token}/dashboard")
+
+      view |> element("#clip-volume-bar") |> render_hook("clip_volume", %{"volume" => "42"})
+      assert_receive {:clip_command, %{command: "volume", value: 42}}
+
+      view |> element("#clip-progress-bar") |> render_hook("clip_seek", %{"position" => "80"})
+      assert_receive {:clip_command, %{command: "seek", value: 80}}
+    end
+
     test "play/pause buttons reflect the actual playback state", %{conn: conn, session: session} do
       {:ok, view, _html} = live(conn, ~p"/sessions/#{session.share_token}/dashboard")
 

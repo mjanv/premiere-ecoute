@@ -28,28 +28,21 @@ defmodule PremiereEcoute.Discography.Services.EnrichClip do
          {:ok, %Single{} = single} <- find_spotify_match(video),
          {:ok, single} <- attach_youtube_id(single, youtube_video_id) do
       {:ok, single, video.thumbnail_url}
-    else
-      :error -> {:error, :no_match}
-      error -> error
     end
   end
 
   defp find_spotify_match(video) do
     query = clean_title(video.title)
 
-    case Apis.spotify().search_singles(query) do
-      {:ok, candidates} when candidates != [] ->
-        candidates
-        |> Enum.map(fn candidate -> {match_score(candidate, video), candidate} end)
-        |> Enum.filter(fn {score, _candidate} -> score > @match_threshold end)
-        |> Enum.sort_by(fn {score, _candidate} -> score end, :desc)
-        |> case do
-          [{_score, best} | _] -> {:ok, best}
-          [] -> :error
-        end
-
-      _ ->
-        :error
+    with {:ok, candidates} <- Apis.spotify().search_singles(query) do
+      candidates
+      |> Enum.map(fn candidate -> {match_score(candidate, video), candidate} end)
+      |> Enum.filter(fn {score, _candidate} -> score > @match_threshold end)
+      |> Enum.sort_by(fn {score, _candidate} -> score end, :desc)
+      |> case do
+        [{_score, best} | _] -> {:ok, best}
+        [] -> {:error, :no_match}
+      end
     end
   end
 
