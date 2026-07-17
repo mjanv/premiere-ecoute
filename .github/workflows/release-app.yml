@@ -28,7 +28,6 @@ jobs:
         with:
           path: |
             deps
-            _build
             ~/.mix
             ~/.hex
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
