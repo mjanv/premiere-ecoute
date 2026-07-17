@@ -210,6 +210,23 @@ defmodule PremiereEcouteWeb.Layouts do
     end
   end
 
+  @doc """
+  Retrieves user's sound effects preference from their profile settings.
+
+  Returns "true" or "false" based on user profile configuration, defaulting to "true" when unset.
+  """
+  @spec get_sound_effects_enabled(map()) :: String.t()
+  def get_sound_effects_enabled(assigns) do
+    with %{current_scope: scope} when not is_nil(scope) <- assigns,
+         %{user: user} when not is_nil(user) <- scope,
+         %{profile: profile} when not is_nil(profile) <- user,
+         enabled when is_boolean(enabled) <- profile.sound_effects_enabled do
+      to_string(enabled)
+    else
+      _ -> "true"
+    end
+  end
+
   @spec posthog_api_key() :: String.t() | nil
   def posthog_api_key, do: Application.get_env(:posthog, :api_key)
 

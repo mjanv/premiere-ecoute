@@ -519,6 +519,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
     ~H"""
     <button
       phx-click={@event}
+      data-cuelume-toggle="bloom"
       class={[
         "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all",
         if(@active, do: @active_class, else: @inactive_class)

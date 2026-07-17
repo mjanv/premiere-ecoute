@@ -168,6 +168,17 @@
                 />
               </div>
 
+              <!-- Sound Effects Toggle -->
+              <div class="md:col-span-2 mt-8 flex items-center justify-between px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
+                <div>
+                  <label class="text-sm font-medium text-gray-200">{gettext("Interface sound effects")}</label>
+                  <p class="text-xs text-gray-400 mt-0.5">
+                    {gettext("Play short sounds on hover, click, and toggle actions")}
+                  </p>
+                </div>
+                <.input field={@profile_form[:sound_effects_enabled]} type="checkbox" data-cuelume-toggle />
+              </div>
+
               <!-- Save Button -->
               <div class="mt-8 flex justify-end">
                 <.button

@@ -24,6 +24,7 @@
                 phx-click="add_track_to_wantlist"
                 phx-value-spotify-id={track.provider_ids[:spotify]}
                 disabled={wantlisted}
+                data-cuelume-toggle="bloom"
                 class={[
                   "shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all opacity-0 group-hover:opacity-100",
                   if(wantlisted,

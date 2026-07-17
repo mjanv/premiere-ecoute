@@ -125,6 +125,7 @@ defmodule PremiereEcouteWeb.Home.Components do
         <button
           phx-click="add_album_to_wantlist"
           phx-value-album-id={@session.album.id}
+          data-cuelume-toggle="bloom"
           class={[
             "absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all",
             "opacity-0 group-hover:opacity-100",

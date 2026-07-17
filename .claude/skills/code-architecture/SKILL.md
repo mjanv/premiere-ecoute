@@ -12,6 +12,7 @@ Each pattern has its own file under `references/`. Read the one relevant to the 
 
 - [Aggregate](references/aggregate.md) — Ecto schemas with generated CRUD
 - [Event Store](references/event-store.md) — event definition, append/read, EventBus handlers
+- [Sound effects](references/sound-effects.md) — Cuelume interaction sounds, declarative vs imperative triggers
 
 To document a new pattern (e.g. command bus, context macros), add a new file under `references/`
 and list it here — don't create a separate skill for it.

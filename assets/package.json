@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cuelume": "^0.1.2",
     "motion": "^12.35.1",
     "vega": "^5.27.0",
     "vega-embed": "^6.24.0",

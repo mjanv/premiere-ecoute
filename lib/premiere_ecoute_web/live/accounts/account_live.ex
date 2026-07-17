@@ -179,6 +179,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
             |> assign(:current_user, updated_user)
             |> assign(:profile_form, updated_profile_form)
             |> push_event("phx:set-theme", %{theme: theme})
+            |> push_event("phx:set-sound-enabled", %{enabled: updated_user.profile.sound_effects_enabled})
             |> push_navigate(to: ~p"/users/account")
             |> put_flash(:info, "Profile updated successfully")
 

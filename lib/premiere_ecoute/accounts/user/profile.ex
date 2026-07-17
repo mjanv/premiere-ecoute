@@ -19,6 +19,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
           language: :en | :fr | :it,
           timezone: String.t(),
           session_reminder: String.t() | nil,
+          sound_effects_enabled: boolean(),
           widget_settings: map() | nil,
           radio_settings: map() | nil,
           chat_settings: map() | nil,
@@ -30,6 +31,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     field :language, Ecto.Enum, values: @languages, default: :en
     field :timezone, :string, default: "UTC"
     field :session_reminder, :string
+    field :sound_effects_enabled, :boolean, default: true
 
     embeds_one :widget_settings, WidgetSettings, on_replace: :update, primary_key: false do
       field :color_primary, :string, default: "#5b21b6"
@@ -74,7 +76,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     |> Map.put(:widget_settings, Map.get(profile, :widget_settings) || %__MODULE__.WidgetSettings{})
     |> Map.put(:chat_settings, Map.get(profile, :chat_settings) || %__MODULE__.ChatSettings{})
     |> Map.put(:video_settings, Map.get(profile, :video_settings) || %__MODULE__.VideoSettings{})
-    |> cast(attrs, [:color_scheme, :language, :timezone, :session_reminder])
+    |> cast(attrs, [:color_scheme, :language, :timezone, :session_reminder, :sound_effects_enabled])
     |> validate_length(:session_reminder, max: 2000)
     |> cast_embed(:widget_settings, with: &widget_settings_changeset/2)
     |> cast_embed(:radio_settings, with: &radio_settings_changeset/2)
@@ -129,6 +131,7 @@ defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile do
       :language,
       :timezone,
       :session_reminder,
+      :sound_effects_enabled,
       :widget_settings,
       :radio_settings,
       :chat_settings,

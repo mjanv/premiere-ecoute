@@ -22,6 +22,7 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import {Hooks} from "./hooks/index.js"
+import {bind, play, setEnabled} from "cuelume"
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
@@ -36,6 +37,12 @@ window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
 liveSocket.connect()
 window.liveSocket = liveSocket
+
+// Interaction sound effects (data-cuelume-* attributes), toggled via user profile preference
+setEnabled(document.documentElement.dataset.soundEnabled !== "false")
+bind()
+window.addEventListener("phx:set-sound-enabled", ({detail: {enabled}}) => setEnabled(enabled))
+window.addEventListener("phx:play-sound", ({detail: {sound}}) => play(sound))
 
 // The lines below enable quality of life phoenix_live_reload
 // development features:
