@@ -124,7 +124,7 @@
 
         <div class="bg-gray-800/50 rounded-xl p-8 border border-gray-700/30">
           <%= if @profile_form do %>
-            <.form for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
+            <.form id="preferences-form" for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Language Selection -->
                 <div>

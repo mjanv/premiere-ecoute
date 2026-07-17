@@ -28,10 +28,7 @@
     ],
     "Stop": [
       {
-        "hooks": [
-          // { "type": "command", "command": "git diff --quiet --name-only -- '*.ex' '*.exs' '.heex' || mix credo --strict", "timeout": 60},
-          // { "type": "command", "command": "git diff --quiet --name-only -- '*.ex' '*.exs' '.heex' || mix test", "timeout": 60 }
-        ]
+        "hooks": []
       }
     ]
   }

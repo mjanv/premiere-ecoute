@@ -107,7 +107,7 @@
             </div>
 
             <%!-- Widget colors row --%>
-            <.form for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
+            <.form id="widget-colors-form" for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
               <div class="flex items-center justify-between px-5 py-3 gap-4">
                 <div class="shrink-0">
                   <p class="text-white text-sm font-medium">{gettext("Widget colors")}</p>
@@ -164,7 +164,7 @@
               class="rounded-xl border border-gray-700/30 divide-y divide-gray-700/30"
               style="background-color: var(--color-dark-850);"
             >
-              <.form for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
+              <.form id="radio-settings-form" for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
                 <.inputs_for :let={rs} field={@profile_form[:radio_settings]}>
                   <div class="flex items-center justify-between px-5 py-3">
                     <div>
@@ -245,7 +245,7 @@
               class="rounded-xl border border-gray-700/30 divide-y divide-gray-700/30"
               style="background-color: var(--color-dark-850);"
             >
-              <.form for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
+              <.form id="chat-commands-form" for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
                 <.inputs_for :let={cc} field={@profile_form[:chat_settings]}>
                   <div class="flex items-center justify-between px-5 py-3">
                     <div>
@@ -314,7 +314,7 @@
               class="rounded-xl border border-gray-700/30 divide-y divide-gray-700/30"
               style="background-color: var(--color-dark-850);"
             >
-              <.form for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
+              <.form id="youtube-settings-form" for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
                 <.inputs_for :let={vs} field={@profile_form[:video_settings]}>
                   <div class="flex items-center justify-between px-5 py-3">
                     <div>
@@ -388,7 +388,7 @@
               class="rounded-xl border border-gray-700/30"
               style="background-color: var(--color-dark-850);"
             >
-              <.form for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
+              <.form id="session-reminder-form" for={@profile_form} phx-change="validate_profile" phx-submit="save_profile">
                 <div class="px-5 py-3">
                   <p class="text-gray-400 text-xs mb-3">
                     {gettext(

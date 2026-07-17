@@ -932,7 +932,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
 
       <div class="ml-16">
         <div class="flex items-center space-x-4">
-          <form phx-change="vote_options_preset_change">
+          <form id="vote-options-preset-form" phx-change="vote_options_preset_change">
             <select
               name="preset"
               class="rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:ring-opacity-50 border-0"
