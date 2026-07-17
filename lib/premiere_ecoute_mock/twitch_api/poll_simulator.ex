@@ -13,7 +13,6 @@ defmodule PremiereEcouteMock.TwitchApi.PollSimulator do
 
   @interval_ms 5_000
   @webhook_url "http://localhost:4000/webhooks/twitch"
-  @secret Application.compile_env(:premiere_ecoute, :twitch_webhook_secret)
 
   @spec start_link(term()) :: GenServer.on_start()
   def start_link(_), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -136,7 +135,9 @@ defmodule PremiereEcouteMock.TwitchApi.PollSimulator do
   end
 
   defp signature(message) do
-    :crypto.mac(:hmac, :sha256, @secret, message)
+    secret = Application.fetch_env!(:premiere_ecoute, :twitch_webhook_secret)
+
+    :crypto.mac(:hmac, :sha256, secret, message)
     |> Base.encode16(case: :lower)
     |> then(&("sha256=" <> &1))
   end
