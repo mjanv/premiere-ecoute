@@ -201,13 +201,13 @@ jobs:
       - name: Health check
         id: health_check
         run: |
-          for i in $(seq 0 10); do
+          for i in $(seq 0 5); do
+            sleep 10
             if curl -fsS -o /dev/null https://premiere-ecoute.fr/health; then
               echo "Application is healthy"
               exit 0
             fi
-            echo "Health check attempt $i failed, retrying in 3s..."
-            sleep 6
+            echo "Health check attempt $i failed, retrying in 10s..."
           done
           echo "Application failed health check"
           exit 1
@@ -222,3 +222,7 @@ jobs:
             systemctl restart premiere-ecoute
             systemctl status premiere-ecoute --no-pager
           '
+
+      - name: Clean up backup after successful deploy
+        if: success()
+        run: ssh root@${{ vars.DO_HOST }} 'rm -rf /opt/premiere-ecoute-backup'
