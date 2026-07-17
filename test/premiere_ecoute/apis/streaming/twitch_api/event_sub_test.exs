@@ -135,7 +135,16 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.EventSubTest do
           {"authorization", "Bearer token"},
           {"content-type", "application/json"}
         ],
-        request: "twitch_api/eventsub/create_event_subscription/request.json",
+        request: %{
+          "type" => "channel.follow",
+          "version" => "2",
+          "condition" => %{"broadcaster_user_id" => "1234", "moderator_user_id" => "1234"},
+          "transport" => %{
+            "method" => "webhook",
+            "callback" => "http://localhost:4002/webhooks/twitch",
+            "secret" => Application.fetch_env!(:premiere_ecoute, :twitch_webhook_secret)
+          }
+        },
         response: "twitch_api/eventsub/create_event_subscription/response.json",
         status: 202
       )

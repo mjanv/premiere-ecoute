@@ -1,7 +1,6 @@
 import Config
 
 config :premiere_ecoute,
-  twitch_eventsub_secret: "s3cre77890ab",
   buymeacoffee_api_key: "test_buymeacoffee_api_key"
 
 config :boruta, Boruta.Oauth, issuer: "http://localhost:4002"

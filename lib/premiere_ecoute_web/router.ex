@@ -21,17 +21,8 @@ defmodule PremiereEcouteWeb.Router do
     plug :put_root_layout, html: {PremiereEcouteWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug Plugs.ContentSecurityPolicy
     plug :fetch_current_scope_for_user
-
-    # plug PlugContentSecurityPolicy,
-    #   nonces_for: [:script_src, :style_src],
-    #   directives: %{
-    #     script_src: ~w('self' 'unsafe-eval' https://unpkg.com),
-    #     style_src: ~w('self' 'unsafe-hashes' https://fonts.googleapis.com),
-    #     font_src: ~w('self' https://fonts.gstatic.com),
-    #     style_src_attr: ~w('self' 'unsafe-hashes' 'unsafe-inline')
-    #   }
-
     plug Plugs.RenewTokens
     plug Plugs.SetLocale
   end
@@ -57,6 +48,14 @@ defmodule PremiereEcouteWeb.Router do
   end
 
   pipeline :api do
+    plug :accepts, ["json"]
+    plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
+  end
+
+  # CORS is only needed for the Twitch extension iframe, which calls the browser
+  # from twitch.tv. It is scoped to /api/extension rather than applied globally.
+  pipeline :extension_api do
+    plug CORSPlug, origin: "*"
     plug :accepts, ["json"]
     plug OpenApiSpex.Plug.PutApiSpec, module: PremiereEcouteWeb.ApiSpec
   end
@@ -382,7 +381,7 @@ defmodule PremiereEcouteWeb.Router do
   end
 
   scope "/api/extension", PremiereEcouteWeb.Api.Extension do
-    pipe_through :api
+    pipe_through :extension_api
 
     get "/tracks/current/:broadcaster_id", WidgetController, :current_track
     post "/tracks/like", WidgetController, :like_track

@@ -19,9 +19,12 @@ defmodule PremiereEcoute.Twitch.Services.Rewards do
 
   def create_rewards(scope, reward_configs) do
     Enum.flat_map(reward_configs, fn attrs ->
-      string_keyed = Map.new(attrs, fn {k, v} -> {String.to_atom(k), v} end)
+      # Keys come from session options JSON. Use to_existing_atom (the reward attr
+      # names all exist as atoms in TwitchApi.Rewards.create_attrs) to avoid minting
+      # atoms from persisted data. An unexpected key raises rather than growing the atom table.
+      atom_keyed = Map.new(attrs, fn {k, v} -> {String.to_existing_atom(k), v} end)
 
-      case Apis.twitch().create_reward(scope, string_keyed) do
+      case Apis.twitch().create_reward(scope, atom_keyed) do
         {:ok, reward} ->
           Logger.info("Created reward #{reward.id} (#{reward.title})")
           [reward]

@@ -32,9 +32,6 @@ defmodule PremiereEcouteWeb.Endpoint do
     plug Tidewave
   end
 
-  # CORS for extension API
-  plug CORSPlug, origin: "*"
-
   if code_reloading? do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
@@ -56,9 +53,11 @@ defmodule PremiereEcouteWeb.Endpoint do
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library(),
-    # Raised from default 1MB to 20MB to accommodate LiveView longpoll
-    # carrying base64-encoded PCM audio segments from the microphone hook.
-    length: 20_000_000
+    # 5MB — comfortably above any JSON webhook/API payload while limiting the
+    # amplification surface on unauthenticated endpoints. Microphone audio and
+    # podcast uploads travel over the LiveView socket, which is dispatched before
+    # this plug and enforces its own limits — they do not pass through here.
+    length: 5_000_000
 
   plug Plug.MethodOverride
   plug PremiereEcouteWeb.Plugs.StashMethod

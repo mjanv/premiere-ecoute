@@ -25,11 +25,12 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
   if Application.compile_env(:premiere_ecoute, :environment) == :dev do
     def call(conn, _opts), do: assign(conn, :twitch_hmac, true)
   else
-    @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
     def call(%Plug.Conn{req_headers: req_headers} = conn, _opts) do
+      secret = Application.fetch_env!(:premiere_ecoute, :twitch_webhook_secret)
+
       with id when id != "" <- at(req_headers, "id"),
            {:ok, body, _} <- read_body(conn) do
-        assign(conn, :twitch_hmac, hmac(req_headers, @secret, body))
+        assign(conn, :twitch_hmac, hmac(req_headers, secret, body))
       else
         _ -> conn
       end

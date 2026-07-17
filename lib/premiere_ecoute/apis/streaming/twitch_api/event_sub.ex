@@ -10,8 +10,6 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.EventSub do
   alias PremiereEcoute.Apis.Streaming.TwitchApi
   alias PremiereEcouteCore.Cache
 
-  @secret Application.compile_env(:premiere_ecoute, :twitch_eventsub_secret)
-
   @doc """
   Retrieves all EventSub subscriptions for user.
 
@@ -44,7 +42,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.EventSub do
         transport: %{
           method: "webhook",
           callback: Application.get_env(:premiere_ecoute, :twitch_webhook_callback_url),
-          secret: @secret
+          secret: Application.get_env(:premiere_ecoute, :twitch_webhook_secret)
         }
       }
     )

@@ -12,8 +12,7 @@ config :premiere_ecoute,
     PremiereEcoute.Sessions.Scores.CommandHandler,
     PremiereEcoute.Collections.CollectionSession.CommandHandler,
     PremiereEcoute.Collections.CollectionSession.EventHandler
-  ],
-  twitch_eventsub_secret: "094545d3d0d963dc017d44e66c075d7e11dbee8fc9209885b20fd5b5f2d3772f"
+  ]
 
 config :premiere_ecoute, :scopes,
   user: [
