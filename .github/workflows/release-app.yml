@@ -201,13 +201,13 @@ jobs:
       - name: Health check
         id: health_check
         run: |
-          for i in $(seq 1 10); do
-            if ssh root@${{ vars.DO_HOST }} 'curl -fsS -o /dev/null http://localhost:4000/health'; then
+          for i in $(seq 0 10); do
+            if curl -fsS -o /dev/null https://premiere-ecoute.fr/health; then
               echo "Application is healthy"
               exit 0
             fi
             echo "Health check attempt $i failed, retrying in 3s..."
-            sleep 3
+            sleep 6
           done
           echo "Application failed health check"
           exit 1
