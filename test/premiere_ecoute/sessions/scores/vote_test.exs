@@ -174,5 +174,24 @@ defmodule PremiereEcoute.Sessions.Scores.VoteTest do
       assert {:error, "5 lala"} = Vote.from_message("5 lala", ["5", "6"])
       assert {:error, "5 6"} = Vote.from_message("5 6", ["5", "6"])
     end
+
+    test "accepts a worded top-score vote without false ambiguity from substring-colliding options" do
+      options = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+
+      assert {:ok, "10"} = Vote.from_message("i give it a 10", options)
+      assert {:ok, "7"} = Vote.from_message("i give it a 7", options)
+    end
+
+    test "accepts worded votes for the 67 preset despite digit overlap with 6 and 7" do
+      options = ["6", "7", "67"]
+
+      assert {:ok, "67"} = Vote.from_message("i vote 67", options)
+      assert {:ok, "6"} = Vote.from_message("i vote 6", options)
+      assert {:ok, "7"} = Vote.from_message("i vote 7", options)
+    end
+
+    test "still refuses when two distinct options are truly both present" do
+      assert {:error, "i vote 6 and 7"} = Vote.from_message("i vote 6 and 7", ["6", "7", "67"])
+    end
   end
 end

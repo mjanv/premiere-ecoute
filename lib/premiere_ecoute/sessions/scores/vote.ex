@@ -70,7 +70,7 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
       |> Enum.filter(fn option -> String.ends_with?(message, " #{option}") end)
       |> case do
         [vote] ->
-          if Enum.any?(vote_options, fn option -> option != vote and String.contains?(message, option) end) do
+          if Enum.any?(vote_options, fn option -> option != vote and contains_token?(message, option) end) do
             {:error, message}
           else
             {:ok, vote}
@@ -80,6 +80,10 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
           {:error, message}
       end
     end
+  end
+
+  defp contains_token?(message, option) do
+    Regex.match?(~r/(?<![\w])#{Regex.escape(option)}(?![\w])/u, message)
   end
 
   def get_vote_message(session_id, viewer_id, vote_options) do
