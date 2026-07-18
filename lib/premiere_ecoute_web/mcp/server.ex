@@ -60,16 +60,21 @@ defmodule PremiereEcouteWeb.Mcp.Server do
   end
 
   @doc false
-  @spec authenticate([String.t()] | nil, [String.t()] | nil) :: {:ok, User.t()} | :error
+  @spec authenticate([String.t()] | String.t() | nil, [String.t()] | String.t() | nil) ::
+          {:ok, User.t()} | :error
   def authenticate(api_key, authorization) do
-    with nil <- by_api_key(api_key) do
-      by_bearer_token(authorization)
+    with nil <- by_api_key(header_value(api_key)) do
+      by_bearer_token(header_value(authorization))
     end
   end
 
-  defp by_api_key(api_key) do
-    api_key = api_key && List.first(api_key)
+  # Plug.Conn.get_req_header/2 returns a list; Hermes.Server.Frame.get_req_header/2 returns the
+  # raw string directly. Normalize both callers' shapes to a single string here.
+  defp header_value([]), do: nil
+  defp header_value([value | _]), do: value
+  defp header_value(value), do: value
 
+  defp by_api_key(api_key) do
     case api_key && Token.get_user_by_api_token(api_key) do
       {user, _inserted_at} -> {:ok, user}
       _ -> nil
@@ -79,8 +84,7 @@ defmodule PremiereEcouteWeb.Mcp.Server do
   # OAuth path for browser-based connectors (e.g. claude.ai) registered via
   # PremiereEcouteWeb.Oauth.RegistrationController; `sub` is the user id set in ResourceOwners.
   defp by_bearer_token(authorization) do
-    with [header] <- authorization,
-         "Bearer " <> token <- header,
+    with "Bearer " <> token <- authorization,
          {:ok, %{sub: sub}} <- AccessToken.authorize(value: token),
          %User{} = user <- Repo.get(User, sub) do
       {:ok, User.preload(user)}
