@@ -25,6 +25,7 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowClosed
   alias PremiereEcoute.Collections.CollectionSession.Events.VoteWindowOpened
   alias PremiereEcoute.Discography.Album.Track
+  alias PremiereEcoute.Twitch.Reward
   alias PremiereEcoute.Twitch.Services.Rewards
   alias PremiereEcouteCore.Cache
 
@@ -64,7 +65,8 @@ defmodule PremiereEcoute.Collections.CollectionSession.CommandHandler do
   def handle(%StartCollectionSession{session_id: session_id, scope: %{user: %{twitch: %{user_id: broadcaster_id}}} = scope}) do
     with %CollectionSession{origin_playlist: origin_playlist} = session <- CollectionSession.get(session_id),
          {:ok, playlist} <- Apis.provider(origin_playlist.provider).get_playlist(origin_playlist.playlist_id),
-         rewards <- Rewards.create_rewards(scope, session.options["rewards"] || []),
+         reward_configs <- Enum.map(session.options["rewards"] || [], &Reward.parse/1),
+         rewards <- Rewards.create_rewards(scope, reward_configs),
          {:ok, _} <-
            Cache.put(:collections, broadcaster_id, %{
              session_id: session_id,
