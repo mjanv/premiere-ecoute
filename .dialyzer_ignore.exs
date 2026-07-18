@@ -39,8 +39,7 @@
   {"lib/premiere_ecoute/wantlists/wantlist_item.ex", :call_without_opaque},
   {"lib/premiere_ecoute/podcasts/show.ex", :call_without_opaque},
   {"lib/premiere_ecoute/podcasts/episode.ex", :call_without_opaque},
-  {"lib/premiere_ecoute_web/components/core_components.ex", :call_without_opaque},
-  {"lib/premiere_ecoute_web/components/cards/modal.ex", :call_without_opaque},
-  {"lib/premiere_ecoute_web/layouts/layouts.ex", :call_with_opaque},
-  {"lib/premiere_ecoute_web/components/panels/drawer.ex", :call_without_opaque}
+  {"lib/premiere_ecoute_web/components/core_components.ex", :contract_with_opaque},
+  {"lib/premiere_ecoute_web/components/cards/modal.ex", :contract_with_opaque},
+  {"lib/premiere_ecoute_web/components/panels/drawer.ex", :contract_with_opaque}
 ]
