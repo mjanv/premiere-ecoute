@@ -40,14 +40,15 @@ defmodule PremiereEcoute.Sessions.AlbumPicks do
       {:ok, pick} ->
         {:ok, pick}
 
-      {:error, %Ecto.Changeset{errors: [user_id: {_, [{:constraint, :unique} | _]}]} = _cs} ->
-        case Repo.get_by(AlbumPick, user_id: user_id, album_id: album_id) do
-          nil -> {:error, :already_exists}
-          existing -> {:ok, existing}
-        end
-
       {:error, changeset} ->
-        {:error, changeset}
+        if unique_constraint_error?(changeset, :user_id) do
+          case Repo.get_by(AlbumPick, user_id: user_id, album_id: album_id) do
+            nil -> {:error, :already_exists}
+            existing -> {:ok, existing}
+          end
+        else
+          {:error, changeset}
+        end
     end
   end
 
@@ -59,7 +60,7 @@ defmodule PremiereEcoute.Sessions.AlbumPicks do
   """
   @spec add_viewer_entry(integer(), map(), String.t()) ::
           {:ok, AlbumPick.t()} | {:error, Ecto.Changeset.t()} | {:error, :already_exists}
-  def add_viewer_entry(user_id, %{album_id: album_id} = attrs, submitter) do
+  def add_viewer_entry(user_id, %{album_id: _album_id} = attrs, submitter) do
     attrs =
       attrs
       |> Map.put(:user_id, user_id)
@@ -70,15 +71,22 @@ defmodule PremiereEcoute.Sessions.AlbumPicks do
       {:ok, pick} ->
         {:ok, pick}
 
-      {:error, %Ecto.Changeset{errors: [user_id: {_, [{:constraint, :unique} | _]}]} = _cs} ->
-        case Repo.get_by(AlbumPick, user_id: user_id, album_id: album_id) do
-          nil -> {:error, :already_exists}
-          _existing -> {:error, :already_exists}
-        end
-
       {:error, changeset} ->
-        {:error, changeset}
+        if unique_constraint_error?(changeset, :user_id) do
+          {:error, :already_exists}
+        else
+          {:error, changeset}
+        end
     end
+  end
+
+  # Checks whether `field` has a unique-constraint error, regardless of how many other
+  # errors are present or the internal ordering of the error's metadata keyword list.
+  defp unique_constraint_error?(%Ecto.Changeset{errors: errors}, field) do
+    Enum.any?(errors, fn
+      {^field, {_message, meta}} -> Keyword.get(meta, :constraint) == :unique
+      _ -> false
+    end)
   end
 
   @doc """
