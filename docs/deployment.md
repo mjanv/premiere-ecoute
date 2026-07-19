@@ -215,22 +215,19 @@ The repository includes an automated deployment pipeline via GitHub Actions that
 
 ### Workflow Overview
 
-The deployment workflow (`.github/workflows/main.yml`) consists of two jobs:
+The deployment workflow (`.github/workflows/release-app.yml`) runs as a single job, `build-and-deploy`, so the release never has to be uploaded/downloaded as an artifact between build and deploy steps:
 
-1. **build-release**: Builds the production Elixir release
-   - Sets up Erlang/Elixir environment
-   - Caches dependencies and build artifacts for faster builds
-   - Compiles assets (`mix assets.deploy`)
-   - Creates production release (`MIX_ENV=prod mix release`)
-   - Uploads release artifact for deployment
+1. Sets up Erlang/Elixir environment
+2. Restores dependency (`deps`, `~/.mix`, `~/.hex`), build (`_build/prod`), and asset (`assets/node_modules`) caches, keyed on `mix.lock`/source hashes — this is what keeps rebuilds fast (~1.5 min instead of ~7 min on a cold cache)
+3. Compiles assets (`npm ci`, `mix tailwind`, `mix esbuild`, `mix phx.digest`)
+4. Creates production release (`MIX_ENV=prod mix release`)
+5. Sets up SSH connection to droplet
+6. Reconstructs `.env.production` from GitHub Secrets
+7. Backs up the current release on the droplet, then syncs the new release to `/opt/premiere-ecoute/` via rsync
+8. Restarts the `premiere-ecoute` systemd service
+9. Health-checks `/health`; on failure, rolls back to the pre-deploy backup automatically
 
-2. **deploy-to-digital-ocean**: Deploys the release to the droplet
-   - Downloads release artifact from build job
-   - Sets up SSH connection to droplet
-   - Reconstructs `.env.production` from GitHub Secrets
-   - Syncs release to `/opt/premiere-ecoute/` via rsync
-   - Restarts the `premiere-ecoute` systemd service
-   - Verifies deployment success
+**Note on caching**: the `_build/prod` cache is keyed on `mix.lock` plus a hash of all `.ex`/`.exs` sources, so it always misses on the exact key for a new commit and falls back to the nearest match via `restore-keys` — that's expected and lets Elixir's incremental compiler recompile only changed files instead of the whole project.
 
 ### Required GitHub Secrets
 

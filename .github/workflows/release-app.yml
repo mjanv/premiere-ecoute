@@ -193,13 +193,12 @@ jobs:
       - name: Health check
         id: health_check
         run: |
-          for i in $(seq 0 10); do
+          for i in $(seq 0 60); do
             if curl -fsS -o /dev/null https://premiere-ecoute.fr/health; then
               echo "Application is healthy"
               exit 0
             fi
-            echo "Health check attempt $i failed, retrying in 5s..."
-            sleep 5
+            sleep 1
           done
           echo "Application failed health check"
           exit 1
