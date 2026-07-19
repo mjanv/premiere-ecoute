@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarkerTest do
   alias PremiereEcoute.Discography.Album.Track, as: AlbumTrack
   alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
 
@@ -166,6 +167,67 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarkerTest do
              0:30 Only Track
              10:00 Conclusion\
              """
+    end
+
+    test "formats track marker for track session using the single's name" do
+      session_start = ~U[2025-01-15 10:00:00Z]
+      track_start = ~U[2025-01-15 10:00:30Z]
+
+      single = %Single{id: 1, name: "Standalone Single"}
+
+      session = %ListeningSession{
+        source: :track,
+        single: single,
+        started_at: session_start,
+        ended_at: nil,
+        track_markers: [
+          %TrackMarker{id: 1, track_id: 1, track_number: 1, started_at: track_start}
+        ]
+      }
+
+      result = TrackMarker.format_youtube_chapters(session, 0)
+
+      assert result == "0:00 Introduction\n0:30 Standalone Single"
+    end
+
+    test "formats track marker for clip session using the single's name" do
+      session_start = ~U[2025-01-15 10:00:00Z]
+      track_start = ~U[2025-01-15 10:00:30Z]
+
+      single = %Single{id: 1, name: "Clip Single"}
+
+      session = %ListeningSession{
+        source: :clip,
+        single: single,
+        started_at: session_start,
+        ended_at: nil,
+        track_markers: [
+          %TrackMarker{id: 1, track_id: 1, track_number: 1, started_at: track_start}
+        ]
+      }
+
+      result = TrackMarker.format_youtube_chapters(session, 0)
+
+      assert result == "0:00 Introduction\n0:30 Clip Single"
+    end
+
+    test "falls back to marker.track_name for track session without a loaded single" do
+      session_start = ~U[2025-01-15 10:00:00Z]
+      track_start = ~U[2025-01-15 10:00:30Z]
+
+      session = %ListeningSession{
+        source: :track,
+        single: nil,
+        started_at: session_start,
+        ended_at: nil,
+        track_markers: [
+          %TrackMarker{id: 1, track_id: 1, track_number: 1, started_at: track_start, track_name: "Fallback Name"}
+        ]
+      }
+
+      result = TrackMarker.format_youtube_chapters(session, 0)
+
+      assert result == "0:00 Introduction\n0:30 Fallback Name"
     end
 
     test "formats timestamps correctly for durations over 1 hour" do

@@ -89,6 +89,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession.TrackMarker do
     marker.track_name || ""
   end
 
+  defp get_track_name(%ListeningSession{source: source, single: single}, marker) when source in [:track, :clip] do
+    (single && single.name) || marker.track_name || ""
+  end
+
   defp format_timestamp(total_seconds) do
     hours = div(total_seconds, 3_600)
     minutes = div(rem(total_seconds, 3_600), 60)

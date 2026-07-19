@@ -12,6 +12,10 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
 
   import Plug.Conn
 
+  require Logger
+
+  @max_message_age_seconds 600
+
   @doc false
   @spec init(any()) :: map()
   def init(_default), do: %{}
@@ -19,7 +23,7 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
   @doc """
   Validates HMAC signature of incoming Twitch EventSub webhook requests.
 
-  Reads the request body and verifies the HMAC signature using the message ID, timestamp, and secret. Assigns the validation result to the connection under :twitch_hmac key for downstream processing.
+  Reads the request body and verifies the HMAC signature using the message ID, timestamp, and secret, and that the message timestamp is recent enough to guard against replay. Assigns the validation result to the connection under :twitch_hmac key for downstream processing.
   """
   @spec call(Plug.Conn.t(), any()) :: Plug.Conn.t()
   if Application.compile_env(:premiere_ecoute, :environment) == :dev do
@@ -30,10 +34,27 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidator do
 
       with id when id != "" <- at(req_headers, "id"),
            {:ok, body, _} <- read_body(conn) do
-        assign(conn, :twitch_hmac, hmac(req_headers, secret, body))
+        assign(conn, :twitch_hmac, hmac(req_headers, secret, body) && fresh?(req_headers))
       else
         _ -> conn
       end
+    end
+  end
+
+  @doc """
+  Checks that a Twitch EventSub message timestamp is recent enough to guard against replay.
+
+  Rejects messages older (or newer, to tolerate clock skew) than #{@max_message_age_seconds} seconds, per Twitch's own EventSub replay guidance.
+  """
+  @spec fresh?(list()) :: boolean()
+  def fresh?(headers) do
+    with timestamp when timestamp != "" <- at(headers, "timestamp"),
+         {:ok, sent_at, _offset} <- DateTime.from_iso8601(timestamp) do
+      abs(DateTime.diff(DateTime.utc_now(), sent_at, :second)) <= @max_message_age_seconds
+    else
+      _ ->
+        Logger.warning("Rejected Twitch EventSub message: missing or unparseable timestamp")
+        false
     end
   end
 

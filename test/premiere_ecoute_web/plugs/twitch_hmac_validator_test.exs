@@ -63,4 +63,43 @@ defmodule PremiereEcouteWeb.Plugs.TwitchHmacValidatorTest do
       assert TwitchHmacValidator.hmac(headers, @secret, @body) == false
     end
   end
+
+  describe "fresh?/1" do
+    test "accepts a message timestamped now" do
+      headers = [{"twitch-eventsub-message-timestamp", DateTime.to_iso8601(DateTime.utc_now())}]
+
+      assert TwitchHmacValidator.fresh?(headers) == true
+    end
+
+    test "accepts a message just inside the replay window" do
+      timestamp = DateTime.utc_now() |> DateTime.add(-590, :second) |> DateTime.to_iso8601()
+      headers = [{"twitch-eventsub-message-timestamp", timestamp}]
+
+      assert TwitchHmacValidator.fresh?(headers) == true
+    end
+
+    test "rejects a message older than the replay window (a captured, replayed request)" do
+      timestamp = DateTime.utc_now() |> DateTime.add(-3600, :second) |> DateTime.to_iso8601()
+      headers = [{"twitch-eventsub-message-timestamp", timestamp}]
+
+      assert TwitchHmacValidator.fresh?(headers) == false
+    end
+
+    test "rejects a message from far in the future" do
+      timestamp = DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_iso8601()
+      headers = [{"twitch-eventsub-message-timestamp", timestamp}]
+
+      assert TwitchHmacValidator.fresh?(headers) == false
+    end
+
+    test "rejects a missing timestamp header" do
+      assert TwitchHmacValidator.fresh?([]) == false
+    end
+
+    test "rejects an unparseable timestamp" do
+      headers = [{"twitch-eventsub-message-timestamp", "not-a-date"}]
+
+      assert TwitchHmacValidator.fresh?(headers) == false
+    end
+  end
 end
