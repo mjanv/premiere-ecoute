@@ -92,10 +92,8 @@ defmodule PremiereEcoute.Discography.Single do
   end
 
   def create_if_not_exists(%__MODULE__{provider_ids: provider_ids} = single) when map_size(provider_ids) > 0 do
-    [{provider, id}] = Enum.take(provider_ids, 1)
-
-    provider
-    |> get_by_provider_id(id)
+    provider_ids
+    |> Enum.find_value(fn {provider, id} -> get_by_provider_id(provider, id) end)
     |> case do
       nil -> create(single)
       existing -> {:ok, existing}
