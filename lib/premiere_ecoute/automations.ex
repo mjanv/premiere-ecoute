@@ -48,16 +48,42 @@ defmodule PremiereEcoute.Automations do
   @doc "Lists automations that reference a given playlist_id in any step config."
   @spec list_for_playlist(User.t(), String.t()) :: [Automation.t()]
   def list_for_playlist(%User{id: user_id}, playlist_id) do
+    scalar_match =
+      Enum.reduce(playlist_id_keys(), false, fn key, acc ->
+        dynamic(
+          [a],
+          ^acc or
+            fragment(
+              "EXISTS (SELECT 1 FROM jsonb_array_elements(?) AS step WHERE step->'config'->>? = ?)",
+              a.steps,
+              ^key,
+              ^playlist_id
+            )
+        )
+      end)
+
+    list_match =
+      Enum.reduce(playlist_id_list_keys(), false, fn key, acc ->
+        dynamic(
+          [a],
+          ^acc or
+            fragment(
+              """
+              EXISTS (
+                SELECT 1 FROM jsonb_array_elements(?) AS step
+                WHERE step->'config'->? @> ?::jsonb
+              )
+              """,
+              a.steps,
+              ^key,
+              ^[playlist_id]
+            )
+        )
+      end)
+
     Automation
     |> where([a], a.user_id == ^user_id)
-    |> where(
-      [a],
-      fragment(
-        "EXISTS (SELECT 1 FROM jsonb_array_elements(?) AS step WHERE step->'config'->>'playlist_id' = ?)",
-        a.steps,
-        ^playlist_id
-      )
-    )
+    |> where(^dynamic([a], ^scalar_match or ^list_match))
     |> Repo.all()
   end
 
@@ -72,7 +98,7 @@ defmodule PremiereEcoute.Automations do
 
     Enum.reduce(rows, %{}, fn steps, acc ->
       steps
-      |> Enum.flat_map(fn step -> [get_in(step, ["config", "playlist_id"])] end)
+      |> Enum.flat_map(&referenced_playlist_ids/1)
       |> Enum.filter(&(&1 in playlist_ids))
       |> Enum.uniq()
       |> Enum.reduce(acc, fn pid, inner -> Map.update(inner, pid, 1, &(&1 + 1)) end)
@@ -80,6 +106,27 @@ defmodule PremiereEcoute.Automations do
   end
 
   def automation_counts(_user, []), do: %{}
+
+  # Config keys whose declared input type references one or more playlist IDs, derived from
+  # each registered action's own metadata instead of a hardcoded key name.
+  defp referenced_playlist_ids(step) do
+    config = step["config"] || %{}
+
+    Enum.flat_map(playlist_id_keys(), fn key -> List.wrap(config[key]) end) ++
+      Enum.flat_map(playlist_id_list_keys(), fn key -> config[key] || [] end)
+  end
+
+  defp playlist_id_keys, do: input_keys_by_type(:playlist_id)
+  defp playlist_id_list_keys, do: input_keys_by_type(:playlist_id_list)
+
+  defp input_keys_by_type(type) do
+    ActionRegistry.all_meta()
+    |> Map.values()
+    |> Enum.flat_map(& &1.inputs)
+    |> Enum.filter(&(&1.type == type))
+    |> Enum.map(& &1.key)
+    |> Enum.uniq()
+  end
 
   @doc "Lists run history for an automation."
   defdelegate list_runs(automation), to: AutomationRun, as: :list_for_automation
