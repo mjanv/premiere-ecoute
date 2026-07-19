@@ -93,8 +93,11 @@ defmodule PremiereEcoute.Sessions.Scores.PollPipeline do
             PremiereEcoute.PubSub.broadcast("session:#{saved.session_id}", {:session_summary, summary})
           end
 
-        _ ->
-          :skip
+        :skip ->
+          Logger.warning("Skipped poll update for unknown poll_id=#{poll.poll_id}: no PollStarted row found yet")
+
+        {:error, changeset} ->
+          Logger.warning("Failed to upsert poll_id=#{poll.poll_id}: #{inspect(changeset.errors)}")
       end
     end)
 

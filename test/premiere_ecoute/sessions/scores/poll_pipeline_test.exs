@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Sessions.Scores.PollPipelineTest do
   use PremiereEcoute.DataCase, async: false
 
+  import ExUnit.CaptureLog
+
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Events.Chat.PollStarted
   alias PremiereEcoute.Events.Chat.PollUpdated
@@ -96,6 +98,16 @@ defmodule PremiereEcoute.Sessions.Scores.PollPipelineTest do
       PremiereEcouteCore.publish(@pipeline, %PollUpdated{id: "poll2", votes: %{"A" => 5, "B" => 7}})
 
       assert Enum.empty?(Poll.all(where: [session_id: session.id]))
+    end
+
+    test "logs a warning when an unknown poll update is skipped" do
+      log =
+        capture_log(fn ->
+          PremiereEcouteCore.publish(@pipeline, %PollUpdated{id: "poll-out-of-order", votes: %{"A" => 5, "B" => 7}})
+          :timer.sleep(100)
+        end)
+
+      assert log =~ "Skipped poll update for unknown poll_id=poll-out-of-order"
     end
   end
 end
