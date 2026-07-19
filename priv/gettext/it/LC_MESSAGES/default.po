@@ -267,28 +267,28 @@ msgstr "Impossibile riprodurre: %{reason}"
 
 #: lib/premiere_ecoute_web/live/admin/admin_events_live.html.heex:126
 #: lib/premiere_ecoute_web/live/admin/admin_events_live.html.heex:133
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:223
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:227
 #, elixir-autogen, elixir-format
 msgid "Next"
 msgstr "Successivo"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:178
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:182
 #, elixir-autogen, elixir-format
 msgid "No track selected"
 msgstr "Nessun brano selezionato"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:141
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:145
 #, elixir-autogen, elixir-format
 msgid "Not playing"
 msgstr "Non in riproduzione"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:206
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:210
 #: lib/premiere_ecoute_web/live/sessions/components/youtube_control_panel.ex:109
 #, elixir-autogen, elixir-format
 msgid "Pause"
 msgstr "Pausa"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:215
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:219
 #: lib/premiere_ecoute_web/live/sessions/components/youtube_control_panel.ex:89
 #, elixir-autogen, elixir-format
 msgid "Play"
@@ -296,12 +296,12 @@ msgstr "Riproduci"
 
 #: lib/premiere_ecoute_web/live/admin/admin_events_live.html.heex:105
 #: lib/premiere_ecoute_web/live/admin/admin_events_live.html.heex:112
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:191
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:195
 #, elixir-autogen, elixir-format
 msgid "Previous"
 msgstr "Precedente"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:168
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:172
 #, elixir-autogen, elixir-format
 msgid "Progress:"
 msgstr "Progresso:"
@@ -1189,7 +1189,7 @@ msgstr "Preferenze"
 #: lib/premiere_ecoute_web/live/accounts/account_features_live.html.heex:196
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:284
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:145
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:822
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:823
 #, elixir-autogen, elixir-format
 msgid "Private"
 msgstr "Privacy"
@@ -1204,7 +1204,7 @@ msgstr "Preferenze del profilo non disponibili"
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:273
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:142
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:194
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:824
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:825
 #, elixir-autogen, elixir-format
 msgid "Public"
 msgstr "Pubblico"
@@ -2253,7 +2253,7 @@ msgid "New Session"
 msgstr "Nuova Sessione"
 
 #: lib/premiere_ecoute_web/live/collections/components/session_components.ex:26
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:144
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:148
 #, elixir-autogen, elixir-format
 msgid "No device"
 msgstr "Nessun dispositivo"
@@ -2273,7 +2273,7 @@ msgstr "Retrospettive globali per streamer e riassunti personali per ogni spetta
 msgid "Host album release listening sessions and let your chat votes for every track"
 msgstr "Organizza sessioni di ascolto per uscite di album e lascia che la tua chat voti per ogni traccia"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:135
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:139
 #, elixir-autogen, elixir-format
 msgid "Playing"
 msgstr "Riproduci"
@@ -2627,7 +2627,7 @@ msgid "Review"
 msgstr "Rivisto"
 
 #: lib/premiere_ecoute_web/live/sessions/components/session_components.ex:234
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:894
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:895
 #, elixir-autogen, elixir-format
 msgid "Session"
 msgstr "Sessione"
@@ -2837,8 +2837,8 @@ msgid_plural "artists"
 msgstr[0] "artista"
 msgstr[1] "artisti"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:403
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:428
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:426
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:451
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La prima di %{name} è finita"
@@ -3389,30 +3389,30 @@ msgstr "Da sempre"
 msgid "Failed to load top tracks"
 msgstr "Impossibile caricare i brani migliori"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:369
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:386
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:392
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:409
 #, elixir-autogen, elixir-format
 msgid "%{name} by %{artist} is over"
 msgstr "%{name} di %{artist} è finita"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:927
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:928
 #, elixir-autogen, elixir-format
 msgid "Anyone with the link can view the retrospective"
 msgstr "Chiunque abbia il link può vedere la retrospettiva"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:926
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:927
 #, elixir-autogen, elixir-format
 msgid "Authenticated users can view the retrospective"
 msgstr "Gli utenti autenticati possono vedere la retrospettiva"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:110
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:129
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:148
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:111
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:130
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:149
 #, elixir-autogen, elixir-format
 msgid "Cannot start session"
 msgstr "Impossibile avviare la sessione"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:172
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:173
 #, elixir-autogen, elixir-format
 msgid "Cannot stop session"
 msgstr "Impossibile fermare la sessione"
@@ -3432,17 +3432,17 @@ msgstr "Nessun brano in riproduzione su Spotify."
 msgid "No tracks found for this session."
 msgstr "Nessun brano trovato per questo album."
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:925
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:926
 #, elixir-autogen, elixir-format
 msgid "Only you can view the retrospective"
 msgstr "Solo tu puoi vedere la retrospettiva"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:823
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:824
 #, elixir-autogen, elixir-format
 msgid "Protected"
 msgstr "Protetto"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:407
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:408
 #, elixir-autogen, elixir-format
 msgid "Received event: %{event}"
 msgstr "Evento ricevuto: %{event}"
@@ -3458,12 +3458,12 @@ msgstr "Cerca brani su Spotify..."
 msgid "Searching tracks..."
 msgstr "Ricerca brani..."
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:84
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:85
 #, elixir-autogen, elixir-format
 msgid "Session not found or connect to Spotify"
 msgstr "Sessione non trovata o connettiti a Spotify"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:595
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:596
 #, elixir-autogen, elixir-format
 msgid "Spotify down: %{reason}"
 msgstr "Spotify non disponibile: %{reason}"
@@ -3804,12 +3804,12 @@ msgstr "(massimo 5 opzioni)"
 msgid "Both"
 msgstr "Due"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:255
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:256
 #, elixir-autogen, elixir-format
 msgid "Cannot capture track"
 msgstr "Impossibile catturare il brano"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:282
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:283
 #, elixir-autogen, elixir-format
 msgid "Cannot close vote window"
 msgstr "Impossibile chiudere la votazione"
@@ -3819,12 +3819,12 @@ msgstr "Impossibile chiudere la votazione"
 msgid "Cannot create the listening session"
 msgstr "Impossibile creare la sessione di ascolto"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:269
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:270
 #, elixir-autogen, elixir-format
 msgid "Cannot open vote window"
 msgstr "Impossibile aprire la votazione"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:267
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:268
 #, elixir-autogen, elixir-format
 msgid "Capture a track first."
 msgstr "Cattura prima un brano."
@@ -3909,7 +3909,7 @@ msgstr "Ancora nessuna submission."
 msgid "No tracks captured yet."
 msgstr "Nessun brano catturato per ora."
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:253
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:254
 #, elixir-autogen, elixir-format
 msgid "Nothing is playing on Spotify."
 msgstr "Niente in riproduzione su Spotify."
@@ -3955,7 +3955,7 @@ msgstr "Avvia la radio"
 msgid "Stop radio"
 msgstr "Ferma la radio"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:572
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:595
 #, elixir-autogen, elixir-format
 msgid "The free session %{name} is over"
 msgstr "La prima di %{name} è finita"
@@ -5463,7 +5463,7 @@ msgstr "Rimuovere dalla lista dei desideri?"
 msgid "Your wantlist is empty."
 msgstr "La tua lista dei desideri è vuota."
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:653
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:654
 #, elixir-autogen, elixir-format
 msgid "Cannot start first track"
 msgstr "Impossibile avviare il primo brano"
@@ -5864,17 +5864,17 @@ msgstr "I miei contributi"
 msgid "Track removed from the playlist."
 msgstr "Brano rimosso dalla playlist."
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:897
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:898
 #, elixir-autogen, elixir-format
 msgid "After"
 msgstr "Dopo"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:893
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:894
 #, elixir-autogen, elixir-format
 msgid "Before"
 msgstr "Prima"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:375
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:376
 #, elixir-autogen, elixir-format
 msgid "Cannot save note"
 msgstr "Impossibile salvare la nota"
@@ -5889,9 +5889,9 @@ msgstr "Nota per il brano corrente…"
 msgid "Session note…"
 msgstr "Nota di sessione…"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:903
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:910
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:916
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:904
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:911
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.ex:917
 #, elixir-autogen, elixir-format
 msgid "Track %{n}"
 msgstr "Brano %{n}"
@@ -6865,37 +6865,37 @@ msgstr "Prossime sessioni"
 msgid "You didn't vote in this session"
 msgstr "Non hai votato durante questa sessione"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:96
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:100
 #, elixir-autogen, elixir-format
 msgid "API connection degraded"
 msgstr "Connessione API degradata"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:97
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:101
 #, elixir-autogen, elixir-format
 msgid "API connection down"
 msgstr "Connessione API interrotta"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:105
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:109
 #, elixir-autogen, elixir-format
 msgid "Auto-skip is still active"
 msgstr "Il cambio automatico di traccia resta attivo"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:104
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:108
 #, elixir-autogen, elixir-format
 msgid "No \"30 seconds left\" Twitch message"
 msgstr "Nessun messaggio Twitch \"30 secondi rimanenti\""
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:102
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:106
 #, elixir-autogen, elixir-format
 msgid "Skip songs on the Spotify album page in parallel"
 msgstr "Cambia traccia dalla pagina album di Spotify in parallelo"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:101
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:105
 #, elixir-autogen, elixir-format
 msgid "Use previous/next in the player to go to next song"
 msgstr "Usa precedente/successivo nel player per cambiare traccia"
 
-#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:103
+#: lib/premiere_ecoute_web/live/sessions/components/spotify_player.ex:107
 #, elixir-autogen, elixir-format
 msgid "Widget is not displaying progress"
 msgstr "Il widget non mostra l'avanzamento"
