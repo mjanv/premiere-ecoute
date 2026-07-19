@@ -389,6 +389,78 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
     end
   end
 
+  describe "handle/1 - SkipPreviousTrackListeningSession :clip" do
+    test "is a no-op that returns the session unchanged" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      single = single_fixture()
+
+      expect(YoutubeApi, :get_video, fn "yt_abc123" ->
+        {:ok,
+         %{
+           id: "yt_abc123",
+           title: "Sample Track (Official Video)",
+           channel_title: "Sample Artist",
+           duration: "PT3M30S",
+           thumbnail_url: "https://i.ytimg.com/vi/yt_abc123/maxresdefault.jpg"
+         }}
+      end)
+
+      expect(SpotifyApi, :search_singles, fn _query -> {:ok, [single]} end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :clip,
+          user_id: user.id,
+          youtube_video_id: "yt_abc123",
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
+
+      {:ok, session, []} =
+        CommandBus.apply(%SkipPreviousTrackListeningSession{source: :clip, session_id: prepared.session_id})
+
+      assert session.id == prepared.session_id
+    end
+  end
+
+  describe "handle/1 - SkipPreviousTrackListeningSession :track" do
+    test "is a no-op that returns the session unchanged" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      single = single_fixture()
+
+      expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :track,
+          user_id: user.id,
+          track_id: Map.get(single.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
+
+      {:ok, session, []} =
+        CommandBus.apply(%SkipPreviousTrackListeningSession{source: :track, session_id: prepared.session_id})
+
+      assert session.id == prepared.session_id
+    end
+  end
+
+  describe "handle/1 - SkipPreviousTrackListeningSession :free" do
+    test "is a no-op that returns the session unchanged" do
+      user = user_fixture()
+
+      {:ok, session, [%SessionPrepared{}]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        })
+
+      {:ok, session, []} = CommandBus.apply(%SkipPreviousTrackListeningSession{source: :free, session_id: session.id})
+
+      assert session.source == :free
+    end
+  end
+
   describe "handle/1 - PrepareListeningSession :playlist" do
     test "successfully creates playlist session and returns SessionPrepared event" do
       user = user_fixture(%{twitch: %{user_id: "1234"}})
@@ -894,14 +966,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       session = ListeningSession.get(event.session_id)
       assert session.current_track_id == Enum.at(session.album.tracks, 1).id
 
-      command = %SkipPreviousTrackListeningSession{session_id: event.session_id, scope: scope}
+      command = %SkipPreviousTrackListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:ok, _, [%PreviousTrackStarted{} = event]} = CommandBus.apply(command)
 
       session = ListeningSession.get(event.session_id)
       assert session.current_track_id == Enum.at(session.album.tracks, 0).id
 
-      command = %SkipPreviousTrackListeningSession{session_id: event.session_id, scope: scope}
+      command = %SkipPreviousTrackListeningSession{source: :album, session_id: event.session_id, scope: scope}
 
       {:error, _} = CommandBus.apply(command)
     end

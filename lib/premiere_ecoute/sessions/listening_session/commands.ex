@@ -73,7 +73,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
 
     alias PremiereEcoute.Accounts.Scope
 
-    @type t :: %__MODULE__{session_id: String.t(), source: :album | :playlist, scope: Scope.t()}
+    @type t :: %__MODULE__{
+            session_id: String.t(),
+            source: :album | :playlist | :track | :clip | :free,
+            scope: Scope.t()
+          }
 
     defstruct [:session_id, :source, :scope]
   end

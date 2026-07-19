@@ -75,7 +75,11 @@ defmodule PremiereEcouteWeb.Sessions.Components.SpotifyPlayer do
   def handle_event("previous_track", _params, socket) do
     %{listening_session: session} = socket.assigns
 
-    %SkipPreviousTrackListeningSession{session_id: session.id, scope: socket.assigns.current_scope}
+    %SkipPreviousTrackListeningSession{
+      source: session.source,
+      session_id: session.id,
+      scope: socket.assigns.current_scope
+    }
     |> PremiereEcoute.apply()
     |> case do
       {:ok, session, _} ->

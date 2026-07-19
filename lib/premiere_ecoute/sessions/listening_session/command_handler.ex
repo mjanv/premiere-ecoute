@@ -346,7 +346,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
     end
   end
 
-  def handle(%SkipPreviousTrackListeningSession{session_id: session_id, scope: scope}) do
+  def handle(%SkipPreviousTrackListeningSession{source: :track, session_id: session_id}) do
+    {:ok, ListeningSession.get(session_id), []}
+  end
+
+  def handle(%SkipPreviousTrackListeningSession{source: :clip, session_id: session_id}) do
+    {:ok, ListeningSession.get(session_id), []}
+  end
+
+  def handle(%SkipPreviousTrackListeningSession{source: :free, session_id: session_id}) do
+    {:ok, ListeningSession.get(session_id), []}
+  end
+
+  def handle(%SkipPreviousTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
          {:ok, session} <- ListeningSession.previous_track(session),
          _ <- Apis.spotify().start_resume_playback(scope, session.current_track),
@@ -356,6 +368,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              "[#{session.current_track.track_number}/#{session.album.total_tracks}] #{session.current_track.name} (#{PremiereEcouteCore.Duration.timer(session.current_track.duration_ms)})"
            ) do
       {:ok, session, [%PreviousTrackStarted{session_id: session.id, user_id: scope.user.id, track: session.current_track}]}
+    else
+      _ -> {:error, []}
+    end
+  end
+
+  def handle(%SkipPreviousTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
+    with session <- ListeningSession.get(session_id),
+         {:ok, session} <- ListeningSession.previous_track(session),
+         _ <- Apis.spotify().start_resume_playback(scope, session.current_playlist_track) do
+      {:ok, session,
+       [%PreviousTrackStarted{session_id: session.id, user_id: scope.user.id, track: session.current_playlist_track}]}
     else
       _ -> {:error, []}
     end

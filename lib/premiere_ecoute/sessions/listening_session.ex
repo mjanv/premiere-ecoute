@@ -381,11 +381,35 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   end
 
   @doc """
-  Returns to the previous track in the album session.
+  Returns to the previous track in the session.
 
-  Moves to the previous track by track number. Returns error if at first track or no previous track available.
+  For albums, moves to the previous track by track number. For playlists, uses track order. Returns error if at first track or no previous track available.
   """
   @spec previous_track(t()) :: {:ok, t()} | {:error, atom() | Ecto.Changeset.t()}
+  def previous_track(%__MODULE__{source: :playlist} = session) do
+    %{playlist: %{tracks: tracks}, current_playlist_track: current_track} =
+      Repo.preload(session, playlist: [:tracks], current_playlist_track: [])
+
+    current_track
+    |> case do
+      nil ->
+        nil
+
+      current ->
+        current_index = Enum.find_index(tracks, &(&1.id == current.id))
+
+        if current_index == 0 do
+          nil
+        else
+          Enum.at(tracks, current_index - 1)
+        end
+    end
+    |> case do
+      nil -> {:error, :no_tracks_left}
+      track -> current_track(session, track.id)
+    end
+  end
+
   def previous_track(%__MODULE__{source: :album} = session) do
     session = Repo.preload(session, album: [:tracks, :artists], current_track: [])
     tracks = Enum.sort_by(session.album.tracks, & &1.track_number)
