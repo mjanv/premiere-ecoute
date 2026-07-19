@@ -38,7 +38,7 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
         |> redirect(to: ~p"/admin")
 
       # Check if trying to impersonate themselves
-      user_id == current_scope.user.id ->
+      to_user_id(user_id) == current_scope.user.id ->
         conn
         |> put_flash(:error, "You cannot impersonate yourself")
         |> redirect(to: ~p"/admin")
@@ -58,6 +58,9 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationController do
         end
     end
   end
+
+  defp to_user_id(user_id) when is_binary(user_id), do: String.to_integer(user_id)
+  defp to_user_id(user_id) when is_integer(user_id), do: user_id
 
   @doc """
   Ends the current impersonation and returns to admin context.

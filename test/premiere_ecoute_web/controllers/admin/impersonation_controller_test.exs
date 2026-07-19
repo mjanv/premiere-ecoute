@@ -47,6 +47,22 @@ defmodule PremiereEcouteWeb.Admin.ImpersonationControllerTest do
       assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "You cannot impersonate yourself"
     end
 
+    test "admin cannot impersonate themselves via a real form-encoded request", %{conn: conn, admin: admin} do
+      conn = log_in_user(conn, admin)
+
+      # Plug's test-conn helpers don't stringify map param values, which previously masked
+      # this bug (`user_id == current_scope.user.id` compared a string form param against an
+      # integer and never fired). A real form-encoded body always sends string values.
+      conn =
+        conn
+        |> Plug.Conn.put_req_header("content-type", "application/x-www-form-urlencoded")
+        |> post(~p"/admin/impersonation", "user_id=#{admin.id}")
+
+      assert redirected_to(conn) == ~p"/admin"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "You cannot impersonate yourself"
+      refute get_session(conn, :impersonated_token)
+    end
+
     test "admin cannot impersonate non-existent user", %{conn: conn, admin: admin} do
       conn = log_in_user(conn, admin)
 
