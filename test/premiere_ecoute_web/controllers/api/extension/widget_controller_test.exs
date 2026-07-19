@@ -87,6 +87,17 @@ defmodule PremiereEcouteWeb.Api.Extension.WidgetControllerTest do
 
       assert json_response(conn, 404) == %{"error" => "Broadcaster not found or not connected to Spotify"}
     end
+
+    test "returns 403 when the token's channel does not match the requested broadcaster", %{conn: conn} do
+      user = insert_user_with_spotify()
+
+      conn =
+        conn
+        |> add_extension_auth("viewer_123", "some_other_channel_id")
+        |> get(~p"/api/extension/tracks/current/#{user.twitch.user_id}")
+
+      assert json_response(conn, 403) == %{"error" => "Token does not match requested broadcaster"}
+    end
   end
 
   describe "POST /extension/tracks/like" do

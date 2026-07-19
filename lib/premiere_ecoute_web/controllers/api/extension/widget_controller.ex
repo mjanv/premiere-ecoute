@@ -22,6 +22,17 @@ defmodule PremiereEcouteWeb.Api.Extension.WidgetController do
   Returns track data from the active listening session or appropriate error response if broadcaster is not found, not connected to Spotify, or has no track playing.
   """
   @spec current_track(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def current_track(%{assigns: %{extension_context: %{channel_id: channel_id}}} = conn, %{
+        "broadcaster_id" => broadcaster_id
+      })
+      when broadcaster_id != channel_id do
+    Logger.warning("Extension token for channel #{channel_id} attempted to read track for broadcaster #{broadcaster_id}")
+
+    conn
+    |> put_status(:forbidden)
+    |> json(%{error: "Token does not match requested broadcaster"})
+  end
+
   def current_track(conn, %{"broadcaster_id" => broadcaster_id}) do
     case Extension.get_current_track(broadcaster_id) do
       {:ok, track} ->
