@@ -33,6 +33,15 @@ jobs:
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-mix-
 
+      - name: Restore build cache
+        uses: actions/cache@v4
+        with:
+          path: _build/prod
+          key: ${{ runner.os }}-build-prod-${{ hashFiles('**/mix.lock') }}-${{ hashFiles('lib/**/*.ex', 'config/**/*.exs', 'mix.exs') }}
+          restore-keys: |
+            ${{ runner.os }}-build-prod-${{ hashFiles('**/mix.lock') }}-
+            ${{ runner.os }}-build-prod-
+
       - name: Restore assets cache
         uses: actions/cache@v4
         with:
@@ -46,7 +55,11 @@ jobs:
           MIX_ENV: prod
 
       - name: Deploy assets
-        run: mix assets.deploy
+        run: |
+          npm ci --prefix assets
+          mix tailwind premiere_ecoute --minify
+          mix esbuild premiere_ecoute --minify
+          mix phx.digest
         env:
           MIX_ENV: prod
 
