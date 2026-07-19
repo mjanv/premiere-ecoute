@@ -120,8 +120,13 @@ defmodule PremiereEcouteWeb.Router do
       live "/terms-acceptance", TermsAcceptanceLive, :index
     end
 
-    post "/log-in", UserSessionController, :create
     delete "/log-out", UserSessionController, :delete
+  end
+
+  scope "/users", PremiereEcouteWeb.Accounts do
+    pipe_through [:browser, Plugs.LoginRateLimit]
+
+    post "/log-in", UserSessionController, :create
   end
 
   scope "/users", PremiereEcouteWeb.Accounts do
