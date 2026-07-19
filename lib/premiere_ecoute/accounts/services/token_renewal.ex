@@ -9,31 +9,36 @@ defmodule PremiereEcoute.Accounts.Services.TokenRenewal do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Accounts.User.OauthToken
   alias PremiereEcoute.Apis
 
   @doc """
   Automatically renews OAuth tokens when approaching expiration. Checks if the provider token expires within 5 minutes and refreshes it via the provider API if needed. Logs errors but returns the original scope on failure to avoid breaking the request flow.
+
+  The actual read-refresh-write cycle is serialized per user/provider by
+  `OauthToken.refresh_locked/4` to avoid a race where two concurrent renewals both
+  use the same (about-to-be-rotated) refresh token, causing the loser to receive
+  `invalid_grant` and disconnect an otherwise-healthy account. On a genuine
+  `invalid_grant`, `refresh_locked/4` disconnects the provider itself and returns
+  `{:ok, user}` with the provider cleared.
   """
   @spec maybe_renew_token(Scope.t(), atom()) :: Scope.t()
   def maybe_renew_token(scope, provider) do
     with %Scope{user: %User{} = user} <- scope,
-         %{expires_at: expires_at, refresh_token: refresh_token} <- Map.get(user, provider),
-         true <- token_expired?(expires_at),
-         {:ok, tokens} <- Apis.provider(provider).renew_token(refresh_token),
-         {:ok, user} <- User.refresh_token(user, provider, tokens) do
-      %{scope | user: user}
+         %{expires_at: expires_at} <- Map.get(user, provider),
+         true <- token_expired?(expires_at) do
+      renew_fun = fn refresh_token -> Apis.provider(provider).renew_token(refresh_token) end
+
+      case OauthToken.refresh_locked(user, provider, &token_expired?/1, renew_fun) do
+        {:ok, user} ->
+          %{scope | user: user}
+
+        {:error, reason} ->
+          Logger.error("Failed to renew #{provider} token: #{inspect(reason)}")
+          scope
+      end
     else
-      {:error, :invalid_grant} ->
-        %Scope{user: %User{} = user} = scope
-        {:ok, user} = User.disconnect_provider(user, provider)
-        %{scope | user: user}
-
-      {:error, reason} ->
-        Logger.error("Failed to renew #{provider} token: #{inspect(reason)}")
-        scope
-
-      _error ->
-        scope
+      _error -> scope
     end
   end
 

@@ -96,6 +96,80 @@ defmodule PremiereEcoute.Accounts.User.OauthToken do
   end
 
   @doc """
+  Refreshes OAuth tokens for a user and provider under a row lock, serializing
+  concurrent refresh attempts for the same user/provider.
+
+  Locks the token row with `SELECT ... FOR UPDATE`, then re-checks expiry (via
+  `expired_fun`) against the locked row before calling `renew_fun`. This prevents
+  a race where two concurrent callers both read the same soon-to-be-rotated
+  refresh token: the loser would otherwise call the provider with a token the
+  winner already invalidated, receive `invalid_grant`, and disconnect an
+  otherwise-healthy account. If another caller already refreshed the token while
+  this one waited for the lock, `renew_fun` is skipped entirely and the
+  now-current token is returned.
+
+  `expired_fun` is a `expires_at -> boolean()` predicate (normally
+  `TokenRenewal.token_expired?/1`) and `renew_fun` is a
+  `refresh_token -> {:ok, map()} | {:error, term()}` function (normally
+  `&provider_api.renew_token/1`) — both injected so this data-layer module
+  doesn't depend on the service layer or on provider dispatch.
+
+  Returns `{:ok, User.t()}` on success — either refreshed, already-fresh, or (if
+  the refresh token was genuinely dead, confirmed by the locked re-check) with
+  the provider disconnected. The disconnect itself runs after the locked
+  transaction commits, not inside it — safe because `invalid_grant` means the
+  token was already unusable, so no concurrent writer can race a *successful*
+  refresh against it in that window.
+  Returns `{:error, nil}` if no token row exists, or `{:error, reason}` for any
+  other provider failure (token left untouched).
+  """
+  @spec refresh_locked(
+          User.t(),
+          atom(),
+          (DateTime.t() | nil -> boolean()),
+          (String.t() -> {:ok, map()} | {:error, term()})
+        ) :: {:ok, User.t()} | {:error, nil | term()}
+  def refresh_locked(%User{id: id} = user, provider, expired_fun, renew_fun)
+      when is_function(expired_fun, 1) and is_function(renew_fun, 1) do
+    Repo.transaction(fn ->
+      from(t in __MODULE__, where: t.parent_id == ^id and t.provider == ^provider, lock: "FOR UPDATE")
+      |> Repo.one()
+      |> case do
+        nil ->
+          {:error, nil}
+
+        %__MODULE__{expires_at: expires_at} = token ->
+          if expired_fun.(expires_at) do
+            renew_locked_token(token, renew_fun)
+          else
+            {:ok, token}
+          end
+      end
+    end)
+    |> then(fn {:ok, result} -> result end)
+    |> case do
+      {:ok, _token} -> {:ok, User.preload(user)}
+      {:error, :invalid_grant} -> disconnect(user, provider)
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp renew_locked_token(token, renew_fun) do
+    case renew_fun.(token.refresh_token) do
+      {:ok, %{expires_in: expires_in} = attrs} ->
+        Repo.update(
+          refresh_changeset(token, Map.merge(attrs, %{expires_at: DateTime.add(DateTime.utc_now(), expires_in, :second)}))
+        )
+
+      {:error, :invalid_grant} = error ->
+        error
+
+      {:error, _reason} = error ->
+        error
+    end
+  end
+
+  @doc """
   Disconnects a provider by deleting its OAuth tokens.
 
   Removes the OAuth token record for the specified provider. Returns success even if no tokens exist for the provider.
