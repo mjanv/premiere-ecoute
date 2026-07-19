@@ -388,5 +388,47 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
       assert_in_delta track2_summary.viewer_score, 8.065, 0.1
       assert track2_summary.streamer_score == 7.0
     end
+
+    test "generates a report for a session with custom (non-preset) numeric vote options" do
+      user = user_fixture()
+      {:ok, album} = Album.create(album_fixture())
+
+      {:ok, session} =
+        ListeningSession.create(%{user_id: user.id, album_id: album.id, vote_options: ["2", "4", "8"]})
+
+      [track1, _track2] = album.tracks
+
+      {:ok, _} =
+        Vote.create(%Vote{
+          viewer_id: "viewer1",
+          session_id: session.id,
+          track_id: track1.id,
+          value: "4",
+          is_streamer: false
+        })
+
+      assert {:ok, report} = Report.generate(session)
+      assert report.session_summary.viewer_score == 4.0
+    end
+
+    test "generates a report for a session with custom (non-preset) text vote options" do
+      user = user_fixture()
+      {:ok, album} = Album.create(album_fixture())
+
+      {:ok, session} =
+        ListeningSession.create(%{user_id: user.id, album_id: album.id, vote_options: ["fire", "meh", "skip"]})
+
+      assert {:ok, report} = Report.generate(session)
+      assert report.session_summary.tracks_rated == 0
+    end
+
+    test "generates a report for a session with no vote options set" do
+      user = user_fixture()
+      {:ok, album} = Album.create(album_fixture())
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, vote_options: []})
+
+      assert {:ok, report} = Report.generate(session)
+      assert report.session_summary.tracks_rated == 0
+    end
   end
 end

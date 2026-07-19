@@ -95,13 +95,7 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
   """
   @spec generate(ListeningSession.t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def generate(%ListeningSession{id: session_id} = session) do
-    mode =
-      case session.vote_options do
-        ["0" | _] -> :numeric
-        ["1" | _] -> :numeric
-        ["6" | _] -> :numeric
-        ["smash" | _] -> :text
-      end
+    mode = vote_mode(session.vote_options)
 
     votes = Vote.all(where: [session_id: session_id])
     polls = Poll.all(where: [session_id: session_id])
@@ -136,6 +130,14 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
       {:error, reason} ->
         Logger.error("Cannot generate report due to: #{inspect(reason)}")
         {:error, reason}
+    end
+  end
+
+  defp vote_mode(vote_options) do
+    if Enum.all?(vote_options || [], &match?({_, ""}, Integer.parse(&1))) do
+      :numeric
+    else
+      :text
     end
   end
 
