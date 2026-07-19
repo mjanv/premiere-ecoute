@@ -30,7 +30,7 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
   defp maybe_open({request, %{status: status} = response}, opts) do
     cond do
       status in @status_codes ->
-        retry_after = String.to_integer(hd(response.headers["retry-after"] || ["60"]))
+        retry_after = retry_after_seconds(hd(response.headers["retry-after"] || ["60"]))
         Cache.put(@cache, opts[:api], response.body, expire: retry_after * 1_000)
 
       status in @transient_error_codes ->
@@ -41,6 +41,26 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
     end
 
     {request, response}
+  end
+
+  @doc """
+  Parses a Retry-After header value into a delay in seconds.
+
+  RFC 7231 §7.1.3 allows Retry-After to be either delay-seconds (e.g. "120") or an HTTP-date
+  (e.g. "Fri, 31 Dec 1999 23:59:59 GMT"). Falls back to 60 seconds if the value is neither.
+  """
+  @spec retry_after_seconds(String.t()) :: integer()
+  def retry_after_seconds(value) do
+    case Integer.parse(value) do
+      {seconds, ""} ->
+        seconds
+
+      _ ->
+        case Timex.parse(value, "{RFC1123}") do
+          {:ok, retry_at} -> max(DateTime.diff(retry_at, DateTime.utc_now(), :second), 0)
+          _ -> 60
+        end
+    end
   end
 
   def up(api, ttl \\ 10), do: Cache.put(@cache, api, "simulated incident", expire: ttl * 1_000)
