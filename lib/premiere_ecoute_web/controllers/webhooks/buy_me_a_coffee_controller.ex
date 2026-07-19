@@ -24,6 +24,15 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeController do
     event_type = get_in(conn.body_params, ["type"])
     ApiMetrics.webhook_event(:buymeacoffee, event_type)
 
+    if Map.get(conn.assigns, :buymeacoffee_hmac, false) do
+      handle_verified(conn)
+    else
+      Logger.warning("Rejected BuyMeACoffee webhook: invalid or missing signature")
+      send_resp(conn, 401, "")
+    end
+  end
+
+  defp handle_verified(conn) do
     case handle_event(conn.body_params) do
       {:ok, %DonationCreated{data: data}} ->
         %{

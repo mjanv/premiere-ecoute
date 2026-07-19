@@ -1,11 +1,12 @@
 defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
-  use PremiereEcouteWeb.ConnCase, async: true
+  use PremiereEcouteWeb.ConnCase, async: false
 
   import ExUnit.CaptureLog
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Payments.FrankfurterApi
   alias PremiereEcoute.Donations
+  alias PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator
 
   setup {Req.Test, :verify_on_exit!}
 
@@ -404,6 +405,76 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
         end)
 
       assert log =~ "Invalid BuyMeACoffee webhook payload"
+    end
+  end
+
+  describe "POST /webhooks/buymeacoffee - signature verification" do
+    @secret "test_webhook_signing_secret"
+
+    setup do
+      previous = Application.get_env(:premiere_ecoute, :buymeacoffee_webhook_secret)
+      Application.put_env(:premiere_ecoute, :buymeacoffee_webhook_secret, @secret)
+
+      on_exit(fn ->
+        if previous do
+          Application.put_env(:premiere_ecoute, :buymeacoffee_webhook_secret, previous)
+        else
+          Application.delete_env(:premiere_ecoute, :buymeacoffee_webhook_secret)
+        end
+      end)
+
+      :ok
+    end
+
+    test "rejects a request with no signature header once a secret is configured", %{conn: conn} do
+      payload = %{"type" => "donation.created", "data" => %{}}
+
+      response =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+
+      assert response.status == 401
+      assert Enum.empty?(Donations.all_donations())
+    end
+
+    test "rejects a request signed with the wrong secret", %{conn: conn} do
+      payload = %{"type" => "donation.created", "data" => %{}}
+      body = Jason.encode!(payload)
+      signature = BuyMeACoffeeHmacValidator.signature("wrong-secret", body)
+
+      response =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> put_req_header("x-signature-sha256", signature)
+        |> post(~p"/webhooks/buymeacoffee", body)
+
+      assert response.status == 401
+    end
+
+    test "accepts a request signed with the correct secret", %{conn: conn} do
+      payload = %{
+        "type" => "donation.created",
+        "data" => %{
+          "amount" => 5,
+          "currency" => "USD",
+          "created_at" => 1_676_544_557,
+          "supporter_name" => "John",
+          "transaction_id" => "pi_signed_ok"
+        }
+      }
+
+      body = Jason.encode!(payload)
+      signature = BuyMeACoffeeHmacValidator.signature(@secret, body)
+
+      response =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> put_req_header("x-signature-sha256", signature)
+        |> post(~p"/webhooks/buymeacoffee", body)
+
+      assert response.status == 202
+      assert length(Donations.all_donations()) == 1
     end
   end
 end

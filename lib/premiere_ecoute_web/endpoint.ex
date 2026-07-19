@@ -48,6 +48,7 @@ defmodule PremiereEcouteWeb.Endpoint do
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug PremiereEcouteWeb.Plugs.TwitchHmacValidator
+  plug PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator
 
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
