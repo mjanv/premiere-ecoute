@@ -618,7 +618,7 @@ msgstr "Utenti"
 msgid "View and manage listening sessions"
 msgstr "Visualizza e gestisci sessioni di ascolto"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:229
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:219
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:315
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:577
 #, elixir-autogen, elixir-format
@@ -1416,8 +1416,8 @@ msgstr "Titolo della classifica aggiornato con successo"
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:276
 #: lib/premiere_ecoute_web/live/podcasts/show_live.ex:70
 #: lib/premiere_ecoute_web/live/sessions/album_pick_admin_live.html.heex:115
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:148
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:227
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:140
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:219
 #, elixir-autogen, elixir-format
 msgid "Copy"
 msgstr "Copia"
@@ -1727,7 +1727,7 @@ msgstr "Questa playlist è già stata inviata"
 #: lib/premiere_ecoute_web/live/playlists/playlist_live.html.heex:743
 #: lib/premiere_ecoute_web/live/podcasts/studio/episode_form_live.ex:132
 #: lib/premiere_ecoute_web/live/podcasts/studio/show_form_live.ex:124
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:133
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:125
 #, elixir-autogen, elixir-format
 msgid "Title"
 msgstr "Titolo"
@@ -2381,7 +2381,7 @@ msgstr "Diminuisci numero tracce"
 #: lib/premiere_ecoute_web/live/playlists/automations/form_live.html.heex:39
 #: lib/premiere_ecoute_web/live/playlists/library_live.html.heex:408
 #: lib/premiere_ecoute_web/live/podcasts/studio/show_form_live.ex:125
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:163
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:155
 #, elixir-autogen, elixir-format
 msgid "Description"
 msgstr "Descrizione"
@@ -3250,7 +3250,7 @@ msgstr "Aggiorna Ruolo"
 msgid "e.g., hosting, server, bandwidth"
 msgstr "es., hosting, server, banda"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:212
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:204
 #, elixir-autogen, elixir-format
 msgid "Chapters"
 msgstr "Capitoli"
@@ -3260,8 +3260,8 @@ msgstr "Capitoli"
 msgid "Export to Youtube"
 msgstr "Esporta su Youtube"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:161
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:245
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:152
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:237
 #, elixir-autogen, elixir-format
 msgid "Time Bias"
 msgstr "Offset temporale"
@@ -3338,12 +3338,12 @@ msgstr "Fuso orario"
 msgid "retrying at %{time}"
 msgstr "nuovo tentativo alle %{time}"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:125
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:115
 #, elixir-autogen, elixir-format
 msgid "Copy and paste this title and description into your YouTube video"
 msgstr "Copia e incolla questo titolo e questa descrizione nel tuo video YouTube"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:180
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:172
 #, elixir-autogen, elixir-format
 msgid "Intro"
 msgstr "Intro"
@@ -3353,28 +3353,28 @@ msgstr "Intro"
 msgid "No users found"
 msgstr "Nessun album trovato"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:196
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:188
 #: lib/premiere_ecoute_web/live/sessions/dashboard_live.html.heex:422
 #, elixir-autogen, elixir-format
 msgid "Notes"
 msgstr "Note"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:236
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:228
 #, elixir-autogen, elixir-format
 msgid "Streamer score"
 msgstr "Punteggio streamer"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:236
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:228
 #, elixir-autogen, elixir-format
 msgid "This week I listened and reacted live to the new album \"%{title}\" by %{artist} !"
 msgstr "Questa settimana ho ascoltato e reagito dal vivo al nuovo album \"%{title}\" di %{artist} !"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:237
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:229
 #, elixir-autogen, elixir-format
 msgid "Viewer score"
 msgstr "Punteggio spettatori"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:122
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:113
 #, elixir-autogen, elixir-format
 msgid "Youtube"
 msgstr "Youtube"
@@ -3494,7 +3494,7 @@ msgstr "Nessuna playlist trovata"
 msgid "No playlists listened during this period"
 msgstr "Nessuna playlist ascoltata in questo periodo"
 
-#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:236
+#: lib/premiere_ecoute_web/live/sessions/components/youtube_metadata.ex:228
 #, elixir-autogen, elixir-format
 msgid "This week I listened and reacted live to the playlist \"%{title}\" by %{artist} !"
 msgstr "Questa settimana ho ascoltato e reagito dal vivo alla playlist \"%{title}\" di %{artist} !"
@@ -5290,33 +5290,33 @@ msgstr "es. Playlist mensile aggiornata"
 msgid "minute hour day month weekday"
 msgstr "minuto ora giorno mese giorno-settimana"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:99
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:90
 #, elixir-autogen, elixir-format
 msgid "Export markers to Premiere Pro"
 msgstr "Esporta i marcatori in Premiere Pro"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:96
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:88
 #: lib/premiere_ecoute_web/live/sessions/dashboard_live.html.heex:388
 #, elixir-autogen, elixir-format
 msgid "Export to Premiere"
 msgstr "Esporta in Premiere"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:139
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:130
 #, elixir-autogen, elixir-format
 msgid "Frame rate"
 msgstr "Frequenza fotogrammi"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:154
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:145
 #, elixir-autogen, elixir-format
 msgid "Leave path blank to relink manually in Premiere."
 msgstr "Lascia il percorso vuoto per ricollegare manualmente in Premiere."
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:125
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:116
 #, elixir-autogen, elixir-format
 msgid "Media file path"
 msgstr "Percorso del file multimediale"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:256
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:247
 #, elixir-autogen, elixir-format
 msgid "No speech markers recorded."
 msgstr "Nessun marcatore vocale registrato."
@@ -5326,17 +5326,17 @@ msgstr "Nessun marcatore vocale registrato."
 msgid "Speech segments"
 msgstr "Segmenti vocali"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:116
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:106
 #, elixir-autogen, elixir-format
 msgid "XMEML"
 msgstr "XMEML"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:272
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:263
 #, elixir-autogen, elixir-format
 msgid "no transcription"
 msgstr "nessuna trascrizione"
 
-#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:253
+#: lib/premiere_ecoute_web/live/sessions/components/premiere_export.ex:244
 #, elixir-autogen, elixir-format
 msgid "speech segments"
 msgstr "segmenti vocali"
@@ -5879,12 +5879,12 @@ msgstr "Prima"
 msgid "Cannot save note"
 msgstr "Impossibile salvare la nota"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.html.heex:853
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.html.heex:862
 #, elixir-autogen, elixir-format
 msgid "Note for current track…"
 msgstr "Nota per il brano corrente…"
 
-#: lib/premiere_ecoute_web/live/sessions/dashboard_live.html.heex:854
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.html.heex:863
 #, elixir-autogen, elixir-format
 msgid "Session note…"
 msgstr "Nota di sessione…"
@@ -6996,3 +6996,8 @@ msgstr "Effetti sonori dell'interfaccia"
 #, elixir-autogen, elixir-format
 msgid "Play short sounds on hover, click, and toggle actions"
 msgstr "Riproduci brevi suoni al passaggio del mouse, al clic e durante le azioni di attivazione/disattivazione"
+
+#: lib/premiere_ecoute_web/live/sessions/dashboard_live.html.heex:840
+#, elixir-autogen, elixir-format
+msgid "Note"
+msgstr "Nota"
