@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
   use PremiereEcoute.DataCase, async: true
 
+  alias Ecto.Adapters.SQL.Sandbox
+  alias PremiereEcoute.Accounts.Services.TokenRenewal
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.OauthToken
 
@@ -217,13 +219,13 @@ defmodule PremiereEcoute.Accounts.User.OauthTokenTest do
       # must re-check the locked row's actual expires_at, which the first
       # caller will have already bumped into the future by the time the lock
       # is released — that re-check is exactly what should skip renew_fun.
-      expired_fun = &PremiereEcoute.Accounts.Services.TokenRenewal.token_expired?/1
+      expired_fun = &TokenRenewal.token_expired?/1
 
       test_pid = self()
 
       task =
         Task.async(fn ->
-          Ecto.Adapters.SQL.Sandbox.allow(PremiereEcoute.Repo, test_pid, self())
+          Sandbox.allow(PremiereEcoute.Repo, test_pid, self())
           OauthToken.refresh_locked(user, :spotify, expired_fun, renew_fun)
         end)
 

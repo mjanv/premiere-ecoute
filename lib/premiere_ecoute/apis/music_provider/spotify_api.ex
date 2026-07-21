@@ -32,6 +32,11 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
 
   alias PremiereEcoute.Accounts.Scope
 
+  defmodule NotConnectedError do
+    @moduledoc "Raised when a Scope's user has no usable Spotify connection."
+    defexception message: "user has no Spotify connection"
+  end
+
   defmodule Behaviour do
     @moduledoc """
     Spotify API Behaviour
@@ -128,6 +133,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
     ]
     |> new()
   end
+
+  def api(%Scope{}), do: raise(NotConnectedError)
 
   def api(token) when is_binary(token) do
     [

@@ -192,6 +192,14 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
       assert error == "Spotify rate limit exceeded"
     end
+
+    test "raises when user has no Spotify connection" do
+      scope = user_scope_fixture(user_fixture())
+
+      assert_raise SpotifyApi.NotConnectedError, fn ->
+        SpotifyApi.get_playback_state(scope, PlaybackState.default())
+      end
+    end
   end
 
   describe "start_playback/1" do

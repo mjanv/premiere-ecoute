@@ -18,6 +18,13 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Gateway do
     since_ms = System.monotonic_time(:millisecond) - state.last_call
     if since_ms < @interval, do: Process.sleep(@interval - since_ms)
 
-    {:reply, apply(module, function, args), %{state | last_call: System.monotonic_time(:millisecond)}}
+    reply =
+      try do
+        apply(module, function, args)
+      rescue
+        error -> {:error, error}
+      end
+
+    {:reply, reply, %{state | last_call: System.monotonic_time(:millisecond)}}
   end
 end
