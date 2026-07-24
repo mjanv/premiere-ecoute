@@ -15,7 +15,10 @@ entryPoints:
 
 providers:
   file:
-    filename: /opt/traefik/dynamic.yml
+    # Directory, not a single file: other apps on this droplet drop their own
+    # routing in here (e.g. cinema.yml) and are deployed independently. Traefik
+    # merges every *.yml into one config, so neither deploy can clobber the other.
+    directory: /opt/traefik/dynamic
     watch: true
 
 certificatesResolvers:

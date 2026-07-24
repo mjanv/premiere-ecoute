@@ -67,10 +67,15 @@ run_remote "
     cp /tmp/systemd/traefik.service /etc/systemd/system/
     cp /tmp/systemd/seaweedfs.service /etc/systemd/system/
 
-    # Setup Traefik config
-    mkdir -p /opt/traefik
+    # Setup Traefik config.
+    # Copy only this app's routing file: /opt/traefik/dynamic/ is shared, and
+    # other apps (cinema) install their own *.yml there via their own deploys.
+    # A --delete or a wholesale copy here would silently take them offline.
+    mkdir -p /opt/traefik/dynamic
     cp /tmp/traefik/traefik.yml /opt/traefik/
-    cp /tmp/traefik/dynamic.yml /opt/traefik/
+    cp /tmp/traefik/dynamic/premiere-ecoute.yml /opt/traefik/dynamic/
+    # Legacy single-file config, superseded by the directory provider.
+    rm -f /opt/traefik/dynamic.yml
     touch /opt/traefik/acme.json
     chmod 600 /opt/traefik/acme.json
     chown -R traefik:traefik /opt/traefik

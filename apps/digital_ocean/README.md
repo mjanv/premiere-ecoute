@@ -34,7 +34,8 @@ apps/digital_ocean/
 │   └── alloy.service            # Grafana Alloy systemd service
 ├── traefik/
 │   ├── traefik.yml              # Traefik static configuration
-│   └── dynamic.yml              # Traefik dynamic configuration
+│   └── dynamic/
+│       └── premiere-ecoute.yml  # This app's routing (dir is shared with other apps)
 └── alloy/
     ├── config.alloy             # Alloy configuration
     └── env.example              # Environment variables template
@@ -63,7 +64,9 @@ Copy Traefik configuration files:
 ```bash
 sudo mkdir -p /opt/traefik
 sudo cp traefik/traefik.yml /opt/traefik/
-sudo cp traefik/dynamic.yml /opt/traefik/
+# Directory provider: each app on the droplet installs its own *.yml here.
+sudo mkdir -p /opt/traefik/dynamic
+sudo cp traefik/dynamic/premiere-ecoute.yml /opt/traefik/dynamic/
 sudo chown -R traefik:traefik /opt/traefik
 ```
 
