@@ -455,7 +455,6 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
                     else: "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50"
                   )
                 ]}
-                disabled={!ListeningSession.playing?(@listening_session)}
               >
                 {rating}
               </button>
