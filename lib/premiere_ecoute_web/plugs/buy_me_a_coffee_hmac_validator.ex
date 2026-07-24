@@ -33,7 +33,7 @@ defmodule PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator do
   if Application.compile_env(:premiere_ecoute, :environment) == :dev do
     def call(conn, _opts), do: assign(conn, :buymeacoffee_hmac, true)
   else
-    def call(%Plug.Conn{req_headers: req_headers} = conn, _opts) do
+    def call(%Plug.Conn{request_path: "/webhooks/buymeacoffee", req_headers: req_headers} = conn, _opts) do
       case Application.get_env(:premiere_ecoute, :buymeacoffee_webhook_secret) do
         nil ->
           log_unconfigured()
@@ -46,6 +46,8 @@ defmodule PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator do
           end
       end
     end
+
+    def call(conn, _opts), do: conn
   end
 
   @doc false
