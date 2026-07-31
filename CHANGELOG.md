@@ -1,6 +1,34 @@
 # Changelog
 
-<!-- Last analyzed commit: f7e8ca1a (2026-06-28) -->
+<!-- Last analyzed commit: 954debac (2026-07-31) -->
+
+## July 2026
+
+* [Feature] YouTube clips as a new listening session source: streamers pick a YouTube video, it's cross-searched against Spotify for real artist/track metadata, with its own OBS overlay, dashboard remote controls, and retrospective support.
+* [Feature] Hashtag chat banner overlay for OBS: viewers post `#hashtag <text>` in Twitch chat and it appears as a scrolling ticker overlay on stream, working across listening and collection sessions.
+* [Feature] Interface sound effects: subtle interaction sounds (e.g. on wantlist hearts), with an on/off toggle in account preferences.
+* [Feature] Added European Portuguese (pt-PT) as a fourth supported language, alongside English, French, and Italian.
+* [Improvement] The app now recovers automatically from expired Spotify sessions: the dashboard, overlays, and session pages pick up a refreshed access token immediately instead of requiring a page reload.
+* [Improvement] Hardened several areas of the app following a security review: added a Content-Security-Policy, scoped the extension API's CORS, moved the Twitch webhook secret out of source control, and closed an atom-exhaustion vector.
+* [Improvement] Sped up production deploys by caching build artifacts, using deterministic installs, and merging the build/deploy steps — cutting deploy time significantly.
+* [Improvement] Radio track tracking is more resilient to Spotify API hiccups so it no longer silently stops polling for the rest of a stream.
+* [Fix] Fixed a security issue where any authenticated streamer could access another streamer's session dashboard (and start/stop sessions, capture tracks, write notes) using a guessable link.
+* [Fix] Fixed a security issue where a valid Twitch extension token for one channel could be used to read another channel's now-playing track.
+* [Fix] Added signature verification to the "Buy Me a Coffee" donation webhook, closing a hole that let anyone fake a donation or refund event.
+* [Fix] Added rate limiting to the login page to slow down credential-stuffing attempts.
+* [Fix] Added replay protection to Twitch webhook messages so a captured request can no longer be resent indefinitely.
+* [Fix] Fixed an admin impersonation safety check that never actually fired against real traffic, allowing self-impersonation.
+* [Fix] Fixed the "Previous track" button crashing for track, clip, and free listening sessions.
+* [Fix] Fixed session retrospective report generation crashing for free sessions using custom vote options.
+* [Fix] Fixed worded vote messages like "i give it a 10" being silently dropped for top-score votes, which was skewing session averages.
+* [Fix] Fixed duplicate Twitch chat warning messages ("votes closing soon") being sent repeatedly instead of once per track.
+* [Fix] Fixed a crash in the retrospective post-session voting page when a session was still live.
+* [Fix] Fixed navigating from a session to its retrospective votes/tops pages triggering a full page reload instead of an instant transition.
+* [Fix] Fixed the streamer dashboard's vote button ignoring the vote-open window for album/playlist sessions, leaving it disabled when voting was actually open.
+* [Fix] Fixed the MCP server crashing on session init, which silently broke OAuth sign-in for Claude/MCP connectors.
+* [Fix] Fixed a production boot crash caused by a stale webhook secret setting.
+* [Fix] Fixed duplicate discography entries that could occur when an album or track had IDs from multiple music providers.
+* [Fix] Converted several hand-rolled popup panels (YouTube chapter export, Premiere Pro export, session notes HUD) to the app's standard modal, restoring proper keyboard and click-outside-to-close behavior.
 
 ## June 2026
 
