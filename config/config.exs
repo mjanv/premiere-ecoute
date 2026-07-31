@@ -176,7 +176,7 @@ config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   metrics_server: :disabled
 
 config :premiere_ecoute, PremiereEcoute.Gettext,
-  locales: ~w(en fr it),
+  locales: ~w(en fr it pt),
   default_locale: "en"
 
 config :premiere_ecoute, PremiereEcoute.Accounts.Mailer, adapter: Resend.Swoosh.Adapter

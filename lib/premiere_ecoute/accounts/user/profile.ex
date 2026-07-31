@@ -2,7 +2,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
   @moduledoc """
   User profile settings.
 
-  Embedded schema for user preferences including color scheme (light/dark/system), language (en/fr/it),
+  Embedded schema for user preferences including color scheme (light/dark/system), language (en/fr/it/pt),
   and widget color settings (hex strings) used in OBS overlay displays.
   """
 
@@ -11,12 +11,12 @@ defmodule PremiereEcoute.Accounts.User.Profile do
   # alias PremiereEcoute.Accounts.User
 
   @schemes [:light, :dark, :system]
-  @languages [:en, :fr, :it]
+  @languages [:en, :fr, :it, :pt]
   @hex_color_regex ~r/^#[0-9A-Fa-f]{6}$/
 
   @type t :: %__MODULE__{
           color_scheme: :light | :dark | :system,
-          language: :en | :fr | :it,
+          language: :en | :fr | :it | :pt,
           timezone: String.t(),
           session_reminder: String.t() | nil,
           sound_effects_enabled: boolean(),

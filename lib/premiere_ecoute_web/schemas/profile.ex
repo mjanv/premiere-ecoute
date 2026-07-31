@@ -8,7 +8,7 @@ defmodule PremiereEcouteWeb.Schemas.Profile do
     type: :object,
     properties: %{
       color_scheme: %OpenApiSpex.Schema{type: :string, enum: ["light", "dark", "system"]},
-      language: %OpenApiSpex.Schema{type: :string, enum: ["en", "fr", "it"]},
+      language: %OpenApiSpex.Schema{type: :string, enum: ["en", "fr", "it", "pt"]},
       timezone: %OpenApiSpex.Schema{type: :string, example: "Europe/Paris"},
       widget_settings: %OpenApiSpex.Schema{
         type: :object,

@@ -445,7 +445,7 @@ export interface components {
             /** @enum {string} */
             color_scheme?: "light" | "dark" | "system";
             /** @enum {string} */
-            language?: "en" | "fr" | "it";
+            language?: "en" | "fr" | "it" | "pt";
             radio_settings?: {
                 enabled?: boolean;
                 retention_days?: number;

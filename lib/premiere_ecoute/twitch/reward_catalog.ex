@@ -19,26 +19,38 @@ defmodule PremiereEcoute.Twitch.RewardCatalog do
     %{
       id: "song_request",
       title: "Song request",
-      labels: %{"en" => "Song request", "fr" => "Demande de chanson", "it" => "Richiesta canzone"},
+      labels: %{
+        "en" => "Song request",
+        "fr" => "Demande de chanson",
+        "it" => "Richiesta canzone",
+        "pt" => "Pedido de música"
+      },
       cost: 1_000,
       prompt: "Request a song to be added to the listening session",
       prompts: %{
         "en" => "Request a song to be added to the listening session",
         "fr" => "Demandez une chanson à ajouter à la session d'écoute",
-        "it" => "Richiedi una canzone da aggiungere alla sessione di ascolto"
+        "it" => "Richiedi una canzone da aggiungere alla sessione di ascolto",
+        "pt" => "Peça uma música para adicionar à sessão de audição"
       },
       is_user_input_required: true
     },
     %{
       id: "skip_track",
       title: "Skip current track",
-      labels: %{"en" => "Skip current track", "fr" => "Passer le morceau actuel", "it" => "Salta traccia attuale"},
+      labels: %{
+        "en" => "Skip current track",
+        "fr" => "Passer le morceau actuel",
+        "it" => "Salta traccia attuale",
+        "pt" => "Saltar a faixa atual"
+      },
       cost: 5_000,
       prompt: "Vote to skip the current track being evaluated",
       prompts: %{
         "en" => "Vote to skip the current track being evaluated",
         "fr" => "Votez pour passer le morceau en cours d'évaluation",
-        "it" => "Vota per saltare la traccia attualmente in valutazione"
+        "it" => "Vota per saltare la traccia attualmente in valutazione",
+        "pt" => "Vote para saltar a faixa atualmente em avaliação"
       },
       is_user_input_required: false
     }
