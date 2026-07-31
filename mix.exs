@@ -157,7 +157,7 @@ defmodule PremiereEcoute.MixProject do
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       # Tests
-      {:hammox, "~> 0.7", only: :test},
+      {:hammox, "~> 1.0", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
       {:lazy_html, "~> 0.1", only: :test},
       {:bypass, "~> 2.1", only: :test},
