@@ -26,4 +26,21 @@ defmodule PremiereEcouteCore.Api.CircuitBreakerTest do
       assert CircuitBreaker.retry_after_seconds("not-a-valid-header") == 60
     end
   end
+
+  describe "quota_exceeded?/1" do
+    test "detects Spotify's QUOTA_EXCEEDED reason" do
+      body = %{"error" => %{"status" => 429, "message" => "Too many requests", "reason" => "QUOTA_EXCEEDED"}}
+
+      assert CircuitBreaker.quota_exceeded?(body)
+    end
+
+    test "does not flag a plain rate-limit 429 body" do
+      refute CircuitBreaker.quota_exceeded?(%{"error" => %{"status" => 429, "message" => "Rate limit exceeded"}})
+    end
+
+    test "does not flag non-map bodies" do
+      refute CircuitBreaker.quota_exceeded?("some html error page")
+      refute CircuitBreaker.quota_exceeded?(nil)
+    end
+  end
 end

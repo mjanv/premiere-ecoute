@@ -3,6 +3,12 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
   Circuit breaker for outbound API requests.
 
   Integrates as a pair of Req steps: a pre-request step that halts the request when the target API is currently rate-limited, and a post-response step that opens the circuit on HTTP 429 by storing the response body in the `:rate_limits` cache with a TTL derived from the `retry-after` header (defaulting to 60 seconds). Once the TTL expires the circuit closes automatically and requests resume.
+
+  Spotify's quota-exceeded 429 (https://developer.spotify.com/documentation/web-api/concepts/quota-modes)
+  is handled distinctly: unlike a transient rate limit, it means the app (in Development Mode) has
+  exhausted its per-developer-account quota, comes with no meaningful `retry-after`, and won't clear
+  until the quota window resets or Extended Quota Mode is granted. Retrying every 60 seconds would just
+  hammer Spotify for nothing, so the circuit opens for a much longer cool-down instead.
   """
 
   alias PremiereEcouteCore.Cache
@@ -11,6 +17,8 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
   @status_codes [429]
   @transient_error_codes [503]
   @transient_ttl_seconds 30
+  @quota_exceeded_ttl_seconds 86_400
+  @quota_exceeded_message "Spotify application quota exceeded (development mode) — request Extended Quota Mode from Spotify"
 
   @spec run(Req.Request.t(), Keyword.t()) :: Req.Request.t()
   def run(request, opts \\ []) do
@@ -29,6 +37,9 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
 
   defp maybe_open({request, %{status: status} = response}, opts) do
     cond do
+      status in @status_codes and quota_exceeded?(response.body) ->
+        Cache.put(@cache, opts[:api], @quota_exceeded_message, expire: @quota_exceeded_ttl_seconds * 1_000)
+
       status in @status_codes ->
         retry_after = retry_after_seconds(hd(response.headers["retry-after"] || ["60"]))
         Cache.put(@cache, opts[:api], response.body, expire: retry_after * 1_000)
@@ -42,6 +53,16 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
 
     {request, response}
   end
+
+  @doc """
+  Detects Spotify's quota-exceeded 429 body, as opposed to a plain rate-limit 429.
+
+  See https://developer.spotify.com/documentation/web-api/concepts/quota-modes — Spotify signals
+  this case with `"reason": "QUOTA_EXCEEDED"` in the error body, with no distinguishing header.
+  """
+  @spec quota_exceeded?(any()) :: boolean()
+  def quota_exceeded?(%{"error" => %{"reason" => "QUOTA_EXCEEDED"}}), do: true
+  def quota_exceeded?(_), do: false
 
   @doc """
   Parses a Retry-After header value into a delay in seconds.

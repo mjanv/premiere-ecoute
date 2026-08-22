@@ -193,6 +193,20 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
       assert error == "Spotify rate limit exceeded"
     end
 
+    test "returns a distinct error when Spotify's application quota is exceeded (429 QUOTA_EXCEEDED)", %{scope: scope} do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
+        response: %{"error" => %{"status" => 429, "message" => "Too many requests", "reason" => "QUOTA_EXCEEDED"}},
+        status: 429
+      )
+
+      {:error, error} = SpotifyApi.get_playback_state(scope, PlaybackState.default())
+
+      assert error == "Spotify application quota exceeded"
+    end
+
     test "raises when user has no Spotify connection" do
       scope = user_scope_fixture(user_fixture())
 
