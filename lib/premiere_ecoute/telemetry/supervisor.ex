@@ -3,10 +3,5 @@ defmodule PremiereEcoute.Telemetry.Supervisor do
   Telemetry subservice.
   """
 
-  alias PremiereEcoute.Telemetry.PromEx
-  alias PremiereEcoute.Telemetry.Tracing
-
-  use PremiereEcouteCore.Supervisor,
-    children: [PromEx],
-    optionals: [{Task, &Tracing.setup/0}]
+  use PremiereEcouteCore.Supervisor, children: [PremiereEcoute.Telemetry.PromEx]
 end

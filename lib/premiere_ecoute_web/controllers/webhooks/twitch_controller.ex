@@ -67,11 +67,12 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
     end
   end
 
-  # Root of the chat vote trace. The surrounding HTTP span comes from the Bandit/Phoenix
-  # auto-instrumentation; this span carries the domain attributes and, more importantly, is the
-  # context that `BroadwayProducer.publish/2` captures and hands to the vote pipeline.
+  # Root of the chat vote trace: the only span this application starts from an inbound request. It
+  # carries the domain attributes and, more importantly, is the context that
+  # `BroadwayProducer.publish/2` captures and hands to the vote pipeline.
   defp publish_chat_message(%MessageSent{} = event) do
     Tracing.span "twitch.chat_message",
+      kind: :server,
       attributes: %{
         "twitch.broadcaster_id" => event.broadcaster_id,
         "twitch.user_id" => event.user_id,

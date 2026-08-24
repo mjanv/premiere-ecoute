@@ -100,18 +100,15 @@ tracing use cases nearly free.
 ## 5. Target span tree
 
 ```
-trace A ─ POST /webhooks/twitch                    (Bandit/Phoenix auto-instrumentation, SERVER)
-          └─ twitch.chat_message                   (Bandit request process, INTERNAL)
-             └─ vote.process                       (Broadway processor process, INTERNAL)
+trace A ─ twitch.chat_message                      (Bandit request process, SERVER)
+          └─ vote.process                          (Broadway processor process, INTERNAL)
 
 trace B ─ vote.batch_write                         (Broadway batcher process, INTERNAL, root)
           │   ↖ link → trace A / vote.process
           │   ↖ link → trace A′ / vote.process
           │   ↖ link → … (one per message in the batch)
           ├─ vote.insert_all
-          │  └─ premiere_ecoute.repo.query         (opentelemetry_ecto)
           ├─ report.generate
-          │  └─ premiere_ecoute.repo.query x N     (opentelemetry_ecto)
           └─ session_summary.broadcast
 ```
 
@@ -121,37 +118,37 @@ Two traces, joined by links. §6.5 explains why that is the honest modelling and
 
 ### 6.1 Dependencies
 
-The SDK and API, the OTLP exporter, and the `opentelemetry_*` auto-instrumentation packages:
+Deliberately minimal — the API, the SDK and one exporter:
 
 ```elixir
-{:opentelemetry_api, "~> 1.5"},                  # Tracer/Ctx macros, used from application code
-{:opentelemetry, "~> 1.7"},                      # SDK: sampler, span processor
-{:opentelemetry_exporter, "~> 1.10"},            # OTLP over http/protobuf
-{:opentelemetry_phoenix, "~> 2.0"},              # endpoint, router and LiveView spans
-{:opentelemetry_bandit, "~> 0.3"},               # HTTP server spans (required by the :bandit adapter)
-{:opentelemetry_ecto, "~> 1.2"},                 # a span per Repo query
-{:opentelemetry_semantic_conventions, "~> 1.27"} # shared attribute names
+{:opentelemetry_api, "~> 1.5"},      # Tracer/Ctx macros, used from application code
+{:opentelemetry, "~> 1.7"},          # SDK: sampler, span processor
+{:opentelemetry_exporter, "~> 1.10"} # OTLP over http/protobuf
 ```
 
-`opentelemetry_process_propagator` arrives transitively. It resolves context through the process
+**No auto-instrumentation.** `opentelemetry_phoenix`, `opentelemetry_bandit` and
+`opentelemetry_ecto` were tried and removed: each of them attaches globally, so they instrument
+every HTTP request and every database query in the application, which is a much larger change than
+"trace the vote flow". Only the selected path is traced, which means every span in this system was
+put there on purpose. The cost is that the trace has no HTTP-level root and no per-query detail —
+`twitch.chat_message` is the root, and the two database calls that matter are wrapped by hand
+(§6.6).
+
+Reconsider these once the first trace has proved its worth and there is an appetite for spans across
+the whole application. That is a separate decision, and it should be taken deliberately rather than
+inherited from this change.
+
+`opentelemetry_process_propagator` also went with them. It resolves context through the process
 *ancestry* (`$ancestors`), which covers `Task` and `spawn`, but not a message sent to a long-lived
-process that is unrelated to the sender — so it does not solve the Broadway boundary, which is
-handled explicitly in §6.3.
+process unrelated to the sender — so it would not have solved the Broadway boundary anyway (§6.3).
 
-The auto-instrumentation gives us the spans surrounding the flow — the HTTP server span that roots
-the trace, and a span per database query inside the batch — for free and with correct semantic
-conventions. The domain spans that make the trace *readable* are still created explicitly at the
-call sites (§6.6); auto-instrumentation alone would show "a POST and some queries", not "a vote".
-
-`open_telemetry_decorator` was left out: the `@decorate` syntax buys little for six hand-written
+`open_telemetry_decorator` was left out too: the `@decorate` syntax buys little for six hand-written
 spans and pulls a macro layer into modules that are otherwise plain.
 
 Note that `PremiereEcouteCore` declares `use Boundary, deps: []`. Boundary only governs in-app
-modules, so depending on `:opentelemetry_api` from core is fine.
-
-Setup runs once at boot from `PremiereEcoute.Telemetry.Tracing.setup/0`, registered as an *optional*
-child of `PremiereEcoute.Telemetry.Supervisor` — `PremiereEcouteCore.Supervisor` skips optional
-children under `:test`, so the suite does not get a span for every query it runs.
+modules, so depending on `:opentelemetry_api` from core is fine. There is no setup step and nothing
+to attach at boot — the SDK starts as an ordinary application dependency, and spans exist only where
+the code creates them.
 
 ### 6.2 `PremiereEcouteCore.Tracing`
 
@@ -286,7 +283,7 @@ building.
 
 | Span | Process | Parent | Attributes |
 |---|---|---|---|
-| `twitch.chat_message` | Bandit request | root (SERVER kind) | `twitch.broadcaster_id`, `twitch.user_id`, `chat.message.length`, `twitch.is_streamer` |
+| `twitch.chat_message` | Bandit request | root, `kind: :server` | `twitch.broadcaster_id`, `twitch.user_id`, `chat.message.length`, `twitch.is_streamer` |
 | `vote.process` | Broadway processor | `twitch.chat_message` via message metadata | `session.id`, `track.id`, `vote.value`, `vote.outcome` (`:ok` / `:no_active_track` / `:unparseable`) |
 | `vote.batch_write` | Broadway batcher | root + N links | `session.id`, `batch.size` |
 | `vote.insert_all` | Broadway batcher | `vote.batch_write` | `db.rows` |
@@ -331,9 +328,9 @@ first rollout: while we are still learning what these traces say, a sampled-out 
 cannot go back and ask about, and the flow is narrow enough — one webhook branch, one pipeline — that
 its volume is bounded by chat activity rather than by total traffic. This is the first knob to turn
 if span volume or cost becomes a problem; swapping `sampler: :always_on` for
-`{:parent_based, %{root: {:trace_id_ratio_based, 0.1}}}` needs no code change. Note that
-`opentelemetry_ecto` widens the blast radius: at 100 %, every repo query in the application produces
-a span, not only the ones on this path.
+`{:parent_based, %{root: {:trace_id_ratio_based, 0.1}}}` needs no code change. With no
+auto-instrumentation attached, 100 % here means every *vote*, not every request and every query —
+the volume is bounded by chat activity on the one branch that is instrumented.
 
 Production values are read in `config/runtime.exs` through Dotenvy `env!/3`, consistent with the rest
 of the project's configuration, rather than relying on the `OTEL_*` variables the Erlang SDK reads
@@ -384,6 +381,7 @@ refutes it, we have learned something cheaply and the instrumentation stays usef
 
 Explicitly **not** in this change, to keep the first trace reviewable:
 
+- App-wide Phoenix / Bandit / Ecto auto-instrumentation (§6.1).
 - Tracing the other three Broadway pipelines, the command and event buses, or Oban jobs. The
   producer-boundary fix (§6.3) makes these cheap later; that is the point, but it is not this change.
 - Trace-to-log correlation (`trace_id` in Logger metadata, Loki derived fields).
@@ -410,8 +408,10 @@ Explicitly **not** in this change, to keep the first trace reviewable:
    `PremiereEcoute.TracingCase` helper, which swaps in a synchronous processor that forwards every
    finished span to the test process.
 2. `docker compose up -d`, run a local session, post a chat vote through the mock Twitch server, and
-   confirm in Grafana that **one** trace contains `twitch.chat_message → vote.process` in two
-   different processes.
+   confirm in Grafana that **one** trace is rooted at `twitch.chat_message` and contains
+   `vote.process`, created in a different process.
+   Confirm too that browsing the app produces **no** other traces — nothing outside this path is
+   instrumented.
 3. Confirm the linked `vote.batch_write` trace is reachable from it, and that its link count equals
    the batch size.
 4. Send 20 votes and confirm there are 20 distinct traces, not one — i.e. that context is not
@@ -424,9 +424,9 @@ Explicitly **not** in this change, to keep the first trace reviewable:
 
 - Is the two-trace split (§6.5) acceptable ergonomically, or would a single trace parented on the
   first message be preferred despite misattributing batch time?
-- ~~Should the batch pipeline spans wait for `opentelemetry_ecto`?~~ Settled: it is wired, so the
-  individual SQL statements inside `report.generate` are visible, at the cost of a span for every
-  query the application makes.
+- The hand-wrapped `report.generate` span shows how long the report takes but not which of its
+  queries is responsible. Is that enough to act on, or is `opentelemetry_ecto` — and the app-wide
+  query spans that come with it — worth revisiting later?
 - ~~Is 10 % the right starting sample rate?~~ Settled for now: 100 %, see §7. The follow-up question
   stands — a per-broadcaster or per-session sampling rule may serve us better than any uniform ratio,
   since the unit we usually want to debug is one streamer's session.

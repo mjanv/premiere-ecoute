@@ -153,10 +153,6 @@ defmodule PremiereEcoute.MixProject do
       {:opentelemetry_api, "~> 1.5"},
       {:opentelemetry, "~> 1.7"},
       {:opentelemetry_exporter, "~> 1.10"},
-      {:opentelemetry_phoenix, "~> 2.0"},
-      {:opentelemetry_bandit, "~> 0.3"},
-      {:opentelemetry_ecto, "~> 1.2"},
-      {:opentelemetry_semantic_conventions, "~> 1.27"},
       # Code quality
       {:credo, "~> 1.7", only: [:dev]},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
