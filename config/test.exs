@@ -92,6 +92,10 @@ config :premiere_ecoute, PremiereEcoute.Accounts.Mailer, adapter: Swoosh.Adapter
 
 config :bcrypt_elixir, :log_rounds, 1
 
+# No span export under test. Tests that assert on spans install their own exporter - see
+# test/support/tracing_case.ex
+config :opentelemetry, traces_exporter: :none
+
 config :logger, level: :warning
 
 config :phoenix, :plug_init_mode, :runtime

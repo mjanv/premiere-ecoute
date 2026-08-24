@@ -1,7 +1,7 @@
 # 🔭 Distributed tracing — first use case
 
-> **Status:** proposed design. No code has been written yet — this document exists to agree on the
-> shape of the first trace before we add OpenTelemetry to the supervision tree.
+> **Status:** implemented. This document is the design of record for the first trace; it was written
+> before the code and updated to match what was built.
 >
 > **Scope:** exactly one trace, end to end. Everything else is explicitly a non-goal (§10).
 
@@ -100,15 +100,18 @@ tracing use cases nearly free.
 ## 5. Target span tree
 
 ```
-trace A ─ twitch.chat_message                      (Bandit request process, SERVER)
-          └─ vote.process                          (Broadway processor process, INTERNAL)
+trace A ─ POST /webhooks/twitch                    (Bandit/Phoenix auto-instrumentation, SERVER)
+          └─ twitch.chat_message                   (Bandit request process, INTERNAL)
+             └─ vote.process                       (Broadway processor process, INTERNAL)
 
 trace B ─ vote.batch_write                         (Broadway batcher process, INTERNAL, root)
           │   ↖ link → trace A / vote.process
           │   ↖ link → trace A′ / vote.process
           │   ↖ link → … (one per message in the batch)
           ├─ vote.insert_all
+          │  └─ premiere_ecoute.repo.query         (opentelemetry_ecto)
           ├─ report.generate
+          │  └─ premiere_ecoute.repo.query x N     (opentelemetry_ecto)
           └─ session_summary.broadcast
 ```
 
@@ -118,34 +121,43 @@ Two traces, joined by links. §6.5 explains why that is the honest modelling and
 
 ### 6.1 Dependencies
 
-Deliberately minimal — the SDK, the API and one exporter:
+The SDK and API, the OTLP exporter, and the `opentelemetry_*` auto-instrumentation packages:
 
 ```elixir
-{:opentelemetry_api, "~> 1.5"},      # 1.5.0 — Tracer/Ctx macros, used from application code
-{:opentelemetry, "~> 1.7"},          # 1.7.0 — SDK: sampler, span processor
-{:opentelemetry_exporter, "~> 1.10"} # 1.10.0 — OTLP over http/protobuf
+{:opentelemetry_api, "~> 1.5"},                  # Tracer/Ctx macros, used from application code
+{:opentelemetry, "~> 1.7"},                      # SDK: sampler, span processor
+{:opentelemetry_exporter, "~> 1.10"},            # OTLP over http/protobuf
+{:opentelemetry_phoenix, "~> 2.0"},              # endpoint, router and LiveView spans
+{:opentelemetry_bandit, "~> 0.3"},               # HTTP server spans (required by the :bandit adapter)
+{:opentelemetry_ecto, "~> 1.2"},                 # a span per Repo query
+{:opentelemetry_semantic_conventions, "~> 1.27"} # shared attribute names
 ```
 
-**Not** added yet, on purpose:
+`opentelemetry_process_propagator` arrives transitively. It resolves context through the process
+*ancestry* (`$ancestors`), which covers `Task` and `spawn`, but not a message sent to a long-lived
+process that is unrelated to the sender — so it does not solve the Broadway boundary, which is
+handled explicitly in §6.3.
 
-- `opentelemetry_phoenix` + `opentelemetry_bandit` — would instrument *every* HTTP request in the
-  app. That is a different, larger decision than "trace the vote flow"; we create the root span by
-  hand in the webhook controller instead. Revisit once the first trace has proved its worth.
-- `opentelemetry_ecto` — same argument: `OpentelemetryEcto.setup/1` attaches to the repo globally
-  and would emit a span for every query the application makes, most with no parent. We create two
-  explicit spans around the two `Repo` calls we actually care about (§6.6), which gives us the
-  latency breakdown without the noise. This is the first thing to reconsider after rollout.
-- `open_telemetry_decorator` — the `@decorate` syntax is pleasant, but it buys nothing for six
-  hand-written spans, and it pulls a macro layer into modules that are otherwise plain.
+The auto-instrumentation gives us the spans surrounding the flow — the HTTP server span that roots
+the trace, and a span per database query inside the batch — for free and with correct semantic
+conventions. The domain spans that make the trace *readable* are still created explicitly at the
+call sites (§6.6); auto-instrumentation alone would show "a POST and some queries", not "a vote".
+
+`open_telemetry_decorator` was left out: the `@decorate` syntax buys little for six hand-written
+spans and pulls a macro layer into modules that are otherwise plain.
 
 Note that `PremiereEcouteCore` declares `use Boundary, deps: []`. Boundary only governs in-app
 modules, so depending on `:opentelemetry_api` from core is fine.
 
+Setup runs once at boot from `PremiereEcoute.Telemetry.Tracing.setup/0`, registered as an *optional*
+child of `PremiereEcoute.Telemetry.Supervisor` — `PremiereEcouteCore.Supervisor` skips optional
+children under `:test`, so the suite does not get a span for every query it runs.
+
 ### 6.2 `PremiereEcouteCore.Tracing`
 
-A new module, added to the `exports` list in `lib/premiere_ecoute_core.ex`. It is small on purpose —
-it exists to make the two things that are easy to get wrong (detaching, and linking) hard to get
-wrong, not to wrap the OTel API.
+`lib/premiere_ecoute_core/tracing.ex`, added to the `exports` list in `lib/premiere_ecoute_core.ex`.
+It is small on purpose — it exists to make the two things that are easy to get wrong (detaching, and
+linking) hard to get wrong, not to wrap the OTel API.
 
 ```elixir
 defmodule PremiereEcouteCore.Tracing do
@@ -296,14 +308,15 @@ should be set deliberately rather than left at its default.
 |---|---|---|---|
 | `:dev` | OTLP http/protobuf → `http://localhost:4318` | always on | Local Tempo, low volume, you want every trace you generate. |
 | `:test` | `:none` | — | No exporter, no background flushing, no interference with the async test suite. |
-| `:prod` | OTLP → `OTEL_EXPORTER_OTLP_ENDPOINT` | `parent_based` with a `trace_id_ratio_based` root, default **0.1** | Chat is high volume during a live session; 100 % sampling is not shippable. |
+| `:prod` | OTLP → `OTEL_EXPORTER_OTLP_ENDPOINT` | always on (**100 %**) | See the note below. |
 
 ```elixir
 # config/config.exs
 config :opentelemetry,
-  resource: [service: [name: "premiere_ecoute"]],
+  resource: [service: [name: "premiere_ecoute", version: Mix.Project.config()[:version]]],
   span_processor: :batch,
-  traces_exporter: :otlp
+  traces_exporter: :otlp,
+  sampler: :always_on
 
 # config/dev.exs
 config :opentelemetry_exporter, otlp_protocol: :http_protobuf, otlp_endpoint: "http://localhost:4318"
@@ -312,13 +325,23 @@ config :opentelemetry_exporter, otlp_protocol: :http_protobuf, otlp_endpoint: "h
 config :opentelemetry, traces_exporter: :none
 ```
 
+**Sampling is at 100 % for now, deliberately.** The original design proposed a 10 % ratio in
+production, on the grounds that chat is high volume during a live session. That was reversed for the
+first rollout: while we are still learning what these traces say, a sampled-out trace is one we
+cannot go back and ask about, and the flow is narrow enough — one webhook branch, one pipeline — that
+its volume is bounded by chat activity rather than by total traffic. This is the first knob to turn
+if span volume or cost becomes a problem; swapping `sampler: :always_on` for
+`{:parent_based, %{root: {:trace_id_ratio_based, 0.1}}}` needs no code change. Note that
+`opentelemetry_ecto` widens the blast radius: at 100 %, every repo query in the application produces
+a span, not only the ones on this path.
+
 Production values are read in `config/runtime.exs` through Dotenvy `env!/3`, consistent with the rest
 of the project's configuration, rather than relying on the `OTEL_*` variables the Erlang SDK reads
 directly — so that a missing endpoint disables export cleanly instead of failing at boot.
 
 Because the sampling decision is taken when the root span starts in the controller and then rides
 along in the propagated context, a trace that is sampled out produces no pipeline spans either. The
-sampling ratio is the single knob for the whole feature.
+sampler is the single knob for the whole feature.
 
 ## 8. Backend
 
@@ -361,7 +384,6 @@ refutes it, we have learned something cheaply and the instrumentation stays usef
 
 Explicitly **not** in this change, to keep the first trace reviewable:
 
-- App-wide Phoenix / Bandit / Ecto auto-instrumentation.
 - Tracing the other three Broadway pipelines, the command and event buses, or Oban jobs. The
   producer-boundary fix (§6.3) makes these cheap later; that is the point, but it is not this change.
 - Trace-to-log correlation (`trace_id` in Logger metadata, Loki derived fields).
@@ -375,14 +397,18 @@ Explicitly **not** in this change, to keep the first trace reviewable:
 |---|---|
 | Context leaks between messages in a long-lived Broadway processor | `with_context/2` is the only attach path and detaches in an `after` block (§6.4). |
 | Exporter unavailable or slow in production | Batch span processor drops on a full queue rather than blocking the caller; export failure must never affect vote processing. Verify by running with a black-holed endpoint. |
-| Span volume / cost during a busy live session | 10 % root sampling by default, tunable by env var without a deploy. |
+| Span volume / cost during a busy live session | Accepted for now at 100 % sampling, on the understanding that this is the first thing to turn down. `sampler` is a one-line config change. |
 | Tracing overhead on the hot vote path | Six spans per vote batch, no synchronous I/O on the request path. Confirm against the existing PromEx vote-processing metrics before and after. |
 | The test suite becomes flaky or slower | `traces_exporter: :none` in `:test`; no SDK background work. |
 | Chat content leaking into a third-party backend | Message text is never an attribute (§6.6); privacy review before production rollout. |
 
 ## 12. Verification plan
 
-1. `mix quality` and the full test suite pass unchanged — instrumentation must be invisible to tests.
+1. `mix quality` and the full test suite pass — instrumentation must be invisible to existing tests.
+   The new coverage lives in `test/premiere_ecoute_core/tracing_test.exs` and
+   `test/premiere_ecoute/sessions/scores/message_pipeline_tracing_test.exs`, on top of the
+   `PremiereEcoute.TracingCase` helper, which swaps in a synchronous processor that forwards every
+   finished span to the test process.
 2. `docker compose up -d`, run a local session, post a chat vote through the mock Twitch server, and
    confirm in Grafana that **one** trace contains `twitch.chat_message → vote.process` in two
    different processes.
@@ -391,15 +417,17 @@ Explicitly **not** in this change, to keep the first trace reviewable:
 4. Send 20 votes and confirm there are 20 distinct traces, not one — i.e. that context is not
    leaking between messages.
 5. Compare vote-processing latency in the existing PromEx dashboard before and after.
-6. Deploy with the sampler at 0.0, confirm no spans, then raise to 0.1.
+6. Watch span volume and exporter latency for one full live session before deciding whether 100 %
+   sampling stays.
 
 ## 13. Open questions
 
 - Is the two-trace split (§6.5) acceptable ergonomically, or would a single trace parented on the
   first message be preferred despite misattributing batch time?
-- Should the batch pipeline spans wait for `opentelemetry_ecto`, accepting app-wide query spans, in
-  exchange for seeing the individual SQL statements inside `report.generate`?
-- Is 10 % the right starting sample rate, given that a single streamer's session is the unit we
-  usually want to debug? A per-broadcaster or per-session sampling rule may serve us better than a
-  uniform ratio.
+- ~~Should the batch pipeline spans wait for `opentelemetry_ecto`?~~ Settled: it is wired, so the
+  individual SQL statements inside `report.generate` are visible, at the cost of a span for every
+  query the application makes.
+- ~~Is 10 % the right starting sample rate?~~ Settled for now: 100 %, see §7. The follow-up question
+  stands — a per-broadcaster or per-session sampling rule may serve us better than any uniform ratio,
+  since the unit we usually want to debug is one streamer's session.
 - Grafana Cloud Tempo, or self-hosted Tempo alongside the existing stack?

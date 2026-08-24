@@ -104,6 +104,12 @@ if config_env() == :prod do
 
   # Podcasts: store audio/cover in SeaweedFS via its Filer HTTP API. Audio/cover are streamed
   # through Phoenix (the Filer stays private), so no public base URL is needed.
+  # OpenTelemetry: OTLP over HTTP to Tempo. Authentication headers are read straight from the
+  # standard OTEL_EXPORTER_OTLP_HEADERS OS variable by the exporter itself.
+  config :opentelemetry_exporter,
+    otlp_protocol: :http_protobuf,
+    otlp_endpoint: env!("OTEL_EXPORTER_OTLP_ENDPOINT", :string, "http://localhost:4318")
+
   config :premiere_ecoute, PremiereEcoute.Podcasts.Storage, adapter: PremiereEcoute.Podcasts.Storage.Seaweed
 
   config :premiere_ecoute, PremiereEcoute.Podcasts.Storage.Seaweed,

@@ -81,6 +81,11 @@ config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
 
 config :premiere_ecoute, PremiereEcoute.Accounts.Mailer, adapter: Swoosh.Adapters.Local
 
+# Traces go to the Tempo container started by `docker compose up -d`
+config :opentelemetry_exporter,
+  otlp_protocol: :http_protobuf,
+  otlp_endpoint: "http://localhost:4318"
+
 config :premiere_ecoute, dev_routes: true
 
 config :logger, level: :info

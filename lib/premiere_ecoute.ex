@@ -33,7 +33,8 @@ defmodule PremiereEcoute do
       Presence,
       Repo,
       DataCase,
-      ExplorerCase
+      ExplorerCase,
+      TracingCase
     ]
 
   alias PremiereEcoute.Accounts.Mailer

@@ -175,6 +175,17 @@ config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
   grafana: :disabled,
   metrics_server: :disabled
 
+# OpenTelemetry distributed tracing - see docs/architecture/tracing.md
+#
+# Sampling is at 100% for now: the first trace is the Twitch chat vote flow and we want every one of
+# them while we learn what the traces actually say. Revisit before this becomes expensive - a
+# `{:parent_based, %{root: {:trace_id_ratio_based, 0.1}}}` sampler is the drop-in replacement.
+config :opentelemetry,
+  resource: [service: [name: "premiere_ecoute", version: Mix.Project.config()[:version]]],
+  span_processor: :batch,
+  traces_exporter: :otlp,
+  sampler: :always_on
+
 config :premiere_ecoute, PremiereEcoute.Gettext,
   locales: ~w(en fr it pt),
   default_locale: "en"
