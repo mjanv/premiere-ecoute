@@ -40,15 +40,25 @@ defmodule PremiereEcouteCore.BroadwayProducer do
   alias Broadway.Message
   alias Broadway.NoopAcknowledger
 
+  alias PremiereEcouteCore.Tracing
+
   @doc """
   Publishes an event to a Broadway pipeline.
 
   Randomly selects a producer from the pipeline and casts the event as a Broadway message. Uses NoopAcknowledger for message acknowledgment.
+
+  The current OpenTelemetry context is captured into the message metadata under `:otel_ctx`. A
+  `GenStage.cast/2` is a plain message send, so trace context does not travel with it on its own;
+  carrying it in the message lets an instrumented pipeline continue the caller's trace instead of
+  starting an orphaned one. Pipelines that are not instrumented simply ignore the key, and when no
+  span is active the captured context is empty.
   """
   @spec publish(atom(), struct()) :: :ok
   def publish(pipeline, event) do
     producer = Enum.random(Broadway.producer_names(pipeline))
-    GenStage.cast(producer, %Message{acknowledger: NoopAcknowledger.init(), data: event})
+    message = %Message{acknowledger: NoopAcknowledger.init(), data: event, metadata: %{otel_ctx: Tracing.context()}}
+
+    GenStage.cast(producer, message)
   end
 
   @doc "Initializes the GenStage producer with an empty queue and zero demand."

@@ -19,7 +19,10 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
   alias PremiereEcoute.Events.Twitch.StreamStarted
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Telemetry.ApiMetrics
+  alias PremiereEcouteCore.Tracing
   alias PremiereEcouteWeb.Plugs.TwitchHmacValidator
+
+  require Tracing
 
   @doc """
   Processes Twitch EventSub webhook requests with HMAC validation.
@@ -50,7 +53,7 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
       {true, "notification", conn} ->
         case handle(conn.body_params) do
           %SendChatCommand{} = command -> PremiereEcoute.apply(command)
-          %MessageSent{} = event -> Sessions.publish_message(event)
+          %MessageSent{} = event -> publish_chat_message(event)
           %PollStarted{} = event -> Sessions.publish_poll(event)
           %PollUpdated{} = event -> Sessions.publish_poll(event)
           %PollEnded{} = event -> Sessions.publish_poll(event)
@@ -61,6 +64,22 @@ defmodule PremiereEcouteWeb.Webhooks.TwitchController do
         end
 
         send_resp(conn, 202, "")
+    end
+  end
+
+  # Root of the chat vote trace: the only span this application starts from an inbound request. It
+  # carries the domain attributes and, more importantly, is the context that
+  # `BroadwayProducer.publish/2` captures and hands to the vote pipeline.
+  defp publish_chat_message(%MessageSent{} = event) do
+    Tracing.span "twitch.chat_message",
+      kind: :server,
+      attributes: %{
+        "twitch.broadcaster_id" => event.broadcaster_id,
+        "twitch.user_id" => event.user_id,
+        "twitch.is_streamer" => event.is_streamer,
+        "chat.message.length" => String.length(event.message || "")
+      } do
+      Sessions.publish_message(event)
     end
   end
 

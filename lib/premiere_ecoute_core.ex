@@ -32,6 +32,7 @@ defmodule PremiereEcouteCore do
       Subscriber,
       Supervisor,
       Timezone,
+      Tracing,
       Utils,
       Worker,
       Xml,

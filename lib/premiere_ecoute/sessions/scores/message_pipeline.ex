@@ -15,6 +15,9 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Scores.Vote
   alias PremiereEcouteCore.Cache
+  alias PremiereEcouteCore.Tracing
+
+  require Tracing
 
   @doc """
   Starts the Broadway pipeline for chat vote processing.
@@ -44,10 +47,36 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   """
   @spec handle_message(atom(), Message.t(), any()) :: Message.t()
   def handle_message(:session, message, _) do
-    case process(message.data) do
-      {:ok, vote} -> message |> Message.put_data(vote) |> Message.put_batch_key(vote.session_id) |> Message.put_batcher(:writer)
-      {:error, reason} -> message |> Message.failed(reason)
-    end
+    Tracing.with_context(message.metadata[:otel_ctx], fn ->
+      Tracing.span "vote.process" do
+        case process(message.data) do
+          {:ok, vote} ->
+            Tracing.set_attributes(%{
+              "session.id" => vote.session_id,
+              "track.id" => vote.track_id,
+              "vote.value" => vote.value,
+              "vote.outcome" => "accepted"
+            })
+
+            message
+            |> Message.put_data(vote)
+            |> Message.put_batch_key(vote.session_id)
+            |> Message.put_batcher(:writer)
+            |> put_trace_context()
+
+          {:error, reason} ->
+            Tracing.set_attributes(%{"vote.outcome" => "rejected"})
+
+            Message.failed(message, reason)
+        end
+      end
+    end)
+  end
+
+  # Re-points the message context at the `vote.process` span, so that the batch span links back to
+  # the per-vote work rather than to the webhook span that produced it.
+  defp put_trace_context(%Message{} = message) do
+    %{message | metadata: Map.put(message.metadata, :otel_ctx, Tracing.context())}
   end
 
   @doc """
@@ -84,18 +113,34 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipeline do
   """
   @spec handle_batch(atom(), [Message.t()], BatchInfo.t(), any()) :: [Message.t()]
   def handle_batch(:writer, messages, %BatchInfo{batch_key: session_id}, _context) do
-    Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
+    links = Tracing.links(Enum.map(messages, fn message -> message.metadata[:otel_ctx] end))
 
-    {:ok, report} = Report.generate(%ListeningSession{id: session_id})
+    Tracing.span "vote.batch_write",
+      links: links,
+      attributes: %{"session.id" => session_id, "batch.size" => length(messages)} do
+      Tracing.span "vote.insert_all", attributes: %{"db.rows" => length(messages)} do
+        Vote.create_all(Enum.map(messages, fn message -> message.data end), on_conflict: :nothing)
+      end
 
-    track_id = hd(messages).data.track_id
-    summary = Enum.find(report.track_summaries, fn s -> s.track_id == track_id end)
+      {:ok, report} =
+        Tracing.span "report.generate", attributes: %{"session.id" => session_id} do
+          {:ok, report} = Report.generate(%ListeningSession{id: session_id})
+          Tracing.set_attributes(%{"report.track_count" => length(report.track_summaries)})
 
-    if summary do
-      PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, summary})
+          {:ok, report}
+        end
+
+      track_id = hd(messages).data.track_id
+      summary = Enum.find(report.track_summaries, fn s -> s.track_id == track_id end)
+
+      if summary do
+        Tracing.span "session_summary.broadcast", attributes: %{"pubsub.topic" => "session:#{session_id}"} do
+          PremiereEcoute.PubSub.broadcast("session:#{session_id}", {:session_summary, summary})
+        end
+      end
+
+      messages
     end
-
-    messages
   end
 
   @doc """

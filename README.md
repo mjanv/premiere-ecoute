@@ -32,4 +32,5 @@ Premiere Ecoute turns music discovery into an interactive experience where strea
 - 🎨 Read for complete design workflow and component creation in our [frontend guide](docs/guides/frontend.md)
 - 🏛️ Learn how to document developer, legal and release documentations in our [documentation guide](docs/guides/documentation.md)
 - 🚀 Deploy to production following our [deployment guide](docs/guides/deployment.md) instructions
+- 🔭 Follow the [distributed tracing design](docs/architecture/tracing.md) for the first end-to-end trace of the Twitch chat vote flow
 - 📊 View the project [presentation slides](slides/) built with Slidev for an overview of features, architecture, and roadmap

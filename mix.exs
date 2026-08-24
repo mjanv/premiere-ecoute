@@ -150,6 +150,9 @@ defmodule PremiereEcoute.MixProject do
       {:prom_ex, "~> 1.11"},
       {:sentry, "~> 13.0"},
       {:posthog, "~> 2.10"},
+      {:opentelemetry_api, "~> 1.5"},
+      {:opentelemetry, "~> 1.7"},
+      {:opentelemetry_exporter, "~> 1.10"},
       # Code quality
       {:credo, "~> 1.7", only: [:dev]},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
