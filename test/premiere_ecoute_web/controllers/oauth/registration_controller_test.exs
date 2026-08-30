@@ -22,7 +22,7 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationControllerTest do
       body = json_response(conn, 201)
       assert body["redirect_uris"] == ["https://claude.ai/api/mcp/auth_callback"]
       assert body["client_name"] == "claude.ai"
-      assert body["grant_types"] == ["authorization_code", "refresh_token"]
+      assert body["grant_types"] == ["client_credentials", "authorization_code"]
       assert is_integer(body["client_id_issued_at"])
 
       stored = Admin.get_client!(client_id)
@@ -33,8 +33,8 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationControllerTest do
     test "rejects registration with invalid metadata", %{conn: conn} do
       conn =
         post(conn, ~p"/oauth/register", %{
-          "redirect_uris" => ["https://claude.ai/api/mcp/auth_callback"],
-          "supported_grant_types" => ["not_a_real_grant_type"]
+          "client_name" => "claude.ai",
+          "redirect_uris" => ["not-a-valid-uri"]
         })
 
       assert json_response(conn, 400)["error"] == "invalid_client_metadata"
