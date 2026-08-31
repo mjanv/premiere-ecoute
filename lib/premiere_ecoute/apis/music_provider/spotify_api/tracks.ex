@@ -44,7 +44,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Tracks do
     end
   end
 
-  defp parse_single(%{"album" => %{"album_type" => "single"}} = data) do
+  defp parse_single(%{"album" => %{"album_type" => album_type}} = data)
+       when album_type in ["single", "album", "compilation"] do
     %Single{
       provider_ids: %{spotify: data["id"]},
       name: data["name"],

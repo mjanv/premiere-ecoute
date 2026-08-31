@@ -26,7 +26,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:user_playlists, AsyncResult.ok([]))
     |> assign(:selected_playlist, AsyncResult.ok(nil))
     |> assign(:search_tracks, AsyncResult.ok([]))
-    |> assign(:search_track_albums, AsyncResult.ok([]))
     |> assign(:selected_track, AsyncResult.ok(nil))
     |> assign(:clip_search_form, to_form(%{"query" => ""}))
     |> assign(:search_clip_videos, AsyncResult.ok([]))
@@ -69,7 +68,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     socket
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:search_tracks, AsyncResult.ok([]))
-    |> assign(:search_track_albums, AsyncResult.ok([]))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -93,16 +91,13 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
   def handle_event("search_tracks", %{"query" => query}, socket) when byte_size(query) > 2 do
     socket
     |> assign(:search_tracks, AsyncResult.loading())
-    |> assign(:search_track_albums, AsyncResult.loading())
-    |> start_async(:search_tracks, fn -> PremiereEcoute.Apis.spotify().search_singles(query) end)
-    |> start_async(:search_track_albums, fn -> PremiereEcoute.Apis.spotify().search_albums(query) end)
+    |> start_async(:search_tracks, fn -> PremiereEcoute.Apis.spotify().search_any_track(query) end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
   def handle_event("search_tracks", _params, socket) do
     socket
     |> assign(:search_tracks, AsyncResult.ok([]))
-    |> assign(:search_track_albums, AsyncResult.ok([]))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -129,16 +124,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
         |> assign(:selected_track, AsyncResult.loading())
         |> start_async(:select_track, fn -> PremiereEcoute.Apis.spotify().get_single(track_id) end)
     end
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  def handle_event("select_track_album", %{"album_id" => album_id}, socket) do
-    socket
-    |> assign(:source_type, "album")
-    |> assign(:search_tracks, AsyncResult.ok([]))
-    |> assign(:search_track_albums, AsyncResult.ok([]))
-    |> assign(:selected_album, AsyncResult.loading())
-    |> start_async(:select, fn -> PremiereEcoute.Apis.spotify().get_album(album_id) end)
     |> then(fn socket -> {:noreply, socket} end)
   end
 
@@ -184,7 +169,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     # Clear previous searches
     |> assign(:search_albums, AsyncResult.ok([]))
     |> assign(:search_tracks, AsyncResult.ok([]))
-    |> assign(:search_track_albums, AsyncResult.ok([]))
     |> assign(:search_clip_videos, AsyncResult.ok([]))
     # Clear previous selection
     |> assign(:selected_album, AsyncResult.ok(nil))
@@ -526,24 +510,6 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     socket
     |> assign(:search_tracks, AsyncResult.failed(assigns.search_tracks, {:error, reason}))
     |> put_flash(:error, "Track search failed. Please try again.")
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  def handle_async(:search_track_albums, {:ok, {:ok, albums}}, socket) do
-    socket
-    |> assign(:search_track_albums, AsyncResult.ok(albums))
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  def handle_async(:search_track_albums, {:ok, {:error, reason}}, %{assigns: assigns} = socket) do
-    socket
-    |> assign(:search_track_albums, AsyncResult.failed(assigns.search_track_albums, {:error, reason}))
-    |> then(fn socket -> {:noreply, socket} end)
-  end
-
-  def handle_async(:search_track_albums, {:exit, reason}, %{assigns: assigns} = socket) do
-    socket
-    |> assign(:search_track_albums, AsyncResult.failed(assigns.search_track_albums, {:error, reason}))
     |> then(fn socket -> {:noreply, socket} end)
   end
 
