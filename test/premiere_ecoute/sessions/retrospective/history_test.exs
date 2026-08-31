@@ -202,6 +202,66 @@ defmodule PremiereEcoute.Sessions.Retrospective.HistoryTest do
     end
   end
 
+  describe "get_singles_by_period/3 with sort: :score" do
+    setup %{user: user, viewer: viewer} do
+      {:ok, low_single} = Single.create(single_fixture(%{provider_ids: %{spotify: "spotify_low"}}))
+      {:ok, low_session} = ListeningSession.create(%{user_id: user.id, source: :track, single_id: low_single.id})
+      {:ok, low_session} = ListeningSession.start(low_session)
+
+      {:ok, _} =
+        Vote.create(%Vote{
+          viewer_id: viewer.twitch.user_id,
+          session_id: low_session.id,
+          track_id: low_single.id,
+          value: "3",
+          is_streamer: false
+        })
+
+      {:ok, low_session} = ListeningSession.stop(low_session)
+      {:ok, _report} = Report.generate(low_session)
+
+      {:ok, high_single} = Single.create(single_fixture(%{provider_ids: %{spotify: "spotify_high"}}))
+      {:ok, high_session} = ListeningSession.create(%{user_id: user.id, source: :track, single_id: high_single.id})
+      {:ok, high_session} = ListeningSession.start(high_session)
+
+      {:ok, _} =
+        Vote.create(%Vote{
+          viewer_id: viewer.twitch.user_id,
+          session_id: high_session.id,
+          track_id: high_single.id,
+          value: "9",
+          is_streamer: false
+        })
+
+      {:ok, high_session} = ListeningSession.stop(high_session)
+      {:ok, _report} = Report.generate(high_session)
+
+      {:ok, no_votes_single} = Single.create(single_fixture(%{provider_ids: %{spotify: "spotify_no_votes"}}))
+
+      {:ok, no_votes_session} =
+        ListeningSession.create(%{user_id: user.id, source: :track, single_id: no_votes_single.id})
+
+      {:ok, no_votes_session} = ListeningSession.start(no_votes_session)
+      {:ok, no_votes_session} = ListeningSession.stop(no_votes_session)
+      {:ok, _report} = Report.generate(no_votes_session)
+
+      {:ok, low_session: low_session, high_session: high_session, no_votes_session: no_votes_session}
+    end
+
+    test "orders sessions by viewer_score descending, unscored sessions last", %{
+      user: user,
+      low_session: low_session,
+      high_session: high_session,
+      no_votes_session: no_votes_session
+    } do
+      retrospective = History.get_singles_by_period(user, :month, %{sort: :score})
+
+      ids = Enum.map(retrospective, & &1.session.id)
+
+      assert ids == [high_session.id, low_session.id, no_votes_session.id]
+    end
+  end
+
   describe "get_album_session_details/1" do
     test "return no tracks if no votes have been casted", %{sessions: [session | _]} do
       {:ok, details} = History.get_album_session_details(session.id)

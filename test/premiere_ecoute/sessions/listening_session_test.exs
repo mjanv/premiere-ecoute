@@ -5,6 +5,7 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.TrackMarker
@@ -789,6 +790,28 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
 
       # Verify marker is also deleted (cascade delete)
       assert Repo.get(TrackMarker, marker.id) == nil
+    end
+  end
+
+  describe "submitter/1" do
+    test "returns the submitter stored in options", %{user: user} do
+      {:ok, single} = Single.create(single_fixture())
+
+      {:ok, session} =
+        ListeningSession.create(%{
+          user_id: user.id,
+          source: :track,
+          single_id: single.id,
+          options: %{"submitter" => "Alice"}
+        })
+
+      assert ListeningSession.submitter(session) == "Alice"
+    end
+
+    test "returns nil when no submitter is stored", %{user: user, album: album} do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      assert ListeningSession.submitter(session) == nil
     end
   end
 end

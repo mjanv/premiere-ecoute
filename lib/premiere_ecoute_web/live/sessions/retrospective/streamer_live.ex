@@ -9,6 +9,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
 
   alias Phoenix.LiveView.AsyncResult
   alias PremiereEcoute.Sessions
+  alias PremiereEcoute.Sessions.ListeningSession
 
   import PremiereEcouteWeb.Retrospective.PeriodHelpers
 
@@ -24,6 +25,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
       |> assign(:selected_month, current_date.month)
       |> assign(:years_available, get_available_years())
       |> assign(:selected_source, :album)
+      |> assign(:selected_sort, :date)
 
     {:ok, socket}
   end
@@ -46,6 +48,13 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
         _ -> socket.assigns.selected_source
       end
 
+    sort =
+      case params["sort"] do
+        "score" -> :score
+        "date" -> :date
+        _ -> socket.assigns.selected_sort
+      end
+
     year = parse_year(params["year"]) || socket.assigns.selected_year
     month = parse_month(params["month"]) || socket.assigns.selected_month
 
@@ -53,6 +62,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
     socket = assign(socket, :selected_year, year)
     socket = assign(socket, :selected_month, month)
     socket = assign(socket, :selected_source, source)
+    socket = assign(socket, :selected_sort, sort)
 
     user = socket.assigns.current_user
 
@@ -62,7 +72,7 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
       items =
         case source do
           :album -> Sessions.get_albums_by_period(user, period, %{year: year, month: month})
-          :track -> Sessions.get_singles_by_period(user, period, %{year: year, month: month})
+          :track -> Sessions.get_singles_by_period(user, period, %{year: year, month: month, sort: sort})
           :playlist -> Sessions.get_playlists_by_period(user, period, %{year: year, month: month})
           :clip -> Sessions.get_clips_by_period(user, period, %{year: year, month: month})
         end
@@ -89,6 +99,18 @@ defmodule PremiereEcouteWeb.Sessions.Retrospective.StreamerLive do
     url_params =
       build_params(socket.assigns.selected_period, socket.assigns.selected_year, socket.assigns.selected_month)
       |> Map.put("source", source)
+
+    {:noreply, push_patch(socket, to: ~p"/sessions/retrospective?#{url_params}")}
+  end
+
+  @impl true
+  def handle_event("change_sort", %{"sort" => sort_str}, socket) do
+    sort = String.to_existing_atom(sort_str)
+
+    url_params =
+      build_params(socket.assigns.selected_period, socket.assigns.selected_year, socket.assigns.selected_month)
+      |> Map.put("source", socket.assigns.selected_source)
+      |> Map.put("sort", sort)
 
     {:noreply, push_patch(socket, to: ~p"/sessions/retrospective?#{url_params}")}
   end

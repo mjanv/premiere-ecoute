@@ -1085,4 +1085,46 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
     </form>
     """
   end
+
+  @doc "Renders the submitter name toggle with optional name input, for track sessions."
+  attr :submitter_enabled, :boolean, required: true
+  attr :track_submitter, :string, required: true
+
+  def submitter_toggle(assigns) do
+    ~H"""
+    <form phx-change="set_submitter" class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
+      <button
+        type="button"
+        phx-click={JS.dispatch("click", to: "#submitter-checkbox")}
+        class={[
+          "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+          if(@submitter_enabled, do: "bg-purple-600", else: "bg-gray-700")
+        ]}
+      >
+        <span class={[
+          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+          if(@submitter_enabled, do: "translate-x-5", else: "translate-x-0")
+        ]} />
+      </button>
+      <input id="submitter-checkbox" type="checkbox" name="enabled" checked={@submitter_enabled} class="hidden" />
+      <div class="flex-1">
+        <label class="text-sm font-medium text-gray-200">{gettext("Submitted by")}</label>
+        <p class="text-xs text-gray-400 mt-0.5">{gettext("Credit who suggested this track")}</p>
+      </div>
+      <div class={[
+        "transition-opacity",
+        if(@submitter_enabled, do: "opacity-100", else: "opacity-0 pointer-events-none")
+      ]}>
+        <input
+          type="text"
+          name="submitter"
+          value={@track_submitter}
+          placeholder={gettext("Name")}
+          phx-debounce="300"
+          class="w-40 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-purple-500"
+        />
+      </div>
+    </form>
+    """
+  end
 end

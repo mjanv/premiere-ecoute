@@ -56,12 +56,16 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
 
   @doc """
   Get all single-track sessions listened by a specific streamer during a time period.
+
+  Pass `sort: :score` in `opts` to order results by viewer_score descending
+  (sessions with no numeric score sort last, ties broken by started_at descending).
   """
   @spec get_singles_by_period(User.t(), time_period(), map()) :: [map()]
   def get_singles_by_period(%User{id: user_id} = user, period, opts \\ %{}) do
     current_date = DateTime.utc_now()
     year = Map.get(opts, :year, current_date.year)
     month = Map.get(opts, :month, current_date.month)
+    sort = Map.get(opts, :sort, :date)
 
     query =
       from s in ListeningSession,
@@ -87,7 +91,17 @@ defmodule PremiereEcoute.Sessions.Retrospective.History do
     end
     |> Repo.all()
     |> Enum.map(fn item -> %{item | session: %{item.session | user: user}} end)
+    |> sort_by(sort)
   end
+
+  defp sort_by(items, :date), do: items
+
+  defp sort_by(items, :score) do
+    Enum.sort_by(items, fn item -> viewer_score(item.report) end, :desc)
+  end
+
+  defp viewer_score(%Report{session_summary: %{"viewer_score" => score}}) when is_number(score), do: score
+  defp viewer_score(_), do: -1
 
   @doc """
   Get all clip sessions listened by a specific streamer during a time period.

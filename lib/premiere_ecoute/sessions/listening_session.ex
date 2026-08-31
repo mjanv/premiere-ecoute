@@ -693,6 +693,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def title(%__MODULE__{single: %{name: name}}), do: name
 
   @doc """
+  Returns the submitter name stored for the session, if any.
+  """
+  @spec submitter(t()) :: String.t() | nil
+  def submitter(%__MODULE__{options: options}), do: options["submitter"]
+
+  @doc """
   Fetches a session by its share token with preloaded associations.
   """
   @spec get_by_share_token(String.t()) :: t() | nil

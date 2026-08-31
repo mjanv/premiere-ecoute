@@ -93,7 +93,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         user_id: user_id,
         track_id: track_id,
         vote_options: vote_options,
-        autostart: autostart
+        autostart: autostart,
+        submitter: submitter
       }) do
     with {:ok, single} <- EnrichDiscography.create_single(track_id, :spotify),
          {:ok, session} <-
@@ -102,7 +103,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              source: :track,
              single_id: single.id,
              vote_options: vote_options,
-             options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
+             options: %{
+               "votes" => 0,
+               "scores" => 0,
+               "next_track" => 0,
+               "autostart" => autostart,
+               "submitter" => submitter
+             }
            }) do
       {:ok, session,
        [

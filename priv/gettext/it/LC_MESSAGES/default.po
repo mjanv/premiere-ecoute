@@ -103,7 +103,7 @@ msgstr "Twitch"
 msgid "Viewers"
 msgstr "Spettatori"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:143
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:163
 #: lib/premiere_ecoute_web/live/sessions/retrospective/votes_live.html.heex:131
 #, elixir-autogen, elixir-format
 msgid "Album cover"
@@ -555,7 +555,7 @@ msgstr "Sessioni"
 msgid "Sessions Management"
 msgstr "Gestione Sessioni"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:107
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:110
 #, elixir-autogen, elixir-format
 msgid "Start Listening Session"
 msgstr "Inizia Sessione di Ascolto"
@@ -625,7 +625,7 @@ msgstr "Visualizza e gestisci sessioni di ascolto"
 msgid "tracks"
 msgstr "brani"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:92
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:95
 #, elixir-autogen, elixir-format
 msgid "Ready to Start"
 msgstr "Pronto per Iniziare"
@@ -704,17 +704,17 @@ msgstr "Termini"
 msgid "Close"
 msgstr "Chiudi"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:107
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:127
 #, elixir-autogen, elixir-format
 msgid "Failed to load albums"
 msgstr "Impossibile caricare gli album"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:119
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:139
 #, elixir-autogen, elixir-format
 msgid "No Albums Found"
 msgstr "Nessun Album Trovato"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:108
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:128
 #: lib/premiere_ecoute_web/live/sessions/retrospective/tops_live.html.heex:120
 #: lib/premiere_ecoute_web/live/sessions/retrospective/votes_live.html.heex:108
 #, elixir-autogen, elixir-format
@@ -728,7 +728,7 @@ msgstr "Prova ad aggiornare la pagina"
 msgid "Month"
 msgstr "Mese"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:120
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:140
 #, elixir-autogen, elixir-format
 msgid "No albums listened during this period"
 msgstr "Nessun album ascoltato durante questo periodo"
@@ -1034,7 +1034,7 @@ msgstr "Seleziona un formato per vedere le opzioni"
 msgid "Source"
 msgstr "Punteggio"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:114
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:117
 #, elixir-autogen, elixir-format
 msgid "Start Over"
 msgstr "Iniziato"
@@ -2837,8 +2837,8 @@ msgid_plural "artists"
 msgstr[0] "artista"
 msgstr[1] "artisti"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:426
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:451
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:433
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:458
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "La prima di %{name} è finita"
@@ -2851,8 +2851,8 @@ msgstr "La prima di %{name} è finita"
 msgid "Votes are open !"
 msgstr "Le votazioni sono aperte!"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:209
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:233
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:216
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:240
 #: lib/premiere_ecoute/sessions/listening_session/listening_session_worker.ex:110
 #, elixir-autogen, elixir-format
 msgid "Welcome to the premiere of %{name} by %{artist}"
@@ -2976,6 +2976,7 @@ msgstr "La valuta è richiesta"
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:247
 #: lib/premiere_ecoute_web/live/admin/donations/goal_live.html.heex:392
 #: lib/premiere_ecoute_web/live/playlists/automations/form_live.html.heex:66
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:97
 #, elixir-autogen, elixir-format
 msgid "Date"
 msgstr "Dati"
@@ -3389,8 +3390,8 @@ msgstr "Da sempre"
 msgid "Failed to load top tracks"
 msgstr "Impossibile caricare i brani migliori"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:392
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:409
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:399
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:416
 #, elixir-autogen, elixir-format
 msgid "%{name} by %{artist} is over"
 msgstr "%{name} di %{artist} è finita"
@@ -3422,7 +3423,7 @@ msgstr "Impossibile fermare la sessione"
 msgid "Currently playing"
 msgstr "In riproduzione"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:514
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:526
 #, elixir-autogen, elixir-format
 msgid "No track currently playing on Spotify."
 msgstr "Nessun brano in riproduzione su Spotify."
@@ -3484,12 +3485,12 @@ msgstr "Selezione del brano"
 msgid "Use currently playing"
 msgstr "Usa il brano in riproduzione"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:125
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:145
 #, elixir-autogen, elixir-format
 msgid "No Playlists Found"
 msgstr "Nessuna playlist trovata"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:126
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:146
 #, elixir-autogen, elixir-format
 msgid "No playlists listened during this period"
 msgstr "Nessuna playlist ascoltata in questo periodo"
@@ -3499,12 +3500,12 @@ msgstr "Nessuna playlist ascoltata in questo periodo"
 msgid "This week I listened and reacted live to the playlist \"%{title}\" by %{artist} !"
 msgstr "Questa settimana ho ascoltato e reagito dal vivo alla playlist \"%{title}\" di %{artist} !"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:122
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:142
 #, elixir-autogen, elixir-format
 msgid "No Tracks Found"
 msgstr "Nessun brano trovato"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:123
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:143
 #, elixir-autogen, elixir-format
 msgid "No tracks listened during this period"
 msgstr "Nessun brano ascoltato in questo periodo"
@@ -3616,7 +3617,7 @@ msgstr "Lista svuotata"
 msgid "Manage picks"
 msgstr "Gestisci i pick"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:428
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:440
 #, elixir-autogen, elixir-format
 msgid "No album selected"
 msgstr "Nessun album selezionato"
@@ -3626,7 +3627,7 @@ msgstr "Nessun album selezionato"
 msgid "No albums in the list yet"
 msgstr "Nessun album nella lista"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:603
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:615
 #, elixir-autogen, elixir-format
 msgid "No albums in the pick list yet!"
 msgstr "Nessun album nella lista dei pick!"
@@ -3686,7 +3687,7 @@ msgstr "Condividi questo link per permettere agli spettatori di inviare album."
 msgid "Spin again"
 msgstr "Rilancia"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:617
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:629
 #, elixir-autogen, elixir-format
 msgid "Spin failed. Please try again."
 msgstr "Estrazione fallita. Riprova."
@@ -3722,6 +3723,8 @@ msgid "Submit an Album"
 msgstr "Invia un album"
 
 #: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:421
+#: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:1111
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:210
 #, elixir-autogen, elixir-format
 msgid "Submitted by"
 msgstr "Inviato da"
@@ -3814,7 +3817,7 @@ msgstr "Impossibile catturare il brano"
 msgid "Cannot close vote window"
 msgstr "Impossibile chiudere la votazione"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:289
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.ex:294
 #, elixir-autogen, elixir-format
 msgid "Cannot create the listening session"
 msgstr "Impossibile creare la sessione di ascolto"
@@ -3955,7 +3958,7 @@ msgstr "Avvia la radio"
 msgid "Stop radio"
 msgstr "Ferma la radio"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:595
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:602
 #, elixir-autogen, elixir-format
 msgid "The free session %{name} is over"
 msgstr "La prima di %{name} è finita"
@@ -4702,7 +4705,7 @@ msgstr "Nessun membro per ora."
 msgid "Not following anyone yet"
 msgstr "Non stai ancora seguendo nessuno"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:261
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:268
 #, elixir-autogen, elixir-format
 msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})"
 msgstr "Benvenuti alla prima ascolto di %{name} di %{artist} (%{tracks} tracce - %{timer})"
@@ -4975,6 +4978,7 @@ msgid "Min"
 msgstr "Min"
 
 #: lib/premiere_ecoute_web/live/playlists/automations/form_live.html.heex:25
+#: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:1122
 #, elixir-autogen, elixir-format
 msgid "Name"
 msgstr "Nome"
@@ -6900,7 +6904,7 @@ msgstr "Usa precedente/successivo nel player per cambiare traccia"
 msgid "Widget is not displaying progress"
 msgstr "Il widget non mostra l'avanzamento"
 
-#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:96
+#: lib/premiere_ecoute_web/live/sessions/session_selection_live.html.heex:99
 #, elixir-autogen, elixir-format
 msgid "Make sure Spotify has played something in the last 10 minutes so the app can control it."
 msgstr "Assicurati che Spotify abbia riprodotto qualcosa negli ultimi 10 minuti affinché l'app possa controllarlo."
@@ -6957,7 +6961,7 @@ msgstr "Banner hashtag"
 msgid "Matched on Spotify"
 msgstr "Trovato su Spotify"
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:128
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:148
 #, elixir-autogen, elixir-format
 msgid "No Clips Found"
 msgstr "Nessun clip trovato"
@@ -6967,7 +6971,7 @@ msgstr "Nessun clip trovato"
 msgid "No Spotify match. Try another video."
 msgstr "Nessuna corrispondenza su Spotify. Prova un altro video."
 
-#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:129
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:149
 #, elixir-autogen, elixir-format
 msgid "No clips listened during this period"
 msgstr "Nessun clip ascoltato durante questo periodo"
@@ -7006,3 +7010,13 @@ msgstr "Nota"
 #, elixir-autogen, elixir-format
 msgid "Português"
 msgstr "Portoghese"
+
+#: lib/premiere_ecoute_web/live/sessions/components/session_selection_components.ex:1112
+#, elixir-autogen, elixir-format
+msgid "Credit who suggested this track"
+msgstr "Indica chi ha suggerito questo brano"
+
+#: lib/premiere_ecoute_web/live/sessions/retrospective/streamer_live.html.heex:104
+#, elixir-autogen, elixir-format
+msgid "Ranking"
+msgstr "Classifica"

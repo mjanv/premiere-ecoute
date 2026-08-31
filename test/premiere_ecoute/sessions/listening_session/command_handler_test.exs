@@ -155,6 +155,25 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert event.single_id == session.single_id
     end
 
+    test "stores the submitter name on the track session when provided" do
+      user = user_fixture()
+      single = single_fixture()
+
+      expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
+
+      command = %PrepareListeningSession{
+        source: :track,
+        user_id: user.id,
+        track_id: Map.get(single.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        submitter: "Alice"
+      }
+
+      {:ok, session, [%SessionPrepared{}]} = CommandBus.apply(command)
+
+      assert ListeningSession.submitter(session) == "Alice"
+    end
+
     test "returns SessionNotPrepared when SpotifyApi get_single fails" do
       user_id = 1
       track_id = "invalid_track"

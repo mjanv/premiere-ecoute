@@ -75,6 +75,9 @@
               <%= if @source_type in ["album", "playlist"] do %>
                 <.interlude_toggle interlude_skip={@interlude_skip} interlude_threshold_s={@interlude_threshold_s} />
               <% end %>
+              <%= if @source_type == "track" do %>
+                <.submitter_toggle submitter_enabled={@submitter_enabled} track_submitter={@track_submitter} />
+              <% end %>
             </div>
           </div>
         <% end %>

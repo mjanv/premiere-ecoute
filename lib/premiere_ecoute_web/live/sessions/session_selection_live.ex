@@ -40,6 +40,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:pick_spinning, false)
     |> assign(:free_session_name, "")
     |> assign(:free_vote_mode, nil)
+    |> assign(:submitter_enabled, false)
+    |> assign(:track_submitter, "")
     |> assign(:autostart, true)
     |> assign(:interlude_skip, true)
     |> assign(:interlude_threshold_s, 45)
@@ -185,6 +187,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:autostart, true)
     |> assign(:interlude_skip, true)
     |> assign(:interlude_threshold_s, 45)
+    |> assign(:submitter_enabled, false)
+    |> assign(:track_submitter, "")
     # Load playlists if playlist source is selected
     |> maybe_load_playlists(source)
     |> update_state()
@@ -243,7 +247,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       user_id: get_user_id(socket),
       track_id: Map.get(track.provider_ids, :spotify),
       vote_options: get_vote_options(socket.assigns),
-      autostart: socket.assigns.autostart
+      autostart: socket.assigns.autostart,
+      submitter: submitter_value(socket.assigns)
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -388,6 +393,13 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       end
 
     {:noreply, socket |> assign(:interlude_skip, enabled) |> assign(:interlude_threshold_s, threshold_s)}
+  end
+
+  def handle_event("set_submitter", params, socket) do
+    enabled = Map.has_key?(params, "enabled")
+    submitter = Map.get(params, "submitter", socket.assigns.track_submitter)
+
+    {:noreply, socket |> assign(:submitter_enabled, enabled) |> assign(:track_submitter, submitter)}
   end
 
   def handle_event("open_random_modal", _params, socket) do
@@ -629,6 +641,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       _ -> nil
     end
   end
+
+  defp submitter_value(%{submitter_enabled: true, track_submitter: ""}), do: nil
+  defp submitter_value(%{submitter_enabled: true, track_submitter: submitter}), do: submitter
+  defp submitter_value(_assigns), do: nil
 
   defp maybe_load_playlists(socket, "playlist") do
     case socket.assigns.current_scope do

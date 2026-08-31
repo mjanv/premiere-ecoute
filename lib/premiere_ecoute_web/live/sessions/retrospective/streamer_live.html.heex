@@ -85,6 +85,26 @@
               </button>
             </div>
           </div>
+
+          <!-- Sort Toggle (tracks only) -->
+          <div :if={@selected_source == :track} class="ml-4 flex items-center">
+            <div class="bg-gray-800 rounded-lg p-1 flex">
+              <button
+                phx-click={if @selected_sort != :date, do: "change_sort"}
+                phx-value-sort="date"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_sort == :date, do: "bg-cyan-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Date")}
+              </button>
+              <button
+                phx-click={if @selected_sort != :score, do: "change_sort"}
+                phx-value-sort="score"
+                class={"px-4 py-2 rounded-md font-medium transition-colors #{if @selected_sort == :score, do: "bg-cyan-700 text-white", else: "text-gray-400 hover:text-white"}"}
+              >
+                {gettext("Ranking")}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -186,6 +206,9 @@
                       <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <p class="text-white font-semibold truncate drop-shadow">{item.single.name}</p>
                         <p class="text-cyan-300 text-sm truncate">{item.single.artist}</p>
+                        <p :if={ListeningSession.submitter(item.session)} class="text-gray-400 text-xs truncate">
+                          {gettext("Submitted by")} {ListeningSession.submitter(item.session)}
+                        </p>
                       </div>
                     </div>
                   </.link>
