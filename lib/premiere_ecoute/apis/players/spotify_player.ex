@@ -145,6 +145,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
     end
   end
 
+  def progress(%PlaybackState{item: nil}), do: 0
+
   @doc """
   Detects playback state changes and generates events.
 
