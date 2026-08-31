@@ -595,6 +595,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   @doc "Renders the track search input, results dropdown, and selected track info card."
   attr :selected_track, :any, required: true
   attr :search_tracks, :any, required: true
+  attr :search_track_albums, :any, required: true
   attr :search_form, :any, required: true
 
   def track_step(assigns) do
@@ -642,33 +643,52 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
           </div>
         </div>
 
-        <%= if @search_tracks.loading do %>
+        <%= if @search_tracks.loading || @search_track_albums.loading do %>
           <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4">
             <div class="flex items-center justify-center space-x-3">
               <div class="animate-spin rounded-full h-5 w-5 border-2 border-cyan-400 border-t-transparent"></div>
-              <span class="text-gray-300 text-sm">{gettext("Searching tracks...")}</span>
+              <span class="text-gray-300 text-sm">{gettext("Searching...")}</span>
             </div>
           </div>
         <% end %>
 
-        <%= if @search_tracks.ok? && length(@search_tracks.result) > 0 do %>
-          <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto">
-            <%= for track <- @search_tracks.result do %>
-              <div
-                class="p-3 cursor-pointer hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg flex items-center space-x-3"
-                style="background-color: var(--color-dark-800);"
-                phx-click="select_track"
-                phx-value-track_id={Map.get(track.provider_ids, :spotify)}
-              >
-                <%= if track.cover_url do %>
-                  <.cover src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
-                <% end %>
-                <div class="flex-1 min-w-0">
-                  <p class="text-white font-medium truncate">{track.name}</p>
-                  <p class="text-gray-400 text-sm truncate">{track.artist}</p>
+        <%= if !@search_tracks.loading && !@search_track_albums.loading &&
+              ((@search_tracks.ok? && length(@search_tracks.result) > 0) ||
+                 (@search_track_albums.ok? && length(@search_track_albums.result) > 0)) do %>
+          <div class="absolute top-full left-0 right-0 z-50 mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-96 overflow-y-auto">
+            <%= if @search_tracks.ok? && length(@search_tracks.result) > 0 do %>
+              <p class="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{gettext("Tracks")}</p>
+              <%= for track <- @search_tracks.result do %>
+                <div
+                  class="p-3 cursor-pointer hover:bg-gray-600 transition-colors flex items-center space-x-3"
+                  style="background-color: var(--color-dark-800);"
+                  phx-click="select_track"
+                  phx-value-track_id={Map.get(track.provider_ids, :spotify)}
+                >
+                  <%= if track.cover_url do %>
+                    <.cover src={track.cover_url} class="w-10 h-10 rounded flex-shrink-0" />
+                  <% end %>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-white font-medium truncate">{track.name}</p>
+                    <p class="text-gray-400 text-sm truncate">{track.artist}</p>
+                  </div>
+                  <span class="text-gray-400 text-xs flex-shrink-0">{PremiereEcouteCore.Duration.timer(track.duration_ms)}</span>
                 </div>
-                <span class="text-gray-400 text-xs flex-shrink-0">{PremiereEcouteCore.Duration.timer(track.duration_ms)}</span>
-              </div>
+              <% end %>
+            <% end %>
+
+            <%= if @search_track_albums.ok? && length(@search_track_albums.result) > 0 do %>
+              <p class="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{gettext("Albums")}</p>
+              <%= for album <- @search_track_albums.result do %>
+                <div
+                  class="p-3 cursor-pointer hover:bg-gray-600 transition-colors last:rounded-b-lg"
+                  style="background-color: var(--color-dark-800);"
+                  phx-click="select_track_album"
+                  phx-value-album_id={Map.get(album.provider_ids, :spotify)}
+                >
+                  <AlbumTrackDisplay.album_display album={album} size="md" show_metadata={true} class="text-primary-300" />
+                </div>
+              <% end %>
             <% end %>
           </div>
         <% end %>
