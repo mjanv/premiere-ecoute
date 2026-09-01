@@ -8,10 +8,13 @@ defmodule PremiereEcouteWeb.Plugs.ContentSecurityPolicy do
     * Frames    — YouTube and Spotify embeds
     * Connect   — self (incl. the LiveView websocket) and PostHog ingestion
     * Images    — self, data: URIs, and YouTube/Spotify thumbnail hosts
-    * Fonts/CSS — self-hosted
+    * Fonts/CSS — self-hosted, plus Google Fonts (Bricolage Grotesque is `@import`ed from
+      fonts.googleapis.com, with the actual font files served from fonts.gstatic.com)
 
   `script-src` and `style-src` keep `'unsafe-inline'`: the layout ships inline `<script>` blocks
   (PostHog init, theme) and templates use inline `style=` attributes for the always-dark chrome.
+  `script-src` also keeps `'unsafe-eval'`: Alpine.js evaluates `x-data`/`@click`-style directive
+  expressions via `new Function()` at runtime.
   The hard wins here are `object-src 'none'`, `base-uri 'self'`, `frame-ancestors`, and
   `form-action 'self'`, plus restricting script/frame/connect/img to a known host allowlist.
 
@@ -23,10 +26,10 @@ defmodule PremiereEcouteWeb.Plugs.ContentSecurityPolicy do
 
   @policy [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' https://unpkg.com https://eu.i.posthog.com https://www.youtube.com https://s.ytimg.com",
-            "style-src 'self' 'unsafe-inline'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://eu.i.posthog.com https://www.youtube.com https://s.ytimg.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "img-src 'self' data: https://i.ytimg.com https://i.scdn.co",
-            "font-src 'self'",
+            "font-src 'self' https://fonts.gstatic.com",
             "connect-src 'self' https://eu.i.posthog.com",
             "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com",
             "media-src 'self' blob:",

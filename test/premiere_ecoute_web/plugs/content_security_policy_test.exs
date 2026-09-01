@@ -31,6 +31,10 @@ defmodule PremiereEcouteWeb.Plugs.ContentSecurityPolicyTest do
     assert policy =~ "https://unpkg.com"
     assert policy =~ "https://eu.i.posthog.com"
     assert policy =~ "https://www.youtube.com"
+    assert policy =~ "https://fonts.googleapis.com"
+    assert policy =~ "https://fonts.gstatic.com"
+    # Alpine.js evaluates directive expressions via new Function()
+    assert policy =~ "'unsafe-eval'"
   end
 
   test "emits a report-only header when csp: :report_only" do
