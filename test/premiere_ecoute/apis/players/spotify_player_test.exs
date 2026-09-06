@@ -453,6 +453,24 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerTest do
 
       assert {:ok, ^new_state, []} = SpotifyPlayer.handle(old_state, new_state)
     end
+
+    test "returns empty events when device stays active but item drops to nil mid-progress" do
+      old_state = %PlaybackState{
+        is_playing: false,
+        progress_ms: 90_000,
+        item: %{duration_ms: 180_000},
+        device: %{name: "device123", is_active: true}
+      }
+
+      new_state = %PlaybackState{
+        is_playing: false,
+        progress_ms: 0,
+        item: nil,
+        device: %{name: "device123", is_active: true}
+      }
+
+      assert {:ok, ^new_state, []} = SpotifyPlayer.handle(old_state, new_state)
+    end
   end
 
   describe "init" do

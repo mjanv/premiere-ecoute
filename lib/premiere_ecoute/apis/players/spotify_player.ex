@@ -162,6 +162,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   def handle(%PlaybackState{item: %{uri: uri1}}, %PlaybackState{item: %{uri: uri2}} = state) when uri1 != uri2,
     do: {:ok, state, [:new_track]}
 
+  def handle(_old_state, %PlaybackState{item: nil} = new_state), do: {:ok, new_state, []}
+
   def handle(old_state, new_state) do
     case {progress(old_state), progress(new_state)} do
       {0, b} when b >= 1 -> {:ok, new_state, [:start_track]}
