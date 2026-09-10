@@ -209,6 +209,10 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
       {:ok, %{status: 400}} ->
         {:ok, state}
 
+      {:ok, %{status: 429, body: %{"error" => %{"reason" => "QUOTA_EXCEEDED"}} = body}} ->
+        Logger.error("Spotify application quota exceeded: #{inspect(body)}")
+        {:error, "Spotify application quota exceeded"}
+
       {:ok, %{status: 429, body: body}} ->
         Logger.error("Spotify rate limit exceeded: #{inspect(body)}")
         {:error, "Spotify rate limit exceeded"}

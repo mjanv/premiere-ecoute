@@ -81,5 +81,28 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApiTest do
       assert {:error, "Network error during playback state"} = SpotifyApi.get_playback_state(scope, %{})
       assert {:error, "Network error during playback state"} = SpotifyApi.get_playback_state(scope, %{})
     end
+
+    test "activate the circuit breaker for a long cool-down on Spotify's QUOTA_EXCEEDED 429, unlike a plain rate limit", %{
+      scope: scope
+    } do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me/player"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}, {"content-type", "application/json"}],
+        response: %{"error" => %{"status" => 429, "message" => "Too many requests", "reason" => "QUOTA_EXCEEDED"}},
+        resp_headers: %{"retry-after" => ["60"]},
+        status: 429
+      )
+
+      {:error, "Spotify application quota exceeded"} = SpotifyApi.get_playback_state(scope, %{})
+      {:ok, message} = Cache.get(:rate_limits, :spotify)
+      {:ok, ttl} = Cache.ttl(:rate_limits, :spotify)
+
+      assert message =~ "quota"
+      assert_in_delta ttl, 86_400_000, 100
+
+      assert {:error, "Network error during playback state"} = SpotifyApi.get_playback_state(scope, %{})
+      assert {:error, "Network error during playback state"} = SpotifyApi.get_playback_state(scope, %{})
+    end
   end
 end
