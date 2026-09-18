@@ -108,6 +108,10 @@ defmodule PremiereEcouteWeb.Router do
     live_session :home, on_mount: [{UserAuth, :viewer}] do
       live "/home", HomeLive, :index
     end
+
+    live_session :debug, on_mount: [{UserAuth, :current_scope}] do
+      live "/debug/spotify", SpotifyDebugLive, :index
+    end
   end
 
   scope "/users", PremiereEcouteWeb.Accounts do

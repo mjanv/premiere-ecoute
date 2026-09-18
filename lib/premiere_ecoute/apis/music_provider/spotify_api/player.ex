@@ -25,11 +25,19 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   def devices(%Scope{} = scope) do
     scope
     |> SpotifyApi.api()
-    |> Req.merge(headers: [{"Content-Type", "application/json"}])
+    |> Req.merge(headers: [{"Content-Type", "application/json"}], retry: false)
     |> Req.get(url: "/me/player/devices")
     |> case do
-      {:ok, %{status: 200, body: %{"devices" => devices}}} -> {:ok, devices}
-      _ -> {:error, []}
+      {:ok, %{status: 200, body: %{"devices" => devices}}} ->
+        {:ok, devices}
+
+      {:ok, %{status: status, body: body}} ->
+        Logger.error("Spotify devices failed: #{status} - #{inspect(body)}")
+        {:error, []}
+
+      {:error, reason} ->
+        Logger.error("Spotify devices request failed: #{inspect(reason)}")
+        {:error, []}
     end
   end
 
@@ -224,6 +232,26 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
       {:error, reason} ->
         Logger.error("Spotify get playback state request failed: #{inspect(reason)}")
         {:error, "Network error during playback state"}
+    end
+  end
+
+  @doc """
+  Retrieves the raw, unprocessed `/me/player` response for debugging.
+
+  Unlike `get_playback_state/2`, this returns the full Spotify response body
+  (including fields like `shuffle_state`, `repeat_state`, `context`, and
+  `actions.disallows` that `PlaybackState.from_json/1` discards) and the raw
+  status code for any outcome, so nothing is normalized away.
+  """
+  @spec raw_playback_state(Scope.t()) :: {:ok, integer(), map() | nil} | {:error, term()}
+  def raw_playback_state(%Scope{} = scope) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.merge(url: "/me/player", retry: false)
+    |> Req.get()
+    |> case do
+      {:ok, %{status: status, body: body}} -> {:ok, status, body}
+      {:error, reason} -> {:error, reason}
     end
   end
 

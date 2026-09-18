@@ -1,0 +1,110 @@
+<.gradient_bg class="p-6 space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-lg font-semibold text-white">Spotify player debug</h1>
+      <p class="text-xs text-surface-muted">
+        Hits the real Spotify Web API for <span class="font-mono">{(@current_scope.user.spotify && @current_scope.user.spotify.username) || "no Spotify account linked"}</span>.
+        Refreshed at {@refreshed_at}.
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <.button size="sm" variant={if @auto_refresh, do: "primary", else: "outline"} phx-click="toggle_auto_refresh">
+        Auto-refresh (5s): {if @auto_refresh, do: "on", else: "off"}
+      </.button>
+      <.button phx-click="refresh">Refresh now</.button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+    <div class="space-y-6">
+      <.card class="p-4 space-y-3 bg-surface-elevated border-surface">
+        <h2 class="text-sm font-medium text-surface uppercase tracking-wide">Load a track</h2>
+        <form phx-change="search_tracks" phx-submit="search_tracks">
+          <input
+            type="text"
+            name="query"
+            value={@track_query}
+            placeholder="Search a track or artist…"
+            autocomplete="off"
+            class="w-full rounded-lg bg-black/30 border border-surface px-3 py-2 text-sm text-white placeholder:text-surface-muted focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </form>
+
+        <p :if={@track_search_error} class="text-xs text-error">
+          Search failed: {inspect(@track_search_error)}
+        </p>
+
+        <ul :if={@track_results != []} class="divide-y divide-surface max-h-72 overflow-y-auto">
+          <li :for={track <- @track_results} class="flex items-center justify-between gap-2 py-2">
+            <div class="min-w-0">
+              <p class="text-sm text-white truncate">{track.name}</p>
+              <p class="text-xs text-surface-muted truncate">
+                {Enum.map_join(track.artists, ", ", & &1.name)}
+              </p>
+            </div>
+            <.button size="xs" phx-click="load_track" phx-value-spotify_id={track.provider_ids.spotify}>
+              Load
+            </.button>
+          </li>
+        </ul>
+      </.card>
+
+      <.card class="p-4 space-y-3 bg-surface-elevated border-surface">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-medium text-surface uppercase tracking-wide">Actions</h2>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <.button size="sm" phx-click="action" phx-value-action="play">Play</.button>
+          <.button size="sm" phx-click="action" phx-value-action="pause">Pause</.button>
+          <.button size="sm" phx-click="action" phx-value-action="previous">Previous</.button>
+          <.button size="sm" phx-click="action" phx-value-action="next">Next</.button>
+          <.button size="sm" variant="outline" phx-click="action" phx-value-action="shuffle_on">
+            Shuffle on
+          </.button>
+          <.button size="sm" variant="outline" phx-click="action" phx-value-action="shuffle_off">
+            Shuffle off
+          </.button>
+          <.button size="sm" variant="outline" phx-click="action" phx-value-action="repeat_track">
+            Repeat track
+          </.button>
+          <.button size="sm" variant="outline" phx-click="action" phx-value-action="repeat_context">
+            Repeat context
+          </.button>
+          <.button size="sm" variant="outline" phx-click="action" phx-value-action="repeat_off">
+            Repeat off
+          </.button>
+        </div>
+
+        <%= if @last_action do %>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-surface-muted">Last action:</span>
+              <.status_badge variant="primary" size="sm">{@last_action.name}</.status_badge>
+              <span class="text-xs text-surface-muted">{@last_action.at}</span>
+            </div>
+            <pre class="bg-black/40 text-xs text-gray-200 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap">{pretty(@last_action.result)}</pre>
+          </div>
+        <% end %>
+      </.card>
+
+      <.card class="p-4 space-y-3 bg-surface-elevated border-surface">
+        <h2 class="text-sm font-medium text-surface uppercase tracking-wide">Devices (/me/player/devices)</h2>
+        <pre class="bg-black/40 text-xs text-gray-200 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap max-h-96">{pretty(@devices)}</pre>
+      </.card>
+    </div>
+
+    <.card class="p-4 space-y-3 bg-surface-elevated border-surface">
+      <div class="flex items-center gap-2">
+        <h2 class="text-sm font-medium text-surface uppercase tracking-wide">Raw playback state (/me/player)</h2>
+        <%= case @raw_state do %>
+          <% {:ok, status, _body} -> %>
+            <.status_badge variant={status_variant(status)} size="sm">HTTP {status}</.status_badge>
+          <% {:error, _reason} -> %>
+            <.status_badge variant="error" size="sm">network error</.status_badge>
+          <% :not_loaded -> %>
+        <% end %>
+      </div>
+      <pre class="bg-black/40 text-xs text-gray-200 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap max-h-[44rem]">{pretty(@raw_state)}</pre>
+    </.card>
+  </div>
+</.gradient_bg>
