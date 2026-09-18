@@ -19,7 +19,7 @@ description: Production debugging session for Premiere Ecoute. Pull live signals
 
 ### 0. Create investigation document
 
-Before doing anything else, create a file `YYYY-MM-DD-<short-slug>.md` describing the reported symptom. Fill it in as the investigation progresses — do not wait until the end.
+Before doing anything else, create a file `docs/bugs/YYYY-MM-DD-<short-slug>.md` describing the reported symptom. Fill it in as the investigation progresses — do not wait until the end.
 
 ```markdown
 # Investigation: <short description>

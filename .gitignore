@@ -44,6 +44,7 @@ phx_new_cache-*.tar
 
 # Documentation files
 docs/product/
+docs/bugs/
 priv/docs/
 
 # Javascript
