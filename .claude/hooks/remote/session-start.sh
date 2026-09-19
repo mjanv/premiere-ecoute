@@ -13,11 +13,11 @@ if [ "$CLAUDE_CODE_REMOTE" = "true" ]; then
   if ! command -v mix >/dev/null 2>&1; then
     echo "==> mix not found (setup-script install did not persist) — installing Elixir/OTP now..."
     curl -fsSO https://elixir-lang.org/install.sh
-    sh install.sh elixir@1.20.4 otp@29.0.5
+    sh install.sh elixir@1.20.4 otp@29.1
     rm install.sh
 
     installs_dir="$HOME/.elixir-install/installs"
-    otp_bin=$(echo "$installs_dir"/otp/29.0.5/bin)
+    otp_bin=$(echo "$installs_dir"/otp/29.1/bin)
     elixir_bin=$(echo "$installs_dir"/elixir/1.20.4-otp-*/bin)
     export PATH="$elixir_bin:$otp_bin:$PATH"
 
