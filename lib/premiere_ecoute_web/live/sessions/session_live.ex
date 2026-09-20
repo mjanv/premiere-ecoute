@@ -19,39 +19,44 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def mount(%{"share_token" => share_token, "username" => _username}, _session, socket) do
-    listening_session =
-      share_token
-      |> ListeningSession.get_by_share_token()
-      |> Repo.preload(report: [:votes, :polls])
+    with listening_session when not is_nil(listening_session) <- ListeningSession.get_by_share_token(share_token) do
+      listening_session = Repo.preload(listening_session, report: [:votes, :polls])
 
-    {:ok, report} = Report.generate(listening_session)
-    tracks = build_tracks(listening_session, report)
+      {:ok, report} = Report.generate(listening_session)
+      tracks = build_tracks(listening_session, report)
 
-    reviews = Reviews.list_for_session(listening_session.id)
-    review_ids = Enum.map(reviews, & &1.id)
+      reviews = Reviews.list_for_session(listening_session.id)
+      review_ids = Enum.map(reviews, & &1.id)
 
-    current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
+      current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
 
-    liked_ids =
-      if current_user,
-        do: ReviewLikes.liked_review_ids(review_ids, current_user.id),
-        else: MapSet.new()
+      liked_ids =
+        if current_user,
+          do: ReviewLikes.liked_review_ids(review_ids, current_user.id),
+          else: MapSet.new()
 
-    socket
-    |> assign(:listening_session, listening_session)
-    |> assign(:report, report)
-    |> assign(:tracks, tracks)
-    |> assign(:reviews, reviews)
-    |> assign(:liked_ids, liked_ids)
-    |> assign(:post_vote_eligible, !Sessions.has_voted?(listening_session, current_user))
-    |> assign(:post_vote_modal_open, false)
-    |> assign(:post_vote_selections, %{})
-    |> assign(:review_modal_open, false)
-    |> assign(:review_form, nil)
-    |> assign(:editing_review, nil)
-    |> assign(:replays_modal_open, false)
-    |> assign(:replays_entries, [])
-    |> then(fn socket -> {:ok, socket} end)
+      socket
+      |> assign(:listening_session, listening_session)
+      |> assign(:report, report)
+      |> assign(:tracks, tracks)
+      |> assign(:reviews, reviews)
+      |> assign(:liked_ids, liked_ids)
+      |> assign(:post_vote_eligible, !Sessions.has_voted?(listening_session, current_user))
+      |> assign(:post_vote_modal_open, false)
+      |> assign(:post_vote_selections, %{})
+      |> assign(:review_modal_open, false)
+      |> assign(:review_form, nil)
+      |> assign(:editing_review, nil)
+      |> assign(:replays_modal_open, false)
+      |> assign(:replays_entries, [])
+      |> then(fn socket -> {:ok, socket} end)
+    else
+      nil ->
+        socket
+        |> put_flash(:error, "Session not found")
+        |> redirect(to: ~p"/")
+        |> then(fn socket -> {:ok, socket} end)
+    end
   end
 
   @impl true
