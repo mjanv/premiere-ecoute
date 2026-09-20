@@ -246,6 +246,7 @@ defmodule PremiereEcouteWeb.Layouts do
     <div id={@id} aria-live="polite">
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:error} flash={@flash} />
+      <.flash kind={:warning} flash={@flash} />
 
       <.flash
         id="client-error"

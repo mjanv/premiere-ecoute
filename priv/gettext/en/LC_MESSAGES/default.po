@@ -306,8 +306,8 @@ msgstr "Previous"
 msgid "Progress:"
 msgstr "Progress:"
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:258
-#: lib/premiere_ecoute_web/layouts/layouts.ex:270
+#: lib/premiere_ecoute_web/layouts/layouts.ex:259
+#: lib/premiere_ecoute_web/layouts/layouts.ex:271
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
 msgstr "Attempting to reconnect"
@@ -322,12 +322,12 @@ msgstr "Log Out"
 msgid "My Sessions"
 msgstr "My Sessions"
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:265
+#: lib/premiere_ecoute_web/layouts/layouts.ex:266
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
 msgstr "Something went wrong!"
 
-#: lib/premiere_ecoute_web/layouts/layouts.ex:253
+#: lib/premiere_ecoute_web/layouts/layouts.ex:254
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
 msgstr "We can't find the internet"
@@ -2837,8 +2837,8 @@ msgid_plural "artists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:433
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:458
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:473
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:506
 #, elixir-autogen, elixir-format
 msgid "The premiere of %{name} is over"
 msgstr "The premiere of %{name} is over"
@@ -3390,8 +3390,8 @@ msgstr "All time"
 msgid "Failed to load top tracks"
 msgstr "Failed to load top tracks"
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:399
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:416
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:439
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:456
 #, elixir-autogen, elixir-format
 msgid "%{name} by %{artist} is over"
 msgstr "%{name} by %{artist} is over"
@@ -3958,7 +3958,7 @@ msgstr "Started"
 msgid "Stop radio"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:602
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:658
 #, elixir-autogen, elixir-format
 msgid "The free session %{name} is over"
 msgstr "The free session %{name} is over"
@@ -4065,7 +4065,7 @@ msgstr ""
 msgid "Edit your review"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:296
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:301
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to save replays"
 msgstr "Failed to remove playlist"
@@ -4113,7 +4113,7 @@ msgstr ""
 msgid "No reviews yet."
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:299
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:304
 #, elixir-autogen, elixir-format
 msgid "Not authorized"
 msgstr ""
@@ -4131,7 +4131,7 @@ msgstr "1-5 Rating"
 msgid "Replays"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:293
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:298
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Replays saved"
 msgstr "Released"
@@ -4139,21 +4139,21 @@ msgstr "Released"
 #: lib/premiere_ecoute_web/live/admin/admin_reviews_live.ex:60
 #: lib/premiere_ecoute_web/live/discography/album_live.ex:169
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.ex:205
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:227
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:232
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Review deleted"
 msgstr "Reviewed"
 
 #: lib/premiere_ecoute_web/live/discography/album_live.ex:172
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.ex:208
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:230
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:235
 #, elixir-autogen, elixir-format
 msgid "Review not found"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/album_live.ex:148
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.ex:184
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:206
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:211
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Review saved"
 msgstr "Reviewed"
@@ -4194,20 +4194,20 @@ msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/album_live.ex:175
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.ex:211
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:233
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:238
 #, elixir-autogen, elixir-format
 msgid "You must be logged in to delete a review"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/album_live.ex:187
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:245
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:250
 #, elixir-autogen, elixir-format
 msgid "You must be logged in to like a review"
 msgstr ""
 
 #: lib/premiere_ecoute_web/live/discography/album_live.ex:154
 #: lib/premiere_ecoute_web/live/sessions/retrospective_live.ex:190
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:212
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:217
 #, elixir-autogen, elixir-format
 msgid "You must be logged in to write a review"
 msgstr ""
@@ -4705,7 +4705,7 @@ msgstr ""
 msgid "Not following anyone yet"
 msgstr ""
 
-#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:268
+#: lib/premiere_ecoute/sessions/listening_session/command_handler.ex:276
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})"
 msgstr "Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})"
@@ -5388,7 +5388,7 @@ msgstr ""
 msgid "Add albums, tracks, or artists from the discography or radio pages."
 msgstr "Add albums, tracks, or artists from the discography or radio pages."
 
-#: lib/premiere_ecoute_web/components/core_components.ex:541
+#: lib/premiere_ecoute_web/components/core_components.ex:543
 #: lib/premiere_ecoute_web/live/radio/viewer_live.html.heex:35
 #, elixir-autogen, elixir-format
 msgid "Add to wantlist"
@@ -5419,7 +5419,7 @@ msgstr "Could not remove from wantlist"
 msgid "Grid view"
 msgstr "Grid view"
 
-#: lib/premiere_ecoute_web/components/core_components.ex:541
+#: lib/premiere_ecoute_web/components/core_components.ex:543
 #, elixir-autogen, elixir-format
 msgid "In wantlist"
 msgstr "In wantlist"
@@ -6068,7 +6068,7 @@ msgstr "pts"
 msgid "Cast your votes"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:96
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:101
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Failed to submit votes"
 msgstr "Failed to remove submission"
@@ -6095,7 +6095,7 @@ msgstr ""
 msgid "You didn't vote during this session"
 msgstr ""
 
-#: lib/premiere_ecoute_web/live/sessions/session_live.ex:92
+#: lib/premiere_ecoute_web/live/sessions/session_live.ex:97
 #, elixir-autogen, elixir-format
 msgid "Your votes have been submitted!"
 msgstr ""
@@ -7020,3 +7020,8 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Ranking"
 msgstr ""
+
+#: lib/premiere_ecoute/sessions/listening_session/event_handler.ex:50
+#, elixir-autogen, elixir-format
+msgid "Spotify playback failed. Please switch the song yourself on Spotify."
+msgstr "Spotify playback failed. Please switch the song yourself on Spotify."

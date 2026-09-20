@@ -33,41 +33,67 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Events do
   defmodule SessionStarted do
     @moduledoc """
     Event - Listening session started.
+
+    `playback` reports the outcome of the underlying Spotify playback command
+    (`:started`, `:failed`, or `nil` when no playback command was issued for
+    this source) so it can be surfaced without blocking session start.
     """
 
-    defstruct [:source, :session_id, :user_id]
+    defstruct [:source, :session_id, :user_id, :playback]
 
-    @type t :: %__MODULE__{source: atom(), session_id: String.t(), user_id: integer()}
+    @type t :: %__MODULE__{
+            source: atom(),
+            session_id: String.t(),
+            user_id: integer(),
+            playback: :started | :failed | nil
+          }
   end
 
   defmodule NextTrackStarted do
     @moduledoc """
     Event - Next track started in session.
+
+    See `SessionStarted` for the meaning of `playback`.
     """
 
-    defstruct [:source, :session_id, :user_id, :track]
+    defstruct [:source, :session_id, :user_id, :track, :playback]
 
-    @type t :: %__MODULE__{source: atom(), session_id: String.t(), user_id: integer(), track: any()}
+    @type t :: %__MODULE__{
+            source: atom(),
+            session_id: String.t(),
+            user_id: integer(),
+            track: any(),
+            playback: :started | :failed | nil
+          }
   end
 
   defmodule PreviousTrackStarted do
     @moduledoc """
     Event - Previous track started in session.
+
+    See `SessionStarted` for the meaning of `playback`.
     """
 
-    defstruct [:session_id, :user_id, :track]
+    defstruct [:session_id, :user_id, :track, :playback]
 
-    @type t :: %__MODULE__{session_id: String.t(), user_id: integer(), track: any()}
+    @type t :: %__MODULE__{
+            session_id: String.t(),
+            user_id: integer(),
+            track: any(),
+            playback: :started | :failed | nil
+          }
   end
 
   defmodule SessionStopped do
     @moduledoc """
     Event - Listening session stopped.
+
+    See `SessionStarted` for the meaning of `playback` (here `:paused` replaces `:started`).
     """
 
-    defstruct [:session_id, :user_id]
+    defstruct [:session_id, :user_id, :playback]
 
-    @type t :: %__MODULE__{session_id: String.t(), user_id: integer()}
+    @type t :: %__MODULE__{session_id: String.t(), user_id: integer(), playback: :paused | :failed | nil}
   end
 
   defmodule TrackCaptured do

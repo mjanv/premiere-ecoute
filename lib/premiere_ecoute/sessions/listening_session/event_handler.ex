@@ -6,6 +6,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   """
 
   use PremiereEcouteCore.EventBus.Handler
+  use Gettext, backend: PremiereEcoute.Gettext
+
+  require Logger
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
@@ -35,6 +38,20 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
 
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
+  # Spotify playback commands (start/resume/pause) issued while handling a session
+  # command are best-effort: `command_handler.ex` never blocks the command on their
+  # outcome, and instead stamps the resulting event's `:playback` field with `:failed`.
+  # Log it here and flash a non-blocking warning to the user's LiveView process, which
+  # is the same process that called `PremiereEcoute.apply/1` (the command bus dispatches
+  # events synchronously), so `send(self(), ...)` reaches it directly.
+  defp notify_playback_failure(%{playback: :failed, user_id: user_id}) do
+    Logger.warning("Spotify playback command failed for user #{user_id}")
+
+    send(self(), {:flash, :warning, gettext("Spotify playback failed. Please switch the song yourself on Spotify.")})
+  end
+
+  defp notify_playback_failure(_event), do: :ok
+
   @impl true
   def dispatch(%SessionPrepared{source: :track, session_id: session_id, user_id: user_id}) do
     with %Scope{user: %{spotify: spotify}} = scope when not is_nil(spotify) <-
@@ -63,7 +80,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%SessionStarted{source: :track, session_id: session_id, user_id: user_id}) do
+  def dispatch(%SessionStarted{source: :track, session_id: session_id, user_id: user_id} = event) do
+    notify_playback_failure(event)
     ListeningSessionWorker.in_seconds(%{action: "open_track", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "send_instructions", user_id: user_id}, 15)
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 30)
@@ -79,7 +97,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%SessionStarted{source: :playlist, session_id: session_id, user_id: user_id}) do
+  def dispatch(%SessionStarted{source: :playlist, session_id: session_id, user_id: user_id} = event) do
+    notify_playback_failure(event)
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
@@ -90,7 +109,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%NextTrackStarted{source: :album, session_id: session_id, user_id: user_id, track: track}) do
+  def dispatch(%NextTrackStarted{source: :album, session_id: session_id, user_id: user_id, track: track} = event) do
+    notify_playback_failure(event)
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
@@ -100,7 +120,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%NextTrackStarted{source: :playlist, session_id: session_id, user_id: user_id, track: track}) do
+  def dispatch(%NextTrackStarted{source: :playlist, session_id: session_id, user_id: user_id, track: track} = event) do
+    notify_playback_failure(event)
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
@@ -110,7 +131,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%PreviousTrackStarted{session_id: session_id, user_id: user_id, track: track}) do
+  def dispatch(%PreviousTrackStarted{session_id: session_id, user_id: user_id, track: track} = event) do
+    notify_playback_failure(event)
     session = ListeningSession.get(session_id)
     ListeningSession.add_track_marker(session)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
@@ -120,7 +142,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     :ok
   end
 
-  def dispatch(%SessionStopped{session_id: session_id, user_id: user_id}) do
+  def dispatch(%SessionStopped{session_id: session_id, user_id: user_id} = event) do
+    notify_playback_failure(event)
     ListeningSessionWorker.in_seconds(%{action: "close", session_id: session_id, user_id: user_id}, 0)
     ListeningSessionWorker.in_seconds(%{action: "send_promo_message", user_id: user_id}, 10)
     ListeningSessionWorker.in_seconds(%{action: "send_session_link", session_id: session_id, user_id: user_id}, 20)
