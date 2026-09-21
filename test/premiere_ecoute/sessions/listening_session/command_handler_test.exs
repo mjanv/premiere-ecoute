@@ -545,6 +545,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       {:ok, _, [%SessionStarted{} = event]} = CommandBus.apply(command)
 
+      assert event.playback == nil
+
       session = ListeningSession.get(event.session_id)
 
       assert session.status == :active
@@ -567,6 +569,35 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
              } = report
 
       assert session_id == session.id
+    end
+
+    test "starts an album session in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      album = album_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
+      expect(TwitchApi, :send_chat_message, 3, fn _, _ -> :ok end)
+
+      command = %PrepareListeningSession{
+        source: :album,
+        user_id: user.id,
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        spotify_commands_disabled: true
+      }
+
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      command = %StartListeningSession{source: :album, session_id: event.session_id, scope: scope}
+
+      {:ok, _, [%SessionStarted{playback: playback}]} = CommandBus.apply(command)
+
+      assert playback == :skipped
+
+      session = ListeningSession.get(event.session_id)
+      assert session.status == :active
     end
 
     test "fails to start a session when user already has an active session" do
@@ -691,6 +722,33 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       assert session_id == session.id
     end
+
+    test "starts a playlist session in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      playlist = playlist_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      command = %PrepareListeningSession{
+        source: :playlist,
+        user_id: user.id,
+        playlist_id: playlist.playlist_id,
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        spotify_commands_disabled: true
+      }
+
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      command = %StartListeningSession{source: :playlist, session_id: event.session_id, scope: scope}
+
+      {:ok, session, [%SessionStarted{playback: playback}]} = CommandBus.apply(command)
+
+      assert playback == :skipped
+      assert session.status == :active
+    end
   end
 
   describe "handle/1 - StartListeningSession :track" do
@@ -760,6 +818,31 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
 
       assert reason == "No Spotify active device detected"
+    end
+
+    test "starts a track session in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      single = single_fixture()
+
+      expect(SpotifyApi, :get_single, fn _ -> {:ok, single} end)
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :track,
+          user_id: user.id,
+          track_id: Map.get(single.provider_ids, :spotify),
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+          spotify_commands_disabled: true
+        })
+
+      {:ok, session, [%SessionStarted{playback: playback}]} =
+        CommandBus.apply(%StartListeningSession{source: :track, session_id: prepared.session_id, scope: scope})
+
+      assert playback == :skipped
+      assert session.status == :active
     end
   end
 
@@ -831,6 +914,36 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       session = ListeningSession.get(event.session_id)
       assert session.current_track_id == Enum.at(session.album.tracks, 1).id
     end
+
+    test "skips to next track in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      album = album_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
+      expect(TwitchApi, :send_chat_message, 5, fn _, _ -> :ok end)
+
+      command = %PrepareListeningSession{
+        source: :album,
+        user_id: user.id,
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        spotify_commands_disabled: true
+      }
+
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      {:ok, _, [%SessionStarted{}]} =
+        CommandBus.apply(%StartListeningSession{source: :album, session_id: event.session_id, scope: scope})
+
+      command = %SkipNextTrackListeningSession{source: :album, session_id: event.session_id, scope: scope}
+
+      {:ok, session, [%NextTrackStarted{playback: playback}]} = CommandBus.apply(command)
+
+      assert playback == :skipped
+      assert session.current_track_id == Enum.at(session.album.tracks, 0).id
+    end
   end
 
   describe "handle/1 - SkipNextTrackListeningSession :playlist" do
@@ -874,6 +987,33 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       assert session.current_playlist_track_id != nil
       assert track != nil
       assert track.name == "Mind Loaded (feat. Caroline Polachek, Lorde & Mustafa)"
+    end
+
+    test "advances to next playlist track in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      playlist = playlist_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :playlist,
+          user_id: user.id,
+          playlist_id: playlist.playlist_id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+          spotify_commands_disabled: true
+        })
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
+
+      {:ok, _session, [%NextTrackStarted{playback: playback}]} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      assert playback == :skipped
     end
 
     test "returns error when all playlist tracks are exhausted" do
@@ -996,6 +1136,103 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       {:error, _} = CommandBus.apply(command)
     end
+
+    test "skips to previous track in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      album = album_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      command = %PrepareListeningSession{
+        source: :album,
+        user_id: user.id,
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        spotify_commands_disabled: true
+      }
+
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      {:ok, _, [%SessionStarted{}]} =
+        CommandBus.apply(%StartListeningSession{source: :album, session_id: event.session_id, scope: scope})
+
+      {:ok, _, [%NextTrackStarted{}]} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :album, session_id: event.session_id, scope: scope})
+
+      {:ok, _, [%NextTrackStarted{}]} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :album, session_id: event.session_id, scope: scope})
+
+      {:ok, session, [%PreviousTrackStarted{playback: playback}]} =
+        CommandBus.apply(%SkipPreviousTrackListeningSession{source: :album, session_id: event.session_id, scope: scope})
+
+      assert playback == :skipped
+      assert session.current_track_id == Enum.at(session.album.tracks, 0).id
+    end
+
+    test "skips to previous playlist track in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+
+      playlist =
+        playlist_fixture(%{
+          tracks: [
+            %PremiereEcoute.Discography.Playlist.Track{
+              provider: :spotify,
+              name: "Track A",
+              playlist_id: nil,
+              track_id: "trackA",
+              album_id: "albumA",
+              user_id: "ku296zgwbo0e3qff8cylptsjq",
+              artist: "Unknown Artist",
+              duration_ms: 200_000,
+              added_at: ~N[2025-07-18 07:59:47],
+              release_date: ~D[2025-07-17]
+            },
+            %PremiereEcoute.Discography.Playlist.Track{
+              provider: :spotify,
+              name: "Track B",
+              playlist_id: nil,
+              track_id: "trackB",
+              album_id: "albumB",
+              user_id: "ku296zgwbo0e3qff8cylptsjq",
+              artist: "Unknown Artist",
+              duration_ms: 210_000,
+              added_at: ~N[2025-07-18 07:59:47],
+              release_date: ~D[2025-07-17]
+            }
+          ]
+        })
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :playlist,
+          user_id: user.id,
+          playlist_id: playlist.playlist_id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+          spotify_commands_disabled: true
+        })
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
+
+      {:ok, _, [%NextTrackStarted{}]} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      {:ok, _, [%NextTrackStarted{}]} =
+        CommandBus.apply(%SkipNextTrackListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      {:ok, _session, [%PreviousTrackStarted{playback: playback}]} =
+        CommandBus.apply(%SkipPreviousTrackListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      assert playback == :skipped
+    end
   end
 
   describe "handle/1 - StopListeningSession" do
@@ -1078,6 +1315,36 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       assert session_id == session.id
     end
+
+    test "stops an album session in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      album = album_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
+      expect(SpotifyApi, :get_album, fn _ -> {:ok, album} end)
+      stub(TwitchApi, :send_chat_message, fn _scope, _msg -> :ok end)
+
+      command = %PrepareListeningSession{
+        source: :album,
+        user_id: user.id,
+        album_id: Map.get(album.provider_ids, :spotify),
+        vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        spotify_commands_disabled: true
+      }
+
+      {:ok, _, [%SessionPrepared{} = event]} = CommandBus.apply(command)
+
+      {:ok, _, [%SessionStarted{}]} =
+        CommandBus.apply(%StartListeningSession{source: :album, session_id: event.session_id, scope: scope})
+
+      {:ok, session, [%SessionStopped{playback: playback}]} =
+        CommandBus.apply(%StopListeningSession{source: :album, session_id: event.session_id, scope: scope})
+
+      assert playback == :skipped
+      assert session.status == :stopped
+    end
   end
 
   describe "handle/1 - StopListeningSession :playlist" do
@@ -1138,6 +1405,35 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       {:ok, session, [%SessionStopped{}]} =
         CommandBus.apply(%StopListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
 
+      assert session.status == :stopped
+    end
+
+    test "stops a playlist session in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+      playlist = playlist_fixture()
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
+      expect(SpotifyApi, :get_playlist, fn _ -> {:ok, playlist} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :playlist,
+          user_id: user.id,
+          playlist_id: playlist.playlist_id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+          spotify_commands_disabled: true
+        })
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :playlist, session_id: prepared.session_id, scope: scope})
+
+      {:ok, session, [%SessionStopped{playback: playback}]} =
+        CommandBus.apply(%StopListeningSession{source: :playlist, session_id: started.session_id, scope: scope})
+
+      assert playback == :skipped
       assert session.status == :stopped
     end
   end
@@ -1309,6 +1605,27 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
         CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
 
       assert reason == "No Spotify active device detected"
+    end
+
+    test "starts a free session in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+          spotify_commands_disabled: true
+        })
+
+      {:ok, session, [%SessionStarted{}]} =
+        CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
+
+      assert session.status == :active
     end
   end
 
@@ -1559,6 +1876,32 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
       {:ok, session, [%SessionStopped{}]} =
         CommandBus.apply(%StopListeningSession{source: :free, session_id: started.session_id, scope: scope})
 
+      assert session.status == :stopped
+    end
+
+    test "stops a free session in degraded mode without calling Spotify player commands" do
+      user = user_fixture(%{twitch: %{user_id: "1234"}})
+      scope = user_scope_fixture(user)
+
+      expect(TwitchApi, :resubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, %{}} end)
+      expect(TwitchApi, :unsubscribe, fn %Scope{user: ^user}, "channel.chat.message" -> {:ok, UUID.uuid4()} end)
+      stub(TwitchApi, :send_chat_message, fn %Scope{}, _ -> :ok end)
+
+      {:ok, _, [%SessionPrepared{} = prepared]} =
+        CommandBus.apply(%PrepareListeningSession{
+          source: :free,
+          user_id: user.id,
+          vote_options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+          spotify_commands_disabled: true
+        })
+
+      {:ok, _, [%SessionStarted{} = started]} =
+        CommandBus.apply(%StartListeningSession{source: :free, session_id: prepared.session_id, scope: scope})
+
+      {:ok, session, [%SessionStopped{playback: playback}]} =
+        CommandBus.apply(%StopListeningSession{source: :free, session_id: started.session_id, scope: scope})
+
+      assert playback == :skipped
       assert session.status == :stopped
     end
   end

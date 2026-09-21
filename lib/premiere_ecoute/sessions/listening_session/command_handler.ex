@@ -54,7 +54,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         album_id: album_id,
         vote_options: vote_options,
         autostart: autostart,
-        interlude_threshold_ms: interlude_threshold_ms
+        interlude_threshold_ms: interlude_threshold_ms,
+        spotify_commands_disabled: spotify_commands_disabled
       }) do
     with {:ok, album} <- EnrichDiscography.create_album(album_id, :spotify),
          {:ok, session} <-
@@ -68,7 +69,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
                "scores" => 0,
                "next_track" => 0,
                "autostart" => autostart,
-               "interlude_threshold_ms" => interlude_threshold_ms
+               "interlude_threshold_ms" => interlude_threshold_ms,
+               "spotify_commands_disabled" => spotify_commands_disabled
              }
            }) do
       {:ok, session,
@@ -94,7 +96,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         track_id: track_id,
         vote_options: vote_options,
         autostart: autostart,
-        submitter: submitter
+        submitter: submitter,
+        spotify_commands_disabled: spotify_commands_disabled
       }) do
     with {:ok, single} <- EnrichDiscography.create_single(track_id, :spotify),
          {:ok, session} <-
@@ -108,7 +111,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
                "scores" => 0,
                "next_track" => 0,
                "autostart" => autostart,
-               "submitter" => submitter
+               "submitter" => submitter,
+               "spotify_commands_disabled" => spotify_commands_disabled
              }
            }) do
       {:ok, session,
@@ -171,7 +175,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         playlist_id: playlist_id,
         vote_options: vote_options,
         autostart: autostart,
-        interlude_threshold_ms: interlude_threshold_ms
+        interlude_threshold_ms: interlude_threshold_ms,
+        spotify_commands_disabled: spotify_commands_disabled
       }) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(playlist_id),
          {:ok, playlist} <- get_or_create_playlist(playlist),
@@ -186,7 +191,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
                "scores" => 0,
                "next_track" => 0,
                "autostart" => autostart,
-               "interlude_threshold_ms" => interlude_threshold_ms
+               "interlude_threshold_ms" => interlude_threshold_ms,
+               "spotify_commands_disabled" => spotify_commands_disabled
              }
            }) do
       {:ok, session,
@@ -228,13 +234,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StartListeningSession{source: :track, session_id: session_id, scope: scope, resume: resume}) do
-    with {:ok, devices} <- Apis.spotify().devices(scope),
-         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+    with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
+         {:ok, _} <- maybe_check_active_device(spotify_disabled, scope),
          {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
-         session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, %{single: single} = session} <- ListeningSession.start(session),
-         {:ok, _} = playback_result <- maybe_start_playback(resume, scope, single),
+         {:ok, _} = playback_result <- maybe_start_playback(resume || spotify_disabled, scope, single),
          message <-
            PremiereEcoute.Gettext.t(scope, fn ->
              gettext("Welcome to the premiere of %{name} by %{artist}", name: single.name, artist: single.artist)
@@ -246,11 +252,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            source: :track,
            session_id: session.id,
            user_id: scope.user.id,
-           playback: playback_outcome(playback_result)
+           playback: playback_outcome(playback_result, :started, spotify_disabled)
          }
        ]}
     else
-      false ->
+      {:error, :no_active_device} ->
         {:error, "No Spotify active device detected"}
 
       {:error, :active_session_exists} ->
@@ -263,14 +269,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StartListeningSession{source: :album, session_id: session_id, scope: scope}) do
-    with {:ok, devices} <- Apis.spotify().devices(scope),
-         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+    with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
+         {:ok, _} <- maybe_check_active_device(spotify_disabled, scope),
          {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
-         session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, %{album: album}} <- ListeningSession.start(session),
-         {:ok, _} <- Apis.spotify().toggle_playback_shuffle(scope, false),
-         {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
+         {:ok, _} <- maybe_toggle_playback_shuffle(spotify_disabled, scope),
+         {:ok, _} <- maybe_set_repeat_mode(spotify_disabled, scope),
          message <-
            PremiereEcoute.Gettext.t(scope, fn ->
              gettext("Welcome to the premiere of %{name} by %{artist} (%{tracks} tracks - %{timer})",
@@ -281,9 +287,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
              )
            end),
          :ok <- Apis.twitch().send_chat_message(scope, message) do
-      {:ok, session, [%SessionStarted{source: :album, session_id: session.id, user_id: scope.user.id}]}
+      {:ok, session,
+       [
+         %SessionStarted{
+           source: :album,
+           session_id: session.id,
+           user_id: scope.user.id,
+           playback: playback_outcome(nil, :started, spotify_disabled)
+         }
+       ]}
     else
-      false ->
+      {:error, :no_active_device} ->
         {:error, "No Spotify active device detected"}
 
       {:error, :active_session_exists} ->
@@ -296,26 +310,26 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StartListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
-    with {:ok, devices} <- Apis.spotify().devices(scope),
-         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+    with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
+         {:ok, _} <- maybe_check_active_device(spotify_disabled, scope),
          {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
-         session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.start(session),
-         {:ok, _} <- Apis.spotify().toggle_playback_shuffle(scope, false),
-         {:ok, _} <- Apis.spotify().set_repeat_mode(scope, :off),
-         playback_result <- Apis.spotify().start_resume_playback(scope, session.playlist) do
+         {:ok, _} <- maybe_toggle_playback_shuffle(spotify_disabled, scope),
+         {:ok, _} <- maybe_set_repeat_mode(spotify_disabled, scope),
+         playback_result <- maybe_start_resume_playback(spotify_disabled, scope, session.playlist) do
       {:ok, session,
        [
          %SessionStarted{
            source: :playlist,
            session_id: session.id,
            user_id: scope.user.id,
-           playback: playback_outcome(playback_result)
+           playback: playback_outcome(playback_result, :started, spotify_disabled)
          }
        ]}
     else
-      false ->
+      {:error, :no_active_device} ->
         {:error, "No Spotify active device detected"}
 
       {:error, :active_session_exists} ->
@@ -337,8 +351,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%SkipNextTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
          {:ok, session} <- ListeningSession.next_track(session),
-         playback_result <- Apis.spotify().start_resume_playback(scope, session.current_track),
+         playback_result <- maybe_start_resume_playback(spotify_disabled, scope, session.current_track),
          :ok <-
            Apis.twitch().send_chat_message(
              scope,
@@ -351,7 +366,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            session_id: session.id,
            user_id: scope.user.id,
            track: session.current_track,
-           playback: playback_outcome(playback_result)
+           playback: playback_outcome(playback_result, :started, spotify_disabled)
          }
        ]}
     else
@@ -361,8 +376,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%SkipNextTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
          {:ok, session} <- ListeningSession.next_track(session),
-         playback_result <- Apis.spotify().start_resume_playback(scope, session.current_playlist_track) do
+         playback_result <- maybe_start_resume_playback(spotify_disabled, scope, session.current_playlist_track) do
       {:ok, session,
        [
          %NextTrackStarted{
@@ -370,7 +386,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            session_id: session.id,
            user_id: scope.user.id,
            track: session.current_playlist_track,
-           playback: playback_outcome(playback_result)
+           playback: playback_outcome(playback_result, :started, spotify_disabled)
          }
        ]}
     else
@@ -392,8 +408,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%SkipPreviousTrackListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
          {:ok, session} <- ListeningSession.previous_track(session),
-         playback_result <- Apis.spotify().start_resume_playback(scope, session.current_track),
+         playback_result <- maybe_start_resume_playback(spotify_disabled, scope, session.current_track),
          :ok <-
            Apis.twitch().send_chat_message(
              scope,
@@ -405,7 +422,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            session_id: session.id,
            user_id: scope.user.id,
            track: session.current_track,
-           playback: playback_outcome(playback_result)
+           playback: playback_outcome(playback_result, :started, spotify_disabled)
          }
        ]}
     else
@@ -415,15 +432,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%SkipPreviousTrackListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
          {:ok, session} <- ListeningSession.previous_track(session),
-         playback_result <- Apis.spotify().start_resume_playback(scope, session.current_playlist_track) do
+         playback_result <- maybe_start_resume_playback(spotify_disabled, scope, session.current_playlist_track) do
       {:ok, session,
        [
          %PreviousTrackStarted{
            session_id: session.id,
            user_id: scope.user.id,
            track: session.current_playlist_track,
-           playback: playback_outcome(playback_result)
+           playback: playback_outcome(playback_result, :started, spotify_disabled)
          }
        ]}
     else
@@ -467,28 +485,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%StopListeningSession{source: :album, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
          message <-
            PremiereEcoute.Gettext.t(scope, fn -> gettext("The premiere of %{name} is over", name: session.album.name) end),
          :ok <- Apis.twitch().send_chat_message(scope, message),
          {:ok, session} <- ListeningSession.stop(session) do
-      playback_result =
-        case Apis.spotify().devices(scope) do
-          {:ok, devices} ->
-            if Enum.any?(devices, fn device -> device["is_active"] end),
-              do: Apis.spotify().pause_playback(scope)
-
-          _ ->
-            :ok
-        end
-
       {:ok, session,
        [
          %SessionStopped{
            session_id: session.id,
            user_id: scope.user.id,
-           playback: playback_outcome(playback_result, :paused)
+           playback: pause_playback_outcome(spotify_disabled, scope)
          }
        ]}
     else
@@ -500,28 +509,19 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%StopListeningSession{source: :playlist, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
          message <-
            PremiereEcoute.Gettext.t(scope, fn -> gettext("The premiere of %{name} is over", name: session.playlist.title) end),
          :ok <- Apis.twitch().send_chat_message(scope, message),
          {:ok, session} <- ListeningSession.stop(session) do
-      playback_result =
-        case Apis.spotify().devices(scope) do
-          {:ok, devices} ->
-            if Enum.any?(devices, fn device -> device["is_active"] end),
-              do: Apis.spotify().pause_playback(scope)
-
-          _ ->
-            :ok
-        end
-
       {:ok, session,
        [
          %SessionStopped{
            session_id: session.id,
            user_id: scope.user.id,
-           playback: playback_outcome(playback_result, :paused)
+           playback: pause_playback_outcome(spotify_disabled, scope)
          }
        ]}
     else
@@ -537,7 +537,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
         name: name,
         vote_options: vote_options,
         vote_mode: vote_mode,
-        autostart: autostart
+        autostart: autostart,
+        spotify_commands_disabled: spotify_commands_disabled
       }) do
     resolved_options = vote_options
 
@@ -547,7 +548,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            name: name || "Free session",
            vote_mode: vote_mode || :chat,
            vote_options: resolved_options,
-           options: %{"votes" => 0, "scores" => 0, "next_track" => 0, "autostart" => autostart}
+           options: %{
+             "votes" => 0,
+             "scores" => 0,
+             "next_track" => 0,
+             "autostart" => autostart,
+             "spotify_commands_disabled" => spotify_commands_disabled
+           }
          }) do
       {:ok, session} ->
         {:ok, session,
@@ -566,15 +573,15 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   def handle(%StartListeningSession{source: :free, session_id: session_id, scope: scope}) do
-    with {:ok, devices} <- Apis.spotify().devices(scope),
-         true <- Enum.any?(devices, fn device -> device["is_active"] end),
+    with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
+         {:ok, _} <- maybe_check_active_device(spotify_disabled, scope),
          {:ok, _} <- Apis.twitch().resubscribe(scope, "channel.chat.message"),
-         session <- ListeningSession.get(session_id),
          {:ok, _} <- Report.generate(session),
          {:ok, session} <- ListeningSession.start(session) do
       {:ok, session, [%SessionStarted{source: :free, session_id: session.id, user_id: scope.user.id}]}
     else
-      false ->
+      {:error, :no_active_device} ->
         {:error, "No Spotify active device detected"}
 
       {:error, :active_session_exists} ->
@@ -651,6 +658,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   def handle(%StopListeningSession{source: :free, session_id: session_id, scope: scope}) do
     with session <- ListeningSession.get(session_id),
+         spotify_disabled <- ListeningSession.option(session, "spotify_commands_disabled", false),
          {:ok, _} <- Report.generate(session),
          {:ok, _} <- Apis.twitch().unsubscribe(scope, "channel.chat.message"),
          message <-
@@ -659,16 +667,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
            end),
          :ok <- Apis.twitch().send_chat_message(scope, message),
          {:ok, session} <- ListeningSession.stop(session) do
-      {:ok, devices} = Apis.spotify().devices(scope)
-      is_active = Enum.any?(devices, fn device -> device["is_active"] end)
-      playback_result = if is_active, do: Apis.spotify().pause_playback(scope)
-
       {:ok, session,
        [
          %SessionStopped{
            session_id: session.id,
            user_id: scope.user.id,
-           playback: playback_outcome(playback_result, :paused)
+           playback: pause_playback_outcome(spotify_disabled, scope)
          }
        ]}
     else
@@ -688,18 +692,64 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   defp maybe_start_playback(true, _scope, _single), do: {:ok, :resumed}
   defp maybe_start_playback(false, scope, single), do: Apis.spotify().start_resume_playback(scope, single)
 
+  defp maybe_check_active_device(true, _scope), do: {:ok, :skipped}
+
+  defp maybe_check_active_device(false, scope) do
+    with {:ok, devices} <- Apis.spotify().devices(scope),
+         true <- Enum.any?(devices, fn device -> device["is_active"] end) do
+      {:ok, :active}
+    else
+      false -> {:error, :no_active_device}
+      error -> error
+    end
+  end
+
+  defp maybe_toggle_playback_shuffle(true, _scope), do: {:ok, :skipped}
+  defp maybe_toggle_playback_shuffle(false, scope), do: Apis.spotify().toggle_playback_shuffle(scope, false)
+
+  defp maybe_set_repeat_mode(true, _scope), do: {:ok, :skipped}
+  defp maybe_set_repeat_mode(false, scope), do: Apis.spotify().set_repeat_mode(scope, :off)
+
+  defp maybe_start_resume_playback(true, _scope, _target), do: {:ok, :skipped}
+  defp maybe_start_resume_playback(false, scope, target), do: Apis.spotify().start_resume_playback(scope, target)
+
+  # Pauses Spotify playback (if an active device exists) and reports the outcome as the
+  # `:playback` field carried by `SessionStopped`. Returns `:skipped` in degraded mode
+  # (no call made), `:paused` on success, `:failed` on error, and `nil` when there was
+  # no active device to pause — callers must still fold this into the event without
+  # letting the failure block the underlying session command.
+  defp pause_playback_outcome(true, _scope), do: :skipped
+
+  defp pause_playback_outcome(false, scope) do
+    case Apis.spotify().devices(scope) do
+      {:ok, devices} ->
+        if Enum.any?(devices, fn device -> device["is_active"] end) do
+          case Apis.spotify().pause_playback(scope) do
+            {:ok, _} -> :paused
+            {:error, _} -> :failed
+          end
+        end
+
+      _ ->
+        nil
+    end
+  end
+
   # Maps a Spotify playback API call's result to the `:playback` field carried by
-  # `SessionStarted`/`NextTrackStarted`/`PreviousTrackStarted`/`SessionStopped` events.
+  # `SessionStarted`/`NextTrackStarted`/`PreviousTrackStarted` events.
   #
-  # `success` is the atom to report when the call succeeded (defaults to `:started`;
-  # pass `:paused` when wrapping a `pause_playback` call). Always returns `:failed` on
-  # error, and `nil` when no playback call was made at all (e.g. no active device to
-  # pause) — callers must still fold this into the event without letting the failure
-  # block the underlying session command.
-  defp playback_outcome(result, success \\ :started)
+  # `success` is the atom to report when the call succeeded (`:started`). Always
+  # returns `:failed` on error, and `nil` when no playback call was made at all —
+  # callers must still fold this into the event without letting the failure block the
+  # underlying session command.
   defp playback_outcome({:ok, _}, success), do: success
   defp playback_outcome({:error, _reason}, _success), do: :failed
   defp playback_outcome(_no_call, _success), do: nil
+
+  # Same as `playback_outcome/2`, but reports `:skipped` when the command was
+  # intentionally not sent to Spotify (degraded mode), regardless of `result`.
+  defp playback_outcome(_result, _success, true), do: :skipped
+  defp playback_outcome(result, success, false), do: playback_outcome(result, success)
 
   defp set_single_id(session, single_id) do
     session

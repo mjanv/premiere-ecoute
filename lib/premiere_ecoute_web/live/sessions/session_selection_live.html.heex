@@ -78,6 +78,10 @@
               <%= if @source_type == "track" do %>
                 <.submitter_toggle submitter_enabled={@submitter_enabled} track_submitter={@track_submitter} />
               <% end %>
+              <.spotify_commands_disabled_toggle
+                :if={@source_type in ["album", "playlist", "track", "free"]}
+                spotify_commands_disabled={@spotify_commands_disabled}
+              />
             </div>
           </div>
         <% end %>

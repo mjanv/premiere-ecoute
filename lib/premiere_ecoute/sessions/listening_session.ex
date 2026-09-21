@@ -699,6 +699,12 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   def submitter(%__MODULE__{options: options}), do: options["submitter"]
 
   @doc """
+  Reads a single key out of the session's `options` map, or `default` when absent.
+  """
+  @spec option(t(), String.t(), term()) :: term()
+  def option(%__MODULE__{options: options}, key, default \\ nil), do: Map.get(options || %{}, key, default)
+
+  @doc """
   Fetches a session by its share token with preloaded associations.
   """
   @spec get_by_share_token(String.t()) :: t() | nil

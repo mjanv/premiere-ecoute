@@ -814,4 +814,25 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
       assert ListeningSession.submitter(session) == nil
     end
   end
+
+  describe "option/3" do
+    test "returns the value stored under the given key", %{user: user, album: album} do
+      {:ok, session} =
+        ListeningSession.create(%{user_id: user.id, album_id: album.id, options: %{"autostart" => false}})
+
+      assert ListeningSession.option(session, "autostart") == false
+    end
+
+    test "returns the given default when the key is absent", %{user: user, album: album} do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, options: %{}})
+
+      assert ListeningSession.option(session, "missing_key", :fallback) == :fallback
+    end
+
+    test "returns nil by default when the key is absent and no default given", %{user: user, album: album} do
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, options: %{}})
+
+      assert ListeningSession.option(session, "missing_key") == nil
+    end
+  end
 end

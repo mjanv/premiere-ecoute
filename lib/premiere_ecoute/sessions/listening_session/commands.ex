@@ -20,7 +20,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
             vote_mode: :chat | :poll | nil,
             autostart: boolean(),
             interlude_threshold_ms: integer() | nil,
-            submitter: String.t() | nil
+            submitter: String.t() | nil,
+            spotify_commands_disabled: boolean()
           }
 
     defstruct [
@@ -35,7 +36,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.Commands do
       :vote_mode,
       autostart: true,
       interlude_threshold_ms: nil,
-      submitter: nil
+      submitter: nil,
+      spotify_commands_disabled: false
     ]
   end
 

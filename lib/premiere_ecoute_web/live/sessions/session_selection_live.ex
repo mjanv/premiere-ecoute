@@ -43,6 +43,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:submitter_enabled, false)
     |> assign(:track_submitter, "")
     |> assign(:autostart, true)
+    |> assign(:spotify_commands_disabled, false)
     |> assign(:interlude_skip, true)
     |> assign(:interlude_threshold_s, 45)
     |> update_state()
@@ -185,6 +186,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
     |> assign(:free_vote_mode, nil)
     # Reset autostart and interlude to defaults
     |> assign(:autostart, true)
+    |> assign(:spotify_commands_disabled, false)
     |> assign(:interlude_skip, true)
     |> assign(:interlude_threshold_s, 45)
     |> assign(:submitter_enabled, false)
@@ -248,6 +250,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       track_id: Map.get(track.provider_ids, :spotify),
       vote_options: get_vote_options(socket.assigns),
       autostart: socket.assigns.autostart,
+      spotify_commands_disabled: socket.assigns.spotify_commands_disabled,
       submitter: submitter_value(socket.assigns)
     }
     |> PremiereEcoute.apply()
@@ -286,7 +289,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       name: socket.assigns.free_session_name,
       vote_options: get_vote_options(socket.assigns),
       vote_mode: String.to_existing_atom(socket.assigns.free_vote_mode),
-      autostart: socket.assigns.autostart
+      autostart: socket.assigns.autostart,
+      spotify_commands_disabled: socket.assigns.spotify_commands_disabled
     }
     |> PremiereEcoute.apply()
     |> case do
@@ -339,6 +343,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       album_id: Map.get(album.provider_ids, :spotify),
       vote_options: vote_options,
       autostart: socket.assigns.autostart,
+      spotify_commands_disabled: socket.assigns.spotify_commands_disabled,
       interlude_threshold_ms: interlude_threshold_ms(socket.assigns)
     }
     |> PremiereEcoute.apply()
@@ -361,6 +366,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
       playlist_id: playlist.playlist_id,
       vote_options: get_vote_options(socket.assigns),
       autostart: socket.assigns.autostart,
+      spotify_commands_disabled: socket.assigns.spotify_commands_disabled,
       interlude_threshold_ms: interlude_threshold_ms(socket.assigns)
     }
     |> PremiereEcoute.apply()
@@ -381,6 +387,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLive do
 
   def handle_event("toggle_autostart", _params, socket) do
     {:noreply, socket |> assign(:autostart, !socket.assigns.autostart)}
+  end
+
+  def handle_event("toggle_spotify_commands_disabled", _params, socket) do
+    {:noreply, socket |> assign(:spotify_commands_disabled, !socket.assigns.spotify_commands_disabled)}
   end
 
   def handle_event("set_interlude", params, socket) do

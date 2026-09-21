@@ -1043,6 +1043,39 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
     """
   end
 
+  @doc "Renders the degraded-mode toggle disabling Spotify play/pause/next/previous commands"
+  attr :spotify_commands_disabled, :boolean, required: true
+
+  def spotify_commands_disabled_toggle(assigns) do
+    ~H"""
+    <div class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-amber-700/50">
+      <button
+        type="button"
+        phx-click="toggle_spotify_commands_disabled"
+        class={[
+          "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+          if(@spotify_commands_disabled, do: "bg-amber-600", else: "bg-gray-700")
+        ]}
+      >
+        <span class={[
+          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+          if(@spotify_commands_disabled, do: "translate-x-5", else: "translate-x-0")
+        ]} />
+      </button>
+      <div class="flex-1">
+        <label class="text-sm font-medium text-gray-200 cursor-pointer">
+          {gettext("Degraded mode (no Spotify control)")}
+        </label>
+        <p class="text-xs text-gray-400 mt-0.5">
+          {gettext(
+            "Don't send play/pause/next/previous commands to Spotify. Use if Spotify refuses to obey playback commands during your session."
+          )}
+        </p>
+      </div>
+    </div>
+    """
+  end
+
   @doc "Renders the interlude skip toggle with optional duration input"
   attr :interlude_skip, :boolean, required: true
   attr :interlude_threshold_s, :integer, required: true
