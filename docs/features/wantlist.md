@@ -1,506 +1,296 @@
-# Feature proposal — Wantlist v2: "Build your playlist live"
+# Wantlist — let your community build their playlist while they watch you
 
-> **Status:** First draft — for discussion, not yet agreed
-> **Type:** Extension of the existing `PremiereEcoute.Wantlists` context + new capture surfaces
-> **Audience:** Streamers (sections 1–6), then the implementation team (sections 7–12)
-> **Author:** Draft, September 2026
+> A new Premiere Ecoute feature — presented to streamers
+> Draft, September 2026
 
 ---
 
-## 1. The pitch, in one paragraph
+## The idea, in one sentence
 
-Your viewers discover music on your stream. Right now, when a track hits, they
-have exactly two options: grab their phone, fight the Spotify search bar, and
-stop watching you — or forget the track forever. **Wantlist v2 makes the third
-option the easy one: they type one word in your chat, and the track lands in
-*their own* Spotify playlist before the chorus is over.** No tab switch, no
-search, no "what was that track again?" in the VOD comments. And you get a live
-readout of exactly which tracks your community wanted to keep.
+**When a track lands on your stream, your viewer types one word in your chat — and
+the track is in their own Spotify playlist before the chorus is over.**
+
+No searching. No second screen. No "what was that track again?" three days later
+under your VOD.
 
 ---
 
-## 2. The problem we are actually solving
+## 1. What happens today, when a track lands
 
-> **"I want to build my playlist live, while listening to the stream."**
+You put on a track. The chat lights up. Someone writes "🔥🔥🔥". Someone else asks
+for the name. And then... nothing happens.
 
-That's the whole thing. Everything in this document exists to make that one
-sentence true with the least possible friction.
+Because for your viewer to actually keep that track, this is what it costs:
 
-Today, for a viewer, that sentence costs about 40 seconds and full attention:
-
-| Step | Cost |
+| What they have to do | What it costs them |
 |---|---|
-| Notice the track | free |
-| Find its name (overlay? ask chat? Shazam?) | 5–20s, often fails |
-| Open Spotify, search, disambiguate the right version | 15–30s |
-| Add to the right playlist | 5–10s |
-| Come back to the stream | attention already gone |
+| Work out what the track is called | 5 to 20 seconds — and they often get it wrong |
+| Leave your stream, open Spotify | your stream is now in the background |
+| Search it, pick the right version between the album, the remaster and the live | 15 to 30 seconds |
+| Find the right playlist, add it | 5 to 10 seconds |
+| Come back to you | their attention is already gone |
 
-Multiply by 15 tracks in a listening session. Nobody does it. The music gets
-discovered and then immediately lost — which is a bad outcome for the viewer
-(no playlist), for the streamer (no evidence their curation worked), and for
-the artist (a play that never converted into a save).
+Around 40 seconds of full attention, for **one** track. On a stream where you play
+fifteen, nobody does it twice. They do it for the first track, maybe the second,
+then they give up and just enjoy the stream.
 
-### What the streamer loses today
+**So the music you spent hours digging up gets discovered, and then immediately
+lost.** Your viewer goes home with nothing. You go home with a chat log full of
+fire emojis and no idea which tracks actually mattered. And the artist gets a
+play that never turned into anything.
 
-- **No proof of impact.** You know the chat said "🔥". You don't know that 62
-  people kept the track.
-- **No recurring artifact.** Every stream's discoveries evaporate at the end of
-  the stream. There is no object your community goes back to during the week.
-- **No leverage with labels/artists.** "My chat liked it" is not a pitch.
-  "148 saves in 2 hours, 71 % of them from first-time listeners" is.
+That's the problem this feature exists to solve — nothing else.
 
 ---
 
-## 3. What already exists (we are not starting from zero)
+## 2. What it looks like once it's on
 
-A substantial part of the machinery is already shipped and in production. This
-proposal is mostly about **connecting existing pieces and lowering friction**,
-not building a new product.
+Same moment. Same track. Your viewer types one word in your chat:
 
-| Capability | Where it lives today | State |
-|---|---|---|
-| Personal wantlist (albums / tracks / artists) | `PremiereEcoute.Wantlists`, `wantlists` + `wantlist_items` tables | ✅ shipped |
-| Automatic Spotify ingestion of unknown tracks | `Wantlists.Services.AddTrack` | ✅ shipped |
-| `!save` chat command (saves the track currently playing) | `Sessions.Scores.CommandHandler` | ✅ shipped |
-| Per-streamer toggle for `!save` | `profile.chat_settings.save_wantlist` | ✅ shipped |
-| Heart button on the radio page & discography pages | `Wantlist.WantlistLive`, radio pages | ✅ shipped |
-| Bell notification on save | `Notifications.Types.WantlistSave` | ✅ shipped |
-| Domain events | `AddedToWantlist`, `RemovedFromWantlist` (event store) | ✅ shipped |
-| REST API (`GET /api/wantlist`, `POST /api/wantlist/tracks/current`, `DELETE /api/wantlist/items/:id`) | `Api.Wantlist.*Controller` | ✅ shipped |
-| MCP tools (`list`, `add`, `remove`, `save_current_track`) | `Mcp.Components.Wantlist.*` | ✅ shipped |
-| Twitch extension panel (now-playing + like button) | `apps/extension`, `Api.Extension.WidgetController` | ⚠️ shipped but **stubbed** — `like_track/2` always returns `:no_playlist_rule` |
-| Chat vote pipeline (Broadway, batched writes, live PubSub) | `Sessions.Scores.MessagePipeline` | ✅ shipped (used for scoring, reusable for saves) |
+```
+<viewer>   banger
+<bot>      @viewer  "Midnight City" — M83 saved to your playlist ❤️
+```
 
-### The one gap that matters
+And that's it. The track is now sitting in a real playlist, in their own Spotify
+account, called something like **"🎧 YourChannel — September 2026"**. A playlist
+they didn't have to create, name, or even think about. It filled itself up while
+they were watching you.
 
-**A wantlist is not a playlist.** Today the wantlist is a page on
-premiere-ecoute.fr with links out to Spotify/Deezer/Tidal. The viewer still has
-to re-do the work in their music app. We solved "remember the track" — we did
-**not** solve "build my playlist".
+They never left your stream. They never opened another app. The whole thing cost
+them one word and half a second.
 
-Closing that gap is §5.1, and it is the heart of this proposal.
+By the end of the night, that playlist has eleven tracks in it — a record of your
+stream that they'll still be listening to on the bus on Thursday. With your
+channel's name on it.
 
 ---
 
-## 4. The proposal in one picture
+## 3. The six ways your chat can save a track
+
+The single thing that decides whether this works is **how little effort a save
+costs**. So we're not building one way to do it — we're building every way that
+costs nearly nothing, and letting you pick the ones that fit your channel.
+
+All of them do exactly the same thing: *save whatever is playing right now.*
+
+### Your emote
+
+You pick one emote — one of your channel emotes, a sub emote, whatever you want.
+When a viewer sends just that emote, the track is saved.
 
 ```
-   During the stream                          In the viewer's world
-   ─────────────────                          ──────────────────────
-                                    ┌──────────────────────────────┐
-  chat: "!save"        ─┐           │                              │
-  chat: <streamer emote>─┤          │   Spotify / Deezer playlist  │
-  chat: "banger"        ─┼──►  Wantlist  ──sync──►  "🎧 <channel> — Sept 2026"
-  chat: personal word   ─┤     (capture)            (auto-created, auto-appended)
-  extension ❤️ panel    ─┤           │                              │
-  Stream Deck / API     ─┤           └──────────────────────────────┘
-  MCP ("save that one") ─┘
-                              │
-                              ├──► live overlay: "23 saves for this track"
-                              └──► end-of-stream recap + community playlist
+<viewer>   yourchannelHeart
+<viewer2>  yourchannelHeart
+<viewer3>  yourchannelHeart
 ```
 
-One capture concept (`save`), many input surfaces, one guaranteed outcome:
-**a real playlist in the viewer's own music account, filled in real time.**
+**Why this one matters most:** spamming your emote when a track slaps is something
+your chat *already does, tonight, for free.* You're not teaching them a new
+behaviour — you're turning the reflex they already have into a playlist. For most
+channels this will be the one that actually gets used.
+
+### Your word
+
+You choose one or more words: `banger`, `pépite`, `+1`, `save`, `dans la playlist`
+— whatever your community already shouts.
+
+```
+<viewer>   PÉPITE
+<viewer2>  bangerrrr
+```
+
+It becomes part of your channel's own language instead of a bot command. A chat
+that yells "PÉPITE" is already voting — it just doesn't know it yet.
+
+### Their word
+
+Each viewer can also set a personal word of their own — `keep`, `mine`, `🎯` —
+that works on your channel and on every other channel using Premiere Ecoute.
+
+It's for the regulars: one habit, one word, works everywhere. And people like
+having *their* word.
+
+### The classic command
+
+`!save` — for anyone who prefers something explicit, and for viewers landing on
+your channel for the first time who don't know your emote or your word yet.
+
+### The button under your stream
+
+A small panel sits under your player, right there on Twitch. It shows what's
+currently playing and has one heart button. One tap, no typing at all.
+
+**This is the one that matters for your mobile viewers** — and on a music stream
+that's a big share of your audience. Typing in chat on a phone while listening is
+genuinely annoying; tapping a heart isn't.
+
+### Everywhere else
+
+- **From their phone or the website** — the track history of your stream, with a
+  heart next to every track. For the ones who realise at midnight that they
+  should have been saving all evening.
+- **From your own Stream Deck** — a physical key you press when you want *your*
+  copy of the track you just played, without touching anything.
+- **From an AI assistant** — a viewer can say *"put everything I kept from last
+  night's stream into a playlist called Autumn Digging, minus the two ambient
+  ones"* and it just happens.
+
+You don't have to use all of these. You could turn on nothing but the emote and
+the feature would already work.
 
 ---
 
-## 5. Feature set
+## 4. What you get out of it
 
-### 5.1 Live playlist sync — *the core*
+Everything above is for your viewers. Here's the part that's for you.
 
-The viewer connects Spotify (or Deezer) once. From then on, every wantlist save
-is appended to a real playlist in their account, within seconds.
+### You finally see what actually landed
 
-- **Target playlist strategy** (viewer setting, default = *per channel, per month*):
-  - `per_channel_month` — `🎧 <channel> — September 2026` (default; keeps
-    playlists a digestible size and gives them a natural "era")
-  - `per_session` — one playlist per listening session / stream
-  - `single` — one forever-growing "Premiere Ecoute" playlist
-  - `existing` — append to a playlist the viewer already owns
-- **Auto-created on first save**, named and described automatically, with the
-  channel name and date. The viewer never has to set anything up beyond the
-  one-time provider connection.
-- **Appended live** — the track appears in their Spotify app while the stream is
-  still playing it. This is the moment that sells the feature.
-- **Deduplicated** — saving the same track twice is a no-op, not a duplicate row.
-- **Reconciled** — a background worker retries failed appends (token expiry,
-  rate limit, offline provider) so a save is never silently lost.
-- **Still works without a provider connection.** The wantlist remains the source
-  of truth; sync is an enrichment. A viewer with no Spotify link keeps the
-  existing behaviour (wantlist page + export links), and the moment they
-  connect, we backfill.
+Live, on your dashboard, track by track: **how many people kept it.** Not how many
+typed "🔥" — how many took the track home.
 
-> **Design principle:** the wantlist is ours and always works; the playlist is
-> theirs and is a projection of the wantlist. We never make the feature depend
-> on a third party being up.
+You've never had this number. Votes tell you what people *say* about a track in
+the moment. Saves tell you what they want to still be listening to next week.
+They are not the same thing, and the gap between them is the single most useful
+piece of information a music curator can have.
 
-### 5.2 Capture surfaces — *"vote to save" from anywhere*
+### An overlay, if you want one
 
-The single most important variable is **how many keystrokes a save costs**. All
-of these resolve to the same command: *save whatever is playing right now on
-this channel to my wantlist*.
+A small counter on screen — **"❤️ 23 saves"** — that climbs while the track plays.
+Your chat sees it climb. It becomes its own game: the room pushing a track past
+the last one's record. Entirely optional, and it's off by default.
 
-#### a) Chat — command (shipped)
+### The top of the night
 
-`!save` → replies in-thread with confirmation. Works today, per-channel toggle.
+At the end of the stream, automatically:
 
-#### b) Chat — emote save *(new)*
+> **Tonight's most saved**
+> 1. Midnight City — M83 — 47 saves
+> 2. Alright — Kendrick Lamar — 39 saves
+> 3. Teardrop — Massive Attack — 31 saves
 
-The streamer picks **one emote** (a channel emote, a sub emote, or a global one)
-as the save trigger. A message whose content is *just that emote* is a save.
+Posted in your chat, and kept on a page you can link to. It's a clip-worthy
+moment to end on, and it's yours every single stream without doing anything.
 
-```
-<viewer> premiereHeart
-<bot>    @viewer "Midnight City" saved to your wantlist ❤️
-```
+### A channel playlist that brings people back
 
-Why it matters: emotes are the native vocabulary of a Twitch chat. Spamming a
-channel emote when a track slaps is something your chat **already does**. We
-turn an existing reflex into a playlist entry — zero new behaviour to teach.
+All of your community's saves, put together into one playlist for your channel,
+ordered by how many people kept each track. It updates every stream. People can
+subscribe to it.
 
-Configurable: `n` repeats of the emote still counts once; emote save can be
-restricted to subs/followers if the streamer wants.
+That's the piece that works **between** your streams: something with your name on
+it that your community listens to on Tuesday afternoon, three days after you went
+offline, and that new people can find without having caught you live.
 
-#### c) Chat — keyword save *(new)*
+### A number you can actually show someone
 
-The streamer defines one or more plain-text keywords: `banger`, `+1`, `save`,
-`pépite`, `dans la playlist`. Matching is exact-token and case-insensitive,
-reusing the same matching discipline as the existing vote parser
-(`Vote.from_message/2` — token boundaries, no false positives inside longer
-words).
+> *"Last month my community saved 2,140 tracks off my stream. 61 % of them from
+> people who'd never heard the artist before."*
 
-Why it matters: it lets the trigger be **part of the channel's culture** rather
-than a bot command. A chat that yells "PÉPITE" already votes; it just doesn't
-know it yet.
-
-#### d) Chat — per-viewer personal keyword *(new)*
-
-Each **viewer** can register their own trigger word in their account settings
-(e.g. `mine`, `keep`, `🎯`). It works in any channel that has chat capture
-enabled.
-
-Why it matters: power users who watch several music channels get one muscle
-memory that works everywhere, and it can be a word that doesn't collide with
-the channel's own chat noise. It also creates a light personalisation hook —
-people like having *their* word.
-
-> **Precedence** when several rules could match one message: personal keyword →
-> channel keyword → channel emote → `!save` command. First match wins, one save
-> per message, always idempotent per (viewer, track).
-
-#### e) Twitch extension panel *(finish what's started)*
-
-The panel already shows the now-playing track. It needs its ❤️ button wired to
-the wantlist (today it dead-ends on `:no_playlist_rule`).
-
-- One tap, no chat, no typing — works on **mobile Twitch**, where typing in chat
-  during a stream is painful and where a large share of the audience is.
-- Shows the viewer's save count for the session, and a "connect your Spotify"
-  call to action for viewers not yet linked.
-- Because the panel is authenticated with the Twitch extension JWT, a viewer who
-  has linked their Twitch identity to a Premiere Ecoute account needs **zero
-  login** in the iframe.
-
-#### f) App / web *(extend)*
-
-- Radio page & session page: heart button (shipped).
-- Session recap page: "save all", "save the top 5 of this stream".
-- Mobile app (`apps/mobile`): wantlist tab + push notification on save.
-
-#### g) REST API *(shipped, document & extend)*
-
-`POST /api/wantlist/tracks/current?broadcaster_id=…` already does the job.
-This is what makes a **Stream Deck key**, an OBS dock, a Discord bot or a
-community-built tool a one-line integration. Add: bulk save, save by Spotify ID,
-session-scoped save history.
-
-#### h) MCP *(shipped, extend)*
-
-Tools already exist for list/add/remove/save-current-track. This is the
-"assistant" surface:
-
-> *"Add everything I saved from <channel> last night to a new playlist called
-> Autumn Digging, and drop the two ambient ones."*
-
-Extend with: `wantlist.sync_to_playlist`, `wantlist.session_saves`,
-`wantlist.top_saved` so an assistant can do real curation work on top of the
-raw captures.
-
-### 5.3 What the streamer gets back
-
-Capture is for the viewer. This part is what makes a streamer *turn it on*.
-
-- **Live save counter** per track, on the dashboard and as an **OBS overlay**
-  ("❤️ 23 saves") — reusing the existing session PubSub broadcast path.
-- **Track leaderboard** for the stream: which tracks were kept, by how many, how
-  fast (saves in the first 30 seconds = an instant hit).
-- **End-of-stream recap**, auto-posted in chat and available as a page:
-  *"Tonight's most saved: 1. … 2. … 3. …"*.
-- **Community playlist**: a channel playlist auto-built from the crowd's saves,
-  ranked by save count. This is a weekly artefact your community can subscribe
-  to — the repo already has playlist subscriptions and notifications
-  (`Playlists.PlaylistSubscription`, `PlaylistNotification`) to distribute it.
-- **Discovery credit**: a per-channel "saves generated" counter — a real,
-  quotable number for sponsorships, label relations and artist outreach.
+That's a sentence you can put in front of a label, an artist, or a sponsor. "My
+chat liked it" is not a pitch. That is.
 
 ---
 
-## 6. Why a streamer should switch it on
+## 5. What it asks of you
 
-| Objection | Answer |
-|---|---|
-| "More setup work for me" | One toggle in account settings, plus optionally choosing an emote/keyword. Under 60 seconds. Nothing to install, nothing in OBS unless you want the overlay. |
-| "My chat won't learn a new command" | They don't have to. Emote save and keyword save use what your chat *already* spams. |
-| "It pulls people away from my stream" | The opposite: the whole point is that they never leave the tab. Today they open Spotify and lose you. |
-| "What do I actually get?" | Live proof your curation lands, a weekly community playlist that brings people back between streams, and a number you can show a sponsor. |
-| "Is it another paid platform?" | No. It's part of Premiere Ecoute, which you already use for sessions and votes. |
-| "Does it work for non-registered viewers?" | Partially, and we're fixing that — see §8.3. Registered viewers get the full loop. |
+**Setup: about a minute.** Open your settings, turn the feature on, pick your
+emote and/or your word. That's the whole thing.
 
-**The 60-second setup:** Account → Features → Chat → enable *Save to wantlist* →
-pick your emote and/or keyword → done. The overlay and the recap are opt-in
-extras.
+**What you do *not* have to do:**
 
----
+- Nothing to install, nothing to plug into OBS (unless you want the overlay)
+- No new command for your chat to memorise
+- No change to how you stream, pick music, or talk
+- No work at the end of the stream — the recap and the playlist build themselves
 
-## 7. Domain model
-
-Everything below extends the existing `PremiereEcoute.Wantlists` context; no new
-bounded context is required. Conventions follow `docs/coding_standards.md` and
-the `PremiereEcouteCore.Aggregate` / event-store patterns already used.
-
-### 7.1 Schema changes
-
-**`wantlist_items` — add capture provenance**
-
-| Field | Type | Notes |
-|---|---|---|
-| `source` | enum | `:web \| :chat_command \| :chat_emote \| :chat_keyword \| :extension \| :api \| :mcp` |
-| `broadcaster_id` | belongs_to User, nullable | which channel the save came from |
-| `session_id` | belongs_to ListeningSession, nullable | which listening session, if any |
-| `saved_at` | utc_datetime | capture time (distinct from `inserted_at` for backfills) |
-
-This is what makes §5.3 (leaderboards, recaps, per-channel credit) queryable at
-all, and it's cheap to add now.
-
-**`wantlist_sync_targets` — new**
-
-| Field | Type | Notes |
-|---|---|---|
-| `user_id` | belongs_to User | the viewer |
-| `provider` | enum | `:spotify \| :deezer` |
-| `strategy` | enum | `:per_channel_month \| :per_session \| :single \| :existing` |
-| `broadcaster_id` | belongs_to User, nullable | for per-channel strategies |
-| `playlist_id` | string | provider playlist id |
-| `period` | string, nullable | e.g. `2026-09` for the monthly strategy |
-| `status` | enum | `:active \| :paused \| :revoked` (revoked = provider token gone) |
-
-**`wantlist_syncs` — new (one row per item→playlist append)**
-
-| Field | Type | Notes |
-|---|---|---|
-| `wantlist_item_id` | belongs_to WantlistItem | |
-| `target_id` | belongs_to WantlistSyncTarget | |
-| `status` | enum | `:pending \| :synced \| :failed \| :skipped` |
-| `provider_track_id` | string | resolved track URI |
-| `error` | string, nullable | last failure reason |
-| `attempts` | integer | retry counter |
-
-Unique index on `(target_id, provider_track_id)` gives deduplication for free.
-
-**`chat_settings` (streamer profile) — add**
-
-```elixir
-field :save_emote, :string          # e.g. "premiereHeart"
-field :save_keywords, {:array, :string}, default: []
-field :save_restrict_to, Ecto.Enum, values: [:everyone, :followers, :subscribers], default: :everyone
-field :save_overlay_enabled, :boolean, default: false
-```
-
-**Viewer profile — add**
-
-```elixir
-field :personal_save_keyword, :string   # works across all enabled channels
-```
-
-### 7.2 New modules
-
-```
-lib/premiere_ecoute/wantlists/
-  wantlist_sync_target.ex              # aggregate
-  wantlist_sync.ex                     # aggregate
-  services/
-    capture.ex                         # one entry point for every surface
-    playlist_sync.ex                   # wantlist item -> provider playlist
-    target_resolution.ex               # strategy -> concrete playlist (create if needed)
-  chat/
-    save_matcher.ex                    # emote / keyword / personal-keyword matching
-    save_pipeline.ex                   # Broadway consumer of MessageSent
-  workers/
-    playlist_sync_worker.ex            # Oban: append + retry with backoff
-    session_recap_worker.ex            # Oban: end-of-stream recap + community playlist
-```
-
-### 7.3 Events
-
-```elixir
-%TrackSaved{id: user_id, source: :chat_emote, broadcaster_id: …, session_id: …, record_id: …}
-%WantlistSynced{id: user_id, provider: :spotify, playlist_id: …, track_id: …}
-%WantlistSyncFailed{id: user_id, provider: :spotify, reason: …}
-```
-
-`AddedToWantlist` / `RemovedFromWantlist` stay as-is; `TrackSaved` carries the
-richer capture context so read models (leaderboard, recap, analytics) can be
-projected without touching the write path.
-
-### 7.4 Capture flow
-
-```
-MessageSent (EventSub webhook)
-   │
-   ├─► Sessions.Scores.MessagePipeline   (existing — scores/votes)
-   └─► Wantlists.Chat.SavePipeline       (new — Broadway, same producer pattern)
-          │  SaveMatcher.match(message, channel_config, viewer_config)
-          │     → :no_match | {:save, :emote|:keyword|:personal}
-          ▼
-       Wantlists.Services.Capture.save_current_track(viewer, broadcaster, source)
-          │  (resolves now-playing via Apis.cache(:spotify).get_playback_state/2,
-          │   exactly like CommandHandler does today)
-          ▼
-       WantlistItem.add/3  ──► %TrackSaved{} ──► PlaylistSyncWorker (Oban)
-                                              └► PubSub "session:<id>" → overlay + dashboard
-```
-
-**Reuse, don't duplicate:** `Capture` becomes the single implementation that
-`CommandHandler` (`!save`), the extension controller, the REST controller and
-the MCP tool all call. Today each of those re-implements a slightly different
-version of the same `with` chain.
-
-### 7.5 Emote capture needs a webhook change
-
-`Webhooks.TwitchController.handle/1` currently keeps only
-`event.message.text`. Twitch EventSub `channel.chat.message` also delivers
-`message.fragments`, with `type: "emote"` entries carrying the emote id and
-name. Emote-based capture should match on **fragments**, not on the raw text, so
-that a viewer typing the literal string `premiereHeart` (without it rendering as
-an emote) doesn't count, and so we can tell channel emotes from global ones.
-
-→ Add `fragments` to `%MessageSent{}` and populate it in the webhook parser.
-This is a small, self-contained change and a prerequisite for §5.2(b).
+**What it asks of your viewers:** a Premiere Ecoute account with their Spotify
+connected. Once, and never again. After that, saving is one word forever.
 
 ---
 
-## 8. Hard problems / decisions to make
+## 6. The questions you're going to ask
 
-### 8.1 Provider rate limits and quota
+**"Does my chat need an account? That's a lot to ask."**
+For the track to land in *their* playlist, yes — we can't put music in an account
+that doesn't exist. But the ask lands at the best possible moment: right after
+they tried to save a track they love, not before. We're also looking at holding
+saves for viewers who aren't signed up yet, so they can claim them later and
+nothing is lost while they decide. Tell us if that matters to you — it changes
+what we build first.
 
-A 200-viewer session where 60 people save a track produces 60 playlist appends
-within seconds, each on a different user's OAuth token. Spotify rate-limits
-per-app, not per-user, so this is a real ceiling.
+**"Does it work on mobile?"**
+Yes, and it's one of the reasons the button under the player exists. The emote
+and the word work fine from the phone chat too.
 
-Mitigations to decide on:
-- **Batch per viewer per window** (e.g. flush every 15–30 s, or on track change)
-  instead of one API call per save — one call with N URIs, not N calls.
-- Oban queue with bounded concurrency + exponential backoff on `429`, honouring
-  `Retry-After`.
-- Degrade gracefully: the wantlist row is written immediately and is the source
-  of truth; the playlist append is eventually consistent. The viewer-facing
-  promise is "within a minute", not "instantly", even though it will usually be
-  instant.
-- Check the current Spotify app quota mode (dev mode caps users at 25 — this
-  must be resolved before any public rollout that depends on viewer tokens).
+**"Is my chat going to get spammed by the bot?"**
+You control it. The bot can confirm every save, confirm quietly, or say nothing
+at all and let the overlay and the dashboard do the talking. On a fast chat, most
+streamers will want it silent.
 
-### 8.2 Abuse and spam
+**"What if people spam the emote to farm something?"**
+There's nothing to farm — a save only ever lands in the spammer's own playlist,
+and saving the same track twice does nothing. You can also limit saving to
+followers or subs if you'd rather.
 
-- Cooldown per (viewer, channel): at most one save per N seconds.
-- One save per (viewer, track) — enforced by the existing unique index.
-- Optional `save_restrict_to: :followers | :subscribers`.
-- Emote-save should ignore messages from banned/timed-out users (EventSub
-  already excludes them) and respect the streamer's global toggle.
+**"Spotify only?"**
+Spotify first, because that's where almost all of your viewers are. Deezer and
+Tidal viewers still get their list of kept tracks and can export it; full
+automatic sync for them comes after.
 
-### 8.3 Unregistered viewers — the biggest funnel leak
+**"Does it cost anything?"**
+It's part of Premiere Ecoute, alongside the sessions and the votes you already
+have.
 
-Today, `!save` from a viewer with no Premiere Ecoute account returns
-*"Register on premiere-ecoute.fr to save tracks!"* — i.e. the moment of highest
-intent produces a chore. Options to decide between:
-
-1. **Shadow wantlist + claim flow (recommended).** Save against the Twitch user
-   id into a pending wantlist. Reply with a one-time claim link. On first login
-   with that Twitch identity, the pending saves are merged. Nothing is lost, and
-   the viewer sees their reward *before* paying the signup cost.
-2. Reply-with-link only (status quo).
-3. Nothing — silent no-op.
-
-Option 1 needs a retention policy (e.g. pending saves expire after 30 days) and
-a GDPR position on storing Twitch ids for non-users. Worth doing: this is
-plausibly where most of the growth is.
-
-### 8.4 Track resolution quality
-
-`AddTrack` already handles "not in our discography → fetch from Spotify → create
-Single or Album". Remaining edge cases: region-locked tracks, the wrong version
-(remaster vs original), and non-Spotify targets (a Deezer sync needs
-cross-provider matching, which the repo does partially via `provider_ids`).
-Decide whether v2 ships **Spotify-only sync** (recommended) with Deezer/Tidal as
-export-only, as today.
-
-### 8.5 Twitch extension review
-
-Wiring the ❤️ button changes the extension's behaviour and will need a new
-review pass, plus a privacy-policy line about linking Twitch identity to a
-Premiere Ecoute account. Lead time on Twitch review should be assumed to be
-weeks, so start the submission early if the panel is in scope.
+**"What if I don't want the overlay / the recap / the emote?"**
+Every piece is independent and off by default. Turn on the ones you want.
 
 ---
 
-## 9. Surface-by-surface spec (draft)
+## 7. One night, from start to finish
 
-| Surface | Interface | Status |
-|---|---|---|
-| Chat command | `!save` | shipped |
-| Chat emote | channel-configured emote, matched on EventSub fragments | new |
-| Chat keyword | channel-configured token list | new |
-| Chat personal keyword | viewer-configured token | new |
-| Twitch extension | `POST /api/extension/tracks/like` (wire to `Capture`) | stub → implement |
-| REST | `GET /api/wantlist` · `POST /api/wantlist/tracks/current` · `DELETE /api/wantlist/items/:id` | shipped |
-| REST (new) | `POST /api/wantlist/tracks` (by provider id) · `GET /api/wantlist/sessions/:id` · `POST /api/wantlist/sync` | new |
-| MCP | `wantlist.add` · `wantlist.remove` · `wantlist.save_current_track` · `user://me/wantlist` | shipped |
-| MCP (new) | `wantlist.sync_to_playlist` · `wantlist.session_saves` · `wantlist.top_saved` | new |
-| Overlay | `/overlay/saves/:broadcaster_id` LiveView, PubSub-driven | new |
-| Stream Deck | existing REST + API token | shipped (document it) |
+**21:00** — You go live. Nothing to do; the feature is already listening.
 
----
+**21:14** — Third track of the night lands. Six people send your emote. The
+counter on your dashboard goes to 6. Six playlists, in six different people's
+Spotify accounts, just gained a track.
 
-## 10. Rollout phases
+**22:30** — You play something obscure you weren't sure about. **41 saves.** It's
+the biggest number of the night and you did not see it coming — that's the whole
+point. You now know something about your audience that you didn't know an hour
+ago.
 
-| Phase | Scope | Why this order |
-|---|---|---|
-| **P1 — Close the loop** | Playlist sync (Spotify, `per_channel_month` default), `Capture` service, `TrackSaved` event, capture provenance columns | This alone makes the headline promise true. Everything else is a multiplier on it. |
-| **P2 — Lower the friction** | Emote save + keyword save + EventSub fragments, per-channel config UI | Biggest capture-volume increase per unit of work. |
-| **P3 — Pay the streamer back** | Live save counter, overlay, end-of-stream recap, top-saved leaderboard | This is what makes streamers advocate for it. |
-| **P4 — Everywhere else** | Extension ❤️ wired, personal keyword, community playlist, new MCP/REST verbs, mobile | Long tail; each is independently shippable. |
-| **P5 — Growth** | Shadow wantlist + claim flow for unregistered viewers | Highest leverage, highest policy cost — do it once the loop is proven. |
+**23:45** — You wrap up. The bot posts the top 3 of the night in chat. Someone
+screenshots it.
+
+**Thursday, 14:00** — A viewer who caught two hours of your stream is at work,
+listening to a playlist named after your channel, that they never had to build.
+Your channel name is on their screen while you're asleep.
+
+**End of the month** — You have a number: how many tracks your community kept,
+which artists came out on top, how many of those were first-time listens. You put
+it in an email to a label.
 
 ---
 
-## 11. Metrics to judge it by
+## 8. What we'd like from you
 
-- **Saves per session** and **savers / viewers** ratio (the real engagement number).
-- **Save → playlist sync success rate** (must stay >99 %; it's the promise).
-- **Time from save to track appearing in the provider playlist** (p50 / p95).
-- **Share of saves by surface** — tells us which capture surfaces earned their build cost.
-- **Return rate on community playlists** (subscriptions, replays between streams).
-- **Registration conversion** from the claim flow, once P5 lands.
+This is a proposal, not a finished product. Before we build it, the things we'd
+genuinely like your answer on:
 
----
+1. **Which of the six ways to save would your chat actually use?** If you only had
+   one, which one?
+2. **What word or emote would you pick?** (This tells us more than it looks like —
+   it tells us how noisy the matching has to be able to handle.)
+3. **Playlist per month, or playlist per stream?** One playlist a month per
+   channel keeps it a sensible size; one per stream is a cleaner souvenir of a
+   specific night. We currently lean towards per month.
+4. **Bot confirmation in chat: on, quiet, or off by default?**
+5. **How much does the unregistered-viewer problem matter to you** — would you
+   rather we made saving work for everyone before building anything else?
+6. **Is the channel playlist yours, or the platform's?** Would you want it sitting
+   in your own Spotify account, under your name?
 
-## 12. Open questions for the next draft
-
-1. Default target-playlist strategy — per channel+month, or per session? (Draft assumes channel+month.)
-2. Do we sync to Deezer in v2, or Spotify-only with Deezer as export?
-3. Is the community playlist owned by the streamer's account or by a platform account?
-4. Shadow wantlist for unregistered viewers: in or out of the first release?
-5. Should emote save be restricted to *channel* emotes only (stronger identity, less accidental) or any emote?
-6. Overlay: reuse the existing overlay stack, or a new dedicated one?
-7. Pricing/limits: is playlist sync available to every streamer, or is it a differentiator for a tier?
+And if you want to be one of the first channels to run it live, say so — the
+first streams on it will shape the rest.
