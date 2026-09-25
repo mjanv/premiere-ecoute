@@ -2,11 +2,11 @@
   background: 
     linear-gradient(
       to bottom,
-      #110033 0%,
-      #080011 20%,
-      #000 50%,
-      #080011 80%,
-      #110033 100%
+      #1c0548 0%,
+      #10032c 20%,
+      #0b0222 50%,
+      #10032c 80%,
+      #1c0548 100%
     );
   position: relative;
 }
@@ -46,14 +46,14 @@
   background: 
     radial-gradient(
       ellipse at 85% 15%,
-      rgba(255, 20, 147, 0.15) 0%,
-      rgba(255, 20, 147, 0.08) 20%,
+      rgba(255, 20, 147, 0.28) 0%,
+      rgba(255, 20, 147, 0.14) 20%,
       transparent 40%
     ),
     radial-gradient(
       ellipse at 15% 85%,
-      rgba(0, 255, 255, 0.12) 0%,
-      rgba(0, 255, 255, 0.06) 20%,
+      rgba(0, 255, 255, 0.22) 0%,
+      rgba(0, 255, 255, 0.1) 20%,
       transparent 40%
     );
   animation: synthwave-glow 15s ease-in-out infinite alternate,
@@ -64,13 +64,13 @@
 
 @keyframes synthwave-glow {
   0% {
-    opacity: 0.0;
+    opacity: 0.55;
   }
   50% {
     opacity: 1;
   }
   100% {
-    opacity: 0.0;
+    opacity: 0.55;
   }
 }
 

@@ -10,17 +10,17 @@
     reliable inside component stylesheets that Tailwind processes after theming.
   */
 
-  /* Fixed dark palette — sidebar, header, drawers, panels */
-  --color-dark-950: #020617;
-  --color-dark-900: #0f172a;
-  --color-dark-850: #172033;
-  --color-dark-800: #1e293b;
-  --color-dark-700: #293548;
-  --color-dark-600: #334155;
-  --color-dark-500: #64748b;
-  --color-dark-400: #94a3b8;
-  --color-dark-300: #cbd5e1;
-  --color-dark-200: #e2e8f0;
+  /* Fixed dark palette — sidebar, header, drawers, panels (violet-tinted, matches slate override below) */
+  --color-dark-950: oklch(14% 0.045 292);
+  --color-dark-900: oklch(20.8% 0.05 292);
+  --color-dark-850: oklch(24.5% 0.052 292);
+  --color-dark-800: oklch(27.9% 0.055 292);
+  --color-dark-700: oklch(33% 0.058 292);
+  --color-dark-600: oklch(37.2% 0.06 292);
+  --color-dark-500: oklch(62% 0.06 292);
+  --color-dark-400: oklch(74% 0.05 292);
+  --color-dark-300: oklch(87% 0.028 292);
+  --color-dark-200: oklch(93% 0.016 292);
 
   /* Primary color scale — purple brand, matches daisyUI dark theme primary */
   --color-primary-950: #36196e;
@@ -41,4 +41,36 @@
   --gradient-primary: linear-gradient(to right, #8b4fff 0%, #db2777 100%);
   --gradient-primary-vertical: linear-gradient(to bottom, #8b4fff 0%, #db2777 100%);
   --gradient-primary-diagonal: linear-gradient(135deg, #8b4fff 0%, #db2777 100%);
+}
+
+/*
+  Tailwind slate/gray scales re-tinted toward the brand violet (hue ~292).
+  Templates use these classes directly (~2,500 occurrences), so overriding the
+  theme variables recolors neutrals app-wide. Lightness is kept, except 400-600
+  which are lifted for readable muted text on the dark synthwave background.
+*/
+@theme {
+  --color-slate-50: oklch(98.4% 0.004 292);
+  --color-slate-100: oklch(96.8% 0.008 292);
+  --color-slate-200: oklch(92.9% 0.016 292);
+  --color-slate-300: oklch(87% 0.028 292);
+  --color-slate-400: oklch(74% 0.05 292);
+  --color-slate-500: oklch(66% 0.055 292);
+  --color-slate-600: oklch(58% 0.06 292);
+  --color-slate-700: oklch(37.2% 0.06 292);
+  --color-slate-800: oklch(27.9% 0.055 292);
+  --color-slate-900: oklch(20.8% 0.05 292);
+  --color-slate-950: oklch(14% 0.045 292);
+
+  --color-gray-50: oklch(98.5% 0.003 292);
+  --color-gray-100: oklch(96.7% 0.006 292);
+  --color-gray-200: oklch(92.8% 0.012 292);
+  --color-gray-300: oklch(87.2% 0.02 292);
+  --color-gray-400: oklch(74% 0.035 292);
+  --color-gray-500: oklch(62% 0.042 292);
+  --color-gray-600: oklch(50% 0.045 292);
+  --color-gray-700: oklch(37.3% 0.045 292);
+  --color-gray-800: oklch(27.8% 0.042 292);
+  --color-gray-900: oklch(21% 0.04 292);
+  --color-gray-950: oklch(13% 0.035 292);
 }
