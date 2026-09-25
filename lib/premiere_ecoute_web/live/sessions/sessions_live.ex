@@ -84,24 +84,12 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   end
 
   @doc """
-  Returns Tailwind CSS classes for session status badge.
-
-  Maps session status atoms to appropriate color scheme classes for visual status indicators (yellow for preparing, green for active, gray for stopped).
-  """
-  @spec session_status_class(atom()) :: String.t()
-  def session_status_class(:preparing), do: "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
-  def session_status_class(:active), do: "bg-green-600/20 text-green-400 border-green-500/30"
-  def session_status_class(:stopped), do: "bg-gray-600/20 text-gray-400 border-gray-500/30"
-
-  @doc """
-  Returns emoji icon for session status.
-
-  Maps session status atoms to emoji icons for visual representation (hourglass for preparing, musical note for active, stop button for stopped).
+  Returns the heroicon name for a session status badge.
   """
   @spec session_status_icon(atom()) :: String.t()
-  def session_status_icon(:preparing), do: "⏳"
-  def session_status_icon(:active), do: "🎵"
-  def session_status_icon(:stopped), do: "⏹️"
+  def session_status_icon(:preparing), do: "hero-clock"
+  def session_status_icon(:active), do: "hero-musical-note"
+  def session_status_icon(:stopped), do: "hero-stop"
 
   @doc """
   Returns Tailwind CSS classes for session visibility badge.

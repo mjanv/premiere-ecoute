@@ -105,11 +105,11 @@ defmodule PremiereEcouteWeb.Components.StatusBadge do
   defp icon_spacing("md"), do: "mr-1.5"
   defp icon_spacing("lg"), do: "mr-2"
 
-  defp variant("success"), do: "bg-green-600/15 text-green-300 border-green-600/25"
-  defp variant("warning"), do: "bg-yellow-600/15 text-yellow-300 border-yellow-600/25"
-  defp variant("error"), do: "bg-red-600/15 text-red-300 border-red-600/25"
-  defp variant("info"), do: "bg-blue-600/15 text-blue-300 border-blue-600/25"
-  defp variant("primary"), do: "bg-purple-600/15 text-purple-300 border-purple-600/25"
-  defp variant("secondary"), do: "bg-white/10 text-white/70 border-white/20"
-  defp variant(_), do: "bg-white/10 text-white/70 border-white/20"
+  defp variant("success"), do: "bg-green-500/20 text-green-300 border-green-400/40"
+  defp variant("warning"), do: "bg-amber-500/20 text-amber-300 border-amber-400/40"
+  defp variant("error"), do: "bg-red-500/20 text-red-300 border-red-400/40"
+  defp variant("info"), do: "bg-cyan-500/20 text-cyan-300 border-cyan-400/40"
+  defp variant("primary"), do: "bg-purple-500/25 text-purple-200 border-purple-400/45"
+  defp variant("secondary"), do: "bg-white/10 text-white/75 border-white/20"
+  defp variant(_), do: "bg-white/10 text-white/75 border-white/20"
 end

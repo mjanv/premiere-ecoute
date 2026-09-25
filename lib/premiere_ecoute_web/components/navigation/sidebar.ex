@@ -34,7 +34,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
               <.sidebar_link
                 href={~p"/discography"}
                 page={@current_page}
-                page_id="discography"
+                page_id={~w(discography albums artists singles)}
                 icon="hero-ticket"
               >
                 {gettext("Discography")}
@@ -46,7 +46,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 <.sidebar_link
                   href={~p"/playlists"}
                   page={@current_page}
-                  page_id="library"
+                  page_id={~w(library playlists_workflows automations)}
                   icon="hero-inbox"
                 >
                   {gettext("Playlists")}
@@ -72,7 +72,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
                 <.sidebar_link
                   href={~p"/sessions"}
                   page={@current_page}
-                  page_id="sessions"
+                  page_id="my_sessions"
                   icon="hero-tag"
                 >
                   {gettext("Sessions")}
@@ -127,7 +127,7 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
   @spec sidebar_link(map()) :: Phoenix.LiveView.Rendered.t()
   attr :href, :string, required: true
   attr :page, :string, default: nil
-  attr :page_id, :string, required: true
+  attr :page_id, :any, required: true, doc: "page identifier, or list of identifiers, that activates this link"
   attr :icon, :string, required: true
   attr :class, :string, default: ""
   attr :title, :string, default: nil, doc: "tooltip text for the link"
@@ -140,8 +140,8 @@ defmodule PremiereEcouteWeb.Components.Sidebar do
       title={@title}
       class={[
         "sidebar-link flex items-center px-3 py-2 text-base font-medium rounded-lg transition-colors",
-        if @page == @page_id do
-          "text-white" <> " " <> "bg-purple-600"
+        if @page in List.wrap(@page_id) do
+          "text-white bg-gradient-primary shadow-purple"
         else
           "text-gray-300 hover:text-white hover:bg-gray-800"
         end,

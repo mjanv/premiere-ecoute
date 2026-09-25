@@ -7,6 +7,8 @@ defmodule PremiereEcouteWeb.Sessions.Overlay do
 
   use Phoenix.Component
 
+  alias PremiereEcouteWeb.Sessions.Components.SessionComponents
+
   embed_templates "overlay/*"
 
   defp score_value(nil, _), do: "-"

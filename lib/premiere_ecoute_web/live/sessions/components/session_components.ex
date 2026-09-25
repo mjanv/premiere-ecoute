@@ -527,11 +527,8 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
       <%= for {rating, votes} <- distribution do %>
         <div class="flex-1 flex flex-col items-center px-1 min-w-0">
           <div
-            class={[
-              "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
-              vote_option_color(rating, @listening_session)
-            ]}
-            style={"height: #{bar_height(votes, track_max_votes, 110, 15)}px"}
+            class="w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center"
+            style={"height: #{bar_height(votes, track_max_votes, 110, 15)}px; background: #{vote_option_color(rating, @listening_session.vote_options)}"}
           >
             <span class="text-sm font-medium text-white">{Integer.to_string(votes)}</span>
           </div>
@@ -581,36 +578,29 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionComponents do
     end
   end
 
+  # Violet (lowest) -> pink -> orange (highest), as RGB channels
+  @vote_ramp [[0x7C, 0x3A, 0xED], [0xEC, 0x48, 0x99], [0xF9, 0x73, 0x16]]
+
   @doc """
-  Returns color class for vote option.
+  Returns the hex color of a vote option bar.
 
-  Maps vote options to Tailwind color classes for visual representation in charts.
+  Options follow one ramp from violet (lowest) through pink to orange (highest), so the color
+  encodes the rating whatever the size of the scale. Smash and pass keep green and red. Hex rather
+  than a Tailwind class so OBS overlays can use it in inline styles.
   """
-  @spec vote_option_color(String.t(), map()) :: String.t()
-  def vote_option_color(vote_option, session) do
-    index = Enum.find_index(session.vote_options, &(&1 == vote_option)) || 0
+  @spec vote_option_color(String.t() | integer(), [String.t() | integer()]) :: String.t()
+  def vote_option_color("smash", _vote_options), do: "#22c55e"
+  def vote_option_color("pass", _vote_options), do: "#ef4444"
 
-    cond do
-      vote_option == "smash" ->
-        "bg-green-500"
+  def vote_option_color(vote_option, vote_options) do
+    index = Enum.find_index(vote_options, &(to_string(&1) == to_string(vote_option))) || 0
+    t = if length(vote_options) > 1, do: index / (length(vote_options) - 1), else: 1.0
+    [low, mid, high] = @vote_ramp
+    {from, to, u} = if t <= 0.5, do: {low, mid, t * 2}, else: {mid, high, (t - 0.5) * 2}
 
-      vote_option == "pass" ->
-        "bg-red-500"
-
-      true ->
-        colors = [
-          "bg-red-500",
-          "bg-orange-500",
-          "bg-yellow-500",
-          "bg-green-500",
-          "bg-blue-500",
-          "bg-purple-500",
-          "bg-pink-500",
-          "bg-indigo-500"
-        ]
-
-        Enum.at(colors, rem(index, length(colors)), "bg-gray-500")
-    end
+    "#" <>
+      (Enum.zip_with(from, to, fn a, b -> round(a + (b - a) * u) end)
+       |> Enum.map_join(&(&1 |> Integer.to_string(16) |> String.pad_leading(2, "0"))))
   end
 
   @doc """

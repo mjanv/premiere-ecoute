@@ -89,13 +89,13 @@ defmodule PremiereEcouteWeb.Components.StatsCard do
 
   defp icon_color_classes(color) do
     case color do
-      "blue" -> "bg-blue-500"
-      "green" -> "bg-green-500"
-      "yellow" -> "bg-yellow-500"
-      "purple" -> "bg-purple-500"
-      "orange" -> "bg-orange-500"
-      "red" -> "bg-red-500"
-      "gray" -> "bg-gray-500"
+      "blue" -> "bg-gradient-to-br from-cyan-400 to-blue-600"
+      "green" -> "bg-gradient-to-br from-emerald-400 to-green-600"
+      "yellow" -> "bg-gradient-to-br from-amber-400 to-yellow-600"
+      "purple" -> "bg-gradient-to-br from-purple-500 to-pink-500"
+      "orange" -> "bg-gradient-to-br from-amber-400 to-orange-600"
+      "red" -> "bg-gradient-to-br from-rose-500 to-red-600"
+      "gray" -> "bg-gradient-to-br from-slate-400 to-slate-600"
     end
   end
 end

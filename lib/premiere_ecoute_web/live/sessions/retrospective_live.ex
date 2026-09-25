@@ -13,6 +13,7 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.Retrospective.VoteTrends
   alias PremiereEcoute.Sessions.Reviews
+  alias PremiereEcouteWeb.Sessions.Components.SessionComponents
 
   @impl true
   def mount(%{"share_token" => share_token, "username" => _username}, _session, socket) do
@@ -386,61 +387,8 @@ defmodule PremiereEcouteWeb.Sessions.RetrospectiveLive do
     end
   end
 
-  defp vote_option_color(rating, session) do
-    vote_options = session.vote_options
-    total_options = length(vote_options)
-
-    # Find the index of this vote option
-    index = Enum.find_index(vote_options, &(to_string(&1) == to_string(rating))) || 0
-
-    cond do
-      # Special handling for common non-numeric options
-      rating in ["smash", "pass"] ->
-        if rating == "smash",
-          do: "bg-gradient-to-t from-pink-500 to-purple-500",
-          else: "bg-gradient-to-t from-red-500 to-pink-500"
-
-      # For numeric options, use synthwave gradient based on position
-      vote_options_are_numeric?(session) and total_options <= 5 ->
-        case index do
-          0 -> "bg-gradient-to-t from-red-500 to-pink-500"
-          1 -> "bg-gradient-to-t from-pink-500 to-purple-500"
-          2 -> "bg-gradient-to-t from-purple-500 to-indigo-500"
-          3 -> "bg-gradient-to-t from-indigo-500 to-cyan-500"
-          4 -> "bg-gradient-to-t from-cyan-500 to-pink-500"
-          _ -> "bg-gradient-to-t from-purple-500 to-pink-500"
-        end
-
-      vote_options_are_numeric?(session) and total_options <= 11 ->
-        synthwave_colors = [
-          "bg-gradient-to-t from-red-500 to-pink-500",
-          "bg-gradient-to-t from-pink-500 to-rose-500",
-          "bg-gradient-to-t from-rose-500 to-purple-500",
-          "bg-gradient-to-t from-purple-500 to-violet-500",
-          "bg-gradient-to-t from-violet-500 to-indigo-500",
-          "bg-gradient-to-t from-indigo-500 to-blue-500",
-          "bg-gradient-to-t from-blue-500 to-cyan-500",
-          "bg-gradient-to-t from-cyan-500 to-teal-500",
-          "bg-gradient-to-t from-teal-500 to-cyan-400",
-          "bg-gradient-to-t from-cyan-400 to-pink-400",
-          "bg-gradient-to-t from-pink-400 to-purple-400"
-        ]
-
-        Enum.at(synthwave_colors, index, "bg-gradient-to-t from-purple-500 to-pink-500")
-
-      true ->
-        synthwave_colors = [
-          "bg-gradient-to-t from-pink-500 to-purple-500",
-          "bg-gradient-to-t from-purple-500 to-indigo-500",
-          "bg-gradient-to-t from-indigo-500 to-cyan-500",
-          "bg-gradient-to-t from-cyan-500 to-pink-500",
-          "bg-gradient-to-t from-red-500 to-pink-500",
-          "bg-gradient-to-t from-violet-500 to-purple-500"
-        ]
-
-        Enum.at(synthwave_colors, rem(index, length(synthwave_colors)), "bg-gradient-to-t from-purple-500 to-pink-500")
-    end
-  end
+  defp vote_option_color(rating, session),
+    do: SessionComponents.vote_option_color(rating, session_vote_options(session))
 
   defp build_track_data_attributes(listening_session, report) do
     tracks = get_session_tracks(listening_session)

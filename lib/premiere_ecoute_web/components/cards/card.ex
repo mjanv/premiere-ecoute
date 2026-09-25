@@ -43,10 +43,10 @@ defmodule PremiereEcouteWeb.Components.Card do
   defp variant_classes(variant) do
     case variant do
       "default" -> "bg-surface-elevated border-surface text-surface-primary"
-      "primary" -> "bg-gradient-to-br from-blue-50/6 to-blue-100/3 border-white/10 text-surface-primary"
-      "success" -> "bg-gradient-to-br from-green-50/6 to-green-100/3 border-white/10 text-surface-primary"
-      "warning" -> "bg-gradient-to-br from-amber-50/6 to-amber-100/3 border-white/10 text-surface-primary"
-      "danger" -> "bg-gradient-to-br from-red-50/6 to-red-100/3 border-white/10 text-surface-primary"
+      "primary" -> "bg-gradient-to-br from-purple-500/15 to-pink-500/5 border-purple-400/30 text-surface-primary"
+      "success" -> "bg-gradient-to-br from-green-500/15 to-emerald-500/5 border-green-400/30 text-surface-primary"
+      "warning" -> "bg-gradient-to-br from-amber-500/15 to-orange-500/5 border-amber-400/30 text-surface-primary"
+      "danger" -> "bg-gradient-to-br from-red-500/15 to-pink-500/5 border-red-400/30 text-surface-primary"
     end
   end
 end

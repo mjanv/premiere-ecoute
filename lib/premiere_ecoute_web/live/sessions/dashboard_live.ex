@@ -656,21 +656,6 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
   end
 
   @doc """
-  Returns CSS classes for session status badge.
-
-  Maps session status (preparing/active/stopped) to corresponding gradient background and styling classes.
-  """
-  @spec session_status_class(atom()) :: String.t()
-  def session_status_class(:preparing),
-    do: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
-
-  def session_status_class(:active),
-    do: "bg-gradient-primary text-white shadow-md"
-
-  def session_status_class(:stopped),
-    do: "bg-gradient-to-r from-slate-500 to-gray-600 text-white shadow-md"
-
-  @doc """
   Returns number of tracks rated in session.
 
   Extracts rated track count from session report, or 0 if report unavailable.
@@ -748,70 +733,6 @@ defmodule PremiereEcouteWeb.Sessions.DashboardLive do
     track_vote_distribution(track_id, report, session)
     |> Enum.map(&elem(&1, 1))
     |> Enum.max(fn -> 0 end)
-  end
-
-  @doc """
-  Returns Tailwind color class for vote option.
-
-  Maps vote options to color gradient based on position and total options, with special handling for smash/pass.
-  """
-  @spec vote_option_color(String.t(), ListeningSession.t()) :: String.t()
-  def vote_option_color(vote_option, session) do
-    vote_options = session.vote_options
-    total_options = length(vote_options)
-
-    # Find the index of this vote option
-    index = Enum.find_index(vote_options, &(&1 == vote_option)) || 0
-
-    cond do
-      # Special handling for smash/pass
-      vote_option == "smash" ->
-        "bg-green-500"
-
-      vote_option == "pass" ->
-        "bg-red-500"
-
-      # For numeric options, use gradient based on position
-      total_options <= 5 ->
-        # For 1-5 scale, use yellow to green gradient
-        case index do
-          0 -> "bg-red-500"
-          1 -> "bg-orange-500"
-          2 -> "bg-yellow-500"
-          3 -> "bg-green-400"
-          4 -> "bg-green-500"
-          _ -> "bg-blue-400"
-        end
-
-      total_options <= 10 ->
-        case index do
-          0 -> "bg-red-600"
-          1 -> "bg-red-500"
-          2 -> "bg-red-400"
-          3 -> "bg-orange-500"
-          4 -> "bg-yellow-500"
-          5 -> "bg-yellow-400"
-          6 -> "bg-green-400"
-          7 -> "bg-blue-400"
-          8 -> "bg-blue-500"
-          9 -> "bg-blue-600"
-          _ -> "bg-purple-400"
-        end
-
-      true ->
-        colors = [
-          "bg-red-500",
-          "bg-orange-500",
-          "bg-yellow-500",
-          "bg-green-500",
-          "bg-blue-500",
-          "bg-purple-500",
-          "bg-pink-500",
-          "bg-indigo-500"
-        ]
-
-        Enum.at(colors, rem(index, length(colors)), "bg-gray-500")
-    end
   end
 
   @doc """
