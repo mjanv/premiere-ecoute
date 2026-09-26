@@ -1,82 +1,52 @@
-/* Sidebar - fixed, collapsed by default, expands over content on hover */
+/* Sidebar - fixed, collapsed by default, expands over content on hover.
+   Icons keep the same position in both states: only the width animates and the labels fade in,
+   so nothing jumps sideways mid-transition. */
 
 .sidebar {
   width: 5rem;
-  transition: width 300ms ease-in-out;
+  transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1) 60ms;
+  will-change: width;
 }
 
 .sidebar:hover {
   width: 16rem;
 }
 
-/* Section titles - hidden by default, fade in on hover */
-.sidebar .sidebar-section-title {
-  opacity: 0;
-  transition: opacity 200ms ease-in-out;
+/* Collapsed: 5rem sidebar - 0.75rem nav padding on each side leaves room to centre
+   the 1.5rem icon with a 1rem left padding. */
+.sidebar .sidebar-link {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 0.75rem;
   white-space: nowrap;
-  overflow: hidden;
-  pointer-events: none;
 }
 
-.sidebar:hover .sidebar-section-title {
-  opacity: 1;
-  pointer-events: auto;
+.sidebar .sidebar-link .icon {
+  margin-right: 0.75rem;
+  flex-shrink: 0;
 }
 
-/* Link text - hidden by default, fade in on hover */
 .sidebar .sidebar-link-text {
   opacity: 0;
-  transition: opacity 200ms ease-in-out;
-  white-space: nowrap;
+  transform: translateX(-0.375rem);
+  transition: opacity 140ms ease, transform 140ms ease;
   overflow: hidden;
   pointer-events: none;
 }
 
 .sidebar:hover .sidebar-link-text {
   opacity: 1;
+  transform: translateX(0);
+  transition: opacity 220ms ease 140ms, transform 260ms cubic-bezier(0.22, 1, 0.36, 1) 140ms;
   pointer-events: auto;
 }
 
-/* Icons centered when collapsed */
-.sidebar .sidebar-link {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.sidebar:hover .sidebar-link {
-  justify-content: flex-start;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
-.sidebar .sidebar-link .icon {
-  margin-right: 0;
-  flex-shrink: 0;
-}
-
-.sidebar:hover .sidebar-link .icon {
-  margin-right: 0.75rem;
-}
-
-/* Section title icons centered when collapsed */
-.sidebar .sidebar-section-title {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.sidebar:hover .sidebar-section-title {
-  justify-content: flex-start;
-}
-
-.sidebar .sidebar-section-title .icon {
-  margin-right: 0;
-  flex-shrink: 0;
-}
-
-.sidebar:hover .sidebar-section-title .icon {
-  margin-right: 0.5rem;
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar .sidebar-link-text,
+  .sidebar:hover .sidebar-link-text {
+    transition: none;
+  }
 }
