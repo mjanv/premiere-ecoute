@@ -4,10 +4,13 @@
   current_scope={assigns[:current_scope] || %{}}
   current_page="singles"
 >
-  <div class="relative min-h-screen text-white" style="background: #0a0010;">
+  <div class="synthwave-bg relative min-h-screen text-white">
     <%!-- Hero backdrop --%>
-    <div class="absolute inset-x-0 top-0 h-[32rem]">
-      <div class="max-w-6xl mx-auto px-6 h-full relative overflow-hidden">
+    <div class="absolute! inset-x-0 top-0 h-[32rem]">
+      <div
+        class="max-w-6xl mx-auto px-6 h-full relative overflow-hidden"
+        style="mask-image: linear-gradient(to bottom, black 45%, transparent 88%);"
+      >
         <.cover
           src={@single.cover_url}
           alt=""
@@ -18,7 +21,7 @@
       </div>
       <div
         class="absolute inset-0"
-        style="background: linear-gradient(to bottom, transparent 0%, rgba(10,0,16,0.3) 55%, #0a0010 85%);"
+        style="background: linear-gradient(to bottom, transparent 0%, rgba(11,2,34,0.35) 60%, transparent 100%);"
       >
       </div>
     </div>
