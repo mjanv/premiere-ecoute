@@ -118,7 +118,6 @@ defmodule PremiereEcouteWeb.Router do
     pipe_through [:browser]
 
     live_session :current_user, on_mount: [{UserAuth, :current_scope}] do
-      live "/register", UserRegistrationLive, :new
       live "/log-in", UserLoginLive, :new
       live "/log-in/:token", UserConfirmationLive, :new
       live "/terms-acceptance", TermsAcceptanceLive, :index

@@ -173,8 +173,11 @@
                               </span>
                             <% end %>
                             <div
-                              class="w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center"
-                              style={"height: #{bar_height}px; background: #{vote_option_color(rating, @listening_session)}"}
+                              class={[
+                                "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
+                                vote_option_color(rating, @listening_session)
+                              ]}
+                              style={"height: #{bar_height}px"}
                             >
                               <%= if votes > 0 && vote_position == :inside do %>
                                 <span class={"#{font_size_class} font-bold text-white drop-shadow-lg"}>
@@ -215,8 +218,11 @@
                                       </span>
                                     <% end %>
                                     <div
-                                      class="w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center"
-                                      style={"height: #{bar_height}px; background: #{vote_option_color(rating, @listening_session)}"}
+                                      class={[
+                                        "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
+                                        vote_option_color(rating, @listening_session)
+                                      ]}
+                                      style={"height: #{bar_height}px"}
                                     >
                                       <%= if votes > 0 && vote_position == :inside do %>
                                         <span class={"#{font_size_class} font-bold text-white"}>
@@ -255,8 +261,11 @@
                                       </span>
                                     <% end %>
                                     <div
-                                      class="w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center"
-                                      style={"height: #{bar_height}px; background: #{vote_option_color(rating, @listening_session)}"}
+                                      class={[
+                                        "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
+                                        vote_option_color(rating, @listening_session)
+                                      ]}
+                                      style={"height: #{bar_height}px"}
                                     >
                                       <%= if votes > 0 && vote_position == :inside do %>
                                         <span class={"#{font_size_class} font-bold text-white"}>
@@ -310,12 +319,13 @@
                                   <div
                                     class={[
                                       "w-full rounded-t transition-all duration-300 min-w-0 relative flex items-center justify-center",
+                                      vote_option_color(rating, @listening_session),
                                       if(votes > 0 && votes == track_max_votes,
                                         do: "ring-2 ring-white/50",
                                         else: ""
                                       )
                                     ]}
-                                    style={"height: #{bar_height}px; background: #{vote_option_color(rating, @listening_session)}"}
+                                    style={"height: #{bar_height}px"}
                                   >
                                     <%= if votes > 0 && vote_position == :inside do %>
                                       <span class={"#{font_size_class} font-bold text-white drop-shadow-lg"}>

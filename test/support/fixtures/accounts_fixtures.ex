@@ -69,7 +69,7 @@ defmodule PremiereEcoute.AccountsFixtures do
   """
   @spec unconfirmed_user_fixture(map()) :: User.t()
   def unconfirmed_user_fixture(attrs \\ %{}) do
-    Repo.insert!(User.changeset(struct(User), valid_user_attributes(attrs)))
+    Repo.insert!(User.changeset(struct(User, Map.take(Map.new(attrs), [:role])), valid_user_attributes(attrs)))
   end
 
   @doc """

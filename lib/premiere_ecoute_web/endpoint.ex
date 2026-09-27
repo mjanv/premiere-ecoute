@@ -63,6 +63,7 @@ defmodule PremiereEcouteWeb.Endpoint do
   plug Plug.MethodOverride
   plug PremiereEcouteWeb.Plugs.StashMethod
   plug Plug.Head
+  plug PremiereEcouteWeb.Plugs.CanonicalHost
   plug Plug.Session, @session_options
 
   plug PremiereEcouteWeb.Router

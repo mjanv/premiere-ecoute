@@ -14,7 +14,7 @@
 - [A Spotify developer account](https://developer.spotify.com/) (for API access)
 - [A Twitch developer account](https://dev.twitch.tv/) (for chat integration)
 
-To get the required API credentials, you'll need to create applications on both platforms. For Spotify, go to the Spotify Developer Dashboard, create a new app, and grab your Client ID and Client Secret. Make sure to add http://localhost:4000/auth/spotify/callback as a redirect URI in your app settings.
+To get the required API credentials, you'll need to create applications on both platforms. For Spotify, go to the Spotify Developer Dashboard, create a new app, and grab your Client ID and Client Secret. Make sure to add http://127.0.0.1:4000/auth/spotify/callback as a redirect URI in your app settings (Spotify rejects `localhost` redirect URIs).
 
 For Twitch, visit the Twitch Developer Console, create a new application, and get your Client ID and Client Secret. Set the OAuth redirect URL to http://localhost:4000/auth/twitch/callback. You'll also need to generate a webhook secret (any random string) for securing webhook communications between Twitch and your application.
 
@@ -24,7 +24,7 @@ Once you have your credentials, update your `.env` file with the actual values:
 # Spotify API
 SPOTIFY_CLIENT_ID=your_spotify_client_id
 SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-SPOTIFY_REDIRECT_URI=http://localhost:4000/auth/spotify/callback
+SPOTIFY_REDIRECT_URI=http://127.0.0.1:4000/auth/spotify/callback
 
 # Twitch API
 TWITCH_CLIENT_ID=your_twitch_client_id
@@ -33,6 +33,8 @@ TWITCH_REDIRECT_URI=http://localhost:4000/auth/twitch/callback
 TWITCH_WEBHOOK_CALLBACK_URL=http://localhost:4000/webhooks/twitch
 TWITCH_WEBHOOK_SECRET=your_webhook_secret
 ```
+
+> Browse the app at http://localhost:4000. Twitch only accepts `http://localhost` and Spotify only `http://127.0.0.1` as plain-HTTP redirect URLs, so in development `PremiereEcouteWeb.Plugs.CanonicalHost` (enabled by `config :premiere_ecoute, :canonical_host` in `config/dev.exs`) redirects any `127.0.0.1` request, such as the Spotify callback, to `localhost` so it carries your session cookie.
 
 > Note for local development: The application uses different API patterns during development. For Twitch, only OAuth requests go to the real Twitch API - all other requests (chat, webhooks, etc.) are routed to http://localhost:4001 which acts as a mock server, whose code is available at `lib/premiere_ecoute_mock`. For Spotify, both OAuth and Web API requests use the real Spotify services.
 

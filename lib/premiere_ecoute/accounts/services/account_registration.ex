@@ -47,11 +47,11 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
          attrs <- %{
            email: email,
            username: username,
-           role: role(payload),
            confirmed_at: DateTime.utc_now(),
            password: password || random(32)
          },
          {:ok, user} <- User.create(attrs),
+         {:ok, user} <- User.update_user_role(user, role(payload)),
          {:ok, user} <- User.create_token(user, :twitch, payload) do
       {:ok, user}
     else

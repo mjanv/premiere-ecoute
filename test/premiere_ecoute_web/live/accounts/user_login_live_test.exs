@@ -6,7 +6,6 @@ defmodule PremiereEcouteWeb.Accounts.UserLoginLiveTest do
       {:ok, _lv, html} = live(conn, ~p"/users/log-in")
 
       assert html =~ "Log in"
-      assert html =~ "Sign up"
       assert html =~ "Log in with email"
     end
   end
@@ -74,17 +73,12 @@ defmodule PremiereEcouteWeb.Accounts.UserLoginLiveTest do
     end
   end
 
-  describe "login navigation" do
-    test "redirects to registration page when the Register button is clicked", %{conn: conn} do
-      {:ok, lv, _html} = live(conn, ~p"/users/log-in")
+  describe "registration" do
+    test "is not offered, accounts are created through Twitch only", %{conn: conn} do
+      {:ok, _lv, html} = live(conn, ~p"/users/log-in")
 
-      {:ok, _login_live, login_html} =
-        lv
-        |> element("main a", "Sign up")
-        |> render_click()
-        |> follow_redirect(conn, ~p"/users/register")
-
-      assert login_html =~ "Register"
+      refute html =~ "Sign up"
+      refute conn |> get("/users/register") |> Map.fetch!(:resp_body) =~ "registration_form"
     end
   end
 

@@ -105,6 +105,12 @@ defmodule PremiereEcoute.Accounts.UserTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
+    test "ignores a role given in attributes" do
+      {:ok, user} = Accounts.create_user(%{email: unique_user_email(), role: :admin})
+
+      assert user.role == :viewer
+    end
+
     test "registers users without password" do
       email = unique_user_email()
 

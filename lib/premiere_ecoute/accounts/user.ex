@@ -56,9 +56,8 @@ defmodule PremiereEcoute.Accounts.User do
   @spec changeset(Ecto.Schema.t(), map(), keyword()) :: Ecto.Changeset.t()
   def changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :username, :role])
+    |> cast(attrs, [:email, :username])
     |> validate_email(opts)
-    |> validate_inclusion(:role, [:viewer, :streamer, :admin, :bot])
     |> cast_embed(:profile, required: false, with: &Profile.changeset/2)
   end
 

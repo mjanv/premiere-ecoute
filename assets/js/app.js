@@ -35,6 +35,11 @@ topbar.config({barColors: {0: "rgba(168, 34, 221, 1)"}, shadowColor: "rgba(24, 7
 window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
+// Firefox closes the socket as soon as a full-page navigation starts (e.g. Twitch/Spotify OAuth
+// redirects), before the `pagehide` LiveView relies on: flag the unload early so the page does
+// not blink the connection error flash while the next page loads.
+window.addEventListener("beforeunload", () => { liveSocket.unloaded = true })
+
 liveSocket.connect()
 window.liveSocket = liveSocket
 

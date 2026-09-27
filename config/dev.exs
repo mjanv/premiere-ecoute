@@ -57,6 +57,8 @@ config :premiere_ecoute, PremiereEcoute.Telemetry.PromEx,
     annotate_app_lifecycle: true
   ]
 
+config :premiere_ecoute, :canonical_host, "localhost"
+
 config :premiere_ecoute, PremiereEcouteWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
