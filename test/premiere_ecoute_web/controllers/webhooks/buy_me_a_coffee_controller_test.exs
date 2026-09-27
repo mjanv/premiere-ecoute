@@ -8,7 +8,33 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
   alias PremiereEcoute.Donations
   alias PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator
 
+  @secret "test_webhook_signing_secret"
+
   setup {Req.Test, :verify_on_exit!}
+
+  setup do
+    previous = Application.get_env(:premiere_ecoute, :buymeacoffee_webhook_secret)
+    Application.put_env(:premiere_ecoute, :buymeacoffee_webhook_secret, @secret)
+
+    on_exit(fn ->
+      if previous do
+        Application.put_env(:premiere_ecoute, :buymeacoffee_webhook_secret, previous)
+      else
+        Application.delete_env(:premiere_ecoute, :buymeacoffee_webhook_secret)
+      end
+    end)
+
+    :ok
+  end
+
+  defp post_signed(conn, payload) do
+    body = Jason.encode!(payload)
+
+    conn
+    |> put_req_header("content-type", "application/json")
+    |> put_req_header("x-signature-sha256", BuyMeACoffeeHmacValidator.signature(@secret, body))
+    |> post(~p"/webhooks/buymeacoffee", body)
+  end
 
   describe "POST /webhooks/buymeacoffee - donation.created" do
     test "creates donation record with active goal when currencies match", %{conn: conn} do
@@ -57,8 +83,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
 
       response =
         conn
-        |> put_req_header("content-type", "application/json")
-        |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+        |> post_signed(payload)
 
       assert response.status == 202
 
@@ -137,8 +162,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
 
       response =
         conn
-        |> put_req_header("content-type", "application/json")
-        |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+        |> post_signed(payload)
 
       assert response.status == 202
 
@@ -190,8 +214,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
 
       response =
         conn
-        |> put_req_header("content-type", "application/json")
-        |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+        |> post_signed(payload)
 
       assert response.status == 202
 
@@ -252,8 +275,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
         capture_log(fn ->
           response =
             conn
-            |> put_req_header("content-type", "application/json")
-            |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+            |> post_signed(payload)
 
           assert response.status == 202
         end)
@@ -314,8 +336,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
 
       response =
         conn
-        |> put_req_header("content-type", "application/json")
-        |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+        |> post_signed(payload)
 
       assert response.status == 202
 
@@ -360,8 +381,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
         capture_log(fn ->
           response =
             conn
-            |> put_req_header("content-type", "application/json")
-            |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+            |> post_signed(payload)
 
           assert response.status == 202
         end)
@@ -382,8 +402,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
         capture_log(fn ->
           response =
             conn
-            |> put_req_header("content-type", "application/json")
-            |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+            |> post_signed(payload)
 
           assert response.status == 400
         end)
@@ -398,8 +417,7 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
         capture_log(fn ->
           response =
             conn
-            |> put_req_header("content-type", "application/json")
-            |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+            |> post_signed(payload)
 
           assert response.status == 400
         end)
@@ -408,24 +426,36 @@ defmodule PremiereEcouteWeb.Webhooks.BuyMeACoffeeControllerTest do
     end
   end
 
-  describe "POST /webhooks/buymeacoffee - signature verification" do
-    @secret "test_webhook_signing_secret"
-
+  describe "POST /webhooks/buymeacoffee - no secret configured" do
     setup do
-      previous = Application.get_env(:premiere_ecoute, :buymeacoffee_webhook_secret)
-      Application.put_env(:premiere_ecoute, :buymeacoffee_webhook_secret, @secret)
-
-      on_exit(fn ->
-        if previous do
-          Application.put_env(:premiere_ecoute, :buymeacoffee_webhook_secret, previous)
-        else
-          Application.delete_env(:premiere_ecoute, :buymeacoffee_webhook_secret)
-        end
-      end)
-
-      :ok
+      Application.delete_env(:premiere_ecoute, :buymeacoffee_webhook_secret)
     end
 
+    test "rejects every request", %{conn: conn} do
+      payload = %{
+        "type" => "donation.created",
+        "data" => %{
+          "amount" => 5,
+          "currency" => "USD",
+          "created_at" => 1_676_544_557,
+          "supporter_name" => "John",
+          "transaction_id" => "pi_unconfigured"
+        }
+      }
+
+      {response, _log} =
+        with_log(fn ->
+          conn
+          |> put_req_header("content-type", "application/json")
+          |> post(~p"/webhooks/buymeacoffee", Jason.encode!(payload))
+        end)
+
+      assert response.status == 401
+      assert Enum.empty?(Donations.all_donations())
+    end
+  end
+
+  describe "POST /webhooks/buymeacoffee - signature verification" do
     test "rejects a request with no signature header once a secret is configured", %{conn: conn} do
       payload = %{"type" => "donation.created", "data" => %{}}
 

@@ -5,9 +5,8 @@ defmodule PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator do
   Validates webhook requests from Buy Me a Coffee by verifying the `x-signature-sha256` header
   against an HMAC-SHA256 of the raw request body, computed with the webhook's signing secret.
 
-  If `BUYMEACOFFEE_WEBHOOK_SECRET` isn't configured, requests are accepted unverified (a warning
-  is logged once per request) so the app keeps working before the secret is provisioned — set the
-  secret to enable verification.
+  `BUYMEACOFFEE_WEBHOOK_SECRET` is optional: while it isn't configured, every request is rejected
+  (a warning is logged once per request), which disables the webhook until the secret is set.
 
   ## Resources
 
@@ -37,7 +36,7 @@ defmodule PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator do
       case Application.get_env(:premiere_ecoute, :buymeacoffee_webhook_secret) do
         nil ->
           log_unconfigured()
-          assign(conn, :buymeacoffee_hmac, true)
+          assign(conn, :buymeacoffee_hmac, false)
 
         secret ->
           case read_body(conn) do
@@ -53,7 +52,7 @@ defmodule PremiereEcouteWeb.Plugs.BuyMeACoffeeHmacValidator do
   @doc false
   @spec log_unconfigured() :: :ok
   def log_unconfigured do
-    Logger.warning("BuyMeACoffee webhook accepted unverified: no signing secret configured")
+    Logger.warning("BuyMeACoffee webhook rejected: no signing secret configured")
   end
 
   @doc """
