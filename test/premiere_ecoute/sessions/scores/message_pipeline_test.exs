@@ -56,7 +56,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
                session_summary: %{
                  "unique_votes" => ^n,
                  "unique_voters" => ^n,
-                 "streamer_score" => +0.0,
+                 "streamer_score" => nil,
                  "tracks_rated" => 1,
                  "viewer_score" => ^average
                },
@@ -64,7 +64,7 @@ defmodule PremiereEcoute.Sessions.Scores.MessagePipelineTest do
                  %{
                    "unique_votes" => ^n,
                    "poll_count" => 0,
-                   "streamer_score" => +0.0,
+                   "streamer_score" => nil,
                    "unique_voters" => ^n,
                    "viewer_score" => ^average
                  }

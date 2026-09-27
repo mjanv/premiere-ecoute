@@ -430,5 +430,68 @@ defmodule PremiereEcoute.Sessions.Retrospective.ReportTest do
       assert {:ok, report} = Report.generate(session)
       assert report.session_summary.tracks_rated == 0
     end
+
+    test "ignores tracks without a streamer vote in the session streamer score" do
+      user = user_fixture()
+      {:ok, album} = Album.create(album_fixture())
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      [track1, track2] = album.tracks
+
+      votes = [
+        %Vote{viewer_id: "viewer1", session_id: session.id, track_id: track1.id, value: "6", is_streamer: false},
+        %Vote{viewer_id: "viewer1", session_id: session.id, track_id: track2.id, value: "4", is_streamer: false},
+        %Vote{viewer_id: "streamer", session_id: session.id, track_id: track1.id, value: "8", is_streamer: true}
+      ]
+
+      for vote <- votes, do: {:ok, _} = Vote.create(vote)
+
+      {:ok, report} = Report.generate(session)
+
+      assert report.session_summary.streamer_score == 8.0
+      assert Enum.find(report.track_summaries, &(&1.track_id == track2.id)).streamer_score == nil
+    end
+
+    test "ignores tracks without a viewer vote in the session viewer score" do
+      user = user_fixture()
+      {:ok, album} = Album.create(album_fixture())
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+
+      [track1, track2] = album.tracks
+
+      votes = [
+        %Vote{viewer_id: "viewer1", session_id: session.id, track_id: track1.id, value: "6", is_streamer: false},
+        %Vote{viewer_id: "streamer", session_id: session.id, track_id: track1.id, value: "8", is_streamer: true},
+        %Vote{viewer_id: "streamer", session_id: session.id, track_id: track2.id, value: "4", is_streamer: true}
+      ]
+
+      for vote <- votes, do: {:ok, _} = Vote.create(vote)
+
+      {:ok, report} = Report.generate(session)
+
+      assert report.session_summary.viewer_score == 6.0
+      assert Enum.find(report.track_summaries, &(&1.track_id == track2.id)).viewer_score == nil
+    end
+
+    test "ignores tracks without a streamer vote in the session streamer score for smash/pass vote options" do
+      user = user_fixture()
+      {:ok, album} = Album.create(album_fixture())
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id, vote_options: ["smash", "pass"]})
+
+      [track1, track2] = album.tracks
+
+      votes = [
+        %Vote{viewer_id: "viewer1", session_id: session.id, track_id: track1.id, value: "pass", is_streamer: false},
+        %Vote{viewer_id: "viewer1", session_id: session.id, track_id: track2.id, value: "pass", is_streamer: false},
+        %Vote{viewer_id: "streamer", session_id: session.id, track_id: track1.id, value: "smash", is_streamer: true}
+      ]
+
+      for vote <- votes, do: {:ok, _} = Vote.create(vote)
+
+      {:ok, report} = Report.generate(session)
+
+      assert report.session_summary.streamer_score == "smash"
+      assert Enum.find(report.track_summaries, &(&1.track_id == track2.id)).streamer_score == nil
+    end
   end
 end

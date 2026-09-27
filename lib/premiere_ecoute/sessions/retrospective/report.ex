@@ -105,8 +105,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
     session_summary = %{
       unique_votes: length(votes) + Enum.sum(Enum.map(polls, fn poll -> poll.total_votes end)),
       unique_voters: votes |> Enum.map(fn vote -> vote.viewer_id end) |> Enum.uniq() |> length(),
-      viewer_score: calculate_average_score(Enum.map(track_summaries, fn t -> t.viewer_score end), mode),
-      streamer_score: calculate_average_score(Enum.map(track_summaries, fn t -> t.streamer_score end), mode),
+      viewer_score: calculate_session_score(track_summaries, :viewer_score, mode),
+      streamer_score: calculate_session_score(track_summaries, :streamer_score, mode),
       tracks_rated: length(track_summaries)
     }
 
@@ -139,6 +139,13 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
     else
       :text
     end
+  end
+
+  defp calculate_session_score(track_summaries, key, mode) do
+    track_summaries
+    |> Enum.map(&Map.fetch!(&1, key))
+    |> Enum.reject(&is_nil/1)
+    |> calculate_average_score(mode)
   end
 
   defp to_integer(x) when is_integer(x), do: x
@@ -248,8 +255,8 @@ defmodule PremiereEcoute.Sessions.Retrospective.Report do
 
       %{
         track_id: track_id,
-        viewer_score: viewer_score || if(mode == :numeric, do: 0.0, else: "even"),
-        streamer_score: streamer_score || if(mode == :numeric, do: 0.0, else: "even"),
+        viewer_score: viewer_score,
+        streamer_score: streamer_score,
         unique_votes: length(track_votes),
         poll_count: Enum.sum(Enum.map(track_polls, & &1.total_votes)),
         unique_voters: length(Enum.uniq(Enum.map(track_votes, & &1.viewer_id)))
