@@ -18,12 +18,14 @@ defmodule PremiereEcouteWeb.Oauth.AuthorizeController do
   alias Boruta.Oauth.ResourceOwner
   alias PremiereEcouteWeb.Oauth.AuthorizeHTML
 
-  def authorize(%Plug.Conn{params: %{"approved" => "true"}} = conn, _params) do
+  # The consent decision is only read from a POST body (CSRF-protected), never from the query
+  # string: a GET link carrying `approved=true` must not mint a code without user interaction.
+  def authorize(%Plug.Conn{method: "POST", body_params: %{"approved" => "true"}} = conn, _params) do
     conn
     |> Boruta.Oauth.authorize(resource_owner(conn), __MODULE__)
   end
 
-  def authorize(%Plug.Conn{params: %{"approved" => "false"}} = conn, _params) do
+  def authorize(%Plug.Conn{method: "POST", body_params: %{"approved" => "false"}} = conn, _params) do
     deny(conn)
   end
 

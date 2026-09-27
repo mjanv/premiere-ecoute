@@ -44,6 +44,17 @@ defmodule PremiereEcouteWeb.Oauth.AuthorizeControllerTest do
       assert html =~ "Deny"
     end
 
+    test "ignores approved=true in the query string and shows the consent screen", %{conn: conn, client: client} do
+      %{conn: conn} = register_and_log_in_user(%{conn: conn})
+      query = Map.put(authorize_query(client), "approved", "true")
+
+      conn = get(conn, ~p"/oauth/authorize?#{query}")
+
+      assert html = html_response(conn, 200)
+      assert html =~ "Approve"
+      assert get_resp_header(conn, "location") == []
+    end
+
     test "renders an error page for an unknown client", %{conn: conn} do
       %{conn: conn} = register_and_log_in_user(%{conn: conn})
 
