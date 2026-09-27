@@ -81,7 +81,7 @@
 
                     <!-- Follow date info -->
                     <div class="mt-4 pt-4 border-t border-gray-700">
-                      <%= if follow = Enum.find(@current_user.follows, &(&1.streamer_id == streamer.id)) do %>
+                      <%= if follow = Enum.find(@current_user.follows, &(&1.followed_id == streamer.id)) do %>
                         <p class="text-xs text-gray-500">
                           Added {Calendar.strftime(follow.inserted_at, "%B %d, %Y")}
                         </p>

@@ -80,7 +80,7 @@ defmodule PremiereEcouteWeb.Accounts.FollowsLive do
             socket
             |> assign(:current_user, user)
             |> assign(:show_follow_modal, false)
-            |> assign(:streamers, Accounts.discover_follows(socket.assigns.current_user))
+            |> assign(:streamers, Accounts.discover_follows(user))
             |> put_flash(:info, "Successfully followed #{streamer.email}")
             |> then(fn socket -> {:noreply, socket} end)
 

@@ -141,8 +141,8 @@ defmodule PremiereEcouteWeb.Router do
       live "/account", AccountLive, :index
       live "/account/features", AccountFeaturesLive, :index
       live "/", UsersLive, :index
-      live "/:username", UserLive, :show
       live "/follows", FollowsLive, :index
+      live "/:username", UserLive, :show
     end
 
     post "/update-password", UserSessionController, :update_password
