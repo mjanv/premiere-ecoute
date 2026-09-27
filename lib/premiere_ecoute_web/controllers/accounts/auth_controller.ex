@@ -41,15 +41,18 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
     redirect_uri = Application.get_env(:premiere_ecoute, :spotify_redirect_uri)
 
     if client_id && redirect_uri do
-      user = conn.assigns.current_scope.user
-      id = user && user.id
+      case conn.assigns.current_scope do
+        %{user: %User{}} ->
+          state = 16 |> :crypto.strong_rand_bytes() |> Base.url_encode64(padding: false)
 
-      if id do
-        redirect(conn, external: SpotifyApi.authorization_url(nil, to_string(id)))
-      else
-        conn
-        |> put_flash(:error, "You must be logged in to connect Spotify")
-        |> redirect(to: ~p"/")
+          conn
+          |> put_session(:spotify_oauth_state, state)
+          |> redirect(external: SpotifyApi.authorization_url(nil, state))
+
+        _ ->
+          conn
+          |> put_flash(:error, "You must be logged in to connect Spotify")
+          |> redirect(to: ~p"/")
       end
     else
       conn
@@ -70,7 +73,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
          {:ok, user} <- AccountRegistration.register_twitch_user(auth_data) do
       conn
       |> put_session(:user_return_to, ~p"/")
-      |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
+      |> UserAuth.log_in_user(user, %{})
     else
       {nil, auth_data} ->
         conn
@@ -87,13 +90,16 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
   end
 
   def callback(conn, %{"provider" => "spotify", "code" => code, "state" => state}) do
-    with {:ok, auth_data} <- SpotifyApi.authorization_code(code, state),
-         {:ok, user} <- AccountRegistration.register_spotify_user(auth_data, state) do
-      conn
-      |> put_session(:user_return_to, ~p"/")
-      |> UserAuth.log_in_user(user, %{})
+    expected_state = get_session(conn, :spotify_oauth_state)
+    conn = delete_session(conn, :spotify_oauth_state)
+
+    with true <- is_binary(expected_state) and Plug.Crypto.secure_compare(expected_state, state),
+         %{user: %User{id: id}} <- conn.assigns.current_scope,
+         {:ok, auth_data} <- SpotifyApi.authorization_code(code, state),
+         {:ok, _user} <- AccountRegistration.register_spotify_user(auth_data, id) do
+      redirect(conn, to: ~p"/")
     else
-      {:error, _} ->
+      _ ->
         conn
         |> put_flash(:error, "Failed to connect Spotify account")
         |> redirect(to: ~p"/")
@@ -125,7 +131,7 @@ defmodule PremiereEcouteWeb.Accounts.AuthController do
       |> delete_session(:pending_twitch_auth)
       |> put_session(:user_return_to, ~p"/home")
       |> put_flash(:info, "Welcome! Your account has been created successfully.")
-      |> PremiereEcouteWeb.UserAuth.log_in_user(user, %{})
+      |> UserAuth.log_in_user(user, %{})
     else
       false ->
         conn
