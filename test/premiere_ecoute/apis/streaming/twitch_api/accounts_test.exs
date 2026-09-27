@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Apis.Streaming.TwitchApi.AccountsTest do
   use PremiereEcoute.DataCase
 
+  import ExUnit.CaptureLog
+
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Streaming.TwitchApi
 
@@ -72,6 +74,30 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.AccountsTest do
                scope: ["user:read:email", "user:read:follows"]
              } = user_data
     end
+
+    test "returns an error without logging tokens when the user profile cannot be fetched" do
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/oauth2/token"},
+        response: "twitch_api/accounts/authorization_code/response.json",
+        status: 200
+      )
+
+      ApiMock.expect(
+        TwitchApi,
+        path: {:get, "/helix/users"},
+        body: %{"error" => "Unauthorized", "status" => 401, "message" => "Invalid OAuth token"},
+        status: 401
+      )
+
+      log =
+        capture_log(fn ->
+          assert {:error, _} = TwitchApi.authorization_code("test_auth_code")
+        end)
+
+      refute log =~ "rfx2uswqe8l4g1mkagrvg5tv0ks3"
+      refute log =~ "5b93chm6hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01"
+    end
   end
 
   describe "renew_token/1" do
@@ -91,6 +117,22 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.AccountsTest do
                refresh_token: "eyJfaWQmNzMtNGCJ9%6VFV5LNrZFUj8oU231/3Aj",
                expires_in: 14_124
              } = token_data
+    end
+
+    test "returns an error without logging tokens when the response has no refresh token" do
+      ApiMock.expect(
+        TwitchApi,
+        path: {:post, "/oauth2/token"},
+        body: %{"access_token" => "1ssjqsqfy6bads1rmgh0rvnvre09kgpz3b", "expires_in" => 14_124, "token_type" => "bearer"},
+        status: 200
+      )
+
+      log =
+        capture_log(fn ->
+          assert {:error, _} = TwitchApi.renew_token("old_refresh_token")
+        end)
+
+      refute log =~ "1ssjqsqfy6bads1rmgh0rvnvre09kgpz3b"
     end
   end
 

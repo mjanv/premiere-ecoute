@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AccountsTest do
   use PremiereEcoute.DataCase, async: true
 
+  import ExUnit.CaptureLog
+
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
 
@@ -75,6 +77,30 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.AccountsTest do
                refresh_token: "NgAagA...Um_SHo",
                expires_in: 3600
              } = user_data
+    end
+
+    test "returns an error without logging tokens when the user profile cannot be fetched" do
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:post, "/api/token"},
+        response: "spotify_api/accounts/authorization_code/response.json",
+        status: 200
+      )
+
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:get, "/v1/me"},
+        body: %{"error" => %{"status" => 403, "message" => "User not registered in the Developer Dashboard"}},
+        status: 403
+      )
+
+      log =
+        capture_log(fn ->
+          assert {:error, _} = SpotifyApi.Accounts.authorization_code("test_auth_code", "test_state")
+        end)
+
+      refute log =~ "NgCXRK...MzYjw"
+      refute log =~ "NgAagA...Um_SHo"
     end
   end
 

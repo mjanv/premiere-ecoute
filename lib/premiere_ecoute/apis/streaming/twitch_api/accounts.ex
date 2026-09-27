@@ -66,6 +66,24 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.Accounts do
   """
   @spec authorization_code(String.t()) :: {:ok, map()} | {:error, term()}
   def authorization_code(code) when is_binary(code) do
+    with {:ok, body} <- exchange_code(code),
+         {:ok, user} <- TwitchApi.get_user_profile(body["access_token"]) do
+      {:ok,
+       %{
+         user_id: user["id"],
+         email: user["email"],
+         username: user["login"],
+         display_name: user["display_name"],
+         broadcaster_type: user["broadcaster_type"],
+         access_token: body["access_token"],
+         refresh_token: body["refresh_token"],
+         expires_in: body["expires_in"],
+         scope: body["scope"] || []
+       }}
+    end
+  end
+
+  defp exchange_code(code) do
     TwitchApi.accounts()
     |> TwitchApi.post(
       url: "/token",
@@ -76,21 +94,7 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi.Accounts do
         redirect_uri: Application.get_env(:premiere_ecoute, :twitch_redirect_uri)
       }
     )
-    |> TwitchApi.handle(200, fn %{"token_type" => "bearer"} = body ->
-      {:ok, user} = TwitchApi.get_user_profile(body["access_token"])
-
-      %{
-        user_id: user["id"],
-        email: user["email"],
-        username: user["login"],
-        display_name: user["display_name"],
-        broadcaster_type: user["broadcaster_type"],
-        access_token: body["access_token"],
-        refresh_token: body["refresh_token"],
-        expires_in: body["expires_in"],
-        scope: body["scope"] || []
-      }
-    end)
+    |> TwitchApi.handle(200, fn %{"token_type" => "bearer"} = body -> body end)
   end
 
   @doc """

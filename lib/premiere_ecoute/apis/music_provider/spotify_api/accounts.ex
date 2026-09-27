@@ -53,6 +53,24 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Accounts do
   """
   @spec authorization_code(String.t(), String.t() | nil) :: {:ok, map()} | {:error, term()}
   def authorization_code(code, _state) do
+    with {:ok, body} <- exchange_code(code),
+         {:ok, user} <- SpotifyApi.get_user_profile(body["access_token"]) do
+      {:ok,
+       %{
+         user_id: user["id"],
+         email: user["email"],
+         username: user["display_name"],
+         display_name: user["display_name"],
+         country: user["country"],
+         product: user["product"],
+         access_token: body["access_token"],
+         refresh_token: body["refresh_token"],
+         expires_in: body["expires_in"]
+       }}
+    end
+  end
+
+  defp exchange_code(code) do
     SpotifyApi.accounts()
     |> SpotifyApi.post(
       url: "/token",
@@ -63,21 +81,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Accounts do
         client_id: Application.get_env(:premiere_ecoute, :spotify_client_id)
       ]
     )
-    |> SpotifyApi.handle(200, fn %{"token_type" => "Bearer"} = body ->
-      {:ok, user} = SpotifyApi.get_user_profile(body["access_token"])
-
-      %{
-        user_id: user["id"],
-        email: user["email"],
-        username: user["display_name"],
-        display_name: user["display_name"],
-        country: user["country"],
-        product: user["product"],
-        access_token: body["access_token"],
-        refresh_token: body["refresh_token"],
-        expires_in: body["expires_in"]
-      }
-    end)
+    |> SpotifyApi.handle(200, fn %{"token_type" => "Bearer"} = body -> body end)
   end
 
   @doc """

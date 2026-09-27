@@ -16,6 +16,8 @@ defmodule PremiereEcouteCore.Api do
   - `token/1` - Retrieves or refreshes access tokens with caching
   """
 
+  @secrets ["access_token", "refresh_token", "id_token"]
+
   @doc """
   Injects API client functionality into using module.
 
@@ -99,11 +101,11 @@ defmodule PremiereEcouteCore.Api do
             {:ok, f.(body)}
           rescue
             error ->
-              Logger.error("#{unquote(name)} API unexpected body: #{status} - #{inspect(body)}")
+              Logger.error("#{unquote(name)} API unexpected body: #{status} - #{inspect(PremiereEcouteCore.Api.redact(body))}")
               {:error, "#{unquote(name)} API error: #{status}"}
           end
         else
-          Logger.error("#{unquote(name)} API unexpected status: #{status} - #{inspect(body)}")
+          Logger.error("#{unquote(name)} API unexpected status: #{status} - #{inspect(PremiereEcouteCore.Api.redact(body))}")
           {:error, "#{unquote(name)} API error: #{status}"}
         end
       end
@@ -137,4 +139,15 @@ defmodule PremiereEcouteCore.Api do
       def circuit_breaker(request), do: CircuitBreaker.run(request, api: unquote(api))
     end
   end
+
+  @doc "Masks OAuth secrets in a response body before it is logged"
+  @spec redact(any()) :: any()
+  def redact(%{} = body) do
+    Map.new(body, fn
+      {key, _} when key in @secrets -> {key, "[REDACTED]"}
+      pair -> pair
+    end)
+  end
+
+  def redact(body), do: body
 end
