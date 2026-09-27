@@ -9,6 +9,8 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
   import Ecto.Query
 
   alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective.Report
@@ -32,12 +34,41 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
   @doc """
   Inserts post-session votes and regenerates the session report.
 
-  Only accepts a stopped session and at least one vote. Existing votes for the
-  same (viewer, session, track) triple are silently ignored via on_conflict.
+  Only accepts a stopped session and at least one vote. The whole batch is
+  rejected with `{:error, :invalid_votes}` if any value is not one of the session
+  vote options or any track does not belong to the session album or playlist.
+  Existing votes for the same (viewer, session, track) triple are silently
+  ignored via on_conflict.
   """
   @spec submit(ListeningSession.t(), User.t(), %{integer() => String.t()}) ::
           {:ok, Report.t()} | {:error, term()}
-  def submit(%ListeningSession{id: session_id, status: :stopped} = session, %User{twitch: %{user_id: viewer_id}}, votes) do
+  def submit(%ListeningSession{status: :stopped} = session, %User{twitch: %{user_id: viewer_id}}, votes) do
+    if valid_votes?(session, votes) do
+      insert_votes(session, viewer_id, votes)
+    else
+      {:error, :invalid_votes}
+    end
+  end
+
+  def submit(_session, _viewer_id, _votes), do: {:error, :invalid}
+
+  defp valid_votes?(%ListeningSession{vote_options: vote_options} = session, votes) do
+    track_ids = session_track_ids(session)
+
+    Enum.all?(votes, fn {track_id, value} -> value in vote_options and MapSet.member?(track_ids, track_id) end)
+  end
+
+  defp session_track_ids(%ListeningSession{source: :album, album_id: album_id}) do
+    from(t in Album.Track, where: t.album_id == ^album_id, select: t.id) |> Repo.all() |> MapSet.new()
+  end
+
+  defp session_track_ids(%ListeningSession{source: :playlist, playlist_id: playlist_id}) do
+    from(t in Playlist.Track, where: t.playlist_id == ^playlist_id, select: t.id) |> Repo.all() |> MapSet.new()
+  end
+
+  defp session_track_ids(_session), do: MapSet.new()
+
+  defp insert_votes(%ListeningSession{id: session_id} = session, viewer_id, votes) do
     now = DateTime.truncate(DateTime.utc_now(), :second)
 
     votes
@@ -58,6 +89,4 @@ defmodule PremiereEcoute.Sessions.Scores.PostSessionVote do
       error -> error
     end)
   end
-
-  def submit(_session, _viewer_id, _votes), do: {:error, :invalid}
 end
