@@ -40,17 +40,17 @@
           <%!-- Left column --%>
           <div class="w-64 shrink-0 space-y-6">
             <%!-- Back link --%>
-            <% is_viewer = assigns[:current_scope] && assigns[:current_scope].user && assigns[:current_scope].user.role == :viewer %>
+            <% {back_path, back_kind} = @back %>
             <.link
               id="back-link"
               phx-hook="BackLink"
-              href={if is_viewer, do: ~p"/sessions/retrospective/votes", else: ~p"/sessions/retrospective"}
+              href={back_path}
               class="inline-flex items-center gap-1.5 ml-6 px-2.5 py-1.5 rounded-md bg-purple-600/50 hover:bg-purple-600/70 border border-purple-400/60 text-white text-xs font-medium"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
-              {gettext("Back to history")}
+              {back_label(back_kind)}
             </.link>
 
             <%!-- Cover --%>

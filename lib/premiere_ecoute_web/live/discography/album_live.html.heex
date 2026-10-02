@@ -206,7 +206,7 @@
               <div class="space-y-2">
                 <%= for session <- @sessions do %>
                   <.link
-                    navigate={~p"/sessions/#{session.user.username}/#{session}"}
+                    navigate={session_href(session.user.username, session.share_token, @current_path)}
                     class="flex items-center justify-between px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group"
                   >
                     <div class="flex items-center gap-3 min-w-0">
@@ -274,7 +274,7 @@
                             <%= if review.session do %>
                               ·
                               <.link
-                                navigate={~p"/sessions/#{review.session.user.username}/#{review.session}"}
+                                navigate={session_href(review.session.user.username, review.session.share_token, @current_path)}
                                 class="text-purple-400 hover:text-purple-300"
                               >
                                 {gettext("session review")}

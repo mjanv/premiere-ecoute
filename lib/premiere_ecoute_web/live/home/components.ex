@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   use PremiereEcouteWeb, :verified_routes
 
   import PremiereEcouteWeb.Components.Images
+  import PremiereEcouteWeb.ReturnTo, only: [session_href: 3]
 
   alias PremiereEcoute.Sessions.ListeningSession
 
@@ -94,13 +95,14 @@ defmodule PremiereEcouteWeb.Home.Components do
   indicator is shown to flag a session the viewer didn't vote in.
   """
   attr :session, :map, required: true
+  attr :return_to, :string, default: nil
   attr :in_wantlist, :boolean, default: false
   attr :missed, :boolean, default: false
 
   def album_square_wantlist(assigns) do
     ~H"""
     <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
-      <.link href={~p"/sessions/#{@session.user.username}/#{@session}"} class="block w-full h-full">
+      <.link href={session_href(@session.user.username, @session.share_token, @return_to)} class="block w-full h-full">
         <%= if @session.album && @session.album.cover_url do %>
           <.cover src={@session.album.cover_url} alt={@session.album.name} class="w-full h-full object-cover" />
         <% else %>

@@ -31,6 +31,7 @@
               <%= for session <- @my_sessions do %>
                 <.album_square_wantlist
                   session={session}
+                  return_to={@current_path}
                   in_wantlist={MapSet.member?(assigns[:wantlisted_album_ids] || MapSet.new(), session.album_id)}
                 />
               <% end %>
@@ -111,6 +112,7 @@
                     <%= for session <- sessions do %>
                       <.album_square_wantlist
                         session={session}
+                        return_to={@current_path}
                         in_wantlist={MapSet.member?(assigns[:wantlisted_album_ids] || MapSet.new(), session.album_id)}
                         missed={MapSet.member?(@missed_session_ids, session.id)}
                       />

@@ -14,7 +14,10 @@
             </h3>
             <.scroll_carousel id="album-carousel">
               <%= for session <- @listening_sessions do %>
-                <.album_square album={session.album} href={~p"/sessions/#{session.user.username}/#{session}"} />
+                <.album_square
+                  album={session.album}
+                  href={session_href(session.user.username, session.share_token, @current_path)}
+                />
               <% end %>
               <%= if @listening_sessions == [] do %>
                 <p class="text-slate-500 text-sm">{gettext("No sessions yet.")}</p>

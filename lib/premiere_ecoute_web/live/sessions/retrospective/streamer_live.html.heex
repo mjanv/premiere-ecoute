@@ -155,7 +155,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
+                    navigate={session_href(item.session.user.username, item.session.share_token, @current_path)}
                     class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover
@@ -185,7 +185,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
                 <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
+                    navigate={session_href(item.session.user.username, item.session.share_token, @current_path)}
                     class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover
@@ -218,7 +218,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
                 <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
+                    navigate={session_href(item.session.user.username, item.session.share_token, @current_path)}
                     class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover
@@ -248,7 +248,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6">
                 <%= for item <- albums_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{item.session.user.username}/#{item.session}"}
+                    navigate={session_href(item.session.user.username, item.session.share_token, @current_path)}
                     class="group relative block overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover

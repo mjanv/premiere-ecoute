@@ -123,7 +123,7 @@
               <% :album -> %>
                 <%= for vote_data <- votes_data.items do %>
                   <.link
-                    href={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
+                    href={session_href(vote_data.username, vote_data.share_token, @current_path)}
                     class="group relative overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover
@@ -151,7 +151,7 @@
               <% :track -> %>
                 <%= for vote_data <- votes_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
+                    navigate={session_href(vote_data.username, vote_data.share_token, @current_path)}
                     class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover
@@ -179,7 +179,7 @@
               <% :playlist -> %>
                 <%= for vote_data <- votes_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
+                    navigate={session_href(vote_data.username, vote_data.share_token, @current_path)}
                     class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover
@@ -207,7 +207,7 @@
               <% :clip -> %>
                 <%= for vote_data <- votes_data.items do %>
                   <.link
-                    navigate={~p"/sessions/#{vote_data.username}/#{vote_data.share_token}"}
+                    navigate={session_href(vote_data.username, vote_data.share_token, @current_path)}
                     class="group relative overflow-hidden transform transition-all duration-200 hover:scale-105"
                   >
                     <.cover

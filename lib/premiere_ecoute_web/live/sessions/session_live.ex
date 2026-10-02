@@ -16,6 +16,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.ReviewLikes
   alias PremiereEcoute.Sessions.Reviews
+  alias PremiereEcouteWeb.ReturnTo
 
   @impl true
   def mount(%{"share_token" => share_token, "username" => _username}, _session, socket) do
@@ -61,8 +62,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(params, _url, socket) do
+    {:noreply, assign(socket, :back, ReturnTo.resolve(params["return_to"], history_path(socket)))}
   end
 
   @impl true
@@ -303,6 +304,20 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
       end
     else
       {:noreply, put_flash(socket, :error, gettext("Not authorized"))}
+    end
+  end
+
+  defp back_label(:album), do: gettext("Back to album")
+  defp back_label(:artist), do: gettext("Back to artist")
+  defp back_label(:single), do: gettext("Back to single")
+  defp back_label(:home), do: gettext("Back to home")
+  defp back_label(:profile), do: gettext("Back to profile")
+  defp back_label(_history), do: gettext("Back to history")
+
+  defp history_path(socket) do
+    case socket.assigns[:current_scope] do
+      %{user: %{role: :viewer}} -> ~p"/sessions/retrospective/votes"
+      _ -> ~p"/sessions/retrospective"
     end
   end
 

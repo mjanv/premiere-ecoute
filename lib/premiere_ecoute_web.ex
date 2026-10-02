@@ -97,6 +97,7 @@ defmodule PremiereEcouteWeb do
       on_mount PremiereEcouteWeb.Hooks.RestoreLocale
       on_mount PremiereEcouteWeb.Hooks.Flash
       on_mount PremiereEcouteWeb.Hooks.RateLimits
+      on_mount PremiereEcouteWeb.Hooks.CurrentPath
 
       unquote(html_helpers())
     end
@@ -138,6 +139,7 @@ defmodule PremiereEcouteWeb do
 
       import Phoenix.HTML
       import PremiereEcouteWeb.CoreComponents
+      import PremiereEcouteWeb.ReturnTo, only: [session_href: 3]
       import PremiereEcouteWeb.Components.Images
       import PremiereEcouteWeb.Components.Modal
       import PremiereEcouteWeb.Components.Backgrounds
