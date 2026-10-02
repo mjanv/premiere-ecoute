@@ -33,8 +33,10 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi do
     alias PremiereEcoute.Accounts.Scope
     alias PremiereEcoute.Accounts.User
     alias PremiereEcoute.Apis.Streaming.TwitchApi.Rewards
+    alias PremiereEcoute.Twitch.Marker
     alias PremiereEcoute.Twitch.Redemption
     alias PremiereEcoute.Twitch.Reward
+    alias PremiereEcoute.Twitch.Video
 
     # Accounts
     @callback client_credentials() :: {:ok, map()} | {:error, any()}
@@ -78,6 +80,16 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi do
                 redemption_id :: Redemption.id(),
                 status :: Redemption.status()
               ) :: {:ok, Redemption.t()} | {:error, term()}
+
+    # Markers
+    @callback create_marker(scope :: Scope.t(), description :: String.t() | nil) ::
+                {:ok, Marker.t()} | {:error, term()}
+    @callback get_markers(scope :: Scope.t(), opts :: [video_id: String.t()]) ::
+                {:ok, [Marker.t()]} | {:error, term()}
+
+    # Videos
+    @callback get_video(scope :: Scope.t(), video_id :: Video.id()) :: {:ok, Video.t()} | {:error, term()}
+    @callback get_videos(scope :: Scope.t(), opts :: keyword()) :: {:ok, [Video.t()]} | {:error, term()}
 
     # Channels
     @callback get_followed_channels(scope :: Scope.t()) :: {:ok, [map()]} | {:error, term()}
@@ -195,4 +207,12 @@ defmodule PremiereEcoute.Apis.Streaming.TwitchApi do
   defdelegate delete_reward(scope, reward_id), to: __MODULE__.Rewards
   defdelegate get_redemptions(scope, reward_id, status), to: __MODULE__.Rewards
   defdelegate update_redemption_status(scope, reward_id, redemption_id, status), to: __MODULE__.Rewards
+
+  # Markers
+  defdelegate create_marker(scope, description \\ nil), to: __MODULE__.Markers
+  defdelegate get_markers(scope, opts \\ []), to: __MODULE__.Markers
+
+  # Videos
+  defdelegate get_video(scope, video_id), to: __MODULE__.Videos
+  defdelegate get_videos(scope, opts \\ []), to: __MODULE__.Videos
 end
