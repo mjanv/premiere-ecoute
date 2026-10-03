@@ -15,6 +15,19 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   alias PremiereEcoute.Youtube.Video
 
   @doc """
+  Looks for the video of `session` for every replay configured by its user.
+
+  The session must come with its `user`. Returns a `{replay, result}` pair per replay, `result` being what
+  `find_replay_video/2` returns.
+  """
+  @spec find_replay_videos(ListeningSession.t()) :: [{Replay.t(), {:ok, Video.t()} | {:error, term()}}]
+  def find_replay_videos(%ListeningSession{user: %User{} = user} = session) do
+    user
+    |> Profile.get([:video_settings, :replays], [])
+    |> Enum.map(&{&1, find_replay_video(session, &1)})
+  end
+
+  @doc """
   Looks for the video of `session` on the channel targeted by `replay`.
 
   Only album sessions are supported. The session must come with its `user` and its album with the artist (as

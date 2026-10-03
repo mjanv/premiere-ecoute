@@ -53,6 +53,24 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
     ReplayVideo.find_replay_video(session, replay)
   end
 
+  describe "find_replay_videos/1" do
+    test "looks for the video of every replay of the user" do
+      raw = replay()
+      other = replay(%{name: "reaction", channel_id: "5d1f8f0a-0b52-4c43-8a3e-2f1c7b9e4d22"})
+      session = update_in(session().user.profile.video_settings, &%{&1 | replays: [raw, other]})
+      match = video()
+
+      expect(YoutubeApi, :get_channel_videos, fn @channel_id, _ -> {:ok, [match]} end)
+
+      assert [{^raw, {:ok, ^match}}, {^other, {:error, :not_found}}] =
+               ReplayVideo.find_replay_videos(session)
+    end
+
+    test "returns nothing when the user has no replay" do
+      assert [] = ReplayVideo.find_replay_videos(session())
+    end
+  end
+
   describe "find_replay_video/2" do
     test "returns the video whose title names the artist and the album" do
       match = video()
