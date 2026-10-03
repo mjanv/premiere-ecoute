@@ -13,6 +13,7 @@ defmodule PremiereEcoute.Sessions do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores
+  alias PremiereEcoute.Sessions.Services.ReplayVideo
 
   # Behaviour
   @callback publish_message(map()) :: :ok
@@ -34,6 +35,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate get_active_session(user), to: ListeningSession
   defdelegate current_session(user), to: ListeningSession
   defdelegate can_view_retrospective?(session, scope), to: ListeningSession
+  defdelegate schedule_upload_checks(session), to: ReplayVideo
 
   @doc "Publishes chat message event to Broadway pipeline for vote processing"
   @spec publish_message(map()) :: :ok

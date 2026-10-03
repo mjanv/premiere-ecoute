@@ -138,6 +138,10 @@ config :premiere_ecoute, PremiereEcoute.Events.Store,
   serializer: EventStore.JsonbSerializer,
   types: EventStore.PostgresTypes
 
+config :premiere_ecoute, PremiereEcoute.Sessions.Services.ReplayVideo,
+  interval_hours: 24,
+  max_iterations: 7
+
 config :premiere_ecoute, Oban,
   prefix: "oban",
   repo: PremiereEcoute.Repo,
@@ -152,7 +156,8 @@ config :premiere_ecoute, Oban,
     notifications: 1,
     discography: 1,
     emails: 1,
-    podcasts: 1
+    podcasts: 1,
+    uploads: 1
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},

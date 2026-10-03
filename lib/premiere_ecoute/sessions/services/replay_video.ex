@@ -6,12 +6,16 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   names the session's artist and album. Matching is intentionally simple: the title only.
   """
 
+  import Ecto.Query, only: [from: 2]
+
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.Profile.VideoSettings.Channel
   alias PremiereEcoute.Accounts.User.Profile.VideoSettings.Replay
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Workers.CheckUploadWorker
   alias PremiereEcoute.Youtube.Video
 
   @doc """
@@ -69,6 +73,56 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
       index -> List.replace_at(replays, index, entry)
     end
   end
+
+  @doc """
+  Schedules one `CheckUploadWorker` job per replay of the session's user.
+
+  The session must come with its `user`. Only ended album sessions are scheduled, when the user enabled
+  upload reminders and the session ended since `tracking_since`. Each job runs at `ended_at` plus the
+  replay's delay, and a `pending` entry is written in `options["uploads"]` under the replay id. Replays that
+  already have an entry are left alone, so calling it twice is harmless.
+  """
+  @spec schedule_upload_checks(ListeningSession.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def schedule_upload_checks(%ListeningSession{source: :album, user: %User{} = user, ended_at: %DateTime{} = ended_at} = session) do
+    with true <- Profile.get(user, [:video_settings, :reminders_enabled], false),
+         %Date{} = since <- Profile.get(user, [:video_settings, :tracking_since]),
+         false <- Date.before?(DateTime.to_date(ended_at), since),
+         [_ | _] = replays <- Profile.get(user, [:video_settings, :replays], []) do
+      config = Application.fetch_env!(:premiere_ecoute, __MODULE__)
+
+      Repo.transaction(fn ->
+        session = Repo.one!(from(s in ListeningSession, where: s.id == ^session.id, lock: "FOR UPDATE"))
+        uploads = session.options["uploads"] || %{}
+
+        new =
+          for replay <- replays, not is_map_key(uploads, replay.id), into: %{} do
+            due_at = DateTime.add(ended_at, replay.delay_hours, :hour)
+            {:ok, job} = CheckUploadWorker.start(%{session_id: session.id, replay_id: replay.id}, scheduled_at: due_at)
+
+            {replay.id,
+             %{
+               "status" => "pending",
+               "job_id" => job.id,
+               "due_at" => DateTime.to_iso8601(due_at),
+               "iterations" => 0,
+               "max_iterations" => config[:max_iterations],
+               "interval_hours" => config[:interval_hours],
+               "last_checked_at" => nil,
+               "next_check_at" => DateTime.to_iso8601(due_at),
+               "last_failure" => nil
+             }}
+          end
+
+        session
+        |> ListeningSession.changeset(%{options: Map.put(session.options, "uploads", Map.merge(uploads, new))})
+        |> Repo.update!()
+      end)
+    else
+      _ -> {:ok, session}
+    end
+  end
+
+  def schedule_upload_checks(%ListeningSession{} = session), do: {:ok, session}
 
   @doc """
   Looks for the video of `session` on the channel targeted by `replay`.
