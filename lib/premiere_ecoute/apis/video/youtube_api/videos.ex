@@ -11,8 +11,8 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.Videos do
   @doc """
   Fetches full details for a video by ID.
 
-  Requests snippet, statistics, and contentDetails parts.
-  Returns a `Video` with title, description, published_at, thumbnail_url, duration, tags,
+  Requests snippet, statistics, contentDetails, and status parts.
+  Returns a `Video` with title, description, channel_id, published_at, privacy, thumbnail_url, duration, tags,
   view_count, like_count, and comment_count.
   """
   @spec get_video(String.t()) :: {:ok, Video.t()} | {:error, term()}
@@ -22,7 +22,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.Videos do
       url: "/videos",
       params: [
         id: video_id,
-        part: "snippet,statistics,contentDetails"
+        part: "snippet,statistics,contentDetails,status"
       ]
     )
     |> YoutubeApi.handle(200, fn %{"items" => [item | _]} -> Video.parse(item) end)
