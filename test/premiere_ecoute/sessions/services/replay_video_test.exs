@@ -53,6 +53,63 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
     ReplayVideo.find_replay_video(session, replay)
   end
 
+  describe "store_replay_videos/2" do
+    setup do
+      user = user_fixture(%{role: :streamer})
+      {:ok, album} = PremiereEcoute.Discography.Album.create(album_fixture())
+      {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, session: session}
+    end
+
+    test "stores the found videos in the session replays", %{session: session} do
+      replay = replay(%{id: Ecto.UUID.generate()})
+      found = video(%{url: "https://www.youtube.com/watch?v=abc", thumbnail_url: "https://i.ytimg.com/vi/abc/hq.jpg"})
+
+      assert {:ok, stored} = ReplayVideo.store_replay_videos(session, [{replay, {:ok, found}}])
+
+      assert [entry] = ListeningSession.get(stored.id).replays
+      assert entry["label"] == "raw"
+      assert entry["url"] == found.url
+      assert entry["replay_id"] == replay.id
+      assert entry["video_id"] == found.id
+      assert entry["youtube_channel_id"] == @channel_id
+      assert entry["thumbnail_url"] == "https://i.ytimg.com/vi/abc/hq.jpg"
+      assert entry["source"] == "auto"
+      assert {:ok, _, _} = DateTime.from_iso8601(entry["uploaded_at"])
+    end
+
+    test "keeps the existing replays and ignores failed results", %{session: session} do
+      {:ok, session} =
+        ListeningSession.update_replays(session, [%{"label" => "Twitch VOD", "url" => "https://twitch.tv/videos/1"}])
+
+      found = video(%{url: "https://www.youtube.com/watch?v=abc"})
+
+      results = [{replay(%{id: Ecto.UUID.generate()}), {:ok, found}}, {replay(%{name: "edited"}), {:error, :not_found}}]
+
+      assert {:ok, stored} = ReplayVideo.store_replay_videos(session, results)
+      assert [%{"label" => "Twitch VOD"}, %{"video_id" => video_id}] = stored.replays
+      assert video_id == found.id
+    end
+
+    test "rewrites the entry of the same replay and leaves the others untouched", %{session: session} do
+      raw = replay(%{id: Ecto.UUID.generate()})
+      other = replay(%{id: Ecto.UUID.generate(), name: "edited"})
+      manual = %{"label" => "Twitch VOD", "url" => "https://twitch.tv/videos/1"}
+      old = %{"label" => "edited", "url" => "https://youtu.be/old", "replay_id" => other.id, "source" => "manual"}
+      {:ok, session} = ListeningSession.update_replays(session, [old, manual])
+
+      first = video(%{url: "https://www.youtube.com/watch?v=one"})
+      second = video(%{url: "https://www.youtube.com/watch?v=two"})
+
+      {:ok, once} = ReplayVideo.store_replay_videos(session, [{raw, {:ok, first}}])
+      {:ok, twice} = ReplayVideo.store_replay_videos(once, [{raw, {:ok, second}}])
+
+      assert [^old, ^manual, %{"replay_id" => replay_id, "video_id" => video_id}] = twice.replays
+      assert replay_id == raw.id
+      assert video_id == second.id
+    end
+  end
+
   describe "find_replay_videos/1" do
     test "looks for the video of every replay of the user" do
       raw = replay()
