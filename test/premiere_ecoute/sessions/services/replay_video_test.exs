@@ -56,7 +56,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
   describe "store_replay_videos/2" do
     setup do
       user = user_fixture(%{role: :streamer})
-      {:ok, album} = PremiereEcoute.Discography.Album.create(album_fixture())
+      {:ok, album} = Album.create(album_fixture())
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, session: session}
     end
@@ -76,6 +76,17 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
       assert entry["thumbnail_url"] == "https://i.ytimg.com/vi/abc/hq.jpg"
       assert entry["source"] == "auto"
       assert {:ok, _, _} = DateTime.from_iso8601(entry["uploaded_at"])
+    end
+
+    test "stores the result of a single replay", %{session: session} do
+      replay = replay(%{id: Ecto.UUID.generate()})
+      found = video(%{url: "https://www.youtube.com/watch?v=abc"})
+
+      assert {:ok, ^session} = ReplayVideo.store_replay_video(session, replay, {:error, :not_found})
+      assert {:ok, stored} = ReplayVideo.store_replay_video(session, replay, {:ok, found})
+      assert [%{"replay_id" => replay_id, "video_id" => video_id}] = stored.replays
+      assert replay_id == replay.id
+      assert video_id == found.id
     end
 
     test "keeps the existing replays and ignores failed results", %{session: session} do

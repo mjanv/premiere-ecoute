@@ -33,8 +33,8 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
   end
 
   defp session(user, attrs \\ %{}) do
-    {:ok, album} = Album.create(album_fixture())
-    attrs = Map.merge(%{user_id: user.id, album_id: album.id, status: :stopped, ended_at: DateTime.utc_now(:second)}, attrs)
+    album_id = attrs[:album_id] || elem(Album.create(album_fixture()), 1).id
+    attrs = Map.merge(%{user_id: user.id, album_id: album_id, status: :stopped, ended_at: DateTime.utc_now(:second)}, attrs)
     {:ok, session} = ListeningSession.create(attrs)
     Repo.preload(session, :user)
   end
@@ -48,7 +48,8 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
       [raw, edited] = user.profile.video_settings.replays
 
       manual(fn ->
-        assert {:ok, updated} = Sessions.schedule_upload_checks(session)
+        assert :ok = Sessions.schedule_upload_checks(session.id)
+        updated = Repo.reload(session)
 
         for {replay, hours} <- [{raw, 24}, {edited, 48}] do
           due_at = DateTime.add(session.ended_at, hours, :hour)
@@ -74,18 +75,22 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
           assert updated.options["uploads"][replay.id]["next_check_at"] == DateTime.to_iso8601(due_at)
         end
 
-        assert Repo.reload(session).options["uploads"] |> map_size() == 2
+        assert map_size(updated.options["uploads"]) == 2
         assert length(all_enqueued(worker: CheckUploadWorker)) == 2
       end)
+    end
+
+    test "does nothing for a session that does not exist" do
+      assert :ok = Sessions.schedule_upload_checks(0)
     end
 
     test "keeps the other options of the session" do
       session = session(streamer())
 
       manual(fn ->
-        assert {:ok, updated} = Sessions.schedule_upload_checks(session)
+        assert :ok = Sessions.schedule_upload_checks(session.id)
 
-        assert updated.options["autostart"] == session.options["autostart"]
+        assert Repo.reload(session).options["autostart"] == session.options["autostart"]
       end)
     end
 
@@ -93,10 +98,11 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
       session = session(streamer())
 
       manual(fn ->
-        {:ok, once} = Sessions.schedule_upload_checks(session)
-        {:ok, twice} = Sessions.schedule_upload_checks(%{session | options: once.options})
+        :ok = Sessions.schedule_upload_checks(session.id)
+        once = Repo.reload(session)
+        :ok = Sessions.schedule_upload_checks(session.id)
 
-        assert twice.options["uploads"] == once.options["uploads"]
+        assert Repo.reload(session).options["uploads"] == once.options["uploads"]
         assert length(all_enqueued(worker: CheckUploadWorker)) == 2
       end)
     end
@@ -105,7 +111,8 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
       session = session(streamer(false))
 
       manual(fn ->
-        assert {:ok, ^session} = Sessions.schedule_upload_checks(session)
+        assert :ok = Sessions.schedule_upload_checks(session.id)
+        assert Repo.reload(session).options == session.options
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end
@@ -116,7 +123,8 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
       session = session(user)
 
       manual(fn ->
-        assert {:ok, ^session} = Sessions.schedule_upload_checks(session)
+        assert :ok = Sessions.schedule_upload_checks(session.id)
+        assert Repo.reload(session).options == session.options
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end
@@ -125,7 +133,8 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
       session = session(streamer(), %{ended_at: DateTime.add(DateTime.utc_now(:second), -2, :day)})
 
       manual(fn ->
-        assert {:ok, ^session} = Sessions.schedule_upload_checks(session)
+        assert :ok = Sessions.schedule_upload_checks(session.id)
+        assert Repo.reload(session).options == session.options
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end
@@ -133,11 +142,13 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
     test "does nothing for a session that has not ended or is not an album" do
       user = streamer()
       running = session(user, %{ended_at: nil})
-      clip = %{running | source: :clip, ended_at: DateTime.utc_now(:second)}
+      clip = session(user, %{source: :clip, album_id: running.album_id})
 
       manual(fn ->
-        assert {:ok, ^running} = Sessions.schedule_upload_checks(running)
-        assert {:ok, ^clip} = Sessions.schedule_upload_checks(clip)
+        assert :ok = Sessions.schedule_upload_checks(running.id)
+        assert :ok = Sessions.schedule_upload_checks(clip.id)
+        assert Repo.reload(running).options == running.options
+        assert Repo.reload(clip).options == clip.options
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end

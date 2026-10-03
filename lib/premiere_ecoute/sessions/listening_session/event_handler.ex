@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.Players.PlaybackState
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted
@@ -152,7 +153,8 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
 
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_stopped, session_id})
-    :ok
+
+    Sessions.schedule_upload_checks(session_id)
   end
 
   def dispatch(%SessionStarted{source: :free, session_id: session_id, user_id: user_id}) do

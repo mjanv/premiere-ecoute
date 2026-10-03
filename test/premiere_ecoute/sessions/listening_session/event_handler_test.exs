@@ -2,12 +2,14 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Accounts
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Sessions.ListeningSession.EventHandler
   alias PremiereEcoute.Sessions.ListeningSession.Events.NextTrackStarted
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionPrepared
   alias PremiereEcoute.Sessions.ListeningSession.Events.SessionStarted
   alias PremiereEcoute.Sessions.ListeningSession.Workers.MissedSessionNotificationWorker
   alias PremiereEcoute.Sessions.ListeningSessionWorker
+  alias PremiereEcoute.Sessions.Workers.CheckUploadWorker
 
   @cooldown Application.compile_env(:premiere_ecoute, PremiereEcoute.Sessions)[:vote_cooldown]
 
@@ -151,6 +153,61 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandlerTest do
 
         assert_enqueued worker: MissedSessionNotificationWorker,
                         args: %{"session_id" => session.id, "user_id" => follower.id}
+      end)
+    end
+  end
+
+  describe "dispatch/1 - SessionStopped upload checks" do
+    defp streamer_with_replays(reminders_enabled) do
+      user = user_fixture(%{role: :streamer})
+
+      {:ok, user} =
+        User.edit_user_profile(user, %{
+          video_settings: %{channels: [%{label: "Main", youtube_channel_id: "UC" <> String.duplicate("a", 22)}]}
+        })
+
+      channel_id = hd(user.profile.video_settings.channels).id
+
+      {:ok, user} =
+        User.edit_user_profile(User.get!(user.id), %{video_settings: %{replays: [%{name: "raw", channel_id: channel_id}]}})
+
+      {:ok, user} =
+        User.edit_user_profile(User.get!(user.id), %{video_settings: %{reminders_enabled: reminders_enabled}})
+
+      user
+    end
+
+    defp stopped_session(user) do
+      session_fixture(%{user_id: user.id, status: :stopped, ended_at: DateTime.utc_now(:second)})
+    end
+
+    defp stop(session, user) do
+      EventHandler.dispatch(%PremiereEcoute.Sessions.ListeningSession.Events.SessionStopped{
+        session_id: session.id,
+        user_id: user.id
+      })
+    end
+
+    test "schedules the check of each replay when the streamer enabled upload reminders" do
+      user = streamer_with_replays(true)
+      session = stopped_session(user)
+      [replay] = user.profile.video_settings.replays
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        stop(session, user)
+
+        assert_enqueued worker: CheckUploadWorker, args: %{"session_id" => session.id, "replay_id" => replay.id}
+      end)
+    end
+
+    test "schedules nothing when upload reminders are off" do
+      user = streamer_with_replays(false)
+      session = stopped_session(user)
+
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        stop(session, user)
+
+        refute_enqueued worker: CheckUploadWorker
       end)
     end
   end
