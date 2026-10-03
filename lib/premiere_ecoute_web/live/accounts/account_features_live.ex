@@ -67,6 +67,21 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLive do
     end
   end
 
+  attr :field, Phoenix.HTML.FormField, required: true
+
+  defp field_errors(assigns) do
+    ~H"""
+    <p
+      :for={msg <- if(used_input?(@field), do: Enum.map(@field.errors, &translate_error/1), else: [])}
+      class="mt-1 text-xs text-red-400"
+    >
+      {msg}
+    </p>
+    """
+  end
+
+  defp saved_channels(user), do: Profile.get(user, [:video_settings, :channels], []) || []
+
   defp overlay_url(username, "collections") do
     "#{PremiereEcouteWeb.Endpoint.url()}/collections/overlay/#{username}"
   end
