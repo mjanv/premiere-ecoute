@@ -356,121 +356,161 @@
                     </div>
                   </div>
 
-                  <div id="youtube-channels" class="px-5 py-3 space-y-3">
-                    <div>
-                      <p class="text-white text-sm font-medium">{gettext("Channels")}</p>
-                      <p class="text-gray-400 text-xs mt-0.5">
-                        {gettext("YouTube channels you upload your replays to. Save a channel before assigning it to a replay.")}
-                      </p>
-                    </div>
-                    <.inputs_for :let={cf} field={vs[:channels]}>
-                      <div class="flex items-start gap-2">
-                        <input type="hidden" name={"#{vs.name}[channels_sort][]"} value={cf.index} />
-                        <div class="w-40">
-                          <input
-                            type="text"
-                            name={cf[:label].name}
-                            value={cf[:label].value}
-                            placeholder={gettext("Label")}
-                            class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
-                          />
-                          <.field_errors field={cf[:label]} />
+                  <div id="youtube-reminders" class="px-5 py-3">
+                    <div class="rounded-lg border border-gray-500 divide-y divide-gray-500">
+                      <div class="flex items-center justify-between px-4 py-3">
+                        <div>
+                          <p class="text-white text-sm font-medium">{gettext("Upload reminders")}</p>
+                          <p class="text-gray-400 text-xs mt-0.5">
+                            {gettext(
+                              "Get reminded when a replay is missing on YouTube. Configure the channels and replays to track below."
+                            )}
+                          </p>
                         </div>
-                        <div class="flex-1 min-w-0">
-                          <input
-                            type="text"
-                            name={cf[:youtube_channel_id].name}
-                            value={cf[:youtube_channel_id].value}
-                            placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
-                            class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none font-mono"
-                          />
-                          <.field_errors field={cf[:youtube_channel_id]} />
-                        </div>
-                        <label
-                          class="cursor-pointer text-gray-400 hover:text-red-400 py-1.5"
-                          aria-label={gettext("Remove channel")}
-                        >
-                          <input type="checkbox" name={"#{vs.name}[channels_drop][]"} value={cf.index} class="hidden" />
-                          <.icon name="hero-trash" class="w-4 h-4" />
-                        </label>
+                        <input type="hidden" name={vs[:reminders_enabled].name} value="false" />
+                        <input
+                          type="checkbox"
+                          id={vs[:reminders_enabled].id}
+                          name={vs[:reminders_enabled].name}
+                          value="true"
+                          checked={vs[:reminders_enabled].value}
+                          class="w-4 h-4 accent-purple-500"
+                        />
                       </div>
-                    </.inputs_for>
-                    <input type="hidden" name={"#{vs.name}[channels_drop][]"} />
-                    <.field_errors field={vs[:channels]} />
-                    <label class="inline-flex items-center gap-1 cursor-pointer text-sm text-purple-300 hover:text-purple-200">
-                      <input type="checkbox" name={"#{vs.name}[channels_sort][]"} value="new" class="hidden" />
-                      <.icon name="hero-plus" class="w-4 h-4" />{gettext("Add channel")}
-                    </label>
-                  </div>
 
-                  <div id="youtube-replays" class="px-5 py-3 space-y-3">
-                    <div>
-                      <p class="text-white text-sm font-medium">{gettext("Replays")}</p>
-                      <p class="text-gray-400 text-xs mt-0.5">
-                        {gettext(
-                          "Replays of a session you upload (raw, edited, ...), and how many hours after the session they are due."
-                        )}
-                      </p>
-                    </div>
-                    <.inputs_for :let={rep} field={vs[:replays]}>
-                      <div class="flex items-start gap-2">
-                        <input type="hidden" name={"#{vs.name}[replays_sort][]"} value={rep.index} />
-                        <div class="w-40">
-                          <input
-                            type="text"
-                            name={rep[:name].name}
-                            value={rep[:name].value}
-                            placeholder={gettext("Name")}
-                            class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
-                          />
-                          <.field_errors field={rep[:name]} />
+                      <div
+                        id="youtube-channels"
+                        class={[
+                          "px-4 py-3 space-y-3 transition-opacity",
+                          vs[:reminders_enabled].value not in [true, "true"] && "opacity-40"
+                        ]}
+                      >
+                        <div>
+                          <p class="text-white text-sm font-medium">{gettext("Channels")}</p>
+                          <p class="text-gray-400 text-xs mt-0.5">
+                            {gettext(
+                              "YouTube channels you upload your replays to. Save a channel before assigning it to a replay."
+                            )}
+                          </p>
                         </div>
-                        <div class="flex-1 min-w-0">
-                          <select
-                            name={rep[:channel_id].name}
-                            class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
-                          >
-                            <option value="" selected={rep[:channel_id].value in [nil, ""]}>{gettext("Select a channel")}</option>
-                            <option
-                              :for={channel <- saved_channels(@current_user)}
-                              value={channel.id}
-                              selected={rep[:channel_id].value == channel.id}
+                        <.inputs_for :let={cf} field={vs[:channels]}>
+                          <div class="flex items-start gap-2">
+                            <input type="hidden" name={"#{vs.name}[channels_sort][]"} value={cf.index} />
+                            <div class="w-40">
+                              <input
+                                type="text"
+                                name={cf[:label].name}
+                                value={cf[:label].value}
+                                placeholder={gettext("Label")}
+                                class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
+                              />
+                              <.field_errors field={cf[:label]} />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                              <input
+                                type="text"
+                                name={cf[:youtube_channel_id].name}
+                                value={cf[:youtube_channel_id].value}
+                                placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+                                class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none font-mono"
+                              />
+                              <.field_errors field={cf[:youtube_channel_id]} />
+                            </div>
+                            <label
+                              class="cursor-pointer text-gray-400 hover:text-red-400 py-1.5"
+                              aria-label={gettext("Remove channel")}
                             >
-                              {channel.label}
-                            </option>
-                          </select>
-                          <.field_errors field={rep[:channel_id]} />
-                        </div>
-                        <div class="w-24">
-                          <div class="flex items-center gap-1">
-                            <input
-                              type="number"
-                              min="1"
-                              max="720"
-                              name={rep[:delay_hours].name}
-                              value={rep[:delay_hours].value}
-                              aria-label={gettext("Due after (hours)")}
-                              class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
-                            />
-                            <span class="text-xs text-gray-400">h</span>
+                              <input type="checkbox" name={"#{vs.name}[channels_drop][]"} value={cf.index} class="hidden" />
+                              <.icon name="hero-trash" class="w-4 h-4" />
+                            </label>
                           </div>
-                          <.field_errors field={rep[:delay_hours]} />
-                        </div>
-                        <label
-                          class="cursor-pointer text-gray-400 hover:text-red-400 py-1.5"
-                          aria-label={gettext("Remove replay")}
-                        >
-                          <input type="checkbox" name={"#{vs.name}[replays_drop][]"} value={rep.index} class="hidden" />
-                          <.icon name="hero-trash" class="w-4 h-4" />
+                        </.inputs_for>
+                        <input type="hidden" name={"#{vs.name}[channels_drop][]"} />
+                        <.field_errors field={vs[:channels]} />
+                        <label class="inline-flex items-center gap-1 cursor-pointer text-sm text-purple-300 hover:text-purple-200">
+                          <input type="checkbox" name={"#{vs.name}[channels_sort][]"} value="new" class="hidden" />
+                          <.icon name="hero-plus" class="w-4 h-4" />{gettext("Add channel")}
                         </label>
                       </div>
-                    </.inputs_for>
-                    <input type="hidden" name={"#{vs.name}[replays_drop][]"} />
-                    <.field_errors field={vs[:replays]} />
-                    <label class="inline-flex items-center gap-1 cursor-pointer text-sm text-purple-300 hover:text-purple-200">
-                      <input type="checkbox" name={"#{vs.name}[replays_sort][]"} value="new" class="hidden" />
-                      <.icon name="hero-plus" class="w-4 h-4" />{gettext("Add replay")}
-                    </label>
+
+                      <div
+                        id="youtube-replays"
+                        class={[
+                          "px-4 py-3 space-y-3 transition-opacity",
+                          vs[:reminders_enabled].value not in [true, "true"] && "opacity-40"
+                        ]}
+                      >
+                        <div>
+                          <p class="text-white text-sm font-medium">{gettext("Replays")}</p>
+                          <p class="text-gray-400 text-xs mt-0.5">
+                            {gettext(
+                              "Replays of a session you upload (raw, edited, ...), and how many hours after the session they are due."
+                            )}
+                          </p>
+                        </div>
+                        <.inputs_for :let={rep} field={vs[:replays]}>
+                          <div class="flex items-start gap-2">
+                            <input type="hidden" name={"#{vs.name}[replays_sort][]"} value={rep.index} />
+                            <div class="w-40">
+                              <input
+                                type="text"
+                                name={rep[:name].name}
+                                value={rep[:name].value}
+                                placeholder={gettext("Name")}
+                                class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
+                              />
+                              <.field_errors field={rep[:name]} />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                              <select
+                                name={rep[:channel_id].name}
+                                class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
+                              >
+                                <option value="" selected={rep[:channel_id].value in [nil, ""]}>
+                                  {gettext("Select a channel")}
+                                </option>
+                                <option
+                                  :for={channel <- saved_channels(@current_user)}
+                                  value={channel.id}
+                                  selected={rep[:channel_id].value == channel.id}
+                                >
+                                  {channel.label}
+                                </option>
+                              </select>
+                              <.field_errors field={rep[:channel_id]} />
+                            </div>
+                            <div class="w-24">
+                              <div class="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max="720"
+                                  name={rep[:delay_hours].name}
+                                  value={rep[:delay_hours].value}
+                                  aria-label={gettext("Due after (hours)")}
+                                  class="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-900/60 border border-gray-600 text-white focus:border-purple-500 focus:outline-none"
+                                />
+                                <span class="text-xs text-gray-400">h</span>
+                              </div>
+                              <.field_errors field={rep[:delay_hours]} />
+                            </div>
+                            <label
+                              class="cursor-pointer text-gray-400 hover:text-red-400 py-1.5"
+                              aria-label={gettext("Remove replay")}
+                            >
+                              <input type="checkbox" name={"#{vs.name}[replays_drop][]"} value={rep.index} class="hidden" />
+                              <.icon name="hero-trash" class="w-4 h-4" />
+                            </label>
+                          </div>
+                        </.inputs_for>
+                        <input type="hidden" name={"#{vs.name}[replays_drop][]"} />
+                        <.field_errors field={vs[:replays]} />
+                        <label class="inline-flex items-center gap-1 cursor-pointer text-sm text-purple-300 hover:text-purple-200">
+                          <input type="checkbox" name={"#{vs.name}[replays_sort][]"} value="new" class="hidden" />
+                          <.icon name="hero-plus" class="w-4 h-4" />{gettext("Add replay")}
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </.inputs_for>
 

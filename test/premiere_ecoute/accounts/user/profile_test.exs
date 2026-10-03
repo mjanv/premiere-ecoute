@@ -88,10 +88,10 @@ defmodule PremiereEcoute.Accounts.User.ProfileTest do
       user.profile
     end
 
-    test "defaults to no channels, no replays and no tracking" do
+    test "defaults to disabled, no channels, no replays and no tracking" do
       vs = %Profile{} |> Profile.changeset() |> Ecto.Changeset.apply_changes() |> Map.fetch!(:video_settings)
 
-      assert %{channels: [], replays: [], tracking_since: nil} = vs
+      assert %{reminders_enabled: false, channels: [], replays: [], tracking_since: nil} = vs
     end
 
     test "validates the channel id format" do
@@ -196,37 +196,31 @@ defmodule PremiereEcoute.Accounts.User.ProfileTest do
       refute cs.valid?
     end
 
-    test "sets tracking_since when the first replay is added, and clears it when all go" do
+    test "adding replays does not enable the feature" do
       {user, _, %{id: cid}} = profile_with_channel()
       profile = saved_profile(%{replays: [%{name: "raw", channel_id: cid}]}, User.get!(user.id))
+
+      assert %{reminders_enabled: false, tracking_since: nil} = profile.video_settings
+    end
+
+    test "sets tracking_since when the feature is enabled, and clears it when disabled" do
+      {user, _, _} = profile_with_channel()
+      profile = saved_profile(%{reminders_enabled: true}, User.get!(user.id))
+      assert profile.video_settings.reminders_enabled
       assert profile.video_settings.tracking_since == Date.utc_today()
 
-      [replay] = profile.video_settings.replays
+      cs = Profile.changeset(profile, %{video_settings: %{reminders_enabled: false}})
 
-      cs =
-        Profile.changeset(profile, %{
-          video_settings: %{replays_drop: ["0"], replays: %{"0" => %{id: replay.id, name: "raw", channel_id: cid}}}
-        })
-
-      assert Ecto.Changeset.apply_changes(cs).video_settings.replays == []
       assert Ecto.Changeset.apply_changes(cs).video_settings.tracking_since == nil
     end
 
-    test "keeps tracking_since when another replay is added" do
+    test "keeps tracking_since while the feature stays enabled" do
       {user, _, %{id: cid}} = profile_with_channel()
-      profile = saved_profile(%{replays: [%{name: "raw", channel_id: cid}]}, User.get!(user.id))
-      since = profile.video_settings.tracking_since
-      [replay] = profile.video_settings.replays
+      profile = saved_profile(%{reminders_enabled: true}, User.get!(user.id))
+      since = Date.add(Date.utc_today(), -3)
+      profile = put_in(profile.video_settings.tracking_since, since)
 
-      cs =
-        Profile.changeset(profile, %{
-          video_settings: %{
-            replays: %{
-              "0" => %{id: replay.id, name: "raw", channel_id: cid},
-              "1" => %{name: "edited", channel_id: cid}
-            }
-          }
-        })
+      cs = with_replays(profile, [%{name: "raw", channel_id: cid}])
 
       assert Ecto.Changeset.apply_changes(cs).video_settings.tracking_since == since
     end

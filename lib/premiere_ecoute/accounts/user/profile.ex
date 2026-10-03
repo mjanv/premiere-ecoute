@@ -53,6 +53,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     embeds_one :video_settings, VideoSettings, on_replace: :update, primary_key: false do
       field :show_name, :string, default: "PREMIÈRE ÉCOUTE"
       field :title_template, :string, default: "{show_name} : \"{title}\" by {artist}"
+      field :reminders_enabled, :boolean, default: false
       field :tracking_since, :date
 
       embeds_many :channels, Channel, on_replace: :delete, primary_key: {:id, :binary_id, autogenerate: true} do
@@ -120,7 +121,7 @@ defmodule PremiereEcoute.Accounts.User.Profile do
 
   defp video_settings_changeset(settings, attrs) do
     settings
-    |> cast(attrs, [:show_name, :title_template])
+    |> cast(attrs, [:show_name, :title_template, :reminders_enabled])
     |> validate_length(:show_name, max: 100)
     |> validate_length(:title_template, max: 200)
     |> cast_embed(:channels, with: &channel_changeset/2, sort_param: :channels_sort, drop_param: :channels_drop)
@@ -182,11 +183,9 @@ defmodule PremiereEcoute.Accounts.User.Profile do
   end
 
   defp put_tracking_since(changeset, settings) do
-    previous = settings.replays || []
-
-    case {previous, get_field(changeset, :replays) || []} do
-      {_, []} -> put_change(changeset, :tracking_since, nil)
-      {[], _} -> put_change(changeset, :tracking_since, Date.utc_today())
+    case {settings.reminders_enabled, get_field(changeset, :reminders_enabled)} do
+      {_, false} -> put_change(changeset, :tracking_since, nil)
+      {false, true} -> put_change(changeset, :tracking_since, Date.utc_today())
       _ -> changeset
     end
   end
@@ -245,7 +244,10 @@ end
 
 defimpl Jason.Encoder, for: PremiereEcoute.Accounts.User.Profile.VideoSettings do
   def encode(settings, opts) do
-    Jason.Encode.map(Map.take(settings, [:show_name, :title_template, :tracking_since, :channels, :replays]), opts)
+    Jason.Encode.map(
+      Map.take(settings, [:show_name, :title_template, :reminders_enabled, :tracking_since, :channels, :replays]),
+      opts
+    )
   end
 end
 

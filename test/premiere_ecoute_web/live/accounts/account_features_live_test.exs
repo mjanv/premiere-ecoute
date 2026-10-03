@@ -49,13 +49,19 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLiveTest do
 
       view
       |> form("#youtube-settings-form",
-        profile: %{video_settings: %{replays: %{"0" => %{name: "raw", channel_id: channel.id, delay_hours: 12}}}}
+        profile: %{
+          video_settings: %{
+            reminders_enabled: "true",
+            replays: %{"0" => %{name: "raw", channel_id: channel.id, delay_hours: 12}}
+          }
+        }
       )
       |> render_submit()
 
       settings = PremiereEcoute.Accounts.User.get!(user.id).profile.video_settings
       assert [%{name: "raw", delay_hours: 12, channel_id: channel_id}] = settings.replays
       assert channel_id == channel.id
+      assert settings.reminders_enabled
       assert settings.tracking_since == Date.utc_today()
     end
 
@@ -76,6 +82,21 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLiveTest do
         |> render_change()
 
       assert html =~ "must be a YouTube channel id"
+    end
+
+    test "dims channels and replays while reminders are disabled", %{conn: conn} do
+      user = user_fixture(%{role: :streamer})
+      conn = log_in_user(conn, user)
+      {:ok, view, html} = live(conn, ~p"/users/account/features")
+
+      assert html =~ ~r/id="youtube-channels"[^>]*opacity-40/s
+
+      html =
+        view
+        |> form("#youtube-settings-form", profile: %{video_settings: %{reminders_enabled: "true"}})
+        |> render_change()
+
+      refute html =~ ~r/id="youtube-channels"[^>]*opacity-40/s
     end
   end
 end
