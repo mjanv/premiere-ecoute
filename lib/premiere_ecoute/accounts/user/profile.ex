@@ -62,6 +62,13 @@ defmodule PremiereEcoute.Accounts.User.Profile do
       end
 
       embeds_many :replays, Replay, on_replace: :delete, primary_key: {:id, :binary_id, autogenerate: true} do
+        @type t :: %__MODULE__{
+                id: Ecto.UUID.t() | nil,
+                name: String.t() | nil,
+                channel_id: Ecto.UUID.t() | nil,
+                delay_hours: pos_integer()
+              }
+
         field :name, :string
         field :channel_id, :binary_id
         field :delay_hours, :integer, default: 24
