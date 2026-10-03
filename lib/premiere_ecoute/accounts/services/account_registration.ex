@@ -18,12 +18,14 @@ defmodule PremiereEcoute.Accounts.Services.AccountRegistration do
           required(:broadcaster_type) => String.t(),
           required(:access_token) => String.t(),
           required(:refresh_token) => String.t(),
-          required(:expires_in) => integer()
+          required(:expires_in) => integer(),
+          optional(:scope) => [String.t()]
         }
 
   @type spotify_data() :: %{
           required(:user_id) => String.t(),
           required(:email) => String.t(),
+          required(:username) => String.t(),
           required(:display_name) => String.t(),
           required(:country) => String.t(),
           required(:product) => String.t(),
