@@ -258,6 +258,176 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   defp finish_upload(state, _now), do: state
 
   @doc """
+  Skips the replay `replay_id` of the session `session_id`: no more checks, and its live job is cancelled.
+
+  Allowed from `pending`, `exhausted` and `rejected`.
+  """
+  @spec skip_upload(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def skip_upload(session_id, replay_id) do
+    update_upload(session_id, replay_id, fn session, %{"status" => status} = state ->
+      if status in ~w(pending exhausted rejected),
+        do: {:ok, session.replays, close(state, "skipped")},
+        else: {:error, :invalid_transition}
+    end)
+  end
+
+  @doc """
+  Puts a `skipped` replay back to `pending`, with a new job and `iterations` back to 0.
+  """
+  @spec unskip_upload(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def unskip_upload(session_id, replay_id), do: revive_upload(session_id, replay_id, "skipped")
+
+  @doc """
+  Puts an `exhausted` replay back to `pending`, with a new job and `iterations` back to 0.
+
+  A `rejected` replay cannot be retried: it would likely match the same wrong video again.
+  """
+  @spec retry_upload(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def retry_upload(session_id, replay_id), do: revive_upload(session_id, replay_id, "exhausted")
+
+  @doc """
+  Runs the live job of a `pending` replay now, without resetting its `iterations`.
+  """
+  @spec check_upload_now(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def check_upload_now(session_id, replay_id) do
+    update_upload(session_id, replay_id, fn session, state ->
+      case state do
+        %{"status" => "pending", "job_id" => job_id} when is_integer(job_id) ->
+          Oban.retry_job(job_id)
+          {:ok, session.replays, %{state | "next_check_at" => DateTime.to_iso8601(DateTime.utc_now(:second))}}
+
+        _ ->
+          {:error, :invalid_transition}
+      end
+    end)
+  end
+
+  @doc """
+  Marks the replay `replay_id` of the session `session_id` as uploaded, at the YouTube link `url`.
+
+  The video must be public, on the YouTube channel of the replay, and not already attached to the session.
+  It is stored with `source: "manual"`, the replay becomes `found` and its live job is cancelled. Allowed
+  from `pending`, `exhausted` and `rejected`.
+
+  Errors: `:invalid_url`, `:video_not_found` (unknown, or not public yet), `{:wrong_channel, title}` with the
+  title of the channel the video is on, `:duplicate`, `:not_found` and `:invalid_transition`.
+  """
+  @spec attach_upload(integer(), String.t(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def attach_upload(session_id, replay_id, url) do
+    with %ListeningSession{user: %User{} = user} <- session_id |> ListeningSession.get() |> ListeningSession.preload(),
+         %Replay{name: name, channel_id: channel_id} <-
+           Enum.find(Profile.get(user, [:video_settings, :replays], []), &(&1.id == replay_id)),
+         %Channel{youtube_channel_id: expected} <-
+           Enum.find(Profile.get(user, [:video_settings, :channels], []), &(&1.id == channel_id)),
+         {:ok, id} <- video_id(url),
+         {:ok, %Video{privacy: :public} = video} <- lookup_video(id),
+         :ok <- if(video.channel_id == expected, do: :ok, else: {:error, {:wrong_channel, video.channel_title}}) do
+      now = DateTime.utc_now(:second)
+
+      update_upload(session_id, replay_id, fn session, %{"status" => status} = state ->
+        cond do
+          status not in ~w(pending exhausted rejected) ->
+            {:error, :invalid_transition}
+
+          Enum.any?(session.replays, &(&1["video_id"] == video.id)) ->
+            {:error, :duplicate}
+
+          true ->
+            entry = build_entry(%{video | url: url}, name, replay_id, "manual", DateTime.to_iso8601(now))
+            {:ok, put_entry(entry, session.replays), found(state, now)}
+        end
+      end)
+    else
+      {:error, _} = error -> error
+      {:ok, %Video{}} -> {:error, :video_not_found}
+      _ -> {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Removes the video of a `found` replay.
+
+  An `auto` match becomes `rejected`: it was wrong, and detection does not restart. A `manual` entry (a typo
+  in the URL, say) goes back to `pending` with a new job.
+  """
+  @spec unmark_upload(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def unmark_upload(session_id, replay_id) do
+    update_upload(session_id, replay_id, fn session, state ->
+      entry = Enum.find(session.replays, &(&1["replay_id"] == replay_id))
+      replays = Enum.reject(session.replays, &(&1["replay_id"] == replay_id))
+
+      case {state["status"], entry} do
+        {"found", %{"source" => "auto"}} -> {:ok, replays, close(state, "rejected")}
+        {"found", %{}} -> {:ok, replays, revive(state, session.id, replay_id)}
+        _ -> {:error, :invalid_transition}
+      end
+    end)
+  end
+
+  defp video_id(url) do
+    case Video.id_from_url(url) do
+      {:ok, _} = ok -> ok
+      :error -> {:error, :invalid_url}
+    end
+  end
+
+  defp lookup_video(id) do
+    case Apis.youtube().get_video(id) do
+      {:ok, %Video{}} = ok -> ok
+      {:error, _} -> {:error, :video_not_found}
+    end
+  end
+
+  defp revive_upload(session_id, replay_id, from) do
+    update_upload(session_id, replay_id, fn session, state ->
+      if state["status"] == from,
+        do: {:ok, session.replays, revive(state, session.id, replay_id)},
+        else: {:error, :invalid_transition}
+    end)
+  end
+
+  # Locks the session, hands the replays and the state of `replay_id` to `fun`, and writes back what it returns.
+  defp update_upload(session_id, replay_id, fun) do
+    Repo.transaction(fn ->
+      with %ListeningSession{} = session <-
+             Repo.one(from(s in ListeningSession, where: s.id == ^session_id, lock: "FOR UPDATE")),
+           %{} = state <- get_in(session.options, ["uploads", replay_id]),
+           {:ok, replays, state} <- fun.(session, state) do
+        session
+        |> ListeningSession.changeset(%{replays: replays, options: put_in(session.options, ["uploads", replay_id], state)})
+        |> Repo.update!()
+      else
+        {:error, reason} -> Repo.rollback(reason)
+        nil -> Repo.rollback(:not_found)
+      end
+    end)
+  end
+
+  defp close(state, status) do
+    if is_integer(state["job_id"]), do: Oban.cancel_job(state["job_id"])
+    %{state | "status" => status, "job_id" => nil, "next_check_at" => nil}
+  end
+
+  defp found(state, now) do
+    if is_integer(state["job_id"]), do: Oban.cancel_job(state["job_id"])
+    CheckUploadWorker.mark_found(state, now)
+  end
+
+  defp revive(state, session_id, replay_id) do
+    now = DateTime.utc_now(:second)
+    {:ok, job} = CheckUploadWorker.start(%{session_id: session_id, replay_id: replay_id})
+
+    %{
+      state
+      | "status" => "pending",
+        "job_id" => job.id,
+        "iterations" => 0,
+        "last_failure" => nil,
+        "next_check_at" => DateTime.to_iso8601(now)
+    }
+  end
+
+  @doc """
   Looks for the video of `session` on the channel targeted by `replay`.
 
   Only album sessions are supported. The session must come with its `user` and its album with the artist (as

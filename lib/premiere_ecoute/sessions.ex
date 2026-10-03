@@ -35,7 +35,13 @@ defmodule PremiereEcoute.Sessions do
   defdelegate get_active_session(user), to: ListeningSession
   defdelegate current_session(user), to: ListeningSession
   defdelegate can_view_retrospective?(session, scope), to: ListeningSession
-  defdelegate schedule_upload_checks(session), to: ReplayVideo
+  defdelegate schedule_upload_checks(session_id), to: ReplayVideo
+  defdelegate skip_upload(session_id, replay_id), to: ReplayVideo
+  defdelegate unskip_upload(session_id, replay_id), to: ReplayVideo
+  defdelegate retry_upload(session_id, replay_id), to: ReplayVideo
+  defdelegate check_upload_now(session_id, replay_id), to: ReplayVideo
+  defdelegate attach_upload(session_id, replay_id, url), to: ReplayVideo
+  defdelegate unmark_upload(session_id, replay_id), to: ReplayVideo
 
   @doc "Publishes chat message event to Broadway pipeline for vote processing"
   @spec publish_message(map()) :: :ok
