@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.ChannelDetailsTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Youtube.Channel
 
   setup {Req.Test, :verify_on_exit!}
 
@@ -18,7 +19,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.ChannelDetailsTest do
 
       {:ok, channel} = YoutubeApi.get_channel("UCsmECZ1G4vHMSmH-m6cJBWA")
 
-      assert %{
+      assert %Channel{
                id: "UCsmECZ1G4vHMSmH-m6cJBWA",
                title: "Flonflon",
                custom_url: "@flonflon",

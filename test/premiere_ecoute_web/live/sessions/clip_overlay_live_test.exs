@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Sessions.ClipOverlayLiveTest do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.PrepareListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Commands.StartListeningSession
+  alias PremiereEcoute.Youtube.Video
 
   setup :verify_on_exit!
 
@@ -40,7 +41,7 @@ defmodule PremiereEcouteWeb.Sessions.ClipOverlayLiveTest do
 
       expect(YoutubeApi.Mock, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -78,7 +79,7 @@ defmodule PremiereEcouteWeb.Sessions.ClipOverlayLiveTest do
 
       expect(YoutubeApi.Mock, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -109,7 +110,7 @@ defmodule PremiereEcouteWeb.Sessions.ClipOverlayLiveTest do
 
       expect(YoutubeApi.Mock, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -148,7 +149,7 @@ defmodule PremiereEcouteWeb.Sessions.ClipOverlayLiveTest do
 
       expect(YoutubeApi.Mock, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -191,7 +192,7 @@ defmodule PremiereEcouteWeb.Sessions.ClipOverlayLiveTest do
 
       expect(YoutubeApi.Mock, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",

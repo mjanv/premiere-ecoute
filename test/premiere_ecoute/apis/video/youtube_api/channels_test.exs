@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.ChannelsTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Youtube.Video
 
   setup {Req.Test, :verify_on_exit!}
 
@@ -23,7 +24,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.ChannelsTest do
       assert length(videos) == 50
 
       assert [
-               %{
+               %Video{
                  id: "DGyTFnNB_UM",
                  title: "Elle va accorder sa guitare ?? React DREAMS : 1 R\u00CAVE, 2 VIES - \u00C9pisodes 9 et 10 [Replay Live]",
                  published_at: "2026-03-18T16:30:06Z",

@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.CommentThreadsTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Youtube.Comment
 
   setup {Req.Test, :verify_on_exit!}
 
@@ -21,7 +22,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.CommentThreadsTest do
       assert length(comments) == 5
 
       assert [
-               %{
+               %Comment{
                  id: "UgyfGqFzG22pp7sw7OV4AaABAg",
                  author: "@bleuapart",
                  published_at: "2026-03-18T14:33:27Z",

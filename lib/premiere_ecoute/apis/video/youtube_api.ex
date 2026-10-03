@@ -11,18 +11,22 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi do
   defmodule Behaviour do
     @moduledoc "YouTube API Behaviour"
 
-    @callback get_channel_videos(channel_id :: String.t()) ::
-                {:ok, [map()]} | {:error, term()}
-    @callback get_channel(channel_id :: String.t()) ::
-                {:ok, map()} | {:error, term()}
-    @callback get_video(video_id :: String.t()) ::
-                {:ok, map()} | {:error, term()}
-    @callback get_comment_threads(video_id :: String.t()) ::
-                {:ok, [map()]} | {:error, term()}
+    alias PremiereEcoute.Youtube.Channel
+    alias PremiereEcoute.Youtube.Comment
+    alias PremiereEcoute.Youtube.Video
+
+    @callback get_channel_videos(channel_id :: Channel.id()) ::
+                {:ok, [Video.t()]} | {:error, term()}
+    @callback get_channel(channel_id :: Channel.id()) ::
+                {:ok, Channel.t()} | {:error, term()}
+    @callback get_video(video_id :: Video.id()) ::
+                {:ok, Video.t()} | {:error, term()}
+    @callback get_comment_threads(video_id :: Video.id()) ::
+                {:ok, [Comment.t()]} | {:error, term()}
     @callback search_track_videos(query :: String.t()) ::
-                {:ok, [map()]} | {:error, term()}
+                {:ok, [Video.t()]} | {:error, term()}
     @callback search_artist(name :: String.t()) ::
-                {:ok, [map()]} | {:error, term()}
+                {:ok, [Channel.t()]} | {:error, term()}
   end
 
   @doc """

@@ -24,6 +24,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
   alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowClosed
   alias PremiereEcoute.Sessions.ListeningSession.Events.VoteWindowOpened
   alias PremiereEcoute.Sessions.Retrospective.Report
+  alias PremiereEcoute.Youtube.Video
   alias PremiereEcouteCore.Cache
   alias PremiereEcouteCore.CommandBus
 
@@ -197,7 +198,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(YoutubeApi, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -230,7 +231,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(YoutubeApi, :get_video, fn "yt_no_match" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_no_match",
            title: "Some random video",
            channel_title: "Some random channel",
@@ -261,7 +262,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(YoutubeApi, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -318,7 +319,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(YoutubeApi, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -383,7 +384,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(YoutubeApi, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",
@@ -415,7 +416,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandlerTest do
 
       expect(YoutubeApi, :get_video, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "Sample Track (Official Video)",
            channel_title: "Sample Artist",

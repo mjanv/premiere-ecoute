@@ -6,11 +6,12 @@ defmodule PremiereEcoute.Discography.Services.EnrichClipTest do
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichClip
   alias PremiereEcoute.Discography.Single
+  alias PremiereEcoute.Youtube.Video
 
   defp expect_youtube_video(attrs \\ %{}) do
     video =
       Map.merge(
-        %{
+        %Video{
           id: "abc123",
           title: "One More Time (Official Video)",
           channel_title: "Daft Punk",

@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
   alias PremiereEcoute.Apis.Video.YoutubeApi.Mock, as: YoutubeApi
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Services.EnrichArtist
+  alias PremiereEcoute.Youtube.Channel
 
   defp artist_fixture(attrs \\ %{}) do
     {:ok, artist} =
@@ -68,7 +69,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtistTest do
 
   defp expect_youtube_music do
     expect(YoutubeApi, :search_artist, fn _query ->
-      {:ok, [%{channel_id: "UC_kRDKYrUlrbtrSiyu5Tflg", name: "Daft Punk"}]}
+      {:ok, [%Channel{id: "UC_kRDKYrUlrbtrSiyu5Tflg", title: "Daft Punk"}]}
     end)
   end
 

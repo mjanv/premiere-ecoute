@@ -10,6 +10,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Discography.Artist
   alias PremiereEcoute.Discography.Supervisor
+  alias PremiereEcoute.Youtube.Channel
 
   @doc """
   Enriches an artist with all available external data.
@@ -89,7 +90,7 @@ defmodule PremiereEcoute.Discography.Services.EnrichArtist do
 
   defp enrich(:youtube_music, %Artist{name: name}) do
     case Apis.youtube().search_artist(name) do
-      {:ok, [%{channel_id: channel_id} | _]} -> channel_id
+      {:ok, [%Channel{id: channel_id} | _]} -> channel_id
       {:ok, []} -> nil
       {:error, _reason} -> nil
     end

@@ -6,14 +6,15 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.Channels do
   """
 
   alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Youtube.Video
 
   @doc """
   Fetches the latest videos for a YouTube channel.
 
   Uses the search endpoint to list the most recent uploads (up to 50) for the given channel ID.
-  Returns a list of maps with video metadata: id, title, description, published_at, thumbnail_url.
+  Returns a list of `Video` structs (summary fields only).
   """
-  @spec get_channel_videos(String.t()) :: {:ok, [map()]} | {:error, term()}
+  @spec get_channel_videos(String.t()) :: {:ok, [Video.t()]} | {:error, term()}
   def get_channel_videos(channel_id) when is_binary(channel_id) do
     YoutubeApi.api()
     |> YoutubeApi.get(
@@ -26,17 +27,6 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.Channels do
         maxResults: 50
       ]
     )
-    |> YoutubeApi.handle(200, fn %{"items" => items} ->
-      Enum.map(items, fn %{"id" => %{"videoId" => video_id}, "snippet" => snippet} ->
-        %{
-          id: video_id,
-          url: "https://www.youtube.com/watch?v=#{video_id}",
-          title: snippet["title"],
-          description: snippet["description"],
-          published_at: snippet["publishedAt"],
-          thumbnail_url: get_in(snippet, ["thumbnails", "high", "url"])
-        }
-      end)
-    end)
+    |> YoutubeApi.handle(200, fn %{"items" => items} -> Enum.map(items, &Video.parse/1) end)
   end
 end

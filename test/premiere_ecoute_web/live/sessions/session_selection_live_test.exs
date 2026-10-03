@@ -7,6 +7,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLiveTest do
 
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi
   alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Youtube.Video
 
   setup :verify_on_exit!
 
@@ -49,7 +50,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLiveTest do
       expect(YoutubeApi.Mock, :search_track_videos, fn "one more time" ->
         {:ok,
          [
-           %{
+           %Video{
              id: "yt_abc123",
              url: "https://www.youtube.com/watch?v=yt_abc123",
              title: "One More Time (Official Video)",
@@ -62,7 +63,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLiveTest do
 
       expect(YoutubeApi.Mock, :get_video, 2, fn "yt_abc123" ->
         {:ok,
-         %{
+         %Video{
            id: "yt_abc123",
            title: "One More Time (Official Video)",
            channel_title: "Sample Artist",
@@ -122,7 +123,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLiveTest do
       expect(YoutubeApi.Mock, :search_track_videos, fn "one more time" ->
         {:ok,
          [
-           %{
+           %Video{
              id: "yt_abc123",
              url: "https://www.youtube.com/watch?v=yt_abc123",
              title: "One More Time (Official Video)",
@@ -130,7 +131,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionSelectionLiveTest do
              published_at: "2020-01-01T00:00:00Z",
              thumbnail_url: "https://i.ytimg.com/vi/yt_abc123/hqdefault.jpg"
            },
-           %{
+           %Video{
              id: "yt_def456",
              url: "https://www.youtube.com/watch?v=yt_def456",
              title: "One More Time (Live)",

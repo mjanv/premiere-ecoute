@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.VideosTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Youtube.Video
 
   setup {Req.Test, :verify_on_exit!}
 
@@ -18,7 +19,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.VideosTest do
 
       {:ok, video} = YoutubeApi.get_video("fWxv_yPImZ4")
 
-      assert %{
+      assert %Video{
                id: "fWxv_yPImZ4",
                title: "PREMIÈRE ÉCOUTE : \"Feel So Good Around U\" de LB aka LABAT (React Live)",
                published_at: "2026-03-17T16:30:17Z",

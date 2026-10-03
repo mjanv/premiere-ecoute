@@ -3,6 +3,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.SearchTest do
 
   alias PremiereEcoute.ApiMock
   alias PremiereEcoute.Apis.Video.YoutubeApi
+  alias PremiereEcoute.Youtube.Video
 
   setup {Req.Test, :verify_on_exit!}
 
@@ -21,7 +22,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.SearchTest do
       assert length(videos) == 10
 
       assert [
-               %{
+               %Video{
                  id: "FGBhQbmPwH8",
                  url: "https://www.youtube.com/watch?v=FGBhQbmPwH8",
                  title: "Daft Punk - One More Time (Official Video)",
