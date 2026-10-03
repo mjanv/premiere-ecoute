@@ -53,6 +53,70 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
     ReplayVideo.find_replay_video(session, replay)
   end
 
+  describe "manual_entry/2" do
+    @url "https://youtu.be/dQw4w9WgXcQ?t=3"
+
+    test "gives a typed YouTube link the same entry as the automatic check" do
+      found = video(%{id: "dQw4w9WgXcQ", channel_title: "Lanfeust Plays", thumbnail_url: "https://i.ytimg.com/vi/x/hq.jpg"})
+      expect(YoutubeApi, :get_video, fn "dQw4w9WgXcQ" -> {:ok, found} end)
+
+      entry = ReplayVideo.manual_entry(%{"label" => "raw", "url" => @url, "replay_id" => "r1"}, nil)
+
+      assert %{
+               "label" => "raw",
+               "url" => @url,
+               "replay_id" => "r1",
+               "video_id" => "dQw4w9WgXcQ",
+               "youtube_channel_id" => @channel_id,
+               "channel_title" => "Lanfeust Plays",
+               "thumbnail_url" => "https://i.ytimg.com/vi/x/hq.jpg",
+               "source" => "manual"
+             } = entry
+
+      assert {:ok, _, _} = DateTime.from_iso8601(entry["uploaded_at"])
+    end
+
+    test "has no replay without one chosen" do
+      expect(YoutubeApi, :get_video, fn _ -> {:ok, video(%{id: "dQw4w9WgXcQ"})} end)
+
+      entry = ReplayVideo.manual_entry(%{"label" => "raw", "url" => @url, "replay_id" => ""}, nil)
+
+      refute Map.has_key?(entry, "replay_id")
+    end
+
+    test "keeps a plain entry for a link that is not YouTube, without any lookup" do
+      assert ReplayVideo.manual_entry(%{"label" => "VOD", "url" => "https://www.twitch.tv/videos/1"}, nil) ==
+               %{"label" => "VOD", "url" => "https://www.twitch.tv/videos/1"}
+    end
+
+    test "keeps a plain entry when the lookup fails" do
+      expect(YoutubeApi, :get_video, fn _ -> {:error, "YouTube API error: 404"} end)
+
+      assert ReplayVideo.manual_entry(%{"label" => "raw", "url" => @url, "replay_id" => "r1"}, nil) ==
+               %{"label" => "raw", "url" => @url, "replay_id" => "r1"}
+    end
+
+    test "completes a plain entry with the same link when it is saved again" do
+      expect(YoutubeApi, :get_video, fn "dQw4w9WgXcQ" -> {:ok, video(%{id: "dQw4w9WgXcQ"})} end)
+      plain = %{"label" => "raw", "url" => @url}
+
+      assert %{"video_id" => "dQw4w9WgXcQ", "source" => "manual", "url" => @url} =
+               ReplayVideo.manual_entry(%{"label" => "raw", "url" => @url}, plain)
+    end
+
+    test "keeps the details of an entry whose link did not change" do
+      existing = %{"label" => "raw", "url" => @url, "video_id" => "dQw4w9WgXcQ", "replay_id" => "r1", "source" => "auto"}
+
+      assert ReplayVideo.manual_entry(%{"label" => "cut", "url" => @url, "replay_id" => "r2"}, existing) ==
+               %{existing | "label" => "cut", "replay_id" => "r2"}
+
+      assert ReplayVideo.manual_entry(%{"label" => "cut", "url" => @url, "replay_id" => ""}, existing) ==
+               existing |> Map.put("label", "cut") |> Map.delete("replay_id")
+
+      assert ReplayVideo.manual_entry(%{"label" => "cut", "url" => @url}, existing) == %{existing | "label" => "cut"}
+    end
+  end
+
   describe "store_replay_videos/2" do
     setup do
       user = user_fixture(%{role: :streamer})
@@ -63,7 +127,13 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
 
     test "stores the found videos in the session replays", %{session: session} do
       replay = replay(%{id: Ecto.UUID.generate()})
-      found = video(%{url: "https://www.youtube.com/watch?v=abc", thumbnail_url: "https://i.ytimg.com/vi/abc/hq.jpg"})
+
+      found =
+        video(%{
+          url: "https://www.youtube.com/watch?v=abc",
+          thumbnail_url: "https://i.ytimg.com/vi/abc/hq.jpg",
+          channel_title: "Lanfeust Plays"
+        })
 
       assert {:ok, stored} = ReplayVideo.store_replay_videos(session, [{replay, {:ok, found}}])
 
@@ -73,6 +143,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
       assert entry["replay_id"] == replay.id
       assert entry["video_id"] == found.id
       assert entry["youtube_channel_id"] == @channel_id
+      assert entry["channel_title"] == "Lanfeust Plays"
       assert entry["thumbnail_url"] == "https://i.ytimg.com/vi/abc/hq.jpg"
       assert entry["source"] == "auto"
       assert {:ok, _, _} = DateTime.from_iso8601(entry["uploaded_at"])

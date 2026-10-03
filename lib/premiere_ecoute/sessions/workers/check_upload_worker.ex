@@ -59,9 +59,22 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorker do
 
   defp parse(iso8601), do: iso8601 |> DateTime.from_iso8601() |> elem(1)
 
-  defp next_state(state, {:ok, _video}, now) do
-    %{state | "status" => "found", "last_checked_at" => DateTime.to_iso8601(now), "next_check_at" => nil, "last_failure" => nil}
+  @doc """
+  Returns the state entry of a replay whose video was found: `found`, with no next check and no live job.
+  """
+  @spec mark_found(map(), DateTime.t()) :: map()
+  def mark_found(state, now) do
+    %{
+      state
+      | "status" => "found",
+        "last_checked_at" => DateTime.to_iso8601(now),
+        "next_check_at" => nil,
+        "last_failure" => nil,
+        "job_id" => nil
+    }
   end
+
+  defp next_state(state, {:ok, _video}, now), do: mark_found(state, now)
 
   defp next_state(state, {:error, reason}, now) do
     iterations = state["iterations"] + 1

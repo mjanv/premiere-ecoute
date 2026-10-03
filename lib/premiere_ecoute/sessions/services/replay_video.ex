@@ -8,6 +8,8 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
 
   import Ecto.Query, only: [from: 2]
 
+  require Logger
+
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Accounts.User.Profile.VideoSettings.Channel
@@ -47,7 +49,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   Stores the videos found by `find_replay_videos/1` in the replays of `session`.
 
   Each `{replay, {:ok, video}}` writes an entry to `ListeningSession.replays` (`label`, `url`, `replay_id`,
-  `video_id`, `youtube_channel_id`, `thumbnail_url`, `uploaded_at`, `source: "auto"`). It replaces the entry
+  `video_id`, `youtube_channel_id`, `channel_title`, `thumbnail_url`, `uploaded_at`, `source: "auto"`). It replaces the entry
   with the same `replay_id` when there is one, and is appended otherwise. Other entries and failed results
   are left untouched.
   """
@@ -62,22 +64,66 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
     |> then(&ListeningSession.update_replays(session, &1))
   end
 
-  defp entry({%Replay{id: id} = replay, {:ok, %Video{} = video}}, uploaded_at) when is_binary(id) do
-    [
-      %{
-        "label" => replay.name,
-        "url" => video.url,
-        "replay_id" => id,
-        "video_id" => video.id,
-        "youtube_channel_id" => video.channel_id,
-        "thumbnail_url" => video.thumbnail_url,
-        "uploaded_at" => uploaded_at,
-        "source" => "auto"
-      }
-    ]
+  defp entry({%Replay{id: id, name: name}, {:ok, %Video{} = video}}, uploaded_at) when is_binary(id) do
+    [build_entry(video, name, id, "auto", uploaded_at)]
   end
 
   defp entry(_result, _uploaded_at), do: []
+
+  defp build_entry(%Video{} = video, label, replay_id, source, uploaded_at) do
+    %{
+      "label" => label,
+      "url" => video.url,
+      "replay_id" => replay_id,
+      "video_id" => video.id,
+      "youtube_channel_id" => video.channel_id,
+      "channel_title" => video.channel_title,
+      "thumbnail_url" => video.thumbnail_url,
+      "uploaded_at" => uploaded_at,
+      "source" => source
+    }
+    |> Map.reject(fn {key, value} -> key == "replay_id" and is_nil(value) end)
+  end
+
+  @doc """
+  Builds the replay entry of a link typed by hand (`%{"label" => ..., "url" => ..., "replay_id" => ...}`).
+
+  `existing` is the entry the form row was opened with, if any. When the link did not change and the entry
+  already has its video details (`video_id`), it keeps everything (thumbnail, channel...) and only takes the
+  new label and replay. Otherwise, a YouTube link is looked up with `YoutubeApi.get_video/1` and gives the
+  same entry the automatic check stores, with `source: "manual"`, so saving a plain entry again completes it. Any other link, or a failed lookup, gives a plain `label` and `url` entry.
+  A blank `replay_id` unlinks the entry from its replay, and no `replay_id` key at all leaves it as it was.
+  """
+  @spec manual_entry(map(), map() | nil) :: map()
+  def manual_entry(%{"url" => url} = submitted, existing) do
+    replay_id = if submitted["replay_id"] not in [nil, ""], do: submitted["replay_id"]
+    now = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601()
+
+    case existing do
+      %{"url" => ^url, "video_id" => _} ->
+        merged = Map.merge(existing, Map.take(submitted, ["label"]))
+
+        if Map.has_key?(submitted, "replay_id"),
+          do: merged |> Map.delete("replay_id") |> put_replay_id(replay_id),
+          else: merged
+
+      _ ->
+        with {:ok, id} <- Video.id_from_url(url),
+             {:ok, %Video{} = video} <- Apis.youtube().get_video(id) do
+          build_entry(%{video | url: url}, submitted["label"], replay_id, "manual", now)
+        else
+          :error ->
+            %{"label" => submitted["label"], "url" => url} |> put_replay_id(replay_id)
+
+          {:error, reason} ->
+            Logger.warning("Replay link lookup failed for #{url}: #{inspect(reason)}")
+            %{"label" => submitted["label"], "url" => url} |> put_replay_id(replay_id)
+        end
+    end
+  end
+
+  defp put_replay_id(entry, nil), do: entry
+  defp put_replay_id(entry, replay_id), do: Map.put(entry, "replay_id", replay_id)
 
   defp put_entry(entry, replays) do
     case Enum.find_index(replays, &(&1["replay_id"] == entry["replay_id"])) do
@@ -138,6 +184,78 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
       _ -> :ok
     end
   end
+
+  @doc """
+  Looks once for the replays of the session `session_id` that have no entry yet.
+
+  A replay is missing when none of the session's `replays` entries carries its id. Each missing replay of the
+  user is looked up with `find_replay_video/2`, outside any transaction. The videos found are then stored
+  under a lock on the session, unless an entry for the replay appeared meanwhile, and a replay still
+  `pending` in `options["uploads"]` becomes `found` and has its job cancelled. Replays that are not found
+  are left alone: no iteration is counted and no job is scheduled.
+
+  Returns the replays `found`, the ones still `missing`, and the ones whose lookup `failed` (YouTube could
+  not be reached). Only ended album sessions are supported.
+  """
+  @spec sync_replay_videos(integer()) ::
+          {:ok, %{found: [Replay.t()], missing: [Replay.t()], failed: [Replay.t()]}} | {:error, term()}
+  def sync_replay_videos(session_id) do
+    case session_id |> ListeningSession.get() |> ListeningSession.preload() do
+      %ListeningSession{source: :album, user: %User{} = user, ended_at: %DateTime{}} = session ->
+        linked = MapSet.new(session.replays, & &1["replay_id"])
+
+        results =
+          user
+          |> Profile.get([:video_settings, :replays], [])
+          |> Enum.reject(&MapSet.member?(linked, &1.id))
+          |> Enum.map(&{&1, find_replay_video(session, &1)})
+
+        {:ok, found} =
+          Repo.transaction(fn ->
+            locked = Repo.one!(from(s in ListeningSession, where: s.id == ^session_id, lock: "FOR UPDATE"))
+            linked = MapSet.new(locked.replays, & &1["replay_id"])
+
+            found =
+              Enum.filter(results, fn {replay, result} -> match?({:ok, _}, result) and not MapSet.member?(linked, replay.id) end)
+
+            now = DateTime.utc_now(:second)
+
+            {:ok, stored} = store_replay_videos(locked, found)
+
+            uploads =
+              Enum.reduce(found, locked.options["uploads"] || %{}, fn {replay, _}, acc ->
+                Map.replace_lazy(acc, replay.id, &finish_upload(&1, now))
+              end)
+
+            options = if locked.options["uploads"], do: Map.put(locked.options, "uploads", uploads), else: locked.options
+
+            stored |> ListeningSession.changeset(%{options: options}) |> Repo.update!()
+            Enum.map(found, &elem(&1, 0))
+          end)
+
+        rest = Enum.reject(results, fn {replay, _} -> replay in found end)
+
+        {:ok,
+         %{
+           found: found,
+           missing: for({replay, {:error, :not_found}} <- rest, do: replay),
+           failed: for({replay, {:error, reason}} <- rest, reason != :not_found, do: replay)
+         }}
+
+      nil ->
+        {:error, :not_found}
+
+      %ListeningSession{} ->
+        {:error, :session_not_valid}
+    end
+  end
+
+  defp finish_upload(%{"status" => "pending", "job_id" => job_id} = state, now) do
+    if job_id, do: Oban.cancel_job(job_id)
+    CheckUploadWorker.mark_found(state, now)
+  end
+
+  defp finish_upload(state, _now), do: state
 
   @doc """
   Looks for the video of `session` on the channel targeted by `replay`.

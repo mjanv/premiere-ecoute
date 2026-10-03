@@ -166,4 +166,52 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
       assert {:cancel, :gone} = perform_job(CheckUploadWorker, %{session_id: 0, replay_id: raw.id})
     end
   end
+
+  # The sandbox shares one connection, so two workers cannot truly run in parallel here. Instead, the second
+  # worker runs to completion inside the first one's YouTube call, which is exactly the window between its
+  # unlocked read and its locked write.
+  describe "perform/1 with another replay of the session finishing meanwhile" do
+    test "keeps what the other worker stored when this one finds its video too" do
+      {session, raw, edited} = setup_session([state(), state()])
+
+      expect(YoutubeApi, :get_channel_videos, 2, fn _, _ ->
+        unless Process.get(:nested) do
+          Process.put(:nested, true)
+          assert :ok = perform_job(CheckUploadWorker, %{session_id: session.id, replay_id: edited.id})
+        end
+
+        {:ok, [video()]}
+      end)
+
+      assert {:ok, []} = run(session, raw)
+
+      assert %{"status" => "found"} = uploads(session)[raw.id]
+      assert %{"status" => "found"} = uploads(session)[edited.id]
+
+      replay_ids = ListeningSession.get(session.id).replays |> Enum.map(& &1["replay_id"]) |> Enum.sort()
+      assert replay_ids == Enum.sort([raw.id, edited.id])
+    end
+
+    test "keeps what the other worker stored when this one does not find its video" do
+      {session, raw, edited} = setup_session([state(), state()])
+
+      expect(YoutubeApi, :get_channel_videos, 2, fn _, _ ->
+        if Process.get(:nested) do
+          {:ok, [video()]}
+        else
+          Process.put(:nested, true)
+          assert :ok = perform_job(CheckUploadWorker, %{session_id: session.id, replay_id: edited.id})
+          {:ok, []}
+        end
+      end)
+
+      assert {:ok, [job]} = run(session, raw)
+
+      assert %{"status" => "found"} = uploads(session)[edited.id]
+      assert %{"status" => "pending", "iterations" => 1, "job_id" => job_id} = uploads(session)[raw.id]
+      assert job_id == job.id
+      assert [%{"replay_id" => replay_id}] = ListeningSession.get(session.id).replays
+      assert replay_id == edited.id
+    end
+  end
 end

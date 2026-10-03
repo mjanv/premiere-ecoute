@@ -83,7 +83,8 @@
 
 
 /* Ensure content appears above the background */
-.synthwave-bg > * {
+/* Unlayered, so it would override Tailwind's `.fixed` on direct children such as modals */
+.synthwave-bg > *:not(.fixed) {
   position: relative;
   z-index: 1;
 }

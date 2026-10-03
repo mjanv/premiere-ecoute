@@ -42,6 +42,30 @@ defmodule PremiereEcoute.Youtube.Video do
     tags: []
   ]
 
+  @hosts ["youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com"]
+  @id_regex ~r/^[\w-]{11}$/
+
+  @doc """
+  Extracts the video id from a YouTube link (`watch?v=`, `youtu.be/`, `/shorts/`, `/live/`, `/embed/`).
+
+  Returns `:error` for anything else, including links to channels and playlists.
+  """
+  @spec id_from_url(String.t()) :: {:ok, id()} | :error
+  def id_from_url(url) when is_binary(url) do
+    uri = url |> String.trim() |> URI.parse()
+    host = uri.host && String.replace_prefix(uri.host, "www.", "")
+
+    id =
+      case {host, String.split(uri.path || "", "/", trim: true)} do
+        {"youtu.be", [id | _]} -> id
+        {host, ["watch"]} when host in @hosts -> URI.decode_query(uri.query || "")["v"]
+        {host, [kind, id | _]} when host in @hosts and kind in ["shorts", "live", "embed", "v"] -> id
+        _ -> nil
+      end
+
+    if is_binary(id) and Regex.match?(@id_regex, id), do: {:ok, id}, else: :error
+  end
+
   @spec parse(map()) :: t()
   def parse(%{"kind" => "youtube#playlistItem", "contentDetails" => %{"videoId" => id} = details, "snippet" => snippet} = data) do
     snippet =
