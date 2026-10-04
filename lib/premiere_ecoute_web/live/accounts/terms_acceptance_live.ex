@@ -15,8 +15,8 @@ defmodule PremiereEcouteWeb.Accounts.TermsAcceptanceLive do
   Validates pending authentication session, loads privacy policy, cookies policy, and terms of service documents, and initializes consent form state.
   """
   @impl true
-  def mount(_params, %{"pending_twitch_auth" => pending_auth}, socket) do
-    if pending_auth do
+  def mount(_params, session, socket) do
+    if pending_auth = session["pending_twitch_auth"] do
       socket
       |> assign(
         pending_auth: pending_auth,
