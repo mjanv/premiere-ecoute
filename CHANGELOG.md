@@ -1,6 +1,30 @@
 # Changelog
 
-<!-- Last analyzed commit: 954debac (2026-07-31) -->
+<!-- Last analyzed commit: 0e531c03 (2026-09-27) -->
+
+## September 2026
+
+* [Feature] Degraded mode for track and album sessions: a session-creation toggle that skips all Spotify playback controls, as a workaround for accounts or devices where Spotify rejects commands with "Restriction violated".
+* [Feature] Spotify debug page to help troubleshoot player problems.
+* [Improvement] When Spotify refuses a play, pause or resume command, the session keeps going and the streamer sees a non-blocking warning to switch the song manually instead of an error.
+* [Improvement] Refreshed look: warmer violet tones, a livelier synthwave background on album, single and session pages, and vote bars colored by score.
+* [Improvement] Session and track averages now ignore tracks nobody rated, instead of counting them as zero.
+* [Fix] Fixed a security issue that let an attacker link their Spotify login to another user's account.
+* [Fix] Fixed security issues in the OAuth flow: access tokens no longer appear in error logs and authorization codes can no longer be leaked through a crafted link.
+* [Fix] Removed the leftover email sign-up page, which could be used to create accounts with any role, including admin. Accounts are now created through Twitch only.
+* [Fix] "Buy Me a Coffee" webhooks are now rejected when no secret is configured.
+* [Fix] Fixed the Spotify player crashing repeatedly when a device stays active with no track loaded.
+* [Fix] Invalid post-session votes are now rejected up front instead of breaking the session report afterwards.
+* [Fix] The "My Follows" page is reachable again and refreshes after following a streamer.
+* [Fix] Fixed a crash when opening a session page without a share link, and a bug where some discography provider links failed to load.
+* [Fix] Fixed the Content-Security-Policy blocking Google Fonts and some interface scripts.
+
+## August 2026
+
+* [Feature] Track sessions can be ranked by viewer score on the retrospective page, and the streamer can credit who suggested each track.
+* [Improvement] Creating a track session now searches albums as well as tracks, and lets you pick any track, not only Spotify singles.
+* [Fix] Fixed OAuth dynamic client registration (used by claude.ai connectors) after a security upgrade.
+* [Fix] Fixed the Spotify player crashing in a loop when Spotify reports no track loaded.
 
 ## July 2026
 
