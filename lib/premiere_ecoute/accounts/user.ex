@@ -17,6 +17,7 @@ defmodule PremiereEcoute.Accounts.User do
   alias PremiereEcoute.Accounts.User.Token
   alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcoute.Events.Store
+  alias PremiereEcoute.Sessions
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -365,11 +366,17 @@ defmodule PremiereEcoute.Accounts.User do
   @doc "Updates user profile."
   @spec edit_user_profile(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def edit_user_profile(user, profile) do
-    user
-    |> cast(%{profile: profile}, [])
-    |> cast_embed(:profile, required: true, with: &Profile.changeset/2)
-    |> Repo.update()
+    with {:ok, updated} <-
+           user
+           |> cast(%{profile: profile}, [])
+           |> cast_embed(:profile, required: true, with: &Profile.changeset/2)
+           |> Repo.update() do
+      for replay_id <- replay_ids(user) -- replay_ids(updated), do: Sessions.forget_replay(updated.id, replay_id)
+      {:ok, updated}
+    end
   end
+
+  defp replay_ids(user), do: user |> Profile.get([:video_settings, :replays], []) |> List.wrap() |> Enum.map(& &1.id)
 
   defdelegate create_token(user, provider, attrs), to: OauthToken, as: :create
   defdelegate refresh_token(user, provider, attrs), to: OauthToken, as: :refresh

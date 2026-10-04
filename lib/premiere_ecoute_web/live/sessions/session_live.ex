@@ -9,6 +9,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   use PremiereEcouteWeb, :live_view
 
+  alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Accounts.User.Profile
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
@@ -16,6 +18,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   alias PremiereEcoute.Sessions.Retrospective.Report
   alias PremiereEcoute.Sessions.ReviewLikes
   alias PremiereEcoute.Sessions.Reviews
+  alias PremiereEcoute.Sessions.Services.ReplayVideo
   alias PremiereEcouteWeb.ReturnTo
 
   @impl true
@@ -57,6 +60,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
         |> assign(:editing_review, nil)
         |> assign(:replays_modal_open, false)
         |> assign(:replays_entries, [])
+        |> assign(:replay_options, replay_options(current_user, listening_session))
+        |> assign(:syncing_replays, false)
         |> then(fn socket -> {:ok, socket} end)
     end
   end
@@ -255,13 +260,25 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("open_replays_modal", _params, socket) do
-    replays = socket.assigns.listening_session.replays || []
-    entries = if replays == [], do: [%{"label" => "", "url" => ""}], else: replays
+    links = Enum.filter(socket.assigns.listening_session.replays || [], &is_binary(&1["url"]))
+    entries = if links == [], do: [%{"label" => "", "url" => ""}], else: links
 
     {:noreply,
      socket
      |> assign(:replays_modal_open, true)
      |> assign(:replays_entries, entries)}
+  end
+
+  @impl true
+  def handle_event("sync_replays", _params, %{assigns: %{listening_session: session}} = socket) do
+    if owner?(socket) and not socket.assigns.syncing_replays do
+      {:noreply,
+       socket
+       |> assign(:syncing_replays, true)
+       |> start_async(:sync_replays, fn -> ReplayVideo.sync_replay_videos(session.id) end)}
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
@@ -289,9 +306,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
     if current_scope && current_scope.user && current_scope.user.id == session.user_id do
       # params arrive as %{"0" => %{"label" => ..., "url" => ...}, "1" => ...}.
-      replays = params |> Enum.sort_by(fn {k, _} -> String.to_integer(k) end) |> Enum.map(&elem(&1, 1))
+      replays =
+        params
+        |> Enum.sort_by(fn {k, _} -> String.to_integer(k) end)
+        |> Enum.map(fn {k, submitted} ->
+          ReplayVideo.manual_entry(submitted, Enum.at(socket.assigns.replays_entries, String.to_integer(k)))
+        end)
 
-      case ListeningSession.update_replays(session, replays) do
+      case ReplayVideo.save_links(session.id, replays) do
         {:ok, updated_session} ->
           {:noreply,
            socket
@@ -299,7 +321,10 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
            |> assign(:replays_modal_open, false)
            |> put_flash(:info, gettext("Replays saved"))}
 
-        {:error, _changeset} ->
+        {:error, :duplicate_replay} ->
+          {:noreply, put_flash(socket, :error, gettext("Each replay can only be linked once"))}
+
+        {:error, _reason} ->
           {:noreply, put_flash(socket, :error, gettext("Failed to save replays"))}
       end
     else
@@ -307,11 +332,92 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
     end
   end
 
+  # The YouTube title when the video is known, else the name of the replay.
+  defp replay_title(%{"title" => title}) when is_binary(title) and title != "", do: title
+  defp replay_title(replay), do: replay["label"] || replay["url"]
+
+  # Under a title, the name of the replay and its channel. Otherwise the channel, or the host of the link.
+  defp replay_subtitle(%{"title" => title} = replay) when is_binary(title) and title != "" do
+    case Enum.reject([replay["label"], replay_source(replay)], &(&1 in [nil, ""])) do
+      [] -> nil
+      parts -> Enum.join(parts, " · ")
+    end
+  end
+
+  defp replay_subtitle(replay), do: replay_source(replay)
+
+  defp replay_source(%{"channel_title" => title}) when is_binary(title) and title != "", do: title
+
+  defp replay_source(%{"url" => url}) when is_binary(url) do
+    case URI.parse(url) do
+      %URI{host: host} when is_binary(host) -> String.replace_prefix(host, "www.", "")
+      _ -> nil
+    end
+  end
+
+  defp replay_source(_replay), do: nil
+
+  @impl true
+  def handle_async(:sync_replays, {:ok, {:ok, %{found: found, missing: missing, failed: failed}}}, socket) do
+    session = socket.assigns.listening_session
+    socket = assign(socket, :syncing_replays, false)
+    names = fn replays -> Enum.map_join(replays, ", ", & &1.name) end
+
+    socket =
+      case ListeningSession.get(session.id) do
+        %ListeningSession{replays: replays} -> assign(socket, :listening_session, %{session | replays: replays})
+        nil -> socket
+      end
+
+    {:noreply,
+     cond do
+       failed != [] ->
+         put_flash(socket, :error, gettext("YouTube could not be reached for: %{names}", names: names.(failed)))
+
+       found != [] and missing != [] ->
+         put_flash(
+           socket,
+           :info,
+           gettext("Found: %{found}. Still missing: %{missing}", found: names.(found), missing: names.(missing))
+         )
+
+       found != [] ->
+         put_flash(socket, :info, gettext("Found: %{found}", found: names.(found)))
+
+       missing != [] ->
+         put_flash(socket, :info, gettext("Nothing found yet. Still missing: %{missing}", missing: names.(missing)))
+
+       true ->
+         put_flash(socket, :info, gettext("No replay is missing"))
+     end}
+  end
+
+  def handle_async(:sync_replays, _failure, socket) do
+    {:noreply,
+     socket
+     |> assign(:syncing_replays, false)
+     |> put_flash(:error, gettext("Could not look for the replays"))}
+  end
+
+  defp owner?(socket) do
+    case socket.assigns[:current_scope] do
+      %{user: %User{id: id}} -> id == socket.assigns.listening_session.user_id
+      _ -> false
+    end
+  end
+
+  defp replay_options(%User{id: id} = user, %ListeningSession{user_id: id}) do
+    user |> Profile.get([:video_settings, :replays], []) |> Enum.map(&{&1.name, &1.id})
+  end
+
+  defp replay_options(_user, _session), do: []
+
   defp back_label(:album), do: gettext("Back to album")
   defp back_label(:artist), do: gettext("Back to artist")
   defp back_label(:single), do: gettext("Back to single")
   defp back_label(:home), do: gettext("Back to home")
   defp back_label(:profile), do: gettext("Back to profile")
+  defp back_label(:sessions), do: gettext("Back to my sessions")
   defp back_label(_history), do: gettext("Back to history")
 
   defp history_path(socket) do

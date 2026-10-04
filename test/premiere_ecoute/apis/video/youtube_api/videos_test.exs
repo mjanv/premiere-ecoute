@@ -33,5 +33,19 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi.VideosTest do
 
       assert "musique" in video.tags
     end
+
+    test "returns the channel id" do
+      ApiMock.expect(
+        YoutubeApi,
+        path: {:get, "/youtube/v3/videos"},
+        headers: [{"content-type", "application/json"}],
+        response: "youtube_api/videos/get_video/response.json",
+        status: 200
+      )
+
+      {:ok, video} = YoutubeApi.get_video("fWxv_yPImZ4")
+
+      assert video.channel_id == "UCsmECZ1G4vHMSmH-m6cJBWA"
+    end
   end
 end

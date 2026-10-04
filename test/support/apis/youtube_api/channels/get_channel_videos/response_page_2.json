@@ -1,7 +1,6 @@
 {
   "kind": "youtube#playlistItemListResponse",
-  "etag": "p1",
-  "nextPageToken": "PAGE2",
+  "etag": "p2",
   "pageInfo": {
     "totalResults": 4,
     "resultsPerPage": 2
@@ -9,70 +8,70 @@
   "items": [
     {
       "kind": "youtube#playlistItem",
-      "etag": "etag0",
-      "id": "UExpd0",
+      "etag": "etag2",
+      "id": "UExpd2",
       "snippet": {
-        "publishedAt": "2026-03-18T16:30:06Z",
+        "publishedAt": "2026-03-10T16:30:17Z",
         "channelId": "UCsmECZ1G4vHMSmH-m6cJBWA",
-        "title": "PREMIÈRE ÉCOUTE : \"Kid A\" by Radiohead",
-        "description": "Replay of the session https://premiere-ecoute.fr/sessions/flon/abc123",
+        "title": "Café Elixir #1 - Les microservice à l'époque d'Elixir",
+        "description": "",
         "thumbnails": {
           "high": {
-            "url": "https://i.ytimg.com/vi/DGyTFnNB_UM/hqdefault.jpg",
+            "url": "https://i.ytimg.com/vi/fWxv_yPImZ4/hqdefault.jpg",
             "width": 480,
             "height": 360
           }
         },
         "channelTitle": "Flonflon",
         "playlistId": "UUsmECZ1G4vHMSmH-m6cJBWA",
-        "position": 0,
+        "position": 2,
         "resourceId": {
           "kind": "youtube#video",
-          "videoId": "DGyTFnNB_UM"
+          "videoId": "fWxv_yPImZ4"
         },
         "videoOwnerChannelTitle": "Flonflon",
         "videoOwnerChannelId": "UCsmECZ1G4vHMSmH-m6cJBWA"
       },
       "contentDetails": {
-        "videoId": "DGyTFnNB_UM",
-        "videoPublishedAt": "2026-03-18T16:30:06Z"
+        "videoId": "fWxv_yPImZ4",
+        "videoPublishedAt": "2026-03-10T16:30:17Z"
       },
       "status": {
-        "privacyStatus": "public"
+        "privacyStatus": "unlisted"
       }
     },
     {
       "kind": "youtube#playlistItem",
-      "etag": "etag1",
-      "id": "UExpd1",
+      "etag": "etag3",
+      "id": "UExpd3",
       "snippet": {
-        "publishedAt": "2026-03-17T10:00:00Z",
+        "publishedAt": "2025-01-01T09:00:00Z",
         "channelId": "UCsmECZ1G4vHMSmH-m6cJBWA",
-        "title": "Private video",
+        "title": "Old upload",
         "description": "",
         "thumbnails": {
           "high": {
-            "url": "https://i.ytimg.com/vi/PrivVid0001/hqdefault.jpg",
+            "url": "https://i.ytimg.com/vi/OldVideo0001/hqdefault.jpg",
             "width": 480,
             "height": 360
           }
         },
         "channelTitle": "Flonflon",
         "playlistId": "UUsmECZ1G4vHMSmH-m6cJBWA",
-        "position": 1,
+        "position": 3,
         "resourceId": {
           "kind": "youtube#video",
-          "videoId": "PrivVid0001"
+          "videoId": "OldVideo0001"
         },
         "videoOwnerChannelTitle": "Flonflon",
         "videoOwnerChannelId": "UCsmECZ1G4vHMSmH-m6cJBWA"
       },
       "contentDetails": {
-        "videoId": "PrivVid0001",
-        "videoPublishedAt": "2026-03-17T10:00:00Z"
+        "videoId": "OldVideo0001",
+        "videoPublishedAt": "2025-01-01T09:00:00Z"
       },
       "status": {
-        "privacyStatus": "private"
+        "privacyStatus": "public"
       }
     }
   ]

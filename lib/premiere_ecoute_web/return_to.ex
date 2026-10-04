@@ -15,6 +15,9 @@ defmodule PremiereEcouteWeb.ReturnTo do
     {"/users", :profile}
   ]
 
+  # Pages matched on their exact path, because their prefix also holds other pages (`/sessions/new`, dashboards...).
+  @exact [{"/sessions", :sessions}]
+
   @doc """
   Resolves a `return_to` param to a `{path, kind}` pair.
 
@@ -54,7 +57,7 @@ defmodule PremiereEcouteWeb.ReturnTo do
     with %URI{scheme: nil, host: nil, path: "/" <> _ = path} <- URI.parse(return_to),
          false <- String.starts_with?(return_to, "//"),
          false <- String.contains?(return_to, ["\\", "..", "\r", "\n"]),
-         {_prefix, kind} <- Enum.find(@allowed, fn {prefix, _kind} -> allowed?(path, prefix) end),
+         kind when not is_nil(kind) <- origin_kind(path),
          false <- settings?(path) do
       kind
     else
@@ -63,6 +66,16 @@ defmodule PremiereEcouteWeb.ReturnTo do
   end
 
   defp classify(_return_to), do: nil
+
+  defp origin_kind(path) do
+    case List.keyfind(@exact, path, 0) do
+      {_path, kind} ->
+        kind
+
+      nil ->
+        Enum.find_value(@allowed, fn {prefix, kind} -> if allowed?(path, prefix), do: kind end)
+    end
+  end
 
   defp allowed?(path, prefix), do: path == prefix or String.starts_with?(path, prefix <> "/")
 

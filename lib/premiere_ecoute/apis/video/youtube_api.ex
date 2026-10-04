@@ -17,6 +17,8 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi do
 
     @callback get_channel_videos(channel_id :: Channel.id()) ::
                 {:ok, [Video.t()]} | {:error, term()}
+    @callback get_channel_videos(channel_id :: Channel.id(), opts :: keyword()) ::
+                {:ok, [Video.t()]} | {:error, term()}
     @callback get_channel(channel_id :: Channel.id()) ::
                 {:ok, Channel.t()} | {:error, term()}
     @callback get_video(video_id :: Video.id()) ::
@@ -57,6 +59,7 @@ defmodule PremiereEcoute.Apis.Video.YoutubeApi do
 
   # Channels
   defdelegate get_channel_videos(channel_id), to: __MODULE__.Channels
+  defdelegate get_channel_videos(channel_id, opts), to: __MODULE__.Channels
   defdelegate get_channel(channel_id), to: __MODULE__.ChannelDetails
 
   # Videos

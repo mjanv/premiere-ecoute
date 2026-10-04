@@ -7,16 +7,24 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
 
   use PremiereEcouteWeb, :live_view
 
+  import PremiereEcouteWeb.Sessions.Components.ReplaySlots
+
   alias PremiereEcoute.Discography.Playlist
+  alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Services.ReplayVideo
 
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: scope}} = socket) do
     page = ListeningSession.page_for_user(scope.user.id, 1)
+    if connected?(socket), do: PremiereEcoute.PubSub.subscribe("uploads:#{scope.user.id}")
 
     socket
     |> assign(:show_delete_modal, false)
     |> assign(:session_to_delete, nil)
+    |> assign(:pasting, nil)
+    |> assign(:paste_error, nil)
+    |> assign(:checking, MapSet.new())
     |> assign(:page, page)
     |> stream(:sessions, page.entries)
     |> then(fn socket -> {:ok, socket} end)
@@ -40,6 +48,36 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   @impl true
   def handle_event("navigate", %{"session_id" => share_token}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/sessions/#{share_token}/dashboard")}
+  end
+
+  @impl true
+  def handle_event("replay_action", %{"action" => action, "session_id" => session_id, "replay_id" => replay_id}, socket) do
+    case owned_session(socket, session_id) do
+      nil -> {:noreply, put_flash(socket, :error, gettext("Session not found"))}
+      session -> {:noreply, replay_action(action, session, replay_id, socket)}
+    end
+  end
+
+  @impl true
+  def handle_event("attach_replay", %{"session_id" => session_id, "replay_id" => replay_id, "url" => url}, socket) do
+    case owned_session(socket, session_id) do
+      nil ->
+        {:noreply, put_flash(socket, :error, gettext("Session not found"))}
+
+      session ->
+        case Sessions.attach_upload(session.id, replay_id, String.trim(url)) do
+          {:ok, _session} ->
+            {:noreply,
+             socket
+             |> assign(:pasting, nil)
+             |> assign(:paste_error, nil)
+             |> put_flash(:info, gettext("Replay linked"))
+             |> refresh(session.id)}
+
+          {:error, reason} ->
+            {:noreply, socket |> assign(:paste_error, attach_error(reason)) |> refresh(session.id)}
+        end
+    end
   end
 
   @impl true
@@ -82,6 +120,134 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     |> assign(:session_to_delete, nil)
     |> then(fn socket -> {:noreply, socket} end)
   end
+
+  @impl true
+  def handle_info({:replay_checked, session_id, replay_id, result}, socket) do
+    socket =
+      socket
+      |> update(:checking, &MapSet.delete(&1, {session_id, replay_id}))
+      |> refresh(session_id)
+
+    case result do
+      :found -> put_flash(socket, :info, gettext("Replay found"))
+      :not_found -> put_flash(socket, :info, gettext("Replay not found"))
+      :error -> put_flash(socket, :error, gettext("YouTube could not be reached"))
+      :settled -> socket
+    end
+    |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  def handle_info({:replay_updated, session_id, _replay_id}, socket), do: {:noreply, refresh(socket, session_id)}
+
+  def handle_info({:check_timeout, session_id, replay_id}, socket) do
+    if MapSet.member?(socket.assigns.checking, {session_id, replay_id}) do
+      {:noreply,
+       socket
+       |> update(:checking, &MapSet.delete(&1, {session_id, replay_id}))
+       |> put_flash(:error, gettext("The check did not answer"))
+       |> refresh(session_id)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @doc """
+  Returns the id of the replay whose link form is open on `session`, if any.
+  """
+  @spec pasting_for({integer(), String.t()} | nil, ListeningSession.t()) :: String.t() | nil
+  def pasting_for({session_id, replay_id}, %ListeningSession{id: session_id}), do: replay_id
+  def pasting_for(_pasting, _session), do: nil
+
+  @doc """
+  Returns the ids of the replays of `session` being checked now.
+  """
+  @spec checking_for(MapSet.t(), ListeningSession.t()) :: [String.t()]
+  def checking_for(checking, %ListeningSession{id: session_id}) do
+    for {^session_id, replay_id} <- checking, do: replay_id
+  end
+
+  @doc """
+  Returns how many replays of `session` are missing.
+  """
+  @spec missing_count(ListeningSession.t()) :: non_neg_integer()
+  def missing_count(session), do: ReplayVideo.missing_count(session)
+
+  @doc """
+  Returns how many replays of `session` need the streamer.
+  """
+  @spec attention_count(ListeningSession.t()) :: non_neg_integer()
+  def attention_count(session), do: ReplayVideo.attention_count(session)
+
+  defp replay_action("paste", session, replay_id, socket) do
+    previous = socket.assigns.pasting
+
+    socket
+    |> assign(:pasting, {session.id, replay_id})
+    |> assign(:paste_error, nil)
+    |> refresh(session.id)
+    |> refresh_previous(previous, session.id)
+  end
+
+  defp replay_action("cancel", session, _replay_id, socket) do
+    socket |> assign(:pasting, nil) |> assign(:paste_error, nil) |> refresh(session.id)
+  end
+
+  defp replay_action("check", session, replay_id, socket) do
+    case Sessions.check_upload_now(session.id, replay_id) do
+      {:ok, _job} ->
+        Process.send_after(self(), {:check_timeout, session.id, replay_id}, 20_000)
+        socket |> update(:checking, &MapSet.put(&1, {session.id, replay_id})) |> refresh(session.id)
+
+      {:error, _reason} ->
+        socket |> put_flash(:error, gettext("This replay changed, nothing was done")) |> refresh(session.id)
+    end
+  end
+
+  defp replay_action(action, session, replay_id, socket) when action in ~w(skip unskip retry unmark) do
+    case run_replay_action(action, session.id, replay_id) do
+      {:ok, _session} ->
+        refresh(socket, session.id)
+
+      {:error, _reason} ->
+        socket |> put_flash(:error, gettext("This replay changed, nothing was done")) |> refresh(session.id)
+    end
+  end
+
+  defp run_replay_action("skip", session_id, replay_id), do: Sessions.skip_upload(session_id, replay_id)
+  defp run_replay_action("unskip", session_id, replay_id), do: Sessions.unskip_upload(session_id, replay_id)
+  defp run_replay_action("retry", session_id, replay_id), do: Sessions.retry_upload(session_id, replay_id)
+  defp run_replay_action("unmark", session_id, replay_id), do: Sessions.unmark_upload(session_id, replay_id)
+
+  defp attach_error(:invalid_url), do: gettext("This is not a YouTube video link")
+  defp attach_error(:video_not_found), do: gettext("Video not found, or not public yet")
+
+  defp attach_error({:wrong_channel, title}),
+    do: gettext("This video is on %{title}, not on the channel of this replay", title: title)
+
+  defp attach_error(:duplicate), do: gettext("This video is already linked to this session")
+  defp attach_error(_reason), do: gettext("The replay could not be linked")
+
+  defp owned_session(socket, session_id) do
+    with {id, ""} <- Integer.parse(to_string(session_id)),
+         %ListeningSession{user_id: user_id} = session <- ListeningSession.get(id),
+         true <- user_id == socket.assigns.current_scope.user.id do
+      session
+    else
+      _ -> nil
+    end
+  end
+
+  defp refresh(socket, session_id) do
+    case session_id |> ListeningSession.get() |> ListeningSession.preload() do
+      %ListeningSession{} = session -> stream_insert(socket, :sessions, session)
+      nil -> socket
+    end
+  end
+
+  defp refresh_previous(socket, {previous_id, _replay_id}, session_id) when previous_id != session_id,
+    do: refresh(socket, previous_id)
+
+  defp refresh_previous(socket, _previous, _session_id), do: socket
 
   @doc """
   Returns the heroicon name for a session status badge.
