@@ -255,6 +255,19 @@ On `SessionStopped`, `EventHandler.dispatch/1` calls `Sessions.schedule_upload_c
 1. Load the streamer's `video_settings`. No replays, `reminders_enabled` false, or a session that ended before `tracking_since`: stop.
 2. For each replay without an entry in `replays`, in one transaction: insert one `CheckUploadWorker` job with `scheduled_at: due_at`, then append the `pending` slot (`replay_id`, `label`, `job_id`, `due_at`, no `url`). The job args carry `iteration: max_iterations`. The slots of a session are the replays configured when it stopped: a replay added later gets no slot on existing sessions, and nothing backfills them.
 
+### Starting the tracking of an existing session by hand
+
+A session that stopped before the streamer enabled the reminders has no slots, and `schedule_upload_checks/1` skips it (`tracking_since`). `Sessions.backfill_replay(session_id)` does the same work for one session by hand, ignoring `reminders_enabled` and `tracking_since`. Run it on the production node (the release is in `/opt/premiere-ecoute`):
+
+```bash
+ssh root@68.183.219.251
+/opt/premiere-ecoute/bin/premiere_ecoute rpc 'IO.inspect(PremiereEcoute.Sessions.backfill_replay(153))'
+```
+
+It returns `{:ok, %{scheduled: ["raw", "edited"], existing: []}}`: the replays that got a slot and a job, and the ones that already had an entry. Errors are `:not_found`, `:session_not_valid` (not an ended album session) and `:no_replays` (the streamer configured none). Calling it twice is harmless.
+
+Each job is due `delay_hours` after the session ended, which is already past, so the first check runs as soon as the `uploads` queue reaches it (one job at a time). If the video exists the replay becomes `found`. If not, the daily checks go on and the replay is `exhausted` after the last one. The channel lookup reads the 150 newest uploads of the channel, so a session older than that cannot match.
+
 ## `CheckUploadWorker`
 
 ```elixir

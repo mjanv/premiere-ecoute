@@ -234,36 +234,73 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
          %Date{} = since <- Profile.get(user, [:video_settings, :tracking_since]),
          false <- Date.before?(DateTime.to_date(ended_at), since),
          [_ | _] = replays <- Profile.get(user, [:video_settings, :replays], []) do
-      {:ok, _} =
-        Repo.transaction(fn ->
-          session = session_id |> lock_session() |> Kernel.||(raise "session #{session_id} is gone")
-
-          new =
-            for replay <- replays, is_nil(slot(session.replays, replay.id)) do
-              due_at = DateTime.to_iso8601(DateTime.add(ended_at, replay.delay_hours, :hour))
-
-              {:ok, job} =
-                CheckUploadWorker.start(
-                  %{session_id: session_id, replay_id: replay.id, iteration: max_iterations()},
-                  scheduled_at: due_at
-                )
-
-              Map.merge(tracking_defaults(), %{
-                "replay_id" => replay.id,
-                "label" => replay.name,
-                "status" => "pending",
-                "job_id" => job.id,
-                "due_at" => due_at
-              })
-            end
-
-          session |> ListeningSession.changeset(%{replays: session.replays ++ new}) |> Repo.update!()
-        end)
-
+      schedule_slots(session_id, ended_at, replays)
       :ok
     else
       _ -> :ok
     end
+  end
+
+  @doc """
+  Starts the tracking of the replays of one session by hand, as if it had just stopped.
+
+  For a session that existed before the user enabled the reminders: same as `schedule_upload_checks/1`, but it
+  ignores `reminders_enabled` and `tracking_since`. Every replay configured by the user that has no entry in
+  the session gets a `pending` slot and a job due at `ended_at` plus its delay. That date is already past, so
+  the first check runs at once: it settles the replay when the video exists, and otherwise the daily checks go
+  on until the replay is `exhausted`. Replays that already have an entry are left alone, so calling it twice is
+  harmless.
+
+  Returns the names of the replays `scheduled` and of the ones that already had an `existing` entry. Errors:
+  `:not_found`, `:session_not_valid` (not an ended album session) and `:no_replays` (none configured).
+  """
+  @spec backfill_replay(integer()) :: {:ok, %{scheduled: [String.t()], existing: [String.t()]}} | {:error, term()}
+  def backfill_replay(session_id) do
+    case session_id |> ListeningSession.get() |> ListeningSession.preload() do
+      %ListeningSession{source: :album, user: %User{} = user, ended_at: %DateTime{} = ended_at} ->
+        case Profile.get(user, [:video_settings, :replays], []) do
+          [_ | _] = replays -> {:ok, schedule_slots(session_id, ended_at, replays)}
+          _ -> {:error, :no_replays}
+        end
+
+      nil ->
+        {:error, :not_found}
+
+      %ListeningSession{} ->
+        {:error, :session_not_valid}
+    end
+  end
+
+  defp schedule_slots(session_id, ended_at, replays) do
+    {:ok, result} =
+      Repo.transaction(fn ->
+        session = session_id |> lock_session() |> Kernel.||(raise "session #{session_id} is gone")
+        {existing, missing} = Enum.split_with(replays, &slot(session.replays, &1.id))
+
+        new =
+          for replay <- missing do
+            due_at = DateTime.to_iso8601(DateTime.add(ended_at, replay.delay_hours, :hour))
+
+            {:ok, job} =
+              CheckUploadWorker.start(
+                %{session_id: session_id, replay_id: replay.id, iteration: max_iterations()},
+                scheduled_at: due_at
+              )
+
+            Map.merge(tracking_defaults(), %{
+              "replay_id" => replay.id,
+              "label" => replay.name,
+              "status" => "pending",
+              "job_id" => job.id,
+              "due_at" => due_at
+            })
+          end
+
+        session |> ListeningSession.changeset(%{replays: session.replays ++ new}) |> Repo.update!()
+        %{scheduled: Enum.map(missing, & &1.name), existing: Enum.map(existing, & &1.name)}
+      end)
+
+    result
   end
 
   @doc """

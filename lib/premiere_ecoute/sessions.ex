@@ -37,6 +37,7 @@ defmodule PremiereEcoute.Sessions do
   defdelegate current_session(user), to: ListeningSession
   defdelegate can_view_retrospective?(session, scope), to: ListeningSession
   defdelegate schedule_upload_checks(session_id), to: ReplayVideo
+  defdelegate backfill_replay(session_id), to: ReplayVideo
 
   @doc "Cleans the sessions of `user_id` after the replay `replay_id` was deleted from their settings."
   @spec forget_replay(integer(), String.t()) :: {:ok, Oban.Job.t()} | {:error, term()}

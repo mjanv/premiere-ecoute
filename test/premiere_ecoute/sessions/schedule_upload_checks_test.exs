@@ -166,4 +166,62 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
       end)
     end
   end
+
+  describe "backfill_replay/1" do
+    test "starts the tracking of a session that ended before tracking started, with the reminders off" do
+      user = streamer(false)
+      [raw, edited] = user.profile.video_settings.replays
+      ended_at = DateTime.add(DateTime.utc_now(:second), -30, :day)
+      session = session(user, %{ended_at: ended_at})
+
+      manual(fn ->
+        assert {:ok, %{scheduled: ["raw", "edited"], existing: []}} = Sessions.backfill_replay(session.id)
+
+        for {replay, hours} <- [{raw, 24}, {edited, 48}] do
+          due_at = DateTime.add(ended_at, hours, :hour)
+
+          assert_enqueued(
+            worker: CheckUploadWorker,
+            args: %{session_id: session.id, replay_id: replay.id, iteration: ReplayVideo.max_iterations()},
+            scheduled_at: {due_at, delta: 5}
+          )
+
+          assert %{"status" => "pending", "job_id" => job_id} = slot(Repo.reload(session), replay)
+          assert is_integer(job_id)
+        end
+      end)
+    end
+
+    test "leaves the replays that already have an entry, and is harmless twice" do
+      user = streamer()
+      [raw, _edited] = user.profile.video_settings.replays
+      linked = %{"label" => "raw", "url" => "https://youtu.be/dQw4w9WgXcQ", "replay_id" => raw.id, "source" => "manual"}
+      {:ok, session} = session(user) |> ListeningSession.changeset(%{replays: [linked]}) |> Repo.update()
+
+      manual(fn ->
+        assert {:ok, %{scheduled: ["edited"], existing: ["raw"]}} = Sessions.backfill_replay(session.id)
+        assert {:ok, %{scheduled: [], existing: ["raw", "edited"]}} = Sessions.backfill_replay(session.id)
+
+        assert [^linked, %{"status" => "pending"}] = Repo.reload(session).replays
+        assert length(all_enqueued(worker: CheckUploadWorker)) == 1
+      end)
+    end
+
+    test "refuses what is not an ended album session with replays" do
+      user = streamer()
+      running = session(user, %{ended_at: nil})
+      clip = session(user, %{source: :clip, album_id: running.album_id})
+
+      no_replays_user = user_fixture(%{role: :streamer})
+      no_replays = session(no_replays_user, %{album_id: running.album_id})
+
+      manual(fn ->
+        assert {:error, :not_found} = Sessions.backfill_replay(0)
+        assert {:error, :session_not_valid} = Sessions.backfill_replay(running.id)
+        assert {:error, :session_not_valid} = Sessions.backfill_replay(clip.id)
+        assert {:error, :no_replays} = Sessions.backfill_replay(no_replays.id)
+        assert all_enqueued(worker: CheckUploadWorker) == []
+      end)
+    end
+  end
 end
