@@ -17,6 +17,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Workers.CheckUploadNowWorker
   alias PremiereEcoute.Sessions.Workers.CheckUploadWorker
   alias PremiereEcoute.Youtube.Video
 
@@ -48,27 +49,110 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   @doc """
   Stores the videos found by `find_replay_videos/1` in the replays of `session`.
 
-  Each `{replay, {:ok, video}}` writes an entry to `ListeningSession.replays` (`label`, `url`, `replay_id`,
-  `video_id`, `youtube_channel_id`, `channel_title`, `thumbnail_url`, `uploaded_at`, `source: "auto"`). It replaces the entry
-  with the same `replay_id` when there is one, and is appended otherwise. Other entries and failed results
-  are left untouched.
+  Each `{replay, {:ok, video}}` writes the video to the entry of `ListeningSession.replays` that has the
+  `replay_id` (see `found_entry/5`), or appends one when there is none. Other entries and failed results are
+  left untouched.
   """
   @spec store_replay_videos(ListeningSession.t(), [{Replay.t(), {:ok, Video.t()} | {:error, term()}}]) ::
           {:ok, ListeningSession.t()} | {:error, Ecto.Changeset.t()}
   def store_replay_videos(%ListeningSession{replays: replays} = session, results) do
-    uploaded_at = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601()
+    now = DateTime.utc_now(:second)
 
     results
-    |> Enum.flat_map(&entry(&1, uploaded_at))
-    |> Enum.reduce(replays, &put_entry/2)
+    |> Enum.reduce(replays, fn
+      {%Replay{id: id} = replay, {:ok, %Video{} = video}}, acc when is_binary(id) ->
+        put_entry(found_entry(slot(acc, id) || %{}, replay, video, "auto", now), acc)
+
+      _failed, acc ->
+        acc
+    end)
     |> then(&ListeningSession.update_replays(session, &1))
   end
 
-  defp entry({%Replay{id: id, name: name}, {:ok, %Video{} = video}}, uploaded_at) when is_binary(id) do
-    [build_entry(video, name, id, "auto", uploaded_at)]
+  @video_fields ~w(url video_id title youtube_channel_id channel_title thumbnail_url uploaded_at source)
+
+  @doc """
+  Returns the status of an entry of `ListeningSession.replays`.
+
+  An entry of a configured replay (it has a `replay_id`) is a slot. Its `status` is `pending` (the worker is
+  looking for the video), `found`, `exhausted` (no iteration left), `rejected` (the streamer unmarked a
+  wrong auto-match) or `skipped`. A slot without a `status` but with a `url` is `found`: it was linked by hand
+  or stored without any tracking. Free links (no `replay_id`) have no status.
+  """
+  @spec status(map()) :: String.t() | nil
+  def status(%{"status" => status}), do: status
+  def status(%{"replay_id" => _, "url" => url}) when is_binary(url), do: "found"
+  def status(_entry), do: nil
+
+  @doc """
+  Returns the slots of `session`: its entries that belong to a configured replay, in order.
+
+  A replay has one slot. If several entries carry the same `replay_id`, the first one is the slot.
+  """
+  @spec slots(ListeningSession.t()) :: [map()]
+  def slots(%ListeningSession{replays: replays}) do
+    (replays || [])
+    |> Enum.filter(&(is_binary(&1["replay_id"]) and status(&1) != nil))
+    |> Enum.uniq_by(& &1["replay_id"])
   end
 
-  defp entry(_result, _uploaded_at), do: []
+  @doc "Returns how many slots of `session` are missing: the ones `pending`, `exhausted` or `rejected`."
+  @spec missing_count(ListeningSession.t()) :: non_neg_integer()
+  def missing_count(%ListeningSession{} = session) do
+    Enum.count(slots(session), &(status(&1) in ["pending", "exhausted", "rejected"]))
+  end
+
+  @doc "Returns how many slots of `session` need the streamer: the ones `exhausted` or `rejected`."
+  @spec attention_count(ListeningSession.t()) :: non_neg_integer()
+  def attention_count(%ListeningSession{} = session) do
+    Enum.count(slots(session), &(status(&1) in ["exhausted", "rejected"]))
+  end
+
+  @doc "Returns the entry of `replays` that belongs to the replay `replay_id`, if any."
+  @spec slot([map()], String.t()) :: map() | nil
+  def slot(replays, replay_id), do: Enum.find(replays, &(&1["replay_id"] == replay_id))
+
+  @doc """
+  Returns `entry` with the video found for `replay`: the video fields (`url`, `video_id`, `channel_title`,
+  `thumbnail_url`...) replace the ones it had, and a tracked slot (one with a `status`) becomes `found`, with
+  no next check and no job.
+  """
+  @spec found_entry(map(), Replay.t(), Video.t(), String.t(), DateTime.t()) :: map()
+  def found_entry(entry, %Replay{id: id, name: name}, %Video{} = video, source, %DateTime{} = now) do
+    entry =
+      entry
+      |> Map.drop(@video_fields)
+      |> Map.merge(build_entry(video, name, id, source, DateTime.to_iso8601(now)))
+
+    if tracked?(entry), do: mark_found(entry, now), else: entry
+  end
+
+  defp tracked?(entry), do: is_map_key(entry, "status")
+
+  defp mark_found(entry, now) do
+    Map.merge(entry, %{
+      "status" => "found",
+      "last_checked_at" => DateTime.to_iso8601(now),
+      "job_id" => nil
+    })
+  end
+
+  defp tracking_defaults do
+    %{"job_id" => nil, "due_at" => DateTime.to_iso8601(DateTime.utc_now(:second)), "last_checked_at" => nil}
+  end
+
+  @doc "Number of checks a replay gets before it is `exhausted`: the `iteration` its first job starts with."
+  @spec max_iterations() :: pos_integer()
+  def max_iterations, do: Application.fetch_env!(:premiere_ecoute, __MODULE__)[:max_iterations]
+
+  @doc "Hours between two checks of the same replay."
+  @spec interval_hours() :: pos_integer()
+  def interval_hours, do: Application.fetch_env!(:premiere_ecoute, __MODULE__)[:interval_hours]
+
+  defp lock_session(session_id), do: Repo.one(from(s in ListeningSession, where: s.id == ^session_id, lock: "FOR UPDATE"))
+
+  defp cancel_job(%{"job_id" => job_id}) when is_integer(job_id), do: Oban.cancel_job(job_id)
+  defp cancel_job(_entry), do: :ok
 
   defp build_entry(%Video{} = video, label, replay_id, source, uploaded_at) do
     %{
@@ -76,6 +160,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
       "url" => video.url,
       "replay_id" => replay_id,
       "video_id" => video.id,
+      "title" => video.title,
       "youtube_channel_id" => video.channel_id,
       "channel_title" => video.channel_title,
       "thumbnail_url" => video.thumbnail_url,
@@ -89,9 +174,9 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   Builds the replay entry of a link typed by hand (`%{"label" => ..., "url" => ..., "replay_id" => ...}`).
 
   `existing` is the entry the form row was opened with, if any. When the link did not change and the entry
-  already has its video details (`video_id`), it keeps everything (thumbnail, channel...) and only takes the
+  already has its video details (`video_id` and `title`), it keeps everything (thumbnail, channel...) and only takes the
   new label and replay. Otherwise, a YouTube link is looked up with `YoutubeApi.get_video/1` and gives the
-  same entry the automatic check stores, with `source: "manual"`, so saving a plain entry again completes it. Any other link, or a failed lookup, gives a plain `label` and `url` entry.
+  same entry the automatic check stores, with `source: "manual"`, so saving a plain entry, or one stored before the title existed, again completes it. Any other link, or a failed lookup, gives a plain `label` and `url` entry.
   A blank `replay_id` unlinks the entry from its replay, and no `replay_id` key at all leaves it as it was.
   """
   @spec manual_entry(map(), map() | nil) :: map()
@@ -100,7 +185,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
     now = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601()
 
     case existing do
-      %{"url" => ^url, "video_id" => _} ->
+      %{"url" => ^url, "video_id" => _, "title" => title} when is_binary(title) ->
         merged = Map.merge(existing, Map.take(submitted, ["label"]))
 
         if Map.has_key?(submitted, "replay_id"),
@@ -125,7 +210,8 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   defp put_replay_id(entry, nil), do: entry
   defp put_replay_id(entry, replay_id), do: Map.put(entry, "replay_id", replay_id)
 
-  defp put_entry(entry, replays) do
+  @doc false
+  def put_entry(entry, replays) do
     case Enum.find_index(replays, &(&1["replay_id"] == entry["replay_id"])) do
       nil -> replays ++ [entry]
       index -> List.replace_at(replays, index, entry)
@@ -135,10 +221,10 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   @doc """
   Schedules one `CheckUploadWorker` job per replay of the user of the session `session_id`.
 
-  Only ended album sessions are scheduled, when the user enabled
-  upload reminders and the session ended since `tracking_since`. Each job runs at `ended_at` plus the
-  replay's delay, and a `pending` entry is written in `options["uploads"]` under the replay id. Replays that
-  already have an entry are left alone, so calling it twice is harmless.
+  Only ended album sessions are scheduled, when the user enabled upload reminders and the session ended
+  since `tracking_since`. Each job runs at `ended_at` plus the replay's delay, and a `pending` entry is added
+  to the `replays` of the session, with the `replay_id` and no `url` yet. Replays that already have an entry
+  are left alone, so calling it twice is harmless.
   """
   @spec schedule_upload_checks(integer()) :: :ok
   def schedule_upload_checks(session_id) do
@@ -148,35 +234,30 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
          %Date{} = since <- Profile.get(user, [:video_settings, :tracking_since]),
          false <- Date.before?(DateTime.to_date(ended_at), since),
          [_ | _] = replays <- Profile.get(user, [:video_settings, :replays], []) do
-      config = Application.fetch_env!(:premiere_ecoute, __MODULE__)
-
       {:ok, _} =
         Repo.transaction(fn ->
-          session = Repo.one!(from(s in ListeningSession, where: s.id == ^session_id, lock: "FOR UPDATE"))
-          uploads = session.options["uploads"] || %{}
+          session = session_id |> lock_session() |> Kernel.||(raise "session #{session_id} is gone")
 
           new =
-            for replay <- replays, not is_map_key(uploads, replay.id), into: %{} do
-              due_at = DateTime.add(ended_at, replay.delay_hours, :hour)
-              {:ok, job} = CheckUploadWorker.start(%{session_id: session.id, replay_id: replay.id}, scheduled_at: due_at)
+            for replay <- replays, is_nil(slot(session.replays, replay.id)) do
+              due_at = DateTime.to_iso8601(DateTime.add(ended_at, replay.delay_hours, :hour))
 
-              {replay.id,
-               %{
-                 "status" => "pending",
-                 "job_id" => job.id,
-                 "due_at" => DateTime.to_iso8601(due_at),
-                 "iterations" => 0,
-                 "max_iterations" => config[:max_iterations],
-                 "interval_hours" => config[:interval_hours],
-                 "last_checked_at" => nil,
-                 "next_check_at" => DateTime.to_iso8601(due_at),
-                 "last_failure" => nil
-               }}
+              {:ok, job} =
+                CheckUploadWorker.start(
+                  %{session_id: session_id, replay_id: replay.id, iteration: max_iterations()},
+                  scheduled_at: due_at
+                )
+
+              Map.merge(tracking_defaults(), %{
+                "replay_id" => replay.id,
+                "label" => replay.name,
+                "status" => "pending",
+                "job_id" => job.id,
+                "due_at" => due_at
+              })
             end
 
-          session
-          |> ListeningSession.changeset(%{options: Map.put(session.options, "uploads", Map.merge(uploads, new))})
-          |> Repo.update!()
+          session |> ListeningSession.changeset(%{replays: session.replays ++ new}) |> Repo.update!()
         end)
 
       :ok
@@ -186,13 +267,14 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   end
 
   @doc """
-  Looks once for the replays of the session `session_id` that have no entry yet.
+  Looks once for the replays of the session `session_id` whose video is not known yet.
 
-  A replay is missing when none of the session's `replays` entries carries its id. Each missing replay of the
-  user is looked up with `find_replay_video/2`, outside any transaction. The videos found are then stored
-  under a lock on the session, unless an entry for the replay appeared meanwhile, and a replay still
-  `pending` in `options["uploads"]` becomes `found` and has its job cancelled. Replays that are not found
-  are left alone: no iteration is counted and no job is scheduled.
+  A replay is missing when it has no entry in the `replays` of the session, or an entry that is `pending` or
+  `exhausted`. `skipped` replays are left out (the streamer chose so), and so are `rejected` ones (the same
+  wrong video would match again). Each missing replay is looked up with `find_replay_video/2`, outside any
+  transaction. The videos found are then stored under a lock on the session, unless the replay was settled
+  meanwhile, and a pending job is cancelled. Replays that are not found are left alone: no iteration is
+  counted and no job is scheduled.
 
   Returns the replays `found`, the ones still `missing`, and the ones whose lookup `failed` (YouTube could
   not be reached). Only ended album sessions are supported.
@@ -202,35 +284,35 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   def sync_replay_videos(session_id) do
     case session_id |> ListeningSession.get() |> ListeningSession.preload() do
       %ListeningSession{source: :album, user: %User{} = user, ended_at: %DateTime{}} = session ->
-        linked = MapSet.new(session.replays, & &1["replay_id"])
-
         results =
           user
           |> Profile.get([:video_settings, :replays], [])
-          |> Enum.reject(&MapSet.member?(linked, &1.id))
+          |> Enum.filter(&(status(slot(session.replays, &1.id) || %{}) in [nil, "pending", "exhausted"]))
           |> Enum.map(&{&1, find_replay_video(session, &1)})
 
         {:ok, found} =
           Repo.transaction(fn ->
-            locked = Repo.one!(from(s in ListeningSession, where: s.id == ^session_id, lock: "FOR UPDATE"))
-            linked = MapSet.new(locked.replays, & &1["replay_id"])
-
-            found =
-              Enum.filter(results, fn {replay, result} -> match?({:ok, _}, result) and not MapSet.member?(linked, replay.id) end)
-
+            locked = lock_session(session_id)
             now = DateTime.utc_now(:second)
 
-            {:ok, stored} = store_replay_videos(locked, found)
+            {replays, found} =
+              Enum.reduce(results, {locked.replays, []}, fn
+                {replay, {:ok, %Video{} = video}}, {acc, found} ->
+                  entry = slot(acc, replay.id) || %{}
 
-            uploads =
-              Enum.reduce(found, locked.options["uploads"] || %{}, fn {replay, _}, acc ->
-                Map.replace_lazy(acc, replay.id, &finish_upload(&1, now))
+                  if status(entry) in [nil, "pending", "exhausted"] do
+                    cancel_job(entry)
+                    {put_entry(found_entry(entry, replay, video, "auto", now), acc), [replay | found]}
+                  else
+                    {acc, found}
+                  end
+
+                _not_found, acc ->
+                  acc
               end)
 
-            options = if locked.options["uploads"], do: Map.put(locked.options, "uploads", uploads), else: locked.options
-
-            stored |> ListeningSession.changeset(%{options: options}) |> Repo.update!()
-            Enum.map(found, &elem(&1, 0))
+            locked |> ListeningSession.changeset(%{replays: replays}) |> Repo.update!()
+            Enum.reverse(found)
           end)
 
         rest = Enum.reject(results, fn {replay, _} -> replay in found end)
@@ -250,12 +332,105 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
     end
   end
 
-  defp finish_upload(%{"status" => "pending", "job_id" => job_id} = state, now) do
-    if job_id, do: Oban.cancel_job(job_id)
-    CheckUploadWorker.mark_found(state, now)
+  @doc """
+  Saves the links edited by hand for the session `session_id`, as built by `manual_entry/2`.
+
+  `entries` replace the links of the session (the entries that have a `url`), in that order. Slots still
+  being looked for (no `url`) are kept. A link that carries the `replay_id` of a tracked slot settles it as
+  `found` and cancels its job. A link that carried a tracked `replay_id` and no longer does (deleted, or
+  moved to another replay) is unmarked like `unmark_upload/2`: the slot becomes `rejected` when it was an
+  auto match, and goes back to `pending` otherwise.
+
+  A replay can be linked once: it fails with `:duplicate_replay` when two entries carry the same `replay_id`,
+  and with `:not_found` when the session is gone.
+  """
+  @spec save_links(integer(), [map()]) :: {:ok, ListeningSession.t()} | {:error, term()}
+  def save_links(session_id, entries) do
+    entries = Enum.reject(entries, &(String.trim(&1["url"] || "") == ""))
+    replay_ids = for %{"replay_id" => replay_id} <- entries, is_binary(replay_id), do: replay_id
+
+    if length(replay_ids) == length(Enum.uniq(replay_ids)),
+      do: store_links(session_id, entries),
+      else: {:error, :duplicate_replay}
   end
 
-  defp finish_upload(state, _now), do: state
+  defp store_links(session_id, entries) do
+    Repo.transaction(fn ->
+      case lock_session(session_id) do
+        %ListeningSession{replays: current} = session ->
+          slots = for %{"replay_id" => replay_id} = entry <- current, into: %{}, do: {replay_id, entry}
+          claimed = for %{"replay_id" => replay_id} <- entries, is_binary(replay_id), into: MapSet.new(), do: replay_id
+
+          links = Enum.map(entries, &link(&1, slots[&1["replay_id"]]))
+
+          others =
+            for {replay_id, entry} <- slots, not MapSet.member?(claimed, replay_id), reduce: [] do
+              acc -> acc ++ List.wrap(release(entry, session_id))
+            end
+
+          session |> ListeningSession.changeset(%{replays: links ++ others}) |> Repo.update!()
+
+        nil ->
+          Repo.rollback(:not_found)
+      end
+    end)
+  end
+
+  defp link(entry, old) do
+    base = if old && old["url"] == entry["url"], do: old, else: Map.drop(old || %{}, @video_fields)
+    entry = Map.merge(base, entry)
+
+    if tracked?(entry) and is_binary(entry["replay_id"]) do
+      cancel_job(entry)
+      mark_found(entry, DateTime.utc_now(:second))
+    else
+      entry
+    end
+  end
+
+  defp release(%{"url" => url} = entry, session_id) when is_binary(url) do
+    if tracked?(entry), do: unmark_entry(with_tracking(entry), session_id)
+  end
+
+  defp release(entry, _session_id), do: entry
+
+  @doc """
+  Forgets a replay that was deleted from the settings of the user `user_id`, in all their sessions.
+
+  In each session that has entries for `replay_id`: the live job is cancelled, a slot still being looked for
+  (no `url`) is removed, and a found slot becomes a plain link again (it keeps its video and loses its
+  `replay_id` and tracking fields).
+  """
+  @spec forget_replay(integer(), String.t()) :: :ok
+  def forget_replay(user_id, replay_id) do
+    session_ids =
+      Repo.all(
+        from(s in ListeningSession,
+          where: s.user_id == ^user_id,
+          where: fragment("EXISTS (SELECT 1 FROM unnest(?) AS r WHERE r->>'replay_id' = ?)", s.replays, ^replay_id),
+          select: s.id
+        )
+      )
+
+    Enum.each(session_ids, fn session_id ->
+      Repo.transaction(fn ->
+        with %ListeningSession{replays: replays} = session <- lock_session(session_id) do
+          replays = Enum.flat_map(replays, &forget_entry(&1, replay_id))
+          session |> ListeningSession.changeset(%{replays: replays}) |> Repo.update!()
+        end
+      end)
+    end)
+  end
+
+  defp forget_entry(%{"replay_id" => replay_id} = entry, replay_id) do
+    cancel_job(entry)
+
+    if is_binary(entry["url"]),
+      do: [Map.drop(entry, ~w(replay_id status job_id due_at last_checked_at))],
+      else: []
+  end
+
+  defp forget_entry(entry, _replay_id), do: [entry]
 
   @doc """
   Skips the replay `replay_id` of the session `session_id`: no more checks, and its live job is cancelled.
@@ -264,21 +439,21 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   """
   @spec skip_upload(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
   def skip_upload(session_id, replay_id) do
-    update_upload(session_id, replay_id, fn session, %{"status" => status} = state ->
+    update_upload(session_id, replay_id, fn _session, %{"status" => status} = entry ->
       if status in ~w(pending exhausted rejected),
-        do: {:ok, session.replays, close(state, "skipped")},
+        do: {:ok, close(entry, "skipped")},
         else: {:error, :invalid_transition}
     end)
   end
 
   @doc """
-  Puts a `skipped` replay back to `pending`, with a new job and `iterations` back to 0.
+  Puts a `skipped` replay back to `pending`, with a new job starting again from the max iteration.
   """
   @spec unskip_upload(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
   def unskip_upload(session_id, replay_id), do: revive_upload(session_id, replay_id, "skipped")
 
   @doc """
-  Puts an `exhausted` replay back to `pending`, with a new job and `iterations` back to 0.
+  Puts an `exhausted` replay back to `pending`, with a new job starting again from the max iteration.
 
   A `rejected` replay cannot be retried: it would likely match the same wrong video again.
   """
@@ -286,20 +461,74 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   def retry_upload(session_id, replay_id), do: revive_upload(session_id, replay_id, "exhausted")
 
   @doc """
-  Runs the live job of a `pending` replay now, without resetting its `iterations`.
-  """
-  @spec check_upload_now(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
-  def check_upload_now(session_id, replay_id) do
-    update_upload(session_id, replay_id, fn session, state ->
-      case state do
-        %{"status" => "pending", "job_id" => job_id} when is_integer(job_id) ->
-          Oban.retry_job(job_id)
-          {:ok, session.replays, %{state | "next_check_at" => DateTime.to_iso8601(DateTime.utc_now(:second))}}
+  Asks for one check of a `pending` replay, now.
 
-        _ ->
-          {:error, :invalid_transition}
+  Inserts a `CheckUploadNowWorker` job, separate from the scheduled checks: it has no iteration and does not
+  touch the schedule. See `check_upload_once/2`.
+  """
+  @spec check_upload_now(integer(), String.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
+  def check_upload_now(session_id, replay_id) do
+    case ListeningSession.get(session_id) do
+      %ListeningSession{replays: replays} ->
+        case slot(replays, replay_id) do
+          %{"status" => "pending"} -> CheckUploadNowWorker.start(%{session_id: session_id, replay_id: replay_id})
+          _ -> {:error, :invalid_transition}
+        end
+
+      nil ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Looks once for the video of a `pending` replay, whatever the schedule says.
+
+  When the video is found, the slot becomes `found` and its scheduled job is cancelled. Otherwise only
+  `last_checked_at` changes: no iteration is counted and no job is inserted, so the scheduled checks go on as
+  planned. Returns what happened with the replay, and the session.
+
+  Errors: `:not_found` (session or replay gone) and `:invalid_transition` (the replay is not `pending`).
+  """
+  @spec check_upload_once(integer(), String.t()) ::
+          {:ok, {:found, Video.t()} | :not_found | {:error, term()}, Replay.t(), ListeningSession.t()} | {:error, term()}
+  def check_upload_once(session_id, replay_id) do
+    with %ListeningSession{user: %User{} = user} = session <- session_id |> ListeningSession.get() |> ListeningSession.preload(),
+         %Replay{} = replay <- Enum.find(Profile.get(user, [:video_settings, :replays], []), &(&1.id == replay_id)),
+         %{"status" => "pending"} <- slot(session.replays, replay_id) do
+      result = find_replay_video(session, replay)
+      now = DateTime.utc_now(:second)
+
+      Repo.transaction(fn ->
+        locked = lock_session(session_id)
+
+        case slot(locked.replays, replay_id) do
+          %{"status" => "pending"} = entry ->
+            {entry, outcome} = once_outcome(entry, result, replay, now)
+            updated = locked |> ListeningSession.changeset(%{replays: put_entry(entry, locked.replays)}) |> Repo.update!()
+            {outcome, replay, updated}
+
+          _ ->
+            Repo.rollback(:invalid_transition)
+        end
+      end)
+      |> case do
+        {:ok, {outcome, replay, updated}} -> {:ok, outcome, replay, updated}
+        {:error, _} = error -> error
       end
-    end)
+    else
+      %{} -> {:error, :invalid_transition}
+      _ -> {:error, :not_found}
+    end
+  end
+
+  defp once_outcome(entry, {:ok, %Video{} = video}, replay, now) do
+    cancel_job(entry)
+    {found_entry(entry, replay, video, "auto", now), {:found, video}}
+  end
+
+  defp once_outcome(entry, result, _replay, now) do
+    outcome = if result == {:error, :not_found}, do: :not_found, else: result
+    {Map.put(entry, "last_checked_at", DateTime.to_iso8601(now)), outcome}
   end
 
   @doc """
@@ -315,16 +544,14 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   @spec attach_upload(integer(), String.t(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
   def attach_upload(session_id, replay_id, url) do
     with %ListeningSession{user: %User{} = user} <- session_id |> ListeningSession.get() |> ListeningSession.preload(),
-         %Replay{name: name, channel_id: channel_id} <-
+         %Replay{channel_id: channel_id} = replay <-
            Enum.find(Profile.get(user, [:video_settings, :replays], []), &(&1.id == replay_id)),
          %Channel{youtube_channel_id: expected} <-
            Enum.find(Profile.get(user, [:video_settings, :channels], []), &(&1.id == channel_id)),
          {:ok, id} <- video_id(url),
          {:ok, %Video{privacy: :public} = video} <- lookup_video(id),
          :ok <- if(video.channel_id == expected, do: :ok, else: {:error, {:wrong_channel, video.channel_title}}) do
-      now = DateTime.utc_now(:second)
-
-      update_upload(session_id, replay_id, fn session, %{"status" => status} = state ->
+      update_upload(session_id, replay_id, fn session, %{"status" => status} = entry ->
         cond do
           status not in ~w(pending exhausted rejected) ->
             {:error, :invalid_transition}
@@ -333,8 +560,8 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
             {:error, :duplicate}
 
           true ->
-            entry = build_entry(%{video | url: url}, name, replay_id, "manual", DateTime.to_iso8601(now))
-            {:ok, put_entry(entry, session.replays), found(state, now)}
+            cancel_job(entry)
+            {:ok, found_entry(entry, replay, %{video | url: url}, "manual", DateTime.utc_now(:second))}
         end
       end)
     else
@@ -352,16 +579,16 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   """
   @spec unmark_upload(integer(), String.t()) :: {:ok, ListeningSession.t()} | {:error, term()}
   def unmark_upload(session_id, replay_id) do
-    update_upload(session_id, replay_id, fn session, state ->
-      entry = Enum.find(session.replays, &(&1["replay_id"] == replay_id))
-      replays = Enum.reject(session.replays, &(&1["replay_id"] == replay_id))
-
-      case {state["status"], entry} do
-        {"found", %{"source" => "auto"}} -> {:ok, replays, close(state, "rejected")}
-        {"found", %{}} -> {:ok, replays, revive(state, session.id, replay_id)}
-        _ -> {:error, :invalid_transition}
-      end
+    update_upload(session_id, replay_id, fn session, entry ->
+      if entry["status"] == "found",
+        do: {:ok, unmark_entry(entry, session.id)},
+        else: {:error, :invalid_transition}
     end)
+  end
+
+  defp unmark_entry(entry, session_id) do
+    rest = Map.drop(entry, @video_fields)
+    if entry["source"] == "auto", do: close(rest, "rejected"), else: revive(rest, session_id)
   end
 
   defp video_id(url) do
@@ -379,23 +606,22 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   end
 
   defp revive_upload(session_id, replay_id, from) do
-    update_upload(session_id, replay_id, fn session, state ->
-      if state["status"] == from,
-        do: {:ok, session.replays, revive(state, session.id, replay_id)},
+    update_upload(session_id, replay_id, fn session, entry ->
+      if entry["status"] == from,
+        do: {:ok, revive(entry, session.id)},
         else: {:error, :invalid_transition}
     end)
   end
 
-  # Locks the session, hands the replays and the state of `replay_id` to `fun`, and writes back what it returns.
+  # Locks the session, hands it and the slot of `replay_id` (with its tracking fields filled in) to `fun`, and
+  # writes back the entry it returns.
   defp update_upload(session_id, replay_id, fun) do
     Repo.transaction(fn ->
-      with %ListeningSession{} = session <-
-             Repo.one(from(s in ListeningSession, where: s.id == ^session_id, lock: "FOR UPDATE")),
-           %{} = state <- get_in(session.options, ["uploads", replay_id]),
-           {:ok, replays, state} <- fun.(session, state) do
-        session
-        |> ListeningSession.changeset(%{replays: replays, options: put_in(session.options, ["uploads", replay_id], state)})
-        |> Repo.update!()
+      with %ListeningSession{replays: replays} = session <- lock_session(session_id),
+           %{} = entry <- slot(replays, replay_id),
+           entry = with_tracking(entry),
+           {:ok, entry} <- fun.(session, entry) do
+        session |> ListeningSession.changeset(%{replays: put_entry(entry, replays)}) |> Repo.update!()
       else
         {:error, reason} -> Repo.rollback(reason)
         nil -> Repo.rollback(:not_found)
@@ -403,28 +629,22 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
     end)
   end
 
-  defp close(state, status) do
-    if is_integer(state["job_id"]), do: Oban.cancel_job(state["job_id"])
-    %{state | "status" => status, "job_id" => nil, "next_check_at" => nil}
+  # An entry linked without any tracking (no `status`) is a `found` slot: give it the fields the actions use.
+  defp with_tracking(entry) do
+    case status(entry) do
+      nil -> entry
+      status -> tracking_defaults() |> Map.merge(entry) |> Map.put("status", status)
+    end
   end
 
-  defp found(state, now) do
-    if is_integer(state["job_id"]), do: Oban.cancel_job(state["job_id"])
-    CheckUploadWorker.mark_found(state, now)
+  defp close(entry, status) do
+    cancel_job(entry)
+    Map.merge(entry, %{"status" => status, "job_id" => nil})
   end
 
-  defp revive(state, session_id, replay_id) do
-    now = DateTime.utc_now(:second)
-    {:ok, job} = CheckUploadWorker.start(%{session_id: session_id, replay_id: replay_id})
-
-    %{
-      state
-      | "status" => "pending",
-        "job_id" => job.id,
-        "iterations" => 0,
-        "last_failure" => nil,
-        "next_check_at" => DateTime.to_iso8601(now)
-    }
+  defp revive(entry, session_id) do
+    {:ok, job} = CheckUploadWorker.start(%{session_id: session_id, replay_id: entry["replay_id"], iteration: max_iterations()})
+    Map.merge(entry, %{"status" => "pending", "job_id" => job.id})
   end
 
   @doc """

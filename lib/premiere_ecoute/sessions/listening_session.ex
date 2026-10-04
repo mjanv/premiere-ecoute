@@ -913,11 +913,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
   @doc """
   Updates the replay links for a session.
 
-  Each replay is a map with "label" and "url" keys. Empty-URL entries are dropped.
+  Each replay is a map with "label" and "url" keys. Empty-URL entries are dropped, unless they belong to a
+  configured replay still being looked for (they carry its `replay_id`).
   """
   @spec update_replays(t(), list(map())) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def update_replays(%__MODULE__{} = session, replays) do
-    cleaned = Enum.reject(replays, fn r -> r["url"] == nil or String.trim(r["url"]) == "" end)
+    cleaned =
+      Enum.reject(replays, fn r -> (r["url"] == nil or String.trim(r["url"]) == "") and is_nil(r["replay_id"]) end)
 
     session
     |> changeset(%{replays: cleaned})

@@ -14,6 +14,7 @@ defmodule PremiereEcoute.Sessions do
   alias PremiereEcoute.Sessions.Retrospective
   alias PremiereEcoute.Sessions.Scores
   alias PremiereEcoute.Sessions.Services.ReplayVideo
+  alias PremiereEcoute.Sessions.Workers.ForgetReplayWorker
 
   # Behaviour
   @callback publish_message(map()) :: :ok
@@ -36,6 +37,10 @@ defmodule PremiereEcoute.Sessions do
   defdelegate current_session(user), to: ListeningSession
   defdelegate can_view_retrospective?(session, scope), to: ListeningSession
   defdelegate schedule_upload_checks(session_id), to: ReplayVideo
+
+  @doc "Cleans the sessions of `user_id` after the replay `replay_id` was deleted from their settings."
+  @spec forget_replay(integer(), String.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
+  def forget_replay(user_id, replay_id), do: ForgetReplayWorker.start(%{user_id: user_id, replay_id: replay_id})
   defdelegate skip_upload(session_id, replay_id), to: ReplayVideo
   defdelegate unskip_upload(session_id, replay_id), to: ReplayVideo
   defdelegate retry_upload(session_id, replay_id), to: ReplayVideo

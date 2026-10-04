@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Sessions
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Services.ReplayVideo
   alias PremiereEcoute.Sessions.Workers.CheckUploadWorker
 
   @channel_id "UC" <> String.duplicate("a", 22)
@@ -39,6 +40,8 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
     Repo.preload(session, :user)
   end
 
+  defp slot(session, replay), do: ReplayVideo.slot(session.replays, replay.id)
+
   defp manual(fun), do: Oban.Testing.with_testing_mode(:manual, fun)
 
   describe "schedule_upload_checks/1" do
@@ -57,25 +60,18 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
           assert_enqueued(
             worker: CheckUploadWorker,
             queue: :uploads,
-            args: %{session_id: session.id, replay_id: replay.id},
+            args: %{session_id: session.id, replay_id: replay.id, iteration: ReplayVideo.max_iterations()},
             scheduled_at: {due_at, delta: 5}
           )
 
-          assert %{
-                   "status" => "pending",
-                   "job_id" => job_id,
-                   "iterations" => 0,
-                   "max_iterations" => 7,
-                   "interval_hours" => 24,
-                   "last_failure" => nil
-                 } = updated.options["uploads"][replay.id]
+          assert %{"status" => "pending", "job_id" => job_id, "label" => _} = entry = slot(updated, replay)
 
           assert is_integer(job_id)
-          assert updated.options["uploads"][replay.id]["due_at"] == DateTime.to_iso8601(due_at)
-          assert updated.options["uploads"][replay.id]["next_check_at"] == DateTime.to_iso8601(due_at)
+          assert entry["due_at"] == DateTime.to_iso8601(due_at)
+          assert Enum.sort(Map.keys(entry)) == ~w(due_at job_id label last_checked_at replay_id status)
         end
 
-        assert map_size(updated.options["uploads"]) == 2
+        assert length(updated.replays) == 2
         assert length(all_enqueued(worker: CheckUploadWorker)) == 2
       end)
     end
@@ -102,8 +98,25 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
         once = Repo.reload(session)
         :ok = Sessions.schedule_upload_checks(session.id)
 
-        assert Repo.reload(session).options["uploads"] == once.options["uploads"]
+        assert Repo.reload(session).replays == once.replays
         assert length(all_enqueued(worker: CheckUploadWorker)) == 2
+      end)
+    end
+
+    test "leaves the other entries alone and skips a replay that already has one" do
+      user = streamer()
+      [raw, edited] = user.profile.video_settings.replays
+      free = %{"label" => "Twitch VOD", "url" => "https://www.twitch.tv/videos/1"}
+      linked = %{"label" => "raw", "url" => "https://youtu.be/dQw4w9WgXcQ", "replay_id" => raw.id, "source" => "manual"}
+      {:ok, session} = session(user) |> ListeningSession.changeset(%{replays: [free, linked]}) |> Repo.update()
+
+      manual(fn ->
+        assert :ok = Sessions.schedule_upload_checks(session.id)
+
+        assert [^free, ^linked, %{"replay_id" => replay_id, "status" => "pending"} = pending] = Repo.reload(session).replays
+        assert replay_id == edited.id
+        refute Map.has_key?(pending, "url")
+        assert [%{args: %{"replay_id" => ^replay_id}}] = all_enqueued(worker: CheckUploadWorker)
       end)
     end
 
@@ -112,7 +125,7 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
 
       manual(fn ->
         assert :ok = Sessions.schedule_upload_checks(session.id)
-        assert Repo.reload(session).options == session.options
+        assert Repo.reload(session).replays == session.replays
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end
@@ -124,7 +137,7 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
 
       manual(fn ->
         assert :ok = Sessions.schedule_upload_checks(session.id)
-        assert Repo.reload(session).options == session.options
+        assert Repo.reload(session).replays == session.replays
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end
@@ -134,7 +147,7 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
 
       manual(fn ->
         assert :ok = Sessions.schedule_upload_checks(session.id)
-        assert Repo.reload(session).options == session.options
+        assert Repo.reload(session).replays == session.replays
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end
@@ -147,8 +160,8 @@ defmodule PremiereEcoute.Sessions.ScheduleUploadChecksTest do
       manual(fn ->
         assert :ok = Sessions.schedule_upload_checks(running.id)
         assert :ok = Sessions.schedule_upload_checks(clip.id)
-        assert Repo.reload(running).options == running.options
-        assert Repo.reload(clip).options == clip.options
+        assert Repo.reload(running).replays == running.replays
+        assert Repo.reload(clip).replays == clip.replays
         assert all_enqueued(worker: CheckUploadWorker) == []
       end)
     end

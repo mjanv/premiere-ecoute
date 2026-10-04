@@ -104,8 +104,23 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
                ReplayVideo.manual_entry(%{"label" => "raw", "url" => @url}, plain)
     end
 
+    test "adds the title to an entry linked before titles were stored" do
+      expect(YoutubeApi, :get_video, fn "dQw4w9WgXcQ" -> {:ok, video(%{id: "dQw4w9WgXcQ", title: "Kid A"})} end)
+      untitled = %{"label" => "raw", "url" => @url, "video_id" => "dQw4w9WgXcQ", "replay_id" => "r1", "source" => "auto"}
+
+      assert %{"title" => "Kid A", "video_id" => "dQw4w9WgXcQ", "replay_id" => "r1"} =
+               ReplayVideo.manual_entry(%{"label" => "raw", "url" => @url, "replay_id" => "r1"}, untitled)
+    end
+
     test "keeps the details of an entry whose link did not change" do
-      existing = %{"label" => "raw", "url" => @url, "video_id" => "dQw4w9WgXcQ", "replay_id" => "r1", "source" => "auto"}
+      existing = %{
+        "label" => "raw",
+        "url" => @url,
+        "video_id" => "dQw4w9WgXcQ",
+        "title" => "Kid A",
+        "replay_id" => "r1",
+        "source" => "auto"
+      }
 
       assert ReplayVideo.manual_entry(%{"label" => "cut", "url" => @url, "replay_id" => "r2"}, existing) ==
                %{existing | "label" => "cut", "replay_id" => "r2"}
@@ -144,6 +159,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideoTest do
       assert entry["video_id"] == found.id
       assert entry["youtube_channel_id"] == @channel_id
       assert entry["channel_title"] == "Lanfeust Plays"
+      assert entry["title"] == "PREMIÈRE ÉCOUTE : \"Kid A\" by Radiohead"
       assert entry["thumbnail_url"] == "https://i.ytimg.com/vi/abc/hq.jpg"
       assert entry["source"] == "auto"
       assert {:ok, _, _} = DateTime.from_iso8601(entry["uploaded_at"])

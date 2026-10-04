@@ -1,10 +1,14 @@
 defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
   use PremiereEcoute.DataCase, async: true
 
+  import ExUnit.CaptureLog
+
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.Video.YoutubeApi.Mock, as: YoutubeApi
   alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.PubSub
   alias PremiereEcoute.Sessions.ListeningSession
+  alias PremiereEcoute.Sessions.Services.ReplayVideo
   alias PremiereEcoute.Sessions.Workers.CheckUploadWorker
   alias PremiereEcoute.Youtube.Video
 
@@ -18,12 +22,7 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
         "status" => "pending",
         "job_id" => nil,
         "due_at" => due_at,
-        "iterations" => 0,
-        "max_iterations" => 3,
-        "interval_hours" => 24,
-        "last_checked_at" => nil,
-        "next_check_at" => due_at,
-        "last_failure" => nil
+        "last_checked_at" => nil
       },
       attrs
     )
@@ -45,7 +44,10 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
     [raw, edited] = user.profile.video_settings.replays
     {:ok, album} = Album.create(album_fixture())
 
-    uploads = for {replay, state} <- Enum.zip([raw, edited], states), state != nil, into: %{}, do: {replay.id, state}
+    slots =
+      for {replay, state} <- Enum.zip([raw, edited], states), state != nil do
+        Map.merge(%{"replay_id" => replay.id, "label" => replay.name}, state)
+      end
 
     {:ok, session} =
       ListeningSession.create(%{
@@ -53,7 +55,7 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
         album_id: album.id,
         status: :stopped,
         ended_at: DateTime.add(DateTime.utc_now(:second), -2, :hour),
-        options: %{"uploads" => uploads}
+        replays: slots
       })
 
     {session, raw, edited}
@@ -71,14 +73,19 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
     }
   end
 
-  defp run(session, replay) do
+  defp run(session, replay, iteration \\ 3) do
     Oban.Testing.with_testing_mode(:manual, fn ->
-      result = perform_job(CheckUploadWorker, %{session_id: session.id, replay_id: replay.id})
+      result = perform_job(CheckUploadWorker, %{session_id: session.id, replay_id: replay.id, iteration: iteration})
       {result, all_enqueued(worker: CheckUploadWorker)}
     end)
   end
 
-  defp uploads(session), do: ListeningSession.get(session.id).options["uploads"]
+  # The tracking state of each replay, as the slots of the session hold it.
+  defp uploads(session) do
+    for %{"replay_id" => replay_id} = entry <- ListeningSession.get(session.id).replays, into: %{} do
+      {replay_id, Map.drop(entry, ["replay_id", "label"])}
+    end
+  end
 
   describe "perform/1" do
     test "stores the found video and finishes" do
@@ -87,48 +94,106 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
 
       assert {:ok, []} = run(session, raw)
 
-      assert %{"status" => "found", "next_check_at" => nil, "job_id" => nil} = uploads(session)[raw.id]
+      assert %{"status" => "found", "job_id" => nil} = uploads(session)[raw.id]
 
-      assert [%{"replay_id" => replay_id, "thumbnail_url" => "https://i.ytimg.com/vi/abc/hq.jpg", "source" => "auto"}] =
-               ListeningSession.get(session.id).replays
-
-      assert replay_id == raw.id
+      assert %{"thumbnail_url" => "https://i.ytimg.com/vi/abc/hq.jpg", "source" => "auto", "url" => _} = uploads(session)[raw.id]
     end
 
-    test "counts a failed iteration and inserts the next check" do
+    test "inserts the next check with one iteration less" do
       {session, raw, _edited} = setup_session([state(), nil])
       expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, []} end)
 
-      assert {:ok, [job]} = run(session, raw)
+      assert {:ok, [job]} = run(session, raw, 3)
       assert_in_delta DateTime.diff(job.scheduled_at, DateTime.utc_now()), 24 * 3600, 5
-      assert job.args == %{"session_id" => session.id, "replay_id" => raw.id}
+      assert job.args == %{"session_id" => session.id, "replay_id" => raw.id, "iteration" => 2}
 
-      assert %{"status" => "pending", "iterations" => 1, "last_failure" => "not_found", "job_id" => job_id} =
-               uploads(session)[raw.id]
-
+      assert %{"status" => "pending", "job_id" => job_id} = uploads(session)[raw.id]
       assert job_id == job.id
     end
 
-    test "records an API error as such" do
+    test "keeps looking after an API error" do
       {session, raw, _edited} = setup_session([state(), nil])
       expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:error, "YouTube API error: 403"} end)
 
-      assert {:ok, [_job]} = run(session, raw)
+      assert {:ok, [%{args: %{"iteration" => 2}}]} = run(session, raw, 3)
 
-      assert %{"iterations" => 1, "last_failure" => "api_error"} = uploads(session)[raw.id]
+      assert %{"status" => "pending"} = uploads(session)[raw.id]
     end
 
-    test "exhausts the replay on its last iteration" do
-      {session, raw, _edited} = setup_session([state(%{"iterations" => 2}), nil])
+    test "starts from the max iteration when its args carry none" do
+      {session, raw, _edited} = setup_session([state(), nil])
       expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, []} end)
 
-      assert {:ok, []} = run(session, raw)
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        perform_job(CheckUploadWorker, %{session_id: session.id, replay_id: raw.id})
 
-      assert %{"status" => "exhausted", "iterations" => 3, "next_check_at" => nil, "job_id" => nil} = uploads(session)[raw.id]
+        assert [%{args: %{"iteration" => iteration}}] = all_enqueued(worker: CheckUploadWorker)
+        assert iteration == ReplayVideo.max_iterations() - 1
+      end)
+    end
+
+    test "exhausts the replay when the last iteration fails" do
+      {session, raw, _edited} = setup_session([state(), nil])
+      expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, []} end)
+
+      assert {:ok, []} = run(session, raw, 1)
+
+      assert %{"status" => "exhausted", "job_id" => nil} = uploads(session)[raw.id]
+    end
+
+    test "logs a success at info level" do
+      Logger.put_module_level(CheckUploadWorker, :info)
+      on_exit(fn -> Logger.delete_module_level(CheckUploadWorker) end)
+      {session, raw, _edited} = setup_session([state(), nil])
+      expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, [video()]} end)
+
+      log = capture_log([level: :info], fn -> run(session, raw) end)
+
+      assert log =~ "[info] CheckUploadWorker: found https://www.youtube.com/watch?v=abc for replay raw of session #{session.id}"
+      refute log =~ "[error]"
+    end
+
+    test "logs the reason of a failure at error level" do
+      {session, raw, _edited} = setup_session([state(), nil])
+      expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:error, "YouTube API error: 403"} end)
+
+      log = capture_log(fn -> run(session, raw, 3) end)
+
+      assert log =~ "[error] CheckUploadWorker: check failed for replay raw of session #{session.id}, 2 checks left"
+      assert log =~ "YouTube API error: 403"
+      refute log =~ "[warning]"
+    end
+
+    test "logs a video not found yet at info level" do
+      Logger.put_module_level(CheckUploadWorker, :info)
+      on_exit(fn -> Logger.delete_module_level(CheckUploadWorker) end)
+      {session, raw, _edited} = setup_session([state(), nil])
+      expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, []} end)
+
+      log = capture_log([level: :info], fn -> run(session, raw, 3) end)
+
+      assert log =~
+               "[info] CheckUploadWorker: video not found yet for replay raw of session #{session.id}, 2 checks left: :not_found"
+
+      refute log =~ "[error]"
+      refute log =~ "[warning]"
+    end
+
+    test "logs the exhaustion at warning level, after the last failed check" do
+      Logger.put_module_level(CheckUploadWorker, :info)
+      on_exit(fn -> Logger.delete_module_level(CheckUploadWorker) end)
+      {session, raw, _edited} = setup_session([state(), nil])
+      expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, []} end)
+
+      log = capture_log([level: :info], fn -> run(session, raw, 1) end)
+
+      assert log =~ "[info] CheckUploadWorker: video not found yet for replay raw of session #{session.id}, 0 checks left"
+      assert log =~ "[warning] CheckUploadWorker: gave up on replay raw of session #{session.id}"
+      refute log =~ "[error]"
     end
 
     test "leaves the other replays untouched" do
-      other = state(%{"iterations" => 1})
+      other = state(%{"last_checked_at" => "2026-10-03T10:00:00Z"})
       {session, raw, edited} = setup_session([state(), other])
       expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, [video()]} end)
 
@@ -137,17 +202,8 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
       assert uploads(session)[edited.id] == other
     end
 
-    test "does nothing before the next check is due" do
-      later = DateTime.to_iso8601(DateTime.add(DateTime.utc_now(:second), 5, :hour))
-      pending = state(%{"next_check_at" => later})
-      {session, raw, _edited} = setup_session([pending, nil])
-
-      assert {:ok, []} = run(session, raw)
-      assert uploads(session)[raw.id] == pending
-    end
-
     test "cancels when the replay is not pending anymore" do
-      skipped = state(%{"status" => "skipped", "next_check_at" => nil})
+      skipped = state(%{"status" => "skipped"})
       {session, raw, _edited} = setup_session([skipped, nil])
 
       assert {{:cancel, :not_pending}, []} = run(session, raw)
@@ -170,6 +226,42 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
   # The sandbox shares one connection, so two workers cannot truly run in parallel here. Instead, the second
   # worker runs to completion inside the first one's YouTube call, which is exactly the window between its
   # unlocked read and its locked write.
+  describe "perform/1 telling the page" do
+    defp subscribe(session), do: PubSub.subscribe("uploads:#{session.user_id}")
+
+    test "broadcasts when the video is found" do
+      {session, raw, _edited} = setup_session([state(), nil])
+      subscribe(session)
+      expect(YoutubeApi, :get_channel_videos, fn _, _ -> {:ok, [video()]} end)
+
+      run(session, raw)
+
+      assert_received {:replay_updated, session_id, replay_id}
+      assert {session_id, replay_id} == {session.id, raw.id}
+    end
+
+    test "broadcasts when a check fails and the next one is scheduled, and when the replay is exhausted" do
+      {session, raw, _edited} = setup_session([state(), nil])
+      subscribe(session)
+      expect(YoutubeApi, :get_channel_videos, 2, fn _, _ -> {:ok, []} end)
+
+      run(session, raw, 3)
+      assert_received {:replay_updated, _, _}
+
+      run(session, raw, 1)
+      assert_received {:replay_updated, _, _}
+    end
+
+    test "says nothing when the slot is not pending anymore" do
+      {session, raw, _edited} = setup_session([state(%{"status" => "skipped"}), nil])
+      subscribe(session)
+
+      run(session, raw)
+
+      refute_received {:replay_updated, _, _}
+    end
+  end
+
   describe "perform/1 with another replay of the session finishing meanwhile" do
     test "keeps what the other worker stored when this one finds its video too" do
       {session, raw, edited} = setup_session([state(), state()])
@@ -188,8 +280,8 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
       assert %{"status" => "found"} = uploads(session)[raw.id]
       assert %{"status" => "found"} = uploads(session)[edited.id]
 
-      replay_ids = ListeningSession.get(session.id).replays |> Enum.map(& &1["replay_id"]) |> Enum.sort()
-      assert replay_ids == Enum.sort([raw.id, edited.id])
+      assert %{"url" => _, "source" => "auto"} = uploads(session)[raw.id]
+      assert %{"url" => _, "source" => "auto"} = uploads(session)[edited.id]
     end
 
     test "keeps what the other worker stored when this one does not find its video" do
@@ -208,10 +300,10 @@ defmodule PremiereEcoute.Sessions.Workers.CheckUploadWorkerTest do
       assert {:ok, [job]} = run(session, raw)
 
       assert %{"status" => "found"} = uploads(session)[edited.id]
-      assert %{"status" => "pending", "iterations" => 1, "job_id" => job_id} = uploads(session)[raw.id]
+      assert %{"status" => "pending", "job_id" => job_id} = uploads(session)[raw.id]
       assert job_id == job.id
-      assert [%{"replay_id" => replay_id}] = ListeningSession.get(session.id).replays
-      assert replay_id == edited.id
+      assert %{"url" => _} = uploads(session)[edited.id]
+      refute Map.has_key?(uploads(session)[raw.id], "url")
     end
   end
 end

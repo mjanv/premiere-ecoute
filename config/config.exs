@@ -161,7 +161,7 @@ config :premiere_ecoute, Oban,
   ],
   plugins: [
     {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(5)},
-    {Oban.Plugins.Pruner, max_age: _48_hours = 172_800},
+    {Oban.Plugins.Pruner, max_age: _7_days = 604_800},
     Oban.Plugins.Reindexer,
     {Oban.Plugins.Cron,
      crontab: [

@@ -6,6 +6,7 @@ defmodule PremiereEcoute.Sessions.Services.SyncReplayVideosTest do
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Services.ReplayVideo
+  alias PremiereEcoute.Sessions.Workers.CheckUploadWorker
   alias PremiereEcoute.Youtube.Video
 
   @channel_id "UC" <> String.duplicate("a", 22)
@@ -18,12 +19,7 @@ defmodule PremiereEcoute.Sessions.Services.SyncReplayVideosTest do
         "status" => "pending",
         "job_id" => nil,
         "due_at" => due_at,
-        "iterations" => 1,
-        "max_iterations" => 7,
-        "interval_hours" => 24,
-        "last_checked_at" => nil,
-        "next_check_at" => due_at,
-        "last_failure" => "not_found"
+        "last_checked_at" => nil
       },
       attrs
     )
@@ -115,24 +111,52 @@ defmodule PremiereEcoute.Sessions.Services.SyncReplayVideosTest do
       assert replay_id == edited.id
     end
 
-    test "marks a pending replay as found and cancels its job" do
+    test "settles the pending and exhausted slots it finds, and cancels the job of a pending one" do
+      Oban.Testing.with_testing_mode(:manual, fn ->
+        {session, raw, edited} = setup_session()
+
+        {:ok, job} =
+          CheckUploadWorker.start(%{session_id: session.id, replay_id: raw.id}, schedule_in: 3600)
+
+        slots = [
+          Map.merge(%{"replay_id" => raw.id, "label" => "raw"}, pending(%{"job_id" => job.id})),
+          Map.merge(%{"replay_id" => edited.id, "label" => "edited"}, pending(%{"status" => "exhausted"}))
+        ]
+
+        {:ok, session} = session |> ListeningSession.changeset(%{replays: slots}) |> PremiereEcoute.Repo.update()
+        expect(YoutubeApi, :get_channel_videos, 2, fn _, _ -> {:ok, [video("Sample Artist - Sample Album")]} end)
+
+        assert {:ok, %{found: [_, _]}} = ReplayVideo.sync_replay_videos(session.id)
+
+        replays = ListeningSession.get(session.id).replays
+        assert length(replays) == 2
+
+        for replay <- [raw, edited] do
+          assert %{
+                   "status" => "found",
+                   "job_id" => nil,
+                   "source" => "auto",
+                   "url" => _
+                 } =
+                   ReplayVideo.slot(replays, replay.id)
+        end
+
+        assert PremiereEcoute.Repo.get!(Oban.Job, job.id, prefix: "oban").state == "cancelled"
+      end)
+    end
+
+    test "leaves the skipped and rejected slots alone" do
       {session, raw, edited} = setup_session()
 
-      uploads = %{raw.id => pending(), edited.id => pending(%{"status" => "exhausted", "next_check_at" => nil})}
-      {:ok, session} = ListeningSession.update_replays(session, [])
+      slots = [
+        Map.merge(%{"replay_id" => raw.id, "label" => "raw"}, pending(%{"status" => "skipped"})),
+        Map.merge(%{"replay_id" => edited.id, "label" => "edited"}, pending(%{"status" => "rejected"}))
+      ]
 
-      {:ok, _} =
-        session
-        |> ListeningSession.changeset(%{options: Map.put(session.options, "uploads", uploads)})
-        |> PremiereEcoute.Repo.update()
+      {:ok, session} = session |> ListeningSession.changeset(%{replays: slots}) |> PremiereEcoute.Repo.update()
 
-      expect(YoutubeApi, :get_channel_videos, 2, fn _, _ -> {:ok, [video("Sample Artist - Sample Album")]} end)
-
-      assert {:ok, %{found: [_, _]}} = ReplayVideo.sync_replay_videos(session.id)
-
-      uploads = ListeningSession.get(session.id).options["uploads"]
-      assert %{"status" => "found", "next_check_at" => nil, "job_id" => nil, "last_failure" => nil} = uploads[raw.id]
-      assert %{"status" => "exhausted"} = uploads[edited.id]
+      assert {:ok, %{found: [], missing: [], failed: []}} = ReplayVideo.sync_replay_videos(session.id)
+      assert ListeningSession.get(session.id).replays == slots
     end
 
     test "does not accept a session that is not an ended album session" do

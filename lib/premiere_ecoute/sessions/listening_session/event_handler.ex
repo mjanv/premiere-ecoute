@@ -154,7 +154,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
     PremiereEcoute.PubSub.broadcast("session:#{session_id}", :stop)
     PremiereEcoute.PubSub.broadcast("playback:#{user_id}", {:session_stopped, session_id})
 
-    Sessions.schedule_upload_checks(session_id)
+    schedule_upload_checks(session_id)
   end
 
   def dispatch(%SessionStarted{source: :free, session_id: session_id, user_id: user_id}) do
@@ -199,4 +199,13 @@ defmodule PremiereEcoute.Sessions.ListeningSession.EventHandler do
   end
 
   def dispatch(_), do: :ok
+
+  # Best effort: the upload reminders must never break the stop of a session.
+  defp schedule_upload_checks(session_id) do
+    Sessions.schedule_upload_checks(session_id)
+  rescue
+    error ->
+      Logger.error("Upload checks of session #{session_id} were not scheduled: #{Exception.message(error)}")
+      :ok
+  end
 end
