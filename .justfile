@@ -12,6 +12,15 @@ server:
 connect:
     iex --remsh dev --sname local
 
+# Show latest available version of each tool in .tool-versions
+outdated:
+    #!/usr/bin/env bash
+    while read -r plugin version _; do
+      latest=$(asdf latest "$plugin")
+      printf '%-15s %s -> %s\n' "$plugin" "$version" "$latest"
+    done < .tool-versions
+    mix hex.outdated
+
 # SSH in production server
 ssh:
     ssh $SERVER
