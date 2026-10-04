@@ -62,7 +62,7 @@
             />
 
             <%!-- Replays --%>
-            <% replays = @listening_session.replays || [] %>
+            <% replays = Enum.filter(@listening_session.replays || [], & &1["url"]) %>
             <% is_owner =
               assigns[:current_scope] && assigns[:current_scope].user &&
                 assigns[:current_scope].user.id == @listening_session.user_id %>
@@ -126,9 +126,9 @@
                         <div class="flex items-center gap-2 px-3 py-2 text-sm">
                           <.icon name="hero-play-circle" class="w-4 h-4 shrink-0" />
                           <div class="min-w-0">
-                            <div class="truncate">{replay["label"] || replay["url"]}</div>
-                            <div :if={replay_source(replay)} class="truncate text-xs text-slate-500">
-                              {replay_source(replay)}
+                            <div class="truncate">{replay_title(replay)}</div>
+                            <div :if={replay_subtitle(replay)} class="truncate text-xs text-slate-500">
+                              {replay_subtitle(replay)}
                             </div>
                           </div>
                         </div>

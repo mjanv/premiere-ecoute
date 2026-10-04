@@ -17,6 +17,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionReplaysTest do
     "url" => "https://www.youtube.com/watch?v=abc",
     "replay_id" => "7c1e0a52-0b52-4c43-8a3e-2f1c7b9e4d22",
     "video_id" => "abc",
+    "title" => "Sample Artist - Sample Album",
     "youtube_channel_id" => "UCaaaaaaaaaaaaaaaaaaaaaa",
     "channel_title" => "Lanfeust Plays",
     "thumbnail_url" => "https://i.ytimg.com/vi/abc/hqdefault.jpg",
@@ -45,6 +46,17 @@ defmodule PremiereEcouteWeb.Sessions.SessionReplaysTest do
     assert has_element?(view, "a", "Lanfeust Plays")
   end
 
+  test "shows the YouTube title when the video is known, with the replay name and channel under it", %{
+    conn: conn,
+    user: user,
+    session: session
+  } do
+    {:ok, view, _html} = open(conn, user, session)
+
+    assert has_element?(view, ~s(a[href="https://www.youtube.com/watch?v=abc"]), "Sample Artist - Sample Album")
+    assert has_element?(view, ~s(a[href="https://www.youtube.com/watch?v=abc"]), "raw · Lanfeust Plays")
+  end
+
   test "falls back to the site of the link without a channel", %{conn: conn, user: user, session: session} do
     {:ok, view, _html} = open(conn, user, session)
 
@@ -67,6 +79,66 @@ defmodule PremiereEcouteWeb.Sessions.SessionReplaysTest do
     |> render_submit()
 
     assert ListeningSession.get(session.id).replays == [@auto]
+  end
+
+  describe "with a replay still looked for" do
+    setup %{session: session} do
+      pending = %{
+        "replay_id" => "7c1e0a52-0000-4c43-8a3e-2f1c7b9e4d99",
+        "label" => "edited",
+        "status" => "pending",
+        "job_id" => nil
+      }
+
+      {:ok, session} =
+        session |> ListeningSession.changeset(%{replays: session.replays ++ [pending]}) |> PremiereEcoute.Repo.update()
+
+      %{session: session, pending: pending}
+    end
+
+    test "shows only the links, on the page and in the modal", %{conn: conn, user: user, session: session} do
+      {:ok, view, _html} = open(conn, user, session)
+
+      assert has_element?(view, ~s(a[href="https://www.twitch.tv/videos/123"]))
+      refute has_element?(view, ~s(a[href=""]))
+
+      render_click(view, "open_replays_modal")
+      assert has_element?(view, ~s(#replays-modal input[name="replays[1][url]"]))
+      refute has_element?(view, ~s(#replays-modal input[name="replays[2][url]"]))
+    end
+
+    test "keeps it when the links are saved", %{conn: conn, user: user, session: session, pending: pending} do
+      {:ok, view, _html} = open(conn, user, session)
+
+      render_click(view, "open_replays_modal")
+
+      view
+      |> form("#replays-modal form", %{
+        "replays" => %{
+          "0" => %{"label" => "raw", "url" => @auto["url"]},
+          "1" => %{"label" => "Twitch VOD", "url" => @legacy["url"]}
+        }
+      })
+      |> render_submit()
+
+      assert [_, _, ^pending] = ListeningSession.get(session.id).replays
+    end
+  end
+
+  test "does not save two links for the same replay", %{conn: conn, user: user, session: session} do
+    {:ok, view, _html} = open(conn, user, session)
+    render_click(view, "open_replays_modal")
+
+    view
+    |> element("#replays-modal form")
+    |> render_submit(%{
+      "replays" => %{
+        "0" => %{"label" => "raw", "url" => @auto["url"], "replay_id" => "same"},
+        "1" => %{"label" => "Twitch VOD", "url" => @legacy["url"], "replay_id" => "same"}
+      }
+    })
+
+    assert ListeningSession.get(session.id).replays == [@auto, @legacy]
   end
 
   test "keeps the details of an entry whose link did not change", %{conn: conn, user: user, session: session} do
@@ -96,6 +168,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionReplaysTest do
     found = %Video{
       id: "9bZkp7q19f0",
       url: "https://www.youtube.com/watch?v=9bZkp7q19f0",
+      title: "Lanfeust highlights, October",
       channel_id: "UCbbbbbbbbbbbbbbbbbbbbbb",
       channel_title: "Lanfeust Highlights",
       thumbnail_url: "https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg"
@@ -116,7 +189,14 @@ defmodule PremiereEcouteWeb.Sessions.SessionReplaysTest do
     |> render_submit()
 
     assert [first, second] = ListeningSession.get(session.id).replays
-    assert %{"video_id" => "9bZkp7q19f0", "channel_title" => "Lanfeust Highlights", "source" => "manual"} = first
+
+    assert %{
+             "video_id" => "9bZkp7q19f0",
+             "title" => "Lanfeust highlights, October",
+             "channel_title" => "Lanfeust Highlights",
+             "source" => "manual"
+           } = first
+
     assert first["thumbnail_url"] == found.thumbnail_url
     assert second == @legacy
   end

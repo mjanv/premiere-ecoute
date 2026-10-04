@@ -52,6 +52,16 @@ defmodule PremiereEcouteWeb.Sessions.ReturnToTest do
     assert has_element?(view, ~s(#back-link[href="/sessions/retrospective"]))
   end
 
+  test "back link returns to my sessions, which is matched exactly", %{conn: conn, user: user, session: session} do
+    {:ok, view, _html} = live(conn, ~p"/sessions/#{user.username}/#{session.share_token}?#{[return_to: "/sessions"]}")
+    assert has_element?(view, ~s(#back-link[href="/sessions"]), "Back to my sessions")
+
+    {:ok, view, _html} =
+      live(conn, ~p"/sessions/#{user.username}/#{session.share_token}?#{[return_to: "/sessions/new"]}")
+
+    assert has_element?(view, ~s(#back-link[href="/sessions/retrospective"]))
+  end
+
   test "back link is labelled after the origin page", %{conn: conn, user: user, session: session} do
     {:ok, view, _html} =
       live(conn, ~p"/sessions/#{user.username}/#{session.share_token}?#{[return_to: "/home"]}")

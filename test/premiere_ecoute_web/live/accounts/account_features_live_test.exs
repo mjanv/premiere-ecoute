@@ -3,6 +3,8 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLiveTest do
 
   import Phoenix.LiveViewTest
 
+  alias PremiereEcoute.Accounts.User
+
   describe "clip overlay URL" do
     test "shows the clip overlay URL when selected", %{conn: conn} do
       user = user_fixture(%{role: :streamer})
@@ -40,7 +42,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLiveTest do
       )
       |> render_submit()
 
-      [channel] = PremiereEcoute.Accounts.User.get!(user.id).profile.video_settings.channels
+      [channel] = User.get!(user.id).profile.video_settings.channels
       assert channel.label == "Main"
 
       view
@@ -58,7 +60,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountFeaturesLiveTest do
       )
       |> render_submit()
 
-      settings = PremiereEcoute.Accounts.User.get!(user.id).profile.video_settings
+      settings = User.get!(user.id).profile.video_settings
       assert [%{name: "raw", delay_hours: 12, channel_id: channel_id}] = settings.replays
       assert channel_id == channel.id
       assert settings.reminders_enabled

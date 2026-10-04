@@ -260,8 +260,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   @impl true
   def handle_event("open_replays_modal", _params, socket) do
-    replays = socket.assigns.listening_session.replays || []
-    entries = if replays == [], do: [%{"label" => "", "url" => ""}], else: replays
+    links = Enum.filter(socket.assigns.listening_session.replays || [], &is_binary(&1["url"]))
+    entries = if links == [], do: [%{"label" => "", "url" => ""}], else: links
 
     {:noreply,
      socket
@@ -313,7 +313,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
           ReplayVideo.manual_entry(submitted, Enum.at(socket.assigns.replays_entries, String.to_integer(k)))
         end)
 
-      case ListeningSession.update_replays(session, replays) do
+      case ReplayVideo.save_links(session.id, replays) do
         {:ok, updated_session} ->
           {:noreply,
            socket
@@ -321,13 +321,30 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
            |> assign(:replays_modal_open, false)
            |> put_flash(:info, gettext("Replays saved"))}
 
-        {:error, _changeset} ->
+        {:error, :duplicate_replay} ->
+          {:noreply, put_flash(socket, :error, gettext("Each replay can only be linked once"))}
+
+        {:error, _reason} ->
           {:noreply, put_flash(socket, :error, gettext("Failed to save replays"))}
       end
     else
       {:noreply, put_flash(socket, :error, gettext("Not authorized"))}
     end
   end
+
+  # The YouTube title when the video is known, else the name of the replay.
+  defp replay_title(%{"title" => title}) when is_binary(title) and title != "", do: title
+  defp replay_title(replay), do: replay["label"] || replay["url"]
+
+  # Under a title, the name of the replay and its channel. Otherwise the channel, or the host of the link.
+  defp replay_subtitle(%{"title" => title} = replay) when is_binary(title) and title != "" do
+    case Enum.reject([replay["label"], replay_source(replay)], &(&1 in [nil, ""])) do
+      [] -> nil
+      parts -> Enum.join(parts, " · ")
+    end
+  end
+
+  defp replay_subtitle(replay), do: replay_source(replay)
 
   defp replay_source(%{"channel_title" => title}) when is_binary(title) and title != "", do: title
 
@@ -400,6 +417,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   defp back_label(:single), do: gettext("Back to single")
   defp back_label(:home), do: gettext("Back to home")
   defp back_label(:profile), do: gettext("Back to profile")
+  defp back_label(:sessions), do: gettext("Back to my sessions")
   defp back_label(_history), do: gettext("Back to history")
 
   defp history_path(socket) do
