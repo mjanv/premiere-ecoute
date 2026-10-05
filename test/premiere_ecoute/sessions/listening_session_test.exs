@@ -499,6 +499,63 @@ defmodule PremiereEcoute.Sessions.ListeningSessionTest do
     end
   end
 
+  describe "page_for_user/4 filters" do
+    setup %{user: user, album: album, playlist: playlist} do
+      {:ok, album_session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
+      {:ok, playlist_session} = ListeningSession.create(%{user_id: user.id, source: :playlist, playlist_id: playlist.id})
+      {:ok, free_session} = ListeningSession.create(%{user_id: user.id, source: :free, name: "Friday Mix"})
+      {:ok, active_session} = ListeningSession.start(album_session)
+
+      {:ok, %{album_session: active_session, playlist_session: playlist_session, free_session: free_session}}
+    end
+
+    defp ids(page), do: page.entries |> Enum.map(& &1.id) |> Enum.sort()
+
+    test "filters by status", %{user: user, album_session: album_session} do
+      assert ids(ListeningSession.page_for_user(user.id, 1, 10, %{status: :active})) == [album_session.id]
+    end
+
+    test "filters by source", %{user: user, playlist_session: playlist_session} do
+      assert ids(ListeningSession.page_for_user(user.id, 1, 10, %{source: :playlist})) == [playlist_session.id]
+    end
+
+    test "searches the album name case-insensitively", %{user: user, album: album, album_session: album_session} do
+      query = album.name |> String.slice(0, 4) |> String.upcase()
+      assert ids(ListeningSession.page_for_user(user.id, 1, 10, %{q: query})) == [album_session.id]
+    end
+
+    test "searches the album artist", %{user: user, album_session: album_session} do
+      assert ids(ListeningSession.page_for_user(user.id, 1, 10, %{q: "sample artist"})) == [album_session.id]
+    end
+
+    test "searches the playlist title", %{user: user, playlist_session: playlist_session} do
+      assert ids(ListeningSession.page_for_user(user.id, 1, 10, %{q: "Playlist"})) == [playlist_session.id]
+    end
+
+    test "searches the free session name", %{user: user, free_session: free_session} do
+      assert ids(ListeningSession.page_for_user(user.id, 1, 10, %{q: "friday"})) == [free_session.id]
+    end
+
+    test "combines search and filters", %{user: user} do
+      assert [] = ListeningSession.page_for_user(user.id, 1, 10, %{q: "friday", status: :active}).entries
+    end
+
+    test "treats blank filters as no filter and escapes LIKE wildcards", %{user: user} do
+      assert length(ListeningSession.page_for_user(user.id, 1, 10, %{q: "  ", status: nil, source: nil}).entries) == 3
+      assert [] = ListeningSession.page_for_user(user.id, 1, 10, %{q: "%"}).entries
+    end
+
+    test "does not leak other users' sessions", %{viewer: viewer} do
+      assert [] = ListeningSession.page_for_user(viewer.id, 1, 10, %{q: "Friday"}).entries
+    end
+
+    test "next_page_for_user/3 keeps the filters", %{user: user} do
+      page = ListeningSession.page_for_user(user.id, 1, 1, %{source: :free})
+      assert page.total_entries == 1
+      assert ListeningSession.next_page_for_user(user.id, page, %{source: :free}) == page
+    end
+  end
+
   describe "delete/1" do
     test "can delete an existing listening session", %{user: user, album: album} do
       {:ok, session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})

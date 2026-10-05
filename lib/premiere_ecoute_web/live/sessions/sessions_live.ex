@@ -14,9 +14,11 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.Services.ReplayVideo
 
+  @statuses %{"preparing" => :preparing, "active" => :active, "stopped" => :stopped}
+  @sources %{"album" => :album, "playlist" => :playlist, "track" => :track, "clip" => :clip, "free" => :free}
+
   @impl true
   def mount(_params, _session, %{assigns: %{current_scope: scope}} = socket) do
-    page = ListeningSession.page_for_user(scope.user.id, 1)
     if connected?(socket), do: PremiereEcoute.PubSub.subscribe("uploads:#{scope.user.id}")
 
     socket
@@ -25,19 +27,23 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
     |> assign(:pasting, nil)
     |> assign(:paste_error, nil)
     |> assign(:checking, MapSet.new())
-    |> assign(:page, page)
-    |> stream(:sessions, page.entries)
+    |> apply_filters(%{})
     |> then(fn socket -> {:ok, socket} end)
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_event("filter", params, socket) do
+    {:noreply, apply_filters(socket, parse_filters(params))}
   end
 
   @impl true
-  def handle_event("next-page", _params, %{assigns: %{current_scope: scope, page: page}} = socket) do
-    next_page = ListeningSession.next_page_for_user(scope.user.id, page)
+  def handle_event("reset_filters", _params, socket) do
+    {:noreply, apply_filters(socket, %{})}
+  end
+
+  @impl true
+  def handle_event("next-page", _params, %{assigns: %{current_scope: scope, page: page, filters: filters}} = socket) do
+    next_page = ListeningSession.next_page_for_user(scope.user.id, page, filters)
 
     socket
     |> assign(:page, next_page)
@@ -177,6 +183,50 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLive do
   """
   @spec attention_count(ListeningSession.t()) :: non_neg_integer()
   def attention_count(session), do: ReplayVideo.attention_count(session)
+
+  @doc """
+  Returns the filters of the filter form as the backend expects them.
+
+  Unknown status and source values are dropped, a blank search is dropped. Nothing is read from the URL: the filters live in the `:filters` assign.
+  """
+  @spec parse_filters(map()) :: %{optional(:q) => String.t(), optional(:status) => atom(), optional(:source) => atom()}
+  def parse_filters(params) do
+    [q: search_term(params["q"]), status: @statuses[params["status"]], source: @sources[params["source"]]]
+    |> Enum.reject(fn {_key, value} -> is_nil(value) end)
+    |> Map.new()
+  end
+
+  defp search_term(q) when is_binary(q), do: if(String.trim(q) == "", do: nil, else: String.trim(q))
+  defp search_term(_q), do: nil
+
+  defp apply_filters(%{assigns: %{current_scope: scope}} = socket, filters) do
+    page = ListeningSession.page_for_user(scope.user.id, 1, 10, filters)
+
+    socket
+    |> assign(:filters, filters)
+    |> assign(:page, page)
+    |> stream(:sessions, page.entries, reset: true)
+  end
+
+  @doc """
+  Returns the status values and labels offered by the status filter.
+  """
+  @spec status_options() :: [{String.t(), String.t()}]
+  def status_options,
+    do: [{"preparing", gettext("Preparing")}, {"active", gettext("Active")}, {"stopped", gettext("Stopped")}]
+
+  @doc """
+  Returns the source values and labels offered by the source filter.
+  """
+  @spec source_options() :: [{String.t(), String.t()}]
+  def source_options,
+    do: [
+      {"album", gettext("Album")},
+      {"playlist", gettext("Playlist")},
+      {"track", gettext("Track")},
+      {"clip", gettext("Clip")},
+      {"free", gettext("Free")}
+    ]
 
   defp replay_action("paste", session, replay_id, socket) do
     previous = socket.assigns.pasting

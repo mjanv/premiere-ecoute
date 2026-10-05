@@ -890,25 +890,84 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   @doc """
   Returns a paginated page of sessions for a user, ordered by status priority (active > preparing > stopped) then date descending.
+
+  Accepts optional filters, all ignored when blank or `nil`:
+
+  - `:q` - case-insensitive text matched against the session name, album name and artist, playlist title and owner, single name and artist
+  - `:status` - one of `:preparing`, `:active`, `:stopped`
+  - `:source` - one of `:album`, `:playlist`, `:track`, `:free`, `:clip`
   """
-  @spec page_for_user(integer(), pos_integer(), pos_integer()) :: Scrivener.Page.t()
-  def page_for_user(user_id, page_number, page_size \\ 10) do
+  @spec page_for_user(integer(), pos_integer(), pos_integer(), map()) :: Scrivener.Page.t()
+  def page_for_user(user_id, page_number, page_size \\ 10, filters \\ %{}) do
     query =
       from s in __MODULE__,
+        as: :session,
+        left_join: a in assoc(s, :album),
+        as: :album,
+        left_join: p in assoc(s, :playlist),
+        as: :playlist,
+        left_join: sg in assoc(s, :single),
+        as: :single,
         where: s.user_id == ^user_id,
         order_by: [
           fragment("CASE status WHEN 'active' THEN 1 WHEN 'preparing' THEN 2 ELSE 3 END"),
           desc: s.inserted_at
         ]
 
-    page = Repo.paginate(query, page: page_number, page_size: page_size)
+    page = query |> filter_sessions(filters) |> Repo.paginate(page: page_number, page_size: page_size)
 
     %{page | entries: Enum.map(page.entries, &preload/1)}
   end
 
-  @spec next_page_for_user(integer(), Scrivener.Page.t()) :: Scrivener.Page.t()
-  def next_page_for_user(_user_id, %Scrivener.Page{page_number: n, total_pages: n} = page), do: page
-  def next_page_for_user(user_id, %Scrivener.Page{page_number: n, page_size: ps}), do: page_for_user(user_id, n + 1, ps)
+  @spec next_page_for_user(integer(), Scrivener.Page.t(), map()) :: Scrivener.Page.t()
+  def next_page_for_user(user_id, page, filters \\ %{})
+  def next_page_for_user(_user_id, %Scrivener.Page{page_number: n, total_pages: n} = page, _filters), do: page
+
+  def next_page_for_user(user_id, %Scrivener.Page{page_number: n, page_size: ps}, filters),
+    do: page_for_user(user_id, n + 1, ps, filters)
+
+  defp filter_sessions(query, filters) do
+    query
+    |> filter_by(:status, filters[:status])
+    |> filter_by(:source, filters[:source])
+    |> search(filters[:q])
+  end
+
+  defp filter_by(query, _field, nil), do: query
+  defp filter_by(query, field, value), do: where(query, [session: s], field(s, ^field) == ^value)
+
+  defp search(query, nil), do: query
+
+  defp search(query, q) do
+    case String.trim(q) do
+      "" -> query
+      term -> where(query, ^search_conditions("%" <> escape_like(term) <> "%"))
+    end
+  end
+
+  defp search_conditions(pattern) do
+    dynamic(
+      [session: s, album: a, playlist: p, single: sg],
+      ilike(s.name, ^pattern) or ilike(a.name, ^pattern) or ilike(p.title, ^pattern) or
+        ilike(p.owner_name, ^pattern) or ilike(sg.name, ^pattern) or
+        exists(
+          from aa in "album_artists",
+            join: ar in "artists",
+            on: ar.id == aa.artist_id,
+            where: aa.album_id == parent_as(:album).id and ilike(ar.name, ^pattern),
+            select: 1
+        ) or
+        exists(
+          from sa in "single_artists",
+            join: ar in "artists",
+            on: ar.id == sa.artist_id,
+            where: sa.single_id == parent_as(:single).id and ilike(ar.name, ^pattern),
+            select: 1
+        )
+    )
+  end
+
+  defp escape_like(term), do: String.replace(term, ~w(\\ % _), &("\\" <> &1))
 
   @doc """
   Updates the replay links for a session.

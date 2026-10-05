@@ -69,6 +69,87 @@
             </.link>
           </:action>
         </.page_header>
+        <form
+          id="sessions-filters"
+          phx-change="filter"
+          phx-submit="filter"
+          class="flex flex-col sm:flex-row gap-3 mb-6"
+        >
+          <label class="relative flex-1">
+            <.icon name="hero-magnifying-glass" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="search"
+              name="q"
+              value={@filters[:q]}
+              placeholder={gettext("Search by album, artist, playlist or name")}
+              phx-debounce="300"
+              autocomplete="off"
+              class="w-full pl-10 pr-3 py-2 rounded-lg bg-white/10 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </label>
+          <div class="relative">
+            <select
+              name="source"
+              aria-label={gettext("Filter by source")}
+              class="appearance-none w-full sm:w-56 py-2 pl-3 pr-9 rounded-lg bg-white/10 border border-gray-700 text-white cursor-pointer transition-colors hover:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="" class="bg-gray-900">{gettext("All sources")}</option>
+              <option
+                :for={{value, label} <- source_options()}
+                value={value}
+                selected={@filters[:source] == String.to_existing_atom(value)}
+                class="bg-gray-900"
+              >
+                {label}
+              </option>
+            </select>
+            <.icon
+              name="hero-chevron-down"
+              class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            />
+          </div>
+          <div class="relative">
+            <select
+              name="status"
+              aria-label={gettext("Filter by status")}
+              class="appearance-none w-full sm:w-56 py-2 pl-3 pr-9 rounded-lg bg-white/10 border border-gray-700 text-white cursor-pointer transition-colors hover:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="" class="bg-gray-900">{gettext("All statuses")}</option>
+              <option
+                :for={{value, label} <- status_options()}
+                value={value}
+                selected={@filters[:status] == String.to_existing_atom(value)}
+                class="bg-gray-900"
+              >
+                {label}
+              </option>
+            </select>
+            <.icon
+              name="hero-chevron-down"
+              class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            />
+          </div>
+        </form>
+
+        <.empty_state
+          :if={@page.total_entries == 0 and map_size(@filters) > 0}
+          icon="hero-magnifying-glass"
+          title={gettext("No session matches")}
+          description={gettext("Try another search or remove a filter.")}
+          class="mb-8"
+        >
+          <:action>
+            <button
+              id="reset-filters"
+              type="button"
+              phx-click="reset_filters"
+              class="text-purple-400 hover:text-purple-300 underline"
+            >
+              {gettext("Reset filters")}
+            </button>
+          </:action>
+        </.empty_state>
+
         <div
           id="sessions"
           class="space-y-3 mb-8"
