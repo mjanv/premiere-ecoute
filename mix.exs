@@ -147,7 +147,7 @@ defmodule PremiereEcoute.MixProject do
       {:telemetry_metrics, "~> 1.2"},
       {:telemetry_poller, "~> 1.3"},
       {:prom_ex, "~> 1.12"},
-      {:sentry, "~> 13.5"},
+      {:sentry, "~> 14.0"},
       {:posthog, "~> 2.16"},
       # Code quality
       {:credo, "~> 1.7", only: [:dev]},
