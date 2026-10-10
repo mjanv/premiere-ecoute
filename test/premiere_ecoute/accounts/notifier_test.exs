@@ -17,8 +17,9 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
   end
 
   describe "Notifier" do
-    test "dispatch an email event on AccountCreated" do
-      event = %AccountCreated{id: 1}
+    test "dispatch an email event on AccountCreated of a streamer" do
+      streamer = user_fixture(%{role: :streamer})
+      event = %AccountCreated{id: streamer.id}
       expect(Mailer, :dispatch, fn ^event -> :ok end)
 
       Store.append(event, stream: "user")
@@ -26,13 +27,13 @@ defmodule PremiereEcoute.Accounts.NotifierTest do
       :timer.sleep(100)
     end
 
-    test "dispatch an email event on AccountDeleted" do
+    test "does not dispatch an email event on AccountDeleted", %{ref: ref, pid: pid} do
       event = %AccountDeleted{id: 1}
-      expect(Mailer, :dispatch, fn ^event -> :ok end)
 
+      expect(Mailer, :dispatch, 0, fn _ -> :ok end)
       Store.append(event, stream: "user")
 
-      :timer.sleep(100)
+      refute_receive {:DOWN, ^ref, :process, ^pid, {%Mox.UnexpectedCallError{}, _}}, 100
     end
 
     test "does not dispatch an email event on other events", %{ref: ref, pid: pid} do

@@ -43,6 +43,8 @@ defmodule PremiereEcoute.Accounts.Mailer.Email do
 
   import Swoosh.Email
 
+  alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Events.AccountCreated
   alias PremiereEcouteCore.Event
 
   @doc """
@@ -51,7 +53,29 @@ defmodule PremiereEcoute.Accounts.Mailer.Email do
   Creates email with event name as subject and event inspection as body for debugging purposes.
   """
   @spec from_event(map()) :: Swoosh.Email.t()
-  def from_event(event) do
+  def from_event(%AccountCreated{id: id} = event) when is_integer(id) do
+    case User.get(id) do
+      %User{role: :streamer} = user ->
+        new()
+        |> to({"Maxime Janvier", "maxime.janvier@gmail.com"})
+        |> from({"Premiere Ecoute", "hello@premiere-ecoute.fr"})
+        |> subject("New streamer: #{user.username}")
+        |> text_body("""
+        A new streamer account has been created.
+
+        Username: #{user.username}
+        Id: #{user.id}
+        Created at: #{user.inserted_at}
+        """)
+
+      _ ->
+        generic(event)
+    end
+  end
+
+  def from_event(event), do: generic(event)
+
+  defp generic(event) do
     new()
     |> to({"Maxime Janvier", "maxime.janvier@gmail.com"})
     |> from({"Premiere Ecoute", "hello@premiere-ecoute.fr"})

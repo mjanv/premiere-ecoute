@@ -2,8 +2,8 @@ defmodule PremiereEcoute.Twitch.EventHandlerTest do
   use PremiereEcoute.DataCase, async: true
 
   alias PremiereEcoute.Apis.Players.SpotifyProbe
-  alias PremiereEcoute.Twitch.EventHandler
   alias PremiereEcoute.Events.Twitch.StreamStarted
+  alias PremiereEcoute.Twitch.EventHandler
 
   defp stream_started(user), do: %StreamStarted{broadcaster_id: user.twitch.user_id, broadcaster_name: user.username}
 
