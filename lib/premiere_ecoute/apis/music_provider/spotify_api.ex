@@ -74,7 +74,7 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi do
                 {:ok, atom()} | {:error, term()}
     @callback start_resume_playback(
                 scope :: Scope.t(),
-                item :: Album.t() | Track.t() | Playlist.t() | Playlist.Track.t() | Single.t()
+                item :: Album.t() | Track.t() | Playlist.t() | Playlist.Track.t() | Single.t() | PlaybackState.t()
               ) ::
                 {:ok, String.t()} | {:error, term()}
     @callback add_item_to_playback_queue(scope :: Scope.t(), item :: Album.t() | Track.t()) ::

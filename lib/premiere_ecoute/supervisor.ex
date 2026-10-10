@@ -17,6 +17,7 @@ defmodule PremiereEcoute.Supervisor do
       PremiereEcoute.Collections.Supervisor,
       PremiereEcoute.Models.Supervisor,
       PremiereEcoute.Radio.EventHandler,
+      PremiereEcoute.Twitch.EventHandler,
       PremiereEcoute.Discography.Supervisor
     ]
 end

@@ -299,6 +299,16 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
     |> SpotifyApi.handle(204, fn _ -> "spotify:track:#{track_id}" end)
   end
 
+  def start_resume_playback(%Scope{} = scope, %PlaybackState{item: %{uri: "spotify:track:" <> _ = uri}, progress_ms: progress_ms}) do
+    scope
+    |> SpotifyApi.api()
+    |> Req.put(
+      url: "/me/player/play",
+      json: %{uris: [uri], position_ms: progress_ms || 0}
+    )
+    |> SpotifyApi.handle([202, 204], fn _ -> uri end)
+  end
+
   def start_resume_playback(%Scope{} = scope, %PlaylistTrack{provider: :spotify, track_id: track_id}) do
     scope
     |> SpotifyApi.api()
