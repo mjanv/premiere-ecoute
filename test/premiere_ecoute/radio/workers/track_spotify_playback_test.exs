@@ -171,7 +171,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlaybackTest do
       assert Radio.get_tracks(user.id, Date.utc_today()) == []
     end
 
-    test "reschedules 30s later on playback error to keep the loop alive" do
+    test "reschedules 60s later on playback error to keep the loop alive" do
       user = user_fixture() |> enable_radio_tracking()
 
       Mox.expect(SpotifyApi, :get_playback_state, fn _scope, _default ->
@@ -183,7 +183,7 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlaybackTest do
 
         assert_enqueued worker: TrackSpotifyPlayback,
                         args: %{user_id: user.id},
-                        scheduled_at: {DateTime.utc_now() |> DateTime.add(30, :second), delta: 5}
+                        scheduled_at: {DateTime.utc_now() |> DateTime.add(60, :second), delta: 5}
       end)
 
       assert Radio.get_tracks(user.id, Date.utc_today()) == []

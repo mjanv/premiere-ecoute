@@ -4,6 +4,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLiveTest do
   import Phoenix.LiveViewTest
   import PremiereEcoute.Discography.SingleFixtures
 
+  alias PremiereEcoute.Discography.Album
+  alias PremiereEcoute.Discography.Playlist
   alias PremiereEcoute.Discography.Single
   alias PremiereEcoute.Sessions.ListeningSession
 
@@ -25,8 +27,8 @@ defmodule PremiereEcouteWeb.Sessions.SessionsLiveTest do
   describe "search and filters" do
     setup %{conn: conn} do
       user = user_fixture(%{role: :streamer})
-      {:ok, album} = PremiereEcoute.Discography.Album.create(album_fixture(%{name: "Moon Safari"}))
-      {:ok, playlist} = PremiereEcoute.Discography.Playlist.create(playlist_fixture(%{title: "Road Trip", tracks: []}))
+      {:ok, album} = Album.create(album_fixture(%{name: "Moon Safari"}))
+      {:ok, playlist} = Playlist.create(playlist_fixture(%{title: "Road Trip", tracks: []}))
 
       {:ok, album_session} = ListeningSession.create(%{user_id: user.id, album_id: album.id})
       {:ok, _playlist_session} = ListeningSession.create(%{user_id: user.id, source: :playlist, playlist_id: playlist.id})

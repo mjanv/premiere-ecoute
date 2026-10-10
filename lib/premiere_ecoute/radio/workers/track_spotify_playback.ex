@@ -13,116 +13,107 @@ defmodule PremiereEcoute.Radio.Workers.TrackSpotifyPlayback do
 
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
+  alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Radio
-  alias PremiereEcoute.Repo
 
   @impl true
   def perform(%Oban.Job{args: %{"user_id" => user_id}}) do
-    with user <- user_id |> Accounts.User.get!() |> Repo.preload(:spotify),
+    with %User{} = user <- User.get(user_id),
          scope <- Accounts.maybe_renew_token(Scope.for_user(user), :spotify),
          {:enabled?, true} <- {:enabled?, Accounts.profile(user, [:radio_settings, :enabled], false)},
-         {:ok, playback} <- Apis.cache(:spotify).get_playback_state(scope, PlaybackState.default()),
-         {:ok, _track} <- store_track_if_new(user_id, playback),
-         :ok <- schedule_next_poll(user_id, playback) do
-      :ok
+         {:spotify?, {:ok, playback}} <- {:spotify?, Apis.cache(:spotify).get_playback_state(scope, PlaybackState.default())},
+         {:track!, {:ok, _track}} <- {:track!, store_track_if_new(user_id, playback)} do
+      schedule_next_poll(user_id, playback)
     else
+      nil ->
+        Logger.info("[#{__MODULE__}] user #{user_id}: no user found")
+        :ok
+
       {:enabled?, false} ->
-        Logger.info("[TrackSpotifyPlayback] user #{user_id}: radio disabled, not rescheduling")
+        Logger.info("[#{__MODULE__}] user #{user_id}: radio disabled")
         :ok
 
-      {:error, "Spotify rate limit exceeded"} ->
-        Logger.warning("[TrackSpotifyPlayback] user #{user_id}: rate limited, rescheduling in 300s")
-        __MODULE__.in_seconds(%{user_id: user_id}, 300)
-        :ok
+      {:spotify?, {:error, "Spotify rate limit exceeded"}} ->
+        Logger.warning("[#{__MODULE__}] user #{user_id}: Spotify rate limit exceeded")
+        schedule_next_poll(user_id, 300)
 
-      {:error, :consecutive_duplicate} ->
-        Logger.info("[TrackSpotifyPlayback] user #{user_id}: consecutive duplicate, rescheduling (60s default)")
-        schedule_next_poll(user_id)
-        :ok
+      {:spotify?, {:error, reason}} ->
+        Logger.warning("[#{__MODULE__}] user #{user_id}: #{inspect(reason)}")
+        schedule_next_poll(user_id, 60)
 
-      {:error, :no_track_playing} ->
-        Logger.info("[TrackSpotifyPlayback] user #{user_id}: no track playing, rescheduling (60s default)")
-        schedule_next_poll(user_id)
-        :ok
+      {:track!, {:error, reason}} ->
+        Logger.info("[#{__MODULE__}] user #{user_id}: #{inspect(reason)}")
+        schedule_next_poll(user_id, 60)
 
       {:error, reason} ->
-        Logger.error("[TrackSpotifyPlayback] user #{user_id}: playback tracking failed (#{inspect(reason)}), rescheduling in 30s")
-        # Reschedule after failure to keep the loop alive (e.g. transient 401 on expired token).
-        __MODULE__.in_seconds(%{user_id: user_id}, 30)
-        :ok
+        Logger.error("[#{__MODULE__}] user #{user_id}: playback tracking failed (#{inspect(reason)})")
+        schedule_next_poll(user_id, 60)
     end
   rescue
     error ->
-      Logger.error(
-        "[TrackSpotifyPlayback] user #{user_id}: perform/1 raised #{Exception.format(:error, error, __STACKTRACE__)} — NOT rescheduling, job will retry/discard per Oban max_attempts"
-      )
-
+      Logger.error("[#{__MODULE__}] user #{user_id}: raised #{Exception.message(error)}")
       reraise error, __STACKTRACE__
   end
 
-  defp store_track_if_new(_user_id, %PlaybackState{item: nil}) do
-    Logger.info("[TrackSpotifyPlayback] no track playing (nil item)")
-    {:error, :no_track_playing}
-  end
-
   defp store_track_if_new(user_id, %PlaybackState{item: %{uri: "spotify:track:" <> provider_id} = item, progress_ms: progress_ms}) do
-    started_at =
-      case progress_ms do
-        ms when is_integer(ms) -> DateTime.add(DateTime.utc_now(), -ms, :millisecond)
-        _ -> DateTime.utc_now()
-      end
-
-    result =
-      Radio.insert_track(user_id, "spotify", %{
-        provider_ids: %{spotify: provider_id},
-        name: item.name,
-        artist: item.artists |> List.first() |> then(&(&1 && Map.get(&1, :name))),
-        album: nil,
-        duration_ms: item.duration_ms,
-        started_at: started_at
-      })
-
-    case result do
+    user_id
+    |> Radio.insert_track("spotify", %{
+      provider_ids: %{spotify: provider_id},
+      name: item.name,
+      artist: item.artists |> List.first() |> then(&(&1 && Map.get(&1, :name))),
+      album: nil,
+      duration_ms: item.duration_ms,
+      started_at:
+        case progress_ms do
+          ms when is_integer(ms) -> DateTime.add(DateTime.utc_now(), -ms, :millisecond)
+          _ -> DateTime.utc_now()
+        end
+    })
+    |> tap(fn
       {:ok, _track} ->
         Logger.info(
-          "[TrackSpotifyPlayback] user #{user_id}: stored track #{inspect(item.name)} (duration_ms=#{item.duration_ms}, progress_ms=#{inspect(progress_ms)})"
+          "[#{__MODULE__}] user #{user_id}: stored track #{inspect(item.name)} (duration_ms=#{item.duration_ms}, progress_ms=#{inspect(progress_ms)})"
         )
 
       {:error, :consecutive_duplicate} ->
         Logger.info(
-          "[TrackSpotifyPlayback] user #{user_id}: skip duplicate #{inspect(item.name)} (duration_ms=#{item.duration_ms}, progress_ms=#{inspect(progress_ms)})"
+          "[#{__MODULE__}] user #{user_id}: skip duplicate #{inspect(item.name)} (duration_ms=#{item.duration_ms}, progress_ms=#{inspect(progress_ms)})"
         )
 
       {:error, reason} ->
-        Logger.error("[TrackSpotifyPlayback] user #{user_id}: insert_track failed (#{inspect(reason)})")
-    end
-
-    result
+        Logger.error("[#{__MODULE__}] user #{user_id}: insert_track failed (#{inspect(reason)})")
+    end)
   end
 
-  defp store_track_if_new(user_id, %PlaybackState{item: %{uri: uri}}) do
-    Logger.warning(
-      "[TrackSpotifyPlayback] user #{user_id}: item with unrecognized uri #{inspect(uri)}, treating as no track playing"
-    )
-
+  defp store_track_if_new(user_id, %PlaybackState{item: nil}) do
+    Logger.info("[#{__MODULE__}] user #{user_id}: no track playing")
     {:error, :no_track_playing}
   end
 
-  defp schedule_next_poll(user_id, playback \\ %PlaybackState{}) do
-    delay_s =
-      case playback do
-        %PlaybackState{progress_ms: progress_ms, item: %{duration_ms: duration_ms}} when not is_nil(progress_ms) ->
-          div(duration_ms - progress_ms + 30_000, 1000)
+  defp store_track_if_new(user_id, %PlaybackState{item: %{uri: uri}}) do
+    Logger.warning("[#{__MODULE__}] user #{user_id}: unrecognized uri #{inspect(uri)}")
+    {:error, :no_track_playing}
+  end
 
-        _ ->
-          60
-      end
+  defp schedule_next_poll(user_id, delay) when is_integer(delay) do
+    Logger.info("[#{__MODULE__}] user #{user_id}: scheduling next poll in #{delay}s")
+    __MODULE__.in_seconds(%{user_id: user_id}, delay)
+    :ok
+  end
 
-    Logger.info("[TrackSpotifyPlayback] user #{user_id}: scheduling next poll in #{delay_s}s")
+  defp schedule_next_poll(user_id, %PlaybackState{progress_ms: nil}) do
+    delay = 60
+    Logger.info("[#{__MODULE__}] user #{user_id}: scheduling next poll in #{delay}s")
+    __MODULE__.in_seconds(%{user_id: user_id}, delay)
+    :ok
+  end
 
-    __MODULE__.in_seconds(%{user_id: user_id}, delay_s)
+  defp schedule_next_poll(user_id, %PlaybackState{progress_ms: p, item: %{duration_ms: d}}) do
+    delay = div(d - p + 30_000, 1_000)
+    Logger.info("[#{__MODULE__}] user #{user_id}: scheduling next poll in #{delay}s")
+    __MODULE__.in_seconds(%{user_id: user_id}, delay)
     :ok
   end
 end
