@@ -14,6 +14,9 @@ defmodule PremiereEcouteMock.TwitchApi.PollSimulator do
   @interval_ms 5_000
   @webhook_url "http://localhost:4000/webhooks/twitch"
 
+  @doc """
+  Starts the poll simulator.
+  """
   @spec start_link(term()) :: GenServer.on_start()
   def start_link(_), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
 

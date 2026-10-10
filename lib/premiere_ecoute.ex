@@ -44,6 +44,7 @@ defmodule PremiereEcoute do
   @commit System.cmd("git", ["rev-parse", "--short", "HEAD"], stderr_to_stdout: true) |> elem(0) |> String.trim()
 
   @doc "Apply a command to the command bus"
+  @spec apply(struct()) :: term()
   def apply(command), do: CommandBus.impl().apply(command)
 
   defdelegate paginate(stream, opts), to: Store

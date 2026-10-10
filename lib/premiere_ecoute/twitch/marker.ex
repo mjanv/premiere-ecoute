@@ -16,6 +16,9 @@ defmodule PremiereEcoute.Twitch.Marker do
 
   defstruct [:id, :created_at, :description, :position_seconds, :url, :video_id]
 
+  @doc """
+  Parses a Twitch API stream marker.
+  """
   @spec parse(map()) :: t()
   def parse(data) do
     %__MODULE__{

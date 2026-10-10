@@ -11,10 +11,12 @@ defmodule PremiereEcoute.Presence do
 
   @type role() :: :player | :overlay | :unknown
 
+  @impl true
   def init(_opts) do
     {:ok, %{}}
   end
 
+  @impl true
   def handle_metas("presence:" <> user_id, %{leaves: leaves}, presences, state) do
     overlay_left = Map.has_key?(leaves, "overlay")
 

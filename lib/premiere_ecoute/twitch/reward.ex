@@ -19,6 +19,9 @@ defmodule PremiereEcoute.Twitch.Reward do
 
   defstruct [:id, :broadcaster_id, :title, :cost, :prompt, :is_enabled, :is_paused, :is_in_stock, :is_user_input_required]
 
+  @doc """
+  Parses a Twitch API custom reward.
+  """
   @spec parse(map()) :: t()
   def parse(data) do
     %__MODULE__{

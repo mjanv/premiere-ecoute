@@ -8,22 +8,27 @@ defmodule PremiereEcouteCore.Channel do
     @channel ~h"user:{id}"
   """
 
+  @doc """
+  Registers the `~h` sigil and tracks the channels declared in the module.
+  """
+  @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(_opts) do
     quote do
       import PremiereEcouteCore.Channel, only: [sigil_h: 2]
-      Module.register_attribute(__MODULE__, :channels, accumulate: true)
-      @before_compile PremiereEcouteCore.Channel
+      Module.register_attribute(__MODULE__, :channels, accumulate: true, persist: true)
+
+      @doc "Returns the templates of the channels declared in this module."
+      @spec __channels__() :: [String.t()]
+      def __channels__ do
+        __MODULE__.__info__(:attributes) |> Keyword.get_values(:channels) |> Enum.concat() |> Enum.reverse()
+      end
     end
   end
 
-  defmacro __before_compile__(env) do
-    channels = Module.get_attribute(env.module, :channels)
-
-    quote do
-      def __channels__, do: unquote(channels)
-    end
-  end
-
+  @doc """
+  Builds a channel name and records its template, interpolations being replaced by `_`.
+  """
+  @spec sigil_h(Macro.t(), charlist()) :: Macro.t()
   defmacro sigil_h({:<<>>, _meta, parts}, _args) do
     template =
       Enum.map_join(parts, fn
@@ -47,13 +52,26 @@ defmodule PremiereEcoute.Prout do
 
   use PremiereEcouteCore.Channel
 
+  @doc """
+  Returns the artist channel name.
+  """
+  @spec a(term()) :: String.t()
   def a(id), do: ~h"artist:#{id}"
+
+  @doc """
+  Returns the user channel name of an artist.
+  """
+  @spec b(map()) :: String.t()
   def b(artist), do: ~h"user:#{artist.meta.id}"
 end
 
 defmodule PremiereEcouteCore.ChannelRegistry do
   @moduledoc false
 
+  @doc """
+  Returns the templates of all channels declared in the application.
+  """
+  @spec all() :: [String.t()]
   def all do
     :application.get_key(:premiere_ecoute, :modules)
     |> elem(1)

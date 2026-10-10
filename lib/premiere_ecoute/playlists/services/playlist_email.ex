@@ -7,6 +7,9 @@ defmodule PremiereEcoute.Playlists.Services.PlaylistEmail do
   alias PremiereEcoute.Discography.LibraryPlaylist
   alias PremiereEcoute.Playlists.Workers.PlaylistEmailWorker
 
+  @doc """
+  Schedules the playlist email for one user or a list of users.
+  """
   @spec email(LibraryPlaylist.t(), User.t() | [User.t()]) :: {:ok, list()}
   def email(playlist, %User{} = user), do: email(playlist, [user])
   def email(%LibraryPlaylist{}, []), do: {:ok, []}

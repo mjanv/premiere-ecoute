@@ -17,6 +17,9 @@ defmodule PremiereEcoute.Discography.Services.SyncPlaylistDiscography do
 
   @type result :: %{new_artists: non_neg_integer(), skipped_albums: non_neg_integer()}
 
+  @doc """
+  Adds the artists, albums and singles of a library playlist to the discography, unless its snapshot is unchanged.
+  """
   @spec sync(LibraryPlaylist.t()) :: {:ok, :unchanged} | {:ok, result()} | {:error, term()}
   def sync(%LibraryPlaylist{} = library_playlist) do
     with {:ok, playlist} <- Apis.spotify().get_playlist(library_playlist.playlist_id),

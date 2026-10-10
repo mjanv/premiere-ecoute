@@ -43,9 +43,11 @@ defmodule PremiereEcoute.Sessions.ListeningSession.XmemlExport do
   ]
 
   @doc "Returns the list of supported frame rates as {label, timebase, ntsc} tuples."
+  @spec frame_rates() :: [{String.t(), pos_integer(), String.t()}]
   def frame_rates, do: @frame_rates
 
   @doc "Resolves a frame rate label to its {timebase, ntsc} pair. Raises if not found."
+  @spec resolve_rate(String.t()) :: {pos_integer(), String.t()}
   def resolve_rate(label) do
     {_, tb, ntsc} = Enum.find(@frame_rates, fn {l, _, _} -> l == label end)
     {tb, ntsc}

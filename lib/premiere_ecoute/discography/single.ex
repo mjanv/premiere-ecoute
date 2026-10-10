@@ -63,12 +63,19 @@ defmodule PremiereEcoute.Discography.Single do
     |> put_artist()
   end
 
+  @doc """
+  Fetches a single matching the clauses, or `nil`.
+  """
+  @spec get_by(keyword() | map()) :: t() | nil
   def get_by(clauses), do: get_by(__MODULE__, clauses)
 
+  @doc "Fetches a single matching the clauses from a query, or `nil`."
+  @spec get_by(Ecto.Queryable.t(), keyword() | map()) :: t() | nil
   def get_by(query, clauses) do
     query |> Repo.get_by(clauses) |> preload()
   end
 
+  @spec get(integer()) :: t() | nil
   def get(id), do: __MODULE__ |> Repo.get(id) |> preload()
 
   def create(%__MODULE__{artists: artists} = single) do
@@ -137,6 +144,9 @@ defmodule PremiereEcoute.Discography.Single do
     |> Enum.map(&put_artist/1)
   end
 
+  @doc """
+  Fetches a single by slug, or `nil` when none matches.
+  """
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 

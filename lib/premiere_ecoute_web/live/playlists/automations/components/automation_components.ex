@@ -11,6 +11,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   @doc "Human-readable one-liner for an automation's schedule."
   attr :automation, :map, required: true
 
+  @spec schedule_summary(map()) :: Phoenix.LiveView.Rendered.t()
   def schedule_summary(assigns) do
     ~H"""
     <span>
@@ -40,6 +41,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   attr :steps, :list, required: true
   attr :registry, :map, required: true
 
+  @spec steps_list(map()) :: Phoenix.LiveView.Rendered.t()
   def steps_list(assigns) do
     ~H"""
     <div class="space-y-2">
@@ -71,6 +73,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   attr :expanded, :boolean, default: false
   attr :on_toggle, :string, default: nil
 
+  @spec run_row(map()) :: Phoenix.LiveView.Rendered.t()
   def run_row(assigns) do
     ~H"""
     <div class="border border-gray-700 rounded-lg overflow-hidden">
@@ -107,6 +110,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
 
   attr :status, :atom, required: true
 
+  @spec run_status_badge(map()) :: Phoenix.LiveView.Rendered.t()
   def run_status_badge(assigns) do
     ~H"""
     <span class={"inline-flex items-center px-2 py-0.5 rounded text-xs font-medium #{status_class(@status)}"}>
@@ -117,6 +121,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
 
   attr :result, :map, required: true
 
+  @spec step_result_row(map()) :: Phoenix.LiveView.Rendered.t()
   def step_result_row(assigns) do
     ~H"""
     <div class={"flex items-start gap-3 p-2 rounded #{step_result_bg(@result["status"])}"}>
@@ -149,6 +154,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   attr :library_playlists, :list, required: true
   attr :show_picker, :boolean, default: false
 
+  @spec step_builder(map()) :: Phoenix.LiveView.Rendered.t()
   def step_builder(assigns) do
     ~H"""
     <div class="space-y-3" id="step-builder">
@@ -231,6 +237,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   attr :index, :integer, required: true
   attr :library_playlists, :list, required: true
 
+  @spec step_config_fields(map()) :: Phoenix.LiveView.Rendered.t()
   def step_config_fields(%{step: %{"action_type" => "create_playlist"}} = assigns) do
     ~H"""
     <div class="space-y-2">
@@ -390,6 +397,7 @@ defmodule PremiereEcouteWeb.Playlists.Automations.Components.AutomationComponent
   attr :value, :string, default: nil
   attr :playlists, :list, required: true
 
+  @spec playlist_select(map()) :: Phoenix.LiveView.Rendered.t()
   def playlist_select(assigns) do
     ~H"""
     <div>

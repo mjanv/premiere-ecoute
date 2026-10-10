@@ -31,6 +31,9 @@ defmodule PremiereEcouteWeb.Api.Collection.VoteController do
     ]
   )
 
+  @doc """
+  Submits a vote on the active vote window.
+  """
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(
         %{assigns: %{current_scope: %{user: %{role: :streamer, twitch: %{user_id: broadcaster_id}}}}} = conn,

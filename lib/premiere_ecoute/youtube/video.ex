@@ -66,6 +66,9 @@ defmodule PremiereEcoute.Youtube.Video do
     if is_binary(id) and Regex.match?(@id_regex, id), do: {:ok, id}, else: :error
   end
 
+  @doc """
+  Parses a YouTube API playlist item or video resource into a video.
+  """
   @spec parse(map()) :: t()
   def parse(%{"kind" => "youtube#playlistItem", "contentDetails" => %{"videoId" => id} = details, "snippet" => snippet} = data) do
     snippet =

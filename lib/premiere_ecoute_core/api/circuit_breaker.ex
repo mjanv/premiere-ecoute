@@ -12,6 +12,9 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
   @transient_error_codes [503]
   @transient_ttl_seconds 30
 
+  @doc """
+  Attaches the circuit breaker steps to a request. The request is halted while the API circuit is open.
+  """
   @spec run(Req.Request.t(), Keyword.t()) :: Req.Request.t()
   def run(request, opts \\ []) do
     request
@@ -63,6 +66,15 @@ defmodule PremiereEcouteCore.Api.CircuitBreaker do
     end
   end
 
+  @doc """
+  Simulates an incident by opening the circuit of an API for `ttl` seconds.
+  """
+  @spec up(atom(), non_neg_integer()) :: term()
   def up(api, ttl \\ 10), do: Cache.put(@cache, api, "simulated incident", expire: ttl * 1_000)
+
+  @doc """
+  Closes the circuit of an API.
+  """
+  @spec down(atom()) :: term()
   def down(api), do: Cache.del(@cache, api)
 end

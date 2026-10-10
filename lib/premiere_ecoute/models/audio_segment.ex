@@ -12,6 +12,10 @@ defmodule PremiereEcoute.Models.AudioSegment do
 
   defstruct [:id, :start_ms, :end_ms, :class, :audio, :text]
 
+  @doc """
+  Builds a segment, classified as speech when clean and noisy otherwise.
+  """
+  @spec new(number(), number(), boolean(), String.t() | nil) :: t()
   def new(start_ms, end_ms, is_clean, audio) do
     class = if is_clean, do: :speech, else: :noisy
 
@@ -31,6 +35,7 @@ defmodule PremiereEcoute.Models.AudioSegment do
   The browser sends raw little-endian Float32 PCM at 48kHz.
   Returns a 1D `{num_samples}` tensor of type `:f32`.
   """
+  @spec decode_audio(t()) :: Nx.Tensor.t()
   def decode_audio(%__MODULE__{audio: b64} = _segment) do
     binary = Base.decode64!(b64)
     floats = for <<f::float-little-32 <- binary>>, do: f
@@ -43,6 +48,7 @@ defmodule PremiereEcoute.Models.AudioSegment do
   Input is Float32 LE PCM at 48kHz mono (fmt type 3 = IEEE float).
   Returns a valid WAV binary ready to be sent to an audio API.
   """
+  @spec to_wav(t()) :: binary()
   def to_wav(%__MODULE__{audio: b64}) do
     pcm = Base.decode64!(b64)
     num_channels = 1

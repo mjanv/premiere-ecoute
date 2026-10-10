@@ -12,6 +12,9 @@ defmodule PremiereEcouteWeb.Podcasts.CoverController do
   alias PremiereEcoute.Podcasts.Show
   alias PremiereEcoute.Podcasts.Storage
 
+  @doc """
+  Serves the cover image of a show.
+  """
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, %{"id" => id}) do
     case Podcasts.get_show(id) do

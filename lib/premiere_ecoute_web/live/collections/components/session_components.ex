@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
 
   attr :player_state, :any, required: true
 
+  @spec player_bar(map()) :: Phoenix.LiveView.Rendered.t()
   def player_bar(%{player_state: nil} = assigns), do: ~H""
 
   def player_bar(assigns) do
@@ -73,6 +74,7 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
   attr :play_event, :string, default: nil
   attr :playing_track_id, :string, default: nil
 
+  @spec track_card(map()) :: Phoenix.LiveView.Rendered.t()
   def track_card(%{track: nil} = assigns) do
     ~H"""
     <div class="bg-white/5 rounded-lg border border-white/10 px-4 py-3 flex items-center justify-center">
@@ -187,6 +189,7 @@ defmodule PremiereEcouteWeb.Collections.Components.SessionComponents do
   attr :color_primary, :string, default: "#3b82f6"
   attr :color_secondary, :string, default: "#f59e0b"
 
+  @spec vote_controls(map()) :: Phoenix.LiveView.Rendered.t()
   def vote_controls(assigns) do
     ~H"""
     <div class="flex items-center gap-2 flex-1">

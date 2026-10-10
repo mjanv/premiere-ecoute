@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Playlists.Formatters.Csv do
   Columns: title, track_count, url, provider.
   """
 
+  @type t :: %__MODULE__{}
+
   defstruct []
 
   alias PremiereEcoute.Discography.LibraryPlaylist

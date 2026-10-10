@@ -632,6 +632,9 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
 
   # ── View helpers ──────────────────────────────────────────────────────────
 
+  @doc """
+  Formats a number of seconds as `MM:SS`.
+  """
   @spec format_countdown(integer() | nil) :: String.t() | nil
   def format_countdown(nil), do: nil
 
@@ -639,11 +642,17 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     :io_lib.format("~2..0B:~2..0B", [div(secs, 60), rem(secs, 60)]) |> IO.iodata_to_binary()
   end
 
+  @doc """
+  Returns the CSS classes of a track decision badge.
+  """
   @spec decision_class(atom()) :: String.t()
   def decision_class(:kept), do: "bg-green-600/20 text-green-400 border-green-500/30"
   def decision_class(:rejected), do: "bg-red-600/20 text-red-400 border-red-500/30"
   def decision_class(:skipped), do: "bg-gray-600/20 text-gray-400 border-gray-500/30"
 
+  @doc """
+  Returns the decision taken on a track, or `nil` when undecided.
+  """
   @spec track_decision(CollectionSession.t(), String.t()) :: :kept | :rejected | :skipped | nil
   def track_decision(session, track_id) do
     cond do
@@ -654,6 +663,9 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionLive do
     end
   end
 
+  @doc """
+  Returns the CSS width of one side of the vote bar.
+  """
   @spec vote_bar_width(integer(), integer(), :a | :b) :: String.t()
   def vote_bar_width(0, 0, _side), do: "50%"
   def vote_bar_width(a, b, :a), do: "#{trunc(a / (a + b) * 100)}%"

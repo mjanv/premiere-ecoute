@@ -5,6 +5,10 @@ defmodule PremiereEcoute.Models.Mistral.Chat do
 
   @url "https://api.mistral.ai/v1/chat/completions"
 
+  @doc """
+  Sends a chat completion request to Mistral.
+  """
+  @spec chat(list()) :: Req.Response.t()
   def chat(_messages) do
     Req.post!(
       @url,

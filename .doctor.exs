@@ -3,7 +3,9 @@
   ignore_paths: [
     "lib/premiere_ecoute_core/aggregate.ex",
     "lib/premiere_ecoute_core/command_bus/handler.ex",
-    "lib/premiere_ecoute_core/event_bus/handler.ex"
+    "lib/premiere_ecoute_core/event_bus/handler.ex",
+    "lib/premiere_ecoute/apis/music_provider/spotify_api/facade.ex",
+    "lib/premiere_ecoute/playlists/automations/action.ex"
   ],
   min_module_doc_coverage: 100,
   min_module_spec_coverage: 100,

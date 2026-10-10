@@ -21,6 +21,10 @@ defmodule PremiereEcouteWeb.Images.ImageProxyController do
     resources.tidal.com
   )
 
+  @doc """
+  Serves a cached copy of an allowed remote image, fetching it on first request.
+  """
+  @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, %{"url" => url}) do
     if allowed_url?(url) do
       cache_path = cache_path_for(url)

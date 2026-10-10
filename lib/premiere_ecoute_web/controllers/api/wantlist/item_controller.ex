@@ -25,6 +25,9 @@ defmodule PremiereEcouteWeb.Api.Wantlist.ItemController do
     ]
   )
 
+  @doc """
+  Removes an item from the authenticated user's wantlist.
+  """
   @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(%{assigns: %{current_scope: %{user: user}}} = conn, %{"id" => id}) do
     with {int_id, ""} <- Integer.parse(id),

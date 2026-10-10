@@ -6,7 +6,15 @@ defmodule PremiereEcouteWeb.Plugs.StashMethod do
   without fetching bytes or counting a download — which `Plug.Head` alone can't express.
   """
 
+  @doc """
+  Returns the plug options unchanged.
+  """
+  @spec init(term()) :: term()
   def init(opts), do: opts
 
+  @doc """
+  Stores the original HTTP method in `conn.private.original_method`.
+  """
+  @spec call(Plug.Conn.t(), term()) :: Plug.Conn.t()
   def call(conn, _opts), do: Plug.Conn.put_private(conn, :original_method, conn.method)
 end

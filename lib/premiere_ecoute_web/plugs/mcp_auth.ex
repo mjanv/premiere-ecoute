@@ -17,6 +17,9 @@ defmodule PremiereEcouteWeb.Plugs.McpAuth do
   @spec init(any()) :: any()
   def init(opts), do: opts
 
+  @doc """
+  Authenticates the MCP request from its API key or bearer token.
+  """
   @spec call(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def call(conn, _opts) do
     api_key = get_req_header(conn, "x-api-key")

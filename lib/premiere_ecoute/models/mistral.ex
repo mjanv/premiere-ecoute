@@ -5,6 +5,10 @@ defmodule PremiereEcoute.Models.Mistral do
   alias PremiereEcoute.Models.Mistral.Moderation
   alias PremiereEcoute.Models.Mistral.Transcription
 
+  @doc """
+  Returns the HTTP headers of a JSON request to the Mistral API.
+  """
+  @spec headers(atom()) :: [{String.t(), String.t()}]
   def headers(:json) do
     [
       {"content-type", "application/json"},

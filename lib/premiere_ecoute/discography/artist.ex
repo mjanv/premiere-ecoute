@@ -39,6 +39,8 @@ defmodule PremiereEcoute.Discography.Artist do
       field :width, :integer
     end
 
+    @doc "Builds an image changeset."
+    @spec changeset(t(), map()) :: Ecto.Changeset.t()
     def changeset(image, attrs) do
       cast(image, attrs, [:url, :height, :width])
     end
@@ -103,9 +105,15 @@ defmodule PremiereEcoute.Discography.Artist do
   @spec last(non_neg_integer()) :: [t()]
   def last(n \\ 5), do: all(order_by: [desc: :inserted_at], limit: n)
 
+  @doc """
+  Fetches an artist by slug, or `nil` when none matches.
+  """
   @spec get_by_slug(String.t()) :: t() | nil
   def get_by_slug(slug), do: get_by(slug: slug)
 
+  @doc """
+  Finds an artist by its identifier on a music provider.
+  """
   @spec find_by_provider(String.t(), atom()) :: t() | nil
   def find_by_provider(id, provider) do
     from(a in __MODULE__,
@@ -131,6 +139,9 @@ defmodule PremiereEcoute.Discography.Artist do
     end
   end
 
+  @doc """
+  Builds an artist changeset, generating the slug from the name.
+  """
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(artist, attrs) do
     artist

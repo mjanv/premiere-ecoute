@@ -7,6 +7,10 @@ defmodule PremiereEcoute.Models.Realtime do
 
   @url "wss://api.mistral.ai/v1/audio/transcriptions/realtime"
 
+  @doc """
+  Opens the websocket connection to the Mistral realtime transcription API.
+  """
+  @spec start_link(term()) :: {:ok, pid()} | {:error, term()}
   def start_link(_args) do
     WebSockex.start_link(@url, __MODULE__, %{initialized: false},
       extra_headers: [
@@ -19,6 +23,7 @@ defmodule PremiereEcoute.Models.Realtime do
   Sends a chunk of audio.
   Expects raw binary audio (e.g., PCM 16-bit 24kHz).
   """
+  @spec push_audio(pid(), binary()) :: :ok | {:error, term()}
   def push_audio(pid, binary_audio) do
     payload = %{
       type: "input_audio_buffer.append",

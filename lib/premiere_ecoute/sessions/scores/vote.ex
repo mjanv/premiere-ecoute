@@ -86,6 +86,10 @@ defmodule PremiereEcoute.Sessions.Scores.Vote do
     Regex.match?(~r/(?<![\w])#{Regex.escape(option)}(?![\w])/u, message)
   end
 
+  @doc """
+  Returns the average vote of a viewer on a session formatted as `avg/max`, or `nil` without votes.
+  """
+  @spec get_vote_message(integer(), term(), [String.t()]) :: String.t() | nil
   def get_vote_message(session_id, viewer_id, vote_options) do
     from(v in __MODULE__,
       where: v.session_id == ^session_id and v.viewer_id == ^viewer_id,

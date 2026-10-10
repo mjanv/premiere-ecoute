@@ -227,6 +227,9 @@ defmodule PremiereEcouteWeb.Layouts do
     end
   end
 
+  @doc """
+  Returns the PostHog API key, or `nil` when analytics are not configured.
+  """
   @spec posthog_api_key() :: String.t() | nil
   def posthog_api_key, do: Application.get_env(:posthog, :api_key)
 

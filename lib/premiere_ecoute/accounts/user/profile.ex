@@ -35,33 +35,62 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     field :sound_effects_enabled, :boolean, default: true
 
     embeds_one :widget_settings, WidgetSettings, on_replace: :update, primary_key: false do
+      @moduledoc "Colors of the streaming widgets."
+
+      @type t :: %__MODULE__{color_primary: String.t(), color_secondary: String.t()}
+
       field :color_primary, :string, default: "#5b21b6"
       field :color_secondary, :string, default: "#be123c"
     end
 
     embeds_one :radio_settings, RadioSettings, on_replace: :update, primary_key: false do
+      @moduledoc "Settings of the radio."
+
+      @type t :: %__MODULE__{enabled: boolean(), retention_days: integer(), visibility: :private | :public}
+
       field :enabled, :boolean, default: false
       field :retention_days, :integer, default: 7
       field :visibility, Ecto.Enum, values: [:private, :public], default: :public
     end
 
     embeds_one :chat_settings, ChatSettings, on_replace: :update, primary_key: false do
+      @moduledoc "Settings of the chat integration."
+
+      @type t :: %__MODULE__{save_wantlist: boolean(), vote_enabled: boolean()}
+
       field :save_wantlist, :boolean, default: false
       field :vote_enabled, :boolean, default: true
     end
 
     embeds_one :video_settings, VideoSettings, on_replace: :update, primary_key: false do
+      @moduledoc "Settings of the replay videos."
+
+      @type t :: %__MODULE__{
+              show_name: String.t(),
+              title_template: String.t(),
+              reminders_enabled: boolean(),
+              tracking_since: Date.t() | nil,
+              channels: [__MODULE__.Channel.t()],
+              replays: [__MODULE__.Replay.t()]
+            }
+
       field :show_name, :string, default: "PREMIÈRE ÉCOUTE"
       field :title_template, :string, default: "{show_name} : \"{title}\" by {artist}"
       field :reminders_enabled, :boolean, default: false
       field :tracking_since, :date
 
       embeds_many :channels, Channel, on_replace: :delete, primary_key: {:id, :binary_id, autogenerate: true} do
+        @moduledoc "A YouTube channel replays can be published on."
+
+        @type t :: %__MODULE__{id: Ecto.UUID.t() | nil, label: String.t() | nil, youtube_channel_id: String.t() | nil}
+
         field :label, :string
         field :youtube_channel_id, :string
       end
 
       embeds_many :replays, Replay, on_replace: :delete, primary_key: {:id, :binary_id, autogenerate: true} do
+        @moduledoc "A replay video published a delay after the stream."
+
         @type t :: %__MODULE__{
                 id: Ecto.UUID.t() | nil,
                 name: String.t() | nil,
@@ -76,6 +105,10 @@ defmodule PremiereEcoute.Accounts.User.Profile do
     end
   end
 
+  @doc """
+  Reads a nested profile value following `path`, returning `default` when the user has no profile or a key is missing.
+  """
+  @spec get(map(), [atom()], term()) :: term()
   def get(user, path, default \\ nil)
 
   def get(%{profile: %__MODULE__{} = profile}, path, default) do

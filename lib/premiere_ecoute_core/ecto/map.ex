@@ -16,20 +16,24 @@ defmodule PremiereEcouteCore.Ecto.Map do
 
   @keys Map.new([:spotify, :deezer, :tidal, :youtube, :youtube_music], &{Atom.to_string(&1), &1})
 
+  @impl true
   def type, do: :map
 
+  @impl true
   def cast(map) when is_map(map) do
     {:ok, to_atom(map)}
   end
 
   def cast(_), do: :error
 
+  @impl true
   def dump(map) when is_map(map) do
     {:ok, map}
   end
 
   def dump(_), do: :error
 
+  @impl true
   def load(map) when is_map(map) do
     {:ok, to_atom(map)}
   end

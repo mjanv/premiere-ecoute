@@ -32,6 +32,7 @@ defmodule PremiereEcoute.Radio.RadioTrack do
   end
 
   @doc false
+  @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(radio_track, attrs) do
     radio_track
     |> cast(attrs, [:user_id, :provider_ids, :name, :artist, :album, :duration_ms, :started_at])
@@ -116,6 +117,9 @@ defmodule PremiereEcoute.Radio.RadioTrack do
   @spec for_date(integer(), Date.t(), keyword()) :: [t()]
   def for_date(user_id, date, filters \\ []), do: for_range(user_id, date, date, filters)
 
+  @doc """
+  Lists the tracks played between two dates, both included.
+  """
   @spec for_range(integer(), Date.t(), Date.t(), keyword()) :: [t()]
   def for_range(user_id, date_from, date_to, filters \\ []) do
     start = DateTime.new!(date_from, ~T[00:00:00], "Etc/UTC")

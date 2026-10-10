@@ -35,6 +35,9 @@ defmodule PremiereEcoute.Playlists.LibraryPlaylist.Submission do
     timestamps(updated_at: false)
   end
 
+  @doc """
+  Builds a submission changeset, at most one submission per user and track in a playlist.
+  """
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(submission, attrs) do
     submission

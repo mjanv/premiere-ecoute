@@ -30,6 +30,9 @@ defmodule PremiereEcouteWeb.Api.Wantlist.WantlistController do
     ]
   )
 
+  @doc """
+  Returns the user's wantlist, optionally filtered by item type.
+  """
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(%{assigns: %{current_scope: %{user: user}}} = conn, params) do
     wantlist = Wantlists.impl().get_wantlist(user.id)

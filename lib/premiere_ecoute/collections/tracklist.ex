@@ -6,6 +6,10 @@ defmodule PremiereEcoute.Collections.Tracklist do
   alias PremiereEcoute.Collections.CollectionSession
   alias PremiereEcouteCore.Cache
 
+  @doc """
+  Shuffles the tracks not yet played and stores the result in the cache.
+  """
+  @spec shuffle(CollectionSession.t(), term(), [term()]) :: {:ok, [term()]}
   def shuffle(%CollectionSession{current_index: idx}, broadcaster_id, tracks) do
     with {:ok, collection} when not is_nil(collection) <- Cache.get(@cache, broadcaster_id),
          {done, remaining} = Enum.split(tracks, idx),
@@ -17,6 +21,10 @@ defmodule PremiereEcoute.Collections.Tracklist do
     end
   end
 
+  @doc """
+  Restores the original order of the tracks not yet played.
+  """
+  @spec restore(CollectionSession.t(), term(), [term()], [term()]) :: {:ok, [term()]}
   def restore(%CollectionSession{current_index: idx}, broadcaster_id, tracks, original_tracks) do
     with {:ok, collection} when not is_nil(collection) <- Cache.get(@cache, broadcaster_id),
          {done, _} = Enum.split(tracks, idx),
@@ -28,6 +36,10 @@ defmodule PremiereEcoute.Collections.Tracklist do
     end
   end
 
+  @doc """
+  Moves the track at `idx` right after the current one.
+  """
+  @spec move_to_top(CollectionSession.t(), non_neg_integer(), term(), [term()]) :: {:ok, [term()]}
   def move_to_top(%CollectionSession{current_index: current}, idx, broadcaster_id, tracks) do
     with {:ok, collection} when not is_nil(collection) <- Cache.get(@cache, broadcaster_id),
          {before_current, from_current} = Enum.split(tracks, current),
@@ -41,6 +53,10 @@ defmodule PremiereEcoute.Collections.Tracklist do
     end
   end
 
+  @doc """
+  Moves the track at `idx` by `delta` positions, never before the current track.
+  """
+  @spec reorder(CollectionSession.t(), non_neg_integer(), integer(), term(), [term()]) :: {:ok, [term()]}
   def reorder(%CollectionSession{current_index: current}, idx, delta, broadcaster_id, tracks) do
     with {:ok, collection} when not is_nil(collection) <- Cache.get(@cache, broadcaster_id),
          target = idx + delta,

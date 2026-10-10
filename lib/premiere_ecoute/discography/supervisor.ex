@@ -6,6 +6,10 @@ defmodule PremiereEcoute.Discography.Supervisor do
       {Task.Supervisor, name: PremiereEcoute.Discography.TaskSupervisor}
     ]
 
+  @doc """
+  Maps `function` over `enumerable` in supervised tasks and returns the results of those that succeeded.
+  """
+  @spec async(Enumerable.t(), (term() -> term())) :: [term()]
   def async(enumerable, function) do
     PremiereEcoute.Discography.TaskSupervisor
     |> Task.Supervisor.async_stream(enumerable, function, timeout: 30_000)

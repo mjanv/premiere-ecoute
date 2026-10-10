@@ -18,6 +18,9 @@ defmodule PremiereEcouteWeb.Podcasts.AudioController do
   alias PremiereEcoute.Podcasts.Storage
   alias PremiereEcoute.Telemetry.PodcastMetrics
 
+  @doc """
+  Streams the audio of a published episode, supporting HEAD and range requests.
+  """
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, %{"username" => username, "show_slug" => slug, "guid" => guid} = params) do
     with %Show{id: show_id} <- Podcasts.get_published_show(username, slug),

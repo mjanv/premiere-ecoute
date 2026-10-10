@@ -10,8 +10,16 @@ defmodule PremiereEcouteWeb.Plugs.CanonicalHost do
 
   import Plug.Conn
 
+  @doc """
+  Returns the plug options unchanged.
+  """
+  @spec init(keyword()) :: keyword()
   def init(opts), do: opts
 
+  @doc """
+  Redirects requests made on another host to the canonical host, if one is configured.
+  """
+  @spec call(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
   def call(conn, opts) do
     case Keyword.get_lazy(opts, :host, fn -> Application.get_env(:premiere_ecoute, :canonical_host) end) do
       nil ->

@@ -13,6 +13,10 @@ defmodule PremiereEcoute.Discography.Workers.EnrichArtistWorker do
   def perform(%Oban.Job{args: %{"id" => id}}), do: run(Artist.get(id))
   def perform(%Oban.Job{}), do: run(Artist.random())
 
+  @doc """
+  Enriches an artist, or returns `{:error, :not_found}` when there is none.
+  """
+  @spec run(Artist.t() | nil) :: :ok | {:error, term()}
   def run(nil), do: {:error, :not_found}
 
   def run(%Artist{} = artist) do

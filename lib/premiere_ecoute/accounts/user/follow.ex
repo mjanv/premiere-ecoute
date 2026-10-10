@@ -29,6 +29,9 @@ defmodule PremiereEcoute.Accounts.User.Follow do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Builds a follow changeset. A user cannot follow themselves.
+  """
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(follow, attrs) do
     follow

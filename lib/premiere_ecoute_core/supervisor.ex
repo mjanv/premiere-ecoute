@@ -10,11 +10,16 @@ defmodule PremiereEcouteCore.Supervisor do
     quote do
       use Supervisor
 
+      @doc "Starts the supervisor and its children."
       @spec start_link(keyword()) :: Supervisor.on_start()
       def start_link(args) do
         Supervisor.start_link(__MODULE__, args, name: __MODULE__)
       end
 
+      @doc """
+      Starts the children of the supervisor, plus the optional ones outside of the test environment.
+      """
+      @spec init(term()) :: {:ok, {Supervisor.sup_flags(), [Supervisor.child_spec()]}}
       @impl true
       def init(_args) do
         optionals =

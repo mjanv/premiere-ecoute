@@ -1,10 +1,16 @@
 defprotocol PremiereEcoute.Discography.Links do
   @moduledoc false
 
+  @doc """
+  Returns the URL of a record on a music provider, or `nil` when it has no identifier there.
+  """
   @fallback_to_any true
   @spec url(t(), atom()) :: String.t() | nil
   def url(value, provider)
 
+  @doc """
+  Returns the title of a record, or `nil` when it has none.
+  """
   @fallback_to_any true
   @spec title(t()) :: String.t() | nil
   def title(value)

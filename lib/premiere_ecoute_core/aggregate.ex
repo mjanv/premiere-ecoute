@@ -69,7 +69,10 @@ defmodule PremiereEcouteCore.Aggregate do
       alias PremiereEcoute.Events.Store
       alias PremiereEcoute.Repo
 
+      @typedoc "An association that is either loaded, `nil` or not loaded."
       @type entity(type) :: type | nil | Ecto.Association.NotLoaded.t()
+
+      @typedoc "A nullable value."
       @type nullable(type) :: type | nil
 
       # Forms
@@ -78,6 +81,7 @@ defmodule PremiereEcouteCore.Aggregate do
       def form(entity, attrs \\ %{}), do: changeset(entity, attrs)
 
       # Preload
+      @typedoc "One or many entities, or `nil`."
       @type entity() :: [Ecto.Schema.t()] | Ecto.Schema.t() | nil
 
       @doc false

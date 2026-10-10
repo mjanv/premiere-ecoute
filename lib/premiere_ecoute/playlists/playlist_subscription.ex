@@ -36,6 +36,9 @@ defmodule PremiereEcoute.Playlists.PlaylistSubscription do
     timestamps(updated_at: false)
   end
 
+  @doc """
+  Builds a subscription changeset, one subscription per user and playlist.
+  """
   @spec changeset(Ecto.Schema.t(), map()) :: Ecto.Changeset.t()
   def changeset(sub, attrs) do
     sub

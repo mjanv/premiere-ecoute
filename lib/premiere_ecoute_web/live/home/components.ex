@@ -31,6 +31,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   attr :id, :string, required: true
   slot :inner_block, required: true
 
+  @spec scroll_carousel(map()) :: Phoenix.LiveView.Rendered.t()
   def scroll_carousel(assigns) do
     ~H"""
     <div class="relative" id={@id} phx-hook="ScrollCarousel">
@@ -67,6 +68,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   attr :album, :map, required: true
   attr :href, :string, default: nil
 
+  @spec album_square(map()) :: Phoenix.LiveView.Rendered.t()
   def album_square(assigns) do
     ~H"""
     <.link href={@href} class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg block">
@@ -99,6 +101,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   attr :in_wantlist, :boolean, default: false
   attr :missed, :boolean, default: false
 
+  @spec album_square_wantlist(map()) :: Phoenix.LiveView.Rendered.t()
   def album_square_wantlist(assigns) do
     ~H"""
     <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
@@ -157,6 +160,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   """
   attr :track, :map, required: true
 
+  @spec radio_track_card(map()) :: Phoenix.LiveView.Rendered.t()
   def radio_track_card(assigns) do
     ~H"""
     <div class="relative flex-shrink-0 w-36 h-10 rounded-lg overflow-hidden border border-white/10 shadow-lg bg-white/5 flex flex-col justify-center px-2">
@@ -171,6 +175,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   """
   attr :session, :map, required: true
 
+  @spec upcoming_session_card(map()) :: Phoenix.LiveView.Rendered.t()
   def upcoming_session_card(assigns) do
     ~H"""
     <div class="relative group flex-shrink-0 w-36 h-36 rounded-lg overflow-hidden shadow-lg">
@@ -209,6 +214,7 @@ defmodule PremiereEcouteWeb.Home.Components do
   """
   attr :session, :map, required: true
 
+  @spec session_row(map()) :: Phoenix.LiveView.Rendered.t()
   def session_row(assigns) do
     ~H"""
     <.link href={~p"/sessions/#{@session.share_token}/dashboard"} class="group block">

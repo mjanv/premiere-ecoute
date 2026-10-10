@@ -14,6 +14,8 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Player do
   alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack
   alias PremiereEcoute.Discography.Single
 
+  @doc "Returns a constant, used to check the delegation to this module."
+  @spec test() :: integer()
   def test, do: 67
 
   @doc """

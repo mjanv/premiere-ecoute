@@ -5,6 +5,8 @@ defmodule PremiereEcoute.Playlists.Formatters.HtmlEmail do
   Renders title, cover image (when present), and track count.
   """
 
+  @type t :: %__MODULE__{tracks: list(), track_count: non_neg_integer() | nil, cover_url: String.t() | nil}
+
   defstruct tracks: [], track_count: nil, cover_url: nil
 
   alias PremiereEcoute.Discography.LibraryPlaylist

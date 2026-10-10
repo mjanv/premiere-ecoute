@@ -16,6 +16,9 @@ defmodule PremiereEcoute.Youtube.Comment do
 
   defstruct [:id, :author, :text, :like_count, :published_at, :total_reply_count]
 
+  @doc """
+  Parses a YouTube API comment thread into a comment.
+  """
   @spec parse(map()) :: t()
   def parse(data) do
     comment = get_in(data, ["snippet", "topLevelComment", "snippet"])

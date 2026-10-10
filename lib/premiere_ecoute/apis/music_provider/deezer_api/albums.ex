@@ -22,6 +22,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.DeezerApi.Albums do
     |> DeezerApi.handle(200, &parse_album/1)
   end
 
+  @doc """
+  Parses a Deezer album payload into an album struct.
+  """
   @spec parse_album(map()) :: Album.t()
   def parse_album(data) do
     %Album{

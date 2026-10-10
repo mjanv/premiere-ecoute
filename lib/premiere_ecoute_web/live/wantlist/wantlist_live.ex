@@ -66,6 +66,10 @@ defmodule PremiereEcouteWeb.Wantlist.WantlistLive do
   attr :provider, :atom, required: true
   attr :view, :atom, required: true
 
+  @doc """
+  Renders a wantlist item as a card in grid view and as a row in list view.
+  """
+  @spec wantlist_media_card(map()) :: Phoenix.LiveView.Rendered.t()
   def wantlist_media_card(%{view: :grid} = assigns) do
     ~H"""
     <div class="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:border-purple-400/40 transition-all">
@@ -157,6 +161,10 @@ defmodule PremiereEcouteWeb.Wantlist.WantlistLive do
   attr :provider, :atom, required: true
   attr :class, :string, default: "w-4 h-4"
 
+  @doc """
+  Renders the logo of a music provider.
+  """
+  @spec provider_icon(map()) :: Phoenix.LiveView.Rendered.t()
   def provider_icon(%{provider: :spotify} = assigns) do
     ~H"""
     <svg class={@class} viewBox="0 0 24 24" fill="currentColor">

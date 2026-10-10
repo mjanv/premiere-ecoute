@@ -143,6 +143,7 @@ defmodule PremiereEcouteWeb.Collections.CollectionOverlayLive do
   end
 
   @doc "Returns the percentage width for each side of the bar."
+  @spec bar_pct(non_neg_integer(), non_neg_integer(), :a | :b) :: non_neg_integer()
   def bar_pct(0, 0, _side), do: 50
   def bar_pct(a, b, :a), do: trunc(a / (a + b) * 100)
   def bar_pct(a, b, :b), do: trunc(b / (a + b) * 100)

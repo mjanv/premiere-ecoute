@@ -29,9 +29,15 @@ defmodule PremiereEcoute.Wantlists.Wantlist do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Fetches the wantlist of a user, or `nil` when there is none.
+  """
   @spec get_by_user(integer()) :: t() | nil
   def get_by_user(user_id), do: get_by(user_id: user_id)
 
+  @doc """
+  Fetches the wantlist of a user, creating it on first use.
+  """
   @spec get_or_create(integer()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def get_or_create(user_id) do
     case Repo.get_by(__MODULE__, user_id: user_id) do

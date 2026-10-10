@@ -25,7 +25,6 @@ defmodule PremiereEcoute.Apis do
   @type video :: :youtube
 
   @type provider :: music_metadata() | music_provider() | streaming() | video()
-  @providers [:genius, :musicbrainz, :wikipedia, :deezer, :spotify, :tidal, :twitch, :youtube]
 
   @doc "Returns the API client module for the specified provider."
   @spec provider(provider()) :: module()
@@ -41,11 +40,41 @@ defmodule PremiereEcoute.Apis do
 
   def provider(:youtube), do: YoutubeApi.impl()
 
-  for provider_name <- @providers do
-    @doc "Returns the #{provider_name} API client."
-    @spec unquote(provider_name)() :: module()
-    def unquote(provider_name)(), do: provider(unquote(provider_name))
-  end
+  @doc "Returns the genius API client."
+  @spec genius() :: module()
+  def genius, do: provider(:genius)
 
+  @doc "Returns the musicbrainz API client."
+  @spec musicbrainz() :: module()
+  def musicbrainz, do: provider(:musicbrainz)
+
+  @doc "Returns the wikipedia API client."
+  @spec wikipedia() :: module()
+  def wikipedia, do: provider(:wikipedia)
+
+  @doc "Returns the deezer API client."
+  @spec deezer() :: module()
+  def deezer, do: provider(:deezer)
+
+  @doc "Returns the spotify API client."
+  @spec spotify() :: module()
+  def spotify, do: provider(:spotify)
+
+  @doc "Returns the tidal API client."
+  @spec tidal() :: module()
+  def tidal, do: provider(:tidal)
+
+  @doc "Returns the twitch API client."
+  @spec twitch() :: module()
+  def twitch, do: provider(:twitch)
+
+  @doc "Returns the youtube API client."
+  @spec youtube() :: module()
+  def youtube, do: provider(:youtube)
+
+  @doc """
+  Returns the cache module holding the playback state of a provider.
+  """
+  @spec cache(:spotify) :: module()
   def cache(:spotify), do: PremiereEcoute.Apis.Players.PlaybackState
 end

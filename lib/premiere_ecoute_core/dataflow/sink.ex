@@ -4,6 +4,7 @@ defmodule PremiereEcouteCore.Dataflow.Sink do
   alias Explorer.DataFrame, as: DF
   alias Explorer.Series
 
+  @doc "Reads the data of the sink from a file, or `nil` when it is not available."
   @callback read(String.t()) :: nil | Explorer.DataFrame.t()
 
   defmacro __using__(opts) do

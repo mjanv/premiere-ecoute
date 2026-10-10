@@ -21,9 +21,13 @@ defmodule PremiereEcoute.Podcasts.Storage do
         adapter: PremiereEcoute.Podcasts.Storage.S3
   """
 
+  @doc "Fetches the bytes of an object."
   @callback fetch(key :: String.t()) :: {:ok, binary()} | {:error, term()}
+  @doc "Stores the bytes of an object."
   @callback put(key :: String.t(), bytes :: binary()) :: :ok | {:error, term()}
+  @doc "Deletes an object."
   @callback delete(key :: String.t()) :: :ok | {:error, term()}
+  @doc "Streams an object to the client."
   @callback send_object(Plug.Conn.t(), key :: String.t(), content_type :: String.t()) :: Plug.Conn.t()
 
   @doc "Fetches an object's bytes via the configured adapter."

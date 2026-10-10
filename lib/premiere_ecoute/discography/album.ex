@@ -149,6 +149,9 @@ defmodule PremiereEcoute.Discography.Album do
 
   def create_if_not_exists(%__MODULE__{} = album), do: create(album)
 
+  @doc """
+  Finds an album by its identifier on a music provider.
+  """
   @spec find_by_provider(String.t(), atom()) :: t() | nil
   def find_by_provider(id, provider) do
     from(a in __MODULE__,
@@ -158,11 +161,16 @@ defmodule PremiereEcoute.Discography.Album do
     |> preload()
   end
 
+  @spec get_by(Ecto.Queryable.t(), keyword() | map()) :: t() | nil
   def get_by(query \\ __MODULE__, clauses), do: query |> Repo.get_by(clauses) |> preload()
 
   @spec get(integer()) :: t() | nil
   def get(id), do: __MODULE__ |> Repo.get(id) |> preload()
 
+  @doc """
+  Fetches an album by slug, or `nil` when none matches.
+  """
+  @spec get_album_by_slug(String.t()) :: t() | nil
   def get_album_by_slug(slug), do: __MODULE__ |> Repo.get_by(slug: slug) |> preload()
 
   defimpl Jason.Encoder do

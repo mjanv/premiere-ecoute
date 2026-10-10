@@ -20,6 +20,10 @@ defmodule PremiereEcouteWeb.Oauth.AuthorizeController do
 
   # The consent decision is only read from a POST body (CSRF-protected), never from the query
   # string: a GET link carrying `approved=true` must not mint a code without user interaction.
+  @doc """
+  Authorizes the client once the user approved the consent, otherwise renders the consent page.
+  """
+  @spec authorize(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def authorize(%Plug.Conn{method: "POST", body_params: %{"approved" => "true"}} = conn, _params) do
     conn
     |> Boruta.Oauth.authorize(resource_owner(conn), __MODULE__)

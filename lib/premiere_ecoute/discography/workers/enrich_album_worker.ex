@@ -13,6 +13,10 @@ defmodule PremiereEcoute.Discography.Workers.EnrichAlbumWorker do
   def perform(%Oban.Job{args: %{"id" => id}}), do: run(Album.get(id))
   def perform(%Oban.Job{}), do: run(Album.random())
 
+  @doc """
+  Enriches an album, or returns `{:error, :not_found}` when there is none.
+  """
+  @spec run(Album.t() | nil) :: :ok | {:error, term()}
   def run(nil), do: {:error, :not_found}
 
   def run(%Album{} = album) do

@@ -1,4 +1,8 @@
 defmodule PremiereEcouteWeb.Oauth.TokenController do
+  @moduledoc """
+  OAuth 2.0 token endpoint, delegated to Boruta.
+  """
+
   @behaviour Boruta.Oauth.TokenApplication
 
   use PremiereEcouteWeb, :controller
@@ -6,8 +10,16 @@ defmodule PremiereEcouteWeb.Oauth.TokenController do
   alias Boruta.Oauth.Error
   alias Boruta.Oauth.TokenResponse
 
+  @doc """
+  Returns the module handling OAuth requests, overridable in tests.
+  """
+  @spec oauth_module() :: module()
   def oauth_module, do: Application.get_env(:premiere_ecoute, :oauth_module, Boruta.Oauth)
 
+  @doc """
+  Issues an access token.
+  """
+  @spec token(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def token(%Plug.Conn{} = conn, _params) do
     conn |> oauth_module().token(__MODULE__)
   end

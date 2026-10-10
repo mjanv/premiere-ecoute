@@ -211,6 +211,7 @@ defmodule PremiereEcoute.Sessions.Services.ReplayVideo do
   defp put_replay_id(entry, replay_id), do: Map.put(entry, "replay_id", replay_id)
 
   @doc false
+  @spec put_entry(map(), [map()]) :: [map()]
   def put_entry(entry, replays) do
     case Enum.find_index(replays, &(&1["replay_id"] == entry["replay_id"])) do
       nil -> replays ++ [entry]

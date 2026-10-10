@@ -68,16 +68,25 @@ defmodule PremiereEcouteWeb.Collections.CollectionSessionsLive do
     |> then(fn socket -> {:noreply, socket} end)
   end
 
+  @doc """
+  Returns the label of a selection mode.
+  """
   @spec mode_label(atom()) :: String.t()
   def mode_label(:streamer_choice), do: "Streamer choice"
   def mode_label(:viewer_vote), do: "Viewer vote"
   def mode_label(:duel), do: "Duel"
 
+  @doc """
+  Returns the CSS classes of a selection mode badge.
+  """
   @spec mode_class(atom()) :: String.t()
   def mode_class(:streamer_choice), do: "bg-purple-600/20 text-purple-400 border-purple-500/30"
   def mode_class(:viewer_vote), do: "bg-blue-600/20 text-blue-400 border-blue-500/30"
   def mode_class(:duel), do: "bg-amber-600/20 text-amber-400 border-amber-500/30"
 
+  @doc """
+  Returns the CSS classes of a session status badge.
+  """
   @spec status_class(atom()) :: String.t()
   def status_class(:pending), do: "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
   def status_class(:active), do: "bg-green-600/20 text-green-400 border-green-500/30"

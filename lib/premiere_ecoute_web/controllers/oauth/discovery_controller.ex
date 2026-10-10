@@ -7,6 +7,10 @@ defmodule PremiereEcouteWeb.Oauth.DiscoveryController do
 
   use PremiereEcouteWeb, :controller
 
+  @doc """
+  Serves the OAuth authorization server metadata (RFC 8414).
+  """
+  @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, _params) do
     issuer = Boruta.Config.issuer()
 

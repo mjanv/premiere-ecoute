@@ -14,6 +14,10 @@ defmodule PremiereEcoute.Discography.Workers.EnrichTrackWorker do
     run(Track.get(id))
   end
 
+  @doc """
+  Enriches a track, or returns `{:error, :not_found}` when there is none.
+  """
+  @spec run(Track.t() | nil) :: :ok | {:error, term()}
   def run(nil), do: {:error, :not_found}
 
   def run(%Track{} = track) do

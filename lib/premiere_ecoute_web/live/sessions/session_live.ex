@@ -475,6 +475,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   defp build_tracks(_session, _report), do: []
 
   @doc "Builds vote distribution for a single viewer's votes (my_votes map from my_votes_by_track)."
+  @spec my_vote_distribution(map(), map()) :: [{String.t(), number()}]
   def my_vote_distribution(my_votes, session) do
     votes = Enum.map(my_votes, fn {_track_id, value} -> %{value: value, is_streamer: false} end)
     individual = build_individual_distribution(votes, session)
@@ -482,6 +483,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
   end
 
   @doc "Returns %{track_id => score_string} for a specific Twitch viewer from report votes."
+  @spec my_votes_by_track(map(), term()) :: %{term() => String.t()}
   def my_votes_by_track(report, twitch_user_id) do
     report.votes
     |> Enum.reject(& &1.is_streamer)
@@ -494,6 +496,7 @@ defmodule PremiereEcouteWeb.Sessions.SessionLive do
 
   Returns `[{label, pct}]` normalized 0-100 relative to max bucket, or `[]` if no votes.
   """
+  @spec vote_distribution(map(), map(), :viewer | :streamer) :: [{String.t(), number()}]
   def vote_distribution(report, session, :viewer) do
     individual =
       report.votes

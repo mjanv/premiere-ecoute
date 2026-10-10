@@ -36,6 +36,9 @@ defmodule PremiereEcoute.Youtube.Channel do
     :uploads_playlist_id
   ]
 
+  @doc """
+  Parses a YouTube API search result into a channel.
+  """
   @spec parse(map()) :: t()
   def parse(%{"id" => %{"channelId" => id}, "snippet" => snippet}) do
     %__MODULE__{

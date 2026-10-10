@@ -32,11 +32,21 @@ defmodule PremiereEcouteCore.Context do
       @app :premiere_ecoute
       @name unquote(name) || __MODULE__ |> Module.split() |> List.last() |> String.downcase() |> String.to_atom()
 
+      @doc "Returns the key under which the implementation of this context is configured."
+      @spec name() :: atom()
       def name, do: @name
+
+      @doc "Returns the configured implementation of this context, the context itself by default."
+      @spec impl() :: module()
       def impl, do: Application.get_env(@app, @name, __MODULE__)
+
+      @doc "Returns the module defining the callbacks of this context."
+      @spec behaviours() :: module()
       def behaviours, do: __MODULE__
 
       if Mix.env() == :test do
+        @doc "Swaps the implementation by its mock until the end of the test."
+        @spec mock(term()) :: :ok
         def mock(_context) do
           api = Application.fetch_env(@app, @name)
           Application.put_env(@app, @name, Module.concat([__MODULE__, Mock]))

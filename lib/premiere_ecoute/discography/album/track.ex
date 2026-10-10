@@ -69,8 +69,15 @@ defmodule PremiereEcoute.Discography.Album.Track do
     |> unique_constraint(:provider_ids, name: :album_tracks_deezer_id_unique)
   end
 
+  @doc """
+  Returns the identifier of a track on the given provider, or `nil`.
+  """
+  @spec provider(t(), atom()) :: String.t() | nil
   def provider(%__MODULE__{provider_ids: providers_ids}, provider), do: Map.get(providers_ids, provider)
 
+  @doc """
+  Finds a track by its identifier on a music provider.
+  """
   @spec find_by_provider(String.t(), atom()) :: t() | nil
   def find_by_provider(id, provider) do
     from(t in __MODULE__,

@@ -204,6 +204,9 @@ defmodule PremiereEcoute.Accounts.User do
   @spec get_user_by_email(String.t()) :: t() | nil
   def get_user_by_email(email), do: get_by(email: email)
 
+  @doc """
+  Fetches a user by username, or `nil` when no user matches.
+  """
   @spec get_user_by_username(String.t()) :: t() | nil
   def get_user_by_username(username), do: get_by(username: username)
 

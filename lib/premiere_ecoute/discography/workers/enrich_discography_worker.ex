@@ -38,6 +38,10 @@ defmodule PremiereEcoute.Discography.Workers.EnrichDiscographyWorker do
     |> run()
   end
 
+  @doc """
+  Creates the albums of an artist and schedules their enrichment, or returns `{:error, :not_found}` when there is no artist.
+  """
+  @spec run(Artist.t() | nil) :: :ok | {:error, term()}
   def run(nil), do: {:error, :not_found}
 
   def run(%Artist{} = artist) do

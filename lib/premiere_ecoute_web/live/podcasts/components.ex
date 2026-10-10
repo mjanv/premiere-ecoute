@@ -12,6 +12,7 @@ defmodule PremiereEcouteWeb.Podcasts.Components do
   attr :id, :string, required: true
   attr :src, :string, required: true
 
+  @spec audio_player(map()) :: Phoenix.LiveView.Rendered.t()
   def audio_player(assigns) do
     ~H"""
     <div

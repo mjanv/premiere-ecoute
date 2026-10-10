@@ -60,6 +60,10 @@ defmodule PremiereEcoute.Discography.Playlist.Track do
     |> unique_constraint([:provider, :playlist_id, :track_id], name: :playlist_tracks_playlist_id_track_id_provider_index)
   end
 
+  @doc """
+  Returns the track identifier when the track belongs to the given provider, `nil` otherwise.
+  """
+  @spec provider(t(), atom()) :: String.t() | nil
   def provider(%__MODULE__{provider: p, track_id: track_id}, provider) when p == provider, do: track_id
   def provider(%__MODULE__{}, _provider), do: nil
 end

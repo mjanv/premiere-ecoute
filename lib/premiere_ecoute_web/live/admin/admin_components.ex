@@ -16,6 +16,7 @@ defmodule PremiereEcouteWeb.Admin.AdminComponents do
   attr :title, :string, required: true
   attr :subtitle, :string, default: nil
 
+  @spec admin_page_header(map()) :: Phoenix.LiveView.Rendered.t()
   def admin_page_header(assigns) do
     ~H"""
     <div class="mb-8">
@@ -51,6 +52,7 @@ defmodule PremiereEcouteWeb.Admin.AdminComponents do
   attr :color, :string, default: "gray"
   slot :icon, required: true
 
+  @spec stat_card(map()) :: Phoenix.LiveView.Rendered.t()
   def stat_card(assigns) do
     ~H"""
     <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
@@ -77,6 +79,7 @@ defmodule PremiereEcouteWeb.Admin.AdminComponents do
   attr :name, :string, default: "search"
   slot :extra
 
+  @spec search_bar(map()) :: Phoenix.LiveView.Rendered.t()
   def search_bar(assigns) do
     ~H"""
     <form phx-change={@event} class="flex gap-3 mb-4">

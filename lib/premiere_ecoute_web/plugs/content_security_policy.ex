@@ -44,6 +44,9 @@ defmodule PremiereEcouteWeb.Plugs.ContentSecurityPolicy do
   @spec init(any()) :: any()
   def init(opts), do: opts
 
+  @doc """
+  Sets the Content-Security-Policy header, or its report-only variant.
+  """
   @spec call(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def call(conn, _opts) do
     header =

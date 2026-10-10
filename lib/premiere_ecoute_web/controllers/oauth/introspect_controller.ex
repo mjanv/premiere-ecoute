@@ -1,4 +1,8 @@
 defmodule PremiereEcouteWeb.Oauth.IntrospectController do
+  @moduledoc """
+  OAuth 2.0 token introspection endpoint (RFC 7662), delegated to Boruta.
+  """
+
   @behaviour Boruta.Oauth.IntrospectApplication
 
   use PremiereEcouteWeb, :controller
@@ -6,8 +10,16 @@ defmodule PremiereEcouteWeb.Oauth.IntrospectController do
   alias Boruta.Oauth.Error
   alias Boruta.Oauth.IntrospectResponse
 
+  @doc """
+  Returns the module handling OAuth requests, overridable in tests.
+  """
+  @spec oauth_module() :: module()
   def oauth_module, do: Application.get_env(:premiere_ecoute, :oauth_module, Boruta.Oauth)
 
+  @doc """
+  Introspects a token.
+  """
+  @spec introspect(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def introspect(%Plug.Conn{} = conn, _params) do
     conn |> oauth_module().introspect(__MODULE__)
   end

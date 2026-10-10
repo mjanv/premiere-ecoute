@@ -58,6 +58,7 @@ defmodule PremiereEcoute.Playlists.Automations.Action do
           description: String.t()
         }
 
+  @typedoc "Compile-time metadata of an action."
   @type meta :: %{
           id: String.t(),
           description: String.t(),

@@ -14,8 +14,16 @@ defmodule PremiereEcouteWeb.Plugs.PodcastRateLimit do
   @window_ms 60_000
   @max_requests 120
 
+  @doc """
+  Returns the plug options unchanged.
+  """
+  @spec init(term()) :: term()
   def init(opts), do: opts
 
+  @doc """
+  Halts the request when the client exceeded the podcast rate limit.
+  """
+  @spec call(Plug.Conn.t(), term()) :: Plug.Conn.t()
   def call(conn, _opts) do
     case allow_or_deny(conn) do
       :allow ->

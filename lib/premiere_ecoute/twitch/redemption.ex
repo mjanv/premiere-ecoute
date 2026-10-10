@@ -20,6 +20,9 @@ defmodule PremiereEcoute.Twitch.Redemption do
 
   defstruct [:id, :broadcaster_id, :user_id, :user_login, :reward_id, :reward_title, :user_input, :status, :redeemed_at]
 
+  @doc """
+  Parses a Twitch API channel point redemption.
+  """
   @spec parse(map()) :: t()
   def parse(data) do
     %__MODULE__{

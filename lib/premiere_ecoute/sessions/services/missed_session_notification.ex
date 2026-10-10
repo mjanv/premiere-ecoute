@@ -6,6 +6,9 @@ defmodule PremiereEcoute.Sessions.Services.MissedSessionNotification do
   alias PremiereEcoute.Sessions.ListeningSession
   alias PremiereEcoute.Sessions.ListeningSession.Workers.MissedSessionNotificationWorker
 
+  @doc """
+  Schedules a notification for the followers who missed the session.
+  """
   @spec notify(ListeningSession.t() | integer()) :: {:ok, list()}
   def notify(%ListeningSession{id: session_id} = session) do
     session

@@ -12,6 +12,9 @@ defmodule PremiereEcouteWeb.Podcasts.FeedController do
   alias PremiereEcoute.Podcasts
   alias PremiereEcoute.Telemetry.PodcastMetrics
 
+  @doc """
+  Serves the RSS feed of a published show.
+  """
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, %{"username" => username, "show_slug" => slug}) do
     case Podcasts.get_published_show(username, slug) do

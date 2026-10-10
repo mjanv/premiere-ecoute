@@ -16,6 +16,9 @@ defmodule PremiereEcoute.Wantlists.Services.AddTrack do
   alias PremiereEcoute.Repo
   alias PremiereEcoute.Wantlists.WantlistItem
 
+  @doc """
+  Adds a radio track to the wantlist, creating the track from Spotify when it is unknown.
+  """
   @spec add_radio_track(integer(), String.t()) :: {:ok, WantlistItem.t()} | {:error, term()}
   def add_radio_track(user_id, spotify_id) do
     case find_existing(spotify_id) do

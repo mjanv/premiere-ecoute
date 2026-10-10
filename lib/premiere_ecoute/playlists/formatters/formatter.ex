@@ -5,6 +5,9 @@ defprotocol PremiereEcoute.Playlists.Formatters.Formatter do
   Implement this protocol with a struct carrying any format-specific options.
   """
 
+  @doc """
+  Formats a library playlist.
+  """
   @spec format(t(), PremiereEcoute.Discography.LibraryPlaylist.t()) :: {:ok, binary()} | {:error, term()}
   def format(formatter, playlist)
 end

@@ -24,6 +24,9 @@ defmodule PremiereEcoute.Podcasts.Workers.EpisodeIngestionWorker do
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"id" => id}}), do: run(Episode.get(id))
 
+  @doc """
+  Ingests the audio of an episode, or returns an error when the episode is missing or has no audio.
+  """
   @spec run(Episode.t() | nil) :: :ok | {:error, term()}
   def run(nil), do: {:error, :not_found}
   def run(%Episode{audio_key: nil}), do: {:error, :no_audio}

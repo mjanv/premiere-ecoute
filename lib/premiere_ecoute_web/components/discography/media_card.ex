@@ -44,6 +44,7 @@ defmodule PremiereEcouteWeb.Components.MediaCard do
   slot :badge, doc: "Small overlay badge shown bottom-right on the image"
   slot :overlay, doc: "Full overlay content shown on hover (replaces default zoom)"
 
+  @spec media_card(map()) :: Phoenix.LiveView.Rendered.t()
   def media_card(assigns) do
     ~H"""
     <.link

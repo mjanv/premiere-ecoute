@@ -24,6 +24,7 @@ defmodule PremiereEcouteCore.CommandBus do
   alias PremiereEcouteCore.Registry
 
   # Behaviour
+  @doc "Processes a command and returns the resulting entity and events."
   @callback apply(struct()) :: {:ok, struct(), list(struct())} | {:ok, list(struct())} | {:error, term()}
 
   @doc """

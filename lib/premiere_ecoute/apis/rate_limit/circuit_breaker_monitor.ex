@@ -13,6 +13,9 @@ defmodule PremiereEcoute.Apis.RateLimit.CircuitBreakerMonitor do
 
   @topic "rate_limits"
 
+  @doc """
+  Returns the PubSub topic on which circuit breaker changes are broadcast.
+  """
   @spec topic() :: String.t()
   def topic, do: @topic
 

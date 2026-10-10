@@ -65,6 +65,10 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationController do
 
   defp drop_none_auth_method(params), do: params
 
+  @doc """
+  Responds with the registered client.
+  """
+  @spec client_registered(Plug.Conn.t(), term()) :: Plug.Conn.t()
   def client_registered(conn, client) do
     maybe_grant_pkce(conn, client)
 
@@ -97,6 +101,10 @@ defmodule PremiereEcouteWeb.Oauth.RegistrationController do
 
   defp maybe_grant_pkce(_conn, _client), do: :ok
 
+  @doc """
+  Responds with the validation errors of a failed registration.
+  """
+  @spec registration_failure(Plug.Conn.t(), Ecto.Changeset.t()) :: Plug.Conn.t()
   def registration_failure(conn, changeset) do
     Logger.warning("OAuth dynamic client registration failed: #{inspect(changeset.errors)}")
 

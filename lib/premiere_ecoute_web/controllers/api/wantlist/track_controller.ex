@@ -32,6 +32,9 @@ defmodule PremiereEcouteWeb.Api.Wantlist.TrackController do
     ]
   )
 
+  @doc """
+  Saves the track currently playing on the broadcaster's stream to the user's wantlist.
+  """
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(%{assigns: %{current_scope: %{user: user}}} = conn, %{"broadcaster_id" => broadcaster_twitch_id}) do
     with %User{} = broadcaster <- Accounts.get_user_by_twitch_id(broadcaster_twitch_id),

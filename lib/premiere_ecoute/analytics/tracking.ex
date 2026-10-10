@@ -6,6 +6,9 @@ defmodule PremiereEcoute.Analytics.Tracking do
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Discography.Album
 
+  @doc """
+  Captures an `album_viewed` analytics event for a user.
+  """
   @spec album_viewed(User.t(), Album.t()) :: :ok
   def album_viewed(%User{id: user_id}, %Album{id: album_id, name: album_name}) do
     capture("album_viewed", user_id, album_id: album_id, album_name: album_name)

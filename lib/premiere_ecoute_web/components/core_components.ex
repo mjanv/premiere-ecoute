@@ -517,6 +517,7 @@ defmodule PremiereEcouteWeb.CoreComponents do
   attr :active_class, :string, required: true
   attr :inactive_class, :string, required: true
 
+  @spec wantlist_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def wantlist_toggle(assigns) do
     ~H"""
     <button

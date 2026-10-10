@@ -39,6 +39,9 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
     {:error, :no_spotify_id}
   end
 
+  @doc """
+  Fetches an album from a music provider and stores it if it does not exist yet.
+  """
   @spec create_album(String.t(), atom()) :: {:ok, Album.t()} | {:error, term()}
   def create_album(album_id, provider \\ :spotify) do
     with {:ok, %Album{} = album} <- Apis.provider(provider).get_album(album_id),
@@ -48,6 +51,9 @@ defmodule PremiereEcoute.Discography.Services.EnrichDiscography do
     end
   end
 
+  @doc """
+  Fetches a single from a music provider and stores it if it does not exist yet.
+  """
   @spec create_single(String.t(), atom()) :: {:ok, Single.t()} | {:error, term()}
   def create_single(single_id, provider \\ :spotify) do
     with {:ok, %Single{} = single} <- Apis.provider(provider).get_single(single_id),

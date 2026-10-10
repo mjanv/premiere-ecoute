@@ -17,6 +17,7 @@ defmodule PremiereEcoute.Sessions do
   alias PremiereEcoute.Sessions.Workers.ForgetReplayWorker
 
   # Behaviour
+  @doc "Publishes a chat message event for vote processing."
   @callback publish_message(map()) :: :ok
 
   # Listening session

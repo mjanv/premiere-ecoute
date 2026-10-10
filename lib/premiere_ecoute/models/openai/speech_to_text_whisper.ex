@@ -9,6 +9,10 @@ defmodule PremiereEcoute.Models.OpenAi.SpeechToTextWhisper do
 
   @behaviour PremiereEcoute.Models.Transcription
 
+  @doc """
+  Returns the child specification of the Whisper serving.
+  """
+  @spec child_spec(keyword()) :: Supervisor.child_spec()
   def child_spec(opts) do
     %{
       id: __MODULE__,
@@ -18,6 +22,10 @@ defmodule PremiereEcoute.Models.OpenAi.SpeechToTextWhisper do
     }
   end
 
+  @doc """
+  Loads the Whisper model and starts its serving.
+  """
+  @spec start_link(keyword()) :: Supervisor.on_start()
   def start_link(model: model) do
     Logger.info("[#{__MODULE__}] loading model...")
 

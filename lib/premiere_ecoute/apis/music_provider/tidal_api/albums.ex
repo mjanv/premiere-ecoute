@@ -35,6 +35,9 @@ defmodule PremiereEcoute.Apis.MusicProvider.TidalApi.Albums do
     |> TidalApi.handle(200, &parse_album/1)
   end
 
+  @doc """
+  Parses a Tidal album payload, with its included resources, into an album struct.
+  """
   @spec parse_album(map()) :: Album.t()
   def parse_album(data) do
     album_data = hd(data["data"])

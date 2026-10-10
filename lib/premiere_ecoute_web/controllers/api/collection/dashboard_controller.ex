@@ -31,6 +31,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     ]
   )
 
+  @doc """
+  Returns the active collection session.
+  """
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, _params) do
     user = conn.assigns.current_scope.user
@@ -55,6 +58,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     ]
   )
 
+  @doc """
+  Starts the pending collection session.
+  """
   @spec start(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def start(conn, _params) do
     scope = conn.assigns.current_scope
@@ -85,6 +91,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     ]
   )
 
+  @doc """
+  Opens a vote window on the current track of the active session.
+  """
   @spec open_vote(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def open_vote(conn, params) do
     scope = conn.assigns.current_scope
@@ -126,6 +135,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     ]
   )
 
+  @doc """
+  Closes the current vote window.
+  """
   @spec close_vote(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def close_vote(conn, _params) do
     scope = conn.assigns.current_scope
@@ -156,6 +168,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     ]
   )
 
+  @doc """
+  Records the decision on the current track and moves to the next one.
+  """
   @spec decide(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def decide(conn, %{"decision" => raw_decision}) do
     scope = conn.assigns.current_scope
@@ -199,6 +214,9 @@ defmodule PremiereEcouteWeb.Api.Collection.DashboardController do
     ]
   )
 
+  @doc """
+  Completes the active collection session.
+  """
   @spec complete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def complete(conn, params) do
     scope = conn.assigns.current_scope

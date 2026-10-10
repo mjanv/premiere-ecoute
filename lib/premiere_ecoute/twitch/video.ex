@@ -48,6 +48,9 @@ defmodule PremiereEcoute.Twitch.Video do
 
   @types %{"archive" => :archive, "highlight" => :highlight, "upload" => :upload}
 
+  @doc """
+  Parses a Twitch API video.
+  """
   @spec parse(map()) :: t()
   def parse(data) do
     %__MODULE__{

@@ -90,8 +90,16 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  Returns the vote options of a vote scale.
+  """
+  @spec vote_options(atom()) :: [String.t()] | nil
   def vote_options(key), do: @vote_options[key]
 
+  @doc """
+  Preloads the associations of a session, a list of sessions or a result tuple.
+  """
+  @spec preload(t() | nil | [t()] | {:ok, t()} | {:error, term()}) :: t() | nil | [t()] | {:ok, t()} | {:error, term()}
   def preload({:ok, entity}), do: {:ok, preload(entity)}
   def preload({:error, reason}), do: {:error, reason}
   def preload(nil), do: nil
@@ -103,6 +111,10 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     |> put_album_artist()
   end
 
+  @doc """
+  Lists the sessions matching the clauses, with the artist of their album or single.
+  """
+  @spec all(keyword()) :: [t()]
   def all(clauses \\ []) do
     clauses |> super() |> Enum.map(&put_album_artist/1)
   end
@@ -298,6 +310,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
 
   @spec add_speech_marker(t(), integer(), integer(), String.t() | nil) ::
           {:ok, SpeechMarker.t()} | {:error, Ecto.Changeset.t()}
+  @doc """
+  Adds a speech marker at an offset from the start of the session.
+  """
   def add_speech_marker(%__MODULE__{} = session, start_ms, end_ms, text \\ nil) do
     started_at =
       session.started_at
@@ -571,11 +586,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     all(where: [album_id: album_id, status: :stopped], order_by: [desc: :started_at])
   end
 
+  @doc """
+  Lists the stopped sessions of a single, most recent first.
+  """
   @spec list_for_single(integer()) :: [t()]
   def list_for_single(single_id) do
     all(where: [single_id: single_id, status: :stopped], order_by: [desc: :started_at])
   end
 
+  @doc """
+  Lists the stopped sessions of an artist.
+  """
   @spec list_for_artist(integer()) :: [t()]
   def list_for_artist(artist_id) do
     album_sessions =
@@ -919,6 +940,9 @@ defmodule PremiereEcoute.Sessions.ListeningSession do
     %{page | entries: Enum.map(page.entries, &preload/1)}
   end
 
+  @doc """
+  Returns the page following `page` for the user's sessions, or `page` itself when it is the last.
+  """
   @spec next_page_for_user(integer(), Scrivener.Page.t(), map()) :: Scrivener.Page.t()
   def next_page_for_user(user_id, page, filters \\ %{})
   def next_page_for_user(_user_id, %Scrivener.Page{page_number: n, total_pages: n} = page, _filters), do: page

@@ -9,6 +9,9 @@ defmodule PremiereEcoute.Playlists.Services.PlaylistNotification do
   alias PremiereEcoute.Playlists.PlaylistSubscription
   alias PremiereEcoute.Playlists.Services.PlaylistEmail
 
+  @doc """
+  Notifies the playlist subscribers by email and in-app, and returns the number of notifications.
+  """
   @spec notify(LibraryPlaylist.t()) :: {:ok, non_neg_integer()}
   def notify(%LibraryPlaylist{} = playlist) do
     {:ok, email_jobs} = notify_email(playlist)

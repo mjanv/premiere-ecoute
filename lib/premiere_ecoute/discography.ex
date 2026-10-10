@@ -52,9 +52,15 @@ defmodule PremiereEcoute.Discography do
   defdelegate url(entity, provider), to: Links
 
   # Enrichment
+  @doc """
+  Schedules the enrichment of an artist.
+  """
   @spec enrich_artist(integer() | String.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
   def enrich_artist(id), do: EnrichArtistWorker.now(%{"id" => id})
 
+  @doc """
+  Schedules the enrichment of the whole discography of an artist.
+  """
   @spec enrich_discography(integer() | String.t()) :: {:ok, Oban.Job.t()} | {:error, term()}
   def enrich_discography(id), do: EnrichDiscographyWorker.now(%{"id" => id})
 

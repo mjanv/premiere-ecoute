@@ -24,6 +24,7 @@ defmodule PremiereEcouteWeb.Components.Images do
   attr :class, :any, default: nil
   attr :rest, :global
 
+  @spec cover(map()) :: Phoenix.LiveView.Rendered.t()
   def cover(assigns) do
     assigns = assign(assigns, :proxy_src, proxy_url(assigns.src))
 
@@ -35,6 +36,7 @@ defmodule PremiereEcouteWeb.Components.Images do
   end
 
   @doc "Returns the proxy URL for a given image source, or nil if src is nil."
+  @spec proxy_url(String.t() | nil) :: String.t() | nil
   def proxy_url(nil), do: nil
   def proxy_url(src), do: ~p"/img?url=#{src}"
 end

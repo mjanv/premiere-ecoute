@@ -64,6 +64,9 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
 
   @spec add(integer(), item_type(), integer()) ::
           {:ok, t()} | {:error, Ecto.Changeset.t()}
+  @doc """
+  Adds a record to the user's wantlist, creating the wantlist if needed.
+  """
   def add(user_id, type, record_id) do
     with {:ok, wantlist} <- Wantlist.get_or_create(user_id) do
       Map.merge(%{type: type, wantlist_id: wantlist.id}, %{fk_for(type) => record_id})
@@ -74,6 +77,9 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
     end
   end
 
+  @doc """
+  Returns whether the user's wantlist contains the record.
+  """
   @spec exists?(integer(), item_type(), integer()) :: boolean()
   def exists?(user_id, type, record_id) do
     fk_field = fk_for(type)
@@ -84,6 +90,9 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
     |> Repo.exists?()
   end
 
+  @doc """
+  Removes an item from the user's wantlist by item id.
+  """
   @spec remove(integer(), integer()) :: {:ok, t()} | {:error, :not_found}
   def remove(user_id, item_id) do
     WantlistItem
@@ -103,6 +112,9 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
     end
   end
 
+  @doc """
+  Removes a record from the user's wantlist by record id.
+  """
   @spec remove(integer(), item_type(), integer()) :: {:ok, t()} | {:error, :not_found}
   def remove(user_id, type, record_id) do
     fk_field = fk_for(type)
@@ -127,6 +139,9 @@ defmodule PremiereEcoute.Wantlists.WantlistItem do
   @spec wantlisted_spotify_ids(integer(), [String.t()]) :: MapSet.t(String.t())
   def wantlisted_spotify_ids(_user_id, []), do: MapSet.new()
 
+  @doc """
+  Returns the set of given Spotify ids that are in the user's wantlist, as albums or tracks.
+  """
   def wantlisted_spotify_ids(user_id, spotify_ids) do
     single_ids =
       Single

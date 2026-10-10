@@ -16,6 +16,10 @@ defmodule PremiereEcouteCore.Registry do
   Each handler must implement `commands_or_events/0` returning a list of command/event modules it handles.
   """
 
+  @doc """
+  Registers the configured handlers for every command or event they handle.
+  """
+  @spec init() :: list()
   def init do
     for h <- Application.get_env(:premiere_ecoute, :handlers, []) do
       case Code.ensure_compiled(h) do

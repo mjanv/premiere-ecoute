@@ -116,6 +116,7 @@ defmodule PremiereEcouteCore.Worker do
       # def perform(%Oban.Job{args: args}), do: handle(args)
 
       @doc "Returns the default job timeout in milliseconds."
+      @spec timeout(Oban.Job.t()) :: timeout()
       @impl Oban.Worker
       def timeout(_job), do: unquote(timeout)
 

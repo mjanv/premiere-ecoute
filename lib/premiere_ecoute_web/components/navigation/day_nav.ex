@@ -18,6 +18,7 @@ defmodule PremiereEcouteWeb.Components.Navigation.DayNav do
   attr :today, Date, required: true
   attr :oldest_date, Date, required: true
 
+  @spec day_nav(map()) :: Phoenix.LiveView.Rendered.t()
   def day_nav(assigns) do
     ~H"""
     <div class="flex items-center gap-6 mb-10">

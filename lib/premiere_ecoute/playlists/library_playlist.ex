@@ -52,6 +52,9 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     timestamps()
   end
 
+  @doc """
+  Returns whether viewers can subscribe to the playlist.
+  """
   @spec subscriptions_open?(t()) :: boolean()
   def subscriptions_open?(%__MODULE__{metadata: meta}), do: meta["subscriptions_open"] == true
 
@@ -69,15 +72,27 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     |> Repo.all()
   end
 
+  @doc """
+  Returns whether the public page to submit tracks is enabled.
+  """
   @spec submission_page_enabled?(t()) :: boolean()
   def submission_page_enabled?(%__MODULE__{metadata: meta}), do: meta["submission_page_enabled"] == true
 
+  @doc """
+  Returns whether viewers can currently submit tracks.
+  """
   @spec submissions_open?(t()) :: boolean()
   def submissions_open?(%__MODULE__{metadata: meta}), do: meta["submissions_open"] == true
 
+  @doc """
+  Returns whether the playlist tracks are visible to viewers.
+  """
   @spec show_tracks_to_viewers?(t()) :: boolean()
   def show_tracks_to_viewers?(%__MODULE__{metadata: meta}), do: meta["show_tracks_to_viewers"] == true
 
+  @doc """
+  Returns the number of tracks a viewer can submit, 3 by default.
+  """
   @spec submission_limit(t()) :: pos_integer()
   def submission_limit(%__MODULE__{metadata: meta}), do: meta["submission_limit"] || 3
 
@@ -109,6 +124,9 @@ defmodule PremiereEcoute.Discography.LibraryPlaylist do
     |> Store.ok("user", fn playlist -> %LibraryPlaylistAdded{id: user.id, provider: to_string(playlist.provider)} end)
   end
 
+  @doc """
+  Deletes a playlist owned by the user and records the deletion.
+  """
   @spec delete(User.t(), t()) :: {:ok, t()} | {:error, :not_found}
   def delete(%User{id: user_id}, %__MODULE__{user_id: user_id} = playlist) do
     playlist

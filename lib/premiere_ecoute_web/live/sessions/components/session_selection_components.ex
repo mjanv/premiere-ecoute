@@ -19,6 +19,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :source_type, :string, default: nil
   attr :current_scope, :map, required: true
 
+  @spec source_buttons(map()) :: Phoenix.LiveView.Rendered.t()
   def source_buttons(assigns) do
     ~H"""
     <% album_enabled = PremiereEcouteCore.FeatureFlag.enabled?(:listening_session_album, for: @current_scope.user)
@@ -181,6 +182,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :search_albums, :any, required: true
   attr :search_form, :any, required: true
 
+  @spec album_step(map()) :: Phoenix.LiveView.Rendered.t()
   def album_step(assigns) do
     ~H"""
     <div class="mb-8 relative" id="step-2">
@@ -385,6 +387,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :pick_spinning, :boolean, required: true
   attr :random_pick, :any, default: nil
 
+  @spec random_album_modal(map()) :: Phoenix.LiveView.Rendered.t()
   def random_album_modal(assigns) do
     ~H"""
     <.modal id="random-album-modal" show on_cancel="close_random_modal" size="lg">
@@ -487,6 +490,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :user_playlists, :any, required: true
   attr :selected_playlist, :any, required: true
 
+  @spec playlist_step(map()) :: Phoenix.LiveView.Rendered.t()
   def playlist_step(assigns) do
     ~H"""
     <div class="mb-8 relative" id="step-2">
@@ -597,6 +601,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :search_tracks, :any, required: true
   attr :search_form, :any, required: true
 
+  @spec track_step(map()) :: Phoenix.LiveView.Rendered.t()
   def track_step(assigns) do
     ~H"""
     <div class="mb-8 relative" id="step-2">
@@ -732,6 +737,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :clip_search_form, :any, required: true
   attr :resolved_clip_single, :any, required: true
 
+  @spec clip_step(map()) :: Phoenix.LiveView.Rendered.t()
   def clip_step(assigns) do
     ~H"""
     <div class="mb-8 relative" id="step-2">
@@ -879,6 +885,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   @doc "Renders the session name input for free mode."
   attr :free_session_name, :string, required: true
 
+  @spec free_step(map()) :: Phoenix.LiveView.Rendered.t()
   def free_step(assigns) do
     ~H"""
     <div class="mb-8 relative" id="step-2">
@@ -917,6 +924,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :source_type, :string, default: nil
   attr :free_vote_mode, :string, default: nil
 
+  @spec vote_options_step(map()) :: Phoenix.LiveView.Rendered.t()
   def vote_options_step(assigns) do
     ~H"""
     <div class="mb-8 relative" id="step-3">
@@ -1015,6 +1023,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   @doc "Renders the autostart toggle option"
   attr :autostart, :boolean, required: true
 
+  @spec autostart_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def autostart_toggle(assigns) do
     ~H"""
     <div class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
@@ -1046,6 +1055,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   @doc "Renders the degraded-mode toggle disabling Spotify play/pause/next/previous commands"
   attr :spotify_commands_disabled, :boolean, required: true
 
+  @spec spotify_commands_disabled_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def spotify_commands_disabled_toggle(assigns) do
     ~H"""
     <div class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-amber-700/50">
@@ -1080,6 +1090,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :interlude_skip, :boolean, required: true
   attr :interlude_threshold_s, :integer, required: true
 
+  @spec interlude_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def interlude_toggle(assigns) do
     ~H"""
     <form phx-change="set_interlude" class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">
@@ -1123,6 +1134,7 @@ defmodule PremiereEcouteWeb.Sessions.Components.SessionSelectionComponents do
   attr :submitter_enabled, :boolean, required: true
   attr :track_submitter, :string, required: true
 
+  @spec submitter_toggle(map()) :: Phoenix.LiveView.Rendered.t()
   def submitter_toggle(assigns) do
     ~H"""
     <form phx-change="set_submitter" class="flex items-center space-x-3 px-4 py-3 bg-gray-900/50 rounded-lg border border-gray-700">

@@ -12,6 +12,9 @@ defmodule PremiereEcouteWeb.Hooks.RateLimits do
 
   alias PremiereEcoute.Apis.RateLimit.CircuitBreakerMonitor
 
+  @doc """
+  Subscribes the LiveView to circuit breaker changes and keeps `rate_limited_apis` up to date.
+  """
   @spec on_mount(atom(), map(), map(), Phoenix.LiveView.Socket.t()) :: {:cont, Phoenix.LiveView.Socket.t()}
   def on_mount(_, _params, _session, socket) do
     if connected?(socket) do

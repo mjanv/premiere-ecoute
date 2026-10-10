@@ -6,14 +6,24 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.Gateway do
   @interval 250
   @timeout 10_000
 
+  @doc """
+  Starts the gateway that serializes Spotify API calls.
+  """
+  @spec start_link(term()) :: GenServer.on_start()
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{last_call: System.monotonic_time(:millisecond)}, name: __MODULE__)
   end
 
+  @doc """
+  Runs `module.function(*args)` through the gateway, spacing calls by a minimum interval.
+  """
+  @spec call(module(), atom(), [term()]) :: term()
   def call(module, function, args), do: GenServer.call(__MODULE__, {:call, module, function, args}, @timeout)
 
+  @impl true
   def init(state), do: {:ok, state}
 
+  @impl true
   def handle_call({:call, module, function, args}, _from, state) do
     since_ms = System.monotonic_time(:millisecond) - state.last_call
     if since_ms < @interval, do: Process.sleep(@interval - since_ms)
