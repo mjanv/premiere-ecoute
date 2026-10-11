@@ -28,3 +28,12 @@ AI assistant MUST NOT do:
 4. Re-format code to any other style.
 5. Refactor large modules without human guidance.
 6. Write raw HTML for any repeated UI pattern (modal overlays, cards, badges, buttons, empty states) without for existing components.
+
+## Worktrees
+
+When your working directory is a linked git worktree (`.git` is a file, usually `.claude/worktrees/<name>`), you are authorized to commit your work on the worktree's branch without asking. See @docs/guides/worktrees.md.
+
+- Commit when a coherent piece of work is done and `mix test` passes for it. Stage only the files you changed, never `git add -A` (symlinked `deps` and `node_modules` live there).
+- Use a conventional title (`feat(scope): ...`) and a short body. Do not list every change.
+- Never push, merge, rebase onto another branch, or touch the original checkout. The developer merges.
+- End your report with the branch name and the commit hashes.

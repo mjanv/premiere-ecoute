@@ -266,4 +266,13 @@ config :fun_with_flags, :persistence,
   ecto_table_name: "feature_flags",
   ecto_primary_key_type: :id
 
+# Identity of the git worktree (see PremiereEcoute.MixProject.worktree/0). Compile time, since each worktree has its own _build.
+worktree =
+  if config_env() == :prod,
+    do: %{name: nil, suffix: "", ports: [web: 4000, mock: 4001]},
+    else: PremiereEcoute.MixProject.worktree()
+
+config :premiere_ecoute, :worktree, worktree.name
+config :premiere_ecoute, :ports, worktree.ports
+
 import_config "#{config_env()}.exs"

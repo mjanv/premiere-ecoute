@@ -67,3 +67,9 @@ docs/plans
 
 # Streamdeck
 *.streamDeckPlugin
+# Linked worktrees and their setup marker
+/.claude/worktrees/
+/.wt-ready
+/deps
+/assets/node_modules
+/.claude/skills/browse/node_modules

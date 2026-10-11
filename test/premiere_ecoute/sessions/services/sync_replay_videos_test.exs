@@ -11,14 +11,12 @@ defmodule PremiereEcoute.Sessions.Services.SyncReplayVideosTest do
 
   @channel_id "UC" <> String.duplicate("a", 22)
 
-  defp pending(attrs \\ %{}) do
-    due_at = DateTime.to_iso8601(DateTime.add(DateTime.utc_now(:second), -1, :hour))
-
+  defp pending(attrs) do
     Map.merge(
       %{
         "status" => "pending",
         "job_id" => nil,
-        "due_at" => due_at,
+        "due_at" => DateTime.to_iso8601(DateTime.add(DateTime.utc_now(:second), -1, :hour)),
         "last_checked_at" => nil
       },
       attrs

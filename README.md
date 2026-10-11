@@ -29,6 +29,7 @@ Premiere Ecoute turns music discovery into an interactive experience where strea
 - 📝 Write consistent code following our [coding standards](docs/coding_standards.md) for style and best practices
 - 🏗️ Understand how the system works with our [architecture overview](docs/architecture.md) explaining contexts, APIs, and data flow
 - 🤝 Get started contributing to the project with our [contribution guide](docs/guides/contributing.md)
+- 🌳 Work on several features in parallel with the [worktrees guide](docs/guides/worktrees.md)
 - 🎨 Read for complete design workflow and component creation in our [frontend guide](docs/guides/frontend.md)
 - 🏛️ Learn how to document developer, legal and release documentations in our [documentation guide](docs/guides/documentation.md)
 - 🚀 Deploy to production following our [deployment guide](docs/guides/deployment.md) instructions

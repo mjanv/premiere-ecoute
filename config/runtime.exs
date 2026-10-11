@@ -31,9 +31,34 @@ config :premiere_ecoute, :feature_flags,
   username: env!("AUTH_USERNAME"),
   password: env!("AUTH_PASSWORD")
 
+# Git worktree identity (see PremiereEcoute.MixProject.worktree/0): own database, ports and storage prefix per worktree.
+worktree =
+  if config_env() == :prod,
+    do: %{name: nil, suffix: "", ports: [web: 4000, mock: 4001]},
+    else: PremiereEcoute.MixProject.worktree()
+
+database =
+  env!("POSTGRES_DATABASE", :string, "premiere_ecoute_#{config_env()}") <>
+    worktree.suffix <> if(config_env() == :test, do: System.get_env("MIX_TEST_PARTITION", ""), else: "")
+
+if config_env() == :dev do
+  web_url = "http://localhost:#{worktree.ports[:web]}"
+
+  config :premiere_ecoute, :ports, worktree.ports
+  config :boruta, Boruta.Oauth, issuer: web_url
+  config :premiere_ecoute, PremiereEcouteWeb.Endpoint, http: [ip: {127, 0, 0, 1}, port: worktree.ports[:web]]
+  config :premiere_ecoute, PremiereEcoute.Apis, twitch: [urls: [api: "http://localhost:#{worktree.ports[:mock]}"]]
+  config :premiere_ecoute, PremiereEcoute.Podcasts.Storage, key_prefix: worktree.name, public_base_url: web_url <> "/uploads"
+end
+
+if config_env() == :test do
+  config :boruta, Boruta.Oauth, issuer: "http://localhost:#{worktree.ports[:test]}"
+  config :premiere_ecoute, PremiereEcouteWeb.Endpoint, http: [ip: {127, 0, 0, 1}, port: worktree.ports[:test]]
+end
+
 config :premiere_ecoute, PremiereEcoute.Repo,
   schema: "public",
-  database: env!("POSTGRES_DATABASE", :string, "premiere_ecoute_#{config_env()}"),
+  database: database,
   username: env!("POSTGRES_USERNAME"),
   password: env!("POSTGRES_PASSWORD"),
   hostname: env!("POSTGRES_HOSTNAME"),
@@ -41,7 +66,7 @@ config :premiere_ecoute, PremiereEcoute.Repo,
 
 config :premiere_ecoute, PremiereEcoute.Events.Store,
   schema: "event_store",
-  database: env!("POSTGRES_DATABASE", :string, "premiere_ecoute_#{config_env()}"),
+  database: database,
   username: env!("POSTGRES_USERNAME"),
   password: env!("POSTGRES_PASSWORD"),
   hostname: env!("POSTGRES_HOSTNAME"),

@@ -9,7 +9,8 @@ defmodule PremiereEcouteWeb.Endpoint do
 
   @session_options [
     store: :cookie,
-    key: "_premiere_ecoute_key",
+    # Cookies are shared across ports on localhost, so a worktree gets its own cookie name.
+    key: "_premiere_ecoute_key" <> if(wt = Application.compile_env(:premiere_ecoute, :worktree), do: "_" <> wt, else: ""),
     signing_salt: "vXxdxPUJ",
     same_site: "Lax"
   ]
