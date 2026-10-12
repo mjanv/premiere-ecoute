@@ -23,6 +23,11 @@ defmodule PremiereEcouteWeb.Endpoint do
     websocket: true,
     longpoll: false
 
+  # Desktop player. Native clients send no Origin header, authentication is the OAuth access token in `X-Access-Token`.
+  socket "/player", PremiereEcouteWeb.Player.Socket,
+    websocket: [connect_info: [:x_headers], max_frame_size: 65_536],
+    longpoll: false
+
   plug Plug.Static,
     at: "/",
     from: :premiere_ecoute,
