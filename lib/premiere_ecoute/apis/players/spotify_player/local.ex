@@ -112,6 +112,14 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   def command(:pause, from, %{state: %{is_playing: true}} = data), do: push(data, from, :toggle_play_pause, %{}, {:ok, :paused})
   def command(:pause, _from, data), do: {:reply, {:ok, :paused}, data}
 
+  def command(:next, from, data), do: push(data, from, :next, %{}, {:ok, :next})
+  def command(:previous, from, data), do: push(data, from, :previous, %{}, {:ok, :previous})
+
+  def command({:set_volume, volume}, from, data) when is_number(volume) and volume >= 0 and volume <= 1,
+    do: push(data, from, :set_volume, %{volume: volume}, {:ok, volume})
+
+  def command({:set_volume, _volume}, _from, data), do: {:reply, {:error, :invalid_volume}, data}
+
   # Without a first snapshot the desktop player state is not known yet.
   def command(:active_device, _from, %{last_seq: -1} = data), do: {:reply, :api, data}
   def command(:active_device, _from, %{state: %{device: nil}} = data), do: {:reply, {:error, :no_active_device}, data}
