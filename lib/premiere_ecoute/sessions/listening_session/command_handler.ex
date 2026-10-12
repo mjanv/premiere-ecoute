@@ -12,6 +12,7 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
 
   alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.Players.PlaybackState
+  alias PremiereEcoute.Apis.Players.SpotifyPlayer
   alias PremiereEcoute.Discography
   alias PremiereEcoute.Discography.Album
   alias PremiereEcoute.Discography.Playlist
@@ -690,28 +691,39 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   end
 
   defp maybe_start_playback(true, _scope, _single), do: {:ok, :resumed}
-  defp maybe_start_playback(false, scope, single), do: Apis.spotify().start_resume_playback(scope, single)
+  defp maybe_start_playback(false, scope, single), do: play(scope, single)
 
   defp maybe_check_active_device(true, _scope), do: {:ok, :skipped}
 
   defp maybe_check_active_device(false, scope) do
-    with {:ok, devices} <- Apis.spotify().devices(scope),
-         true <- Enum.any?(devices, fn device -> device["is_active"] end) do
-      {:ok, :active}
-    else
-      false -> {:error, :no_active_device}
-      error -> error
-    end
+    SpotifyPlayer.command(scope, :active_device, fn ->
+      with {:ok, devices} <- Apis.spotify().devices(scope),
+           true <- Enum.any?(devices, fn device -> device["is_active"] end) do
+        {:ok, :active}
+      else
+        false -> {:error, :no_active_device}
+        error -> error
+      end
+    end)
   end
 
   defp maybe_toggle_playback_shuffle(true, _scope), do: {:ok, :skipped}
-  defp maybe_toggle_playback_shuffle(false, scope), do: Apis.spotify().toggle_playback_shuffle(scope, false)
+
+  defp maybe_toggle_playback_shuffle(false, scope),
+    do: SpotifyPlayer.command(scope, {:shuffle, false}, fn -> Apis.spotify().toggle_playback_shuffle(scope, false) end)
 
   defp maybe_set_repeat_mode(true, _scope), do: {:ok, :skipped}
-  defp maybe_set_repeat_mode(false, scope), do: Apis.spotify().set_repeat_mode(scope, :off)
+
+  defp maybe_set_repeat_mode(false, scope),
+    do: SpotifyPlayer.command(scope, {:repeat, :off}, fn -> Apis.spotify().set_repeat_mode(scope, :off) end)
 
   defp maybe_start_resume_playback(true, _scope, _target), do: {:ok, :skipped}
-  defp maybe_start_resume_playback(false, scope, target), do: Apis.spotify().start_resume_playback(scope, target)
+  defp maybe_start_resume_playback(false, scope, target), do: play(scope, target)
+
+  # Plays through the streamer's desktop player when connected, through the Web API otherwise.
+  defp play(scope, target) do
+    SpotifyPlayer.command(scope, {:play, target}, fn -> Apis.spotify().start_resume_playback(scope, target) end)
+  end
 
   # Pauses Spotify playback (if an active device exists) and reports the outcome as the
   # `:playback` field carried by `SessionStopped`. Returns `:skipped` in degraded mode
@@ -721,14 +733,17 @@ defmodule PremiereEcoute.Sessions.ListeningSession.CommandHandler do
   defp pause_playback_outcome(true, _scope), do: :skipped
 
   defp pause_playback_outcome(false, scope) do
+    case SpotifyPlayer.command(scope, :pause, fn -> pause_through_web_api(scope) end) do
+      {:ok, _} -> :paused
+      {:error, _} -> :failed
+      nil -> nil
+    end
+  end
+
+  defp pause_through_web_api(scope) do
     case Apis.spotify().devices(scope) do
       {:ok, devices} ->
-        if Enum.any?(devices, fn device -> device["is_active"] end) do
-          case Apis.spotify().pause_playback(scope) do
-            {:ok, _} -> :paused
-            {:error, _} -> :failed
-          end
-        end
+        if Enum.any?(devices, fn device -> device["is_active"] end), do: Apis.spotify().pause_playback(scope)
 
       _ ->
         nil

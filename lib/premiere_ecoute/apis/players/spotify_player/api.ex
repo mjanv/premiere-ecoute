@@ -110,6 +110,9 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Api do
 
   def handle_info(_message, data), do: {:noreply, data}
 
+  @impl true
+  def command(_command, _from, data), do: {:reply, :api, data}
+
   @doc """
   Registers a failed poll and publishes the degraded or down status when reached.
   """
