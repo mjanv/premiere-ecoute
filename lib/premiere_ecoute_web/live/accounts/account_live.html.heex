@@ -319,6 +319,22 @@
               </.button>
             </div>
           <% end %>
+
+          <%!-- Desktop player --%>
+          <div :if={@player_enrolled} id="desktop-player" class="flex items-center justify-between px-6 py-3">
+            <div class="min-w-0">
+              <p class="text-white text-sm font-medium">{gettext("Desktop player")}</p>
+              <p class="text-gray-500 text-xs">{gettext("A desktop player is connected to your account")}</p>
+            </div>
+            <.button
+              phx-click="disconnect_player"
+              data-confirm={gettext("Disconnect the desktop player? You will have to log in again from the player.")}
+              variant="danger"
+              size="xs"
+            >
+              {gettext("Disconnect")}
+            </.button>
+          </div>
         </div>
       </div>
 

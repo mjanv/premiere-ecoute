@@ -7,12 +7,15 @@ defmodule PremiereEcouteWeb.Player.Channel do
 
   use Phoenix.Channel
 
+  alias PremiereEcoute.Accounts.User
+  alias PremiereEcoute.Devices
   alias PremiereEcouteWeb.Player.Protocol
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
 
   @protocol 1
   @snapshot_interval_ms 1_000
+  @recheck_ms 300_000
   @snapshot_rate 5
   @snapshot_flood 20
   @invalid_limit 10
@@ -28,6 +31,8 @@ defmodule PremiereEcouteWeb.Player.Channel do
         {:error, %{reason: "unsupported_protocol"}}
 
       true ->
+        PremiereEcoute.PubSub.subscribe("player:revoked:#{user_id}")
+        Process.send_after(self(), :recheck, @recheck_ms)
         socket = assign(socket, :invalid, [])
         forward(socket, {:device_attached, self(), %{session_id: payload["session_id"], app_version: payload["app_version"]}})
         {:ok, %{"snapshot_interval_ms" => @snapshot_interval_ms}, socket}
@@ -64,6 +69,17 @@ defmodule PremiereEcouteWeb.Player.Channel do
     push(socket, "command", Protocol.command(command))
     {:noreply, socket}
   end
+
+  def handle_info(:recheck, %{assigns: %{user_id: user_id}} = socket) do
+    if Devices.player_enrolled?(%User{id: user_id}) do
+      Process.send_after(self(), :recheck, @recheck_ms)
+      {:noreply, socket}
+    else
+      handle_info({:disconnect, :revoked}, socket)
+    end
+  end
+
+  def handle_info(:player_revoked, socket), do: handle_info({:disconnect, :revoked}, socket)
 
   def handle_info({:disconnect, reason}, socket) do
     push(socket, "disconnect", Protocol.disconnect(reason))
