@@ -114,6 +114,42 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerCommandTest do
       refute_received :web_api
     end
 
+    test "skips to the next and previous track", %{scope: scope, player: player} do
+      for {command, type} <- [next: :next, previous: :previous] do
+        task = command_async(scope, command)
+        assert_receive {:device, {:command, %{id: id, type: ^type, args: args, ttl_ms: 10_000}}}
+        assert args == %{}
+        send(player, {:device_ack, id, :ok, nil})
+
+        assert Task.await(task) == {:ok, command}
+      end
+    end
+
+    test "uses the Web API when the desktop player rejects a skip", %{scope: scope, player: player} do
+      task = command_async(scope, :next)
+      assert_receive {:device, {:command, %{id: id}}}
+      send(player, {:device_ack, id, :rejected, "no"})
+
+      assert Task.await(task) == {:ok, :web_api}
+    end
+
+    test "sets the volume", %{scope: scope, player: player} do
+      task = command_async(scope, {:set_volume, 0.3})
+      assert_receive {:device, {:command, %{id: id, type: :set_volume, args: %{volume: 0.3}}}}
+      send(player, {:device_ack, id, :ok, nil})
+
+      assert Task.await(task) == {:ok, 0.3}
+    end
+
+    test "refuses a volume out of range without asking anybody", %{scope: scope} do
+      for volume <- [7, -0.1, "loud"] do
+        assert Task.await(command_async(scope, {:set_volume, volume})) == {:error, :invalid_volume}
+      end
+
+      refute_receive {:device, {:command, _command}}
+      refute_received :web_api
+    end
+
     test "uses the Web API for what the desktop player cannot play", %{scope: scope} do
       for target <- [%Album{provider_ids: %{spotify: "x"}}, %PlaybackState{item: %{uri: "spotify:track:1"}, progress_ms: 5}] do
         assert Task.await(command_async(scope, {:play, target})) == {:ok, :web_api}
