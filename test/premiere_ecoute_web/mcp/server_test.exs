@@ -148,14 +148,14 @@ defmodule PremiereEcouteWeb.Mcp.ServerTest do
   end
 
   defp issue_access_token(user, scope) do
-    {:ok, _scope} = Admin.create_scope(%{name: "player", public: true})
-
     {:ok, client} =
       Admin.create_client(%{
         name: "client-#{System.unique_integer([:positive])}",
         redirect_uris: ["https://example.com/callback"],
         supported_grant_types: ["authorization_code", "refresh_token"],
-        pkce: true
+        pkce: true,
+        authorize_scope: true,
+        authorized_scopes: [%{name: "player"}, %{name: "mcp"}]
       })
 
     code_verifier = "AaypQFt5gKjNdyiPjJ6AQ1UDbPJtbym3Oa6OpwiRV0g"
