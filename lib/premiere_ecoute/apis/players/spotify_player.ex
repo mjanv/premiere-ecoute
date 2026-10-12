@@ -17,6 +17,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   alias PremiereEcoute.Presence
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
+  @command_timeout 15_000
 
   @doc """
   Starts the Spotify player monitoring GenServer.
@@ -48,6 +49,42 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
         {:ok, Api.schedule_poll(data, Api.poll_interval(data.failures))}
     end
   end
+
+  @doc """
+  Runs a playback command through the user's local player when there is one, through the Web API otherwise.
+
+  `fallback` runs the command through the Web API. It is called when the user has no player, when the player is in Api mode, or when the local player did not execute the command (unsupported, rejected, expired). It is never called when the local player may have executed it: that case returns `{:error, :unknown}`, as a blind retry could double-toggle or skip two tracks.
+  """
+  @spec command(Scope.t(), term(), (-> result)) :: result | {:error, :unknown} when result: term()
+  def command(%Scope{user: %{id: user_id}}, command, fallback) when is_function(fallback, 0) do
+    with pid when is_pid(pid) <- player(user_id),
+         :api <- call(pid, command) do
+      fallback.()
+    else
+      nil -> fallback.()
+      result -> result
+    end
+  end
+
+  defp player(user_id) do
+    with pid when is_pid(pid) <- Process.whereis(@registry),
+         [{player, _value} | _] <- Registry.lookup(@registry, user_id) do
+      player
+    else
+      _ -> nil
+    end
+  end
+
+  defp call(pid, command) do
+    GenServer.call(pid, {:command, command}, @command_timeout)
+  catch
+    :exit, {:noproc, _} -> :api
+    :exit, _ -> {:error, :unknown}
+  end
+
+  @doc false
+  @impl true
+  def handle_call({:command, command}, from, data), do: mode(data).command(command, from, data)
 
   @doc false
   @impl true

@@ -14,4 +14,12 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Mode do
   """
   @callback handle_info(message :: term(), data :: map()) ::
               {:observe, PlaybackState.t(), map()} | {:noreply, map()} | {:switch, :api, map()} | {:stop, term(), map()}
+
+  @doc """
+  Handles a playback command asked by `PremiereEcoute.Apis.Players.SpotifyPlayer.command/3`.
+
+  Replies `:api` when the command was not executed and must be run through the Web API, or the result of the command. May reply later with `GenServer.reply/2`.
+  """
+  @callback command(command :: term(), from :: GenServer.from(), data :: map()) ::
+              {:reply, term(), map()} | {:noreply, map()}
 end
