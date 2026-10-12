@@ -43,6 +43,10 @@ defmodule PremiereEcouteWeb.Player.ChannelTest do
       assert is_pid(player) and player != socket.channel_pid
     end
 
+    test "accepts the me topic, as the player does not know its user id", %{socket: socket} do
+      assert {:ok, %{"snapshot_interval_ms" => 1_000}, _socket} = subscribe_and_join(socket, Channel, "desktop:me", @join)
+    end
+
     test "refuses another user's topic", %{user: user, socket: socket} do
       assert {:error, %{reason: "forbidden"}} =
                subscribe_and_join(socket, Channel, "desktop:#{user.id + 1}", @join)
