@@ -2,6 +2,8 @@ defmodule PremiereEcouteWeb.Player.Channel do
   @moduledoc """
   Channel of the desktop player.
 
+  Topic `desktop:<user_id>`, or `desktop:me` for a player that does not know its user id.
+
   Thin transport between the player and the user's `SpotifyPlayer`: validates incoming messages, forwards them and pushes commands. Takes no decision.
   """
 
@@ -25,7 +27,7 @@ defmodule PremiereEcouteWeb.Player.Channel do
   @impl true
   def join("desktop:" <> topic_user_id, payload, %{assigns: %{user_id: user_id}} = socket) do
     cond do
-      topic_user_id != to_string(user_id) ->
+      topic_user_id not in ["me", to_string(user_id)] ->
         {:error, %{reason: "forbidden"}}
 
       payload["proto"] != @protocol ->
