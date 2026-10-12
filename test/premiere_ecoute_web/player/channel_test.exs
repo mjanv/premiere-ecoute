@@ -1,9 +1,13 @@
 defmodule PremiereEcouteWeb.Player.ChannelTest do
   use PremiereEcouteWeb.ChannelCase
 
+  import Hammox
   import PremiereEcoute.PlayerFixtures
 
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Players.PlayerRegistry
+  alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Devices
   alias PremiereEcouteWeb.Player.Channel
   alias PremiereEcouteWeb.Player.Socket
@@ -12,6 +16,7 @@ defmodule PremiereEcouteWeb.Player.ChannelTest do
 
   setup do
     start_supervised({Registry, keys: :unique, name: PlayerRegistry})
+    start_supervised({DynamicSupervisor, name: PlayerSupervisor, strategy: :one_for_one})
 
     user = user_fixture()
     %{access_token: token} = player_tokens(user)
@@ -24,6 +29,18 @@ defmodule PremiereEcouteWeb.Player.ChannelTest do
     test "accepts the player's own topic and tells the snapshot interval", %{user: user, socket: socket} do
       assert {:ok, %{"snapshot_interval_ms" => 1_000}, _socket} =
                subscribe_and_join(socket, Channel, "desktop:#{user.id}", @join)
+    end
+
+    test "starts the user's player and attaches to it", %{user: user, socket: socket} do
+      set_mox_global()
+      stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
+      Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{user.id}")
+
+      {:ok, _, socket} = subscribe_and_join(socket, Channel, "desktop:#{user.id}", @join)
+
+      assert [{player, _}] = Registry.lookup(PlayerRegistry, user.id)
+      assert_receive {:player, {:mode, :local}, _state}
+      assert is_pid(player) and player != socket.channel_pid
     end
 
     test "refuses another user's topic", %{user: user, socket: socket} do

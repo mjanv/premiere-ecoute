@@ -12,11 +12,15 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Api do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Apis
+  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.NotConnectedError
+  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Players.SpotifyPlayer
 
   @poll_interval 1_000
   @poll_max_hours 9
   @polls trunc(@poll_max_hours * 3_600_000 / @poll_interval)
+
+  @idle_ms 300_000
 
   @degraded_after 3
   @down_after 20
@@ -29,6 +33,46 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Api do
   @doc "Number of polls before the player stops."
   @spec polls() :: pos_integer()
   def polls, do: @polls
+
+  @doc """
+  Enters the api mode with a fresh poll budget and polls right away.
+  """
+  @spec enter(map()) :: map()
+  def enter(data) do
+    data
+    |> Map.merge(%{mode: :api, state: PlaybackState.default(), polls: @polls, failures: 0})
+    |> schedule_poll(0)
+  end
+
+  @doc """
+  Leaves the api mode: cancels the scheduled poll.
+  """
+  @spec leave(map()) :: map()
+  def leave(data) do
+    for key <- [:poll_timer, :idle_timer], timer = data[key], do: Process.cancel_timer(timer)
+    Map.drop(data, [:poll_timer, :idle_timer])
+  end
+
+  @doc """
+  Fetches the playback state from the Web API.
+
+  A user without a linked Spotify account has no Web API access, which is reported as `{:error, :not_connected}` instead of raising.
+  """
+  @spec fetch(Scope.t(), PlaybackState.t()) :: {:ok, PlaybackState.t()} | {:error, term()}
+  def fetch(scope, old_state) do
+    Apis.spotify().get_playback_state(scope, old_state)
+  rescue
+    NotConnectedError -> {:error, :not_connected}
+  end
+
+  @doc """
+  Stops polling and waits for a desktop player to attach, stopping the player after an idle timeout.
+  """
+  @spec idle(map()) :: map()
+  def idle(data) do
+    data = Map.delete(data, :poll_timer)
+    Map.put_new_lazy(data, :idle_timer, fn -> Process.send_after(self(), :idle_timeout, @idle_ms) end)
+  end
 
   @doc """
   Schedules the next poll.
@@ -46,10 +90,13 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Api do
 
   def handle_info(:poll, %{scope: scope, state: old_state, polls: polls} = data) do
     with {:ok, scope} <- maybe_renew_token(scope),
-         {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state) do
+         {:ok, new_state} <- fetch(scope, old_state) do
       data = schedule_poll(data, @poll_interval)
       {:observe, new_state, %{data | scope: scope, polls: polls - 1, failures: 0}}
     else
+      {:error, :not_connected} ->
+        {:noreply, idle(data)}
+
       {:error, reason} ->
         data = register_failure(data, reason)
         data = schedule_poll(data, poll_interval(data.failures))
@@ -58,6 +105,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Api do
   end
 
   def handle_info(:no_overlay, data), do: {:stop, :normal, data}
+
+  def handle_info(:idle_timeout, data), do: {:stop, :normal, data}
 
   def handle_info(_message, data), do: {:noreply, data}
 
