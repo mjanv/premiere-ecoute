@@ -15,6 +15,7 @@ defmodule PremiereEcoute do
       {Billboard, except: []},
       {Collections, except: []},
       {Commands, except: []},
+      {Devices, except: []},
       {Discography, except: []},
       {Donations, except: []},
       {Events, except: []},

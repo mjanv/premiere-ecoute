@@ -10,6 +10,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
   alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Services.AccountCompliance
   alias PremiereEcoute.Accounts.User.Profile
+  alias PremiereEcoute.Devices
 
   @impl true
   def mount(_params, _session, socket) do
@@ -31,6 +32,7 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
     |> assign(:profile_form, profile_form)
     |> assign(:timezones, PremiereEcouteCore.Timezone.list())
     |> assign(:api_tokens, if(current_user, do: Accounts.list_user_api_tokens(current_user), else: []))
+    |> assign(:player_enrolled, if(current_user, do: Devices.player_enrolled?(current_user), else: false))
     |> assign(:show_token_modal, false)
     |> assign(:new_api_token, nil)
     |> assign(:new_token_name, "")
@@ -242,6 +244,12 @@ defmodule PremiereEcouteWeb.Accounts.AccountLive do
     |> assign(:api_tokens, [])
     |> assign(:new_api_token, nil)
     |> then(fn socket -> {:noreply, socket} end)
+  end
+
+  @impl true
+  def handle_event("disconnect_player", _params, socket) do
+    Devices.revoke_player(socket.assigns.current_user)
+    {:noreply, assign(socket, :player_enrolled, false)}
   end
 
   @impl true

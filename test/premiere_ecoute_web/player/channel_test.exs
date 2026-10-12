@@ -4,6 +4,7 @@ defmodule PremiereEcouteWeb.Player.ChannelTest do
   import PremiereEcoute.PlayerFixtures
 
   alias PremiereEcoute.Apis.Players.PlayerRegistry
+  alias PremiereEcoute.Devices
   alias PremiereEcouteWeb.Player.Channel
   alias PremiereEcouteWeb.Player.Socket
 
@@ -109,6 +110,30 @@ defmodule PremiereEcouteWeb.Player.ChannelTest do
       send(socket.channel_pid, {:command, %{id: "c1", type: :set_volume, args: %{volume: 0.3}, ttl_ms: 10_000}})
 
       assert_push "command", %{"id" => "c1", "type" => "set_volume", "args" => %{"volume" => 0.3}, "ttl_ms" => 10_000}
+    end
+
+    test "tells the player it was revoked and stops when the user revokes the player", %{user: user, socket: socket} do
+      Process.flag(:trap_exit, true)
+      ref = Process.monitor(socket.channel_pid)
+
+      :ok = Devices.revoke_player(user)
+
+      assert_push "disconnect", %{"reason" => "revoked"}
+      assert_receive {:DOWN, ^ref, :process, _pid, _reason}
+    end
+
+    test "periodically checks that the player is still enrolled", %{socket: socket} do
+      Process.flag(:trap_exit, true)
+      ref = Process.monitor(socket.channel_pid)
+
+      send(socket.channel_pid, :recheck)
+      refute_receive {:DOWN, ^ref, :process, _pid, _reason}
+
+      PremiereEcoute.Repo.update_all(Boruta.Ecto.Token, set: [refresh_token_revoked_at: DateTime.utc_now()])
+      send(socket.channel_pid, :recheck)
+
+      assert_push "disconnect", %{"reason" => "revoked"}
+      assert_receive {:DOWN, ^ref, :process, _pid, _reason}
     end
 
     test "pushes a disconnect reason and stops", %{socket: socket} do
