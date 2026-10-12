@@ -10,8 +10,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Mode do
   @doc """
   Handles a message received by the player while in this mode.
 
-  Returns `{:observe, playback_state, data}` when a new playback state was observed, `{:noreply, data}` when there is nothing to report, or `{:stop, reason, data}`.
+  Returns `{:observe, playback_state, data}` when a new playback state was observed, `{:noreply, data}` when there is nothing to report, `{:switch, :api, data}` when the mode cannot continue, or `{:stop, reason, data}`.
   """
   @callback handle_info(message :: term(), data :: map()) ::
-              {:observe, PlaybackState.t(), map()} | {:noreply, map()} | {:stop, term(), map()}
+              {:observe, PlaybackState.t(), map()} | {:noreply, map()} | {:switch, :api, map()} | {:stop, term(), map()}
 end

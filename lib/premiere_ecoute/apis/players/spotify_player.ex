@@ -11,9 +11,9 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Players.SpotifyPlayer.Api
+  alias PremiereEcoute.Apis.Players.SpotifyPlayer.Local
   alias PremiereEcoute.Presence
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
@@ -37,9 +37,12 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
     with {:ok, phx_ref} <- Presence.join(scope.user.id, :player),
          :ok <- PremiereEcoute.PubSub.subscribe("player:#{scope.user.id}"),
-         {:ok, state} <- Apis.spotify().get_playback_state(scope, PlaybackState.default()) do
+         {:ok, state} <- Api.fetch(scope, PlaybackState.default()) do
       {:ok, Api.schedule_poll(Map.merge(data, %{phx_ref: phx_ref, state: state}), Api.poll_interval())}
     else
+      {:error, :not_connected} ->
+        {:ok, Api.idle(Map.put(data, :phx_ref, nil))}
+
       {:error, reason} ->
         data = register_failure(Map.put(data, :phx_ref, nil), reason)
         {:ok, Api.schedule_poll(data, Api.poll_interval(data.failures))}
@@ -48,10 +51,13 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   @doc false
   @impl true
+  def handle_info({:device_attached, pid, meta}, data), do: {:noreply, attach(data, pid, meta)}
+
   def handle_info(message, data) do
     case mode(data).handle_info(message, data) do
       {:observe, new_state, data} -> observe(data, new_state)
       {:noreply, data} -> {:noreply, data}
+      {:switch, :api, data} -> {:noreply, switch_to_api(data)}
       {:stop, reason, data} -> {:stop, reason, data}
     end
   end
@@ -74,7 +80,23 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   end
 
   # The api mode is the default: it is the one the player starts in and the one it falls back to.
+  defp mode(%{mode: :local}), do: Local
   defp mode(_data), do: Api
+
+  # A newly attached device replaces the previous one.
+  defp attach(%{mode: :local, device: %{pid: previous}} = data, pid, meta) do
+    send(previous, {:disconnect, :replaced})
+    data |> Local.leave() |> Local.enter(pid, meta) |> publish_mode()
+  end
+
+  defp attach(data, pid, meta), do: data |> Api.leave() |> Local.enter(pid, meta) |> publish_mode()
+
+  defp switch_to_api(data), do: data |> Local.leave() |> Api.enter() |> publish_mode()
+
+  defp publish_mode(%{scope: scope, state: state, mode: mode} = data) do
+    publish(scope, {:mode, mode}, state)
+    data
+  end
 
   defp observe(%{scope: scope, state: old_state} = data, new_state) do
     {:ok, state, events} = handle(old_state, %{new_state | status: :normal})
