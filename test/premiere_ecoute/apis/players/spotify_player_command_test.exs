@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Apis.Players.SpotifyPlayerCommandTest do
   use PremiereEcoute.DataCase
 
+  import ExUnit.CaptureLog
+
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Players.SpotifyPlayer
@@ -188,6 +190,93 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerCommandTest do
       assert Task.await(command_async(scope, {:shuffle, false})) == {:ok, :skipped}
       assert Task.await(command_async(scope, {:repeat, :off})) == {:ok, :skipped}
     end
+  end
+
+  describe "logs" do
+    setup %{user: user} do
+      previous = Logger.level()
+      Logger.configure(level: :info)
+      on_exit(fn -> Logger.configure(level: previous) end)
+
+      start_supervised({Registry, keys: :unique, name: PremiereEcoute.Apis.Players.PlayerRegistry})
+      set_mox_global()
+      stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
+
+      {:ok, player} = SpotifyPlayer.start_link({user.id, device: true})
+      test = self()
+      device = spawn(fn -> forward(test) end)
+      on_exit(fn -> if Process.alive?(player), do: GenServer.stop(player) end)
+      {:ok, %{player: player, device: device}}
+    end
+
+    test "follow the device attaching and the mode changes", %{user: user, player: player, device: device} do
+      log = capture_log(fn -> attach(player, device) end)
+      assert log =~ "Desktop player attached user=#{user.id}"
+
+      ref = Process.monitor(device)
+
+      log =
+        capture_log(fn ->
+          Process.exit(device, :kill)
+          assert_receive {:DOWN, ^ref, :process, _pid, _reason}
+          :sys.get_state(player)
+        end)
+
+      assert log =~ "Desktop player lost user=#{user.id} reason=disconnected"
+      assert log =~ "back to the Web API"
+    end
+
+    test "follow a command and its ack", %{user: user, scope: scope, player: player, device: device} do
+      attach(player, device)
+      track = %Track{provider_ids: %{spotify: "6rqhFgbbKwnb9MLmUQDhG6"}}
+
+      log =
+        capture_log(fn ->
+          task = command_async(scope, {:play, track})
+          assert_receive {:device, {:command, %{id: id}}}
+          send(player, {:device_ack, id, :ok, nil})
+          Task.await(task)
+        end)
+
+      assert log =~ "Desktop player command sent user=#{user.id}"
+      assert log =~ "type=play_uri"
+      assert log =~ "Desktop player command acked user=#{user.id}"
+      assert log =~ "status=ok"
+    end
+
+    test "follow the fallback to the Web API", %{user: user, scope: scope, player: player, device: device} do
+      attach(player, device)
+
+      log =
+        capture_log(fn ->
+          task = command_async(scope, :next)
+          assert_receive {:device, {:command, %{id: id}}}
+          send(player, {:device_ack, id, :rejected, "no"})
+          Task.await(task)
+        end)
+
+      assert log =~ "status=rejected"
+      assert log =~ "Desktop player command falls back to the Web API user=#{user.id} command=next"
+    end
+
+    test "warn about a command without result", %{user: user, scope: scope, player: player, device: device} do
+      attach(player, device)
+
+      log =
+        capture_log(fn ->
+          task = command_async(scope, :next)
+          assert_receive {:device, {:command, %{id: id}}}
+          send(player, {:command_expired, id})
+          Task.await(task)
+        end)
+
+      assert log =~ "Desktop player command without ack user=#{user.id}"
+    end
+  end
+
+  defp attach(player, device) do
+    send(player, {:device_attached, device, %{session_id: "s1"}})
+    :sys.get_state(player)
   end
 
   defp command_async(scope, command) do

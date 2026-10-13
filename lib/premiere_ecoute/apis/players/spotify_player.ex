@@ -132,10 +132,16 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   # A newly attached device replaces the previous one.
   defp attach(%{mode: :local, device: %{pid: previous}} = data, pid, meta) do
     send(previous, {:disconnect, :replaced})
-    data |> Local.leave() |> Local.enter(pid, meta) |> publish_mode()
+    Logger.info("Desktop player replaced user=#{data.scope.user.id}")
+    data |> Local.leave() |> Local.enter(pid, meta) |> log_attached(meta) |> publish_mode()
   end
 
-  defp attach(data, pid, meta), do: data |> Api.leave() |> Local.enter(pid, meta) |> publish_mode()
+  defp attach(data, pid, meta), do: data |> Api.leave() |> Local.enter(pid, meta) |> log_attached(meta) |> publish_mode()
+
+  defp log_attached(data, meta) do
+    Logger.info("Desktop player attached user=#{data.scope.user.id} session=#{Map.get(meta, :session_id)}")
+    data
+  end
 
   defp switch_to_api(data), do: data |> Local.leave() |> Api.enter() |> publish_mode()
 

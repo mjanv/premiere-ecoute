@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Devices do
 
   import Ecto.Query
 
+  require Logger
+
   alias Boruta.Ecto.Token
   alias Boruta.Oauth.Token, as: OauthToken
   alias PremiereEcoute.Accounts.User
@@ -30,6 +32,7 @@ defmodule PremiereEcoute.Devices do
       end
     end)
 
+    Logger.info("Desktop player revoked user=#{user.id}")
     PubSub.broadcast("player:revoked:#{user.id}", :player_revoked)
   end
 
