@@ -1,6 +1,8 @@
 defmodule PremiereEcoute.Apis.Players.SpotifyPlayerLocalTest do
   use PremiereEcoute.DataCase
 
+  import ExUnit.CaptureLog
+
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
   alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.NotConnectedError
   alias PremiereEcoute.Apis.Players.PlaybackState
@@ -201,6 +203,62 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerLocalTest do
       refute Map.has_key?(state, :idle_timer)
 
       GenServer.stop(player)
+    end
+  end
+
+  describe "local mode: logs" do
+    setup %{data: data} do
+      previous = Logger.level()
+      Logger.configure(level: :info)
+      on_exit(fn -> Logger.configure(level: previous) end)
+
+      device = spawn(fn -> Process.sleep(:infinity) end)
+      {:noreply, data} = SpotifyPlayer.handle_info({:device_attached, device, %{}}, data)
+      {:ok, %{data: data}}
+    end
+
+    test "state changes are logged with what the player sent", %{user: user, data: data} do
+      log = capture_log(fn -> SpotifyPlayer.handle_info({:device_snapshot, 1, snapshot()}, data) end)
+
+      assert log =~
+               ~s(Desktop player state user=#{user.id} running=true playback=playing uri="#{@uri}" title="Song" artist="Artist" album="Album")
+    end
+
+    test "an unchanged state is not logged again", %{data: data} do
+      {:noreply, data} = SpotifyPlayer.handle_info({:device_snapshot, 1, snapshot()}, data)
+
+      log = capture_log(fn -> SpotifyPlayer.handle_info({:device_snapshot, 2, snapshot(%{position_ms: 13_345})}, data) end)
+
+      refute log =~ "Desktop player state"
+    end
+
+    test "a pause or a new track is logged", %{data: data} do
+      {:noreply, data} = SpotifyPlayer.handle_info({:device_snapshot, 1, snapshot()}, data)
+
+      log = capture_log(fn -> SpotifyPlayer.handle_info({:device_snapshot, 2, snapshot(%{playback: :paused})}, data) end)
+      assert log =~ "playback=paused"
+
+      log =
+        capture_log(fn ->
+          SpotifyPlayer.handle_info({:device_snapshot, 2, snapshot(%{title: "Other", uri: "spotify:track:other"})}, data)
+        end)
+
+      assert log =~ ~s(title="Other")
+    end
+
+    test "text from the player cannot add log lines", %{data: data} do
+      log = capture_log(fn -> SpotifyPlayer.handle_info({:device_snapshot, 1, snapshot(%{title: "a\n[error] forged"})}, data) end)
+
+      assert log =~ ~s(title="a\\n[error] forged")
+    end
+
+    test "every snapshot is logged at debug level", %{user: user, data: data} do
+      Logger.configure(level: :debug)
+      {:noreply, data} = SpotifyPlayer.handle_info({:device_snapshot, 1, snapshot()}, data)
+
+      log = capture_log(fn -> SpotifyPlayer.handle_info({:device_snapshot, 2, snapshot(%{position_ms: 13_345})}, data) end)
+
+      assert log =~ "Desktop player snapshot user=#{user.id} seq=2 position_ms=13345"
     end
   end
 
