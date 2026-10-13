@@ -61,7 +61,9 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
 
   @impl true
   def handle_info({:device_snapshot, seq, snapshot}, %{last_seq: last_seq} = data) when seq > last_seq do
-    {:observe, to_playback_state(snapshot), %{data | last_seq: seq, last_seen_ms: now()}}
+    state = to_playback_state(snapshot)
+    log_snapshot(data, seq, snapshot, state)
+    {:observe, state, %{data | last_seq: seq, last_seen_ms: now()}}
   end
 
   def handle_info({:DOWN, ref, :process, _pid, _reason}, %{device: %{ref: ref}} = data) do
@@ -165,6 +167,23 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   defp track_uri(%Single{provider_ids: %{spotify: id}}) when is_binary(id), do: "spotify:track:" <> id
   defp track_uri(%PlaylistTrack{provider: :spotify, track_id: id}) when is_binary(id), do: "spotify:track:" <> id
   defp track_uri(_target), do: nil
+
+  # Every snapshot at debug level; at info level only what changed (first snapshot, playback, device or track).
+  defp log_snapshot(data, seq, snapshot, state) do
+    Logger.debug(
+      "Desktop player snapshot user=#{user(data)} seq=#{seq} position_ms=#{snapshot.position_ms} length_ms=#{snapshot.length_ms} volume=#{inspect(snapshot.volume)}"
+    )
+
+    if data.last_seq == -1 or changed?(data.state, state) do
+      Logger.info(
+        "Desktop player state user=#{user(data)} running=#{snapshot.running} playback=#{snapshot.playback} uri=#{inspect(snapshot.uri)} title=#{inspect(snapshot.title)} artist=#{inspect(snapshot.artist)} album=#{inspect(snapshot.album)}"
+      )
+    end
+  end
+
+  defp changed?(old, new) do
+    {old.is_playing, old.device == nil, old.item && old.item.uri} != {new.is_playing, new.device == nil, new.item && new.item.uri}
+  end
 
   defp log_fallback(data, command, detail) do
     Logger.info("Desktop player command falls back to the Web API user=#{user(data)} command=#{command} #{detail}")
