@@ -42,6 +42,10 @@ windows-core = "0.62"
 gpui-pre-windows = { path = "vendor/gpui-pre-windows" }
 
 # Smaller, faster exe for distribution. Never `panic = "abort"`: the supervisors catch panics.
+[features]
+# Dev builds talk to a local backend (http://localhost:4000); without it the server is https://premiere-ecoute.fr.
+dev-server = []
+
 [profile.release]
 lto = "thin"
 strip = true

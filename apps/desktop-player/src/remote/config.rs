@@ -1,9 +1,16 @@
 //! The server address the user chose, kept between runs: `%APPDATA%\premiere-ecoute-player\server.txt`.
 //! `PLAYER_HUB_URL` still wins when it is set (development, scripts).
+//! With neither, the build's own server is used: `http://localhost:4000` for a `dev-server` build, `https://premiere-ecoute.fr` otherwise.
 
 use std::path::{Path, PathBuf};
 
 const FILE: &str = "server.txt";
+
+/// The server a build talks to until the user picks another one.
+#[cfg(feature = "dev-server")]
+pub const DEFAULT_SERVER: &str = "http://localhost:4000";
+#[cfg(not(feature = "dev-server"))]
+pub const DEFAULT_SERVER: &str = "https://premiere-ecoute.fr";
 
 pub fn dir() -> Option<PathBuf> {
     std::env::var_os("APPDATA").map(|appdata| PathBuf::from(appdata).join("premiere-ecoute-player"))
@@ -32,14 +39,15 @@ pub fn save(address: &str) -> Result<(), String> {
     save_to(&dir, address).map_err(|e| format!("cannot save the server address: {e}"))
 }
 
-/// The address to use: the environment variable first, then the saved one.
-pub fn resolve(env: Option<&str>, saved: Option<&str>) -> Option<String> {
+/// The address to use: the environment variable first, then the saved one, then the build's default.
+pub fn resolve(env: Option<&str>, saved: Option<&str>, default: &str) -> String {
     [env, saved]
         .into_iter()
         .flatten()
         .map(str::trim)
         .find(|s| !s.is_empty())
-        .map(str::to_string)
+        .unwrap_or(default)
+        .to_string()
 }
 
 #[cfg(test)]

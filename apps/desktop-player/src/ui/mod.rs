@@ -28,9 +28,6 @@ const TRACE_POINTS: usize = 200;
 /// After the user moves the slider, ignore polled volume for this long so the thumb doesn't jump back.
 const VOLUME_HOLD: Duration = Duration::from_millis(1500);
 
-/// Offered in the server field the first time, for a backend running on this PC.
-const LOCAL_SERVER: &str = "http://localhost:4000";
-
 const DISPLAY: &str = "Anton";
 const MONO: &str = "DM Mono";
 
@@ -99,7 +96,7 @@ impl NowPlaying {
         let server_input = cx.new(|cx| {
             InputState::new(window, cx)
                 .placeholder("Server address, for example https://…")
-                .default_value(remote::config::load().unwrap_or_else(|| LOCAL_SERVER.to_string()))
+                .default_value(remote::config::load().unwrap_or_else(|| remote::config::DEFAULT_SERVER.to_string()))
         });
         cx.subscribe(&server_input, |this, _, event: &InputEvent, cx| {
             if matches!(event, InputEvent::PressEnter { .. }) {

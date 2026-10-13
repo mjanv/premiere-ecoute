@@ -50,18 +50,17 @@ fn main() {
         if let Some(snapshot) = preview.snapshot {
             *player::lock(&shared) = snapshot;
         }
-        // The backend link is optional: with no address (PLAYER_HUB_URL or saved from the window) the player stays local only.
+        // The server is PLAYER_HUB_URL, else the address saved from the window, else the build's default.
         let remote_handle = if previewing {
             None
         } else {
             match remote::Settings::configured() {
-                Ok(Some(settings)) => Some(remote::start(
+                Ok(settings) => Some(remote::start(
                     settings,
                     shared.clone(),
                     commands.clone(),
                     remote.clone(),
                 )),
-                Ok(None) => None,
                 Err(message) => {
                     player::lock(&remote).link = remote_status::Link::Failed(message);
                     None

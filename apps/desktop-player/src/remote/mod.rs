@@ -51,13 +51,11 @@ fn is_loopback(host: &str) -> bool {
 
 impl Settings {
     /// The server to connect to: `PLAYER_HUB_URL` if set, else the address saved from the window.
-    /// Neither means local control only.
-    pub fn configured() -> Result<Option<Self>, String> {
+    /// Neither means the build's own server (`config::DEFAULT_SERVER`).
+    pub fn configured() -> Result<Self, String> {
         let env = std::env::var("PLAYER_HUB_URL").ok();
-        match config::resolve(env.as_deref(), config::load().as_deref()) {
-            Some(address) => Self::parse(&address).map(Some),
-            None => Ok(None),
-        }
+        let address = config::resolve(env.as_deref(), config::load().as_deref(), config::DEFAULT_SERVER);
+        Self::parse(&address)
     }
 
     /// Plain `http://` is accepted for the machine itself only; anything else must be `https://`.

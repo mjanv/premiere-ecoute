@@ -32,14 +32,23 @@ fn an_empty_or_blank_file_means_nothing_was_chosen() {
 
 #[test]
 fn the_environment_wins_over_the_saved_address_and_blanks_are_skipped() {
-    assert_eq!(
-        resolve(Some("http://a"), Some("http://b")).as_deref(),
-        Some("http://a")
-    );
-    assert_eq!(resolve(None, Some("http://b")).as_deref(), Some("http://b"));
-    assert_eq!(
-        resolve(Some("  "), Some("http://b")).as_deref(),
-        Some("http://b")
-    );
-    assert_eq!(resolve(None, None), None);
+    let default = "https://default";
+    assert_eq!(resolve(Some("http://a"), Some("http://b"), default), "http://a");
+    assert_eq!(resolve(None, Some("http://b"), default), "http://b");
+    assert_eq!(resolve(Some("  "), Some("http://b"), default), "http://b");
+}
+
+#[test]
+fn the_built_in_server_is_the_fallback() {
+    assert_eq!(resolve(None, None, "https://default"), "https://default");
+    assert_eq!(resolve(Some(" "), Some(""), "https://default"), "https://default");
+}
+
+#[test]
+fn the_built_in_server_matches_the_build_flavour() {
+    if cfg!(feature = "dev-server") {
+        assert_eq!(DEFAULT_SERVER, "http://localhost:4000");
+    } else {
+        assert_eq!(DEFAULT_SERVER, "https://premiere-ecoute.fr");
+    }
 }
