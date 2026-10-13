@@ -1,6 +1,8 @@
 defmodule PremiereEcouteWeb.Player.ChannelTest do
   use PremiereEcouteWeb.ChannelCase
 
+  import ExUnit.CaptureLog
+
   import PremiereEcoute.PlayerFixtures
 
   alias PremiereEcoute.Apis.Players.PlayerRegistry
@@ -159,6 +161,52 @@ defmodule PremiereEcouteWeb.Player.ChannelTest do
 
       assert_push "disconnect", %{"reason" => "replaced"}
       assert_receive {:DOWN, ^ref, :process, _pid, _reason}
+    end
+  end
+
+  describe "logs" do
+    setup do
+      previous = Logger.level()
+      Logger.configure(level: :info)
+      on_exit(fn -> Logger.configure(level: previous) end)
+    end
+
+    test "follow a player joining and leaving", %{user: user, socket: socket} do
+      Process.flag(:trap_exit, true)
+
+      log =
+        capture_log(fn ->
+          {:ok, _, socket} = subscribe_and_join(socket, Channel, "desktop:me", @join)
+          ref = Process.monitor(socket.channel_pid)
+          send(socket.channel_pid, {:disconnect, :replaced})
+          assert_receive {:DOWN, ^ref, :process, _pid, _reason}
+        end)
+
+      assert log =~ "Desktop player joined user=#{user.id} session=7d1f6f0c-2c3b-4b53-a4ad-3a8d1a4f9c11 version=0.1.0"
+      assert log =~ "Desktop player left user=#{user.id}"
+      assert log =~ "replaced"
+    end
+
+    test "report a refused join", %{user: user, socket: socket} do
+      log =
+        capture_log(fn ->
+          {:error, _} = subscribe_and_join(socket, Channel, "desktop:#{user.id}", %{@join | "proto" => 2})
+        end)
+
+      assert log =~ "Desktop player join refused user=#{user.id} reason=unsupported_protocol"
+    end
+
+    test "report invalid payloads without their content", %{user: user, socket: socket} do
+      {:ok, _, socket} = subscribe_and_join(socket, Channel, "desktop:me", @join)
+
+      log =
+        capture_log(fn ->
+          push(socket, "snapshot", %{"seq" => 1, "snapshot" => %{"title" => "secret title"}})
+          :sys.get_state(socket.channel_pid)
+        end)
+
+      assert log =~ "Desktop player invalid snapshot user=#{user.id}"
+      refute log =~ "secret title"
     end
   end
 

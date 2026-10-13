@@ -7,6 +7,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
 
   @behaviour PremiereEcoute.Apis.Players.SpotifyPlayer.Mode
 
+  require Logger
+
   alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Discography.Album.Track
   alias PremiereEcoute.Discography.Playlist.Track, as: PlaylistTrack
@@ -46,8 +48,9 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
     if timer = data[:stale_timer], do: Process.cancel_timer(timer)
 
     # A command already sent to the device may have been executed: its result is unknown.
-    for {_id, {from, timer, _result}} <- data.pending do
+    for {id, {from, timer, _result, type}} <- data.pending do
       Process.cancel_timer(timer)
+      Logger.warning("Desktop player command without ack user=#{user(data)} id=#{id} type=#{type} reason=disconnected")
       GenServer.reply(from, {:error, :unknown})
     end
 
@@ -61,10 +64,14 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
     {:observe, to_playback_state(snapshot), %{data | last_seq: seq, last_seen_ms: now()}}
   end
 
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{device: %{ref: ref}} = data), do: {:switch, :api, data}
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{device: %{ref: ref}} = data) do
+    Logger.info("Desktop player lost user=#{user(data)} reason=disconnected, back to the Web API")
+    {:switch, :api, data}
+  end
 
   def handle_info(:stale_check, %{last_seen_ms: last_seen_ms} = data) do
     if now() - last_seen_ms > @stale_after_ms do
+      Logger.info("Desktop player lost user=#{user(data)} reason=silent, back to the Web API")
       {:switch, :api, data}
     else
       {:noreply, schedule_stale_check(data)}
@@ -76,9 +83,12 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
       {nil, _pending} ->
         {:noreply, data}
 
-      {{from, timer, result}, pending} ->
+      {{from, timer, result, type}, pending} ->
         Process.cancel_timer(timer)
-        GenServer.reply(from, reply(status, result))
+        Logger.info("Desktop player command acked user=#{user(data)} id=#{id} type=#{type} status=#{status}")
+        reply = reply(status, result)
+        if reply == :api, do: log_fallback(data, type, "status=#{status}")
+        GenServer.reply(from, reply)
         {:noreply, %{data | pending: pending}}
     end
   end
@@ -88,7 +98,8 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
       {nil, _pending} ->
         {:noreply, data}
 
-      {{from, _timer, _result}, pending} ->
+      {{from, _timer, _result, type}, pending} ->
+        Logger.warning("Desktop player command without ack user=#{user(data)} id=#{id} type=#{type} reason=timeout")
         GenServer.reply(from, {:error, :unknown})
         {:noreply, %{data | pending: pending}}
     end
@@ -104,8 +115,12 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   @impl true
   def command({:play, target}, from, data) do
     case track_uri(target) do
-      nil -> {:reply, :api, data}
-      uri -> push(data, from, :play_uri, %{uri: uri}, {:ok, uri})
+      nil ->
+        log_fallback(data, :play, "reason=unsupported")
+        {:reply, :api, data}
+
+      uri ->
+        push(data, from, :play_uri, %{uri: uri}, {:ok, uri})
     end
   end
 
@@ -121,7 +136,11 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   def command({:set_volume, _volume}, _from, data), do: {:reply, {:error, :invalid_volume}, data}
 
   # Without a first snapshot the desktop player state is not known yet.
-  def command(:active_device, _from, %{last_seq: -1} = data), do: {:reply, :api, data}
+  def command(:active_device, _from, %{last_seq: -1} = data) do
+    log_fallback(data, :active_device, "reason=no_snapshot_yet")
+    {:reply, :api, data}
+  end
+
   def command(:active_device, _from, %{state: %{device: nil}} = data), do: {:reply, {:error, :no_active_device}, data}
   def command(:active_device, _from, data), do: {:reply, {:ok, :active}, data}
 
@@ -129,19 +148,33 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
   def command({:shuffle, _shuffle}, _from, data), do: {:reply, {:ok, :skipped}, data}
   def command({:repeat, _mode}, _from, data), do: {:reply, {:ok, :skipped}, data}
 
-  def command(_command, _from, data), do: {:reply, :api, data}
+  def command(command, _from, data) do
+    log_fallback(data, command_name(command), "reason=unsupported")
+    {:reply, :api, data}
+  end
 
   defp push(%{device: %{pid: pid}} = data, from, type, args, result) do
     id = UUID.uuid4()
     send(pid, {:command, %{id: id, type: type, args: args, ttl_ms: @command_ttl_ms}})
+    Logger.info("Desktop player command sent user=#{user(data)} id=#{id} type=#{type}")
     timer = Process.send_after(self(), {:command_expired, id}, @command_ttl_ms + @command_grace_ms)
-    {:noreply, %{data | pending: Map.put(data.pending, id, {from, timer, result})}}
+    {:noreply, %{data | pending: Map.put(data.pending, id, {from, timer, result, type})}}
   end
 
   defp track_uri(%Track{provider_ids: %{spotify: id}}) when is_binary(id), do: "spotify:track:" <> id
   defp track_uri(%Single{provider_ids: %{spotify: id}}) when is_binary(id), do: "spotify:track:" <> id
   defp track_uri(%PlaylistTrack{provider: :spotify, track_id: id}) when is_binary(id), do: "spotify:track:" <> id
   defp track_uri(_target), do: nil
+
+  defp log_fallback(data, command, detail) do
+    Logger.info("Desktop player command falls back to the Web API user=#{user(data)} command=#{command} #{detail}")
+  end
+
+  defp command_name(command) when is_atom(command), do: command
+  defp command_name(command) when is_tuple(command), do: elem(command, 0)
+  defp command_name(_command), do: :unknown
+
+  defp user(%{scope: %{user: %{id: id}}}), do: id
 
   defp schedule_stale_check(data), do: Map.put(data, :stale_timer, Process.send_after(self(), :stale_check, @stale_check_ms))
 

@@ -9,6 +9,8 @@ defmodule PremiereEcouteWeb.Player.Channel do
 
   use Phoenix.Channel
 
+  require Logger
+
   alias PremiereEcoute.Accounts.User
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Devices
@@ -28,10 +30,10 @@ defmodule PremiereEcouteWeb.Player.Channel do
   def join("desktop:" <> topic_user_id, payload, %{assigns: %{user_id: user_id}} = socket) do
     cond do
       topic_user_id not in ["me", to_string(user_id)] ->
-        {:error, %{reason: "forbidden"}}
+        refuse(user_id, "forbidden")
 
       payload["proto"] != @protocol ->
-        {:error, %{reason: "unsupported_protocol"}}
+        refuse(user_id, "unsupported_protocol")
 
       true ->
         PremiereEcoute.PubSub.subscribe("player:revoked:#{user_id}")
@@ -39,6 +41,11 @@ defmodule PremiereEcouteWeb.Player.Channel do
         socket = assign(socket, :invalid, [])
         PlayerSupervisor.start({user_id, device: true})
         forward(socket, {:device_attached, self(), %{session_id: payload["session_id"], app_version: payload["app_version"]}})
+
+        Logger.info(
+          "Desktop player joined user=#{user_id} session=#{clean(payload["session_id"])} version=#{clean(payload["app_version"])}"
+        )
+
         {:ok, %{"snapshot_interval_ms" => @snapshot_interval_ms}, socket}
     end
   end
@@ -50,7 +57,7 @@ defmodule PremiereEcouteWeb.Player.Channel do
       if rate <= @snapshot_rate, do: forward(socket, {:device_snapshot, seq, snapshot})
       {:noreply, socket}
     else
-      {:error, :invalid} -> invalid(socket)
+      {:error, :invalid} -> invalid(socket, "snapshot")
       {:error, :flood} -> {:stop, {:shutdown, :flood}, socket}
     end
   end
@@ -62,7 +69,7 @@ defmodule PremiereEcouteWeb.Player.Channel do
         {:noreply, socket}
 
       {:error, :invalid} ->
-        invalid(socket)
+        invalid(socket, "ack")
     end
   end
 
@@ -90,6 +97,20 @@ defmodule PremiereEcouteWeb.Player.Channel do
     {:stop, {:shutdown, reason}, socket}
   end
 
+  @impl true
+  def terminate(reason, %{assigns: %{user_id: user_id}}) do
+    Logger.info("Desktop player left user=#{user_id} reason=#{inspect(reason)}")
+  end
+
+  defp refuse(user_id, reason) do
+    Logger.warning("Desktop player join refused user=#{user_id} reason=#{reason}")
+    {:error, %{reason: reason}}
+  end
+
+  # Values sent by the player are logged on one line, without control characters.
+  defp clean(value) when is_binary(value), do: value |> String.replace(~r/[^\w.\-]/u, "_") |> String.slice(0, 64)
+  defp clean(_value), do: "unknown"
+
   # Number of snapshots received during the last second, this one included.
   defp rate(%{assigns: assigns} = socket) do
     now = System.monotonic_time(:millisecond)
@@ -102,9 +123,11 @@ defmodule PremiereEcouteWeb.Player.Channel do
     end
   end
 
-  defp invalid(%{assigns: %{invalid: invalid}} = socket) do
+  defp invalid(%{assigns: %{invalid: invalid, user_id: user_id}} = socket, event) do
     now = System.monotonic_time(:millisecond)
     invalid = [now | Enum.filter(invalid, &(now - &1 < @invalid_window_ms))]
+
+    Logger.warning("Desktop player invalid #{event} user=#{user_id} recent=#{length(invalid)}")
 
     if length(invalid) >= @invalid_limit do
       {:stop, {:shutdown, :invalid_payloads}, socket}
