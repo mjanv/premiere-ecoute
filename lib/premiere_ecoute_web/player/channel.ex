@@ -37,7 +37,7 @@ defmodule PremiereEcouteWeb.Player.Channel do
         PremiereEcoute.PubSub.subscribe("player:revoked:#{user_id}")
         Process.send_after(self(), :recheck, @recheck_ms)
         socket = assign(socket, :invalid, [])
-        PlayerSupervisor.start(user_id)
+        PlayerSupervisor.start({user_id, device: true})
         forward(socket, {:device_attached, self(), %{session_id: payload["session_id"], app_version: payload["app_version"]}})
         {:ok, %{"snapshot_interval_ms" => @snapshot_interval_ms}, socket}
     end

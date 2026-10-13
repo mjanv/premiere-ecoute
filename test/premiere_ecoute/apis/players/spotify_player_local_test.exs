@@ -175,6 +175,35 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerLocalTest do
     end
   end
 
+  describe "started for a desktop player" do
+    setup do
+      start_supervised({Registry, keys: :unique, name: PremiereEcoute.Apis.Players.PlayerRegistry})
+      :ok
+    end
+
+    test "does not call the Web API and waits for the device", %{user: user} do
+      assert {:ok, player} = SpotifyPlayer.start_link({user.id, device: true})
+
+      assert [{^player, _}] = Registry.lookup(PremiereEcoute.Apis.Players.PlayerRegistry, user.id)
+      assert is_reference(:sys.get_state(player).idle_timer)
+
+      GenServer.stop(player)
+    end
+
+    test "follows the device once attached", %{user: user} do
+      {:ok, player} = SpotifyPlayer.start_link({user.id, device: true})
+      device = spawn(fn -> Process.sleep(:infinity) end)
+
+      send(player, {:device_attached, device, %{}})
+      state = :sys.get_state(player)
+
+      assert state.mode == :local
+      refute Map.has_key?(state, :idle_timer)
+
+      GenServer.stop(player)
+    end
+  end
+
   defp playing_state do
     %PlaybackState{is_playing: true, progress_ms: 1, device: %{name: "phone", is_active: true}, item: nil}
   end
