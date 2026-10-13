@@ -90,8 +90,14 @@ pub fn redirect_uri(port: u16) -> String {
     format!("http://127.0.0.1:{port}/cb")
 }
 
-pub fn authorize_url(base: &str, port: u16, state: &str, challenge: &str) -> Result<String, AuthError> {
-    let mut url = Url::parse(base).map_err(|e| AuthError::Transient(format!("bad server address: {e}")))?;
+pub fn authorize_url(
+    base: &str,
+    port: u16,
+    state: &str,
+    challenge: &str,
+) -> Result<String, AuthError> {
+    let mut url =
+        Url::parse(base).map_err(|e| AuthError::Transient(format!("bad server address: {e}")))?;
     url.set_path("/oauth/authorize");
     url.query_pairs_mut()
         .append_pair("response_type", "code")
@@ -116,7 +122,11 @@ pub enum Callback {
 
 fn same(a: &str, b: &str) -> bool {
     // Constant time over equal lengths; the state is not secret from us, but there is no reason to leak it.
-    a.len() == b.len() && a.bytes().zip(b.bytes()).fold(0u8, |acc, (x, y)| acc | (x ^ y)) == 0
+    a.len() == b.len()
+        && a.bytes()
+            .zip(b.bytes())
+            .fold(0u8, |acc, (x, y)| acc | (x ^ y))
+            == 0
 }
 
 /// Interprets the first line of an HTTP request (`GET /cb?code=..&state=.. HTTP/1.1`).
@@ -125,12 +135,20 @@ pub fn parse_callback(request_line: &str, expected_state: &str) -> Callback {
     if parts.next() != Some("GET") {
         return Callback::Ignore;
     }
-    let Some(target) = parts.next() else { return Callback::Ignore };
-    let Ok(url) = Url::parse(&format!("http://127.0.0.1{target}")) else { return Callback::Ignore };
+    let Some(target) = parts.next() else {
+        return Callback::Ignore;
+    };
+    let Ok(url) = Url::parse(&format!("http://127.0.0.1{target}")) else {
+        return Callback::Ignore;
+    };
     if url.path() != "/cb" {
         return Callback::Ignore;
     }
-    let q = |name: &str| url.query_pairs().find(|(k, _)| k == name).map(|(_, v)| v.into_owned());
+    let q = |name: &str| {
+        url.query_pairs()
+            .find(|(k, _)| k == name)
+            .map(|(_, v)| v.into_owned())
+    };
     // The state is checked before anything else.
     if !q("state").is_some_and(|s| same(&s, expected_state)) {
         return Callback::Ignore;
@@ -146,13 +164,23 @@ const PAGE: &str = "<!doctype html><meta charset=utf-8><title>Player</title><bod
 const MAX_REQUEST: usize = 8 * 1024;
 
 fn respond(stream: &mut std::net::TcpStream, status: &str, body: &str) {
-    let _ = write!(stream, "HTTP/1.1 {status}\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len());
+    let _ = write!(
+        stream,
+        "HTTP/1.1 {status}\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+        body.len()
+    );
 }
 
 /// Waits for the browser to come back to `127.0.0.1:<port>/cb`. Accepts the first valid request,
 /// ignores everything else, and gives up at `timeout`.
-pub fn wait_for_callback(listener: &TcpListener, state: &str, timeout: Duration) -> Result<String, AuthError> {
-    listener.set_nonblocking(true).map_err(|e| AuthError::Transient(e.to_string()))?;
+pub fn wait_for_callback(
+    listener: &TcpListener,
+    state: &str,
+    timeout: Duration,
+) -> Result<String, AuthError> {
+    listener
+        .set_nonblocking(true)
+        .map_err(|e| AuthError::Transient(e.to_string()))?;
     let deadline = Instant::now() + timeout;
     loop {
         match listener.accept() {
@@ -167,7 +195,11 @@ pub fn wait_for_callback(listener: &TcpListener, state: &str, timeout: Duration)
                         Ok(n) => buf.extend_from_slice(&chunk[..n]),
                     }
                 }
-                let line = String::from_utf8_lossy(&buf).lines().next().unwrap_or("").to_string();
+                let line = String::from_utf8_lossy(&buf)
+                    .lines()
+                    .next()
+                    .unwrap_or("")
+                    .to_string();
                 match parse_callback(&line, state) {
                     Callback::Code(code) => {
                         respond(&mut stream, "200 OK", PAGE);
@@ -192,15 +224,20 @@ pub fn wait_for_callback(listener: &TcpListener, state: &str, timeout: Duration)
 }
 
 pub fn bind_loopback() -> Result<(TcpListener, u16), AuthError> {
-    let listener = TcpListener::bind(SocketAddr::from((Ipv4Addr::LOCALHOST, 0))).map_err(|e| AuthError::Transient(e.to_string()))?;
-    let port = listener.local_addr().map_err(|e| AuthError::Transient(e.to_string()))?.port();
+    let listener = TcpListener::bind(SocketAddr::from((Ipv4Addr::LOCALHOST, 0)))
+        .map_err(|e| AuthError::Transient(e.to_string()))?;
+    let port = listener
+        .local_addr()
+        .map_err(|e| AuthError::Transient(e.to_string()))?
+        .port();
     Ok((listener, port))
 }
 
 // ---- token endpoint ------------------------------------------------------------------------
 
 fn endpoint(base: &str, path: &str) -> Result<String, AuthError> {
-    let mut url = Url::parse(base).map_err(|e| AuthError::Transient(format!("bad server address: {e}")))?;
+    let mut url =
+        Url::parse(base).map_err(|e| AuthError::Transient(format!("bad server address: {e}")))?;
     url.set_path(path);
     Ok(url.to_string())
 }
@@ -209,32 +246,63 @@ pub fn parse_token_response(status: u16, body: &str) -> Result<Tokens, AuthError
     let json: Value = serde_json::from_str(body).unwrap_or(Value::Null);
     match status {
         200 => {
-            let text = |k: &str| json[k].as_str().filter(|s| !s.is_empty()).map(str::to_string);
-            match (text("access_token"), text("refresh_token"), json["expires_in"].as_u64()) {
-                (Some(access), Some(refresh), Some(secs)) => Ok(Tokens { access, refresh, expires_in: Duration::from_secs(secs) }),
-                _ => Err(AuthError::Transient("the server answered without tokens".into())),
+            let text = |k: &str| {
+                json[k]
+                    .as_str()
+                    .filter(|s| !s.is_empty())
+                    .map(str::to_string)
+            };
+            match (
+                text("access_token"),
+                text("refresh_token"),
+                json["expires_in"].as_u64(),
+            ) {
+                (Some(access), Some(refresh), Some(secs)) => Ok(Tokens {
+                    access,
+                    refresh,
+                    expires_in: Duration::from_secs(secs),
+                }),
+                _ => Err(AuthError::Transient(
+                    "the server answered without tokens".into(),
+                )),
             }
         }
         400..=499 => {
             let error = json["error"].as_str().unwrap_or("rejected");
             let detail = json["error_description"].as_str().unwrap_or(error);
             match error {
-                "invalid_grant" | "invalid_client" | "unauthorized_client" | "invalid_scope" => Err(AuthError::Unauthorized(detail.to_string())),
+                "invalid_grant" | "invalid_client" | "unauthorized_client" | "invalid_scope" => {
+                    Err(AuthError::Unauthorized(detail.to_string()))
+                }
                 // Throttling and similar: not the credential's fault.
                 _ if status == 429 => Err(AuthError::Transient("the server is busy".into())),
                 _ => Err(AuthError::Unauthorized(detail.to_string())),
             }
         }
-        _ => Err(AuthError::Transient(format!("the server answered {status}"))),
+        _ => Err(AuthError::Transient(format!(
+            "the server answered {status}"
+        ))),
     }
 }
 
-pub fn exchange_code(http: &dyn Http, base: &str, port: u16, code: &str, verifier: &str) -> Result<Tokens, AuthError> {
+pub fn exchange_code(
+    http: &dyn Http,
+    base: &str,
+    port: u16,
+    code: &str,
+    verifier: &str,
+) -> Result<Tokens, AuthError> {
     let redirect = redirect_uri(port);
     let r = http
         .post_form(
             &endpoint(base, "/oauth/token")?,
-            &[("grant_type", "authorization_code"), ("code", code), ("redirect_uri", &redirect), ("client_id", CLIENT_ID), ("code_verifier", verifier)],
+            &[
+                ("grant_type", "authorization_code"),
+                ("code", code),
+                ("redirect_uri", &redirect),
+                ("client_id", CLIENT_ID),
+                ("code_verifier", verifier),
+            ],
         )
         .map_err(AuthError::Transient)?;
     parse_token_response(r.status, &r.body)
@@ -242,7 +310,14 @@ pub fn exchange_code(http: &dyn Http, base: &str, port: u16, code: &str, verifie
 
 pub fn refresh(http: &dyn Http, base: &str, refresh_token: &str) -> Result<Tokens, AuthError> {
     let r = http
-        .post_form(&endpoint(base, "/oauth/token")?, &[("grant_type", "refresh_token"), ("refresh_token", refresh_token), ("client_id", CLIENT_ID)])
+        .post_form(
+            &endpoint(base, "/oauth/token")?,
+            &[
+                ("grant_type", "refresh_token"),
+                ("refresh_token", refresh_token),
+                ("client_id", CLIENT_ID),
+            ],
+        )
         .map_err(AuthError::Transient)?;
     parse_token_response(r.status, &r.body)
 }
@@ -250,7 +325,14 @@ pub fn refresh(http: &dyn Http, base: &str, refresh_token: &str) -> Result<Token
 /// Best effort: the credential is deleted locally either way.
 pub fn revoke(http: &dyn Http, base: &str, refresh_token: &str) {
     if let Ok(url) = endpoint(base, "/oauth/revoke") {
-        let _ = http.post_form(&url, &[("client_id", CLIENT_ID), ("token", refresh_token), ("token_type_hint", "refresh_token")]);
+        let _ = http.post_form(
+            &url,
+            &[
+                ("client_id", CLIENT_ID),
+                ("token", refresh_token),
+                ("token_type_hint", "refresh_token"),
+            ],
+        );
     }
 }
 

@@ -41,8 +41,18 @@ pub fn decode_frame(text: &str) -> Result<Frame, BadFrame> {
         Value::String(s) => Ok(Some(s.clone())),
         _ => Err(BadFrame("ref must be a string or null".into())),
     };
-    let text = |v: &Value, what: &str| v.as_str().map(str::to_string).ok_or_else(|| BadFrame(format!("{what} must be a string")));
-    Ok(Frame { join_ref: opt(&join_ref)?, msg_ref: opt(&msg_ref)?, topic: text(&topic, "topic")?, event: text(&event, "event")?, payload })
+    let text = |v: &Value, what: &str| {
+        v.as_str()
+            .map(str::to_string)
+            .ok_or_else(|| BadFrame(format!("{what} must be a string")))
+    };
+    Ok(Frame {
+        join_ref: opt(&join_ref)?,
+        msg_ref: opt(&msg_ref)?,
+        topic: text(&topic, "topic")?,
+        event: text(&event, "event")?,
+        payload,
+    })
 }
 
 pub fn encode_frame(f: &Frame) -> String {
@@ -62,7 +72,12 @@ fn frame(join_ref: &str, msg_ref: u64, event: &str, payload: Value) -> String {
 }
 
 pub fn join(join_ref: &str, session_id: &str, app_version: &str) -> String {
-    frame(join_ref, 1, "phx_join", json!({"proto": PROTO, "app_version": app_version, "session_id": session_id}))
+    frame(
+        join_ref,
+        1,
+        "phx_join",
+        json!({"proto": PROTO, "app_version": app_version, "session_id": session_id}),
+    )
 }
 
 pub fn heartbeat(msg_ref: u64) -> String {
@@ -86,7 +101,11 @@ pub fn snapshot(join_ref: &str, msg_ref: u64, seq: u64, s: &Snapshot) -> String 
         Playback::Stopped => "stopped",
     };
     // Spotify not running: say so and send no track identity (the backend then reports "no device").
-    let uri = if s.running { s.uri.as_deref().map(cut) } else { None };
+    let uri = if s.running {
+        s.uri.as_deref().map(cut)
+    } else {
+        None
+    };
     frame(
         join_ref,
         msg_ref,
@@ -117,7 +136,13 @@ impl Outcome {
     }
 }
 
-pub fn ack(join_ref: &str, msg_ref: u64, command_id: &str, outcome: Outcome, error: Option<&str>) -> String {
+pub fn ack(
+    join_ref: &str,
+    msg_ref: u64,
+    command_id: &str,
+    outcome: Outcome,
+    error: Option<&str>,
+) -> String {
     let mut payload = json!({"command_id": command_id, "status": outcome.wire()});
     if let Some(e) = error {
         payload["error"] = json!(cut(e));
@@ -153,8 +178,12 @@ pub enum Disconnect {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Inbound {
-    JoinOk { snapshot_interval: Duration },
-    JoinRefused { reason: String },
+    JoinOk {
+        snapshot_interval: Duration,
+    },
+    JoinRefused {
+        reason: String,
+    },
     HeartbeatReply,
     Command(Result<RemoteCommand, Rejection>),
     Disconnect(Disconnect),
@@ -182,10 +211,20 @@ pub fn interpret(f: &Frame) -> Inbound {
 fn join_reply(payload: &Value) -> Inbound {
     match payload["status"].as_str() {
         Some("ok") => {
-            let ms = payload["response"]["snapshot_interval_ms"].as_u64().unwrap_or(1_000).clamp(500, 30_000);
-            Inbound::JoinOk { snapshot_interval: Duration::from_millis(ms) }
+            let ms = payload["response"]["snapshot_interval_ms"]
+                .as_u64()
+                .unwrap_or(1_000)
+                .clamp(500, 30_000);
+            Inbound::JoinOk {
+                snapshot_interval: Duration::from_millis(ms),
+            }
         }
-        Some("error") => Inbound::JoinRefused { reason: payload["response"]["reason"].as_str().unwrap_or("unknown").to_string() },
+        Some("error") => Inbound::JoinRefused {
+            reason: payload["response"]["reason"]
+                .as_str()
+                .unwrap_or("unknown")
+                .to_string(),
+        },
         _ => Inbound::Ignored,
     }
 }
@@ -193,13 +232,22 @@ fn join_reply(payload: &Value) -> Inbound {
 /// `spotify:track:` followed by 22 alphanumeric characters, nothing else (links are not accepted
 /// from the backend).
 fn strict_track_uri(uri: &str) -> bool {
-    uri.strip_prefix("spotify:track:").is_some_and(|id| id.len() == 22 && id.chars().all(|c| c.is_ascii_alphanumeric()))
+    uri.strip_prefix("spotify:track:")
+        .is_some_and(|id| id.len() == 22 && id.chars().all(|c| c.is_ascii_alphanumeric()))
 }
 
 fn command(p: &Value) -> Result<RemoteCommand, Rejection> {
-    let id = p["id"].as_str().filter(|s| !s.is_empty()).map(str::to_string);
-    let reject = |reason: &str| Rejection { id: id.clone(), reason: reason.into() };
-    let Some(command_id) = id.clone() else { return Err(reject("missing command id")) };
+    let id = p["id"]
+        .as_str()
+        .filter(|s| !s.is_empty())
+        .map(str::to_string);
+    let reject = |reason: &str| Rejection {
+        id: id.clone(),
+        reason: reason.into(),
+    };
+    let Some(command_id) = id.clone() else {
+        return Err(reject("missing command id"));
+    };
 
     let args = &p["args"];
     let (name, command) = match p["type"].as_str() {
@@ -207,18 +255,42 @@ fn command(p: &Value) -> Result<RemoteCommand, Rejection> {
         Some("next") => ("next", Command::Next),
         Some("previous") => ("previous", Command::Previous),
         Some("set_volume") => {
-            let v = args["volume"].as_f64().filter(|v| v.is_finite() && (0.0..=1.0).contains(v));
-            ("set_volume", Command::SetVolume(v.ok_or_else(|| reject("volume must be a number from 0 to 1"))? as f32))
+            let v = args["volume"]
+                .as_f64()
+                .filter(|v| v.is_finite() && (0.0..=1.0).contains(v));
+            (
+                "set_volume",
+                Command::SetVolume(
+                    v.ok_or_else(|| reject("volume must be a number from 0 to 1"))? as f32,
+                ),
+            )
         }
         Some("play_uri") => {
             let uri = args["uri"].as_str().filter(|u| strict_track_uri(u));
-            ("play_uri", Command::PlayUri(uri.ok_or_else(|| reject("uri must be spotify:track: and 22 letters or digits"))?.to_string()))
+            (
+                "play_uri",
+                Command::PlayUri(
+                    uri.ok_or_else(|| {
+                        reject("uri must be spotify:track: and 22 letters or digits")
+                    })?
+                    .to_string(),
+                ),
+            )
         }
         Some(_) => return Err(reject("unknown command type")),
         None => return Err(reject("missing command type")),
     };
-    let ttl = p["ttl_ms"].as_u64().map(Duration::from_millis).unwrap_or(DEFAULT_TTL).min(MAX_TTL);
-    Ok(RemoteCommand { id: command_id, name: name.into(), command, ttl })
+    let ttl = p["ttl_ms"]
+        .as_u64()
+        .map(Duration::from_millis)
+        .unwrap_or(DEFAULT_TTL)
+        .min(MAX_TTL);
+    Ok(RemoteCommand {
+        id: command_id,
+        name: name.into(),
+        command,
+        ttl,
+    })
 }
 
 #[cfg(test)]

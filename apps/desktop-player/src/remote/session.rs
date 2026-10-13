@@ -6,8 +6,8 @@ use super::protocol::{self, Disconnect, Inbound, RemoteCommand};
 use super::retry::SeenIds;
 use crate::player::{Command, Reply, Request, Snapshot, lock};
 use crate::remote_status::{CommandLog, Link, Outcome, RemoteStatus};
-use std::sync::mpsc::{Receiver, Sender, TryRecvError};
 use std::sync::Mutex;
+use std::sync::mpsc::{Receiver, Sender, TryRecvError};
 use std::time::{Duration, Instant};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -114,7 +114,15 @@ const REPLY_GRACE: Duration = Duration::from_secs(5);
 
 impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_, T, C, E> {
     pub fn run(self) -> Ended {
-        let Session { transport, clock, executor, snapshot, status, config, cancelled } = self;
+        let Session {
+            transport,
+            clock,
+            executor,
+            snapshot,
+            status,
+            config,
+            cancelled,
+        } = self;
         let mut msg_ref = 1u64;
         let mut seq = 0u64;
         let mut seen = SeenIds::new(256);
@@ -128,14 +136,24 @@ impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_,
 
         let lost = |transport: &mut T, joined_at: Option<Instant>, now: Instant, why: &str| {
             transport.close();
-            Ended { reason: End::Lost(why.into()), joined_for: joined_at.map_or(Duration::ZERO, |t| now.saturating_duration_since(t)) }
+            Ended {
+                reason: End::Lost(why.into()),
+                joined_for: joined_at.map_or(Duration::ZERO, |t| now.saturating_duration_since(t)),
+            }
         };
         let ended = |transport: &mut T, joined_at: Option<Instant>, now: Instant, reason: End| {
             transport.close();
-            Ended { reason, joined_for: joined_at.map_or(Duration::ZERO, |t| now.saturating_duration_since(t)) }
+            Ended {
+                reason,
+                joined_for: joined_at.map_or(Duration::ZERO, |t| now.saturating_duration_since(t)),
+            }
         };
 
-        if let Err(e) = transport.send(&protocol::join(JOIN_REF, &config.session_id, &config.app_version)) {
+        if let Err(e) = transport.send(&protocol::join(
+            JOIN_REF,
+            &config.session_id,
+            &config.app_version,
+        )) {
             return lost(transport, None, clock.now(), &e.0);
         }
 
@@ -160,17 +178,38 @@ impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_,
                             lock(status).link = Link::Connected;
                         }
                         Inbound::JoinOk { .. } => {}
-                        Inbound::JoinRefused { reason } => return ended(transport, joined_at, now, End::Refused(reason)),
+                        Inbound::JoinRefused { reason } => {
+                            return ended(transport, joined_at, now, End::Refused(reason));
+                        }
                         Inbound::HeartbeatReply => heartbeat_sent = None,
-                        Inbound::Disconnect(Disconnect::Replaced) => return ended(transport, joined_at, now, End::Replaced),
-                        Inbound::Disconnect(Disconnect::Revoked) => return ended(transport, joined_at, now, End::Revoked),
-                        Inbound::Disconnect(Disconnect::Other(why)) => return lost(transport, joined_at, now, &format!("disconnected: {why}")),
-                        Inbound::ChannelEnded => return lost(transport, joined_at, now, "channel closed"),
+                        Inbound::Disconnect(Disconnect::Replaced) => {
+                            return ended(transport, joined_at, now, End::Replaced);
+                        }
+                        Inbound::Disconnect(Disconnect::Revoked) => {
+                            return ended(transport, joined_at, now, End::Revoked);
+                        }
+                        Inbound::Disconnect(Disconnect::Other(why)) => {
+                            return lost(
+                                transport,
+                                joined_at,
+                                now,
+                                &format!("disconnected: {why}"),
+                            );
+                        }
+                        Inbound::ChannelEnded => {
+                            return lost(transport, joined_at, now, "channel closed");
+                        }
                         Inbound::Command(parsed) if joined_at.is_some() => {
                             let acks = on_command(parsed, &mut seen, executor, &mut inflight, now);
                             for (id, name, outcome, error) in acks {
                                 msg_ref += 1;
-                                if let Err(e) = transport.send(&protocol::ack(JOIN_REF, msg_ref, &id, outcome, error.as_deref())) {
+                                if let Err(e) = transport.send(&protocol::ack(
+                                    JOIN_REF,
+                                    msg_ref,
+                                    &id,
+                                    outcome,
+                                    error.as_deref(),
+                                )) {
                                     return lost(transport, joined_at, now, &e.0);
                                 }
                                 record(status, name, outcome, now);
@@ -205,7 +244,13 @@ impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_,
                     Reply::Expired => (Outcome::Expired, None),
                 };
                 msg_ref += 1;
-                if let Err(e) = transport.send(&protocol::ack(JOIN_REF, msg_ref, &id, outcome, error.as_deref())) {
+                if let Err(e) = transport.send(&protocol::ack(
+                    JOIN_REF,
+                    msg_ref,
+                    &id,
+                    outcome,
+                    error.as_deref(),
+                )) {
                     return lost(transport, joined_at, now, &e.0);
                 }
                 record(status, name, outcome, now);
@@ -214,7 +259,9 @@ impl<T: Transport + ?Sized, C: Clock + ?Sized, E: Executor + ?Sized> Session<'_,
             if now >= next_snapshot {
                 seq += 1;
                 msg_ref += 1;
-                if let Err(e) = transport.send(&protocol::snapshot(JOIN_REF, msg_ref, seq, &snapshot())) {
+                if let Err(e) =
+                    transport.send(&protocol::snapshot(JOIN_REF, msg_ref, seq, &snapshot()))
+                {
                     return lost(transport, joined_at, now, &e.0);
                 }
                 {
@@ -260,13 +307,28 @@ fn on_command(
             // Without an id there is nothing to acknowledge.
             None => Vec::new(),
             Some(id) if !seen.insert(&id) => vec![(id, "invalid".into(), Outcome::Duplicate, None)],
-            Some(id) => vec![(id, "invalid".into(), Outcome::Rejected, Some(rejection.reason))],
+            Some(id) => vec![(
+                id,
+                "invalid".into(),
+                Outcome::Rejected,
+                Some(rejection.reason),
+            )],
         },
         Ok(c) if !seen.insert(&c.id) => vec![(c.id, c.name, Outcome::Duplicate, None)],
         Ok(c) => match executor.execute(c.command.clone(), c.ttl) {
-            None => vec![(c.id, c.name, Outcome::Error, Some("the player is not available".into()))],
+            None => vec![(
+                c.id,
+                c.name,
+                Outcome::Error,
+                Some("the player is not available".into()),
+            )],
             Some(reply) => {
-                inflight.push(InFlight { id: c.id, name: c.name, reply, give_up_at: now + c.ttl + REPLY_GRACE });
+                inflight.push(InFlight {
+                    id: c.id,
+                    name: c.name,
+                    reply,
+                    give_up_at: now + c.ttl + REPLY_GRACE,
+                });
                 Vec::new()
             }
         },

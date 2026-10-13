@@ -37,7 +37,11 @@ pub struct SeenIds {
 
 impl SeenIds {
     pub fn new(cap: usize) -> Self {
-        Self { order: VecDeque::new(), ids: HashSet::new(), cap }
+        Self {
+            order: VecDeque::new(),
+            ids: HashSet::new(),
+            cap,
+        }
     }
 
     /// Records the id; `false` when it was already there.
@@ -46,10 +50,10 @@ impl SeenIds {
             return false;
         }
         self.order.push_back(id.to_string());
-        if self.order.len() > self.cap {
-            if let Some(old) = self.order.pop_front() {
-                self.ids.remove(&old);
-            }
+        if self.order.len() > self.cap
+            && let Some(old) = self.order.pop_front()
+        {
+            self.ids.remove(&old);
         }
         true
     }

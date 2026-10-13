@@ -25,7 +25,11 @@ const MINUTE: u64 = 60;
 /// The smallest step that keeps the ruler under `MAX_TICKS` ticks.
 pub fn tick_step(length: Duration) -> Duration {
     let secs = length.as_secs();
-    let step = STEPS_S.iter().copied().find(|s| secs / s <= MAX_TICKS).unwrap_or(600);
+    let step = STEPS_S
+        .iter()
+        .copied()
+        .find(|s| secs / s <= MAX_TICKS)
+        .unwrap_or(600);
     Duration::from_secs(step)
 }
 
@@ -39,11 +43,16 @@ pub fn ticks(length: Duration) -> Vec<Tick> {
     (0..=length.as_secs() / step)
         .map(|k| {
             let at = k * step;
-            let major = at % MINUTE == 0;
-            let label = (major && at > 0 && (short || at % (5 * MINUTE) == 0)).then_some((at / MINUTE) as u32);
+            let major = at.is_multiple_of(MINUTE);
+            let label = (major && at > 0 && (short || at.is_multiple_of(5 * MINUTE)))
+                .then_some((at / MINUTE) as u32);
             Tick {
                 fraction: (at as f32 / total).min(1.0),
-                kind: if major { TickKind::Major } else { TickKind::Minor },
+                kind: if major {
+                    TickKind::Major
+                } else {
+                    TickKind::Minor
+                },
                 label,
             }
         })

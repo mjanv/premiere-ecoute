@@ -27,7 +27,13 @@ fn part(s: &str) -> String {
 }
 
 pub fn synthetic_uri(id: &Identity) -> String {
-    format!("spotify:local:{}:{}:{}:{}", part(&id.artist), part(&id.album), part(&id.title), id.seconds)
+    format!(
+        "spotify:local:{}:{}:{}:{}",
+        part(&id.artist),
+        part(&id.album),
+        part(&id.title),
+        id.seconds
+    )
 }
 
 #[derive(Default)]
@@ -55,8 +61,15 @@ impl UriTracker {
             return None;
         }
         if self.last.as_ref() != Some(&id) {
-            let commanded = self.pending.take().filter(|(_, at)| now.duration_since(*at) < PENDING_TTL);
-            self.current = Some(commanded.map(|(uri, _)| uri).unwrap_or_else(|| synthetic_uri(&id)));
+            let commanded = self
+                .pending
+                .take()
+                .filter(|(_, at)| now.duration_since(*at) < PENDING_TTL);
+            self.current = Some(
+                commanded
+                    .map(|(uri, _)| uri)
+                    .unwrap_or_else(|| synthetic_uri(&id)),
+            );
             self.last = Some(id);
         }
         self.current.clone()

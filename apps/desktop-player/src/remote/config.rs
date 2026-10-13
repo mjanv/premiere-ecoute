@@ -34,7 +34,12 @@ pub fn save(address: &str) -> Result<(), String> {
 
 /// The address to use: the environment variable first, then the saved one.
 pub fn resolve(env: Option<&str>, saved: Option<&str>) -> Option<String> {
-    [env, saved].into_iter().flatten().map(str::trim).find(|s| !s.is_empty()).map(str::to_string)
+    [env, saved]
+        .into_iter()
+        .flatten()
+        .map(str::trim)
+        .find(|s| !s.is_empty())
+        .map(str::to_string)
 }
 
 #[cfg(test)]

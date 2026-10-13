@@ -58,7 +58,10 @@ impl Snapshot {
         let album = self.album.trim();
         let norm = |s: &str| {
             let s = s.trim().to_lowercase();
-            s.strip_suffix(" - single").or_else(|| s.strip_suffix(" - ep")).map(str::to_string).unwrap_or(s)
+            s.strip_suffix(" - single")
+                .or_else(|| s.strip_suffix(" - ep"))
+                .map(str::to_string)
+                .unwrap_or(s)
         };
         (!album.is_empty() && norm(album) != norm(&self.title)).then_some(album)
     }
@@ -174,12 +177,23 @@ pub struct Request {
 
 impl Request {
     pub fn local(command: Command) -> Self {
-        Self { command, reply: None, deadline: None }
+        Self {
+            command,
+            reply: None,
+            deadline: None,
+        }
     }
 
     pub fn remote(command: Command, ttl: Duration) -> (Self, Receiver<Reply>) {
         let (tx, rx) = std::sync::mpsc::channel();
-        (Self { command, reply: Some(tx), deadline: Some(Instant::now() + ttl) }, rx)
+        (
+            Self {
+                command,
+                reply: Some(tx),
+                deadline: Some(Instant::now() + ttl),
+            },
+            rx,
+        )
     }
 }
 

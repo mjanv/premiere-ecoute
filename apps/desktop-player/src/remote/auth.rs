@@ -28,12 +28,23 @@ pub struct Auth {
 
 impl Auth {
     pub fn new(http: Box<dyn Http>, store: Box<dyn CredentialStore>, base: String) -> Self {
-        Self { http, store, base, loaded: false, refresh_token: None, access: None, unsaved: false }
+        Self {
+            http,
+            store,
+            base,
+            loaded: false,
+            refresh_token: None,
+            access: None,
+            unsaved: false,
+        }
     }
 
     fn load(&mut self) -> Result<(), AuthError> {
         if !self.loaded {
-            self.refresh_token = self.store.load().map_err(|e| AuthError::Transient(format!("cannot read the saved sign-in: {e}")))?;
+            self.refresh_token = self
+                .store
+                .load()
+                .map_err(|e| AuthError::Transient(format!("cannot read the saved sign-in: {e}")))?;
             self.loaded = true;
         }
         Ok(())
@@ -58,10 +69,10 @@ impl Auth {
     pub fn access_token(&mut self, now: Instant) -> Result<String, AuthError> {
         self.load()?;
         self.try_save();
-        if let Some((token, expires)) = &self.access {
-            if *expires > now + REFRESH_MARGIN {
-                return Ok(token.clone());
-            }
+        if let Some((token, expires)) = &self.access
+            && *expires > now + REFRESH_MARGIN
+        {
+            return Ok(token.clone());
         }
         let refresh = self.refresh_token.clone().ok_or(AuthError::NotEnrolled)?;
         match oauth::refresh(self.http.as_ref(), &self.base, &refresh) {
@@ -88,11 +99,19 @@ impl Auth {
     }
 
     /// Browser sign-in: PKCE, loopback redirect, consent, code exchange.
-    pub fn sign_in(&mut self, browser: &dyn Browser, timeout: Duration, now: Instant) -> Result<(), AuthError> {
+    pub fn sign_in(
+        &mut self,
+        browser: &dyn Browser,
+        timeout: Duration,
+        now: Instant,
+    ) -> Result<(), AuthError> {
         let (listener, port) = oauth::bind_loopback()?;
         let (verifier, state) = (oauth::code_verifier(), oauth::random_state());
-        let url = oauth::authorize_url(&self.base, port, &state, &oauth::code_challenge(&verifier))?;
-        browser.open(&url).map_err(|e| AuthError::Transient(format!("cannot open the browser: {e}")))?;
+        let url =
+            oauth::authorize_url(&self.base, port, &state, &oauth::code_challenge(&verifier))?;
+        browser
+            .open(&url)
+            .map_err(|e| AuthError::Transient(format!("cannot open the browser: {e}")))?;
         let code = oauth::wait_for_callback(&listener, &state, timeout)?;
         let tokens = oauth::exchange_code(self.http.as_ref(), &self.base, port, &code, &verifier)?;
         self.adopt_tokens(tokens, now);
@@ -101,10 +120,10 @@ impl Auth {
 
     /// Signs out: tells the backend (best effort) and forgets everything locally.
     pub fn forget(&mut self) {
-        if self.load().is_ok() {
-            if let Some(token) = &self.refresh_token {
-                oauth::revoke(self.http.as_ref(), &self.base, token);
-            }
+        if self.load().is_ok()
+            && let Some(token) = &self.refresh_token
+        {
+            oauth::revoke(self.http.as_ref(), &self.base, token);
         }
         self.clear();
         self.loaded = true;

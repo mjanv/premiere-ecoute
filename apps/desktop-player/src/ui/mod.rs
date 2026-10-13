@@ -9,8 +9,8 @@ use crate::player::{self, Command, Request, Snapshot, format_time, lock};
 use crate::remote;
 use crate::remote_status::{Link, RemoteStatus, Tone};
 use crate::waveform::Scope;
-use gpui_kit::component::input::{Input, InputEvent, InputState};
 use gpui::prelude::FluentBuilder;
+use gpui_kit::component::input::{Input, InputEvent, InputState};
 use gpui_kit::component::slider::{Slider, SliderEvent, SliderState};
 use gpui_kit::component::{Theme, TitleBar};
 use gpui_kit::*;
@@ -73,8 +73,11 @@ impl NowPlaying {
         let (watched_snapshot, watched_scope) = (shared.clone(), scope.clone());
         cx.spawn(async move |this, cx| {
             loop {
-                let busy = lock(&watched_snapshot).playback == player::Playback::Playing && lock(&watched_scope).is_live(Instant::now());
-                cx.background_executor().timer(if busy { SMOOTH } else { POLL / 3 }).await;
+                let busy = lock(&watched_snapshot).playback == player::Playback::Playing
+                    && lock(&watched_scope).is_live(Instant::now());
+                cx.background_executor()
+                    .timer(if busy { SMOOTH } else { POLL / 3 })
+                    .await;
                 if this.update(cx, |_, cx| cx.notify()).is_err() {
                     break;
                 }
@@ -84,9 +87,13 @@ impl NowPlaying {
 
         let volume = cx.new(|_| SliderState::new().min(0.0).max(1.0).step(0.01));
         let _volume_sub = cx.subscribe(&volume, |this, _, event: &SliderEvent, _| {
-            let SliderEvent::Change(value) = event else { return };
+            let SliderEvent::Change(value) = event else {
+                return;
+            };
             this.volume_touched = Some(Instant::now());
-            let _ = this.commands.send(Request::local(Command::SetVolume(value.end())));
+            let _ = this
+                .commands
+                .send(Request::local(Command::SetVolume(value.end())));
         });
 
         let server_input = cx.new(|cx| {
@@ -130,7 +137,12 @@ impl NowPlaying {
                 self.server_error = None;
                 self.editing_server = false;
                 if self.remote_handle.is_none() {
-                    self.remote_handle = Some(remote::start(settings, self.shared.clone(), self.commands.clone(), self.remote.clone()));
+                    self.remote_handle = Some(remote::start(
+                        settings,
+                        self.shared.clone(),
+                        self.commands.clone(),
+                        self.remote.clone(),
+                    ));
                 }
             }
             Err(message) => self.server_error = Some(message),
@@ -169,27 +181,37 @@ impl NowPlaying {
                 artwork::Format::Png => ImageFormat::Png,
                 artwork::Format::Jpeg => ImageFormat::Jpeg,
             };
-            self.cover = Some((art.id, Arc::new(Image::from_bytes(format, art.bytes.to_vec()))));
+            self.cover = Some((
+                art.id,
+                Arc::new(Image::from_bytes(format, art.bytes.to_vec())),
+            ));
         }
         self.cover.as_ref().map(|(_, image)| image.clone())
     }
 
     fn follow_volume(&mut self, snap: &Snapshot, window: &mut Window, cx: &mut Context<Self>) {
-        let held = self.volume_touched.is_some_and(|t| t.elapsed() < VOLUME_HOLD);
-        if let (false, Some(v)) = (held, snap.volume) {
-            if (self.volume.read(cx).value().end() - v).abs() > 0.005 {
-                self.volume.update(cx, |s, cx| s.set_value(v, window, cx));
-            }
+        let held = self
+            .volume_touched
+            .is_some_and(|t| t.elapsed() < VOLUME_HOLD);
+        if let (false, Some(v)) = (held, snap.volume)
+            && (self.volume.read(cx).value().end() - v).abs() > 0.005
+        {
+            self.volume.update(cx, |s, cx| s.set_value(v, window, cx));
         }
     }
 }
 
 fn dot(color: Hsla, filled: bool) -> Div {
     let d = div().flex_none().size(px(8.)).rounded_full();
-    if filled { d.bg(color) } else { d.border_1().border_color(color) }
+    if filled {
+        d.bg(color)
+    } else {
+        d.border_1().border_color(color)
+    }
 }
 
-fn control(
+/// How a round transport button looks.
+struct Control {
     id: &'static str,
     icon: &'static str,
     size: f32,
@@ -197,9 +219,21 @@ fn control(
     fg: Hsla,
     fill: Option<Hsla>,
     hover: Hsla,
-    enabled: bool,
+    /// Horizontal shift of the glyph, to look optically centred.
     nudge: f32,
-) -> Stateful<Div> {
+}
+
+fn control(spec: Control, enabled: bool) -> Stateful<Div> {
+    let Control {
+        id,
+        icon,
+        size,
+        glyph,
+        fg,
+        fill,
+        hover,
+        nudge,
+    } = spec;
     div()
         .id(id)
         .flex()
@@ -211,7 +245,13 @@ fn control(
         .when_some(fill, |d, f| d.bg(f))
         .when(enabled, |d| d.cursor_pointer().hover(move |s| s.bg(hover)))
         .when(!enabled, |d| d.opacity(0.35))
-        .child(svg().path(icon).size(px(glyph)).ml(px(nudge)).text_color(fg))
+        .child(
+            svg()
+                .path(icon)
+                .size(px(glyph))
+                .ml(px(nudge))
+                .text_color(fg),
+        )
 }
 
 impl Render for NowPlaying {
@@ -243,7 +283,10 @@ impl Render for NowPlaying {
             .bg(col(p.surface))
             .shadow_lg()
             .child(match cover {
-                Some(image) => img(image).size_full().object_fit(ObjectFit::Cover).into_any_element(),
+                Some(image) => img(image)
+                    .size_full()
+                    .object_fit(ObjectFit::Cover)
+                    .into_any_element(),
                 None => div()
                     .size_full()
                     .flex()
@@ -257,7 +300,10 @@ impl Render for NowPlaying {
 
         // State eyebrow, poster title, credits.
         let (title, credits) = if snap.can_control() {
-            (snap.title.to_uppercase(), Some((snap.artist.clone(), snap.album_line().map(str::to_string))))
+            (
+                snap.title.to_uppercase(),
+                Some((snap.artist.clone(), snap.album_line().map(str::to_string))),
+            )
         } else if snap.error.is_some() {
             ("Can't read Spotify".to_uppercase(), None)
         } else {
@@ -266,7 +312,9 @@ impl Render for NowPlaying {
         let hint = if !snap.can_control() {
             Some(match &snap.error {
                 Some(e) => e.clone(),
-                None => "Open Spotify on this PC. It shows up here as soon as it plays.".to_string(),
+                None => {
+                    "Open Spotify on this PC. It shows up here as soon as it plays.".to_string()
+                }
             })
         } else {
             None
@@ -282,9 +330,16 @@ impl Render for NowPlaying {
                     .gap(px(8.))
                     .text_size(px(12.))
                     .text_color(col(p.muted))
-                    .child(dot(if playing { col(p.accent) } else { col(p.muted) }, playing || enabled))
+                    .child(dot(
+                        if playing { col(p.accent) } else { col(p.muted) },
+                        playing || enabled,
+                    ))
                     .child("SPOTIFY")
-                    .child(div().text_color(col(p.ink)).child(snap.state_label().to_uppercase())),
+                    .child(
+                        div()
+                            .text_color(col(p.ink))
+                            .child(snap.state_label().to_uppercase()),
+                    ),
             )
             .child(
                 div()
@@ -300,11 +355,26 @@ impl Render for NowPlaying {
                         .flex()
                         .gap(px(12.))
                         .text_size(px(14.))
-                        .child(div().flex_none().max_w(relative(0.6)).truncate().child(artist))
-                        .children(album.map(|a| div().flex_1().min_w_0().truncate().text_color(col(p.muted)).child(a))),
+                        .child(
+                            div()
+                                .flex_none()
+                                .max_w(relative(0.6))
+                                .truncate()
+                                .child(artist),
+                        )
+                        .children(album.map(|a| {
+                            div()
+                                .flex_1()
+                                .min_w_0()
+                                .truncate()
+                                .text_color(col(p.muted))
+                                .child(a)
+                        })),
                 )
             })
-            .when_some(hint, |d, h| d.child(div().text_size(px(14.)).text_color(col(p.muted)).child(h)));
+            .when_some(hint, |d, h| {
+                d.child(div().text_size(px(14.)).text_color(col(p.muted)).child(h))
+            });
 
         // The ruler.
         let progress = snap.progress();
@@ -322,7 +392,11 @@ impl Render for NowPlaying {
                     .top(px(top))
                     .w(px(1.5))
                     .h(px(height))
-                    .bg(if lit { col(p.accent) } else { col(p.muted).opacity(0.4) }),
+                    .bg(if lit {
+                        col(p.accent)
+                    } else {
+                        col(p.muted).opacity(0.4)
+                    }),
             );
             if let Some(minute) = t.label {
                 ruler = ruler.child(
@@ -339,58 +413,95 @@ impl Render for NowPlaying {
         }
         if !snap.length.is_zero() {
             ruler = ruler
-                .child(div().absolute().left(relative(progress)).top(px(-2.)).ml(px(-1.)).w(px(2.)).h(px(26.)).bg(col(p.ink)))
-                .child(div().absolute().left(relative(progress)).top(px(-8.)).ml(px(-4.)).size(px(8.)).rounded_full().bg(col(p.ink)));
+                .child(
+                    div()
+                        .absolute()
+                        .left(relative(progress))
+                        .top(px(-2.))
+                        .ml(px(-1.))
+                        .w(px(2.))
+                        .h(px(26.))
+                        .bg(col(p.ink)),
+                )
+                .child(
+                    div()
+                        .absolute()
+                        .left(relative(progress))
+                        .top(px(-8.))
+                        .ml(px(-4.))
+                        .size(px(8.))
+                        .rounded_full()
+                        .bg(col(p.ink)),
+                );
         }
-        let timeline = div()
-            .flex()
-            .flex_col()
-            .h(px(66.))
-            .flex_none()
-            .when(!snap.length.is_zero(), |d| d.child(
-                div()
-                    .flex()
-                    .justify_between()
-                    .text_size(px(13.))
-                    .child(div().child(format_time(snap.position)))
-                    .child(div().text_color(col(p.muted)).child(format_time(snap.length))),
-            )
-            .child(ruler));
+        let timeline =
+            div()
+                .flex()
+                .flex_col()
+                .h(px(66.))
+                .flex_none()
+                .when(!snap.length.is_zero(), |d| {
+                    d.child(
+                        div()
+                            .flex()
+                            .justify_between()
+                            .text_size(px(13.))
+                            .child(div().child(format_time(snap.position)))
+                            .child(
+                                div()
+                                    .text_color(col(p.muted))
+                                    .child(format_time(snap.length)),
+                            ),
+                    )
+                    .child(ruler)
+                });
 
         // Spotify's sound right now: a line that stays put and moves with it, in a small box of its own.
         let trace = lock(&self.scope).trace(TRACE_POINTS, now);
         let (line, baseline) = (col(p.accent), col(p.muted).opacity(0.3));
-        let wave = div().flex_none().h(px(44.)).px(px(8.)).rounded(px(4.)).bg(col(p.surface)).child(
-            canvas(
-                |bounds, _, _| bounds,
-                move |_, bounds, window, _| {
-                    let middle = bounds.center().y;
-                    let reach = bounds.size.height * 0.42;
-                    let across = |i: usize, y| point(bounds.left() + bounds.size.width * (i as f32 / (TRACE_POINTS - 1) as f32), y);
+        let wave = div()
+            .flex_none()
+            .h(px(44.))
+            .px(px(8.))
+            .rounded(px(4.))
+            .bg(col(p.surface))
+            .child(
+                canvas(
+                    |bounds, _, _| bounds,
+                    move |_, bounds, window, _| {
+                        let middle = bounds.center().y;
+                        let reach = bounds.size.height * 0.42;
+                        let across = |i: usize, y| {
+                            point(
+                                bounds.left()
+                                    + bounds.size.width * (i as f32 / (TRACE_POINTS - 1) as f32),
+                                y,
+                            )
+                        };
 
-                    let mut rule = PathBuilder::stroke(px(1.));
-                    rule.move_to(across(0, middle));
-                    rule.line_to(across(TRACE_POINTS - 1, middle));
-                    if let Ok(path) = rule.build() {
-                        window.paint_path(path, baseline);
-                    }
-
-                    let mut wave = PathBuilder::stroke(px(1.5));
-                    for (i, level) in trace.iter().enumerate() {
-                        let at = across(i, middle - reach * *level);
-                        if i == 0 {
-                            wave.move_to(at);
-                        } else {
-                            wave.line_to(at);
+                        let mut rule = PathBuilder::stroke(px(1.));
+                        rule.move_to(across(0, middle));
+                        rule.line_to(across(TRACE_POINTS - 1, middle));
+                        if let Ok(path) = rule.build() {
+                            window.paint_path(path, baseline);
                         }
-                    }
-                    if let Ok(path) = wave.build() {
-                        window.paint_path(path, line);
-                    }
-                },
-            )
-            .size_full(),
-        );
+
+                        let mut wave = PathBuilder::stroke(px(1.5));
+                        for (i, level) in trace.iter().enumerate() {
+                            let at = across(i, middle - reach * *level);
+                            if i == 0 {
+                                wave.move_to(at);
+                            } else {
+                                wave.line_to(at);
+                            }
+                        }
+                        if let Ok(path) = wave.build() {
+                            window.paint_path(path, line);
+                        }
+                    },
+                )
+                .size_full(),
+            );
 
         // Transport, centred.
         let hover = col(p.surface);
@@ -401,27 +512,57 @@ impl Render for NowPlaying {
             .justify_center()
             .gap(px(22.))
             .child(
-                control("previous", "icons/skip-back.svg", 40., 20., col(p.ink), None, hover, enabled, 0.)
-                    .on_click(send(|| Command::Previous)),
+                control(
+                    Control {
+                        id: "previous",
+                        icon: "icons/skip-back.svg",
+                        size: 40.,
+                        glyph: 20.,
+                        fg: col(p.ink),
+                        fill: None,
+                        hover,
+                        nudge: 0.,
+                    },
+                    enabled,
+                )
+                .on_click(send(|| Command::Previous)),
             )
             .child(
                 control(
-                    "toggle",
-                    if playing { "icons/pause.svg" } else { "icons/play.svg" },
-                    56.,
-                    22.,
-                    col(p.on_accent),
-                    Some(col(p.accent)),
-                    col(p.accent).opacity(0.85),
+                    Control {
+                        id: "toggle",
+                        icon: if playing {
+                            "icons/pause.svg"
+                        } else {
+                            "icons/play.svg"
+                        },
+                        size: 56.,
+                        glyph: 22.,
+                        fg: col(p.on_accent),
+                        fill: Some(col(p.accent)),
+                        hover: col(p.accent).opacity(0.85),
+                        // A play triangle's weight sits left of its box; shift it right to look centred.
+                        nudge: if playing { 0. } else { 3. },
+                    },
                     enabled,
-                    // A play triangle's weight sits left of its box; shift it right to look centred.
-                    if playing { 0. } else { 3. },
                 )
                 .on_click(send(|| Command::TogglePlayPause)),
             )
             .child(
-                control("next", "icons/skip-forward.svg", 40., 20., col(p.ink), None, hover, enabled, 0.)
-                    .on_click(send(|| Command::Next)),
+                control(
+                    Control {
+                        id: "next",
+                        icon: "icons/skip-forward.svg",
+                        size: 40.,
+                        glyph: 20.,
+                        fg: col(p.ink),
+                        fill: None,
+                        hover,
+                        nudge: 0.,
+                    },
+                    enabled,
+                )
+                .on_click(send(|| Command::Next)),
             );
 
         // Volume, full width.
@@ -430,7 +571,12 @@ impl Render for NowPlaying {
             .flex_none()
             .items_center()
             .gap(px(10.))
-            .child(svg().path("icons/volume-2.svg").size(px(18.)).text_color(col(p.muted)))
+            .child(
+                svg()
+                    .path("icons/volume-2.svg")
+                    .size(px(18.))
+                    .text_color(col(p.muted)),
+            )
             .child(
                 div().flex_1().child(
                     Slider::new(&self.volume)
@@ -444,12 +590,23 @@ impl Render for NowPlaying {
                     .w(px(38.))
                     .text_size(px(12.))
                     .text_color(col(p.muted))
-                    .child(snap.volume.map_or("—".to_string(), |v| format!("{:.0}%", v * 100.0))),
+                    .child(
+                        snap.volume
+                            .map_or("—".to_string(), |v| format!("{:.0}%", v * 100.0)),
+                    ),
             );
 
         // What went wrong with the last command, if anything.
-        let problem = snap.notice.clone().map(|n| format!("Last action failed: {n}"));
-        let notice = div().h(px(16.)).flex_none().text_size(px(12.)).text_color(col(p.warn)).children(problem);
+        let problem = snap
+            .notice
+            .clone()
+            .map(|n| format!("Last action failed: {n}"));
+        let notice = div()
+            .h(px(16.))
+            .flex_none()
+            .text_size(px(12.))
+            .text_color(col(p.warn))
+            .children(problem);
 
         // Footer: the link to the backend and what was exchanged.
         let tone = |t: Tone| match t {
@@ -468,7 +625,10 @@ impl Render for NowPlaying {
             cx.notify();
         });
         let connect = cx.listener(|this, _, _, cx| this.connect_server(cx));
-        let enrolled = matches!(remote.link, Link::Connected | Link::Connecting | Link::Offline { .. });
+        let enrolled = matches!(
+            remote.link,
+            Link::Connected | Link::Connecting | Link::Offline { .. }
+        );
         let sign_in = cx.listener(|this, _, _, _| {
             if let Some(handle) = &this.remote_handle {
                 handle.sign_in();
@@ -489,12 +649,20 @@ impl Render for NowPlaying {
                     .flex_none()
                     .items_center()
                     .gap(px(8.))
-                    .child(dot(link_color, remote.link.tone() == Tone::Good || remote.link.tone() == Tone::Warn))
+                    .child(dot(
+                        link_color,
+                        remote.link.tone() == Tone::Good || remote.link.tone() == Tone::Warn,
+                    ))
                     .child(div().text_color(link_color).child(remote.link.label())),
             )
             .when(connected, |d| {
                 d.child(div().flex_none().child(remote.exchange.sent_line(now)))
-                    .children(remote.exchange.command_line(now).map(|c| div().flex_1().min_w_0().truncate().text_right().child(c)))
+                    .children(
+                        remote
+                            .exchange
+                            .command_line(now)
+                            .map(|c| div().flex_1().min_w_0().truncate().text_right().child(c)),
+                    )
             })
             .when(enrolled, |d| {
                 d.child(
@@ -548,7 +716,11 @@ impl Render for NowPlaying {
                         .cursor_pointer()
                         .hover(|s| s.bg(col(p.surface)))
                         .on_click(open_editor)
-                        .child(if editing { "Cancel" } else { "Connect to server" }),
+                        .child(if editing {
+                            "Cancel"
+                        } else {
+                            "Connect to server"
+                        }),
                 )
             });
 
@@ -588,7 +760,11 @@ impl Render for NowPlaying {
                                 .child("Connect"),
                         ),
                 )
-                .children(self.server_error.clone().map(|e| div().text_color(col(p.warn)).child(e)))
+                .children(
+                    self.server_error
+                        .clone()
+                        .map(|e| div().text_color(col(p.warn)).child(e)),
+                )
             });
 
         div()
@@ -600,8 +776,12 @@ impl Render for NowPlaying {
             .font_family(MONO)
             .child(
                 // Nothing clickable in here: Windows treats the whole bar as the window caption.
-                TitleBar::new()
-                    .child(div().text_size(px(11.)).text_color(col(p.muted)).child("PREMIÈRE ÉCOUTE PLAYER")),
+                TitleBar::new().child(
+                    div()
+                        .text_size(px(11.))
+                        .text_color(col(p.muted))
+                        .child("PREMIÈRE ÉCOUTE PLAYER"),
+                ),
             )
             .child(
                 div()
@@ -656,7 +836,13 @@ pub fn preview() -> Preview {
     } else {
         None
     };
-    Preview { remote: raw.split(',').find_map(|k| RemoteStatus::preview(k.trim(), now)), snapshot, editing_server: has("connect") }
+    Preview {
+        remote: raw
+            .split(',')
+            .find_map(|k| RemoteStatus::preview(k.trim(), now)),
+        snapshot,
+        editing_server: has("connect"),
+    }
 }
 
 /// Feeds the scope with a believable pulse, for previews without Spotify.
@@ -672,7 +858,10 @@ pub fn fake_sound(scope: Arc<Mutex<Scope>>) {
                 .map(|_| {
                     let x = sample as f32 / 48_000.0 * std::f32::consts::TAU;
                     sample += 1;
-                    level * (0.6 * (x * 140.0).sin() + 0.3 * (x * 420.0).sin() + 0.1 * (x * 1300.0).sin())
+                    level
+                        * (0.6 * (x * 140.0).sin()
+                            + 0.3 * (x * 420.0).sin()
+                            + 0.1 * (x * 1300.0).sin())
                 })
                 .collect();
             lock(&scope).push(&samples, Instant::now());

@@ -67,16 +67,23 @@ impl Settings {
         match url.scheme() {
             "https" => {}
             "http" if is_loopback(host) => {}
-            "http" => return Err("The server address must use https, unless the server runs on this PC".into()),
+            "http" => {
+                return Err(
+                    "The server address must use https, unless the server runs on this PC".into(),
+                );
+            }
             _ => return Err("The server address must start with https://".into()),
         }
-        Ok(Self { base_url: base.trim_end_matches('/').to_string() })
+        Ok(Self {
+            base_url: base.trim_end_matches('/').to_string(),
+        })
     }
 
     pub fn ws_url(&self) -> String {
         let mut url = Url::parse(&self.base_url).expect("validated in parse");
         let scheme = if url.scheme() == "https" { "wss" } else { "ws" };
-        url.set_scheme(scheme).expect("http and https can become ws and wss");
+        url.set_scheme(scheme)
+            .expect("http and https can become ws and wss");
         url.set_path("/player/websocket");
         url.set_query(Some("vsn=2.0.0"));
         url.to_string()
@@ -139,6 +146,13 @@ pub enum Next {
     AwaitSignIn,
 }
 
+/// State the worker shares with the rest of the app.
+pub struct Shared {
+    pub snapshot: Arc<Mutex<Snapshot>>,
+    pub status: Arc<Mutex<RemoteStatus>>,
+    pub cancel: Arc<AtomicBool>,
+}
+
 pub struct Worker {
     pub auth: Auth,
     pub dialer: Box<dyn Dialer>,
@@ -161,11 +175,14 @@ impl Worker {
         dialer: Box<dyn Dialer>,
         browser: Box<dyn Browser>,
         executor: Box<dyn Executor>,
-        snapshot: Arc<Mutex<Snapshot>>,
-        status: Arc<Mutex<RemoteStatus>>,
+        shared: Shared,
         config: Config,
-        cancel: Arc<AtomicBool>,
     ) -> Self {
+        let Shared {
+            snapshot,
+            status,
+            cancel,
+        } = shared;
         Self {
             auth,
             dialer,
@@ -201,7 +218,9 @@ impl Worker {
     pub fn step(&mut self) -> Next {
         let token = match self.auth.access_token(self.clock.now()) {
             Ok(token) => token,
-            Err(AuthError::NotEnrolled | AuthError::Unauthorized(_)) => return self.sign_in_needed(),
+            Err(AuthError::NotEnrolled | AuthError::Unauthorized(_)) => {
+                return self.sign_in_needed();
+            }
             Err(_) => return self.offline(),
         };
         self.set_link(Link::Connecting);
@@ -264,7 +283,10 @@ impl Worker {
         match control {
             Control::SignIn => {
                 self.set_link(Link::SigningIn);
-                match self.auth.sign_in(self.browser.as_ref(), SIGN_IN_TIMEOUT, self.clock.now()) {
+                match self
+                    .auth
+                    .sign_in(self.browser.as_ref(), SIGN_IN_TIMEOUT, self.clock.now())
+                {
                     Ok(()) => {
                         self.backoff.reset();
                         self.set_link(Link::Connecting);
@@ -277,14 +299,23 @@ impl Worker {
                 self.cancel.store(false, Ordering::Relaxed);
                 self.auth.forget();
                 self.backoff.reset();
-                *lock(&self.status) = RemoteStatus { link: Link::Unauthorized, exchange: Exchange::default() };
+                *lock(&self.status) = RemoteStatus {
+                    link: Link::Unauthorized,
+                    exchange: Exchange::default(),
+                };
             }
         }
     }
 
     /// Waits up to `total`, counting down in the link, and returns early on a control message.
     /// `Err` when the app is shutting down (nobody can send controls any more).
-    pub fn wait(&self, total: Duration, countdown: bool, control: &Receiver<Control>, slice: Duration) -> Result<Option<Control>, ()> {
+    pub fn wait(
+        &self,
+        total: Duration,
+        countdown: bool,
+        control: &Receiver<Control>,
+        slice: Duration,
+    ) -> Result<Option<Control>, ()> {
         let mut left = total;
         while !left.is_zero() {
             if countdown {
@@ -361,7 +392,10 @@ pub fn start(
 ) -> Handle {
     let (control_tx, control_rx) = std::sync::mpsc::channel();
     let cancel = Arc::new(AtomicBool::new(false));
-    let handle = Handle { control: control_tx, cancel: cancel.clone() };
+    let handle = Handle {
+        control: control_tx,
+        cancel: cancel.clone(),
+    };
 
     let crash_status = status.clone();
     let on_crash = move |decision: &Decision, message: &str| {
@@ -374,24 +408,34 @@ pub fn start(
 
     supervise::supervise("remote-worker", Policy::default(), on_crash, move || {
         #[cfg(windows)]
-        let store: Box<dyn credentials::CredentialStore> = Box::new(credentials::WindowsStore::for_server(&settings.base_url));
+        let store: Box<dyn credentials::CredentialStore> =
+            Box::new(credentials::WindowsStore::for_server(&settings.base_url));
         #[cfg(not(windows))]
-        let store: Box<dyn credentials::CredentialStore> = Box::new(credentials::MemoryStore::default());
+        let store: Box<dyn credentials::CredentialStore> =
+            Box::new(credentials::MemoryStore::default());
         #[cfg(windows)]
         let browser: Box<dyn Browser> = Box::new(WindowsBrowser);
         #[cfg(not(windows))]
         let browser: Box<dyn Browser> = Box::new(NoBrowser);
 
-        let auth = Auth::new(Box::new(http::UreqHttp::new()), store, settings.base_url.clone());
+        let auth = Auth::new(
+            Box::new(http::UreqHttp::new()),
+            store,
+            settings.base_url.clone(),
+        );
         let mut worker = Worker::new(
             auth,
-            Box::new(WsDialer { ws_url: settings.ws_url() }),
+            Box::new(WsDialer {
+                ws_url: settings.ws_url(),
+            }),
             browser,
             Box::new(commands.clone()),
-            snapshot.clone(),
-            status.clone(),
+            Shared {
+                snapshot: snapshot.clone(),
+                status: status.clone(),
+                cancel: cancel.clone(),
+            },
             Config::new(session_id(), env!("CARGO_PKG_VERSION").to_string()),
-            cancel.clone(),
         );
         drive(&mut worker, &control_rx, WAIT_SLICE);
     });

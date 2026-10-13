@@ -17,7 +17,13 @@ const REFERENCE_DECAY: f32 = 0.998;
 
 /// Averages interleaved 16-bit stereo into mono floats in -1.0..=1.0 (a trailing odd sample is ignored).
 pub fn mono_from_i16_stereo(interleaved: &[i16], out: &mut Vec<f32>) {
-    out.extend(interleaved.chunks_exact(2).map(|lr| (lr[0] as f32 + lr[1] as f32) / 65_536.0));
+    out.extend(
+        interleaved
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|lr| (lr[0] as f32 + lr[1] as f32) / 65_536.0),
+    );
 }
 
 #[derive(Default)]
@@ -32,7 +38,11 @@ impl Scope {
     pub fn push(&mut self, samples: &[f32], now: Instant) {
         let mut loudest = 0.0f32;
         for s in samples {
-            let s = if s.is_finite() { s.clamp(-1.0, 1.0) } else { 0.0 };
+            let s = if s.is_finite() {
+                s.clamp(-1.0, 1.0)
+            } else {
+                0.0
+            };
             loudest = loudest.max(s.abs());
             if self.window.len() == WINDOW {
                 self.window.pop_front();
@@ -44,7 +54,8 @@ impl Scope {
     }
 
     pub fn is_live(&self, now: Instant) -> bool {
-        self.last_push.is_some_and(|t| now.saturating_duration_since(t) <= STALE)
+        self.last_push
+            .is_some_and(|t| now.saturating_duration_since(t) <= STALE)
     }
 
     /// The window reduced to `points` values in -1.0..=1.0, scaled to the recent loudness. Each
@@ -63,7 +74,14 @@ impl Scope {
             .map(|i| {
                 let from = i * len / points;
                 let to = ((i + 1) * len / points).max(from + 1).min(len);
-                let swing = self.window.range(from..to).copied().fold(0.0f32, |best, s| if s.abs() > best.abs() { s } else { best });
+                let swing = self
+                    .window
+                    .range(from..to)
+                    .copied()
+                    .fold(
+                        0.0f32,
+                        |best, s| if s.abs() > best.abs() { s } else { best },
+                    );
                 (swing / reference).clamp(-1.0, 1.0)
             })
             .collect()

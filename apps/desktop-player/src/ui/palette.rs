@@ -13,7 +13,11 @@ impl Rgb {
     fn luminance(self) -> f32 {
         let lin = |c: u8| {
             let c = c as f32 / 255.0;
-            if c <= 0.03928 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
+            if c <= 0.03928 {
+                c / 12.92
+            } else {
+                ((c + 0.055) / 1.055).powf(2.4)
+            }
         };
         0.2126 * lin(self.0) + 0.7152 * lin(self.1) + 0.0722 * lin(self.2)
     }
@@ -69,11 +73,27 @@ impl Palette {
         let surface = hsl(hue, 0.04 + 0.26 * k, 0.135);
         let ink = hsl(hue, 0.10 + 0.20 * k, 0.94);
         let muted = lift(hue, 0.08 + 0.12 * k, 0.66, bg, 4.5);
-        let accent_sat = if sat > 0.05 { (0.55 + 0.4 * sat).min(0.95) } else { 0.45 };
+        let accent_sat = if sat > 0.05 {
+            (0.55 + 0.4 * sat).min(0.95)
+        } else {
+            0.45
+        };
         let accent_hue = if sat > 0.05 { hue } else { 38.0 }; // sodium amber on a grey cover
         let accent = lift(accent_hue, accent_sat, 0.62, bg, 4.5);
-        let on_accent = if contrast(bg, accent) >= contrast(ink, accent) { bg } else { ink };
-        Self { bg, surface, ink, muted, accent, warn: Rgb(0xFF, 0x9A, 0x7A), on_accent }
+        let on_accent = if contrast(bg, accent) >= contrast(ink, accent) {
+            bg
+        } else {
+            ink
+        };
+        Self {
+            bg,
+            surface,
+            ink,
+            muted,
+            accent,
+            warn: Rgb(0xFF, 0x9A, 0x7A),
+            on_accent,
+        }
     }
 }
 

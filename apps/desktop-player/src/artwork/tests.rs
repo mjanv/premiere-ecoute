@@ -54,7 +54,8 @@ fn from_bytes_rejects_garbage_and_decodes_a_real_png() {
 
     let mut png = Vec::new();
     let img = image::RgbaImage::from_pixel(8, 8, image::Rgba([0, 0, 255, 255]));
-    img.write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png).unwrap();
+    img.write_to(&mut std::io::Cursor::new(&mut png), image::ImageFormat::Png)
+        .unwrap();
     let art = Artwork::from_bytes(png).expect("valid png");
     assert!(near(art.tint.hue, 240.0));
 }

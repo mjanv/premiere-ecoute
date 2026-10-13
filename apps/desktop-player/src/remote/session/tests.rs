@@ -38,18 +38,32 @@ struct FakeTransport {
 
 impl FakeTransport {
     fn new(clock: &FakeClock, script: Vec<Step>) -> Self {
-        Self { clock: clock.clone(), script: script.into(), sent: Vec::new(), closed: false, calls: 0 }
+        Self {
+            clock: clock.clone(),
+            script: script.into(),
+            sent: Vec::new(),
+            closed: false,
+            calls: 0,
+        }
     }
 
     fn events(&self) -> Vec<String> {
-        self.sent.iter().map(|f| f[3].as_str().unwrap().to_string()).collect()
+        self.sent
+            .iter()
+            .map(|f| f[3].as_str().unwrap().to_string())
+            .collect()
     }
 
     fn acks(&self) -> Vec<(String, String)> {
         self.sent
             .iter()
             .filter(|f| f[3] == "ack")
-            .map(|f| (f[4]["command_id"].as_str().unwrap().into(), f[4]["status"].as_str().unwrap().into()))
+            .map(|f| {
+                (
+                    f[4]["command_id"].as_str().unwrap().into(),
+                    f[4]["status"].as_str().unwrap().into(),
+                )
+            })
             .collect()
     }
 }
@@ -83,7 +97,10 @@ struct FakeExecutor {
 
 impl FakeExecutor {
     fn answering(replies: Vec<Reply>) -> Self {
-        Self { replies: RefCell::new(replies.into()), started: RefCell::new(Vec::new()) }
+        Self {
+            replies: RefCell::new(replies.into()),
+            started: RefCell::new(Vec::new()),
+        }
     }
 }
 
@@ -109,12 +126,30 @@ fn frame(s: &str) -> Step {
     Step::Frame(s.into())
 }
 
-fn drive(script: Vec<Step>, executor: &FakeExecutor, config: Config) -> (Ended, FakeTransport, Mutex<RemoteStatus>, FakeClock) {
+fn drive(
+    script: Vec<Step>,
+    executor: &FakeExecutor,
+    config: Config,
+) -> (Ended, FakeTransport, Mutex<RemoteStatus>, FakeClock) {
     let clock = FakeClock::new();
     let mut transport = FakeTransport::new(&clock, script);
     let status = Mutex::new(RemoteStatus::default());
-    let snapshot = || Snapshot { running: true, playback: Playback::Playing, title: "T".into(), ..Snapshot::default() };
-    let ended = Session { transport: &mut transport, clock: &clock, executor, snapshot: &snapshot, status: &status, config: &config, cancelled: &|| false }.run();
+    let snapshot = || Snapshot {
+        running: true,
+        playback: Playback::Playing,
+        title: "T".into(),
+        ..Snapshot::default()
+    };
+    let ended = Session {
+        transport: &mut transport,
+        clock: &clock,
+        executor,
+        snapshot: &snapshot,
+        status: &status,
+        config: &config,
+        cancelled: &|| false,
+    }
+    .run();
     (ended, transport, status, clock)
 }
 
@@ -155,11 +190,19 @@ fn snapshots_follow_the_interval_with_increasing_seq() {
     script.push(replaced());
     let (ended, t, _, _) = drive(script, &ex, config());
     assert_eq!(ended.reason, End::Replaced);
-    let seqs: Vec<_> = t.sent.iter().filter(|f| f[3] == "snapshot").map(|f| f[4]["seq"].as_u64().unwrap()).collect();
+    let seqs: Vec<_> = t
+        .sent
+        .iter()
+        .filter(|f| f[3] == "snapshot")
+        .map(|f| f[4]["seq"].as_u64().unwrap())
+        .collect();
     assert_eq!(seqs, [1, 2, 3, 4]);
 }
 
-fn acked(script_cmds: Vec<Step>, replies: Vec<Reply>) -> (Vec<(String, String)>, Vec<Command>, Vec<Value>) {
+fn acked(
+    script_cmds: Vec<Step>,
+    replies: Vec<Reply>,
+) -> (Vec<(String, String)>, Vec<Command>, Vec<Value>) {
     let ex = FakeExecutor::answering(replies);
     let mut script = vec![frame(JOIN_OK)];
     script.extend(script_cmds);
@@ -185,28 +228,72 @@ fn a_valid_command_runs_and_is_acked_ok() {
 
 #[test]
 fn a_repeated_command_id_is_acked_duplicate_and_not_run_twice() {
-    let (acks, started, _) = acked(vec![command("c1", "next", json!({})), command("c1", "next", json!({}))], vec![Reply::Done]);
+    let (acks, started, _) = acked(
+        vec![
+            command("c1", "next", json!({})),
+            command("c1", "next", json!({})),
+        ],
+        vec![Reply::Done],
+    );
     assert_eq!(started, [Command::Next]);
-    assert_eq!(acks, [("c1".to_string(), "ok".to_string()), ("c1".to_string(), "duplicate".to_string())]);
+    assert_eq!(
+        acks,
+        [
+            ("c1".to_string(), "ok".to_string()),
+            ("c1".to_string(), "duplicate".to_string())
+        ]
+    );
 }
 
 #[test]
 fn an_invalid_command_is_rejected_and_never_reaches_the_player() {
-    let (acks, started, sent) = acked(vec![command("c1", "format_disk", json!({})), command("c2", "set_volume", json!({"volume": 9}))], vec![]);
+    let (acks, started, sent) = acked(
+        vec![
+            command("c1", "format_disk", json!({})),
+            command("c2", "set_volume", json!({"volume": 9})),
+        ],
+        vec![],
+    );
     assert!(started.is_empty());
-    assert_eq!(acks, [("c1".to_string(), "rejected".to_string()), ("c2".to_string(), "rejected".to_string())]);
+    assert_eq!(
+        acks,
+        [
+            ("c1".to_string(), "rejected".to_string()),
+            ("c2".to_string(), "rejected".to_string())
+        ]
+    );
     let ack = sent.iter().find(|f| f[3] == "ack").unwrap();
-    assert!(ack[4]["error"].as_str().unwrap().contains("unknown command type"));
+    assert!(
+        ack[4]["error"]
+            .as_str()
+            .unwrap()
+            .contains("unknown command type")
+    );
 }
 
 #[test]
 fn a_failed_command_is_acked_error_with_the_message_and_an_expired_one_expired() {
     let (acks, _, sent) = acked(
-        vec![command("c1", "next", json!({})), command("c2", "previous", json!({}))],
-        vec![Reply::Failed("Spotify did not accept the command".into()), Reply::Expired],
+        vec![
+            command("c1", "next", json!({})),
+            command("c2", "previous", json!({})),
+        ],
+        vec![
+            Reply::Failed("Spotify did not accept the command".into()),
+            Reply::Expired,
+        ],
     );
-    assert_eq!(acks, [("c1".to_string(), "error".to_string()), ("c2".to_string(), "expired".to_string())]);
-    let err = sent.iter().find(|f| f[3] == "ack" && f[4]["status"] == "error").unwrap();
+    assert_eq!(
+        acks,
+        [
+            ("c1".to_string(), "error".to_string()),
+            ("c2".to_string(), "expired".to_string())
+        ]
+    );
+    let err = sent
+        .iter()
+        .find(|f| f[3] == "ack" && f[4]["status"] == "error")
+        .unwrap();
     assert_eq!(err[4]["error"], "Spotify did not accept the command");
 }
 
@@ -221,7 +308,9 @@ fn commands_before_the_join_is_confirmed_are_ignored() {
 #[test]
 fn a_refused_join_ends_the_session_with_the_reason() {
     let ex = FakeExecutor::answering(vec![]);
-    let script = vec![frame(r#"["1","1","desktop:me","phx_reply",{"status":"error","response":{"reason":"unsupported_protocol"}}]"#)];
+    let script = vec![frame(
+        r#"["1","1","desktop:me","phx_reply",{"status":"error","response":{"reason":"unsupported_protocol"}}]"#,
+    )];
     let (ended, t, _, _) = drive(script, &ex, config());
     assert_eq!(ended.reason, End::Refused("unsupported_protocol".into()));
     assert_eq!(t.events(), ["phx_join"]);
@@ -247,7 +336,10 @@ fn a_transport_error_is_a_lost_connection_and_the_transport_is_closed() {
 #[test]
 fn the_server_closing_the_channel_is_a_lost_connection() {
     let ex = FakeExecutor::answering(vec![]);
-    let script = vec![frame(JOIN_OK), frame(r#"["1",null,"desktop:me","phx_close",{}]"#)];
+    let script = vec![
+        frame(JOIN_OK),
+        frame(r#"["1",null,"desktop:me","phx_close",{}]"#),
+    ];
     let (ended, _, _, _) = drive(script, &ex, config());
     assert_eq!(ended.reason, End::Lost("channel closed".into()));
 }
@@ -267,7 +359,13 @@ fn heartbeats_are_sent_and_a_missing_reply_ends_the_session() {
 #[test]
 fn garbage_frames_are_ignored() {
     let ex = FakeExecutor::answering(vec![]);
-    let script = vec![frame(JOIN_OK), frame("not json"), frame("[1,2]"), frame(r#"["1",null,"desktop:me","mystery",{}]"#), replaced()];
+    let script = vec![
+        frame(JOIN_OK),
+        frame("not json"),
+        frame("[1,2]"),
+        frame(r#"["1",null,"desktop:me","mystery",{}]"#),
+        replaced(),
+    ];
     let (ended, _, _, _) = drive(script, &ex, config());
     assert_eq!(ended.reason, End::Replaced);
 }
@@ -279,7 +377,11 @@ fn the_session_reports_how_long_it_was_joined() {
     script.extend(silence(50));
     script.push(replaced());
     let (ended, _, _, _) = drive(script, &ex, config());
-    assert!(ended.joined_for >= Duration::from_secs(5), "{:?}", ended.joined_for);
+    assert!(
+        ended.joined_for >= Duration::from_secs(5),
+        "{:?}",
+        ended.joined_for
+    );
 }
 
 #[test]
@@ -295,7 +397,16 @@ fn a_cancelled_session_ends_at_once_and_closes_the_transport() {
         calls.get() > 3
     };
     let cfg = config();
-    let ended = Session { transport: &mut transport, clock: &clock, executor: &ex, snapshot: &snapshot, status: &status, config: &cfg, cancelled: &cancelled }.run();
+    let ended = Session {
+        transport: &mut transport,
+        clock: &clock,
+        executor: &ex,
+        snapshot: &snapshot,
+        status: &status,
+        config: &cfg,
+        cancelled: &cancelled,
+    }
+    .run();
     assert_eq!(ended.reason, End::Cancelled);
     assert!(transport.closed);
 }

@@ -16,7 +16,10 @@ struct FakeHttp {
 
 impl FakeHttp {
     fn new(replies: Vec<Result<HttpResponse, String>>) -> Self {
-        Self { replies: Rc::new(RefCell::new(replies.into())), posted: Rc::default() }
+        Self {
+            replies: Rc::new(RefCell::new(replies.into())),
+            posted: Rc::default(),
+        }
     }
 
     fn form(&self, i: usize) -> std::collections::BTreeMap<String, String> {
@@ -26,17 +29,33 @@ impl FakeHttp {
 
 impl Http for FakeHttp {
     fn post_form(&self, url: &str, form: &[(&str, &str)]) -> Result<HttpResponse, String> {
-        self.posted.borrow_mut().push((url.to_string(), form.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()));
-        self.replies.borrow_mut().pop_front().unwrap_or(Err("no reply scripted".into()))
+        self.posted.borrow_mut().push((
+            url.to_string(),
+            form.iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        ));
+        self.replies
+            .borrow_mut()
+            .pop_front()
+            .unwrap_or(Err("no reply scripted".into()))
     }
 }
 
 fn tokens(access: &str, refresh: &str, secs: u64) -> Result<HttpResponse, String> {
-    Ok(HttpResponse { status: 200, body: format!(r#"{{"token_type":"Bearer","access_token":"{access}","expires_in":{secs},"refresh_token":"{refresh}"}}"#) })
+    Ok(HttpResponse {
+        status: 200,
+        body: format!(
+            r#"{{"token_type":"Bearer","access_token":"{access}","expires_in":{secs},"refresh_token":"{refresh}"}}"#
+        ),
+    })
 }
 
 fn status(code: u16, body: &str) -> Result<HttpResponse, String> {
-    Ok(HttpResponse { status: code, body: body.into() })
+    Ok(HttpResponse {
+        status: code,
+        body: body.into(),
+    })
 }
 
 /// A store that several `Auth` pieces can look at.
@@ -55,11 +74,22 @@ impl CredentialStore for SharedStore {
     }
 }
 
-fn auth(replies: Vec<Result<HttpResponse, String>>, stored: Option<&str>) -> (Auth, FakeHttp, SharedStore) {
+fn auth(
+    replies: Vec<Result<HttpResponse, String>>,
+    stored: Option<&str>,
+) -> (Auth, FakeHttp, SharedStore) {
     let http = FakeHttp::new(replies);
     let store = SharedStore::default();
     *store.0.value.lock().unwrap() = stored.map(str::to_string);
-    (Auth::new(Box::new(http.clone()), Box::new(store.clone()), "http://localhost:4000".into()), http, store)
+    (
+        Auth::new(
+            Box::new(http.clone()),
+            Box::new(store.clone()),
+            "http://localhost:4000".into(),
+        ),
+        http,
+        store,
+    )
 }
 
 fn stored(store: &SharedStore) -> Option<String> {
@@ -79,33 +109,61 @@ fn a_refresh_returns_the_access_token_and_saves_the_rotated_refresh_token() {
     assert_eq!(a.access_token(Instant::now()), Ok("A1".into()));
     assert_eq!(stored(&store).as_deref(), Some("R2"));
     let form = http.form(0);
-    assert_eq!((form["grant_type"].as_str(), form["refresh_token"].as_str()), ("refresh_token", "R1"));
+    assert_eq!(
+        (form["grant_type"].as_str(), form["refresh_token"].as_str()),
+        ("refresh_token", "R1")
+    );
     assert_eq!(form["client_id"], oauth::CLIENT_ID);
     assert!(http.posted.borrow()[0].0.ends_with("/oauth/token"));
 }
 
 #[test]
 fn the_access_token_is_reused_until_a_minute_before_it_expires() {
-    let (mut a, http, _) = auth(vec![tokens("A1", "R2", 3600), tokens("A2", "R3", 3600)], Some("R1"));
+    let (mut a, http, _) = auth(
+        vec![tokens("A1", "R2", 3600), tokens("A2", "R3", 3600)],
+        Some("R1"),
+    );
     let t0 = Instant::now();
     assert_eq!(a.access_token(t0), Ok("A1".into()));
-    assert_eq!(a.access_token(t0 + Duration::from_secs(3000)), Ok("A1".into()));
+    assert_eq!(
+        a.access_token(t0 + Duration::from_secs(3000)),
+        Ok("A1".into())
+    );
     assert_eq!(http.posted.borrow().len(), 1);
-    assert_eq!(a.access_token(t0 + Duration::from_secs(3541)), Ok("A2".into()));
+    assert_eq!(
+        a.access_token(t0 + Duration::from_secs(3541)),
+        Ok("A2".into())
+    );
     assert_eq!(http.form(1)["refresh_token"], "R2"); // always the newest refresh token
 }
 
 #[test]
 fn a_dead_credential_is_forgotten_and_reported() {
-    let (mut a, _, store) = auth(vec![status(400, r#"{"error":"invalid_grant","error_description":"Token revoked"}"#)], Some("R1"));
-    assert_eq!(a.access_token(Instant::now()), Err(AuthError::Unauthorized("Token revoked".into())));
+    let (mut a, _, store) = auth(
+        vec![status(
+            400,
+            r#"{"error":"invalid_grant","error_description":"Token revoked"}"#,
+        )],
+        Some("R1"),
+    );
+    assert_eq!(
+        a.access_token(Instant::now()),
+        Err(AuthError::Unauthorized("Token revoked".into()))
+    );
     assert_eq!(stored(&store), None);
     assert_eq!(a.access_token(Instant::now()), Err(AuthError::NotEnrolled));
 }
 
 #[test]
 fn a_server_error_keeps_the_credential_for_later() {
-    let (mut a, _, store) = auth(vec![status(503, ""), Err("connection refused".into()), tokens("A1", "R2", 3600)], Some("R1"));
+    let (mut a, _, store) = auth(
+        vec![
+            status(503, ""),
+            Err("connection refused".into()),
+            tokens("A1", "R2", 3600),
+        ],
+        Some("R1"),
+    );
     let now = Instant::now();
     assert!(matches!(a.access_token(now), Err(AuthError::Transient(_))));
     assert!(matches!(a.access_token(now), Err(AuthError::Transient(_))));
@@ -115,24 +173,36 @@ fn a_server_error_keeps_the_credential_for_later() {
 
 #[test]
 fn a_failing_store_cannot_lose_the_rotated_token_and_the_save_is_retried() {
-    let (mut a, http, store) = auth(vec![tokens("A1", "R2", 100), tokens("A2", "R3", 3600)], Some("R1"));
+    let (mut a, http, store) = auth(
+        vec![tokens("A1", "R2", 100), tokens("A2", "R3", 3600)],
+        Some("R1"),
+    );
     *store.0.fail_saves.lock().unwrap() = true;
     let t0 = Instant::now();
     assert_eq!(a.access_token(t0), Ok("A1".into()));
     assert_eq!(stored(&store).as_deref(), Some("R1")); // stale on disk, newest in memory
 
     // The next refresh must use the in-memory token: the stored one was revoked by the server.
-    assert_eq!(a.access_token(t0 + Duration::from_secs(200)), Ok("A2".into()));
+    assert_eq!(
+        a.access_token(t0 + Duration::from_secs(200)),
+        Ok("A2".into())
+    );
     assert_eq!(http.form(1)["refresh_token"], "R2");
 
     *store.0.fail_saves.lock().unwrap() = false;
-    assert_eq!(a.access_token(t0 + Duration::from_secs(201)), Ok("A2".into()));
+    assert_eq!(
+        a.access_token(t0 + Duration::from_secs(201)),
+        Ok("A2".into())
+    );
     assert_eq!(stored(&store).as_deref(), Some("R3"));
 }
 
 #[test]
 fn invalidating_forces_a_refresh_even_when_the_token_looks_valid() {
-    let (mut a, http, _) = auth(vec![tokens("A1", "R2", 3600), tokens("A2", "R3", 3600)], Some("R1"));
+    let (mut a, http, _) = auth(
+        vec![tokens("A1", "R2", 3600), tokens("A2", "R3", 3600)],
+        Some("R1"),
+    );
     let now = Instant::now();
     a.access_token(now).unwrap();
     a.invalidate_access();
@@ -183,16 +253,36 @@ impl Browser for FakeBrowser {
 fn signing_in_exchanges_the_code_with_the_matching_pkce_verifier_and_saves_the_credential() {
     let (mut a, http, store) = auth(vec![tokens("A1", "R1", 3600)], None);
     let seen = Rc::new(RefCell::new(None));
-    let browser = FakeBrowser { outcome: "approve", seen: seen.clone() };
-    assert_eq!(a.sign_in(&browser, Duration::from_secs(5), Instant::now()), Ok(()));
+    let browser = FakeBrowser {
+        outcome: "approve",
+        seen: seen.clone(),
+    };
+    assert_eq!(
+        a.sign_in(&browser, Duration::from_secs(5), Instant::now()),
+        Ok(())
+    );
 
     let form = http.form(0);
-    assert_eq!((form["grant_type"].as_str(), form["code"].as_str()), ("authorization_code", "CODE1"));
+    assert_eq!(
+        (form["grant_type"].as_str(), form["code"].as_str()),
+        ("authorization_code", "CODE1")
+    );
     assert_eq!(form["client_id"], oauth::CLIENT_ID);
     let url = url::Url::parse(seen.borrow().as_ref().unwrap()).unwrap();
-    let challenge = url.query_pairs().find(|(k, _)| k == "code_challenge").unwrap().1.into_owned();
+    let challenge = url
+        .query_pairs()
+        .find(|(k, _)| k == "code_challenge")
+        .unwrap()
+        .1
+        .into_owned();
     assert_eq!(oauth::code_challenge(&form["code_verifier"]), challenge);
-    assert_eq!(form["redirect_uri"], url.query_pairs().find(|(k, _)| k == "redirect_uri").unwrap().1);
+    assert_eq!(
+        form["redirect_uri"],
+        url.query_pairs()
+            .find(|(k, _)| k == "redirect_uri")
+            .unwrap()
+            .1
+    );
 
     assert_eq!(stored(&store).as_deref(), Some("R1"));
     assert_eq!(a.access_token(Instant::now()), Ok("A1".into()));
@@ -201,8 +291,14 @@ fn signing_in_exchanges_the_code_with_the_matching_pkce_verifier_and_saves_the_c
 #[test]
 fn declining_in_the_browser_signs_nobody_in() {
     let (mut a, http, store) = auth(vec![], None);
-    let browser = FakeBrowser { outcome: "deny", seen: Rc::default() };
-    assert_eq!(a.sign_in(&browser, Duration::from_secs(5), Instant::now()), Err(AuthError::Denied));
+    let browser = FakeBrowser {
+        outcome: "deny",
+        seen: Rc::default(),
+    };
+    assert_eq!(
+        a.sign_in(&browser, Duration::from_secs(5), Instant::now()),
+        Err(AuthError::Denied)
+    );
     assert!(http.posted.borrow().is_empty());
     assert_eq!(stored(&store), None);
 }
@@ -216,5 +312,8 @@ fn a_browser_that_cannot_open_is_a_transient_error() {
         }
     }
     let (mut a, _, _) = auth(vec![], None);
-    assert!(matches!(a.sign_in(&Broken, Duration::from_millis(100), Instant::now()), Err(AuthError::Transient(_))));
+    assert!(matches!(
+        a.sign_in(&Broken, Duration::from_millis(100), Instant::now()),
+        Err(AuthError::Transient(_))
+    ));
 }

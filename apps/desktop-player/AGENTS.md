@@ -15,7 +15,9 @@ cargo xwin test  --target x86_64-pc-windows-msvc --release --no-run   # then run
 
 Plain `cargo build` / `cargo test` on Linux does not work. There is no native Windows build path (no C++ workload / SDK installed).
 
-Run a cross-compiled exe through WSL interop: copy it to `/mnt/c/Users/lanfe/` and execute it. A running exe is locked by Windows, so use a new filename per build (`spotify-remote-vN.exe`). Single test: run the test exe with a filter, e.g. `/mnt/c/Users/lanfe/spotify-tests.exe player::tests::parse_track`.
+Package for users with `tools/package.sh` (installer + portable zip in `dist/`, see `docs/distribution.md`).
+
+Run a cross-compiled exe through WSL interop: copy it to `/mnt/c/Users/lanfe/` and execute it. A running exe is locked by Windows, so use a new filename per build (`premiere-ecoute-player-vN.exe`). Single test: run the test exe with a filter, e.g. `/mnt/c/Users/lanfe/spotify-tests.exe player::tests::parse_track`.
 
 Debug builds of GPUI compile shaders at runtime from source paths, so use `--release`.
 

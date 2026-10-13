@@ -8,13 +8,13 @@ mod identity;
 mod player;
 mod remote;
 mod remote_status;
-mod supervise;
-mod waveform;
 #[cfg(windows)]
 mod smtc;
+mod supervise;
 mod ui;
 #[cfg(windows)]
 mod volume;
+mod waveform;
 
 use gpui_kit::component::TitleBar;
 use gpui_kit::*;
@@ -55,7 +55,12 @@ fn main() {
             None
         } else {
             match remote::Settings::configured() {
-                Ok(Some(settings)) => Some(remote::start(settings, shared.clone(), commands.clone(), remote.clone())),
+                Ok(Some(settings)) => Some(remote::start(
+                    settings,
+                    shared.clone(),
+                    commands.clone(),
+                    remote.clone(),
+                )),
                 Ok(None) => None,
                 Err(message) => {
                     player::lock(&remote).link = remote_status::Link::Failed(message);
@@ -66,7 +71,12 @@ fn main() {
         #[cfg(windows)]
         if !previewing {
             let scope = scope.clone();
-            supervise::supervise("audio-capture", supervise::Policy::default(), |_, _| {}, move || capture::run(scope.clone()));
+            supervise::supervise(
+                "audio-capture",
+                supervise::Policy::default(),
+                |_, _| {},
+                move || capture::run(scope.clone()),
+            );
             let shared = shared.clone();
             supervise::supervise(
                 "player-worker",
@@ -85,12 +95,19 @@ fn main() {
         }
 
         let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(Bounds::centered(None, size(px(400.), px(840.)), cx))),
+            window_bounds: Some(WindowBounds::Windowed(Bounds::centered(
+                None,
+                size(px(400.), px(840.)),
+                cx,
+            ))),
             window_min_size: Some(size(px(360.), px(660.))),
             ..TitleBar::window_options()
         };
         open_window(options, cx, |window, cx| {
-            cx.new(|cx| NowPlaying::new(window, cx, shared, remote, scope, commands, remote_handle).editing_server(editing_server))
+            cx.new(|cx| {
+                NowPlaying::new(window, cx, shared, remote, scope, commands, remote_handle)
+                    .editing_server(editing_server)
+            })
         })
         .expect("Failed to open window");
     });

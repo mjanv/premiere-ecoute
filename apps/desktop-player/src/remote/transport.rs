@@ -28,9 +28,15 @@ pub struct WsTransport {
 }
 
 fn connect_tcp(url: &Url) -> Result<TcpStream, ConnectError> {
-    let host = url.host_str().ok_or_else(|| ConnectError::Failed("the server address has no host".into()))?;
-    let port = url.port_or_known_default().ok_or_else(|| ConnectError::Failed("the server address has no port".into()))?;
-    let addrs = (host, port).to_socket_addrs().map_err(|e| ConnectError::Failed(format!("cannot resolve {host}: {e}")))?;
+    let host = url
+        .host_str()
+        .ok_or_else(|| ConnectError::Failed("the server address has no host".into()))?;
+    let port = url
+        .port_or_known_default()
+        .ok_or_else(|| ConnectError::Failed("the server address has no port".into()))?;
+    let addrs = (host, port)
+        .to_socket_addrs()
+        .map_err(|e| ConnectError::Failed(format!("cannot resolve {host}: {e}")))?;
     let mut last = format!("no address for {host}");
     for addr in addrs {
         match TcpStream::connect_timeout(&addr, CONNECT_TIMEOUT) {
@@ -43,26 +49,38 @@ fn connect_tcp(url: &Url) -> Result<TcpStream, ConnectError> {
 
 impl WsTransport {
     pub fn connect(ws_url: &str, access_token: &str) -> Result<Self, ConnectError> {
-        let url = Url::parse(ws_url).map_err(|e| ConnectError::Failed(format!("bad server address: {e}")))?;
+        let url = Url::parse(ws_url)
+            .map_err(|e| ConnectError::Failed(format!("bad server address: {e}")))?;
         if !matches!(url.scheme(), "ws" | "wss") {
-            return Err(ConnectError::Failed("the server address must start with ws:// or wss://".into()));
+            return Err(ConnectError::Failed(
+                "the server address must start with ws:// or wss://".into(),
+            ));
         }
         let stream = connect_tcp(&url)?;
         let _ = stream.set_nodelay(true);
         let _ = stream.set_write_timeout(Some(WRITE_TIMEOUT));
         let _ = stream.set_read_timeout(Some(HANDSHAKE_TIMEOUT));
 
-        let mut request = ws_url.into_client_request().map_err(|e| ConnectError::Failed(e.to_string()))?;
-        let token = HeaderValue::from_str(access_token).map_err(|_| ConnectError::Failed("the access token is not a valid header".into()))?;
+        let mut request = ws_url
+            .into_client_request()
+            .map_err(|e| ConnectError::Failed(e.to_string()))?;
+        let token = HeaderValue::from_str(access_token)
+            .map_err(|_| ConnectError::Failed("the access token is not a valid header".into()))?;
         request.headers_mut().insert("X-Access-Token", token);
 
-        let config = WebSocketConfig::default().max_message_size(Some(MAX_FRAME)).max_frame_size(Some(MAX_FRAME));
+        let config = WebSocketConfig::default()
+            .max_message_size(Some(MAX_FRAME))
+            .max_frame_size(Some(MAX_FRAME));
         match client_tls_with_config(request, stream, Some(config), None) {
             Ok((socket, _)) => Ok(Self { socket }),
-            Err(HandshakeError::Failure(WsError::Http(response))) => match response.status().as_u16() {
-                401 | 403 => Err(ConnectError::Unauthorized),
-                status => Err(ConnectError::Failed(format!("the server answered {status}"))),
-            },
+            Err(HandshakeError::Failure(WsError::Http(response))) => {
+                match response.status().as_u16() {
+                    401 | 403 => Err(ConnectError::Unauthorized),
+                    status => Err(ConnectError::Failed(format!(
+                        "the server answered {status}"
+                    ))),
+                }
+            }
             Err(e) => Err(ConnectError::Failed(e.to_string())),
         }
     }
@@ -82,7 +100,9 @@ fn closed() -> TransportError {
 
 impl Transport for WsTransport {
     fn send(&mut self, frame: &str) -> Result<(), TransportError> {
-        self.socket.send(Message::text(frame)).map_err(|e| TransportError(e.to_string()))
+        self.socket
+            .send(Message::text(frame))
+            .map_err(|e| TransportError(e.to_string()))
     }
 
     fn recv(&mut self, timeout: Duration) -> Result<Option<String>, TransportError> {
@@ -98,7 +118,14 @@ impl Transport for WsTransport {
                 Ok(None)
             }
             Ok(_) => Ok(None),
-            Err(WsError::Io(e)) if matches!(e.kind(), std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut) => Ok(None),
+            Err(WsError::Io(e))
+                if matches!(
+                    e.kind(),
+                    std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
+                ) =>
+            {
+                Ok(None)
+            }
             Err(WsError::ConnectionClosed | WsError::AlreadyClosed) => Err(closed()),
             Err(e) => Err(TransportError(e.to_string())),
         }

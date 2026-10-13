@@ -47,7 +47,8 @@ mod windows_store {
     use super::CredentialStore;
     use windows::Win32::Foundation::ERROR_NOT_FOUND;
     use windows::Win32::Security::Credentials::{
-        CRED_PERSIST_LOCAL_MACHINE, CRED_TYPE_GENERIC, CREDENTIALW, CredDeleteW, CredFree, CredReadW, CredWriteW,
+        CRED_PERSIST_LOCAL_MACHINE, CRED_TYPE_GENERIC, CREDENTIALW, CredDeleteW, CredFree,
+        CredReadW, CredWriteW,
     };
     use windows::core::{PCWSTR, PWSTR};
 
@@ -59,7 +60,9 @@ mod windows_store {
     impl WindowsStore {
         pub fn for_server(base_url: &str) -> Self {
             let name = format!("premiere-ecoute-player:{}", base_url.trim_end_matches('/'));
-            Self { target: name.encode_utf16().chain(std::iter::once(0)).collect() }
+            Self {
+                target: name.encode_utf16().chain(std::iter::once(0)).collect(),
+            }
         }
     }
 
@@ -69,12 +72,23 @@ mod windows_store {
 
     impl CredentialStore for WindowsStore {
         fn load(&self) -> Result<Option<String>, String> {
+            // SAFETY: `target` is NUL-terminated (see `for_server`). On success `cred` points to a
+            // CREDENTIALW whose blob is `CredentialBlobSize` bytes; the bytes are copied before
+            // `CredFree` releases it, and `cred` is not used afterwards.
             unsafe {
                 let mut cred: *mut CREDENTIALW = std::ptr::null_mut();
-                match CredReadW(PCWSTR(self.target.as_ptr()), CRED_TYPE_GENERIC, None, &mut cred) {
+                match CredReadW(
+                    PCWSTR(self.target.as_ptr()),
+                    CRED_TYPE_GENERIC,
+                    None,
+                    &mut cred,
+                ) {
                     Ok(()) => {
                         let c = &*cred;
-                        let bytes = std::slice::from_raw_parts(c.CredentialBlob, c.CredentialBlobSize as usize);
+                        let bytes = std::slice::from_raw_parts(
+                            c.CredentialBlob,
+                            c.CredentialBlobSize as usize,
+                        );
                         let value = String::from_utf8(bytes.to_vec()).map_err(|e| e.to_string());
                         CredFree(cred as *const _);
                         value.map(Some)
@@ -96,10 +110,13 @@ mod windows_store {
                 Persist: CRED_PERSIST_LOCAL_MACHINE,
                 ..Default::default()
             };
+            // SAFETY: `cred` points to `target` and `blob`, which outlive the call; `CredWriteW` copies
+            // them and does not write through the pointers.
             unsafe { CredWriteW(&cred, 0) }.map_err(|e| e.message())
         }
 
         fn delete(&self) -> Result<(), String> {
+            // SAFETY: `target` is NUL-terminated (see `for_server`) and outlives the call.
             match unsafe { CredDeleteW(PCWSTR(self.target.as_ptr()), CRED_TYPE_GENERIC, None) } {
                 Ok(()) => Ok(()),
                 Err(e) if not_found(&e) => Ok(()),
@@ -107,7 +124,6 @@ mod windows_store {
             }
         }
     }
-
 }
 
 #[cfg(all(test, windows))]

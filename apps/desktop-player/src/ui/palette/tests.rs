@@ -2,9 +2,20 @@ use super::*;
 
 fn tints() -> impl Iterator<Item = Option<Tint>> {
     let chromatic = (0..360).step_by(15).flat_map(|h| {
-        [0.3, 0.7, 1.0].map(|s| Some(Tint { hue: h as f32, saturation: s }))
+        [0.3, 0.7, 1.0].map(|s| {
+            Some(Tint {
+                hue: h as f32,
+                saturation: s,
+            })
+        })
     });
-    chromatic.chain([None, Some(Tint { hue: 0.0, saturation: 0.0 })])
+    chromatic.chain([
+        None,
+        Some(Tint {
+            hue: 0.0,
+            saturation: 0.0,
+        }),
+    ])
 }
 
 #[test]
@@ -18,11 +29,20 @@ fn text_is_readable_on_every_tint() {
     for t in tints() {
         let p = Palette::from_tint(t);
         assert!(contrast(p.ink, p.bg) >= 12.0, "ink on bg for {t:?}");
-        assert!(contrast(p.ink, p.surface) >= 10.0, "ink on surface for {t:?}");
+        assert!(
+            contrast(p.ink, p.surface) >= 10.0,
+            "ink on surface for {t:?}"
+        );
         assert!(contrast(p.muted, p.bg) >= 4.5, "muted on bg for {t:?}");
         assert!(contrast(p.accent, p.bg) >= 4.5, "accent on bg for {t:?}");
-        assert!(contrast(p.on_accent, p.accent) >= 4.5, "glyph on accent for {t:?}");
-        assert!(contrast(p.warn, p.surface) >= 4.5, "warn on surface for {t:?}");
+        assert!(
+            contrast(p.on_accent, p.accent) >= 4.5,
+            "glyph on accent for {t:?}"
+        );
+        assert!(
+            contrast(p.warn, p.surface) >= 4.5,
+            "warn on surface for {t:?}"
+        );
     }
 }
 
@@ -35,7 +55,10 @@ fn the_background_stays_dark() {
 
 #[test]
 fn a_blue_cover_gives_a_blue_background() {
-    let p = Palette::from_tint(Some(Tint { hue: 240.0, saturation: 0.9 }));
+    let p = Palette::from_tint(Some(Tint {
+        hue: 240.0,
+        saturation: 0.9,
+    }));
     assert!(p.bg.2 > p.bg.0 && p.bg.2 > p.bg.1);
 }
 

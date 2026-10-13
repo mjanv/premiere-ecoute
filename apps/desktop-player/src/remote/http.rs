@@ -25,9 +25,18 @@ impl UreqHttp {
 
 impl Http for UreqHttp {
     fn post_form(&self, url: &str, form: &[(&str, &str)]) -> Result<HttpResponse, String> {
-        let mut response = self.agent.post(url).send_form(form.iter().copied()).map_err(|e| e.to_string())?;
+        let mut response = self
+            .agent
+            .post(url)
+            .send_form(form.iter().copied())
+            .map_err(|e| e.to_string())?;
         let status = response.status().as_u16();
-        let body = response.body_mut().with_config().limit(MAX_BODY).read_to_string().map_err(|e| e.to_string())?;
+        let body = response
+            .body_mut()
+            .with_config()
+            .limit(MAX_BODY)
+            .read_to_string()
+            .map_err(|e| e.to_string())?;
         Ok(HttpResponse { status, body })
     }
 }

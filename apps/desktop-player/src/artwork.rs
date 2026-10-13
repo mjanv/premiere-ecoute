@@ -22,7 +22,12 @@ pub struct Artwork {
 
 impl std::fmt::Debug for Artwork {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Artwork {{ id: {}, {} bytes }}", self.id, self.bytes.len())
+        write!(
+            f,
+            "Artwork {{ id: {}, {} bytes }}",
+            self.id,
+            self.bytes.len()
+        )
     }
 }
 
@@ -58,7 +63,7 @@ pub fn tint_from_rgba(pixels: &[u8]) -> Tint {
     let mut total = 0usize;
     let mut coloured = 0usize;
 
-    for px in pixels.chunks_exact(4) {
+    for px in pixels.as_chunks::<4>().0 {
         total += 1;
         let (h, s, v) = rgb_to_hsv(px[0], px[1], px[2]);
         if s < MIN_SATURATION || v < MIN_VALUE {
@@ -75,11 +80,19 @@ pub fn tint_from_rgba(pixels: &[u8]) -> Tint {
     }
 
     if total == 0 || (coloured as f32 / total as f32) < MIN_COLOURED_SHARE {
-        return Tint { hue: 0.0, saturation: 0.0 };
+        return Tint {
+            hue: 0.0,
+            saturation: 0.0,
+        };
     }
-    let best = (0..BINS).max_by(|&a, &b| weight[a].total_cmp(&weight[b])).unwrap_or(0);
+    let best = (0..BINS)
+        .max_by(|&a, &b| weight[a].total_cmp(&weight[b]))
+        .unwrap_or(0);
     let hue = sin[best].atan2(cos[best]).to_degrees().rem_euclid(360.0);
-    Tint { hue, saturation: (sat[best] / weight[best]).clamp(0.0, 1.0) }
+    Tint {
+        hue,
+        saturation: (sat[best] / weight[best]).clamp(0.0, 1.0),
+    }
 }
 
 fn rgb_to_hsv(r: u8, g: u8, b: u8) -> (f32, f32, f32) {
@@ -107,7 +120,11 @@ impl Artwork {
         let tint = tint_from_rgba(small.as_raw());
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         bytes.hash(&mut hasher);
-        Some(Self { id: hasher.finish(), bytes: bytes.into(), tint })
+        Some(Self {
+            id: hasher.finish(),
+            bytes: bytes.into(),
+            tint,
+        })
     }
 }
 

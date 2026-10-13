@@ -12,7 +12,9 @@ pub enum Link {
     SigningIn,
     Connecting,
     Connected,
-    Offline { retry_in: Duration },
+    Offline {
+        retry_in: Duration,
+    },
     /// Credentials rejected: the user has to connect the account again.
     Unauthorized,
     Failed(String),
@@ -63,7 +65,9 @@ impl Link {
             Link::SigningIn => "Waiting for the browser".into(),
             Link::Connecting => "Connecting to server".into(),
             Link::Connected => "Server linked".into(),
-            Link::Offline { retry_in } => format!("Server offline, retry in {} s", retry_in.as_secs().max(1)),
+            Link::Offline { retry_in } => {
+                format!("Server offline, retry in {} s", retry_in.as_secs().max(1))
+            }
             Link::Unauthorized => "Server: sign in again".into(),
             Link::Failed(reason) => format!("Server error: {reason}"),
         }
@@ -113,7 +117,12 @@ impl Exchange {
     /// `next, done 18s`; `None` until a command has been received.
     pub fn command_line(&self, now: Instant) -> Option<String> {
         let c = self.last_command.as_ref()?;
-        Some(format!("{}, {} {}", c.name, c.outcome.label(), age_short(now, c.at)))
+        Some(format!(
+            "{}, {} {}",
+            c.name,
+            c.outcome.label(),
+            age_short(now, c.at)
+        ))
     }
 }
 
@@ -123,18 +132,31 @@ impl RemoteStatus {
         let sent = Exchange {
             snapshots_sent: 4312,
             last_snapshot_at: now.checked_sub(Duration::from_secs(1)),
-            last_command: now.checked_sub(Duration::from_secs(12)).map(|at| CommandLog {
-                name: "next".into(),
-                outcome: Outcome::Ok,
-                at,
-            }),
+            last_command: now
+                .checked_sub(Duration::from_secs(12))
+                .map(|at| CommandLog {
+                    name: "next".into(),
+                    outcome: Outcome::Ok,
+                    at,
+                }),
         };
         let (link, exchange) = match kind {
             "connected" => (Link::Connected, sent),
             "connecting" => (Link::Connecting, Exchange::default()),
-            "offline" => (Link::Offline { retry_in: Duration::from_secs(12) }, Exchange { last_snapshot_at: now.checked_sub(Duration::from_secs(95)), ..sent }),
+            "offline" => (
+                Link::Offline {
+                    retry_in: Duration::from_secs(12),
+                },
+                Exchange {
+                    last_snapshot_at: now.checked_sub(Duration::from_secs(95)),
+                    ..sent
+                },
+            ),
             "unauthorized" => (Link::Unauthorized, Exchange::default()),
-            "failed" => (Link::Failed("server refused protocol 1".into()), Exchange::default()),
+            "failed" => (
+                Link::Failed("server refused protocol 1".into()),
+                Exchange::default(),
+            ),
             _ => return None,
         };
         Some(Self { link, exchange })

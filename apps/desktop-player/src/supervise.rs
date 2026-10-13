@@ -30,9 +30,13 @@ impl Default for Policy {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Decision {
-    Restart { after: Duration },
+    Restart {
+        after: Duration,
+    },
     /// Too many crashes: the worker is considered failed for a while.
-    CoolOff { after: Duration },
+    CoolOff {
+        after: Duration,
+    },
 }
 
 impl Decision {
@@ -50,19 +54,27 @@ pub struct Tracker {
 
 impl Tracker {
     pub fn new(policy: Policy) -> Self {
-        Self { policy, recent: Vec::new() }
+        Self {
+            policy,
+            recent: Vec::new(),
+        }
     }
 
     pub fn on_panic(&mut self, now: Instant) -> Decision {
         let window = self.policy.window;
-        self.recent.retain(|t| now.saturating_duration_since(*t) < window);
+        self.recent
+            .retain(|t| now.saturating_duration_since(*t) < window);
         self.recent.push(now);
         if self.recent.len() > self.policy.max_restarts {
             self.recent.clear();
-            return Decision::CoolOff { after: self.policy.cooloff };
+            return Decision::CoolOff {
+                after: self.policy.cooloff,
+            };
         }
         let exp = (self.recent.len() as u32 - 1).min(16);
-        Decision::Restart { after: (self.policy.backoff * 2u32.pow(exp)).min(self.policy.max_backoff) }
+        Decision::Restart {
+            after: (self.policy.backoff * 2u32.pow(exp)).min(self.policy.max_backoff),
+        }
     }
 }
 

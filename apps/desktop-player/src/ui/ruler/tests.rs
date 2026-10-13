@@ -32,7 +32,10 @@ fn long_tracks_widen_the_step_and_label_every_fifth_minute() {
 #[test]
 fn the_ruler_never_exceeds_the_tick_budget() {
     for len in [1, 30, 210, 600, 1200, 3600, 7200, 36_000] {
-        assert!(ticks(secs(len)).len() as u64 <= MAX_TICKS + 1, "length {len}");
+        assert!(
+            ticks(secs(len)).len() as u64 <= MAX_TICKS + 1,
+            "length {len}"
+        );
     }
 }
 
