@@ -22,24 +22,26 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   @doc """
   Starts the Spotify player monitoring GenServer.
 
-  Launches a GenServer registered via Registry to monitor Spotify playback state for a specific user.
+  Launches a GenServer registered via Registry to monitor Spotify playback state for a specific user. Started as `{user_id, device: true}` for a desktop player that is about to attach, the player then does not call the Web API and waits for the device.
   """
-  @spec start_link(integer()) :: GenServer.on_start()
-  def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: {:via, Registry, {@registry, args}})
+  @spec start_link(integer() | {integer(), keyword()}) :: GenServer.on_start()
+  def start_link({user_id, _opts} = args) do
+    GenServer.start_link(__MODULE__, args, name: {:via, Registry, {@registry, user_id}})
   end
 
+  def start_link(user_id), do: start_link({user_id, []})
+
   @doc false
-  @spec init(integer()) :: {:ok, map()}
+  @spec init({integer(), keyword()}) :: {:ok, map()}
   @impl true
-  def init(args) do
-    scope = Scope.for_user(User.get(args))
+  def init({user_id, opts}) do
+    scope = Scope.for_user(User.get(user_id))
     data = %{scope: scope, state: PlaybackState.default(), polls: Api.polls(), failures: 0}
 
     with {:ok, phx_ref} <- Presence.join(scope.user.id, :player),
          :ok <- PremiereEcoute.PubSub.subscribe("player:#{scope.user.id}"),
-         {:ok, state} <- Api.fetch(scope, PlaybackState.default()) do
-      {:ok, Api.schedule_poll(Map.merge(data, %{phx_ref: phx_ref, state: state}), Api.poll_interval())}
+         {:ok, state} <- initial_state(scope, opts) do
+      {:ok, start(Map.merge(data, %{phx_ref: phx_ref, state: state}), opts)}
     else
       {:error, :not_connected} ->
         {:ok, Api.idle(Map.put(data, :phx_ref, nil))}
@@ -49,6 +51,13 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
         {:ok, Api.schedule_poll(data, Api.poll_interval(data.failures))}
     end
   end
+
+  # A desktop player is about to attach: the Web API is not needed to start.
+  defp initial_state(_scope, device: true), do: {:ok, PlaybackState.default()}
+  defp initial_state(scope, _opts), do: Api.fetch(scope, PlaybackState.default())
+
+  defp start(data, device: true), do: Api.idle(data)
+  defp start(data, _opts), do: Api.schedule_poll(data, Api.poll_interval())
 
   @doc """
   Runs a playback command through the user's local player when there is one, through the Web API otherwise.

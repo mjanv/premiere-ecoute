@@ -1,11 +1,8 @@
 defmodule PremiereEcouteWeb.Player.ChannelTest do
   use PremiereEcouteWeb.ChannelCase
 
-  import Hammox
   import PremiereEcoute.PlayerFixtures
 
-  alias PremiereEcoute.Apis.MusicProvider.SpotifyApi.Mock, as: SpotifyApi
-  alias PremiereEcoute.Apis.Players.PlaybackState
   alias PremiereEcoute.Apis.Players.PlayerRegistry
   alias PremiereEcoute.Apis.PlayerSupervisor
   alias PremiereEcoute.Devices
@@ -32,8 +29,6 @@ defmodule PremiereEcouteWeb.Player.ChannelTest do
     end
 
     test "starts the user's player and attaches to it", %{user: user, socket: socket} do
-      set_mox_global()
-      stub(SpotifyApi, :get_playback_state, fn _scope, _state -> {:ok, PlaybackState.default()} end)
       Phoenix.PubSub.subscribe(PremiereEcoute.PubSub, "playback:#{user.id}")
 
       {:ok, _, socket} = subscribe_and_join(socket, Channel, "desktop:#{user.id}", @join)
