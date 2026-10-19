@@ -41,7 +41,7 @@ Already decided: tests live in dedicated files (`foo/tests.rs`, see `AGENTS.md`)
 | C2 | **Release profile is untuned** | Add `lto`, `strip`, `codegen-units`. **Never `panic = "abort"`**: the supervisors rely on `catch_unwind` |
 | C3 | **Manual build and test steps** | Copying exes by hand, `/mnt/c/Users/lanfe` hard-coded in `AGENTS.md` and `tools/shot.sh`. One build and one test script, a configurable Windows directory |
 | C4 | **Vendored GPUI crate and pre-generated shaders** | Re-run `tools/gen-shaders.sh` and re-vendor on every GPUI upgrade (procedure in `docs/architecture.md`). Consider an upstream fix to the host-gated `build.rs` |
-| C5 | **No CI** | Nothing runs the build or the tests automatically |
+| C5 | **CI is minimal** | `pr-desktop-player.yml` and `release-desktop-player.yml` cover build, tests and release. No scheduled advisory check, no coverage |
 
 ## D. Tests
 

@@ -1,0 +1,56 @@
+name: Release - Desktop player
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Windows installer and portable zip
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/desktop-player
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Cargo.toml and app.rc agree on the version
+        run: |
+          cargo_version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+          rc_version=$(sed -n 's/.*"FileVersion", "\(.*\)\\0".*/\1/p' assets/app.rc)
+          echo "Cargo.toml=$cargo_version app.rc=$rc_version"
+          test "$cargo_version" = "$rc_version"
+
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y clang lld llvm nsis zip
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop-player
+
+      - name: Install cargo-xwin
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-xwin
+
+      - name: Package
+        run: tools/package.sh
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            apps/desktop-player/dist/*-setup.exe
+            apps/desktop-player/dist/*-portable.zip
