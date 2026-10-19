@@ -64,6 +64,7 @@ apps/digital_ocean/backups/
 # Agents
 .claude/settings.local.json
 docs/plans
+docs/reviews
 
 # Streamdeck
 *.streamDeckPlugin

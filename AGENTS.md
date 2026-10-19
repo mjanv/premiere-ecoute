@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 > Onboarding manual for every AI assistant who edits this repository. It encodes coding standards, guard-rails, and workflow tricks so the *human 30 %* (architecture, tests, domain judgment) stays in human hands. This principle emphasizes human oversight for critical aspects like architecture, testing, and domain-specific decisions, ensuring AI assists not dictates development.
 
@@ -10,6 +10,7 @@ Read those documents before working on the codebase:
 - Coding standards: @docs/coding_standards.md
 - Development guide: @docs/guides/development.md
 - Frontend & design system: @docs/guides/frontend.md
+- Desktop player (Rust, Windows, `apps/desktop-player/`): build, test and quality commands are in @apps/desktop-player/AGENTS.md; backend contract in @docs/guides/desktop-player.md
 
 ## Rules
 
@@ -25,7 +26,7 @@ AI assistant MUST NOT do:
 
 1. Edit or delete any existing unit tests without approval (human own tests).
 2. Write changes or use tools when you are not sure about something project specific, or if you don't have context for a particular feature/decision.
-4. Re-format code to any other style.
+4. Re-format code to any other style, without automatic tools.
 5. Refactor large modules without human guidance.
 6. Write raw HTML for any repeated UI pattern (modal overlays, cards, badges, buttons, empty states) without for existing components.
 

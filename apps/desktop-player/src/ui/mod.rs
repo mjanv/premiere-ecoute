@@ -96,7 +96,10 @@ impl NowPlaying {
         let server_input = cx.new(|cx| {
             InputState::new(window, cx)
                 .placeholder("Server address, for example https://…")
-                .default_value(remote::config::load().unwrap_or_else(|| remote::config::DEFAULT_SERVER.to_string()))
+                .default_value(
+                    remote::config::load()
+                        .unwrap_or_else(|| remote::config::DEFAULT_SERVER.to_string()),
+                )
         });
         cx.subscribe(&server_input, |this, _, event: &InputEvent, cx| {
             if matches!(event, InputEvent::PressEnter { .. }) {

@@ -33,7 +33,10 @@ fn an_empty_or_blank_file_means_nothing_was_chosen() {
 #[test]
 fn the_environment_wins_over_the_saved_address_and_blanks_are_skipped() {
     let default = "https://default";
-    assert_eq!(resolve(Some("http://a"), Some("http://b"), default), "http://a");
+    assert_eq!(
+        resolve(Some("http://a"), Some("http://b"), default),
+        "http://a"
+    );
     assert_eq!(resolve(None, Some("http://b"), default), "http://b");
     assert_eq!(resolve(Some("  "), Some("http://b"), default), "http://b");
 }
@@ -41,7 +44,10 @@ fn the_environment_wins_over_the_saved_address_and_blanks_are_skipped() {
 #[test]
 fn the_built_in_server_is_the_fallback() {
     assert_eq!(resolve(None, None, "https://default"), "https://default");
-    assert_eq!(resolve(Some(" "), Some(""), "https://default"), "https://default");
+    assert_eq!(
+        resolve(Some(" "), Some(""), "https://default"),
+        "https://default"
+    );
 }
 
 #[test]
