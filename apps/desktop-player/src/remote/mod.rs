@@ -1,5 +1,5 @@
 //! Connection to the Première Écoute backend (ADR 0001 and `docs/guides/desktop-player.md` in the
-//! backend repository).
+//! monorepo root).
 //!
 //! One supervised worker thread owns the whole lifecycle: sign in, get an access token, dial,
 //! run a session, and decide what to do when it ends. Nothing here can block or crash the local

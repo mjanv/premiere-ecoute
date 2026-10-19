@@ -1,4 +1,4 @@
-//! The wire protocol of `docs/guides/desktop-player.md` in the backend repository (Phoenix V2 JSON
+//! The wire protocol of `docs/guides/desktop-player.md` in the monorepo root (Phoenix V2 JSON
 //! frames on the topic `desktop:me`). Everything that knows an event name or a JSON shape lives
 //! here; the rest of the player sees only `Inbound` and `Outbound`-style neutral types.
 //!
