@@ -18,6 +18,11 @@ fn err(e: windows::core::Error) -> String {
     e.message()
 }
 
+/// Whether a process image path is the Spotify desktop app, not just a name that ends alike.
+fn is_spotify_exe(path: &str) -> bool {
+    path.to_lowercase().ends_with("\\spotify.exe")
+}
+
 fn is_spotify(pid: u32) -> bool {
     // SAFETY: `buf` and `len` outlive the calls and `len` is its capacity in UTF-16 units. The process
     // handle is closed exactly once, after its last use.
@@ -35,9 +40,7 @@ fn is_spotify(pid: u32) -> bool {
         )
         .is_ok();
         let _ = CloseHandle(process);
-        ok && String::from_utf16_lossy(&buf[..len as usize])
-            .to_lowercase()
-            .ends_with("\\spotify.exe")
+        ok && is_spotify_exe(&String::from_utf16_lossy(&buf[..len as usize]))
     }
 }
 
@@ -93,3 +96,6 @@ pub fn set(volume: f32) -> Result<(), String> {
     // SAFETY: `v` is a live COM interface; a null event context is allowed.
     unsafe { v.SetMasterVolume(volume.clamp(0.0, 1.0), std::ptr::null()) }.map_err(err)
 }
+
+#[cfg(test)]
+mod tests;

@@ -6,6 +6,7 @@ use crate::identity::{Identity, UriTracker};
 use crate::player::{Backend, Playback, Snapshot, autoplay_uri, current_position};
 use crate::volume;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use windows::Foundation::{DateTime, TimeSpan};
 use windows::Media::Control::{
     GlobalSystemMediaTransportControlsSession as Session,
     GlobalSystemMediaTransportControlsSessionManager as Manager,
@@ -84,12 +85,39 @@ fn accepted(taken: bool) -> Result<(), String> {
     }
 }
 
+/// Spotify's AppUserModelId: `Spotify.exe` for the installer build, a `SpotifyAB...` package for the Store one.
+fn is_spotify_app(id: &str) -> bool {
+    id.to_lowercase().contains("spotify")
+}
+
+fn playback_from(status: Status) -> Playback {
+    match status {
+        Status::Playing => Playback::Playing,
+        Status::Paused => Playback::Paused,
+        _ => Playback::Stopped,
+    }
+}
+
+/// A timeline value: 100 ns ticks, never negative.
+fn ticks(t: TimeSpan) -> Duration {
+    Duration::from_nanos(t.Duration.max(0) as u64 * 100)
+}
+
+/// Time elapsed since Spotify last updated the timeline. `DateTime` is 100 ns ticks since
+/// 1601-01-01; the Unix epoch is 11644473600 s later.
+fn since_update(updated: DateTime, now: SystemTime) -> Duration {
+    let updated = Duration::from_nanos(updated.UniversalTime.max(0) as u64 * 100);
+    let now =
+        now.duration_since(UNIX_EPOCH).unwrap_or_default() + Duration::from_secs(11_644_473_600);
+    now.saturating_sub(updated)
+}
+
 fn spotify_session() -> Result<Option<Session>, String> {
     let manager = Manager::RequestAsync().map_err(err)?.join().map_err(err)?;
     let sessions = manager.GetSessions().map_err(err)?;
     for session in sessions {
         let id = session.SourceAppUserModelId().map_err(err)?.to_string();
-        if id.to_lowercase().contains("spotify") {
+        if is_spotify_app(&id) {
             return Ok(Some(session));
         }
     }
@@ -112,31 +140,13 @@ impl Backend for Smtc {
             .map_err(err)?
             .PlaybackStatus()
             .map_err(err)?;
-        let playback = match status {
-            Status::Playing => Playback::Playing,
-            Status::Paused => Playback::Paused,
-            _ => Playback::Stopped,
-        };
+        let playback = playback_from(status);
         let timeline = session.GetTimelineProperties().map_err(err)?;
-        let ticks =
-            |t: windows::Foundation::TimeSpan| Duration::from_nanos(t.Duration.max(0) as u64 * 100);
         let length = ticks(timeline.EndTime().map_err(err)?)
             .saturating_sub(ticks(timeline.StartTime().map_err(err)?));
         let reported = ticks(timeline.Position().map_err(err)?);
-        // DateTime is 100ns ticks since 1601-01-01; the Unix epoch is 11644473600s later.
-        let updated = Duration::from_nanos(
-            timeline
-                .LastUpdatedTime()
-                .map_err(err)?
-                .UniversalTime
-                .max(0) as u64
-                * 100,
-        );
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            + Duration::from_secs(11_644_473_600);
-        let position = current_position(reported, now.saturating_sub(updated), playback, length);
+        let elapsed = since_update(timeline.LastUpdatedTime().map_err(err)?, SystemTime::now());
+        let position = current_position(reported, elapsed, playback, length);
         let title = props.Title().map_err(err)?.to_string();
         let artist = props.Artist().map_err(err)?.to_string();
         let album = props.AlbumTitle().map_err(err)?.to_string();

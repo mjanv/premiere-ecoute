@@ -39,13 +39,13 @@ Already decided: tests live in dedicated files (`foo/tests.rs`, see `AGENTS.md`)
 |---|---|---|
 | C1 | **Not installable yet** | No icon, version info or manifest (including DPI awareness), no installer or zip, no code signing, no autostart, no auto-update. "Installable on Windows without WSL" was the goal |
 | C2 | **Release profile is untuned** | Add `lto`, `strip`, `codegen-units`. **Never `panic = "abort"`**: the supervisors rely on `catch_unwind` |
-| C3 | **Manual build and test steps** | Copying exes by hand, `/mnt/c/Users/lanfe` hard-coded in `AGENTS.md` and `tools/shot.sh`. One build and one test script, a configurable Windows directory |
+| C3 | ~~Manual build and test steps~~ | Done: `tools/win-run.sh` (cargo runner), `tools/check.sh`, `tools/lib.sh` finds the Windows directory (`WIN_DIR` overrides it) |
 | C4 | **Vendored GPUI crate and pre-generated shaders** | Re-run `tools/gen-shaders.sh` and re-vendor on every GPUI upgrade (procedure in `docs/architecture.md`). Consider an upstream fix to the host-gated `build.rs` |
 | C5 | **CI is minimal** | `pr-desktop-player.yml` and `release-desktop-player.yml` cover build, tests and release. No scheduled advisory check, no coverage |
 
 ## D. Tests
 
-- Not automated: `smtc.rs`, `volume.rs`, the capture beyond the `--ignored` test that needs Spotify playing, and the window. Candidates: a smoke test that starts the exe with `PLAYER_UI_PREVIEW` and checks the window appears (`tools/shot.sh` already does the capture), or screenshot comparison.
+- Not automated: the Windows calls in `smtc.rs`, `volume.rs` and `capture.rs` (their decisions are tested, the capture also has an `--ignored` test that needs Spotify playing), and what the window draws. `tools/smoke.sh` checks that the window opens; screenshot comparison is still open.
 - End-to-end against the real backend is manual (backend guide, "End-to-end test with your account"). A script would make it repeatable.
 
 ## E. Docs

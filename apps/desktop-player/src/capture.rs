@@ -38,6 +38,11 @@ const ACTIVATION_TIMEOUT: Duration = Duration::from_secs(5);
 const PID_CHECK: Duration = Duration::from_secs(2);
 const RETRY: Duration = Duration::from_secs(2);
 
+/// Samples in one flat-line pass: `PASS` of silence at `RATE`.
+fn silent_pass_len() -> usize {
+    (RATE as u64 * PASS.as_millis() as u64 / 1000) as usize
+}
+
 fn err(e: windows::core::Error) -> String {
     e.message()
 }
@@ -199,7 +204,7 @@ fn capture_once(pid: u32, scope: &Mutex<Scope>) -> Result<(), String> {
         capture.drain(&mut mono)?;
         if mono.is_empty() {
             // Nothing arrived this pass (paused): a flat line, not the last shape frozen.
-            mono.resize((RATE as u64 * PASS.as_millis() as u64 / 1000) as usize, 0.0);
+            mono.resize(silent_pass_len(), 0.0);
         }
         lock(scope).push(&mono, Instant::now());
         if checked.elapsed() >= PID_CHECK {

@@ -59,10 +59,10 @@ The window reads `PLAYER_UI_PREVIEW` (comma separated) at startup, for developme
 - `idle`: do not talk to Spotify; show the "Nothing playing" state.
 - `sample`: do not talk to Spotify; show a playing track with long names, to check truncation and spacing (with a synthetic signal in the waveform).
 
-`tools/shot.sh <exe> <out.png> [wait-seconds] [preview]` launches a built exe on Windows through WSL, captures its window and closes it. Example:
+`tools/shot.sh <exe> <out.png> [wait-seconds] [preview]` launches a built exe (a WSL path, copied to your Windows profile directory first) on Windows through WSL, captures its window and closes it. Example:
 
 ```
-tools/shot.sh 'C:\Users\lanfe\ui-shot.exe' /tmp/shot.png 6 connected
+tools/shot.sh target/x86_64-pc-windows-msvc/release/premiere-ecoute-player.exe /tmp/shot.png 6 connected
 ```
 
 ## Not done

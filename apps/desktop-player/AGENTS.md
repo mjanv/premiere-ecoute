@@ -21,7 +21,7 @@ Package for users with `tools/package.sh` (installer + portable zip in `dist/`, 
 
 Fastest dev loop: `just player` from the monorepo root runs the app on Windows against this checkout's server (port from `just info`) and rebuilds and restarts it on every change under `src/`, `assets/`, `build.rs` or `Cargo.toml` (needs `watchexec`: `cargo install --locked watchexec-cli`). Underneath, set `CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUNNER=$PWD/tools/win-run.sh`, then `cargo xwin run --target x86_64-pc-windows-msvc --release` (or `cargo xwin test ... -- <filter>`) copies the exe to Windows under a fixed name, stops the previous run and executes it. Set `WIN_DIR` to change the Windows directory (default: the Windows user's profile) and `PLAYER_HUB_URL=http://localhost:4000` to use a local backend with a plain build, no `dev-server` feature needed.
 
-Manual alternative, run a cross-compiled exe through WSL interop: copy it to `/mnt/c/Users/lanfe/` and execute it. A running exe is locked by Windows, so use a new filename per build (`premiere-ecoute-player-vN.exe`). Single test: run the test exe with a filter, e.g. `/mnt/c/Users/lanfe/spotify-tests.exe player::tests::parse_track`.
+`just player-test <filter>` runs the tests the same way (`just player-test remote::session`), `just player-check` runs every quality gate of `docs/quality.md` (`tools/check.sh`), and `just player-smoke` starts the release exe without Spotify and checks that its window opens (`tools/smoke.sh`). Scripts that reach Windows share `tools/lib.sh`, which finds your Windows profile (`WIN_DIR` overrides it) and temp directory: nothing is hardcoded to a user name.
 
 Debug builds of GPUI compile shaders at runtime from source paths, so use `--release`.
 
@@ -42,6 +42,7 @@ Tests live in dedicated files, never inline. A module `foo.rs` ends with `#[cfg(
 
 - Test-first for logic; the pure parts (`player`, `remote/protocol`, `remote/session`, `waveform`, `ui/palette`, ...) are where tests pay off.
 - Never drop the `PROPVARIANT` that carries the audio activation parameters, and never build with `panic = "abort"` (the supervisors catch panics).
+- A Windows API call you cannot test (`smtc.rs`, `volume.rs`, `capture.rs`) still gets its decisions pulled out into a small pure function with a test next to it (`is_spotify_app`, `since_update`, `silent_pass_len`).
 - Update `docs/architecture.md`, `docs/ui.md` and this file in the same change as the code.
 
 ## Non-obvious details

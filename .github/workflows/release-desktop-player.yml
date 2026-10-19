@@ -28,7 +28,7 @@ jobs:
           test "$cargo_version" = "$rc_version"
 
       - name: Install system packages
-        run: sudo apt-get update && sudo apt-get install -y clang lld llvm nsis zip
+        run: sudo apt-get update && sudo apt-get install -y clang lld llvm nsis osslsigncode zip
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -45,7 +45,20 @@ jobs:
         with:
           tool: cargo-xwin
 
+      - name: Prepare code signing
+        env:
+          PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_PFX_BASE64 }}
+        run: |
+          if [ -n "$PFX_BASE64" ]; then
+            echo "$PFX_BASE64" | base64 -d > "$RUNNER_TEMP/sign.pfx"
+            echo "SIGN_PFX=$RUNNER_TEMP/sign.pfx" >> "$GITHUB_ENV"
+          else
+            echo "::warning::WINDOWS_SIGNING_PFX_BASE64 is not set: the release is unsigned"
+          fi
+
       - name: Package
+        env:
+          SIGN_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
         run: tools/package.sh
 
       - name: Create GitHub release

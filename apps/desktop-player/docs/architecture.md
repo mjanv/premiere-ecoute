@@ -327,8 +327,8 @@ cargo xwin test  --target x86_64-pc-windows-msvc --release --no-run
 
 - **`cargo-xwin`** downloads the Windows SDK and C runtime headers/libs on first use and links with `lld-link`.
 - **apt packages** `clang lld llvm` provide `llvm-rc`, which GPUI's build script needs to compile its Windows resource file, and the C tooling for native dependencies.
-- **Running**: WSL can execute Windows binaries directly. Copy the `.exe` to `/mnt/c/Users/lanfe/` and run it. A running exe is locked by Windows, so use a new filename per build.
-- **Tests** are built with `--no-run`, then the produced test exe is copied to Windows and run with an optional filter, for example `spotify-tests.exe player::tests::parse_track`.
+- **Running**: WSL can execute Windows binaries directly. `tools/win-run.sh` is the cargo runner: it copies the exe to your Windows profile directory under a fixed name, stops the previous run (a running exe is locked by Windows) and executes it. With `CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUNNER` pointing at it, `cargo xwin run` and `cargo xwin test` build and run in one step, and `just player` rebuilds and restarts on every change.
+- **Tests** run on Windows through the same runner, with an optional filter: `just player-test player::tests::parse_track`.
 - **`--release` is required**: GPUI's debug builds compile shaders at runtime from source files on the build machine, which do not exist on the target.
 
 ### The shader workaround

@@ -5,7 +5,8 @@ set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 src=$root/vendor/gpui-pre-windows/src
 exe=$root/tools/hlslc/target/x86_64-pc-windows-msvc/release/hlslc.exe
-tmp=$(mktemp -d /mnt/c/Users/lanfe/AppData/Local/Temp/shaders.XXXX)
+source "$root/tools/lib.sh"
+tmp=$(mktemp -d "$(win_temp)/shaders.XXXX")
 trap 'rm -rf "$tmp"' EXIT
 
 inline() { sed -e "/#include \"alpha_correction.hlsl\"/{r $src/alpha_correction.hlsl" -e 'd}' "$1"; }

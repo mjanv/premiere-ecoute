@@ -7,7 +7,8 @@
 set -euo pipefail
 exe=$1; shift
 
-win_dir=${WIN_DIR:-/mnt/c/Users/$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')}
+source "$(dirname "$0")/lib.sh"
+win_dir=$(win_dir)
 case $(basename "$exe") in
   premiere-ecoute-player*) name=pep-dev ;;
   *) name=pep-tests ;;

@@ -1,6 +1,6 @@
 # Quality gates
 
-`.github/workflows/pr-desktop-player.yml` runs format, lint, tests, machete and deny on every pull request, natively on a Windows runner (no `cargo-xwin`, and the tests actually run). Run the gates below by hand from WSL before pushing. `cargo audit` is not in CI: it scans the whole `Cargo.lock`, including Linux-only crates the exe never links.
+`.github/workflows/pr-desktop-player.yml` runs format, lint, tests, machete and deny on every pull request, natively on a Windows runner (no `cargo-xwin`, and the tests actually run). `tools/check.sh` (`just player-check` from the monorepo root) runs the same gates from WSL, with the tests executed on Windows: run it before pushing. `cargo audit` is not in CI: it scans the whole `Cargo.lock`, including Linux-only crates the exe never links.
 
 ## Tools
 
@@ -32,4 +32,5 @@ cargo install --locked cargo-deny cargo-audit cargo-machete
 ## Known limits
 
 - **Coverage is not measured**: `cargo llvm-cov` builds for the Linux host and the code only compiles for Windows. It would need an instrumented Windows exe and `llvm-profdata` on the `.profraw` files.
-- `smtc.rs`, `volume.rs`, the capture and the window have no automated tests (refactoring.md D).
+- `smtc.rs`, `volume.rs` and `capture.rs` have tests for their decisions (which session is Spotify, the timeline arithmetic, the pass length), not for the Windows calls themselves: the capture needs Spotify playing (`--ignored`).
+- The window has no unit tests. `tools/smoke.sh` (`just player-smoke`) starts the release exe with `PLAYER_UI_PREVIEW=idle` and fails if it exits or opens no window. It needs a desktop session, so it is not in CI.

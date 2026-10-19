@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 # Launch a built exe on Windows, wait, capture its window to a PNG, kill it.
-# usage: tools/shot.sh <exe-on-windows C:\path> <out.png> [wait-seconds] [PLAYER_UI_PREVIEW value]
+# usage: tools/shot.sh <exe> <out.png> [wait-seconds] [PLAYER_UI_PREVIEW value]
+#   <exe> is a WSL path (copied to the Windows directory first, see tools/lib.sh) or a Windows path (C:\...) used as is.
 set -euo pipefail
+source "$(dirname "$0")/lib.sh"
 exe=$1; out=$2; wait=${3:-4}; preview=${4:-}
+if [[ $exe != [A-Za-z]:* ]]; then
+  cp "$exe" "$(win_dir)/ui-shot.exe"
+  exe=$(wslpath -w "$(win_dir)/ui-shot.exe")
+fi
 win_out=$(wslpath -w "$out")
 powershell.exe -NoProfile -Command "
 Add-Type -AssemblyName System.Drawing

@@ -24,3 +24,9 @@ fn captures_sound_from_spotify_while_it_plays() {
         "only silence was captured (is Spotify playing?): {loudest}"
     );
 }
+
+#[test]
+fn a_paused_pass_is_a_flat_line_of_exactly_one_pass() {
+    // 25 ms at 48 kHz.
+    assert_eq!(silent_pass_len(), 1_200);
+}
