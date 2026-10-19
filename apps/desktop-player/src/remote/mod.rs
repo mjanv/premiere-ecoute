@@ -54,7 +54,11 @@ impl Settings {
     /// Neither means the build's own server (`config::DEFAULT_SERVER`).
     pub fn configured() -> Result<Self, String> {
         let env = std::env::var("PLAYER_HUB_URL").ok();
-        let address = config::resolve(env.as_deref(), config::load().as_deref(), config::DEFAULT_SERVER);
+        let address = config::resolve(
+            env.as_deref(),
+            config::load().as_deref(),
+            config::DEFAULT_SERVER,
+        );
         Self::parse(&address)
     }
 

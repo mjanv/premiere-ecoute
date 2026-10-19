@@ -1,10 +1,10 @@
 # Desktop player hand-off
 
-Backend contract for the Rust desktop player (`../spotify`). This document supersedes sections 4, 5 and 13 of ADR 0001 wherever they differ. Branch: `feat/rust-player` of this repository.
+Backend contract for the Rust desktop player (`apps/desktop-player`). This document supersedes sections 4, 5 and 13 of ADR 0001 wherever they differ. Branch: `feat/rust-player` of this repository.
 
 ## Status
 
-Implemented and covered by backend tests: OAuth enrollment, the socket and channel, the playback state follow, command routing with Web API fallback, revocation. **Not yet exercised over a real WebSocket against a running server** (tests use `Phoenix.ChannelTest`): the first real run is the test described below.
+Implemented and covered by backend tests: OAuth enrollment, the socket and channel, the playback state follow, command routing with Web API fallback, revocation. Verified live over a real WebSocket on a dev server with the Rust player: join, snapshots, `play_uri`, `toggle_play_pause`, `next`, and the fall back to Web API polling on disconnect. Not verified live: refresh rotation, revoke from the account page, `replaced`.
 
 ## What changed from the ADR
 

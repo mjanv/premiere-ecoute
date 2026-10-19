@@ -481,5 +481,12 @@ fn run_pauses_a_commanded_track_in_its_last_second() {
     }
     drop(tx);
     handle.join().unwrap();
-    assert_eq!(log.lock().unwrap().iter().filter(|l| *l == "toggle").count(), 1);
+    assert_eq!(
+        log.lock()
+            .unwrap()
+            .iter()
+            .filter(|l| *l == "toggle")
+            .count(),
+        1
+    );
 }

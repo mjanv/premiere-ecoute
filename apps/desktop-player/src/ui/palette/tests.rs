@@ -72,7 +72,10 @@ fn the_gradient_end_is_readable_and_dark_too() {
         assert!(p.bg_end.luminance() < 0.05, "{t:?}");
         assert!(contrast(p.ink, p.bg_end) >= 10.0, "ink on end for {t:?}");
         assert!(contrast(p.muted, p.bg_end) >= 4.5, "muted on end for {t:?}");
-        assert!(contrast(p.accent, p.bg_end) >= 4.5, "accent on end for {t:?}");
+        assert!(
+            contrast(p.accent, p.bg_end) >= 4.5,
+            "accent on end for {t:?}"
+        );
     }
 }
 
