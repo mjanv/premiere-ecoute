@@ -1,6 +1,6 @@
 # Quality gates
 
-No CI yet (refactoring.md C5). Run these by hand from WSL before committing.
+`.github/workflows/pr-desktop-player.yml` runs format, lint, tests, machete and deny on every pull request, natively on a Windows runner (no `cargo-xwin`, and the tests actually run). Run the gates below by hand from WSL before pushing. `cargo audit` is not in CI: it scans the whole `Cargo.lock`, including Linux-only crates the exe never links.
 
 ## Tools
 
