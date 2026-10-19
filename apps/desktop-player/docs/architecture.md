@@ -253,7 +253,7 @@ A test that needs Spotify playing runs with `spotify-tests.exe --ignored capture
 
 ## The backend link
 
-`src/remote/` connects the player to the Première Écoute backend (contract: the backend repository's `docs/guides/desktop-player.md`, decisions: ADR 0001). The server is `PLAYER_HUB_URL` if set, else the address saved with the "Connect to server" button in the footer, else the build default (`config::DEFAULT_SERVER`): `https://premiere-ecoute.fr` for a normal build, `http://localhost:4000` for a build with `--features dev-server`.
+`src/remote/` connects the player to the Première Écoute backend (contract: `docs/guides/desktop-player.md` at the monorepo root, decisions: ADR 0001). The server is `PLAYER_HUB_URL` if set, else the address saved with the "Connect to server" button in the footer, else the build default (`config::DEFAULT_SERVER`): `https://premiere-ecoute.fr` for a normal build, `http://localhost:4000` for a build with `--features dev-server`.
 
 ```
 UI thread ── Request(Local) ───────────────▶ player worker (player::run)
