@@ -10,6 +10,8 @@ pub struct Tint {
     pub hue: f32,
     /// 0.0..=1.0
     pub saturation: f32,
+    /// Strongest hue at least 60 degrees from `hue`, when it has a real share of the cover.
+    pub second_hue: Option<f32>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -53,6 +55,9 @@ const MIN_SATURATION: f32 = 0.15;
 const MIN_VALUE: f32 = 0.15;
 /// Below this share of coloured pixels, the cover counts as grey.
 const MIN_COLOURED_SHARE: f32 = 0.02;
+/// The second colour must be this far (in bins) from the first, and weigh this share of it.
+const SECOND_MIN_BINS: usize = BINS / 6;
+const SECOND_MIN_SHARE: f32 = 0.06;
 
 /// Dominant tint of RGBA8 pixels: the hue bin with the most (saturation x value) weight.
 pub fn tint_from_rgba(pixels: &[u8]) -> Tint {
@@ -83,15 +88,25 @@ pub fn tint_from_rgba(pixels: &[u8]) -> Tint {
         return Tint {
             hue: 0.0,
             saturation: 0.0,
+            second_hue: None,
         };
     }
     let best = (0..BINS)
         .max_by(|&a, &b| weight[a].total_cmp(&weight[b]))
         .unwrap_or(0);
-    let hue = sin[best].atan2(cos[best]).to_degrees().rem_euclid(360.0);
+    let hue_of = |bin: usize| sin[bin].atan2(cos[bin]).to_degrees().rem_euclid(360.0);
+    let apart = |bin: usize| {
+        let d = bin.abs_diff(best);
+        d.min(BINS - d) >= SECOND_MIN_BINS
+    };
+    let second_hue = (0..BINS)
+        .filter(|&b| apart(b) && weight[b] >= SECOND_MIN_SHARE * weight[best])
+        .max_by(|&a, &b| weight[a].total_cmp(&weight[b]))
+        .map(hue_of);
     Tint {
-        hue,
+        hue: hue_of(best),
         saturation: (sat[best] / weight[best]).clamp(0.0, 1.0),
+        second_hue,
     }
 }
 

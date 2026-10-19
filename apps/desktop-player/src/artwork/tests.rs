@@ -59,3 +59,21 @@ fn from_bytes_rejects_garbage_and_decodes_a_real_png() {
     let art = Artwork::from_bytes(png).expect("valid png");
     assert!(near(art.tint.hue, 240.0));
 }
+
+#[test]
+fn a_distinct_second_colour_is_found() {
+    let mut px = solid([0, 200, 0], 70);
+    px.extend(solid([0, 0, 200], 30));
+    let t = tint_from_rgba(&px);
+    assert!(near(t.hue, 120.0));
+    assert!(near(t.second_hue.expect("second"), 240.0));
+}
+
+#[test]
+fn a_near_hue_or_a_tiny_area_is_not_a_second_colour() {
+    let mut px = solid([0, 200, 0], 70);
+    px.extend(solid([40, 200, 0], 30)); // same family
+    px.extend(solid([200, 0, 0], 1)); // too small
+    assert_eq!(tint_from_rgba(&px).second_hue, None);
+    assert_eq!(tint_from_rgba(&solid([0, 200, 0], 50)).second_hue, None);
+}

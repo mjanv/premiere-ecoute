@@ -137,6 +137,107 @@ pub fn autoplay_uri(uri: &str) -> String {
     format!("{uri}?autoplay=true")
 }
 
+/// How long before the end a commanded track is paused.
+const END_MARGIN: Duration = Duration::from_secs(1);
+/// How long a `play_uri` waits for its track to show up in the snapshots.
+const ARM_TTL: Duration = Duration::from_secs(20);
+
+/// The desktop app plays a commanded track inside its album and carries on with the next song
+/// (no URI variant avoids that, see docs/architecture.md). Pauses the track in its last second so
+/// a `play_uri` plays that one track only.
+#[derive(Default)]
+pub struct StopAtEnd {
+    state: Guard,
+}
+
+#[derive(Default)]
+enum Guard {
+    #[default]
+    Idle,
+    /// A `play_uri` was accepted; waiting for its track to start.
+    Armed {
+        before: (String, String, Duration),
+        position: Duration,
+        since: Instant,
+    },
+    /// Following the commanded track.
+    Following {
+        track: (String, String, Duration),
+        remaining: Duration,
+    },
+}
+
+fn track_key(s: &Snapshot) -> (String, String, Duration) {
+    (s.title.clone(), s.artist.clone(), s.length)
+}
+
+impl StopAtEnd {
+    /// Call after a `play_uri` was accepted; `before` is the last snapshot taken before it.
+    pub fn arm(&mut self, before: &Snapshot, now: Instant) {
+        self.state = Guard::Armed {
+            before: track_key(before),
+            position: before.position,
+            since: now,
+        };
+    }
+
+    /// Returns true when playback must be paused now.
+    pub fn observe(&mut self, snap: &Snapshot, now: Instant) -> bool {
+        let key = track_key(snap);
+        let playing = snap.playback == Playback::Playing && !snap.length.is_zero();
+        match &self.state {
+            Guard::Idle => false,
+            Guard::Armed {
+                before,
+                position,
+                since,
+            } => {
+                if now.saturating_duration_since(*since) > ARM_TTL {
+                    self.state = Guard::Idle;
+                    return false;
+                }
+                // A new track, or the same one restarted from near the start.
+                let started = playing
+                    && (key != *before || snap.position + Duration::from_secs(2) < *position);
+                if started {
+                    self.state = Guard::Following {
+                        track: key,
+                        remaining: Duration::MAX,
+                    };
+                    return self.observe(snap, now);
+                }
+                false
+            }
+            Guard::Following { track, .. } => {
+                if key != *track {
+                    self.state = Guard::Idle;
+                    return false;
+                }
+                let remaining = snap.length.saturating_sub(snap.position);
+                if playing && remaining <= END_MARGIN {
+                    self.state = Guard::Idle;
+                    return true;
+                }
+                self.state = Guard::Following {
+                    track: key,
+                    remaining: if playing { remaining } else { Duration::MAX },
+                };
+                false
+            }
+        }
+    }
+
+    /// How long until the track enters its last second, so the loop can wake up in time.
+    pub fn wake_in(&self) -> Option<Duration> {
+        match &self.state {
+            Guard::Following { remaining, .. } if *remaining != Duration::MAX => {
+                Some(remaining.saturating_sub(END_MARGIN))
+            }
+            _ => None,
+        }
+    }
+}
+
 pub trait Backend {
     fn snapshot(&mut self) -> Result<Snapshot, String>;
     fn toggle_play_pause(&mut self) -> Result<(), String>;
@@ -206,13 +307,20 @@ pub fn run(
     poll: Duration,
 ) {
     let mut notice: Option<(String, Instant)> = None;
+    let mut guard = StopAtEnd::default();
     loop {
         let mut snapshot = backend.snapshot().unwrap_or_else(Snapshot::failed);
+        if guard.observe(&snapshot, Instant::now())
+            && let Err(message) = backend.toggle_play_pause()
+        {
+            notice = Some((message, Instant::now()));
+        }
         notice = notice.filter(|(_, since)| since.elapsed() < NOTICE_HOLD);
         snapshot.notice = notice.as_ref().map(|(message, _)| message.clone());
         *lock(&shared) = snapshot;
 
-        match commands.recv_timeout(poll) {
+        let wait = guard.wake_in().map_or(poll, |w| w.min(poll));
+        match commands.recv_timeout(wait) {
             Ok(request) => {
                 if request.deadline.is_some_and(|d| Instant::now() >= d) {
                     if let Some(reply) = request.reply {
@@ -225,7 +333,13 @@ pub fn run(
                     Command::Next => backend.next(),
                     Command::Previous => backend.previous(),
                     Command::SetVolume(v) => backend.set_volume(v),
-                    Command::PlayUri(uri) => backend.play_uri(&uri),
+                    Command::PlayUri(uri) => {
+                        let started = backend.play_uri(&uri);
+                        if started.is_ok() {
+                            guard.arm(&lock(&shared), Instant::now());
+                        }
+                        started
+                    }
                 };
                 match request.reply {
                     Some(reply) => {

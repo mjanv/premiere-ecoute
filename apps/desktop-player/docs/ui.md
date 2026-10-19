@@ -14,11 +14,12 @@ A vertical card (default 400 by 840, minimum 360 by 660). From top to bottom: th
 
 ## Palette comes from the cover
 
-Every album gives the window a different look. `artwork.rs` takes the cover's dominant hue (a weighted hue histogram of a 32x32 thumbnail, ignoring dark and grey pixels). `ui/palette.rs` turns that tint into six colours:
+Every album gives the window a different look. `artwork.rs` takes the cover's dominant hue (a weighted hue histogram of a 32x32 thumbnail, ignoring dark and grey pixels), plus a second hue: the strongest bin at least 60 degrees away with at least 20% of the first's weight. `ui/palette.rs` turns that tint into seven colours:
 
 | Role | Use |
 |---|---|
-| `bg`, `surface` | window and cover placeholder, very dark and slightly tinted |
+| `bg`, `bg_end` | the window's top-to-bottom gradient: the cover's dominant hue to its second hue (a hue 50 degrees on when the cover has one colour), both very dark |
+| `surface` | cover placeholder, very dark and slightly tinted |
 | `ink`, `muted` | text, secondary text |
 | `accent` | the play button, lit ruler ticks, links that are alive |
 | `on_accent` | glyph on the accent |

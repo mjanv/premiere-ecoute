@@ -222,6 +222,8 @@ A plain `spotify:track:<id>` only opens the track's *album page*. Testing agains
 | `spotify:track:<id>:play`, `?play=true`, `--uri=…` | no change |
 | `spotify:track:<id>?autoplay=true` | starts playing |
 
+**The track stops at its end.** The desktop app plays a commanded track inside its album and carries on with the next song. Tested against a real client: `?autoplay=true`, `#0.01`, the `open.spotify.com` link and `&context=spotify:track:<id>` all continue with the album, and no other URI parameter is known to change that. So `player::StopAtEnd` pauses the track in its last second (`END_MARGIN`): `run` arms it when a `play_uri` succeeds, it locks on to the first track that starts afterwards (a different track, or the same one restarted), follows it, and asks for one `toggle_play_pause` when 1 s remain; the poll wakes up exactly then (`wake_in`). It lets go when the track changes (the user skipped) or when no new track shows up within 20 s. Playing a single track and then Spotify's own autoplay would need the Web API (`PUT /me/player/play` with `uris`) from the backend.
+
 The window has no track field any more: `play_uri` is called for commands from the backend. When it succeeds, `identity.rs` remembers the URI so the next track change reports it. This relies on undocumented client behaviour and may change with Spotify updates. The test `autoplay_uri_makes_the_desktop_app_start_the_track` pins the format; the behaviour itself can only be verified against a real client.
 
 ## The UI
