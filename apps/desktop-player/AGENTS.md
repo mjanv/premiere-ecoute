@@ -44,7 +44,7 @@ Tests live in dedicated files, never inline. A module `foo.rs` ends with `#[cfg(
 
 ## Non-obvious details
 
-- **Starting a track**: `spotify:track:<id>` alone only opens the album page. The backend appends `?autoplay=true` (verified against the desktop client; `:play`, `?play=true`, and `--uri=` did not work) and launches it via `rundll32 url.dll,FileProtocolHandler`.
+- **Starting a track**: `spotify:track:<id>` alone only opens the album page. The backend appends `?autoplay=true` (verified against the desktop client; `:play`, `?play=true`, and `--uri=` did not work) and launches it via `rundll32 url.dll,FileProtocolHandler`. The desktop app then continues with the album, which no URI variant avoids, so `player::StopAtEnd` pauses the track in its last second.
 - **SMTC position** is only the value at the last update; `current_position` adds elapsed time while playing.
 - **Cross-compiling GPUI shaders**: upstream `gpui-pre-windows`'s `build.rs` only runs `fxc` when the *host* is Windows. `vendor/gpui-pre-windows` is a copy with a patched `build.rs` that copies a pre-generated `shaders_bytes.rs`, wired via `[patch.crates-io]` in `Cargo.toml`. Regenerate it with `tools/gen-shaders.sh` after a GPUI version bump; it uses `tools/hlslc` (a tiny `D3DCompile` wrapper, built with `cargo xwin build` inside `tools/hlslc`) run through WSL interop, because no `fxc.exe` is available.
 - `windows` crate async calls are blocked on with the inherent `.join()`, not `.get()`.

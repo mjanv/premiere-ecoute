@@ -342,3 +342,144 @@ fn run_publishes_state_and_applies_commands() {
     drop(tx);
     handle.join().unwrap();
 }
+
+fn track(title: &str, position: u64, length: u64) -> Snapshot {
+    Snapshot {
+        title: title.into(),
+        artist: "Artist".into(),
+        position: Duration::from_secs(position),
+        length: Duration::from_secs(length),
+        ..playing()
+    }
+}
+
+fn armed(before: &Snapshot, t0: Instant) -> StopAtEnd {
+    let mut guard = StopAtEnd::default();
+    guard.arm(before, t0);
+    guard
+}
+
+#[test]
+fn a_commanded_track_is_paused_in_its_last_second() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.observe(&track("New", 1, 180), t0));
+    assert!(!guard.observe(&track("New", 150, 180), t0));
+    assert!(!guard.observe(&track("New", 178, 180), t0));
+    assert!(guard.observe(&track("New", 179, 180), t0));
+    // Once paused it does nothing more, even if the user resumes into the next song.
+    assert!(!guard.observe(&track("New", 179, 180), t0));
+}
+
+#[test]
+fn the_guard_follows_only_the_commanded_track() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.observe(&track("New", 1, 180), t0));
+    // The user skipped to another song: leave it alone.
+    assert!(!guard.observe(&track("Other", 179, 180), t0));
+    assert!(!guard.observe(&track("Other", 179, 180), t0));
+}
+
+#[test]
+fn the_old_track_is_never_paused_while_waiting_for_the_new_one() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 199, 200), t0);
+    assert!(!guard.observe(&track("Old", 199, 200), t0));
+    assert!(!guard.observe(&track("New", 1, 180), t0));
+}
+
+#[test]
+fn the_same_track_played_again_is_guarded_after_it_restarts() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Song", 170, 180), t0);
+    assert!(!guard.observe(&track("Song", 175, 180), t0));
+    assert!(!guard.observe(&track("Song", 2, 180), t0));
+    assert!(guard.observe(&track("Song", 179, 180), t0));
+}
+
+#[test]
+fn a_command_that_never_starts_a_track_expires() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    let late = t0 + Duration::from_secs(30);
+    assert!(!guard.observe(&track("Old", 100, 200), late));
+    assert!(!guard.observe(&track("New", 179, 180), late));
+}
+
+#[test]
+fn a_paused_or_unguarded_player_is_left_alone() {
+    let t0 = Instant::now();
+    assert!(!StopAtEnd::default().observe(&track("Song", 179, 180), t0));
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert!(!guard.observe(&track("New", 1, 180), t0));
+    let paused = Snapshot {
+        playback: Playback::Paused,
+        ..track("New", 179, 180)
+    };
+    assert!(!guard.observe(&paused, t0));
+}
+
+#[test]
+fn the_guard_asks_to_wake_at_the_last_second() {
+    let t0 = Instant::now();
+    let mut guard = armed(&track("Old", 100, 200), t0);
+    assert_eq!(guard.wake_in(), None);
+    guard.observe(&track("New", 170, 180), t0);
+    assert_eq!(guard.wake_in(), Some(Duration::from_secs(9)));
+}
+
+#[test]
+fn run_pauses_a_commanded_track_in_its_last_second() {
+    struct Ending {
+        log: Arc<Mutex<Vec<String>>>,
+        position: u64,
+        started: bool,
+    }
+    impl Backend for Ending {
+        fn snapshot(&mut self) -> Result<Snapshot, String> {
+            Ok(if self.started {
+                track("New", self.position, 180)
+            } else {
+                track("Old", 50, 100)
+            })
+        }
+        fn toggle_play_pause(&mut self) -> Result<(), String> {
+            self.log.lock().unwrap().push("toggle".into());
+            Ok(())
+        }
+        fn next(&mut self) -> Result<(), String> {
+            Ok(())
+        }
+        fn previous(&mut self) -> Result<(), String> {
+            Ok(())
+        }
+        fn set_volume(&mut self, _: f32) -> Result<(), String> {
+            Ok(())
+        }
+        fn play_uri(&mut self, _: &str) -> Result<(), String> {
+            self.started = true;
+            self.position = 179; // already in the last second at the next poll
+            Ok(())
+        }
+    }
+    let log = Arc::new(Mutex::new(Vec::new()));
+    let backend = Ending {
+        log: log.clone(),
+        position: 0,
+        started: false,
+    };
+    let shared = Arc::new(Mutex::new(Snapshot::default()));
+    let (tx, rx) = channel();
+    let handle = std::thread::spawn(move || run(backend, &rx, shared, Duration::from_millis(5)));
+    tx.send(Request::local(Command::PlayUri("spotify:track:x".into())))
+        .unwrap();
+    let deadline = Instant::now() + Duration::from_secs(2);
+    while !log.lock().unwrap().contains(&"toggle".to_string()) {
+        assert!(Instant::now() < deadline, "the track was not paused");
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    drop(tx);
+    handle.join().unwrap();
+    assert_eq!(log.lock().unwrap().iter().filter(|l| *l == "toggle").count(), 1);
+}

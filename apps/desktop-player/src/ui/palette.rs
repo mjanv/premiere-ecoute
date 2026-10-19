@@ -10,7 +10,7 @@ impl Rgb {
         ((self.0 as u32) << 16) | ((self.1 as u32) << 8) | self.2 as u32
     }
 
-    fn luminance(self) -> f32 {
+    pub(crate) fn luminance(self) -> f32 {
         let lin = |c: u8| {
             let c = c as f32 / 255.0;
             if c <= 0.03928 {
@@ -47,7 +47,10 @@ fn hsl(h: f32, s: f32, l: f32) -> Rgb {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Palette {
+    /// Top of the window gradient.
     pub bg: Rgb,
+    /// Bottom of the window gradient, from the cover's second colour.
+    pub bg_end: Rgb,
     pub surface: Rgb,
     pub ink: Rgb,
     pub muted: Rgb,
@@ -69,17 +72,29 @@ impl Palette {
         };
         // How much of the cover's colour reaches the surfaces; grey covers stay neutral.
         let k = (sat / 0.6).min(1.0);
-        let bg = hsl(hue, 0.04 + 0.30 * k, 0.085);
+        let bg = hsl(hue, 0.04 + 0.45 * k, 0.09);
+        // Second colour of the cover; a nearby hue when the cover has only one.
+        let end_hue = match tint {
+            Some(t) if sat > 0.05 => t.second_hue.unwrap_or(hue + 70.0),
+            _ => hue,
+        };
+        // As light as the hue allows: greens and yellows are brighter than blues at equal lightness.
+        let end_sat = 0.06 + 0.60 * k;
+        let mut end_l = 0.17;
+        while hsl(end_hue, end_sat, end_l).luminance() > 0.03 {
+            end_l -= 0.01;
+        }
+        let bg_end = hsl(end_hue, end_sat, end_l);
         let surface = hsl(hue, 0.04 + 0.26 * k, 0.135);
         let ink = hsl(hue, 0.10 + 0.20 * k, 0.94);
-        let muted = lift(hue, 0.08 + 0.12 * k, 0.66, bg, 4.5);
+        let muted = lift(hue, 0.08 + 0.12 * k, 0.66, bg_end, 4.5);
         let accent_sat = if sat > 0.05 {
             (0.55 + 0.4 * sat).min(0.95)
         } else {
             0.45
         };
         let accent_hue = if sat > 0.05 { hue } else { 38.0 }; // sodium amber on a grey cover
-        let accent = lift(accent_hue, accent_sat, 0.62, bg, 4.5);
+        let accent = lift(accent_hue, accent_sat, 0.62, bg_end, 4.5);
         let on_accent = if contrast(bg, accent) >= contrast(ink, accent) {
             bg
         } else {
@@ -87,6 +102,7 @@ impl Palette {
         };
         Self {
             bg,
+            bg_end,
             surface,
             ink,
             muted,

@@ -768,7 +768,11 @@ impl Render for NowPlaying {
             .size_full()
             .flex()
             .flex_col()
-            .bg(col(p.bg))
+            .bg(linear_gradient(
+                180.,
+                linear_color_stop(col(p.bg), 0.),
+                linear_color_stop(col(p.bg_end), 1.),
+            ))
             .text_color(col(p.ink))
             .font_family(MONO)
             .child(
