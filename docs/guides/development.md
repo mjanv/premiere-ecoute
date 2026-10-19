@@ -54,6 +54,14 @@ mix                  # Run the server
 Visit [http://localhost:4000](http://localhost:4000) to access the application.
 
 
+## 🌳 Parallel worktrees
+
+Run several checkouts side by side (one per feature or agent) with their own database and ports: see the [worktrees guide](worktrees.md).
+
+## 🖥️ Desktop player
+
+The Windows desktop player lives in `apps/desktop-player/` (Rust, GPUI). It is cross-compiled from WSL with `cargo-xwin`; plain `cargo build` does not work. See its [AGENTS.md](../../apps/desktop-player/AGENTS.md) for build, test and quality commands, and the [backend contract](desktop-player.md).
+
 ## 🔁 Application lifecycle
 
 ### Code quality

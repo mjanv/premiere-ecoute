@@ -12,7 +12,6 @@ defmodule PremiereEcouteMock.TwitchApi.PollSimulator do
   require Logger
 
   @interval_ms 5_000
-  @webhook_url "http://localhost:4000/webhooks/twitch"
 
   @doc """
   Starts the poll simulator.
@@ -121,7 +120,7 @@ defmodule PremiereEcouteMock.TwitchApi.PollSimulator do
 
     sig = signature(msg_id <> timestamp <> body)
 
-    case Req.post(@webhook_url,
+    case Req.post(PremiereEcouteMock.webhook_url(),
            body: body,
            headers: [
              {"content-type", "application/json"},

@@ -25,7 +25,7 @@ defmodule PremiereEcouteMock.Supervisor do
   def init(_args) do
     children = [
       {Registry, keys: :duplicate, name: PremiereEcouteMock.ChatRegistry},
-      {Bandit, plug: TwitchApi.Server, scheme: :http, port: 4001},
+      {Bandit, plug: TwitchApi.Server, scheme: :http, port: Application.fetch_env!(:premiere_ecoute, :ports)[:mock]},
       TwitchApi.Backend,
       TwitchApi.PollSimulator
     ]

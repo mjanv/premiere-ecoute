@@ -3,6 +3,23 @@
 
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 
+# Linked git worktree (e.g. `claude --worktree`): own database, ports and node name (mix.exs).
+if [ -f .git ]; then
+  if [ ! -e .wt-ready ]; then
+    echo "==> Setting up git worktree database..."
+    mix setup && touch .wt-ready
+  fi
+  # Point the project MCP servers (.mcp.json uses ${PE_PORT:-4000}) at this worktree's app.
+  # Same rules as PremiereEcoute.MixProject.worktree/0 in mix.exs and the .justfile.
+  name="${PE_WORKTREE:-$(basename "$PWD")}"
+  name=$(printf %s "$name" | tr 'A-Z' 'a-z' | sed -E 's/[^a-z0-9]+/_/g; s/^_+|_+$//g' | cut -c1-24)
+  if [ -n "${PE_PORT:-}" ]; then port="$PE_PORT"
+  else port=$((4000 + 10 * (16#$(printf %s "$name" | md5sum | cut -c1-8) % 90 + 1))); fi
+  settings=.claude/settings.local.json
+  [ -f "$settings" ] || echo '{}' >"$settings"
+  jq --arg port "$port" '.env.PE_PORT = $port' "$settings" >"$settings.tmp" && mv "$settings.tmp" "$settings"
+fi
+
 # Cloud-only: start PostgreSQL and prepare the test database
 if [ "$CLAUDE_CODE_REMOTE" = "true" ]; then
   echo "==> Loading Erlang/Elixir PATH..."

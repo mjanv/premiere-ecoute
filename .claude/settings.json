@@ -5,8 +5,17 @@
       "Bash(mix test:*)",
       "Bash(grep -E \"\\\\.ex$\")",
       "Bash(mix run --no-start -e ' *)",
-      "Bash(mix run *)"
+      "Bash(mix run *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
+  },
+  "worktree": {
+    "baseRef": "head",
+    "symlinkDirectories": ["deps", "assets/node_modules", ".claude/skills/browse/node_modules"]
   },
   "enableAllProjectMcpServers": true,
   "hooks": {

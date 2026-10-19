@@ -1,0 +1,54 @@
+name: PR - Desktop player CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/desktop-player/**'
+      - '.github/workflows/pr-desktop-player.yml'
+
+concurrency:
+  group: pr-desktop-player-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  desktop-player:
+    name: Desktop player
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: apps/desktop-player
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop-player
+
+      - name: Install cargo-deny and cargo-machete
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny,cargo-machete
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Lint
+        run: cargo clippy --release --all-targets --no-deps -- -D warnings
+
+      - name: Tests
+        run: cargo test --release
+
+      - name: Unused dependencies
+        run: cargo machete
+
+      - name: Advisories, licenses, bans, sources
+        run: cargo deny check

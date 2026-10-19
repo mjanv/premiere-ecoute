@@ -169,10 +169,63 @@ defmodule PremiereEcoute.MixProject do
     ]
   end
 
+  @doc """
+  Identity of the current checkout, so parallel git worktrees don't collide on database, ports or cookies.
+
+  Called from config.exs and runtime.exs (never in prod). `.justfile` and the SessionStart hook repeat the same
+  rules in shell: keep them in sync.
+
+  - The original checkout (where `.git` is a directory) has no name: ports 4000/4001/4002, no suffix.
+  - A linked worktree (where `.git` is a file) is named after its directory, or `PE_WORKTREE` if set. Its web
+    port is `4000 + 10 * slot`, with the slot taken from the first 4 bytes of the name's MD5, modulo 90 (1..90), then the mock Twitch server and
+    the test endpoint right after. Override the web port with `PE_PORT`.
+  """
+  def worktree do
+    name =
+      case System.get_env("PE_WORKTREE") do
+        value when value in [nil, ""] -> if File.regular?(Path.join(__DIR__, ".git")), do: Path.basename(__DIR__)
+        value -> value
+      end
+
+    name = name && name |> String.downcase() |> String.replace(~r/[^a-z0-9]+/, "_") |> String.trim("_") |> String.slice(0, 24)
+
+    web_port =
+      case System.get_env("PE_PORT") do
+        value when value in [nil, ""] -> 4000 + 10 * if(name, do: slot(name), else: 0)
+        value -> String.to_integer(value)
+      end
+
+    %{
+      name: name,
+      suffix: if(name, do: "_" <> name, else: ""),
+      ports: [web: web_port, mock: web_port + 1, test: web_port + 2]
+    }
+  end
+
+  defp slot(name) do
+    <<n::32, _::binary>> = :crypto.hash(:md5, name)
+    rem(n, 90) + 1
+  end
+
+  # A fresh git worktree has no _build, and compiling all dependencies takes ~5 minutes. Copy the original
+  # checkout's compiled _build instead (`cp -a` keeps the priv symlinks; the app itself recompiles in ~20s).
+  # First step of `mix setup`, which the SessionStart hook runs in a new worktree.
+  defp seed_build(_args) do
+    with true <- File.regular?(".git"),
+         false <- File.dir?("_build"),
+         {git_dir, 0} <- System.cmd("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"]),
+         source = Path.join(Path.dirname(String.trim(git_dir)), "_build"),
+         true <- File.dir?(source) do
+      System.cmd("cp", ["-a", source, "_build"])
+    end
+
+    :ok
+  end
+
   defp aliases do
     [
       # Setup
-      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
+      setup: [&seed_build/1, "deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["event_store.create", "ecto.create", "event_store.init", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["event_store.drop", "ecto.drop", "ecto.setup"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],

@@ -55,17 +55,25 @@ defmodule PremiereEcoute.Podcasts.Storage do
 
   @doc "Returns the immutable storage key for an episode's audio file."
   @spec audio_key(integer(), String.t()) :: String.t()
-  def audio_key(show_id, guid), do: "podcasts/#{show_id}/episodes/#{guid}.mp3"
+  def audio_key(show_id, guid), do: prefixed("podcasts/#{show_id}/episodes/#{guid}.mp3")
 
   @doc "Returns the storage key for a show's cover image."
   @spec cover_key(integer(), String.t()) :: String.t()
-  def cover_key(show_id, ext), do: "podcasts/#{show_id}/cover.#{normalize_ext(ext)}"
+  def cover_key(show_id, ext), do: prefixed("podcasts/#{show_id}/cover.#{normalize_ext(ext)}")
 
   @doc "Resolves a storage key to its public URL using the configured base URL."
   @spec public_url(String.t()) :: String.t()
   def public_url(key) do
     base = config(:public_base_url, "http://localhost:4000/uploads")
     String.trim_trailing(base, "/") <> "/" <> String.trim_leading(key, "/")
+  end
+
+  # Dev worktrees share one SeaweedFS but not one database, so their ids would overwrite each other's files.
+  defp prefixed(key) do
+    case config(:key_prefix, nil) do
+      nil -> key
+      prefix -> prefix <> "/" <> key
+    end
   end
 
   defp normalize_ext(ext), do: ext |> to_string() |> String.trim_leading(".") |> String.downcase()

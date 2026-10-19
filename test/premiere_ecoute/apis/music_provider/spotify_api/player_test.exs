@@ -462,6 +462,20 @@ defmodule PremiereEcoute.Apis.MusicProvider.SpotifyApi.PlayerTest do
 
       assert context_uri == "spotify:track:11dFghVXANMlKmJXsNCbNl"
     end
+
+    test "resumes the track of a playback state at its saved position, accepting 202", %{scope: scope} do
+      state = %PlaybackState{is_playing: true, progress_ms: 42_000, item: %{uri: "spotify:track:11dFghVXANMlKmJXsNCbNl"}}
+
+      ApiMock.expect(
+        SpotifyApi,
+        path: {:put, "/v1/me/player/play"},
+        headers: [{"authorization", "Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx"}],
+        request: "spotify_api/player/start_resume_playback/request_playback_state.json",
+        status: 202
+      )
+
+      assert {:ok, "spotify:track:11dFghVXANMlKmJXsNCbNl"} = SpotifyApi.start_resume_playback(scope, state)
+    end
   end
 
   describe "add_item_to_playback_queue/1" do

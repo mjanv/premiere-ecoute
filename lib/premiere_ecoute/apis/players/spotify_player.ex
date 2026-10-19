@@ -9,76 +9,103 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
 
   require Logger
 
-  alias PremiereEcoute.Accounts
   alias PremiereEcoute.Accounts.Scope
   alias PremiereEcoute.Accounts.User
-  alias PremiereEcoute.Apis
   alias PremiereEcoute.Apis.Players.PlaybackState
+  alias PremiereEcoute.Apis.Players.SpotifyPlayer.Api
+  alias PremiereEcoute.Apis.Players.SpotifyPlayer.Local
   alias PremiereEcoute.Presence
 
   @registry PremiereEcoute.Apis.Players.PlayerRegistry
-  @poll_interval 1_000
-  @poll_max_hours 9
-  @polls trunc(@poll_max_hours * 3_600_000 / @poll_interval)
-
-  @degraded_after 3
-  @down_after 20
-  @max_backoff_interval 5_000
+  @command_timeout 15_000
 
   @doc """
   Starts the Spotify player monitoring GenServer.
 
-  Launches a GenServer registered via Registry to monitor Spotify playback state for a specific user.
+  Launches a GenServer registered via Registry to monitor Spotify playback state for a specific user. Started as `{user_id, device: true}` for a desktop player that is about to attach, the player then does not call the Web API and waits for the device.
   """
-  @spec start_link(integer()) :: GenServer.on_start()
-  def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: {:via, Registry, {@registry, args}})
+  @spec start_link(integer() | {integer(), keyword()}) :: GenServer.on_start()
+  def start_link({user_id, _opts} = args) do
+    GenServer.start_link(__MODULE__, args, name: {:via, Registry, {@registry, user_id}})
   end
 
+  def start_link(user_id), do: start_link({user_id, []})
+
   @doc false
-  @spec init(integer()) :: {:ok, map()}
+  @spec init({integer(), keyword()}) :: {:ok, map()}
   @impl true
-  def init(args) do
-    scope = Scope.for_user(User.get(args))
-    data = %{scope: scope, state: PlaybackState.default(), polls: @polls, failures: 0}
+  def init({user_id, opts}) do
+    scope = Scope.for_user(User.get(user_id))
+    data = %{scope: scope, state: PlaybackState.default(), polls: Api.polls(), failures: 0}
 
     with {:ok, phx_ref} <- Presence.join(scope.user.id, :player),
          :ok <- PremiereEcoute.PubSub.subscribe("player:#{scope.user.id}"),
-         {:ok, state} <- Apis.spotify().get_playback_state(scope, PlaybackState.default()) do
-      Process.send_after(self(), :poll, @poll_interval)
-      {:ok, Map.merge(data, %{phx_ref: phx_ref, state: state})}
+         {:ok, state} <- initial_state(scope, opts) do
+      {:ok, start(Map.merge(data, %{phx_ref: phx_ref, state: state}), opts)}
     else
+      {:error, :not_connected} ->
+        {:ok, Api.idle(Map.put(data, :phx_ref, nil))}
+
       {:error, reason} ->
         data = register_failure(Map.put(data, :phx_ref, nil), reason)
-        Process.send_after(self(), :poll, poll_interval(data.failures))
-        {:ok, data}
+        {:ok, Api.schedule_poll(data, Api.poll_interval(data.failures))}
     end
   end
 
-  @impl true
-  def handle_info(:poll, %{scope: scope, polls: 0} = data) do
-    Logger.warning("Spotify player budget exhausted for user #{scope.user.id}, stopping normally")
-    {:stop, :normal, data}
-  end
+  # A desktop player is about to attach: the Web API is not needed to start.
+  defp initial_state(_scope, device: true), do: {:ok, PlaybackState.default()}
+  defp initial_state(scope, _opts), do: Api.fetch(scope, PlaybackState.default())
 
-  def handle_info(:poll, %{scope: scope, state: old_state, polls: polls} = data) do
-    with {:ok, scope} <- maybe_renew_token(scope),
-         {:ok, new_state} <- Apis.spotify().get_playback_state(scope, old_state),
-         {:ok, state, events} <- handle(old_state, %{new_state | status: :normal}),
-         :ok <- Enum.each(events, fn event -> publish(scope, event, state) end) do
-      Process.send_after(self(), :poll, @poll_interval)
-      {:noreply, %{data | scope: scope, state: state, polls: polls - 1, failures: 0}}
+  defp start(data, device: true), do: Api.idle(data)
+  defp start(data, _opts), do: Api.schedule_poll(data, Api.poll_interval())
+
+  @doc """
+  Runs a playback command through the user's local player when there is one, through the Web API otherwise.
+
+  `fallback` runs the command through the Web API. It is called when the user has no player, when the player is in Api mode, or when the local player did not execute the command (unsupported, rejected, expired). It is never called when the local player may have executed it: that case returns `{:error, :unknown}`, as a blind retry could double-toggle or skip two tracks.
+  """
+  @spec command(Scope.t(), term(), (-> result)) :: result | {:error, :unknown} when result: term()
+  def command(%Scope{user: %{id: user_id}}, command, fallback) when is_function(fallback, 0) do
+    with pid when is_pid(pid) <- player(user_id),
+         :api <- call(pid, command) do
+      fallback.()
     else
-      {:error, reason} ->
-        data = register_failure(%{data | scope: scope}, reason)
-        Process.send_after(self(), :poll, poll_interval(data.failures))
-        {:noreply, %{data | polls: polls - 1}}
+      nil -> fallback.()
+      result -> result
     end
   end
 
+  defp player(user_id) do
+    with pid when is_pid(pid) <- Process.whereis(@registry),
+         [{player, _value} | _] <- Registry.lookup(@registry, user_id) do
+      player
+    else
+      _ -> nil
+    end
+  end
+
+  defp call(pid, command) do
+    GenServer.call(pid, {:command, command}, @command_timeout)
+  catch
+    :exit, {:noproc, _} -> :api
+    :exit, _ -> {:error, :unknown}
+  end
+
+  @doc false
   @impl true
-  def handle_info(:no_overlay, data) do
-    {:stop, :normal, data}
+  def handle_call({:command, command}, from, data), do: mode(data).command(command, from, data)
+
+  @doc false
+  @impl true
+  def handle_info({:device_attached, pid, meta}, data), do: {:noreply, attach(data, pid, meta)}
+
+  def handle_info(message, data) do
+    case mode(data).handle_info(message, data) do
+      {:observe, new_state, data} -> observe(data, new_state)
+      {:noreply, data} -> {:noreply, data}
+      {:switch, :api, data} -> {:noreply, switch_to_api(data)}
+      {:stop, reason, data} -> {:stop, reason, data}
+    end
   end
 
   @impl true
@@ -92,44 +119,44 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
     :ok
   end
 
-  defp maybe_renew_token(old_scope) do
-    scope = Accounts.maybe_renew_token(old_scope, :spotify)
-    if at(scope) != at(old_scope), do: publish(scope, :token_refreshed, scope)
-    {:ok, scope}
-  end
-
-  defp at(%Scope{user: %{spotify: %{access_token: access_token}}}), do: access_token
-  defp at(_), do: nil
-
-  defp publish(scope, event, state) do
+  @doc false
+  @spec publish(Scope.t(), term(), term()) :: :ok | {:error, term()}
+  def publish(scope, event, state) do
     PremiereEcoute.PubSub.broadcast("playback:#{scope.user.id}", {:player, event, state})
   end
 
-  defp register_failure(%{state: state, failures: failures, scope: scope} = data, reason) do
-    failures = failures + 1
-    status = status_for(failures)
-    state = %{state | status: status}
-    interval = poll_interval(failures)
+  # The api mode is the default: it is the one the player starts in and the one it falls back to.
+  defp mode(%{mode: :local}), do: Local
+  defp mode(_data), do: Api
 
-    Logger.warning(
-      "Spotify player poll failed for user #{scope.user.id} (#{failures} consecutive failures, status: #{status}, retrying in #{interval}ms): #{inspect(reason)}"
-    )
-
-    if status != :normal, do: publish(scope, status, state)
-
-    %{data | state: state, failures: failures}
+  # A newly attached device replaces the previous one.
+  defp attach(%{mode: :local, device: %{pid: previous}} = data, pid, meta) do
+    send(previous, {:disconnect, :replaced})
+    Logger.info("Desktop player replaced user=#{data.scope.user.id}")
+    data |> Local.leave() |> Local.enter(pid, meta) |> log_attached(meta) |> publish_mode()
   end
 
-  defp status_for(failures) when failures >= @down_after, do: :down
-  defp status_for(failures) when failures >= @degraded_after, do: :degraded
-  defp status_for(_failures), do: :normal
+  defp attach(data, pid, meta), do: data |> Api.leave() |> Local.enter(pid, meta) |> log_attached(meta) |> publish_mode()
 
-  defp poll_interval(failures) when failures < @degraded_after, do: @poll_interval
-
-  defp poll_interval(failures) do
-    interval = @poll_interval * trunc(:math.pow(2, failures - @degraded_after + 1))
-    min(interval, @max_backoff_interval)
+  defp log_attached(data, meta) do
+    Logger.info("Desktop player attached user=#{data.scope.user.id} session=#{Map.get(meta, :session_id)}")
+    data
   end
+
+  defp switch_to_api(data), do: data |> Local.leave() |> Api.enter() |> publish_mode()
+
+  defp publish_mode(%{scope: scope, state: state, mode: mode} = data) do
+    publish(scope, {:mode, mode}, state)
+    data
+  end
+
+  defp observe(%{scope: scope, state: old_state} = data, new_state) do
+    {:ok, state, events} = handle(old_state, %{new_state | status: :normal})
+    Enum.each(events, fn event -> publish(scope, event, state) end)
+    {:noreply, %{data | state: state}}
+  end
+
+  defp register_failure(data, reason), do: Api.register_failure(data, reason)
 
   @doc """
   Calculates playback progress as a percentage.
@@ -138,7 +165,7 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer do
   """
   @spec progress(PlaybackState.t()) :: integer()
   def progress(%PlaybackState{item: %{duration_ms: duration_ms}, progress_ms: progress_ms}) do
-    if duration_ms - progress_ms <= @poll_interval do
+    if duration_ms - progress_ms <= Api.poll_interval() do
       100
     else
       trunc(100 * (progress_ms / (duration_ms + 1)))

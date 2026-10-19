@@ -22,11 +22,13 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
 
     case File.read(html_file_path) do
       {:ok, chat_html} ->
+        mock_port = Application.fetch_env!(:premiere_ecoute, :ports)[:mock]
+
         updated_html =
           String.replace(
             chat_html,
             "ws://localhost:4001/chat/ws",
-            "ws://localhost:4001/#{conn.params["broadcaster_id"]}/chat/ws"
+            "ws://localhost:#{mock_port}/#{conn.params["broadcaster_id"]}/chat/ws"
           )
 
         conn
@@ -400,7 +402,7 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
     broadcaster_user_id = event_data["broadcaster_user_id"] || "123456"
 
     Req.post(
-      "http://localhost:4000/webhooks/twitch",
+      PremiereEcouteMock.webhook_url(),
       json: %{
         "subscription" => %{
           "id" => UUID.uuid4(),
@@ -413,7 +415,7 @@ defmodule PremiereEcouteMock.TwitchApi.Server do
           },
           "transport" => %{
             "method" => "webhook",
-            "callback" => "http://localhost:4000/webhooks/twitch"
+            "callback" => PremiereEcouteMock.webhook_url()
           },
           "created_at" => DateTime.to_iso8601(DateTime.utc_now()),
           "cost" => 0

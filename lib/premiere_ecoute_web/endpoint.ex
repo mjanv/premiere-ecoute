@@ -9,7 +9,8 @@ defmodule PremiereEcouteWeb.Endpoint do
 
   @session_options [
     store: :cookie,
-    key: "_premiere_ecoute_key",
+    # Cookies are shared across ports on localhost, so a worktree gets its own cookie name.
+    key: "_premiere_ecoute_key" <> if(wt = Application.compile_env(:premiere_ecoute, :worktree), do: "_" <> wt, else: ""),
     signing_salt: "vXxdxPUJ",
     same_site: "Lax"
   ]
@@ -20,6 +21,11 @@ defmodule PremiereEcouteWeb.Endpoint do
 
   socket "/socket", PremiereEcouteWeb.UserSocket,
     websocket: true,
+    longpoll: false
+
+  # Desktop player. Native clients send no Origin header, authentication is the OAuth access token in `X-Access-Token`.
+  socket "/player", PremiereEcouteWeb.Player.Socket,
+    websocket: [connect_info: [:x_headers], max_frame_size: 65_536],
     longpoll: false
 
   plug Plug.Static,
