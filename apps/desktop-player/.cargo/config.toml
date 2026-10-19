@@ -1,3 +1,4 @@
 # Link the C runtime statically: the exe then runs on a clean Windows without the Visual C++ Redistributable.
+# /ignore:4099 hides "Cannot use debug info for libcmt.lib(...)": the runtime libs point to .pdb files Microsoft does not ship, and the warning repeats ~60 times per build.
 [target.x86_64-pc-windows-msvc]
-rustflags = ["-C", "target-feature=+crt-static"]
+rustflags = ["-C", "target-feature=+crt-static", "-C", "link-arg=/ignore:4099"]

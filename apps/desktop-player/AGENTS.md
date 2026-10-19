@@ -19,7 +19,9 @@ Dev build against a local backend: add `--features dev-server` to the build/test
 
 Package for users with `tools/package.sh` (installer + portable zip in `dist/`, see `docs/distribution.md`).
 
-Run a cross-compiled exe through WSL interop: copy it to `/mnt/c/Users/lanfe/` and execute it. A running exe is locked by Windows, so use a new filename per build (`premiere-ecoute-player-vN.exe`). Single test: run the test exe with a filter, e.g. `/mnt/c/Users/lanfe/spotify-tests.exe player::tests::parse_track`.
+Fastest dev loop: `just player` from the monorepo root runs the app on Windows against this checkout's server (port from `just info`) and rebuilds and restarts it on every change under `src/`, `assets/`, `build.rs` or `Cargo.toml` (needs `watchexec`: `cargo install --locked watchexec-cli`). Underneath, set `CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUNNER=$PWD/tools/win-run.sh`, then `cargo xwin run --target x86_64-pc-windows-msvc --release` (or `cargo xwin test ... -- <filter>`) copies the exe to Windows under a fixed name, stops the previous run and executes it. Set `WIN_DIR` to change the Windows directory (default: the Windows user's profile) and `PLAYER_HUB_URL=http://localhost:4000` to use a local backend with a plain build, no `dev-server` feature needed.
+
+Manual alternative, run a cross-compiled exe through WSL interop: copy it to `/mnt/c/Users/lanfe/` and execute it. A running exe is locked by Windows, so use a new filename per build (`premiere-ecoute-player-vN.exe`). Single test: run the test exe with a filter, e.g. `/mnt/c/Users/lanfe/spotify-tests.exe player::tests::parse_track`.
 
 Debug builds of GPUI compile shaders at runtime from source paths, so use `--release`.
 
