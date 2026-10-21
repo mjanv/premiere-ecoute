@@ -223,9 +223,24 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayer.Local do
 
   # The desktop app does not always start the track it is asked for (asked for the first track of an
   # album, it may go back to where the album was left): the position of an album track in its album
-  # lets the player check what plays, and navigate to the right track.
-  defp play_args(uri, %Track{track_number: number}) when is_integer(number) and number > 0, do: %{uri: uri, track_number: number}
-  defp play_args(uri, _target), do: %{uri: uri}
+  # lets the player check what plays, and navigate to the right track. The exact length lets it
+  # pause close to the end: the length the media session reports is rounded up by up to a second.
+  defp play_args(uri, target) do
+    %{uri: uri}
+    |> put_positive(:track_number, track_number(target))
+    |> put_positive(:duration_ms, duration_ms(target))
+  end
+
+  defp put_positive(args, key, value) when is_integer(value) and value > 0, do: Map.put(args, key, value)
+  defp put_positive(args, _key, _value), do: args
+
+  defp track_number(%Track{track_number: number}), do: number
+  defp track_number(_target), do: nil
+
+  defp duration_ms(%Track{duration_ms: duration}), do: duration
+  defp duration_ms(%Single{duration_ms: duration}), do: duration
+  defp duration_ms(%PlaylistTrack{duration_ms: duration}), do: duration
+  defp duration_ms(_target), do: nil
 
   defp track_uri(%Track{provider_ids: %{spotify: id}}) when is_binary(id), do: "spotify:track:" <> id
   defp track_uri(%Single{provider_ids: %{spotify: id}}) when is_binary(id), do: "spotify:track:" <> id

@@ -442,7 +442,8 @@ fn a_track_number_with_play_uri_is_carried_to_the_player() {
         command(json!({"uri": uri, "track_number": 4})),
         Command::PlayTrack {
             uri: uri.clone(),
-            number: 4
+            number: Some(4),
+            duration: None
         }
     );
     // A number that makes no sense is ignored: the command still plays, only unchecked.
@@ -456,6 +457,49 @@ fn a_track_number_with_play_uri_is_carried_to_the_player() {
     ] {
         assert_eq!(
             command(json!({"uri": uri, "track_number": bad})),
+            Command::PlayUri(uri.clone()),
+            "{bad}"
+        );
+    }
+}
+
+#[test]
+fn the_exact_length_with_play_uri_is_carried_to_the_player() {
+    let uri = format!("spotify:track:{ID}");
+    let command = |args: Value| match cmd(
+        json!({"id": "c1", "type": "play_uri", "args": args, "ttl_ms": 10000}),
+    ) {
+        Inbound::Command(Ok(c)) => c.command,
+        other => panic!("{other:?}"),
+    };
+    assert_eq!(
+        command(json!({"uri": uri, "track_number": 4, "duration_ms": 194_087})),
+        Command::PlayTrack {
+            uri: uri.clone(),
+            number: Some(4),
+            duration: Some(Duration::from_millis(194_087))
+        }
+    );
+    // A single or a playlist track has a length but no number.
+    assert_eq!(
+        command(json!({"uri": uri, "duration_ms": 210_000})),
+        Command::PlayTrack {
+            uri: uri.clone(),
+            number: None,
+            duration: Some(Duration::from_secs(210))
+        }
+    );
+    // A length that makes no sense is ignored: the track still plays, only paused a second early.
+    for bad in [
+        json!(0),
+        json!(-1),
+        json!("200"),
+        json!(100.5),
+        json!(86_400_000),
+        Value::Null,
+    ] {
+        assert_eq!(
+            command(json!({"uri": uri, "duration_ms": bad})),
             Command::PlayUri(uri.clone()),
             "{bad}"
         );

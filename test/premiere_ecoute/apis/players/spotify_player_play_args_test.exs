@@ -82,4 +82,28 @@ defmodule PremiereEcoute.Apis.Players.SpotifyPlayerPlayArgsTest do
       assert {:ok, :web_api} = SpotifyPlayer.command(scope, {:play, album}, fn -> {:ok, :web_api} end)
     end
   end
+
+  describe "the exact length of the track" do
+    test "is sent with an album track, so the player can pause close to its end", %{scope: scope, player: player} do
+      track = %Track{provider_ids: %{spotify: "6rqhFgbbKwnb9MLmUQDhG6"}, track_number: 4, duration_ms: 194_087}
+
+      assert %{uri: "spotify:track:6rqhFgbbKwnb9MLmUQDhG6", track_number: 4, duration_ms: 194_087} = play(scope, player, track)
+    end
+
+    test "is sent with a single and a playlist track too", %{scope: scope, player: player} do
+      single = %Single{provider_ids: %{spotify: "aaaaaaaaaaaaaaaaaaaaaa"}, duration_ms: 210_000}
+      playlist_track = %PlaylistTrack{provider: :spotify, track_id: "bbbbbbbbbbbbbbbbbbbbbb", duration_ms: 180_500}
+
+      assert play(scope, player, single) == %{uri: "spotify:track:aaaaaaaaaaaaaaaaaaaaaa", duration_ms: 210_000}
+      assert play(scope, player, playlist_track) == %{uri: "spotify:track:bbbbbbbbbbbbbbbbbbbbbb", duration_ms: 180_500}
+    end
+
+    test "is left out when it is not known or makes no sense", %{scope: scope, player: player} do
+      for duration <- [nil, 0, -5] do
+        track = %Track{provider_ids: %{spotify: "6rqhFgbbKwnb9MLmUQDhG6"}, track_number: 2, duration_ms: duration}
+
+        assert play(scope, player, track) == %{uri: "spotify:track:6rqhFgbbKwnb9MLmUQDhG6", track_number: 2}
+      end
+    end
+  end
 end

@@ -144,7 +144,7 @@ On join the backend starts the user's player process and switches it to local mo
 
 | `type` | `args` | Sent today by the backend |
 |---|---|---|
-| `play_uri` | `{"uri": "spotify:track:...", "track_number": 4}`: `track_number` is the position of an album track in its album, sent when known (not for singles and playlist tracks) | Yes (session track start, next, previous, resume) |
+| `play_uri` | `{"uri": "spotify:track:...", "track_number": 4, "duration_ms": 194087}`: `track_number` is the position of an album track in its album, sent when known (not for singles and playlist tracks); `duration_ms` is the exact length of the track, so the player can pause it 0.5 s before its end instead of 1 s | Yes (session track start, next, previous, resume) |
 | `toggle_play_pause` | `{}` | Yes, only to pause a session that is playing |
 | `next`, `previous` | `{}` | Only on demand through `SpotifyPlayer.command/3`; no session flow sends them |
 | `set_volume` | `{"volume": 0.0..1.0}` | Only on demand through `SpotifyPlayer.command/3` |

@@ -743,3 +743,81 @@ fn a_command_whose_track_is_the_one_playing_with_a_jittering_length_is_not_a_new
     assert!(!guard.observe(&jittered, t0 + Duration::from_secs(1)));
     assert_eq!(guard.describe(), "waiting for the commanded track");
 }
+
+fn long_track(title: &str, position_ms: u64, length_ms: u64) -> Snapshot {
+    Snapshot {
+        position: Duration::from_millis(position_ms),
+        length: Duration::from_millis(length_ms),
+        ..track(title, 0, 0)
+    }
+}
+
+#[test]
+fn with_the_exact_length_the_pause_comes_closer_to_the_end() {
+    // Spotify reports 181 s for a track that lasts 180.0 s. Without the exact length the pause
+    // waits for the last second of the reported one, with it for the last half second of the real.
+    let t0 = Instant::now();
+    let reported = |pos| long_track("New", pos, 181_000);
+    let mut rounded = armed(&track("Old", 100, 200), t0);
+    assert!(!rounded.observe(&reported(1_000), t0));
+    assert!(!rounded.observe(&reported(179_800), t0));
+    assert!(rounded.observe(&reported(180_000), t0));
+
+    let mut exact = StopAtEnd::default();
+    exact.arm_with_length(
+        &track("Old", 100, 200),
+        t0,
+        Some(Duration::from_millis(180_000)),
+    );
+    assert!(!exact.observe(&reported(1_000), t0));
+    assert!(!exact.observe(&reported(179_400), t0));
+    assert!(exact.observe(&reported(179_500), t0));
+}
+
+#[test]
+fn the_exact_length_makes_the_guard_wake_up_at_the_right_moment() {
+    let t0 = Instant::now();
+    let mut guard = StopAtEnd::default();
+    guard.arm_with_length(
+        &track("Old", 100, 200),
+        t0,
+        Some(Duration::from_millis(180_000)),
+    );
+    guard.observe(&long_track("New", 170_000, 181_000), t0);
+    assert_eq!(guard.wake_in(), Some(Duration::from_millis(9_500)));
+}
+
+#[test]
+fn an_exact_length_that_does_not_fit_the_track_that_plays_is_not_trusted() {
+    // The length is for the track that was asked for; another one plays (a wrong track resumed):
+    // its own length decides.
+    let t0 = Instant::now();
+    let mut guard = StopAtEnd::default();
+    guard.arm_with_length(
+        &track("Old", 100, 200),
+        t0,
+        Some(Duration::from_millis(60_000)),
+    );
+    assert!(!guard.observe(&long_track("Other", 1_000, 181_000), t0));
+    assert!(
+        !guard.observe(&long_track("Other", 59_600, 181_000), t0),
+        "60 s is not its length"
+    );
+    assert!(guard.observe(&long_track("Other", 180_000, 181_000), t0));
+}
+
+#[test]
+fn without_an_exact_length_nothing_changes() {
+    let t0 = Instant::now();
+    let mut plain = StopAtEnd::default();
+    plain.arm(&track("Old", 100, 200), t0);
+    let mut none = StopAtEnd::default();
+    none.arm_with_length(&track("Old", 100, 200), t0, None);
+    for snap in [
+        track("New", 1, 180),
+        track("New", 178, 180),
+        track("New", 179, 180),
+    ] {
+        assert_eq!(plain.observe(&snap, t0), none.observe(&snap, t0));
+    }
+}

@@ -38,16 +38,25 @@ use waveform::Scope;
 
 /// Development only, built with `--features dev-tools`: `PLAYER_DEV_PLAY=spotify:track:<id>` plays
 /// that track at start, as the backend would command it (`PLAYER_DEV_TRACK=<n>` adds its position
-/// in its album), and `PLAYER_DEV_SESSION=1` behaves as if the backend said a session is running.
+/// in its album, `PLAYER_DEV_DURATION_MS=<ms>` its exact length), and `PLAYER_DEV_SESSION=1` behaves as if the backend said a session is running.
 #[cfg(feature = "dev-tools")]
 fn dev_tools(commands: &std::sync::mpsc::Sender<player::Request>) {
     if let Ok(uri) = std::env::var("PLAYER_DEV_PLAY") {
         let number = std::env::var("PLAYER_DEV_TRACK")
             .ok()
             .and_then(|n| n.parse::<u32>().ok());
-        let command = match number {
-            Some(number) => player::Command::PlayTrack { uri, number },
-            None => player::Command::PlayUri(uri),
+        let duration = std::env::var("PLAYER_DEV_DURATION_MS")
+            .ok()
+            .and_then(|n| n.parse::<u64>().ok())
+            .map(std::time::Duration::from_millis);
+        let command = if number.is_some() || duration.is_some() {
+            player::Command::PlayTrack {
+                uri,
+                number,
+                duration,
+            }
+        } else {
+            player::Command::PlayUri(uri)
         };
         let _ = commands.send(player::Request::local(command));
     }

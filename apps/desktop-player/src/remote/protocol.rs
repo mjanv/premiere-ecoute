@@ -16,6 +16,8 @@ const HEARTBEAT_TOPIC: &str = "phoenix";
 const MAX_TEXT: usize = 512;
 /// No album has more tracks than this.
 const MAX_TRACK_NUMBER: u64 = 999;
+/// No track lasts more than 6 hours.
+const MAX_DURATION_MS: u64 = 6 * 3_600_000;
 const MAX_GENRES: usize = 10;
 const DEFAULT_TTL: Duration = Duration::from_millis(10_000);
 const MAX_TTL: Duration = Duration::from_secs(60);
@@ -323,11 +325,21 @@ fn command(p: &Value) -> Result<RemoteCommand, Rejection> {
                 .as_u64()
                 .filter(|n| (1..=MAX_TRACK_NUMBER).contains(n))
                 .and_then(|n| u32::try_from(n).ok());
+            // The exact length of the track, when the backend knows it. Ignored when it makes no sense.
+            let duration = args["duration_ms"]
+                .as_u64()
+                .filter(|ms| (1..=MAX_DURATION_MS).contains(ms))
+                .map(Duration::from_millis);
             (
                 "play_uri",
-                match number {
-                    Some(number) => Command::PlayTrack { uri, number },
-                    None => Command::PlayUri(uri),
+                if number.is_some() || duration.is_some() {
+                    Command::PlayTrack {
+                        uri,
+                        number,
+                        duration,
+                    }
+                } else {
+                    Command::PlayUri(uri)
                 },
             )
         }

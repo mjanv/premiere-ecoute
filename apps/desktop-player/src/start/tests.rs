@@ -782,7 +782,8 @@ fn run_answers_a_play_track_command_only_once_the_right_track_plays() {
     let (request, reply) = Request::remote(
         Command::PlayTrack {
             uri: "spotify:track:x".into(),
-            number: 1,
+            number: Some(1),
+            duration: None,
         },
         Duration::from_secs(30),
     );

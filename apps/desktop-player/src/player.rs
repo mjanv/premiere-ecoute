@@ -159,6 +159,12 @@ pub fn autoplay_uri(uri: &str) -> String {
 const END_MARGIN: Duration = Duration::from_secs(1);
 /// How long a `play_uri` waits for its track to show up in the snapshots.
 const ARM_TTL: Duration = Duration::from_secs(20);
+/// With the exact length of the track the pause is made this close to its end: only the latency
+/// of the pause and the jitter of the position are left (the 1 s above also covers a length
+/// rounded up by up to a second).
+const EXACT_MARGIN: Duration = Duration::from_millis(500);
+/// The exact length is only believed for a track whose reported length is this close to it.
+const EXACT_TRUST: Duration = Duration::from_secs(3);
 /// A followed identity that changes within this long of the lock, to a track near its start, was
 /// still settling and is not a skip.
 const RELOCK: Duration = Duration::from_secs(5);
@@ -177,6 +183,8 @@ pub struct StopAtEnd {
     state: Guard,
     /// The followed track was replaced just after its end, before the pause: see `take_missed`.
     missed: bool,
+    /// The exact length of the commanded track, when the backend sent it.
+    exact: Option<Duration>,
 }
 
 #[derive(Default)]
@@ -197,6 +205,8 @@ enum Guard {
         remaining: Duration,
         /// When it locked on: an identity that changes right after was a transitional one.
         since: Instant,
+        /// How close to the end the pause is made: the margin of the length that was used.
+        margin: Duration,
     },
 }
 
@@ -219,13 +229,29 @@ pub fn same_track(a: &Identity, b: &Identity) -> bool {
 
 impl StopAtEnd {
     /// Call after a `play_uri` was accepted; `before` is the last snapshot taken before it.
+    #[cfg(test)]
     pub fn arm(&mut self, before: &Snapshot, now: Instant) {
+        self.arm_with_length(before, now, None);
+    }
+
+    /// `arm`, with the exact length of the commanded track when it is known.
+    pub fn arm_with_length(&mut self, before: &Snapshot, now: Instant, exact: Option<Duration>) {
+        self.exact = exact;
         self.state = Guard::Armed {
             before: track_key(before),
             position: before.position,
             was_playing: before.playback == Playback::Playing,
             since: now,
         };
+    }
+
+    /// The length to count the end from and how close to it to pause: the exact one when it fits the
+    /// track that plays, the reported one (rounded up, hence the wider margin) otherwise.
+    fn end_of(&self, snap: &Snapshot) -> (Duration, Duration) {
+        match self.exact {
+            Some(exact) if exact.abs_diff(snap.length) <= EXACT_TRUST => (exact, EXACT_MARGIN),
+            _ => (snap.length, END_MARGIN),
+        }
     }
 
     /// Returns true when playback must be paused now.
@@ -258,6 +284,7 @@ impl StopAtEnd {
                         track: key,
                         remaining: Duration::MAX,
                         since: now,
+                        margin: END_MARGIN,
                     };
                     return self.observe(snap, now);
                 }
@@ -267,6 +294,7 @@ impl StopAtEnd {
                 track,
                 remaining,
                 since,
+                ..
             } => {
                 if !same_track(&key, track) {
                     // Spotify updates the title and the length one after the other: right after
@@ -282,6 +310,7 @@ impl StopAtEnd {
                             track: key,
                             remaining: Duration::MAX,
                             since: *since,
+                            margin: END_MARGIN,
                         };
                         return self.observe(snap, now);
                     }
@@ -290,15 +319,18 @@ impl StopAtEnd {
                     self.state = Guard::Idle;
                     return false;
                 }
-                let remaining = snap.length.saturating_sub(snap.position);
-                if playing && remaining <= END_MARGIN {
+                let since = *since;
+                let (length, margin) = self.end_of(snap);
+                let remaining = length.saturating_sub(snap.position);
+                if playing && remaining <= margin {
                     self.state = Guard::Idle;
                     return true;
                 }
                 self.state = Guard::Following {
                     track: key,
                     remaining: if playing { remaining } else { Duration::MAX },
-                    since: *since,
+                    since,
+                    margin,
                 };
                 false
             }
@@ -335,10 +367,12 @@ impl StopAtEnd {
         if !matches!(self.state, Guard::Idle) || !playing || remaining <= END_MARGIN {
             return false;
         }
+        self.exact = None;
         self.state = Guard::Following {
             track: track_key(snap),
             remaining,
             since: now,
+            margin: END_MARGIN,
         };
         true
     }
@@ -346,9 +380,9 @@ impl StopAtEnd {
     /// How long until the track enters its last second, so the loop can wake up in time.
     pub fn wake_in(&self) -> Option<Duration> {
         match &self.state {
-            Guard::Following { remaining, .. } if *remaining != Duration::MAX => {
-                Some(remaining.saturating_sub(END_MARGIN))
-            }
+            Guard::Following {
+                remaining, margin, ..
+            } if *remaining != Duration::MAX => Some(remaining.saturating_sub(*margin)),
             _ => None,
         }
     }
@@ -403,11 +437,14 @@ pub enum Command {
     Previous,
     SetVolume(f32),
     PlayUri(String),
-    /// `PlayUri` for an album track whose position in its album is known: the player checks that
-    /// this is the track that plays, and goes to it if not.
+    /// `PlayUri` for a track whose position in its album and/or exact length is known: the player
+    /// checks that this is the track that plays and goes to it if not, and pauses it close to its
+    /// real end.
     PlayTrack {
         uri: String,
-        number: u32,
+        number: Option<u32>,
+        /// The exact length, when the backend knows it: the media session rounds lengths up.
+        duration: Option<Duration>,
     },
 }
 
@@ -459,6 +496,7 @@ fn play(
     shared: &Mutex<Snapshot>,
     uri: &str,
     number: Option<u32>,
+    duration: Option<Duration>,
 ) -> Result<(), String> {
     let before = lock(shared).clone();
     // A new track: the end of the previous one is over.
@@ -482,8 +520,11 @@ fn play(
         backend.play_uri(uri)
     };
     if started.is_ok() {
-        guard.arm(&before, Instant::now());
-        crate::log::info(format!("play_uri {uri}: guard armed"));
+        guard.arm_with_length(&before, Instant::now(), duration);
+        crate::log::info(format!(
+            "play_uri {uri}: guard armed{}",
+            duration.map_or(String::new(), |d| format!(" (length {} ms)", d.as_millis()))
+        ));
     }
     started
 }
@@ -594,16 +635,27 @@ pub fn run_with(
                     Command::Next => backend.next(),
                     Command::Previous => backend.previous(),
                     Command::SetVolume(v) => backend.set_volume(v),
-                    Command::PlayUri(uri) => {
-                        play(&mut backend, &mut guard, &mut ending, &shared, &uri, None)
-                    }
-                    Command::PlayTrack { uri, number } => play(
+                    Command::PlayUri(uri) => play(
                         &mut backend,
                         &mut guard,
                         &mut ending,
                         &shared,
                         &uri,
-                        Some(number),
+                        None,
+                        None,
+                    ),
+                    Command::PlayTrack {
+                        uri,
+                        number,
+                        duration,
+                    } => play(
+                        &mut backend,
+                        &mut guard,
+                        &mut ending,
+                        &shared,
+                        &uri,
+                        number,
+                        duration,
                     ),
                 };
                 match request.reply {
